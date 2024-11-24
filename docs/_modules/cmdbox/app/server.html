@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html lang="jp" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cmdbox.app.server &#8212; cmdbox 2024/11/25 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=56c4699f" />
+    <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="../../../_static/documentation_options.js?v=7a0352e1"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for cmdbox.app.server</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">cmdbox.app</span> <span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">filer</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">options</span>
+<span class="kn">from</span> <span class="nn">cmdbox.app.commons</span> <span class="kn">import</span> <span class="n">redis_client</span>
+<span class="kn">from</span> <span class="nn">redis</span> <span class="kn">import</span> <span class="n">exceptions</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">redis</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+
+<div class="viewcode-block" id="Server">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.server.Server">[docs]</a>
+<span class="k">class</span> <span class="nc">Server</span><span class="p">(</span><span class="n">filer</span><span class="o">.</span><span class="n">Filer</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_host</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">redis_port</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">6379</span><span class="p">,</span> <span class="n">redis_password</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">svname</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;server&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Redisサーバーに接続し、クライアントからのコマンドを受信し実行する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data_dir (Path): データフォルダのパス</span>
+<span class="sd">            logger (logging): ロガー</span>
+<span class="sd">            redis_host (str): Redisホスト名, by default &quot;localhost&quot;</span>
+<span class="sd">            redis_port (int): Redisポート番号, by default 6379</span>
+<span class="sd">            redis_password (str): Redisパスワード, by default None</span>
+<span class="sd">            svname (str, optional): 推論サーバーのサービス名. by default &#39;server&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">svname</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Server name is invalid. &#39;-&#39; is not allowed. svname=</span><span class="si">{</span><span class="n">svname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_host</span> <span class="o">=</span> <span class="n">redis_host</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_port</span> <span class="o">=</span> <span class="n">redis_port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_password</span> <span class="o">=</span> <span class="n">redis_password</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">org_svname</span> <span class="o">=</span> <span class="n">svname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">svname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">svname</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">common</span><span class="o">.</span><span class="n">random_string</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_thread</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleaning_interval</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;server init parameter: data=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;server init parameter: redis_host=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_host</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;server init parameter: redis_port=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;server init parameter: redis_password=********&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;server init parameter: svname=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_server</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminate_server</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Server.start_server">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.server.Server.start_server">[docs]</a>
+    <span class="k">def</span> <span class="nf">start_server</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">retry_count</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">retry_interval</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        サーバー処理を開始する</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retry_count</span> <span class="o">=</span> <span class="n">retry_count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retry_interval</span> <span class="o">=</span> <span class="n">retry_interval</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;server start parameter: retry_count=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">retry_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;server start parameter: retry_interval=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">retry_interval</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span> <span class="o">=</span> <span class="n">redis_client</span><span class="o">.</span><span class="n">RedisClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_port</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_password</span><span class="p">,</span> <span class="n">svname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">check_server</span><span class="p">(</span><span class="n">find_svname</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">retry_count</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">retry_count</span><span class="p">,</span> <span class="n">retry_interval</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">retry_interval</span><span class="p">,</span> <span class="n">outstatus</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run_server</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Server.list_server">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.server.Server.list_server">[docs]</a>
+    <span class="k">def</span> <span class="nf">list_server</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        起動しているサーバーリストを取得する</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, List[Dict[str, Any]]]: サーバーのリスト</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span> <span class="o">=</span> <span class="n">redis_client</span><span class="o">.</span><span class="n">RedisClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_port</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_password</span><span class="p">,</span> <span class="n">svname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="p">)</span>
+        <span class="n">svlist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">list_server</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">svlist</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="s2">&quot;No server is running.&quot;</span><span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="n">svlist</span><span class="p">}</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_clean_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Redisサーバーに残っている停止済みのサーバーキーを削除する</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">hblist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span><span class="s2">&quot;hb-*&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">hb</span> <span class="ow">in</span> <span class="n">hblist</span><span class="p">:</span>
+            <span class="n">hb</span> <span class="o">=</span> <span class="n">hb</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hget</span><span class="p">(</span><span class="n">hb</span><span class="p">,</span> <span class="s1">&#39;ctime&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+            <span class="k">except</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">ResponseError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get ctime. </span><span class="si">{</span><span class="n">hb</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">tm</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">tm</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaning_interval</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">hb</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">hb</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;hb-&quot;</span><span class="p">,</span> <span class="s2">&quot;sv-&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_clean_reskey</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Redisサーバーに残っている停止済みのクライアントキーを削除する</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rlist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span><span class="s2">&quot;cl-*&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">reskey</span> <span class="ow">in</span> <span class="n">rlist</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">tm</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">reskey</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">tm</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaning_interval</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">reskey</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">reskey</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_run_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;start server. svname=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">ltime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">receive_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">sccess_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">warn_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">error_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hbname</span><span class="p">,</span> <span class="s1">&#39;receive_cnt&#39;</span><span class="p">,</span> <span class="n">receive_cnt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hbname</span><span class="p">,</span> <span class="s1">&#39;sccess_cnt&#39;</span><span class="p">,</span> <span class="n">sccess_cnt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hbname</span><span class="p">,</span> <span class="s1">&#39;warn_cnt&#39;</span><span class="p">,</span> <span class="n">warn_cnt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hbname</span><span class="p">,</span> <span class="s1">&#39;error_cnt&#39;</span><span class="p">,</span> <span class="n">error_cnt</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_publish</span><span class="p">(</span><span class="n">msg_str</span><span class="p">):</span>
+            <span class="c1"># 各サーバーにメッセージを配布する</span>
+            <span class="n">hblist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;hb-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">org_svname</span><span class="si">}</span><span class="s2">-*&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">hb</span> <span class="ow">in</span> <span class="n">hblist</span><span class="p">:</span>
+                <span class="n">hb</span> <span class="o">=</span> <span class="n">hb</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                <span class="n">sv</span> <span class="o">=</span> <span class="n">hb</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;hb-&quot;</span><span class="p">,</span> <span class="s2">&quot;sv-&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">sv</span><span class="p">,</span> <span class="n">msg_str</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># ブロッキングリストから要素を取り出す</span>
+                <span class="n">ctime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hbname</span><span class="p">,</span> <span class="s1">&#39;ctime&#39;</span><span class="p">,</span> <span class="n">ctime</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hbname</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;ready&#39;</span><span class="p">)</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">blpop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">svname</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ctime</span> <span class="o">-</span> <span class="n">ltime</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaning_interval</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_clean_server</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_clean_reskey</span><span class="p">()</span>
+                    <span class="n">ltime</span> <span class="o">=</span> <span class="n">ctime</span>
+                <span class="n">to_cluster</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># クラスター宛メッセージがあるか確認する</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">blpop</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sv-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">org_svname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="k">continue</span>
+                    <span class="n">to_cluster</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">msg_str</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">msg_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+                <span class="n">st</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">receive_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hbname</span><span class="p">,</span> <span class="s1">&#39;receive_cnt&#39;</span><span class="p">,</span> <span class="n">receive_cnt</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hbname</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;processing&#39;</span><span class="p">)</span>
+
+                <span class="n">svcmd_feature</span><span class="p">:</span><span class="n">feature</span><span class="o">.</span><span class="n">Feature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get_svcmd_feature</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">svcmd_feature</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">to_cluster</span> <span class="ow">and</span> <span class="n">svcmd_feature</span><span class="o">.</span><span class="n">is_cluster_redirect</span><span class="p">():</span>
+                        <span class="n">_publish</span><span class="p">(</span><span class="n">msg_str</span><span class="p">)</span>
+                        <span class="k">continue</span>
+                    <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;stop_server&#39;</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">st</span> <span class="o">=</span> <span class="n">svcmd_feature</span><span class="o">.</span><span class="n">svrun</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown command </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+
+                <span class="k">if</span> <span class="n">st</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">RESP_SCCESS</span><span class="p">:</span>
+                    <span class="n">sccess_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hbname</span><span class="p">,</span> <span class="s1">&#39;sccess_cnt&#39;</span><span class="p">,</span> <span class="n">sccess_cnt</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">st</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">:</span>
+                    <span class="n">warn_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hbname</span><span class="p">,</span> <span class="s1">&#39;warn_cnt&#39;</span><span class="p">,</span> <span class="n">warn_cnt</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">st</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">RESP_ERROR</span><span class="p">:</span>
+                    <span class="n">error_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hbname</span><span class="p">,</span> <span class="s1">&#39;error_cnt&#39;</span><span class="p">,</span> <span class="n">error_cnt</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hbname</span><span class="p">,</span> <span class="s1">&#39;ctime&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+            <span class="k">except</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">except</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connection to the server was lost. </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exec_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">check_server</span><span class="p">(</span><span class="n">find_svname</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">retry_count</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">retry_count</span><span class="p">,</span> <span class="n">retry_interval</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">retry_interval</span><span class="p">,</span> <span class="n">outstatus</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OSError. </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exec_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">pass</span>
+            <span class="k">except</span> <span class="ne">KeyboardInterrupt</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown error occurred. </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">break</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">svname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hbname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;stop server. svname=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">svname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Server.terminate_server">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.server.Server.terminate_server">[docs]</a>
+    <span class="k">def</span> <span class="nf">terminate_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        サーバー処理を終了する</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;terminate server.&quot;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">cmdbox</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">コマンドリファレンス</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">開発者向け情報</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/license.html">ライセンス</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;Copyright (c) 2023-2024 hamacom2004jp All Rights Reserved..
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

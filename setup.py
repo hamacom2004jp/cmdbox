@@ -16,20 +16,17 @@ VERSION = version.__version__
 PYTHON_REQUIRES = '>=3.8'
 INSTALL_REQUIRES = [
     'argcomplete',
-    'async_timeout',
-    'beaker',
-    'bottle',
-    'bottle_websocket',
     'cryptography',
-    'motpy',
-    'opencv-python',
+    'fastapi',
+    'gevent',
+    'itsdangerous',
     'numpy',
     'Pillow',
-    'pyyaml',
+    'python-multipart',
     'redis',
-    'requests',
+    'six',
     'tabulate',
-    'urllib3',
+    'uvicorn',
     'wheel',
 ]
 PACKAGES = [
@@ -38,14 +35,9 @@ PACKAGES = [
     'cmdbox.app.commons',
     'cmdbox.app.features.cli',
     'cmdbox.app.features.web',
-    'cmdbox.app.injections',
-    'cmdbox.app.postprocesses',
-    'cmdbox.app.predicts',
-    'cmdbox.app.trains',
-    'cmdbox.docker',
     'cmdbox.extensions'
 ]
-KEYWORDS = 'onnxruntime predict inference image ai model'
+KEYWORDS = 'cli restapi redis fastapi'
 CLASSIFIERS=[
     'Development Status :: 4 - Beta',
     'Intended Audience :: Developers',

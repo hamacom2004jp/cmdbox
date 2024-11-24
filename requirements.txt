@@ -15,5 +15,5 @@ sphinx_fontawesome
 sphinx-intl
 sphinx-sitemap
 tabulate
-hypercorn
+uvicorn
 wheel

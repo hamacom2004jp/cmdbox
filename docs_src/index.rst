@@ -1,4 +1,8 @@
-# cmdbox
+.. -*- coding: utf-8 -*-
+
+#######################################
+cmdbox
+#######################################
 
 - プラグイン機構を備えたコマンドラインアプリケーションです。
 - ドキュメントは[こちら](https://hamacom2004jp.github.io/cmdbox/)。
@@ -8,7 +12,15 @@
 - 実装したコマンドは、Webコンソールから実行できます。
 - リモートサーバーでコマンドを実行するために、必要なファイルをwebファイラーを使って転送できます。
 
+.. toctree::
+   :maxdepth: 2
 
-## Lisence
+   コマンドリファレンス <docs/command.rst>
+   開発者向け情報 <docs/developer.rst>
+   ライセンス <docs/license.rst>
 
-This project is licensed under the MIT License, see the LICENSE file for details
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`

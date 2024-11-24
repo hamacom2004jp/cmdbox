@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+
+<html lang="jp" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cmdbox.app.web &#8212; cmdbox 2024/11/25 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=56c4699f" />
+    <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="../../../_static/documentation_options.js?v=7a0352e1"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for cmdbox.app.web</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">cmdbox.app</span> <span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">options</span>
+<span class="kn">from</span> <span class="nn">cmdbox.app.commons</span> <span class="kn">import</span> <span class="n">module</span>
+<span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span>
+<span class="kn">from</span> <span class="nn">fastapi.responses</span> <span class="kn">import</span> <span class="n">RedirectResponse</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">starlette.middleware.sessions</span> <span class="kn">import</span> <span class="n">SessionMiddleware</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">ctypes</span>
+<span class="kn">import</span> <span class="nn">gevent</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">queue</span>
+<span class="kn">import</span> <span class="nn">signal</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">uvicorn</span>
+<span class="kn">import</span> <span class="nn">webbrowser</span>
+
+
+<div class="viewcode-block" id="Web">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web">[docs]</a>
+<span class="k">class</span> <span class="nc">Web</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">redis_host</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">redis_port</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">6379</span><span class="p">,</span> <span class="n">redis_password</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">svname</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;server&#39;</span><span class="p">,</span>
+                 <span class="n">client_only</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">gui_html</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filer_html</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">assets</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signin_html</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signin_file</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gui_mode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">web_features_packages</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        cmdboxクライアント側のwebapiサービス</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging): ロガー</span>
+<span class="sd">            data (Path): コマンドやパイプラインの設定ファイルを保存するディレクトリ</span>
+<span class="sd">            redis_host (str, optional): Redisサーバーのホスト名. Defaults to &quot;localhost&quot;.</span>
+<span class="sd">            redis_port (int, optional): Redisサーバーのポート番号. Defaults to 6379.</span>
+<span class="sd">            redis_password (str, optional): Redisサーバーのパスワード. Defaults to None.</span>
+<span class="sd">            svname (str, optional): 推論サーバーのサービス名. Defaults to &#39;server&#39;.</span>
+<span class="sd">            client_only (bool, optional): クライアントのみのサービスかどうか. Defaults to False.</span>
+<span class="sd">            gui_html (str, optional): GUIのHTMLファイル. Defaults to None.</span>
+<span class="sd">            filer_html (str, optional): ファイラーのHTMLファイル. Defaults to None.</span>
+<span class="sd">            anno_html (str, optional): アノテーション画面のHTMLファイル. Defaults to None.</span>
+<span class="sd">            assets (List[str], optional): 静的ファイルのリスト. Defaults to None.</span>
+<span class="sd">            signin_html (str, optional): ログイン画面のHTMLファイル. Defaults to None.</span>
+<span class="sd">            signin_file (str, optional): ログイン情報のファイル. Defaults to args.signin_file.</span>
+<span class="sd">            gui_mode (bool, optional): GUIモードかどうか. Defaults to False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_host</span> <span class="o">=</span> <span class="n">redis_host</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_port</span> <span class="o">=</span> <span class="n">redis_port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_password</span> <span class="o">=</span> <span class="n">redis_password</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">svname</span> <span class="o">=</span> <span class="n">svname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_only</span> <span class="o">=</span> <span class="n">client_only</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_only</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">svname</span> <span class="o">=</span> <span class="s1">&#39;client&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui_html</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">gui_html</span><span class="p">)</span> <span class="k">if</span> <span class="n">gui_html</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;web&#39;</span> <span class="o">/</span> <span class="s1">&#39;gui.html&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filer_html</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">filer_html</span><span class="p">)</span> <span class="k">if</span> <span class="n">filer_html</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;web&#39;</span> <span class="o">/</span> <span class="s1">&#39;filer.html&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assets</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">assets</span><span class="p">]</span> <span class="k">if</span> <span class="n">assets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signin_html</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">signin_html</span><span class="p">)</span> <span class="k">if</span> <span class="n">signin_html</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;web&#39;</span> <span class="o">/</span> <span class="s1">&#39;signin.html&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">signin_file</span><span class="p">)</span> <span class="k">if</span> <span class="n">signin_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui_html_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filer_html_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assets_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signin_html_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui_mode</span> <span class="o">=</span> <span class="n">gui_mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">web_features_packages</span> <span class="o">=</span> <span class="n">web_features_packages</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmds_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="s2">&quot;.cmds&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipes_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="s2">&quot;.pipes&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">static_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;web&#39;</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">mkdirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmds_path</span><span class="p">)</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">mkdirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipes_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_th</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_queue</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cb_queue</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">webcap_client</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web init parameter: data=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web init parameter: redis_host=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_host</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web init parameter: redis_port=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web init parameter: redis_password=********&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web init parameter: svname=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web init parameter: client_only=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">client_only</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web init parameter: gui_html=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">gui_html</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web init parameter: filer_html=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">filer_html</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web init parameter: assets=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">assets</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web init parameter: signin_html=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_html</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web init parameter: signin_file=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web init parameter: gui_mode=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">gui_mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web init parameter: web_features_packages=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">web_features_packages</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web init parameter: cmds_path=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cmds_path</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cmds_path</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web init parameter: pipes_path=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">pipes_path</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">pipes_path</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Web.enable_cors">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.enable_cors">[docs]</a>
+    <span class="k">def</span> <span class="nf">enable_cors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        CORSを有効にする</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            req (Request): リクエスト</span>
+<span class="sd">            res (Response): レスポンス</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">req</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="s1">&#39;Origin&#39;</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">return</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Access-Control-Allow-Origin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Origin&#39;</span><span class="p">]</span></div>
+
+
+    <span class="c1">#security = OAuth2PasswordBearer(tokenUrl=&quot;token&quot;)</span>
+
+<div class="viewcode-block" id="Web.check_signin">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.check_signin">[docs]</a>
+    <span class="k">def</span> <span class="nf">check_signin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        サインインをチェックする</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            req (Request): リクエスト</span>
+<span class="sd">            res (Response): レスポンス</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Response: サインインエラーの場合はリダイレクトレスポンス</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_cors</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;signin_file_data is None. (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;signin&#39;</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">:</span>
+            <span class="n">userid</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;userid&#39;</span><span class="p">]</span>
+            <span class="n">passwd</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;password&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">userid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="ow">and</span> <span class="n">passwd</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin_file_data</span><span class="p">[</span><span class="n">userid</span><span class="p">][</span><span class="s1">&#39;password&#39;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;signin error.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/signin</span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Web.start">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.start">[docs]</a>
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">allow_host</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">listen_port</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">8081</span><span class="p">,</span> <span class="n">session_timeout</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">outputs_key</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">[]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Webサーバを起動する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            allow_host (str, optional): 許可ホスト. Defaults to &quot;</span>
+<span class="sd">            listen_port (int, optional): リスンポート. Defaults to 8081.</span>
+<span class="sd">            session_timeout (int, optional): セッションタイムアウト. Defaults to 600.</span>
+<span class="sd">            outputs_key (list, optional): 出力キー. Defaults to [].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span> <span class="o">=</span> <span class="n">allow_host</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span> <span class="o">=</span> <span class="n">listen_port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputs_key</span> <span class="o">=</span> <span class="n">outputs_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_timeout</span> <span class="o">=</span> <span class="n">session_timeout</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: allow_host=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: listen_port=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: outputs_key=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">outputs_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: session_timeout=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">session_timeout</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">()</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">SessionMiddleware</span><span class="p">,</span> <span class="n">secret_key</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">random_string</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">toolmenu</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="c1"># webfeatureの読込み</span>
+        <span class="k">def</span> <span class="nf">wf_route</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">wf</span> <span class="ow">in</span> <span class="n">module</span><span class="o">.</span><span class="n">load_webfeatures</span><span class="p">(</span><span class="n">pk</span><span class="p">):</span>
+                <span class="n">wf</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">toolmenu</span> <span class="o">|=</span> <span class="n">wf</span><span class="o">.</span><span class="n">toolmenu</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+
+        <span class="n">wf_route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;cmdbox.app.features.web&quot;</span><span class="p">,</span> <span class="n">app</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">web_features_packages</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">web_features_package</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">web_features_packages</span><span class="p">:</span>
+                <span class="n">wf_route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web_features_package</span><span class="p">,</span> <span class="n">app</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">load_features_file</span><span class="p">(</span><span class="s1">&#39;web&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">pk</span><span class="p">:</span> <span class="n">wf_route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">app</span><span class="p">))</span>
+
+        <span class="c1"># 読込んだrouteの内容をログに出力</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">routes</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;loaded webfeature: </span><span class="si">{</span><span class="n">route</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1">#uvicorn.run(app, host=self.allow_host, port=self.listen_port, workers=2)</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">RaiseThread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">uvicorn</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="p">))</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui_mode</span><span class="p">:</span>
+                <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;http://localhost:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="si">}</span><span class="s1">/gui&#39;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;web.pid&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()))</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+                <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">th</span><span class="o">.</span><span class="n">raise_exception</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+            <span class="n">th</span><span class="o">.</span><span class="n">raise_exception</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Web.stop">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.stop">[docs]</a>
+    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Webサーバを停止する</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;web.pid&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">pid</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">pid</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pid</span><span class="p">),</span> <span class="n">signal</span><span class="o">.</span><span class="n">CTRL_C_EVENT</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stop bottle web. allow_host=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="si">}</span><span class="s2"> listen_port=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;pid is empty.&quot;</span><span class="p">)</span>
+            <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;web.pid&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exit web. allow_host=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="si">}</span><span class="s2"> listen_port=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="RaiseThread">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.RaiseThread">[docs]</a>
+<span class="k">class</span> <span class="nc">RaiseThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_id_and_run</span>
+
+<div class="viewcode-block" id="RaiseThread.set_id_and_run">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.RaiseThread.set_id_and_run">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_id_and_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">get_native_id</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="RaiseThread.get_id">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.RaiseThread.get_id">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span></div>
+
+        
+<div class="viewcode-block" id="RaiseThread.raise_exception">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.RaiseThread.raise_exception">[docs]</a>
+    <span class="k">def</span> <span class="nf">raise_exception</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">pythonapi</span><span class="o">.</span><span class="n">PyThreadState_SetAsyncExc</span><span class="p">(</span>
+            <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_id</span><span class="p">()),</span> 
+            <span class="n">ctypes</span><span class="o">.</span><span class="n">py_object</span><span class="p">(</span><span class="ne">SystemExit</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">res</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">ctypes</span><span class="o">.</span><span class="n">pythonapi</span><span class="o">.</span><span class="n">PyThreadState_SetAsyncExc</span><span class="p">(</span>
+                <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_id</span><span class="p">()),</span> 
+                <span class="mi">0</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Failure in raising exception&#39;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">cmdbox</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">コマンドリファレンス</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">開発者向け情報</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/license.html">ライセンス</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;Copyright (c) 2023-2024 hamacom2004jp All Rights Reserved..
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
