@@ -1,0 +1,63 @@
+{
+    // IntelliSense を使用して利用可能な属性を学べます。
+    // 既存の属性の説明をホバーして表示します。
+    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.0.1",
+    "configurations": [
+        {
+            "name": "Python: cmdbox server",
+            "type": "python",
+            "request": "launch",
+            "args": ["-m","server","-c","start","-f","--retry_count","3","--debug"],
+            "module": "cmdbox",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: cmdbox gui",
+            "type": "python",
+            "request": "launch",
+            "args": ["-m","gui","-c","start","-f"],
+            "module": "cmdbox",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: cmdbox web",
+            "type": "python",
+            "request": "launch",
+            "args": ["-m","web","-c","start","--debug"],//"--signin_file",".samples/user_list.txt","--client_only", "--filer_html", "filer2.html", "--assets", "README.md", "--assets", "setup.py"
+            //"args": ["--version"],
+            "module": "cmdbox",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: cmdbox webcap",
+            "type": "python",
+            "request": "launch",
+            "args": ["-m","web","-c","webcap","--listen_port", "8082",
+                     "--image_type", "capture", "--capture_count", "1", "--capture_frame_width", "1920", "--capture_frame_height", "1080", "--capture_fps", "5"],
+            "module": "cmdbox",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: gentest",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "cmdbox/tools/gentest.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH":"${workspaceFolder}", // 追加
+            }
+        }
+        
+    ]
+}

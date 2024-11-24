@@ -1,0 +1,466 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="assets/cmdbox/favicon.ico">
+    <title>cmdbox</title>
+    <style type="text/css">
+    .card-hover:hover {
+        box-shadow: 0 0 8px gray;
+        cursor: pointer;
+    }
+    </style>
+</head>
+<body lang="ja" class="overflow-hidden p-2">
+    <!-- ナビゲーションバー -->
+    <nav class="navbar navbar-expand-sm fixed-top p-2">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">cmdbox</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="fileMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            File
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="fileMenuLink">
+                            <li><a class="dropdown-item" href="#" onclick="$(`.cmd_add`).click();">New Command</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="$(`.pipe_add`).click();">New Pipeline</a></li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick="open_output_json_func(`open_output_json_path`)">Open output_json</a>
+                                <input type="hidden" id="open_output_json_path" value=""/>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick="open_capture_func(`open_capture_path`)">Open capture</a>
+                                <input type="hidden" id="open_capture_path" value=""/>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="toolMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Tool
+                        </a>
+                        <ul class="dropdown-menu toolmenu" aria-labelledby="toolMenuLink"></ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="viewMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            View
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="cmdbox.change_dark_mode();">Change Dark Mode</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="$(`#console_modal`).modal(`show`);">Console log</a></li>
+                        </ul>
+                    </li>
+                    
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="aboutMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            About
+                        </a>
+                        <ul class="dropdown-menu about-menu" aria-labelledby="aboutMenuLink">
+                            <li><a class="dropdown-item" href="#" onclick="$(`#versions_modal`).modal(`show`);">Versions</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div id="main_container" class="container-fluid overflow-auto" style="margin-top:66px;height:calc(100vh - 120px);">
+        <!-- コマンドリスト -->
+        <h2 class="pb-2 border-bottom">
+            Commands : 
+            <input id="cmd_kwd" name="cmd_kwd" type="text" class="form-control d-inline-block" style="width:200px;" placeholder="Search title">
+        </h2>
+        <div id="cmd_items" class="row">
+        </div>
+        <div class="d-none">
+            <div id="cmd_add">
+                <div class="col-4 p-1">
+                    <div class="card card-hover cmd_card cmd_add">
+                        <div class="card-body">
+                            <h4 class="card-title text-center">[ + ]</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="cmd_template">
+                <div class="col-4 p-1">
+                    <div class="card card-hover cmd_card">
+                        <div class="card-body">
+                            <h5 class="cmd_title card-title">Card title</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">mode:<span class="cmd_mode"></span>, cmd:<span class="cmd_cmd"></span></h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- パイプラインリスト -->
+        <h2 class="pb-2 border-bottom">
+            Pipeline : 
+            <input id="pipe_kwd" name="pipe_kwd" type="text" class="form-control d-inline-block" style="width:200px;" placeholder="Search title">
+        </h2>
+        <div id="pipe_items" class="row">
+        </div>
+        <div class="d-none">
+            <div id="pipe_add">
+                <div class="col-4 p-1">
+                    <div class="card card-hover pipe_card pipe_add">
+                        <div class="card-body">
+                            <h4 class="card-title text-center">[ + ]</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="pipe_template">
+                <div class="col-4 p-1">
+                    <div class="card card-hover pipe_card">
+                        <div class="card-body">
+                            <h5 class="pipe_title card-title">Pipeline title</h5>
+                            <p class="card-subtitle mb-2 text-muted"><span class="pipe_desc"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- コマンドモーダル -->
+    <div id="cmd_modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="cmd_form" class="modal-content novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="btn btn_window_stack">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
+                            <path d="M4.5 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1ZM6 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
+                            <path d="M12 1a2 2 0 0 1 2 2 2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h10ZM2 12V5a2 2 0 0 1 2-2h9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm1-4v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8H3Zm12-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2h12Z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn_window">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window" viewBox="0 0 16 16">
+                            <path d="M2.5 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1 .5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                            <path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm13 2v2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zM2 14a1 1 0 0 1-1-1V6h14v7a1 1 0 0 1-1 1H2z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row row_content_common">
+                        <div class="col-12 mb-3">
+                            <div class="input-group">
+                                <label class="input-group-text text-decoration-underline">
+                                    <span class="text-danger">*</span>
+                                    title
+                                </label>
+                                <input name="title" type="text" class="form-control" param_data_type="str" param_data_multi="false" required>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="input-group">
+                                <label class="mode_label input-group-text text-decoration-underline">
+                                    <span class="text-danger">*</span>
+                                    mode
+                                </label>
+                                <select name="mode" class="form-select form-select" param_data_type="str" param_data_multi="false" required>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="input-group">
+                                <span class="cmd_label input-group-text text-decoration-underline">
+                                    <span class="text-danger">*</span>
+                                    cmd
+                                </span>
+                                <select name="cmd" class="form-select form-select" param_data_type="str" param_data_multi="false" required>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row d-none row_content_template_str">
+                        <div class="col-6 mb-3">
+                            <div class="input-group">
+                                <label class="input-group-text row_content_template_title">title</label>
+                                <input type="text" class="form-control row_content_template_input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row d-none row_content_template_choice">
+                        <div class="col-6 mb-3">
+                            <div class="input-group">
+                                <label class="input-group-text row_content_template_title">title</label>
+                                <select class="form-select form-select row_content_template_select">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row row_content">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="cmd_raw" type="button" class="btn btn-secondary">Raw</button>
+                    <button id="cmd_save" type="button" class="btn btn-success">Save</button>
+                    <button id="cmd_del" type="button" class="btn btn-danger">Delete</button>
+                    <button id="cmd_exec" type="button" class="btn btn-primary">Execute</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- パイプラインモーダル -->
+    <div id="pipe_modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="pipe_form" class="modal-content novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="btn btn_window_stack">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
+                            <path d="M4.5 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1ZM6 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
+                            <path d="M12 1a2 2 0 0 1 2 2 2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h10ZM2 12V5a2 2 0 0 1 2-2h9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm1-4v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8H3Zm12-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2h12Z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn_window">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window" viewBox="0 0 16 16">
+                            <path d="M2.5 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1 .5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                            <path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm13 2v2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zM2 14a1 1 0 0 1-1-1V6h14v7a1 1 0 0 1-1 1H2z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row row_content_common">
+                        <div class="col-6 mb-3">
+                            <div class="input-group">
+                                <label class="input-group-text text-decoration-underline">
+                                    <span class="text-danger">*</span>
+                                    title
+                                </label>
+                                <input name="title" type="text" class="form-control" param_data_type="str" param_data_multi="false" required>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="input-group">
+                                <label class="input-group-text text-decoration-underline">
+                                    description
+                                </label>
+                                <input name="description" type="text" class="form-control" param_data_type="str" param_data_multi="false"/>
+                            </div>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <ol class="list-group list-group-numbered row_content"></ol>
+                        </div>
+                    </div>
+                    <div class="row d-none cmd_select_template">
+                        <li class="list-group-item d-flex justify-content-between align-items-start cmd_select_item">
+                            <div class="input-group ms-2">
+                                <select name="pipe_cmd" class="form-select form-select d-inline-block" param_data_type="str" param_data_multi="true">
+                                </select>
+                                <button type="button" class="btn btn-danger del_buton">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                    </svg>
+                                </button>
+                                <button type="button" class="btn btn-success add_buton">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </li>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="pipe_raw" type="button" class="btn btn-secondary">Raw</button>
+                    <button id="pipe_save" type="button" class="btn btn-success">Save</button>
+                    <button id="pipe_del" type="button" class="btn btn-danger">Delete</button>
+                    <button id="pipe_exec" type="button" class="btn btn-primary">Execute</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- 結果モーダル -->
+    <div id="result_modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="result_form" class="modal-content novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="btn btn_window_stack">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
+                            <path d="M4.5 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1ZM6 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
+                            <path d="M12 1a2 2 0 0 1 2 2 2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h10ZM2 12V5a2 2 0 0 1 2-2h9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm1-4v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8H3Zm12-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2h12Z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn_window">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window" viewBox="0 0 16 16">
+                            <path d="M2.5 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1 .5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                            <path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm13 2v2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zM2 14a1 1 0 0 1-1-1V6h14v7a1 1 0 0 1-1 1H2z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>
+                </div>
+                <div class="modal-body overflow-auto"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- ファイラーモーダル -->
+    <div id="filer_modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="result_form" class="modal-content novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title text-nowrap">Modal title</h5>
+                    <div class="input-group p-1">
+                        <button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Current</button>'
+                        <input name="filer_host" type="hidden" class="filer_host">
+                        <input name="filer_port" type="hidden" class="filer_port">
+                        <input name="filer_password" type="hidden" class="filer_password">
+                        <input name="filer_svname" type="hidden" class="filer_svname">
+                        <input name="filer_scope" type="hidden" class="filer_scope">
+                        <input name="filer_client_data" type="hidden" class="filer_client_data">
+                        <ul class="dropdown-menu filer_server"></ul>
+                        <input type="text" class="form-control filer_address" aria-describedby="button-addon2">
+                        <button class="btn btn-outline-secondary filer_address_bot" type="button" id="button-addon2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <button type="button" class="btn btn_window_stack">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
+                            <path d="M4.5 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1ZM6 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
+                            <path d="M12 1a2 2 0 0 1 2 2 2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h10ZM2 12V5a2 2 0 0 1 2-2h9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm1-4v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8H3Zm12-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2h12Z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn_window">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window" viewBox="0 0 16 16">
+                            <path d="M2.5 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1 .5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                            <path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm13 2v2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zM2 14a1 1 0 0 1-1-1V6h14v7a1 1 0 0 1-1 1H2z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>
+                </div>
+                <div class="modal-body row">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- consoleモーダル -->
+    <div id="console_modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="console_form" class="modal-content novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title">Console log</h5>
+                    <button type="button" class="btn btn_window_stack">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
+                            <path d="M4.5 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1ZM6 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
+                            <path d="M12 1a2 2 0 0 1 2 2 2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h10ZM2 12V5a2 2 0 0 1 2-2h9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm1-4v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8H3Zm12-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2h12Z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn_window">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window" viewBox="0 0 16 16">
+                            <path d="M2.5 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1 .5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                            <path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm13 2v2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zM2 14a1 1 0 0 1-1-1V6h14v7a1 1 0 0 1-1 1H2z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea id="console_modal_log" class="form-control overflow-auto w-100" rows="10"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="$(`#console_modal_log`).val(``);">Clear</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- versionsモーダル -->
+    <div id="versions_modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="console_form" class="modal-content novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <!--img src="assets/cmdbox/icon.png" class="me-2" height="30" width="30"/-->
+                        Versions
+                    </h5>
+                    <button type="button" class="btn btn_window_stack">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
+                            <path d="M4.5 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1ZM6 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
+                            <path d="M12 1a2 2 0 0 1 2 2 2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h10ZM2 12V5a2 2 0 0 1 2-2h9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm1-4v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8H3Zm12-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2h12Z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn_window">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window" viewBox="0 0 16 16">
+                            <path d="M2.5 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1 .5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                            <path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm13 2v2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zM2 14a1 1 0 0 1-1-1V6h14v7a1 1 0 0 1-1 1H2z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="versions_cmdbox-tab" data-bs-toggle="tab" data-bs-target="#versions_cmdbox" type="button" role="tab" aria-controls="versions_cmdbox" aria-selected="true">
+                                cmdbox
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="versions_used-tab" data-bs-toggle="tab" data-bs-target="#versions_used" type="button" role="tab" aria-controls="versions_used" aria-selected="false">
+                                Used software
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="versions_cmdbox" role="tabpanel" aria-labelledby="versions_cmdbox-tab">
+                            versions_cmdbox
+                        </div>
+                        <div class="tab-pane fade" id="versions_used" role="tabpanel" aria-labelledby="versions_used-tab">
+                            versions_used
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- ローディングマスク -->
+    <div id="loading" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(0, 0, 0, 0.3);z-index:10000;">
+        <div class="text-center position-absolute top-50 start-50 w-100 translate-middle">
+            <div class="spinner-border text-light" role="status">
+                <span class="sr-only"></span>
+            </div>
+            <div>
+                <button type="button" class="btn btn-outline-danger mt-3 bbforce">Back by force</button>
+            </div>
+        </div>
+    </div>
+    <!-- フッター -->
+    <footer class="fixed-bottom text-center p-2 copyright"></footer>
+</body>
+<link rel="stylesheet" href="assets/bootstrap/bootstrap.min.5.3.0.css">
+<link rel="stylesheet" href="assets/lightbox2/css/lightbox.min.css">
+<link rel="stylesheet" href="assets/tree-menu/css/tree-menu.css">
+<script type="text/javascript" src="assets/bootstrap/bootstrap.bundle.min.5.3.0.js"></script>
+<script type="text/javascript" src="assets/jquery/jquery.min.3.2.0.js"></script>
+<script type="text/javascript" src="assets/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="assets/jquery-resizable/jquery-resizable.min.js"></script>
+<script type="text/javascript" src="assets/tree-menu/js/tree-menu.js"></script>
+<script type="text/javascript" src="assets/lightbox2/js/lightbox.min.js"></script>
+<script type="text/javascript" src="assets/cmdbox/common.js"></script>
+<script type="text/javascript" src="assets/cmdbox/filer_modal.js"></script>
+<script type="text/javascript" src="assets/cmdbox/list_cmd.js"></script>
+<script type="text/javascript" src="assets/cmdbox/view_result.js"></script>
+<script type="text/javascript" src="assets/cmdbox/view_raw.js"></script>
+<script type="text/javascript" src="assets/cmdbox/open_output_json.js"></script>
+<script type="text/javascript" src="assets/cmdbox/open_capture.js"></script>
+<script type="text/javascript" src="assets/cmdbox/list_pipe.js"></script>
+<script type="text/javascript" src="assets/cmdbox/main.js"></script>
+</html>

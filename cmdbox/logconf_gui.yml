@@ -1,0 +1,30 @@
+version: 1
+ 
+formatters:
+    fmt:
+        format: '[%(asctime)s] [%(levelname)s] %(message)s'
+        class: logging.Formatter
+handlers:
+    std:
+        class: logging.StreamHandler
+        level: INFO
+        formatter: fmt
+        stream: ext://sys.stdout
+    gui:
+        class: logging.handlers.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/gui.log
+
+loggers:
+    gui:
+        handlers: [gui, std]
+        level: INFO
+        qualname: gui
+ 
+#root:
+#    handlers: [std]
+#    level: NOTSET

@@ -1,0 +1,10 @@
+Author	License	Name	URL	Version	File
+The Bootstrap Authors	MIT	Bootstrap	https://getbootstrap.com/	v5.0.2	-
+Josh Goebel <hello@joshgoebel.com> and other contributors	BSD-3-Clause	highlight.js	https://highlightjs.org/	v11.10.0	-
+JS Foundation and other contributors	jquery.org/license	jquery	https://jquery.com/	v3.2.0	-
+jQuery Foundation and other contributors	MIT	jqueryui	http://jqueryui.com	v1.13.2	-
+Lokesh Dhakar	MIT	lightbox2	http://lokeshdhakar.com/projects/lightbox2/	v2.11.4	-
+Simon Hagström	MIT	split-pane	https://github.com/shagstrom/split-pane	v0.9.4	-
+杜甫々	-	tree-menu	https://www.tohoho-web.com/tech/tree-menu.htm	Ver1.1	-
+polygonplanet   MIT encoding-japanese   https://github.com/polygonplanet/encoding.js    v2.2.0  -
+Alan Williamson MIT jquery-linedtextarea    https://github.com/cotenoni/jquery-linedtextarea    -   -

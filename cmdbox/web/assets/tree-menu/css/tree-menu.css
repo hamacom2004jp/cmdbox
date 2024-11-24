@@ -1,0 +1,53 @@
+.tree-menu {
+    font-size: 9pt;
+    line-height: 13pt;
+    min-height: 300px;
+    float: left;
+    margin: 0;
+    margin-left: 0;
+    padding: 5px;
+    white-space: nowrap;
+}
+.tree-menu ul {
+    /*display: none;*/
+    margin-left: 16px;
+    padding: 0;
+    list-style: none;
+}
+.tree-menu li {
+    list-style: none;
+    padding: 0;
+}
+.tree-menu a {
+    padding: 0 4px 0 19px;
+    background-position: top left;
+    background-repeat: no-repeat;
+}
+.tree-menu a.file {
+    background-image: url(../image/file.png);
+}
+.tree-menu a.folder-close {
+    background-image: url(../image/folder-close.png);
+}
+.tree-menu a.folder-open {
+    background-image: url(../image/folder-open.png);
+    font-weight: bold;
+}
+.tree-menu a:link {
+    color: #0044cc;
+    text-decoration: none;
+}
+.tree-menu a:visited {
+    color: #000066;
+    text-decoration: none;
+}
+.tree-menu a:hover {
+    color: #ff0000;
+}
+.tree-menu .num {
+    font-size: 8pt;
+    color: #999999;
+}
+.tree-menu .current {
+    background-color: #e0e0ff;
+}

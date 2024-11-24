@@ -1,0 +1,18 @@
+# Files to include
+include cmdbox/*.yml
+include cmdbox/extensions/**
+include cmdbox/docker/**
+include cmdbox/licenses/**
+include cmdbox/tools/**
+include cmdbox/web/**
+
+# Files to exclude
+global-exclude *.pyc
+global-exclude *.swp
+global-exclude .DS_Store
+global-exclude cmdbox/extensions/data/*.json
+global-exclude cmdbox/extensions/data/*/*.jpg
+global-exclude cmdbox/extensions/data/*/*.svg
+
+# Exclude specific directories
+recursive-exclude * build
