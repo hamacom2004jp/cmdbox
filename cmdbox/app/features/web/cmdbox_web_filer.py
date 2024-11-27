@@ -46,11 +46,12 @@ class Filer(feature.WebFeature):
         Sample:
             {
                 'filer': {
-                    'text': 'Filer',
+                    'html': 'Filer',
                     'href': 'filer',
                     'target': '_blank',
                     'css_class': 'dropdown-item'
+                    'onclick': 'alert("filer")'
                 }
             }
         """
-        return dict(filer=dict(text='Filer', href='filer', target='_blank', css_class='dropdown-item'))
+        return dict(filer=dict(html='Filer', href='filer', target='_blank', css_class='dropdown-item'))

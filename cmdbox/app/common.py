@@ -335,11 +335,6 @@ def to_str(o, slise=-1):
     ret = ret[0:slise]
     return len(ret) > 100 and ret + '...' or ret
 
-BASE_MODELS = {}
-BASE_BREFORE_INJECTIONS = {}
-BASE_AFTER_INJECTIONS = {}
-BASE_TRAIN_MODELS = {}
-
 def download_file(url:str, save_path:Path) -> Path:
     """
     ファイルをダウンロードします。

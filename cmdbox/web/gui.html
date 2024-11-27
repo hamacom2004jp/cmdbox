@@ -25,7 +25,7 @@
                         <a class="nav-link dropdown-toggle" href="#" id="fileMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             File
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="fileMenuLink">
+                        <ul class="dropdown-menu filemenu" aria-labelledby="fileMenuLink">
                             <li><a class="dropdown-item" href="#" onclick="$(`.cmd_add`).click();">New Command</a></li>
                             <li><a class="dropdown-item" href="#" onclick="$(`.pipe_add`).click();">New Pipeline</a></li>
                             <li>
@@ -48,7 +48,7 @@
                         <a class="nav-link dropdown-toggle" href="#" id="viewMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             View
                         </a>
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu viewmenu">
                             <li><a class="dropdown-item" href="#" onclick="cmdbox.change_dark_mode();">Change Dark Mode</a></li>
                             <li><a class="dropdown-item" href="#" onclick="$(`#console_modal`).modal(`show`);">Console log</a></li>
                         </ul>
@@ -58,7 +58,7 @@
                         <a class="nav-link dropdown-toggle" href="#" id="aboutMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             About
                         </a>
-                        <ul class="dropdown-menu about-menu" aria-labelledby="aboutMenuLink">
+                        <ul class="dropdown-menu aboutmenu" aria-labelledby="aboutMenuLink">
                             <li><a class="dropdown-item" href="#" onclick="$(`#versions_modal`).modal(`show`);">Versions</a></li>
                         </ul>
                     </li>

@@ -73,18 +73,26 @@ $(() => {
         };
     };
     gui_callback();
-    const toolmenu = async () => {
-        const res = await fetch('gui/toolmenu', {method: 'GET'});
+    const menu = async (sel, url) => {
+        const res = await fetch(url, {method: 'GET'});
         const menu = await res.json();
         for (let key in menu) {
             const m = menu[key];
             const li = $('<li>');
-            const a = $('<a>').attr('class', m["css_class"]).attr('href', m["href"]).attr('target', m["target"]).text(m["text"]);
+            const css_class = m["css_class"] ? m["css_class"] : '';
+            const href = m["href"] ? m["href"] : '#';
+            const target = m["target"] ? m["target"] : '_self';
+            const onclick = m["onclick"] ? m["onclick"] : '';
+            const html = m["html"] ? m["html"] : '';
+            const a = $('<a>').attr('class', css_class).attr('href', href).attr('onclick', onclick).attr('target', target).html(html);
             li.append(a);
-            $('.toolmenu').append(li);
+            $(sel).append(li);
         }
     };
-    toolmenu();
+    menu('.filemenu', 'gui/filemenu');
+    menu('.toolmenu', 'gui/toolmenu');
+    menu('.viewmenu', 'gui/viewmenu');
+    menu('.aboutmenu', 'gui/aboutmenu');
 });
 const get_client_data = async () => {
     const res = await fetch('gui/get_client_data', {method: 'GET'});

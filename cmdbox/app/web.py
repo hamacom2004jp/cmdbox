@@ -40,6 +40,7 @@ class Web:
             signin_html (str, optional): ログイン画面のHTMLファイル. Defaults to None.
             signin_file (str, optional): ログイン情報のファイル. Defaults to args.signin_file.
             gui_mode (bool, optional): GUIモードかどうか. Defaults to False.
+            web_features_packages (List[str], optional): webfeatureのパッケージ名のリスト. Defaults to None.
         """
         super().__init__()
         self.logger = logger
@@ -152,12 +153,18 @@ class Web:
         app = FastAPI()
         app.add_middleware(SessionMiddleware, secret_key=common.random_string())
 
+        self.filemenu = dict()
         self.toolmenu = dict()
+        self.viewmenu = dict()
+        self.aboutmenu = dict()
         # webfeatureの読込み
         def wf_route(w, pk, app):
             for wf in module.load_webfeatures(pk):
                 wf.route(self, app)
+                self.filemenu |= wf.filemenu(w)
                 self.toolmenu |= wf.toolmenu(w)
+                self.viewmenu |= wf.viewmenu(w)
+                self.aboutmenu |= wf.aboutmenu(w)
 
         wf_route(self, "cmdbox.app.features.web", app)
         if self.web_features_packages is not None:

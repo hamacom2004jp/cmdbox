@@ -34,9 +34,21 @@ class Gui(feature.WebFeature):
             res.headers['Access-Control-Allow-Origin'] = '*'
             return web.gui_html_data
 
+        @app.get('/gui/filemenu')
+        async def filemenu(req:Request, res:Response):
+            return web.filemenu
+
         @app.get('/gui/toolmenu')
         async def toolmenu(req:Request, res:Response):
             return web.toolmenu
+
+        @app.get('/gui/viewmenu')
+        async def viewmenu(req:Request, res:Response):
+            return web.viewmenu
+
+        @app.get('/gui/aboutmenu')
+        async def aboutmenu(req:Request, res:Response):
+            return web.aboutmenu
 
     def callback_console_modal_log_func(self, web:web.Web, output:Dict[str, Any]):
         """

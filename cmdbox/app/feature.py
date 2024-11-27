@@ -117,6 +117,29 @@ class WebFeature(object):
         """
         raise NotImplementedError
 
+    def filemenu(self, web:Web) -> Dict[str, Any]:
+        """
+        ファイルメニューの情報を返します
+
+        Args:
+            web (Web): Webオブジェクト
+        
+        Returns:
+            Dict[str, Any]: fileメニュー情報
+        
+        Sample:
+            {
+                'filer': {
+                    'html': 'Filer',
+                    'href': 'filer',
+                    'target': '_blank',
+                    'css_class': 'dropdown-item'
+                    'onclick': 'alert("filer")'
+                }
+            }
+        """
+        return dict()
+
     def toolmenu(self, web:Web) -> Dict[str, Any]:
         """
         ツールメニューの情報を返します
@@ -130,10 +153,57 @@ class WebFeature(object):
         Sample:
             {
                 'filer': {
-                    'text': 'Filer',
+                    'html': 'Filer',
+                    'href': 'filer',
+                    'target': '_blank',
+                    'css_class': 'dropdown-item',
+                    'onclick': 'alert("filer")'
+                }
+            }
+        """
+        return dict()
+
+    def viewmenu(self, web:Web) -> Dict[str, Any]:
+        """
+        Viewメニューの情報を返します
+
+        Args:
+            web (Web): Webオブジェクト
+        
+        Returns:
+            Dict[str, Any]: Viewメニュー情報
+        
+        Sample:
+            {
+                'filer': {
+                    'html': 'Filer',
                     'href': 'filer',
                     'target': '_blank',
                     'css_class': 'dropdown-item'
+                    'onclick': 'alert("filer")'
+                }
+            }
+        """
+        return dict()
+
+    def aboutmenu(self, web:Web) -> Dict[str, Any]:
+        """
+        Aboutメニューの情報を返します
+
+        Args:
+            web (Web): Webオブジェクト
+        
+        Returns:
+            Dict[str, Any]: Aboutメニュー情報
+        
+        Sample:
+            {
+                'filer': {
+                    'html': 'Filer',
+                    'href': 'filer',
+                    'target': '_blank',
+                    'css_class': 'dropdown-item'
+                    'onclick': 'alert("filer")'
                 }
             }
         """

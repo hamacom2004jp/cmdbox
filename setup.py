@@ -26,7 +26,7 @@ INSTALL_REQUIRES = [
     'redis',
     'six',
     'tabulate',
-    'uvicorn',
+    'uvicorn[standard]',
     'wheel',
 ]
 PACKAGES = [

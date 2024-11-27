@@ -1,12 +1,9 @@
 from cmdbox.app import common, feature
 from cmdbox.app.web import Web
-from fastapi import FastAPI, HTTPException, Request, Response, WebSocket
-import asyncio
+from fastapi import FastAPI, HTTPException, WebSocket
 import logging
-import gevent
 import json
 import queue
-import threading
 
 
 class GuiCallback(feature.WebFeature):
@@ -22,7 +19,9 @@ class GuiCallback(feature.WebFeature):
             app (FastAPI): FastAPIオブジェクト
         """
         @app.websocket('/gui/callback')
-        async def gui_callback(websocket: WebSocket):
+        async def gui_callback(websocket: WebSocket=None):
+            if websocket is None:
+                raise HTTPException(status_code=200, detail='ok.')
             await websocket.accept()
             # コマンドの実行結果をキューから取り出してブラウザに送信する
             if web.logger.level == logging.DEBUG:
@@ -33,7 +32,7 @@ class GuiCallback(feature.WebFeature):
             while True:
                 outputs = None
                 try:
-                    await websocket.receive_text()
+                    await websocket.receive_text() # これを行わねば非同期処理にならない。。
                     cmd, title, output = web.cb_queue.get(block=True, timeout=0.001)
                     if web.logger.level == logging.DEBUG:
                         output_str = common.to_str(output, slise=100)

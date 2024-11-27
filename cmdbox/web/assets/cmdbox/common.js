@@ -87,7 +87,7 @@ $(()=>{
       const json = await res.json();
       const usesignout = json['success']['usesignout'];
       if (!usesignout) return;
-      const about_menu = $('.about-menu');
+      const about_menu = $('.aboutmenu');
       if (!about_menu.find('.signout-menu-item').length) {
         const parts = location.pathname.split('/');
         const sitepath = parts[parts.length-1];

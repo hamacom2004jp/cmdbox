@@ -1,11 +1,12 @@
 from cmdbox.app import feature
+from cmdbox.app.features.web import cmdbox_web_signin
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 import hashlib
 
 
-class DoSignin(feature.WebFeature):
+class DoSignin(cmdbox_web_signin.Signin):
     def __init__(self):
         super().__init__()
 
@@ -24,7 +25,7 @@ class DoSignin(feature.WebFeature):
             passwd = form.get('password')
             if userid == '' or passwd == '':
                 return RedirectResponse(url=f'/signin/{next}?error=1')
-            web.load_signin_file()
+            self.load_signin_file(web)
             if userid not in web.signin_file_data:
                 return RedirectResponse(url=f'/signin/{next}?error=1')
             algname = web.signin_file_data[userid]['algname']
