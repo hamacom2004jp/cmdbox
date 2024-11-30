@@ -10,11 +10,18 @@ import sys
 
 
 def main(args_list:list=None):
-    app = CmdBoxApp()
+    app = CmdBoxApp.getInstance()
     return app.main(args_list)[0]
 
 class CmdBoxApp:
-    def __init__(self, appid:str=version.__appid__, description:str=None, cli_features_packages:List[str]=None):
+    _instance = None
+    @staticmethod
+    def getInstance():
+        if CmdBoxApp._instance is None:
+            CmdBoxApp._instance = CmdBoxApp()
+        return CmdBoxApp._instance
+
+    def __init__(self, appid:str=version.__appid__, description:str=None, cli_features_packages:List[str]=None, cli_features_prefix:List[str]=None):
         """
         コンストラクタ
 
@@ -22,11 +29,13 @@ class CmdBoxApp:
             appid (str, optional): アプリケーションID. Defaults to version.__appid__.
             description (str, optional): アプリケーションの説明. Defaults to None.
             cli_package_name (str, optional): プラグインのパッケージ名. Defaults to None.
+            cli_features_prefix (List[str], optional): プラグインのパッケージのモジュール名のプレフィックス. Defaults to None.
         """
         self.options = options.Options.getInstance()
         self.appid = appid
         self.description = description
         self.cli_features_packages = cli_features_packages
+        self.cli_features_prefix = cli_features_prefix
 
     def main(self, args_list:list=None, file_dict:dict=dict(), webcall:bool=False):
         """
@@ -37,8 +46,12 @@ class CmdBoxApp:
         # プラグイン読込み
         self.options.load_svcmd('cmdbox.app.features.cli')
         if self.cli_features_packages is not None:
-            for cli_features_package in self.cli_features_packages:
-                self.options.load_svcmd(cli_features_package)
+            if self.cli_features_prefix is None:
+                raise ValueError(f"cli_features_prefix is None. cli_features_packages={self.cli_features_packages}")
+            if len(self.cli_features_prefix) != len(self.cli_features_packages):
+                raise ValueError(f"cli_features_prefix is not match. cli_features_packages={self.cli_features_packages}, cli_features_prefix={self.cli_features_prefix}")
+            for i, pn in enumerate(self.cli_features_packages):
+                self.options.load_svcmd(pn, prefix=self.cli_features_prefix[i])
         self.options.load_features_file('cli', self.options.load_svcmd)
 
         # コマンド引数の生成
@@ -97,7 +110,7 @@ class CmdBoxApp:
         common.copy_sample(args.data)
         common.copy_sample(Path.cwd())
 
-        logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall if args.cmd != 'webcap' else True)
+        logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall if args.cmd != 'webcap' else True, appid=self.appid)
         if logger.level == logging.DEBUG:
             logger.debug(f"args.mode={args.mode}, args.cmd={args.cmd}")
             for m, mo in self.options._options["cmd"].items():

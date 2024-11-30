@@ -17,7 +17,7 @@ handlers:
         backupCount: 5
         when : 'D'
         encoding : 'utf-8'
-        filename: .logs/gui.log
+        filename: .logs/cmdbox_gui.log
 
 loggers:
     gui:

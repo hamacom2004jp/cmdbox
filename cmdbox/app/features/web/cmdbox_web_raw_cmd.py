@@ -9,8 +9,8 @@ import json
 
 
 class RawCmd(cmdbox_web_gui.Gui):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def route(self, web:Web, app:FastAPI) -> None:
         """
@@ -48,6 +48,6 @@ class RawCmd(cmdbox_web_gui.Gui):
         if 'stdout_log' in opt: del opt['stdout_log']
         if 'capture_stdout' in opt: del opt['capture_stdout']
         curl_cmd_file = self.mk_curl_fileup(web, opt)
-        return [dict(type='cmdline',raw=' '.join(['python','-m',version.__appid__]+opt_list)),
+        return [dict(type='cmdline',raw=' '.join(['python','-m',self.ver.__appid__]+opt_list)),
                 dict(type='optjson',raw=json.dumps(opt, default=common.default_json_enc)),
                 dict(type='curlcmd',raw=f'curl {curl_cmd_file} http://localhost:{web.listen_port}/exec_cmd/{title}')]

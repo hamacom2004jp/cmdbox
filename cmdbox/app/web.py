@@ -20,8 +20,9 @@ import webbrowser
 
 class Web:
     def __init__(self, logger:logging.Logger, data:Path, redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server',
-                 client_only:bool = False, gui_html:str=None, filer_html:str=None,
-                 assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False, web_features_packages:List[str]=None):
+                 client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None,
+                 assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
+                 web_features_packages:List[str]=None, web_features_prefix:List[str]=None):
         """
         cmdboxクライアント側のwebapiサービス
 
@@ -33,6 +34,7 @@ class Web:
             redis_password (str, optional): Redisサーバーのパスワード. Defaults to None.
             svname (str, optional): 推論サーバーのサービス名. Defaults to 'server'.
             client_only (bool, optional): クライアントのみのサービスかどうか. Defaults to False.
+            doc_root (Path, optional): カスタムファイルのドキュメントルート. フォルダ指定のカスタムファイルのパスから、doc_rootのパスを除去したパスでURLマッピングします。Defaults to None.
             gui_html (str, optional): GUIのHTMLファイル. Defaults to None.
             filer_html (str, optional): ファイラーのHTMLファイル. Defaults to None.
             anno_html (str, optional): アノテーション画面のHTMLファイル. Defaults to None.
@@ -41,6 +43,7 @@ class Web:
             signin_file (str, optional): ログイン情報のファイル. Defaults to args.signin_file.
             gui_mode (bool, optional): GUIモードかどうか. Defaults to False.
             web_features_packages (List[str], optional): webfeatureのパッケージ名のリスト. Defaults to None.
+            web_features_prefix (List[str], optional): webfeatureのパッケージのモジュール名のプレフィックス. Defaults to None.
         """
         super().__init__()
         self.logger = logger
@@ -53,9 +56,19 @@ class Web:
         self.client_only = client_only
         if self.client_only:
             self.svname = 'client'
+        self.doc_root = Path(doc_root) if doc_root is not None else Path(__file__).parent.parent / 'web'
         self.gui_html = Path(gui_html) if gui_html is not None else Path(__file__).parent.parent / 'web' / 'gui.html'
         self.filer_html = Path(filer_html) if filer_html is not None else Path(__file__).parent.parent / 'web' / 'filer.html'
-        self.assets = [Path(a) for a in assets] if assets is not None else None
+        self.assets = []
+        if assets is not None:
+            if not isinstance(assets, list):
+                raise ValueError(f'assets is not list. ({assets})')
+            for a in assets:
+                asset = Path(a)
+                if asset.is_dir():
+                    self.assets += [p for p in asset.glob('**/*') if p.is_file()]
+                elif asset.is_file():
+                    self.assets.append(asset)
         self.signin_html = Path(signin_html) if signin_html is not None else Path(__file__).parent.parent / 'web' / 'signin.html'
         self.signin_file = Path(signin_file) if signin_file is not None else None
         self.gui_html_data = None
@@ -65,6 +78,7 @@ class Web:
         self.signin_file_data = None
         self.gui_mode = gui_mode
         self.web_features_packages = web_features_packages
+        self.web_features_prefix = web_features_prefix
         self.cmds_path = self.data / ".cmds"
         self.pipes_path = self.data / ".pipes"
         self.static_root = Path(__file__).parent.parent / 'web'
@@ -76,21 +90,22 @@ class Web:
         self.options = options.Options.getInstance()
         self.webcap_client = requests.Session()
         if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"web init parameter: data={self.data} -> {self.data.absolute()}")
+            self.logger.debug(f"web init parameter: data={self.data} -> {self.data.absolute() if self.data is not None else None}")
             self.logger.debug(f"web init parameter: redis_host={self.redis_host}")
             self.logger.debug(f"web init parameter: redis_port={self.redis_port}")
             self.logger.debug(f"web init parameter: redis_password=********")
             self.logger.debug(f"web init parameter: svname={self.svname}")
             self.logger.debug(f"web init parameter: client_only={self.client_only}")
-            self.logger.debug(f"web init parameter: gui_html={self.gui_html}")
-            self.logger.debug(f"web init parameter: filer_html={self.filer_html}")
-            self.logger.debug(f"web init parameter: assets={self.assets}")
-            self.logger.debug(f"web init parameter: signin_html={self.signin_html}")
-            self.logger.debug(f"web init parameter: signin_file={self.signin_file}")
+            self.logger.debug(f"web init parameter: gui_html={self.gui_html} -> {self.gui_html.absolute() if self.gui_html is not None else None}")
+            self.logger.debug(f"web init parameter: filer_html={self.filer_html} -> {self.filer_html.absolute() if self.filer_html is not None else None}")
+            self.logger.debug(f"web init parameter: assets={self.assets} -> {[a.absolute() for a in self.assets] if self.assets is not None else None}")
+            self.logger.debug(f"web init parameter: signin_html={self.signin_html} -> {self.signin_html.absolute() if self.signin_html is not None else None}")
+            self.logger.debug(f"web init parameter: signin_file={self.signin_file} -> {self.signin_file.absolute() if self.signin_file is not None else None}")
             self.logger.debug(f"web init parameter: gui_mode={self.gui_mode}")
             self.logger.debug(f"web init parameter: web_features_packages={self.web_features_packages}")
-            self.logger.debug(f"web init parameter: cmds_path={self.cmds_path} -> {self.cmds_path.absolute()}")
-            self.logger.debug(f"web init parameter: pipes_path={self.pipes_path} -> {self.pipes_path.absolute()}")
+            self.logger.debug(f"web init parameter: web_features_prefix={self.web_features_prefix}")
+            self.logger.debug(f"web init parameter: cmds_path={self.cmds_path} -> {self.cmds_path.absolute() if self.cmds_path is not None else None}")
+            self.logger.debug(f"web init parameter: pipes_path={self.pipes_path} -> {self.pipes_path.absolute() if self.pipes_path is not None else None}")
 
     def enable_cors(self, req:Request, res:Response) -> None:
         """
@@ -158,19 +173,23 @@ class Web:
         self.viewmenu = dict()
         self.aboutmenu = dict()
         # webfeatureの読込み
-        def wf_route(w, pk, app):
-            for wf in module.load_webfeatures(pk):
+        def wf_route(pk, prefix, w, app):
+            for wf in module.load_webfeatures(pk, prefix):
                 wf.route(self, app)
                 self.filemenu |= wf.filemenu(w)
                 self.toolmenu |= wf.toolmenu(w)
                 self.viewmenu |= wf.viewmenu(w)
                 self.aboutmenu |= wf.aboutmenu(w)
 
-        wf_route(self, "cmdbox.app.features.web", app)
         if self.web_features_packages is not None:
-            for web_features_package in self.web_features_packages:
-                wf_route(self, web_features_package, app)
-        self.options.load_features_file('web', lambda pk: wf_route(self, pk, app))
+            if self.web_features_prefix is None:
+                raise ValueError(f"web_features_prefix is None. web_features_prefix={self.web_features_prefix}")
+            if len(self.web_features_prefix) != len(self.web_features_packages):
+                raise ValueError(f"web_features_prefix is not match. web_features_packages={self.web_features_packages}, web_features_prefix={self.web_features_prefix}")
+            for i, pn in enumerate(self.web_features_packages):
+                wf_route(pn, self.web_features_prefix[i], self, app)
+        self.options.load_features_file('web', lambda pk, pn: wf_route(pk, pn, self, app))
+        wf_route("cmdbox.app.features.web", "cmdbox_web_", self, app)
 
         # 読込んだrouteの内容をログに出力
         if self.logger.level == logging.DEBUG:

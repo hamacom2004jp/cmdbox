@@ -64,7 +64,7 @@ def load_yml(yml_path:Path) -> dict:
     with open(yml_path) as f:
         return yaml.safe_load(f)
 
-def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False) -> Tuple[logging.Logger, dict]:
+def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, appid:str=version.__appid__) -> Tuple[logging.Logger, dict]:
     """
     指定されたモードのロガーと設定を読み込みます。
 
@@ -73,13 +73,14 @@ def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False) -
         debug (bool, optional): デバッグモード. Defaults to False
         data (Path, optional): データディレクトリ. Defaults to HOME_DIR.
         webcall (bool, optional): WebAPIからの呼出しの場合はTrue. setHandlerを削除します。. Defaults to False.
+        appid (str, optional): アプリケーションID. Defaults to version.__appid__.
 
     Returns:
         logger (logging.Logger): ロガー
         config (dict): 設定
     """
     data = Path(data) if data is not None else HOME_DIR
-    log_config = yaml.safe_load(resource_string(version.__appid__, f"logconf_{mode}.yml"))
+    log_config = yaml.safe_load(resource_string(appid, f"logconf_{mode}.yml"))
     std_key = None
     for k, h in log_config['handlers'].items():
         if 'filename' in h:

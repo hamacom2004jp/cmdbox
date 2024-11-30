@@ -1,3 +1,4 @@
+from cmdbox import version
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
@@ -12,8 +13,8 @@ import logging
 
 
 class WebGencert(Feature):
-    def __init__(self):
-        pass
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """

@@ -6,9 +6,10 @@ from typing import Dict, Any, Tuple
 import argparse
 import logging
 
+
 class ServerStart(Feature):
-    def __init__(self):
-        pass
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """
@@ -52,7 +53,7 @@ class ServerStart(Feature):
                 dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None,
                         discription_ja="推論サーバーのサービス名を指定します。省略時は `server` を使用します。",
                         discription_en="Specify the service name of the inference server. If omitted, `server` is used."),
-                dict(opt="data", type="file", default=common.HOME_DIR / f".{version.__appid__}", required=False, multi=False, hide=False, choise=None,
+                dict(opt="data", type="file", default=common.HOME_DIR / f".{self.ver.__appid__}", required=False, multi=False, hide=False, choise=None,
                         discription_ja="省略した時は `$HONE/.cmdbox` を使用します。",
                         discription_en="When omitted, `$HONE/.cmdbox` is used."),
                 dict(opt="retry_count", type="int", default=20, required=False, multi=False, hide=True, choise=None,

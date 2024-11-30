@@ -9,8 +9,8 @@ import logging
 
 
 class ClientFileCopy(Feature):
-    def __init__(self):
-        pass
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """
@@ -82,7 +82,7 @@ class ClientFileCopy(Feature):
                         discription_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
                         discription_en="Specify the path of the data folder when local is referenced.",
                         test_true={"server":None,
-                                "client":common.HOME_DIR / f".{version.__appid__}",
+                                "client":common.HOME_DIR / f".{self.ver.__appid__}",
                                 "current":None}),
                 dict(opt="retry_count", type="int", default=3, required=False, multi=False, hide=True, choise=None,
                         discription_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",

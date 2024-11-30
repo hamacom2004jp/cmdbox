@@ -1,4 +1,4 @@
-<html>
+<html data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -28,14 +28,6 @@
                         <ul class="dropdown-menu filemenu" aria-labelledby="fileMenuLink">
                             <li><a class="dropdown-item" href="#" onclick="$(`.cmd_add`).click();">New Command</a></li>
                             <li><a class="dropdown-item" href="#" onclick="$(`.pipe_add`).click();">New Pipeline</a></li>
-                            <li>
-                                <a class="dropdown-item" href="#" onclick="open_output_json_func(`open_output_json_path`)">Open output_json</a>
-                                <input type="hidden" id="open_output_json_path" value=""/>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="#" onclick="open_capture_func(`open_capture_path`)">Open capture</a>
-                                <input type="hidden" id="open_capture_path" value=""/>
-                            </li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -404,26 +396,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>
                 </div>
                 <div class="modal-body">
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="versions_cmdbox-tab" data-bs-toggle="tab" data-bs-target="#versions_cmdbox" type="button" role="tab" aria-controls="versions_cmdbox" aria-selected="true">
-                                cmdbox
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="versions_used-tab" data-bs-toggle="tab" data-bs-target="#versions_used" type="button" role="tab" aria-controls="versions_used" aria-selected="false">
-                                Used software
-                            </button>
-                        </li>
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane fade show active" id="versions_cmdbox" role="tabpanel" aria-labelledby="versions_cmdbox-tab">
-                            versions_cmdbox
-                        </div>
-                        <div class="tab-pane fade" id="versions_used" role="tabpanel" aria-labelledby="versions_used-tab">
-                            versions_used
-                        </div>
-                    </div>
+                    <ul class="nav nav-tabs version-tabs" role="tablist"></ul>
+                    <div class="tab-content version-content"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

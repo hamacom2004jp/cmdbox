@@ -9,8 +9,8 @@ import logging
 
 
 class ClientFileDownload(Feature):
-    def __init__(self):
-        pass
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """
@@ -77,7 +77,7 @@ class ClientFileDownload(Feature):
                         discription_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
                         discription_en="Specify the path of the data folder when local is referenced.",
                         test_true={"server":None,
-                                "client":common.HOME_DIR / f".{version.__appid__}",
+                                "client":common.HOME_DIR / f".{self.ver.__appid__}",
                                 "current":None}),
                 dict(opt="img_thumbnail", type="float", default=None, required=False, multi=False, hide=True, choise=None,
                         discription_ja="対象が画像だった場合のサムネイルのピクセル単位のサイズを指定します。",

@@ -1,3 +1,4 @@
+from cmdbox import version
 from cmdbox.app.commons import redis_client
 from cmdbox.app.web import Web
 from fastapi import FastAPI
@@ -19,8 +20,8 @@ class Feature:
     default_port:int = int(os.environ.get('REDIS_PORT', '6379'))
     default_pass:str = os.environ.get('REDIS_PASSWORD', 'password')
 
-    def __init__(self):
-        pass
+    def __init__(self, ver=version):
+        self.ver = ver
 
     def get_mode(self) -> str:
         """
@@ -104,8 +105,8 @@ class WebFeature(object):
     USE_REDIS_TRUE:int = Feature.USE_REDIS_TRUE
     DEFAULT_CAPTURE_MAXSIZE:int = Feature.DEFAULT_CAPTURE_MAXSIZE
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, ver=version):
+        self.ver = ver
 
     def route(self, web:Web, app:FastAPI) -> None:
         """
@@ -127,16 +128,18 @@ class WebFeature(object):
         Returns:
             Dict[str, Any]: fileメニュー情報
         
-        Sample:
-            {
-                'filer': {
-                    'html': 'Filer',
-                    'href': 'filer',
-                    'target': '_blank',
-                    'css_class': 'dropdown-item'
-                    'onclick': 'alert("filer")'
+        Notes:
+            以下は返されるJSONのサンプル::
+            
+                {
+                    'filer': {
+                        'html': 'Filer',
+                        'href': 'filer',
+                        'target': '_blank',
+                        'css_class': 'dropdown-item'
+                        'onclick': 'alert("filer")'
+                    }
                 }
-            }
         """
         return dict()
 
@@ -150,16 +153,18 @@ class WebFeature(object):
         Returns:
             Dict[str, Any]: ツールメニュー情報
         
-        Sample:
-            {
-                'filer': {
-                    'html': 'Filer',
-                    'href': 'filer',
-                    'target': '_blank',
-                    'css_class': 'dropdown-item',
-                    'onclick': 'alert("filer")'
+        Notes:
+            以下は返されるJSONのサンプル::
+
+                {
+                    'filer': {
+                        'html': 'Filer',
+                        'href': 'filer',
+                        'target': '_blank',
+                        'css_class': 'dropdown-item',
+                        'onclick': 'alert("filer")'
+                    }
                 }
-            }
         """
         return dict()
 
@@ -173,16 +178,18 @@ class WebFeature(object):
         Returns:
             Dict[str, Any]: Viewメニュー情報
         
-        Sample:
-            {
-                'filer': {
-                    'html': 'Filer',
-                    'href': 'filer',
-                    'target': '_blank',
-                    'css_class': 'dropdown-item'
-                    'onclick': 'alert("filer")'
+        Notes:
+            以下は返されるJSONのサンプル::
+
+                {
+                    'filer': {
+                        'html': 'Filer',
+                        'href': 'filer',
+                        'target': '_blank',
+                        'css_class': 'dropdown-item',
+                        'onclick': 'alert("filer")'
+                    }
                 }
-            }
         """
         return dict()
 
@@ -196,15 +203,17 @@ class WebFeature(object):
         Returns:
             Dict[str, Any]: Aboutメニュー情報
         
-        Sample:
-            {
-                'filer': {
-                    'html': 'Filer',
-                    'href': 'filer',
-                    'target': '_blank',
-                    'css_class': 'dropdown-item'
-                    'onclick': 'alert("filer")'
+        Notes:
+            以下は返されるJSONのサンプル::
+
+                {
+                    'filer': {
+                        'html': 'Filer',
+                        'href': 'filer',
+                        'target': '_blank',
+                        'css_class': 'dropdown-item',
+                        'onclick': 'alert("filer")'
+                    }
                 }
-            }
         """
         return dict()

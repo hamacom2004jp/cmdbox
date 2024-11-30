@@ -1,14 +1,16 @@
-from cmdbox.app import common, web, feature
+from cmdbox import version
+from cmdbox.app import common, feature
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse
 from typing import Dict, Any
 import logging
 
 
 class Gui(feature.WebFeature):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
+        self.version_info = [dict(tabid='versions_cmdbox', title=version.__appid__, url='versions_cmdbox')]
 
     def route(self, web:Web, app:FastAPI) -> None:
         """
@@ -34,6 +36,14 @@ class Gui(feature.WebFeature):
             res.headers['Access-Control-Allow-Origin'] = '*'
             return web.gui_html_data
 
+        @app.get('/gui/appid', response_class=PlainTextResponse)
+        async def appid(req:Request, res:Response):
+            return self.ver.__appid__
+
+        @app.get('/gui/version_info')
+        async def version_info(req:Request, res:Response):
+            return self.version_info
+
         @app.get('/gui/filemenu')
         async def filemenu(req:Request, res:Response):
             return web.filemenu
@@ -50,12 +60,12 @@ class Gui(feature.WebFeature):
         async def aboutmenu(req:Request, res:Response):
             return web.aboutmenu
 
-    def callback_console_modal_log_func(self, web:web.Web, output:Dict[str, Any]):
+    def callback_console_modal_log_func(self, web:Web, output:Dict[str, Any]):
         """
         コンソールモーダルにログを出力する
 
         Args:
-            web (web.Web): Webオブジェクト
+            web (Web): Webオブジェクト
             output (Dict[str, Any]): 出力
         """
         if web.logger.level == logging.DEBUG:
@@ -63,12 +73,12 @@ class Gui(feature.WebFeature):
             web.logger.debug(f"web.callback_console_modal_log_func: output={output_str}")
         web.cb_queue.put(('js_console_modal_log_func', None, output))
 
-    def callback_return_cmd_exec_func(self, web:web.Web, title:str, output:Dict[str, Any]):
+    def callback_return_cmd_exec_func(self, web:Web, title:str, output:Dict[str, Any]):
         """
         コマンド実行結果を返す
 
         Args:
-            web (web.Web): Webオブジェクト
+            web (Web): Webオブジェクト
             title (str): タイトル
             output (Dict[str, Any]): 出力
         """
@@ -77,12 +87,12 @@ class Gui(feature.WebFeature):
             web.logger.debug(f"web.callback_return_cmd_exec_func: output={output_str}")
         web.cb_queue.put(('js_return_cmd_exec_func', title, output))
 
-    def callback_return_pipe_exec_func(self, web:web.Web, title:str, output:Dict[str, Any]):
+    def callback_return_pipe_exec_func(self, web:Web, title:str, output:Dict[str, Any]):
         """
         パイプライン実行結果を返す
 
         Args:
-            web (web.Web): Webオブジェクト
+            web (Web): Webオブジェクト
             title (str): タイトル
             output (Dict[str, Any]): 出力
         """
@@ -91,12 +101,12 @@ class Gui(feature.WebFeature):
             web.logger.debug(f"web.callback_return_pipe_exec_func: title={title}, output={output_str}")
         web.cb_queue.put(('js_return_pipe_exec_func', title, output))
 
-    def callback_return_stream_log_func(self, web:web.Web, output:Dict[str, Any]):
+    def callback_return_stream_log_func(self, web:Web, output:Dict[str, Any]):
         """
         ストリームログを返す
 
         Args:
-            web (web.Web): Webオブジェクト
+            web (Web): Webオブジェクト
             output (Dict[str, Any]): 出力
         """
         if web.logger.level == logging.DEBUG:
@@ -104,11 +114,12 @@ class Gui(feature.WebFeature):
             web.logger.debug(f"web.callback_return_stream_log_func: output={output_str}")
         web.cb_queue.put(('js_return_stream_log_func', None, output))
 
-    def mk_curl_fileup(self, web:web.Web, cmd_opt:Dict[str, Any]) -> str:
+    def mk_curl_fileup(self, web:Web, cmd_opt:Dict[str, Any]) -> str:
         """
         curlコマンド文字列を作成する
 
         Args:
+            web (Web): Webオブジェクト
             cmd_opt (dict): コマンドのオプション
         
         Returns:

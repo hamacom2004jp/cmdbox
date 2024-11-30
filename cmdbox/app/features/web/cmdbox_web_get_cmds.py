@@ -1,11 +1,14 @@
-from cmdbox.app import feature
+from cmdbox import version
+from cmdbox.app import common, feature
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response
+from starlette.responses import PlainTextResponse
+import json
 
 
 class GetCmds(feature.WebFeature):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def route(self, web:Web, app:FastAPI) -> None:
         """
@@ -15,7 +18,7 @@ class GetCmds(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/gui/get_cmds')
+        @app.post('/gui/get_cmds', response_class=PlainTextResponse)
         async def get_cmds(req:Request, res:Response):
             signin = web.check_signin(req, res)
             if signin is not None:
@@ -23,4 +26,4 @@ class GetCmds(feature.WebFeature):
             form = await req.form()
             mode = form.get('mode')
             ret = web.options.get_cmds(mode)
-            return ret
+            return json.dumps(ret, default=common.default_json_enc)

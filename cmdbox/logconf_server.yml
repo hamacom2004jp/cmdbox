@@ -17,7 +17,7 @@ handlers:
         backupCount: 5
         when : 'D'
         encoding : 'utf-8'
-        filename: .logs/server.log
+        filename: .logs/cmdbox_server.log
 
 loggers:
     server:

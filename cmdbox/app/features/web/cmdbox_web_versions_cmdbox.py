@@ -4,9 +4,9 @@ from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response
 
 
-class VersionsC(feature.WebFeature):
-    def __init__(self):
-        super().__init__()
+class VersionsCmdbox(feature.WebFeature):
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def route(self, web:Web, app:FastAPI) -> None:
         """
@@ -20,6 +20,6 @@ class VersionsC(feature.WebFeature):
         async def versions_cmdbox(req:Request, res:Response):
             signin = web.check_signin(req, res)
             if signin is not None:
-                return str(dict(warn=f'Please log in to retrieve session.'))
+                return dict(warn=f'Please log in to retrieve session.')
             logo = [version.__logo__]
             return logo + version.__description__.split('\n')

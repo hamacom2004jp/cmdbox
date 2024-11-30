@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（guiモード） &mdash; cmdbox 2024/11/27 documentation</title>
+  <title>コマンドリファレンス（guiモード） &mdash; cmdbox 2024/11/30 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=56c4699f" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=e9835c92"></script>
+      <script src="../_static/documentation_options.js?v=46c51c1b"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -140,19 +140,23 @@
 <td></td>
 <td><p>cmdboxサーバーへの接続を行わないようにします。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--gui_html &lt;gui.htmlファイルのパス&gt;</p></td>
+<tr class="row-odd"><td><p>--doc_root &lt;ドキュメントルートのパス&gt;</p></td>
+<td></td>
+<td><p>カスタムファイルのドキュメントルート. フォルダ指定のカスタムファイルのパスから、doc_rootのパスを除去したパスでURLマッピングします。</p></td>
+</tr>
+<tr class="row-even"><td><p>--gui_html &lt;gui.htmlファイルのパス&gt;</p></td>
 <td></td>
 <td><p><cite>gui.html</cite> を指定します。省略時はcmdbox内蔵のHTMLファイルを使用します。</p></td>
 </tr>
-<tr class="row-even"><td><p>--filer_html &lt;filer.htmlファイルのパス&gt;</p></td>
+<tr class="row-odd"><td><p>--filer_html &lt;filer.htmlファイルのパス&gt;</p></td>
 <td></td>
 <td><p><cite>filer.html</cite> を指定します。省略時はcmdbox内蔵のHTMLファイルを使用します。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--assets &lt;jsやcssファイルのパス&gt;</p></td>
+<tr class="row-even"><td><p>--assets &lt;jsやcssファイルのパス&gt;</p></td>
 <td></td>
 <td><p>htmlファイルを使用する場合に必要なアセットファイルを指定します。</p></td>
 </tr>
-<tr class="row-even"><td><p>--signin_html &lt;signin.htmlファイルのパス&gt;</p></td>
+<tr class="row-odd"><td><p>--signin_html &lt;signin.htmlファイルのパス&gt;</p></td>
 <td></td>
 <td><p><cite>signin.html</cite> を指定します。省略時はcmdbox内蔵のHTMLファイルを使用します。</p></td>
 </tr>

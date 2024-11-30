@@ -1,3 +1,4 @@
+from cmdbox import version
 from cmdbox.app import app, client, server, web as _web
 from cmdbox.app.commons import convert
 from cmdbox.app.features.web import cmdbox_web_load_cmd
@@ -13,8 +14,8 @@ import sys
 
 
 class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def route(self, web:Web, app:FastAPI) -> None:
         """
@@ -76,7 +77,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 return True, output
         return False, None
 
-    def exec_cmd(self, web:Web, title:str, opt:Dict[str, Any], nothread:bool=False) -> List[Dict[str, Any]]:
+    def exec_cmd(self, web:Web, title:str, opt:Dict[str, Any], nothread:bool=False, appcls=app.CmdBoxApp) -> List[Dict[str, Any]]:
         """
         コマンドを実行する
 
@@ -89,7 +90,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         Returns:
             list: コマンド実行結果
         """
-        web.container['cmdbox_app'] = ap = app.CmdBoxApp()
+        web.container['cmdbox_app'] = ap = appcls.getInstance()
         ap.sv = None
         ap.cl = None
         ap.web = None

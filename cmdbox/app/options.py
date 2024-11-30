@@ -111,47 +111,51 @@ class Options:
 
     def list_options(self):
         def _list(ret, key, val):
-            if type(val) == dict and 'type' in val:
-                opt = dict()
-                if val['type'] == 'int':
-                    opt['type'] = int
-                    opt['action'] = 'append' if val['multi'] else None
-                elif val['type'] == 'float':
-                    opt['type'] = float
-                    opt['action'] = 'append' if val['multi'] else None
-                elif val['type'] == 'bool':
-                    opt['type'] = None
-                    opt['action'] = 'store_true'
-                else:
-                    opt['type'] = str
-                    opt['action'] = 'append' if val['multi'] else None
-                o = [f'-{val["short"]}'] if "short" in val else []
-                o += [f'--{key}']
-                language, _ = locale.getlocale()
-                opt['help'] = val['discription_en'] if language.find('Japan') < 0 and language.find('ja_JP') < 0 else val['discription_ja']
-                opt['default'] = val['default']
-                opt['opts'] = o
-                if val['choise'] is not None:
-                    opt['choices'] = []
-                    for c in val['choise']:
-                        if type(c) == dict:
-                            opt['choices'] += [c['opt']]
-                        elif c is not None and c != "":
-                            opt['choices'] += [c]
-                else:
-                    opt['choices'] = None
-                ret[key] = opt
+            if type(val) != dict or 'type' not in val:
+                return
+            opt = dict()
+            if val['type'] == 'int':
+                opt['type'] = int
+                opt['action'] = 'append' if val['multi'] else None
+            elif val['type'] == 'float':
+                opt['type'] = float
+                opt['action'] = 'append' if val['multi'] else None
+            elif val['type'] == 'bool':
+                opt['type'] = None
+                opt['action'] = 'store_true'
+            else:
+                opt['type'] = str
+                opt['action'] = 'append' if val['multi'] else None
+            o = [f'-{val["short"]}'] if "short" in val else []
+            o += [f'--{key}']
+            language, _ = locale.getlocale()
+            opt['help'] = val['discription_en'] if language.find('Japan') < 0 and language.find('ja_JP') < 0 else val['discription_ja']
+            opt['default'] = val['default']
+            opt['opts'] = o
+            if val['choise'] is not None:
+                opt['choices'] = []
+                for c in val['choise']:
+                    if type(c) == dict:
+                        opt['choices'] += [c['opt']]
+                    elif c is not None and c != "":
+                        opt['choices'] += [c]
+            else:
+                opt['choices'] = None
+            ret[key] = opt
         ret = dict()
         for k, v in self._options.items():
             _list(ret, k, v)
-        for mode in self._options["mode"]['choise']:
-            for c, cmd in mode.items():
-                if type(cmd) is not dict:
+        #for mode in self._options["mode"]['choise']:
+        for _, cmd in self._options["cmd"].items():
+            if type(cmd) is not dict:
+                continue
+            for _, opt in cmd.items():
+                if type(opt) is not dict:
                     continue
-                for opt in cmd["choise"]:
-                    if type(opt) is not dict:
+                for o in opt["choise"]:
+                    if type(o) is not dict:
                         continue
-                    _list(ret, opt['opt'], opt)
+                    _list(ret, o['opt'], o)
         return ret
 
     def mk_opt_list(self, opt:dict):
@@ -235,21 +239,22 @@ class Options:
         for key, mode in self._options["cmd"].items():
             if type(mode) is not dict:
                 continue
-            if key in self._options["mode"]:
-                continue
             mode['opt'] = key
             for k, c in mode.items():
                 if type(c) is not dict:
                     continue
                 c["opt"] = k
-                c["choise"].append(self._options["debug"])
-                self._options["cmd"]["choise"] += [c]
+                if "debug" not in [_o['opt'] for _o in c["choise"]]:
+                    c["choise"].append(self._options["debug"])
+                if c["opt"] not in [_o['opt'] for _o in self._options["cmd"]["choise"]]:
+                    self._options["cmd"]["choise"] += [c]
             self._options["mode"][key] = mode
             self._options["mode"]["choise"] += [mode]
 
-    def load_svcmd(self, package_name:str):
-        self._options["svcmd"] = dict()
-        for mode, f in module.load_features(package_name).items():
+    def load_svcmd(self, package_name:str, prefix:str="cmdbox_"):
+        if "svcmd" not in self._options:
+            self._options["svcmd"] = dict()
+        for mode, f in module.load_features(package_name, prefix).items():
             if mode not in self._options["cmd"]:
                 self._options["cmd"][mode] = dict()
             for cmd, opt in f.items():
@@ -280,7 +285,15 @@ class Options:
                 return
             if type(yml['features'][ftype]) is not list:
                 raise Exception(f'features.yml is invalid. (The “features.{ftype} element must be a list. {ftype}={yml["features"][ftype]})')
-            for pkg in yml['features'][ftype]:
-                if type(pkg) is not str:
-                    raise Exception(f'features.yml is invalid. (The “features.{ftype}” element must be a list element must be a string. pkg={pkg})')
-                func(pkg)
+            for data in yml['features'][ftype]:
+                if type(data) is not dict:
+                    raise Exception(f'features.yml is invalid. (The “features.{ftype}” element must be a list element must be a dictionary. data={data})')
+                if 'package' in data:
+                    raise Exception(f'features.yml is invalid. (The “package” element must be in the dictionary of the list element of the “features.{ftype}” element. data={data})')
+                if 'prefix' in data:
+                    raise Exception(f'features.yml is invalid. (The prefix element must be in the dictionary of the list element of the “features.{ftype}” element. data={data})')
+                if data['package'] is None or data['package'] == "":
+                    continue
+                if data['prefix'] is None or data['prefix'] == "":
+                    continue
+                func(data['package'], data['prefix'])

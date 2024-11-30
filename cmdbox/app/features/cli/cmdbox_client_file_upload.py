@@ -9,8 +9,8 @@ import logging
 
 
 class ClientFileUpload(Feature):
-    def __init__(self):
-        pass
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """
@@ -74,7 +74,7 @@ class ClientFileUpload(Feature):
                         discription_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
                         discription_en="Specify the path of the data folder when local is referenced.",
                         test_true={"server":None,
-                                "client":common.HOME_DIR / f".{version.__appid__}",
+                                "client":common.HOME_DIR / f".{self.ver.__appid__}",
                                 "current":None}),
                 dict(opt="mkdir", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False],
                         discription_ja="中間フォルダがない場合作成します。",

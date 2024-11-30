@@ -1,3 +1,4 @@
+from cmdbox import version
 from cmdbox.app import common, server
 from cmdbox.app.feature import Feature
 from pathlib import Path
@@ -7,8 +8,8 @@ import logging
 
 
 class ServerList(Feature):
-    def __init__(self):
-        pass
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """

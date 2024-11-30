@@ -71,6 +71,15 @@ cmdbox.copyright = async () => {
   $('.copyright').text(await res.text());
 };
 /**
+ * appid表示
+ * @param {string} sel - セレクタ
+ */
+cmdbox.appid = async (sel) => {
+  const res = await fetch('gui/appid', {method: 'GET'});
+  const appid = await res.text()
+  $(sel).text(appid);
+};
+/**
  * サインアウト
  * @param {string} sitepath - サイトパス
  **/
@@ -96,21 +105,27 @@ $(()=>{
       }
     } catch (e) {}
   });
+  cmdbox.appid('.navbar-brand');
 });
 /**
  * バージョンモーダルを初期化
  */
 cmdbox.init_version_modal = () => {
-  $('#versions_modal').on('shown.bs.modal', () => {
+  $('#versions_modal').on('shown.bs.modal', async () => {
     // cmdboxのバージョン情報取得
-    const versions_cmdbox_func = async () => {
-      const res = await fetch('versions_cmdbox', {method: 'GET'});
+    const versions_func = async (tabid, title, url) => {
+      const tab = $(`<li class="nav-item" role="presentation">`)
+      tab.append(`<button class="nav-link" id="${tabid}-tab" data-bs-toggle="tab" data-bs-target="#${tabid}" type="button" role="tab" aria-controls="${tabid}" aria-selected="true">${title}</button>`);
+      $('.version-tabs').prepend(tab);
+      if (!url) return;
+      const tabcont = $(`<div class="tab-pane fade show" id="${tabid}" role="tabpanel" aria-labelledby="${tabid}-tab"/>`)
+      $('.version-content').prepend(tabcont);
+      const res = await fetch(url, {method: 'GET'});
       const vi = await res.json();
-      $('#versions_cmdbox').html('');
       vi.forEach((v, i) => {
         v = v.replace(/<([^>]+)>/g, '<a href="$1" target="_blank">$1</a>');
         const div = $('<div></div>');
-        $('#versions_cmdbox').append(div);
+        tabcont.append(div);
         if(i==0) {
           div.addClass('d-flex');
           div.addClass('m-3');
@@ -123,8 +138,19 @@ cmdbox.init_version_modal = () => {
           div.append(`<h6>${v}</h6>`);
         }
       });
-    };
-    versions_cmdbox_func();
+      $('.version-tabs').find('.nav-link').removeClass('active');
+      $('.version-content').children().removeClass('active');
+      $('.version-tabs').find('.nav-link').first().addClass('active');
+      $('.version-content').children().first().addClass('active');
+    }
+    $('.version-tabs').html('');
+    $('.version-content').html('<div class="tab-pane fade" id="versions_used" role="tabpanel" aria-labelledby="versions_used-tab">versions_used</div>');
+    await versions_func('versions_used', 'Used software', null);
+    const res = await fetch('gui/version_info', {method: 'GET'});
+    const verinfos = await res.json();
+    for (const v of verinfos) {
+      await versions_func(v['tabid'], v['title'], v['url']);
+    }
     // usedのバージョン情報取得
     const versions_used_func = async () => {
       const res = await fetch('versions_used', {method: 'GET'});

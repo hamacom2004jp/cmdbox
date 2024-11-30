@@ -1,3 +1,4 @@
+from cmdbox import version
 from cmdbox.app import common, client
 from cmdbox.app.commons import redis_client
 from cmdbox.app.feature import Feature
@@ -6,9 +7,10 @@ from typing import Dict, Any, Tuple, List
 import argparse
 import logging
 
+
 class ServerStop(Feature):
-    def __init__(self):
-        pass
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """
