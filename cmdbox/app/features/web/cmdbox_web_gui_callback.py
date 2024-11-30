@@ -2,6 +2,7 @@ from cmdbox import version
 from cmdbox.app import common, feature
 from cmdbox.app.web import Web
 from fastapi import FastAPI, HTTPException, WebSocket
+from starlette.websockets import WebSocketDisconnect
 import logging
 import json
 import queue
@@ -29,7 +30,6 @@ class GuiCallback(feature.WebFeature):
                 web.logger.debug(f"web.gui_callback: connected")
             if not websocket:
                 raise HTTPException(status_code=400, detail='Expected WebSocket request.')
-            #def gui_callback_loop(web:Web, websocket:WebSocket):
             while True:
                 outputs = None
                 try:
@@ -42,8 +42,9 @@ class GuiCallback(feature.WebFeature):
                     await websocket.send_text(json.dumps(outputs, default=common.default_json_enc))
                 except queue.Empty:
                     pass
+                except WebSocketDisconnect:
+                    web.logger.warning('web.sub_img: websocket disconnected.')
+                    raise HTTPException(status_code=400, detail='web.sub_img: websocket disconnected.')
                 except Exception as e:
                     web.logger.warning(f'web.gui_callback: websocket error. {e}')
                     raise HTTPException(status_code=400, detail='Expected WebSocket request.')
-            #th = threading.Thread(target=gui_callback_loop, args=(web, websocket))
-            #th.start()

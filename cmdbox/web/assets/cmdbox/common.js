@@ -8,6 +8,7 @@ cmdbox.change_dark_mode = (dark_mode) => {
   if(dark_mode) html.attr('data-bs-theme','dark');
   else if(html.attr('data-bs-theme')=='dark') html.removeAttr('data-bs-theme');
   else html.attr('data-bs-theme','dark');
+  $('body').css('background-color', '');
 };
 /**
  * ローディング表示
@@ -78,6 +79,9 @@ cmdbox.appid = async (sel) => {
   const res = await fetch('gui/appid', {method: 'GET'});
   const appid = await res.text()
   $(sel).text(appid);
+  const head = $('head');
+  head.append(`<title>${appid}</title>`);
+  head.append(`<link rel="icon" type="image/x-icon" href="assets/${appid}/favicon.ico">`);
 };
 /**
  * サインアウト
@@ -113,9 +117,15 @@ $(()=>{
 cmdbox.init_version_modal = () => {
   $('#versions_modal').on('shown.bs.modal', async () => {
     // cmdboxのバージョン情報取得
-    const versions_func = async (tabid, title, url) => {
+    const versions_func = async (tabid, title, icon, url) => {
       const tab = $(`<li class="nav-item" role="presentation">`)
-      tab.append(`<button class="nav-link" id="${tabid}-tab" data-bs-toggle="tab" data-bs-target="#${tabid}" type="button" role="tab" aria-controls="${tabid}" aria-selected="true">${title}</button>`);
+      const btn = $(`<button class="nav-link" id="${tabid}-tab" data-bs-toggle="tab" data-bs-target="#${tabid}" type="button" role="tab" aria-controls="${tabid}" aria-selected="true"/>`);
+      if (icon) btn.append(`<span><img class="me-2" src="${icon}" width="32" height="32"/>${title}</span>`);
+      else {
+        btn.addClass('mt-2');
+        btn.html(title);
+      }
+      tab.append(btn);
       $('.version-tabs').prepend(tab);
       if (!url) return;
       const tabcont = $(`<div class="tab-pane fade show" id="${tabid}" role="tabpanel" aria-labelledby="${tabid}-tab"/>`)
@@ -145,11 +155,11 @@ cmdbox.init_version_modal = () => {
     }
     $('.version-tabs').html('');
     $('.version-content').html('<div class="tab-pane fade" id="versions_used" role="tabpanel" aria-labelledby="versions_used-tab">versions_used</div>');
-    await versions_func('versions_used', 'Used software', null);
+    await versions_func('versions_used', 'Used software', null, null);
     const res = await fetch('gui/version_info', {method: 'GET'});
     const verinfos = await res.json();
     for (const v of verinfos) {
-      await versions_func(v['tabid'], v['title'], v['url']);
+      await versions_func(v['tabid'], v['title'], v['icon'], v['url']);
     }
     // usedのバージョン情報取得
     const versions_used_func = async () => {

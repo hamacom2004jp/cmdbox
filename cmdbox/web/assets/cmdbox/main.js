@@ -16,8 +16,15 @@ $(() => {
     cmdbox.init_version_modal();
     // モーダルボタン初期化
     cmdbox.init_modal_button();
-
+    cmdbox.gui_callback_reconnectInterval_handler = null;
+    cmdbox.gui_callback_ping_handler = null;
     const gui_callback = () => {
+        if (cmdbox.gui_callback_reconnectInterval_handler) {
+            clearInterval(cmdbox.gui_callback_reconnectInterval_handler);
+        }
+        if (cmdbox.gui_callback_ping_handler) {
+            clearInterval(cmdbox.gui_callback_ping_handler);
+        }
         const protocol = window.location.protocol.endsWith('s:') ? 'wss' : 'ws';
         const host = window.location.hostname;
         const port = window.location.port;
@@ -59,17 +66,19 @@ $(() => {
                 result_modal.find('.btn_window').click();
             }
         };
-        ws.isopen = false;
         ws.onopen = () => {
-            ws.isopen = true;
-            const ping = () => {
-                ws.send('ping');
-                ws.isopen && window.setTimeout(ping, 100);
-            };
-            ping();
+            const ping = () => {ws.send('ping');};
+            cmdbox.gui_callback_ping_handler = setInterval(() => {ping();}, 1000);
+        };
+        ws.onerror = (e) => {
+            console.error(`Websocket error: ${e}`);
+            clearInterval(cmdbox.gui_callback_ping_handler);
         };
         ws.onclose = () => {
-            ws.isopen = false;
+            clearInterval(cmdbox.gui_callback_ping_handler);
+            cmdbox.gui_callback_reconnectInterval_handler = setInterval(() => {
+                gui_callback();
+            }, 3000);
         };
     };
     gui_callback();

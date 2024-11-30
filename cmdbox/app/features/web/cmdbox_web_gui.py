@@ -10,7 +10,8 @@ import logging
 class Gui(feature.WebFeature):
     def __init__(self, ver=version):
         super().__init__(ver=ver)
-        self.version_info = [dict(tabid='versions_cmdbox', title=version.__appid__, url='versions_cmdbox')]
+        self.version_info = [dict(tabid='versions_cmdbox', title=version.__appid__,
+                                  icon=f'assets/cmdbox/icon.png', url='versions_cmdbox')]
 
     def route(self, web:Web, app:FastAPI) -> None:
         """
@@ -36,6 +37,7 @@ class Gui(feature.WebFeature):
             res.headers['Access-Control-Allow-Origin'] = '*'
             return web.gui_html_data
 
+        @app.get('/signin/gui/appid', response_class=PlainTextResponse)
         @app.get('/gui/appid', response_class=PlainTextResponse)
         async def appid(req:Request, res:Response):
             return self.ver.__appid__

@@ -22,6 +22,7 @@ class Assets(feature.WebFeature):
             app (FastAPI): FastAPIオブジェクト
         """
         def asset_func(asset_data, path):
+            @app.get(f'/signin/assets/{path}')
             @app.get(f'/assets/{path}')
             def func():
                 mime, enc = mimetypes.guess_type(path)

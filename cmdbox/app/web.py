@@ -5,6 +5,8 @@ from fastapi.responses import RedirectResponse
 from pathlib import Path
 from starlette.middleware.sessions import SessionMiddleware
 from typing import Any, Dict, List
+from uvicorn.config import Config
+import asyncio
 import ctypes
 import gevent
 import logging
@@ -145,29 +147,7 @@ class Web:
         self.logger.warning(f"signin error.")
         return RedirectResponse(url=f'/signin{req.url.path}')
 
-    def start(self, allow_host:str="0.0.0.0", listen_port:int=8081, session_timeout:int=600, outputs_key:List[str]=[]):
-        """
-        Webサーバを起動する
-
-        Args:
-            allow_host (str, optional): 許可ホスト. Defaults to "
-            listen_port (int, optional): リスンポート. Defaults to 8081.
-            session_timeout (int, optional): セッションタイムアウト. Defaults to 600.
-            outputs_key (list, optional): 出力キー. Defaults to [].
-        """
-        self.allow_host = allow_host
-        self.listen_port = listen_port
-        self.outputs_key = outputs_key
-        self.session_timeout = session_timeout
-        if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"web start parameter: allow_host={self.allow_host}")
-            self.logger.debug(f"web start parameter: listen_port={self.listen_port}")
-            self.logger.debug(f"web start parameter: outputs_key={self.outputs_key}")
-            self.logger.debug(f"web start parameter: session_timeout={self.session_timeout}")
-
-        app = FastAPI()
-        app.add_middleware(SessionMiddleware, secret_key=common.random_string())
-
+    def init_webfeatures(self, app:FastAPI):
         self.filemenu = dict()
         self.toolmenu = dict()
         self.viewmenu = dict()
@@ -190,15 +170,38 @@ class Web:
                 wf_route(pn, self.web_features_prefix[i], self, app)
         self.options.load_features_file('web', lambda pk, pn: wf_route(pk, pn, self, app))
         wf_route("cmdbox.app.features.web", "cmdbox_web_", self, app)
-
         # 読込んだrouteの内容をログに出力
         if self.logger.level == logging.DEBUG:
             for route in app.routes:
                 self.logger.debug(f"loaded webfeature: {route}")
 
+    def start(self, allow_host:str="0.0.0.0", listen_port:int=8081, session_timeout:int=600, outputs_key:List[str]=[]):
+        """
+        Webサーバを起動する
+
+        Args:
+            allow_host (str, optional): 許可ホスト. Defaults to "
+            listen_port (int, optional): リスンポート. Defaults to 8081.
+            session_timeout (int, optional): セッションタイムアウト. Defaults to 600.
+            outputs_key (list, optional): 出力キー. Defaults to [].
+        """
+        self.allow_host = allow_host
+        self.listen_port = listen_port
+        self.outputs_key = outputs_key
+        self.session_timeout = session_timeout
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"web start parameter: allow_host={self.allow_host}")
+            self.logger.debug(f"web start parameter: listen_port={self.listen_port}")
+            self.logger.debug(f"web start parameter: outputs_key={self.outputs_key}")
+            self.logger.debug(f"web start parameter: session_timeout={self.session_timeout}")
+
+        app = FastAPI()
+        app.add_middleware(SessionMiddleware, secret_key=common.random_string())
+        self.init_webfeatures(app)
+
         self.is_running = True
         #uvicorn.run(app, host=self.allow_host, port=self.listen_port, workers=2)
-        th = RaiseThread(target=uvicorn.run, kwargs=dict(app=app, host=self.allow_host, port=self.listen_port))
+        th = ThreadedUvicorn(config=Config(app=app, host=self.allow_host, port=self.listen_port))
         th.start()
         try:
             if self.gui_mode:
@@ -207,9 +210,9 @@ class Web:
                 f.write(str(os.getpid()))
             while self.is_running:
                 gevent.sleep(1)
-            th.raise_exception()
+            th.stop()
         except KeyboardInterrupt:
-            th.raise_exception()
+            th.stop()
 
     def stop(self):
         """
@@ -228,6 +231,25 @@ class Web:
             traceback.print_exc()
         finally:
             self.logger.info(f"Exit web. allow_host={self.allow_host} listen_port={self.listen_port}")
+
+class ThreadedUvicorn:
+    def __init__(self, config: Config):
+        self.server = uvicorn.Server(config)
+        self.thread = threading.Thread(daemon=True, target=self.server.run)
+
+    def start(self):
+        self.thread.start()
+        asyncio.run(self.wait_for_started())
+
+    async def wait_for_started(self):
+        while not self.server.started:
+            await asyncio.sleep(0.1)
+
+    def stop(self):
+        if self.thread.is_alive():
+            self.server.should_exit = True
+            while self.thread.is_alive():
+                continue
 
 class RaiseThread(threading.Thread):
     def __init__(self, *args, **kwargs):
