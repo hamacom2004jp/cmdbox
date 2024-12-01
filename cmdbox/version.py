@@ -1,6 +1,6 @@
 import datetime
 
-dt_now = datetime.datetime(2024, 11, 30)
+dt_now = datetime.datetime(2024, 12, 1)
 __appid__ = 'cmdbox'
 __title__ = 'cmdbox'
 __version__ = '0.1.2'

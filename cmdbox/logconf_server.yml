@@ -1,17 +1,17 @@
 version: 1
- 
+
 formatters:
     fmt:
-        format: '[%(asctime)s] [%(levelname)s] %(message)s'
+        format: '%(levelname)s[%(asctime)s] - %(message)s'
         class: logging.Formatter
 handlers:
     std:
-        class: logging.StreamHandler
+        class: cmdbox.app.commons.loghandler.ColorfulStreamHandler
         level: INFO
         formatter: fmt
         stream: ext://sys.stdout
     server:
-        class: logging.handlers.TimedRotatingFileHandler
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
         level: INFO
         formatter: fmt
         backupCount: 5
