@@ -39,7 +39,7 @@ class ServerStop(Feature):
         """
         return dict(
             type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_TRUE,
-            discription_ja="推論サーバーを停止します。installモードで `cmdbox -m install -c server` を実行している場合は、 `docker-compose down` を使用してください。",
+            discription_ja="サーバーを停止します。installモードで `cmdbox -m install -c server` を実行している場合は、 `docker-compose down` を使用してください。",
             discription_en="Stop the inference server. If you are running `cmdbox -m install -c server` in install mode, use `docker-compose down`.",
             choise=[
                 dict(opt="host", type="str", default=self.default_host, required=True, multi=False, hide=True, choise=None,
@@ -52,7 +52,7 @@ class ServerStop(Feature):
                         discription_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
                         discription_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
                 dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None,
-                        discription_ja="推論サーバーのサービス名を指定します。省略時は `server` を使用します。",
+                        discription_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
                         discription_en="Specify the service name of the inference server. If omitted, `server` is used."),
                 dict(opt="retry_count", type="int", default=3, required=False, multi=False, hide=True, choise=None,
                         discription_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",

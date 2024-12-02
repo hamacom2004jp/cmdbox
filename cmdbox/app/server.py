@@ -20,7 +20,7 @@ class Server(filer.Filer):
             redis_host (str): Redisホスト名, by default "localhost"
             redis_port (int): Redisポート番号, by default 6379
             redis_password (str): Redisパスワード, by default None
-            svname (str, optional): 推論サーバーのサービス名. by default 'server'
+            svname (str, optional): サーバーのサービス名. by default 'server'
         """
         super().__init__(data_dir, logger)
         if svname.find('-') >= 0:

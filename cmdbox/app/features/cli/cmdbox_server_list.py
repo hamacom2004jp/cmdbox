@@ -38,7 +38,7 @@ class ServerList(Feature):
         """
         return dict(
             type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_TRUE,
-            discription_ja="起動中の推論サーバーの一覧を表示します。クライアント環境からの利用も可能です。",
+            discription_ja="起動中のサーバーの一覧を表示します。クライアント環境からの利用も可能です。",
             discription_en="Displays a list of running inference servers. Can also be used from the client environment.",
             choise=[
                 dict(opt="host", type="str", default=self.default_host, required=True, multi=False, hide=True, choise=None,

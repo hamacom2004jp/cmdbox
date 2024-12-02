@@ -21,19 +21,17 @@ class CmdBoxApp:
             CmdBoxApp._instance = CmdBoxApp()
         return CmdBoxApp._instance
 
-    def __init__(self, appid:str=version.__appid__, description:str=None, cli_features_packages:List[str]=None, cli_features_prefix:List[str]=None):
+    def __init__(self, ver=version, cli_features_packages:List[str]=None, cli_features_prefix:List[str]=None):
         """
         コンストラクタ
 
         Args:
-            appid (str, optional): アプリケーションID. Defaults to version.__appid__.
-            description (str, optional): アプリケーションの説明. Defaults to None.
+            ver (version, optional): バージョンモジュール. Defaults to version.
             cli_package_name (str, optional): プラグインのパッケージ名. Defaults to None.
             cli_features_prefix (List[str], optional): プラグインのパッケージのモジュール名のプレフィックス. Defaults to None.
         """
         self.options = options.Options.getInstance()
-        self.appid = appid
-        self.description = description
+        self.ver = ver
         self.cli_features_packages = cli_features_packages
         self.cli_features_prefix = cli_features_prefix
 
@@ -41,7 +39,8 @@ class CmdBoxApp:
         """
         コマンドライン引数を処理し、サーバーまたはクライアントを起動し、コマンドを実行する。
         """
-        parser = argparse.ArgumentParser(prog=self.appid, description=self.description, exit_on_error=False)
+        parser = argparse.ArgumentParser(prog=self.ver.__appid__, description=self.ver.__logo__ + '\n\n' + self.ver.__description__,
+                                         formatter_class=argparse.RawDescriptionHelpFormatter, exit_on_error=False)
 
         # プラグイン読込み
         self.options.load_svcmd('cmdbox.app.features.cli')
@@ -97,7 +96,7 @@ class CmdBoxApp:
             ret = {"success":f"Save options file. {args.useopt}"}
 
         if args.version:
-            v = version.__logo__ + '\n' + version.__description__
+            v = self.ver.__logo__ + '\n' + self.ver.__description__
             common.print_format(v, False, tm, None, False)
             return 0, v, None
 
@@ -110,7 +109,7 @@ class CmdBoxApp:
         common.copy_sample(args.data)
         common.copy_sample(Path.cwd())
 
-        logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall if args.cmd != 'webcap' else True, appid=self.appid)
+        logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall if args.cmd != 'webcap' else True, appid=self.ver.__appid__)
         if logger.level == logging.DEBUG:
             logger.debug(f"args.mode={args.mode}, args.cmd={args.cmd}")
             for m, mo in self.options._options["cmd"].items():

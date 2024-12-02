@@ -51,7 +51,7 @@ class WebStart(Feature):
                         discription_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
                         discription_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
                 dict(opt="svname", type="str", default="server", required=False, multi=False, hide=True, choise=None,
-                        discription_ja="推論サーバーのサービス名を指定します。省略時は `server` を使用します。",
+                        discription_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
                         discription_en="Specify the service name of the inference server. If omitted, `server` is used."),
                 dict(opt="data", type="file", default=common.HOME_DIR / f".{self.ver.__appid__}", required=False, multi=False, hide=False, choise=None,
                         discription_ja="省略した時は `$HONE/.cmdbox` を使用します。",

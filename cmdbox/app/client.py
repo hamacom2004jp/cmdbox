@@ -15,7 +15,7 @@ class Client(object):
             redis_host (str, optional): Redisサーバーのホスト名. Defaults to "localhost".
             redis_port (int, optional): Redisサーバーのポート番号. Defaults to 6379.
             redis_password (str, optional): Redisサーバーのパスワード. Defaults to None.
-            svname (str, optional): 推論サーバーのサービス名. Defaults to 'server'.
+            svname (str, optional): サーバーのサービス名. Defaults to 'server'.
         """
         self.logger = logger
         if svname is None or svname == "":

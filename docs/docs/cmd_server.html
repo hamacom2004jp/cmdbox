@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（serverモード） &mdash; cmdbox 2024/12/01 documentation</title>
+  <title>コマンドリファレンス（serverモード） &mdash; cmdbox 2024/12/02 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=56c4699f" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=78a7ace0"></script>
+      <script src="../_static/documentation_options.js?v=4f5f268a"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -48,8 +48,8 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_common.html">共通オプション</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">サーバー</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-server-c-start-option">サーバー起動 : <cite>cmdbox -m server -c start &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-server-c-stop-option">推論サーバー停止 : <cite>cmdbox -m server -c stop &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-server-c-list-option">推論サーバー一覧 : <cite>cmdbox -m server -c list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-server-c-stop-option">サーバー停止 : <cite>cmdbox -m server -c stop &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-server-c-list-option">サーバー一覧 : <cite>cmdbox -m server -c list &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html">クライアント</a></li>
@@ -123,7 +123,7 @@
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
 </tr>
 <tr class="row-even"><td><p>--data &lt;データフォルダ&gt;</p></td>
 <td></td>
@@ -141,7 +141,7 @@
 </table>
 </section>
 <section id="cmdbox-m-server-c-stop-option">
-<h2>推論サーバー停止 : <cite>cmdbox -m server -c stop &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-server-c-stop-option" title="Link to this heading"></a></h2>
+<h2>サーバー停止 : <cite>cmdbox -m server -c stop &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-server-c-stop-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>installモードで <cite>cmdbox -m install -c server</cite> を実行している場合は、 <cite>docker-compose down</cite> を使用してください。</p></li>
 </ul>
@@ -172,7 +172,7 @@
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
@@ -182,9 +182,9 @@
 </table>
 </section>
 <section id="cmdbox-m-server-c-list-option">
-<h2>推論サーバー一覧 : <cite>cmdbox -m server -c list &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-server-c-list-option" title="Link to this heading"></a></h2>
+<h2>サーバー一覧 : <cite>cmdbox -m server -c list &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-server-c-list-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>起動中の推論サーバーの一覧を表示します。</p></li>
+<li><p>起動中のサーバーの一覧を表示します。</p></li>
 <li><p>クライアント環境からの利用も可能です。</p></li>
 </ul>
 <table class="docutils align-default">

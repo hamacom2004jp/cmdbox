@@ -34,7 +34,7 @@ class Web:
             redis_host (str, optional): Redisサーバーのホスト名. Defaults to "localhost".
             redis_port (int, optional): Redisサーバーのポート番号. Defaults to 6379.
             redis_password (str, optional): Redisサーバーのパスワード. Defaults to None.
-            svname (str, optional): 推論サーバーのサービス名. Defaults to 'server'.
+            svname (str, optional): サーバーのサービス名. Defaults to 'server'.
             client_only (bool, optional): クライアントのみのサービスかどうか. Defaults to False.
             doc_root (Path, optional): カスタムファイルのドキュメントルート. フォルダ指定のカスタムファイルのパスから、doc_rootのパスを除去したパスでURLマッピングします。Defaults to None.
             gui_html (str, optional): GUIのHTMLファイル. Defaults to None.

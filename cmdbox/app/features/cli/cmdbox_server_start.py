@@ -38,7 +38,7 @@ class ServerStart(Feature):
         """
         return dict(
             type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_TRUE,
-            discription_ja="推論サーバーを起動します。installモードで `cmdbox -m install -c server` を実行している場合は、 `docker-compose up -d` を使用してください。",
+            discription_ja="サーバーを起動します。installモードで `cmdbox -m install -c server` を実行している場合は、 `docker-compose up -d` を使用してください。",
             discription_en="Start the inference server. If you are running `cmdbox -m install -c server` in install mode, use `docker-compose up -d`.",
             choise=[
                 dict(opt="host", type="str", default=self.default_host, required=True, multi=False, hide=True, choise=None,
@@ -51,7 +51,7 @@ class ServerStart(Feature):
                         discription_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
                         discription_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
                 dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None,
-                        discription_ja="推論サーバーのサービス名を指定します。省略時は `server` を使用します。",
+                        discription_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
                         discription_en="Specify the service name of the inference server. If omitted, `server` is used."),
                 dict(opt="data", type="file", default=common.HOME_DIR / f".{self.ver.__appid__}", required=False, multi=False, hide=False, choise=None,
                         discription_ja="省略した時は `$HONE/.cmdbox` を使用します。",

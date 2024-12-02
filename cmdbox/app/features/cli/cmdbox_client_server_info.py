@@ -52,7 +52,7 @@ class ClientServerInfo(Feature):
                         discription_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
                         discription_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
                 dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None,
-                        discription_ja="推論サーバーのサービス名を指定します。省略時は `server` を使用します。",
+                        discription_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
                         discription_en="Specify the service name of the inference server. If omitted, `server` is used."),
                 dict(opt="retry_count", type="int", default=3, required=False, multi=False, hide=True, choise=None,
                         discription_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",
