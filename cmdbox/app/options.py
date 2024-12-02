@@ -288,9 +288,9 @@ class Options:
             for data in yml['features'][ftype]:
                 if type(data) is not dict:
                     raise Exception(f'features.yml is invalid. (The “features.{ftype}” element must be a list element must be a dictionary. data={data})')
-                if 'package' in data:
+                if 'package' not in data:
                     raise Exception(f'features.yml is invalid. (The “package” element must be in the dictionary of the list element of the “features.{ftype}” element. data={data})')
-                if 'prefix' in data:
+                if 'prefix' not in data:
                     raise Exception(f'features.yml is invalid. (The prefix element must be in the dictionary of the list element of the “features.{ftype}” element. data={data})')
                 if data['package'] is None or data['package'] == "":
                     continue

@@ -23,17 +23,18 @@ import yaml
 
 
 HOME_DIR = Path(os.path.expanduser("~"))
-def copy_sample(data:Path):
+def copy_sample(data:Path, ver=version):
     """
     サンプルデータをコピーします。
 
     Args:
         data (Path): データディレクトリ
+        ver (version, optional): バージョン. Defaults to version
     """
     dst = Path(data) / '.samples' if data is not None else HOME_DIR / '.samples'
     if dst.exists():
         return
-    src = Path(__file__).parent.parent / 'extensions'
+    src = Path(ver.__file__).parent / 'extensions'
     shutil.copytree(src, dst, dirs_exist_ok=True)
 
 def mklogdir(data:Path) -> Path:

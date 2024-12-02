@@ -117,7 +117,7 @@ class WebStart(Feature):
         if args.data is None:
             msg = {"warn":f"Please specify the --data option."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
-            return 1, msg
+            return 1, msg, None
         w = None
         try:
             w = web.Web(logger, Path(args.data), redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
