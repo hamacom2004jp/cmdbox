@@ -353,7 +353,7 @@ def download_file(url:str, save_path:Path) -> Path:
         f.write(r.content)
     return save_path
 
-def cmd(cmd:str, logger:logging.Logger, slise:int=100):
+def cmd(cmd:str, logger:logging.Logger, slise:int=100, newenv:Dict=None):
     """
     コマンドを実行します。
 
@@ -361,13 +361,18 @@ def cmd(cmd:str, logger:logging.Logger, slise:int=100):
         cmd (str): 実行するコマンド
         logger (logging.Logger): ロガー
         slise (int, optional): 出力文字列の最大長. Defaults to 100
+        newenv (dict): 上書きしたい環境変数
 
     Returns:
         Tuple[int, str]: コマンドの戻り値と出力
     """
     if logger.level == logging.DEBUG:
         logger.debug(f"common.cmd:{cmd}")
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    env = os.environ.copy()
+    if newenv is not None:
+        for k, v in newenv.items():
+            env[k] = v
+    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
     output = None
     while proc.returncode is None:
         out = proc.stdout.readline()
@@ -385,7 +390,7 @@ def cmd(cmd:str, logger:logging.Logger, slise:int=100):
             except UnicodeDecodeError:
                 pass
 
-    return proc.returncode, output
+    return proc.returncode, output, cmd
 
 def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], classes:List[int], ids:List[str]=None,
                labels:List[str]=None, colors:List[Tuple[int]]=None, tracks:List[int]=None,
