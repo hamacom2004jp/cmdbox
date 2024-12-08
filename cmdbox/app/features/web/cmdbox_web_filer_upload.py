@@ -26,15 +26,16 @@ class FilerUpload(cmdbox_web_exec_cmd.ExecCmd):
             signin = web.check_signin(req, res)
             if signin is not None:
                 return signin
-            return await self.filer_upload(web, req)
+            return await self.filer_upload(web, req, res)
 
-    async def filer_upload(self, web:Web, req:Request) -> str:
+    async def filer_upload(self, web:Web, req:Request, res:Response) -> str:
         """
         ファイルをアップロードする
 
         Args:
             web (Web): Webオブジェクト
             req (Request): リクエスト
+            res (Response): レスポンス
         
         Returns:
             str: 結果
@@ -58,8 +59,10 @@ class FilerUpload(cmdbox_web_exec_cmd.ExecCmd):
                 opt['upload_file'] = str(upload_file).replace('"','')
                 opt['capture_stdout'] = True
                 shutil.copyfileobj(files[fn].file, Path(opt['upload_file']).open('wb'))
-                ret = self.exec_cmd(web, "file_upload", opt, nothread=True)
-                if len(ret) == 0 or 'success' not in ret[0]:
+                ret = self.exec_cmd(req, res, web, "file_upload", opt, nothread=True)
+                if type(ret) is dict and 'success' not in ret:
+                    return str(ret)
+                if type(ret) is list and (len(ret) == 0 or 'success' not in ret[0]):
                     return str(ret)
         return 'upload success'
         #return f'upload {upload.filename}'

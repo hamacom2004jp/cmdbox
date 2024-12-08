@@ -26,8 +26,7 @@ class GuiCallback(feature.WebFeature):
                 raise HTTPException(status_code=200, detail='ok.')
             await websocket.accept()
             # コマンドの実行結果をキューから取り出してブラウザに送信する
-            if web.logger.level == logging.DEBUG:
-                web.logger.debug(f"web.gui_callback: connected")
+            web.logger.info(f"web.gui_callback: connected")
             if not websocket:
                 raise HTTPException(status_code=400, detail='Expected WebSocket request.')
             while True:
@@ -44,7 +43,7 @@ class GuiCallback(feature.WebFeature):
                     pass
                 except WebSocketDisconnect:
                     web.logger.warning('web.sub_img: websocket disconnected.')
-                    raise HTTPException(status_code=400, detail='web.sub_img: websocket disconnected.')
+                    break
                 except Exception as e:
                     web.logger.warning(f'web.gui_callback: websocket error. {e}')
                     raise HTTPException(status_code=400, detail='Expected WebSocket request.')

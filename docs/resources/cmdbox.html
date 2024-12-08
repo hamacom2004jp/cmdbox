@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox package &mdash; cmdbox 2024/12/03 documentation</title>
+  <title>cmdbox package &mdash; cmdbox 2024/12/08 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=56c4699f" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=eb27a293"></script>
+      <script src="../_static/documentation_options.js?v=ff4c1bf6"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -112,6 +112,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.download_file"><code class="docutils literal notranslate"><span class="pre">download_file()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.draw_boxes"><code class="docutils literal notranslate"><span class="pre">draw_boxes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.getopt"><code class="docutils literal notranslate"><span class="pre">getopt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.hash_password"><code class="docutils literal notranslate"><span class="pre">hash_password()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.load_config"><code class="docutils literal notranslate"><span class="pre">load_config()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.load_yml"><code class="docutils literal notranslate"><span class="pre">load_yml()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.loadopt"><code class="docutils literal notranslate"><span class="pre">loadopt()</span></code></a></li>
@@ -122,6 +123,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.random_string"><code class="docutils literal notranslate"><span class="pre">random_string()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.rmdirs"><code class="docutils literal notranslate"><span class="pre">rmdirs()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.safe_fname"><code class="docutils literal notranslate"><span class="pre">safe_fname()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.save_yml"><code class="docutils literal notranslate"><span class="pre">save_yml()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.saveopt"><code class="docutils literal notranslate"><span class="pre">saveopt()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.set_debug"><code class="docutils literal notranslate"><span class="pre">set_debug()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.to_str"><code class="docutils literal notranslate"><span class="pre">to_str()</span></code></a></li>
@@ -223,11 +225,24 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web"><code class="docutils literal notranslate"><span class="pre">Web</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.check_cmd"><code class="docutils literal notranslate"><span class="pre">Web.check_cmd()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.check_signin"><code class="docutils literal notranslate"><span class="pre">Web.check_signin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.correct_group"><code class="docutils literal notranslate"><span class="pre">Web.correct_group()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.enable_cors"><code class="docutils literal notranslate"><span class="pre">Web.enable_cors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.get_enable_cmds"><code class="docutils literal notranslate"><span class="pre">Web.get_enable_cmds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.get_enable_modes"><code class="docutils literal notranslate"><span class="pre">Web.get_enable_modes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.group_add"><code class="docutils literal notranslate"><span class="pre">Web.group_add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.group_del"><code class="docutils literal notranslate"><span class="pre">Web.group_del()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.group_edit"><code class="docutils literal notranslate"><span class="pre">Web.group_edit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.group_list"><code class="docutils literal notranslate"><span class="pre">Web.group_list()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.init_webfeatures"><code class="docutils literal notranslate"><span class="pre">Web.init_webfeatures()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.load_signin_file"><code class="docutils literal notranslate"><span class="pre">Web.load_signin_file()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.start"><code class="docutils literal notranslate"><span class="pre">Web.start()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.stop"><code class="docutils literal notranslate"><span class="pre">Web.stop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.user_add"><code class="docutils literal notranslate"><span class="pre">Web.user_add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.user_del"><code class="docutils literal notranslate"><span class="pre">Web.user_del()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.user_edit"><code class="docutils literal notranslate"><span class="pre">Web.user_edit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.Web.user_list"><code class="docutils literal notranslate"><span class="pre">Web.user_list()</span></code></a></li>
 </ul>
 </li>
 </ul>

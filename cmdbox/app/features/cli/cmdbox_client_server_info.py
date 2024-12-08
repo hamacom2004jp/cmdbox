@@ -140,7 +140,7 @@ class ClientServerInfo(Feature):
         Returns:
             int: 終了コード
         """
-        st = self.server_info(msg[1])
+        st = self.server_info(msg[1], data_dir, logger, redis_cli, sessions)
         return st
 
     def server_info(self, reskey:str,

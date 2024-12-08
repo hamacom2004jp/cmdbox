@@ -25,16 +25,17 @@ class DoSignin(cmdbox_web_signin.Signin):
             passwd = form.get('password')
             if userid == '' or passwd == '':
                 return RedirectResponse(url=f'/signin/{next}?error=1')
-            self.load_signin_file(web)
-            if userid not in web.signin_file_data:
+            user = [u for u in web.signin_file_data['users'] if u['name'] == userid]
+            if len(user) <= 0:
                 return RedirectResponse(url=f'/signin/{next}?error=1')
-            algname = web.signin_file_data[userid]['algname']
-            if algname != 'plain':
-                h = hashlib.new(algname)
+            hash = user[0]['hash']
+            if hash != 'plain':
+                h = hashlib.new(hash)
                 h.update(passwd.encode('utf-8'))
                 passwd = h.hexdigest()
-            if passwd != web.signin_file_data[userid]['password']:
+            if passwd != user[0]['password']:
                 return RedirectResponse(url=f'/signin/{next}?error=1')
-
-            req.session['signin'] = dict(userid=userid, password=passwd)
+            group_names = list(set(web.correct_group(user[0]['groups'])))
+            req.session['signin'] = dict(userid=userid, password=passwd, groups=group_names)
             return RedirectResponse(url=f'/{next}')
+

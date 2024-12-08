@@ -100,16 +100,23 @@ $(()=>{
       const json = await res.json();
       const usesignout = json['success']['usesignout'];
       if (!usesignout) return;
-      const about_menu = $('.aboutmenu');
-      if (!about_menu.find('.signout-menu-item').length) {
+      const user = await cmdbox.user_info();
+      if (!user) return;
+      const user_info_menu = $('.user_info');
+      user_info_menu.removeClass('d-none').addClass('d-flex');
+      if (!user_info_menu.find('.dropdown-menu .signout-menu-item').length) {
         const parts = location.pathname.split('/');
         const sitepath = parts[parts.length-1];
         const signout_item = $(`<li><a class="dropdown-item signout-menu-item" href="#" onclick="cmdbox.singout('${sitepath}');">Sign out</a></li>`);
-        about_menu.append(signout_item);
+        user_info_menu.find('.dropdown-menu').append(signout_item);
       }
+      user_info_menu.find('.user_info_note').html(`Groups: ${user['groups'].join(', ')}`);
+      user_info_menu.find('.username').text(user['name']);
     } catch (e) {}
   });
   cmdbox.appid('.navbar-brand');
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 });
 /**
  * バージョンモーダルを初期化
@@ -457,6 +464,16 @@ cmdbox.deploy_list = (target, error_func=undefined) => {
     }
     return res[0]['success'];
   });
+};
+/**
+ * 現在のユーザー情報取得
+ * @returns {Promise} - レスポンス
+ */
+cmdbox.user_info = async () => {
+  const res = await fetch('gui/user_info', {method: 'GET'});
+  if (!res.ok) return null;
+  const user = await res.json()
+  return user;
 };
 /**
  * ファイルリスト取得

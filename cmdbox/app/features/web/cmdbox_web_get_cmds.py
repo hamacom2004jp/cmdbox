@@ -25,5 +25,6 @@ class GetCmds(feature.WebFeature):
                 return dict(warn=f'Please log in to retrieve session.')
             form = await req.form()
             mode = form.get('mode')
-            ret = web.options.get_cmds(mode)
+            #ret = web.options.get_cmds(mode)
+            ret = web.get_enable_cmds(mode, req, res)
             return json.dumps(ret, default=common.default_json_enc)

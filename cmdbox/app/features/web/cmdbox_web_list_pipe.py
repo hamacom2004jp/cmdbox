@@ -26,16 +26,18 @@ class ListPipe(feature.WebFeature):
                 return dict(warn=f'Please log in to retrieve session.')
             form = await req.form()
             kwd = form.get('kwd')
-            ret = self.list_pipe(web, kwd)
+            ret = self.list_pipe(web, kwd, req, res)
             return ret
 
-    def list_pipe(self, web:Web, kwd:str) -> List[Dict[str, Any]]:
+    def list_pipe(self, web:Web, kwd:str, req:Request, res:Response) -> List[Dict[str, Any]]:
         """
         パイプラインファイルのリストを取得する
 
         Args:
             web (Web): Webオブジェクト
             kwd (str): キーワード
+            req (Request): リクエスト
+            res (Response): レスポンス
         
         Returns:
             list: パイプラインファイルのリスト
@@ -45,7 +47,15 @@ class ListPipe(feature.WebFeature):
         if web.logger.level == logging.DEBUG:
             web.logger.debug(f"web.list_pipe: kwd={kwd}")
         paths = glob.glob(str(web.pipes_path / f"pipe-{kwd}.json"))
-        ret = [common.loadopt(path) for path in paths]
-        ret = sorted(ret, key=lambda cmd: cmd["title"])
-        return ret
-    
+        pipes = [common.loadopt(path) for path in paths]
+        pipes = sorted(pipes, key=lambda cmd: cmd["title"])
+        pipes = [pipe for pipe in pipes if self.chk_pipe(web, pipe['pipe_cmd'], req, res)]
+        return pipes
+
+    def chk_pipe(self, web:Web, pipe_cmd:list, req:Request, res:Response) -> Dict[str, Any]:
+        cmd = [title for title in pipe_cmd if self.chk_opt(web, title, req, res)]
+        return len(pipe_cmd) == len(cmd)
+
+    def chk_opt(self, web:Web, title:str, req:Request, res:Response) -> Dict[str, Any]:
+        opt = common.loadopt(web.cmds_path / f'cmd-{title}.json')
+        return web.check_cmd(req, res, opt['mode'], opt['cmd'])

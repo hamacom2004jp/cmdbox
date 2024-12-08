@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（webモード） &mdash; cmdbox 2024/12/03 documentation</title>
+  <title>コマンドリファレンス（webモード） &mdash; cmdbox 2024/12/08 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=56c4699f" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=eb27a293"></script>
+      <script src="../_static/documentation_options.js?v=ff4c1bf6"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -52,6 +52,14 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Web</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#web-cmdbox-m-web-c-start-option">Webサービス起動 : <cite>cmdbox -m web -c start &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#web-cmdbox-m-web-c-stop-option">Webサービス停止 : <cite>cmdbox -m web -c stop &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-web-c-user-list-option">ユーザー一覧取得 : <cite>cmdbox -m web -c user_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-web-c-user-add-option">ユーザー追加 : <cite>cmdbox -m web -c user_add &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-web-c-user-edit-option">ユーザー編集 : <cite>cmdbox -m web -c user_edit &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-web-c-user-del-option">ユーザー削除 : <cite>cmdbox -m web -c user_del &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-web-c-group-list-option">グループ一覧取得 : <cite>cmdbox -m web -c group_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-web-c-group-add-option">グループ追加 : <cite>cmdbox -m web -c group_add &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-web-c-group-edit-option">グループ編集 : <cite>cmdbox -m web -c group_edit &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-web-c-group-del-option">グループ削除 : <cite>cmdbox -m web -c group_del &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-web-c-gencert-option">自己署名サーバー証明書生成 : <cite>cmdbox -m web -c gencert &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
@@ -134,9 +142,25 @@
 <td></td>
 <td><p>省略した時は <cite>8081</cite> を使用します。</p></td>
 </tr>
+<tr class="row-odd"><td><p>--ssl_cert &lt;SSLサーバー証明書ファイル&gt;</p></td>
+<td></td>
+<td><p>SSLサーバー証明書ファイルを指定します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--ssl_key &lt;SSLサーバー秘密鍵ファイル&gt;</p></td>
+<td></td>
+<td><p>SSLサーバー秘密鍵ファイルを指定します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--ssl_keypass &lt;SSLサーバー秘密鍵パスワード&gt;</p></td>
+<td></td>
+<td><p>SSLサーバー秘密鍵ファイルの複合化パスワードを指定します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--ssl_ca_certs &lt;SSLサーバーCA証明書ファイル&gt;</p></td>
+<td></td>
+<td><p>SSLサーバーCA証明書ファイルを指定します。</p></td>
+</tr>
 <tr class="row-odd"><td><p>--signin_file &lt;ユーザーリストファイル&gt;</p></td>
 <td></td>
-<td><p>ログイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。ログインファイルは、各行が1ユーザーを示し、ユーザーID、パスワード、ハッシュアルゴリズム名の順で、「 : 」で区切って記載します。ハッシュアルゴリズム名は「plain」「md5」「sha1」「sha256」が指定できます。</p></td>
+<td><p>ログイン可能なユーザーとパスワードを記載したファイルを指定します。</p></td>
 </tr>
 <tr class="row-even"><td><p>--client_only</p></td>
 <td></td>
@@ -191,6 +215,422 @@
 </tbody>
 </table>
 </section>
+<section id="cmdbox-m-web-c-user-list-option">
+<h2>ユーザー一覧取得 : <cite>cmdbox -m web -c user_list &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-web-c-user-list-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<td></td>
+<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+</tr>
+<tr class="row-even"><td><p>--data &lt;データフォルダ&gt;</p></td>
+<td></td>
+<td><p>省略した時は <cite>$HONE/.cmdbox</cite> を使用します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--user_name &lt;ユーザー名&gt;</p></td>
+<td></td>
+<td><p>ユーザー名を指定して取得します。省略した時は全てのユーザーを取得します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--signin_file &lt;ユーザーリストファイル&gt;</p></td>
+<td></td>
+<td><p>ログイン可能なユーザーとパスワードを記載したファイルを指定します。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="cmdbox-m-web-c-user-add-option">
+<h2>ユーザー追加 : <cite>cmdbox -m web -c user_add &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-web-c-user-add-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<td></td>
+<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+</tr>
+<tr class="row-even"><td><p>--data &lt;データフォルダ&gt;</p></td>
+<td></td>
+<td><p>省略した時は <cite>$HONE/.cmdbox</cite> を使用します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--user_id &lt;ユーザーID&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>ユーザーIDを指定します。他のユーザーと重複しないようにしてください。</p></td>
+</tr>
+<tr class="row-even"><td><p>--user_name &lt;ユーザー名&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>ユーザー名を指定します。他のユーザーと重複しないようにしてください。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--user_pass &lt;ユーザーパスワード&gt;</p></td>
+<td></td>
+<td><p>ユーザーパスワードを指定します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--user_pass_hash &lt;ハッシュアルゴリズム&gt;</p></td>
+<td></td>
+<td><p>ユーザーパスワードのハッシュアルゴリズムを指定します。'plain', 'md5', 'sha1', 'sha256' が指定できます。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--user_group &lt;ユーザーグループ&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>ユーザーが所属するグループを指定します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--signin_file &lt;ユーザーリストファイル&gt;</p></td>
+<td></td>
+<td><p>ログイン可能なユーザーとパスワードを記載したファイルを指定します。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="cmdbox-m-web-c-user-edit-option">
+<h2>ユーザー編集 : <cite>cmdbox -m web -c user_edit &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-web-c-user-edit-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<td></td>
+<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+</tr>
+<tr class="row-even"><td><p>--data &lt;データフォルダ&gt;</p></td>
+<td></td>
+<td><p>省略した時は <cite>$HONE/.cmdbox</cite> を使用します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--user_id &lt;ユーザーID&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>ユーザーIDを指定します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--user_name &lt;ユーザー名&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>ユーザー名を指定します。他のユーザーと重複しないようにしてください。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--user_pass &lt;ユーザーパスワード&gt;</p></td>
+<td></td>
+<td><p>ユーザーパスワードを指定します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--user_pass_hash &lt;ハッシュアルゴリズム&gt;</p></td>
+<td></td>
+<td><p>ユーザーパスワードのハッシュアルゴリズムを指定します。'plain', 'md5', 'sha1', 'sha256' が指定できます。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--user_group &lt;ユーザーグループ&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>ユーザーが所属するグループを指定します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--signin_file &lt;ユーザーリストファイル&gt;</p></td>
+<td></td>
+<td><p>ログイン可能なユーザーとパスワードを記載したファイルを指定します。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="cmdbox-m-web-c-user-del-option">
+<h2>ユーザー削除 : <cite>cmdbox -m web -c user_del &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-web-c-user-del-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<td></td>
+<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+</tr>
+<tr class="row-even"><td><p>--data &lt;データフォルダ&gt;</p></td>
+<td></td>
+<td><p>省略した時は <cite>$HONE/.cmdbox</cite> を使用します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--user_id &lt;ユーザーID&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>ユーザーIDを指定します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--signin_file &lt;ユーザーリストファイル&gt;</p></td>
+<td></td>
+<td><p>ログイン可能なユーザーとパスワードを記載したファイルを指定します。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="cmdbox-m-web-c-group-list-option">
+<h2>グループ一覧取得 : <cite>cmdbox -m web -c group_list &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-web-c-group-list-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<td></td>
+<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+</tr>
+<tr class="row-even"><td><p>--data &lt;データフォルダ&gt;</p></td>
+<td></td>
+<td><p>省略した時は <cite>$HONE/.cmdbox</cite> を使用します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--group_name &lt;グループ名&gt;</p></td>
+<td></td>
+<td><p>グループ名を指定して取得します。省略した時は全てのグループを取得します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--signin_file &lt;ユーザーリストファイル&gt;</p></td>
+<td></td>
+<td><p>ログイン可能なユーザーとパスワードを記載したファイルを指定します。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="cmdbox-m-web-c-group-add-option">
+<h2>グループ追加 : <cite>cmdbox -m web -c group_add &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-web-c-group-add-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<td></td>
+<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+</tr>
+<tr class="row-even"><td><p>--data &lt;データフォルダ&gt;</p></td>
+<td></td>
+<td><p>省略した時は <cite>$HONE/.cmdbox</cite> を使用します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--group_id &lt;グループID&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>グループIDを指定します。他のグループと重複しないようにしてください。</p></td>
+</tr>
+<tr class="row-even"><td><p>--group_name &lt;グループ名&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>グループ名を指定します。他のグループと重複しないようにしてください。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--group_parent &lt;親グループ名&gt;</p></td>
+<td></td>
+<td><p>親グループ名を指定します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--signin_file &lt;ユーザーリストファイル&gt;</p></td>
+<td></td>
+<td><p>ログイン可能なユーザーとパスワードを記載したファイルを指定します。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="cmdbox-m-web-c-group-edit-option">
+<h2>グループ編集 : <cite>cmdbox -m web -c group_edit &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-web-c-group-edit-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<td></td>
+<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+</tr>
+<tr class="row-even"><td><p>--data &lt;データフォルダ&gt;</p></td>
+<td></td>
+<td><p>省略した時は <cite>$HONE/.cmdbox</cite> を使用します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--group_id &lt;グループID&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>グループIDを指定します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--group_name &lt;グループ名&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>グループ名を指定します。他のグループと重複しないようにしてください。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--group_parent &lt;親グループ名&gt;</p></td>
+<td></td>
+<td><p>親グループ名を指定します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--signin_file &lt;ユーザーリストファイル&gt;</p></td>
+<td></td>
+<td><p>ログイン可能なユーザーとパスワードを記載したファイルを指定します。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="cmdbox-m-web-c-group-del-option">
+<h2>グループ削除 : <cite>cmdbox -m web -c group_del &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-web-c-group-del-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<td></td>
+<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+</tr>
+<tr class="row-even"><td><p>--data &lt;データフォルダ&gt;</p></td>
+<td></td>
+<td><p>省略した時は <cite>$HONE/.cmdbox</cite> を使用します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--group_id &lt;グループID&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>グループIDを指定します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--signin_file &lt;ユーザーリストファイル&gt;</p></td>
+<td></td>
+<td><p>ログイン可能なユーザーとパスワードを記載したファイルを指定します。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="cmdbox-m-web-c-gencert-option">
 <h2>自己署名サーバー証明書生成 : <cite>cmdbox -m web -c gencert &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-web-c-gencert-option" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
@@ -214,9 +654,17 @@
 <td></td>
 <td><p>出力する自己署名証明書のファイルを指定します。省略した場合は <cite>webhostオプションに指定したホスト名</cite> .crt に出力されます。</p></td>
 </tr>
-<tr class="row-even"><td><p>--output_key &lt;保存先&gt;</p></td>
+<tr class="row-even"><td><p>--output_cert_format &lt;フォーマット&gt;</p></td>
+<td></td>
+<td><p>出力する自己署名証明書のファイルフォーマットを指定します。'PEM', 'DER' が指定できます。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--output_key &lt;保存先&gt;</p></td>
 <td></td>
 <td><p>出力する自己署名証明書の秘密鍵ファイルを指定します。省略した場合は <cite>webhostオプションに指定したホスト名</cite> .key に出力されます。</p></td>
+</tr>
+<tr class="row-even"><td><p>--output_key_format &lt;フォーマット&gt;</p></td>
+<td></td>
+<td><p>出力する自己署名証明書の秘密鍵ファイルフォーマットを指定します。'PEM', 'DER' が指定できます。</p></td>
 </tr>
 <tr class="row-odd"><td><p>--overwrite</p></td>
 <td></td>

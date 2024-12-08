@@ -23,6 +23,6 @@ class GetModes(feature.WebFeature):
             signin = web.check_signin(req, res)
             if signin is not None:
                 return dict(warn=f'Please log in to retrieve session.')
-            ret = web.options.get_modes()
+            ret = web.get_enable_modes(req, res)
             return json.dumps(ret, default=common.default_json_enc)
 

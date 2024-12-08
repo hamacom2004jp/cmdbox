@@ -8,6 +8,7 @@ from typing import List, Tuple, Dict, Any
 import datetime
 import logging
 import logging.config
+import hashlib
 import json
 import numpy as np
 import os
@@ -32,10 +33,14 @@ def copy_sample(data:Path, ver=version):
         ver (version, optional): バージョン. Defaults to version
     """
     dst = Path(data) / '.samples' if data is not None else HOME_DIR / '.samples'
-    if dst.exists():
-        return
+    #if dst.exists():
+    #    return
     src = Path(ver.__file__).parent / 'extensions'
-    shutil.copytree(src, dst, dirs_exist_ok=True)
+    def copy(src:str, dst:str):
+        p = Path(dst)
+        if not p.exists():
+            shutil.copy2(src, dst)
+    shutil.copytree(src, dst, dirs_exist_ok=True, copy_function=copy)
 
 def mklogdir(data:Path) -> Path:
     """
@@ -64,6 +69,17 @@ def load_yml(yml_path:Path) -> dict:
     """
     with open(yml_path) as f:
         return yaml.safe_load(f)
+
+def save_yml(yml_path:Path, data:dict) -> None:
+    """
+    YAMLファイルに書き込みます。
+
+    Args:
+        yml_path (Path): YAMLファイルのパス
+        data (dict): 書き込むデータ
+    """
+    with open(yml_path, 'w') as f:
+        yaml.dump(data, f, default_flow_style=False, sort_keys=False)
 
 def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, appid:str=version.__appid__) -> Tuple[logging.Logger, dict]:
     """
@@ -353,7 +369,7 @@ def download_file(url:str, save_path:Path) -> Path:
         f.write(r.content)
     return save_path
 
-def cmd(cmd:str, logger:logging.Logger, slise:int=100, newenv:Dict=None):
+def cmd(cmd:str, logger:logging.Logger, slise:int=100, newenv:Dict=None) -> Tuple[int, str, str]:
     """
     コマンドを実行します。
 
@@ -364,10 +380,10 @@ def cmd(cmd:str, logger:logging.Logger, slise:int=100, newenv:Dict=None):
         newenv (dict): 上書きしたい環境変数
 
     Returns:
-        Tuple[int, str]: コマンドの戻り値と出力
+        Tuple[int, str, str]: コマンドの戻り値と出力とコマンド
     """
     if logger.level == logging.DEBUG:
-        logger.debug(f"common.cmd:{cmd}")
+        logger.debug(f"cmd: {cmd}")
     env = os.environ.copy()
     if newenv is not None:
         for k, v in newenv.items():
@@ -385,12 +401,28 @@ def cmd(cmd:str, logger:logging.Logger, slise:int=100, newenv:Dict=None):
                 #    output = output.rstrip()
                 if logger.level == logging.DEBUG:
                     output_str = to_str(output, slise=slise)
-                    logger.debug(f"common.cmd:output={output_str}")
+                    logger.debug(f"output: {output_str}")
                 break
             except UnicodeDecodeError:
                 pass
 
     return proc.returncode, output, cmd
+
+def hash_password(password:str, hash:str) -> str:
+    """
+    パスワードをハッシュ化します。
+
+    Args:
+        password (str): パスワード
+        hash (str): ハッシュアルゴリズム
+
+    Returns:
+        str: ハッシュ化されたパスワード
+    """
+    h = hashlib.new(hash)
+    h.update(password.encode('utf-8'))
+    passwd = h.hexdigest()
+    return passwd
 
 def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], classes:List[int], ids:List[str]=None,
                labels:List[str]=None, colors:List[Tuple[int]]=None, tracks:List[int]=None,

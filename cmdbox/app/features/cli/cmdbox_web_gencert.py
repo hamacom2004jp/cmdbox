@@ -53,9 +53,15 @@ class WebGencert(Feature):
                 dict(opt="output_cert", type="file", default=None, required=False, multi=False, hide=False, choise=None,
                         discription_ja="出力する自己署名証明書のファイルを指定します。省略した場合は `webhostオプションに指定したホスト名` .crt に出力されます。",
                         discription_en="Specify the self-signed certificate file to be output.If omitted, the hostname specified in the `webhost option` .crt will be output."),
+                dict(opt="output_cert_format", type="str", default="PEM", required=False, multi=False, hide=False, choise=["DER", "PEM"],
+                        discription_ja="出力する自己署名証明書のファイルフォーマットを指定します。",
+                        discription_en="Specifies the file format of the self-signed certificate to be output."),
                 dict(opt="output_key", type="file", default=None, required=False, multi=False, hide=False, choise=None,
                         discription_ja="出力する自己署名証明書の秘密鍵ファイルを指定します。省略した場合は `webhostオプションに指定したホスト名` .key に出力されます。",
                         discription_en="Specifies the private key file of the self-signed certificate to be output.If omitted, the hostname specified in the `webhost option` .key will be output."),
+                dict(opt="output_key_format", type="str", default="PEM", required=False, multi=False, hide=False, choise=["DER", "PEM"],
+                        discription_ja="出力する自己署名証明書の秘密鍵ファイルフォーマットを指定します。",
+                        discription_en="Specifies the private key file format of the output self-signed certificate."),
                 dict(opt="overwrite", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False],
                         discription_ja="出力する自己署名証明書のファイルが存在する場合に上書きします。",
                         discription_en="Overwrites the self-signed certificate file to be output if it exists."),
@@ -111,13 +117,15 @@ class WebGencert(Feature):
             return 1, msg, None
         return 0, ret, None
 
-    def gen_cert(self, logger:logging.Logger, webhost:str, output_cert:Path, output_key:Path):
+    def gen_cert(self, logger:logging.Logger, webhost:str,
+                 output_cert:Path, output_cert_format:str,
+                 output_key:Path, output_key_format:str) -> None:
         # 秘密鍵の作成
         private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
         # 秘密鍵の保存
         with open(output_key, "wb") as f:
             f.write(private_key.private_bytes(
-                encoding=serialization.Encoding.DER,
+                encoding=serialization.Encoding.DER if output_key_format == "DER" else serialization.Encoding.PEM,
                 format=serialization.PrivateFormat.TraditionalOpenSSL,
                 encryption_algorithm=serialization.NoEncryption() #BestAvailableEncryption(b"passphrase"),
             ))
@@ -149,5 +157,5 @@ class WebGencert(Feature):
 
         # 自己署名証明書の保存
         with open(output_cert, "wb") as f:
-            f.write(self_cert.public_bytes(serialization.Encoding.DER))
+            f.write(self_cert.public_bytes(serialization.Encoding.DER if output_cert_format == "DER" else serialization.Encoding.PEM))
             logger.info(f"Save self-signed certificate. {output_cert}")

@@ -86,6 +86,10 @@ fsapi.filer = (svpath, is_local) => {
     cmdbox.file_upload(fsapi.right, svpath, formData, orverwrite=false, progress_func=(e) => {
       cmdbox.progress(0, e.total, e.loaded, '', true, e.total==e.loaded);
     }, success_func=(target, svpath, data) => {
+      if (data != "upload success") {
+        cmdbox.message(data);
+        return;
+      }
       fsapi.tree(target, svpath, target.find('.tree-menu'), false);
     }, error_func=(target, svpath, data) => {
       fsapi.tree(target, svpath, target.find('.tree-menu'), false);

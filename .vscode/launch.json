@@ -28,7 +28,7 @@
             "name": "Python: cmdbox web",
             "type": "python",
             "request": "launch",
-            "args": ["-m","web","-c","start","--debug"],//"--signin_file",".samples/user_list.txt","--client_only", "--filer_html", "filer2.html", "--assets", "README.md", "--assets", "setup.py"
+            "args": ["-m","web","-c","start","--signin_file",".samples/user_list.yml","--debug", "--ssl_cert", "server.cert", "--ssl_key", "server.key"],//"--client_only", "--filer_html", "filer2.html", "--assets", "README.md", "--assets", "setup.py"
             //"args": ["--version"],
             "module": "cmdbox",
             "console": "integratedTerminal",

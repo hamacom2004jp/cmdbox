@@ -47,7 +47,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     opt = self.load_cmd(web, title)
                 opt['capture_stdout'] = nothread = True
                 opt['stdout_log'] = False
-                return self.exec_cmd(web, title, opt, nothread)
+                return self.exec_cmd(req, res, web, title, opt, nothread)
             except:
                 return dict(warn=f'Command "{title}" failed. {traceback.format_exc()}')
 
@@ -77,11 +77,14 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 return True, output
         return False, None
 
-    def exec_cmd(self, web:Web, title:str, opt:Dict[str, Any], nothread:bool=False, appcls=app.CmdBoxApp) -> List[Dict[str, Any]]:
+    def exec_cmd(self, req:Request, res:Response, web:Web,
+                 title:str, opt:Dict[str, Any], nothread:bool=False, appcls=app.CmdBoxApp) -> List[Dict[str, Any]]:
         """
         コマンドを実行する
 
         Args:
+            req (Request): リクエスト
+            res (Response): レスポンス
             web (Web): Webオブジェクト
             title (str): タイトル
             opt (dict): オプション
@@ -91,6 +94,9 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
             list: コマンド実行結果
         """
         web.container['cmdbox_app'] = ap = appcls.getInstance()
+        if 'mode' in opt and 'cmd' in opt:
+            if not web.check_cmd(req, res, opt['mode'], opt['cmd']):
+                return dict(warn=f'Command "{title}" failed. Execute command denyed. mode={opt["mode"]}, cmd={opt["cmd"]}')
         ap.sv = None
         ap.cl = None
         ap.web = None

@@ -2,7 +2,7 @@ from cmdbox import version
 from cmdbox.app import common, feature
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response
-from fastapi.responses import HTMLResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
 from typing import Dict, Any
 import logging
 
@@ -28,6 +28,9 @@ class Gui(feature.WebFeature):
                 web.gui_html_data = f.read()
 
         @app.get('/', response_class=HTMLResponse)
+        async def index(req:Request, res:Response):
+            return RedirectResponse(url='/gui')
+
         @app.get('/gui', response_class=HTMLResponse)
         @app.post('/gui', response_class=HTMLResponse)
         async def gui(req:Request, res:Response):
@@ -45,6 +48,21 @@ class Gui(feature.WebFeature):
         @app.get('/gui/version_info')
         async def version_info(req:Request, res:Response):
             return self.version_info
+
+        @app.get('/gui/user_info')
+        async def user_info(req:Request, res:Response):
+            if 'signin' not in req.session:
+                return dict(warn='Please log in to retrieve session.')
+            if 'userid' not in req.session['signin']:
+                return dict(warn='Please log in to retrieve session.')
+            userid = req.session['signin']['userid']
+            try:
+                users = web.user_list(userid)
+                if users is None or len(users) == 0:
+                    return dict(warn='User information is not found.')
+                return users[0]
+            except Exception as e:
+                return dict(error=f'{e}')
 
         @app.get('/gui/filemenu')
         async def filemenu(req:Request, res:Response):
