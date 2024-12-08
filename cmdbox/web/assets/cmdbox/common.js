@@ -69,6 +69,7 @@ cmdbox.message = (res) => {
  */
 cmdbox.copyright = async () => {
   const res = await fetch('copyright', {method: 'GET'});
+  if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
   $('.copyright').text(await res.text());
 };
 /**
@@ -77,6 +78,7 @@ cmdbox.copyright = async () => {
  */
 cmdbox.appid = async (sel) => {
   const res = await fetch('gui/appid', {method: 'GET'});
+  if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
   const appid = await res.text()
   $(sel).text(appid);
   const head = $('head');
@@ -97,6 +99,7 @@ $(()=>{
   // サインアウトメニューを表示
   fetch('usesignout', {method: 'GET'}).then(async res => {
     try {
+      if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
       const json = await res.json();
       const usesignout = json['success']['usesignout'];
       if (!usesignout) return;
@@ -138,6 +141,7 @@ cmdbox.init_version_modal = () => {
       const tabcont = $(`<div class="tab-pane fade show" id="${tabid}" role="tabpanel" aria-labelledby="${tabid}-tab"/>`)
       $('.version-content').prepend(tabcont);
       const res = await fetch(url, {method: 'GET'});
+      if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
       const vi = await res.json();
       vi.forEach((v, i) => {
         v = v.replace(/<([^>]+)>/g, '<a href="$1" target="_blank">$1</a>');
@@ -164,6 +168,7 @@ cmdbox.init_version_modal = () => {
     $('.version-content').html('<div class="tab-pane fade" id="versions_used" role="tabpanel" aria-labelledby="versions_used-tab">versions_used</div>');
     await versions_func('versions_used', 'Used software', null, null);
     const res = await fetch('gui/version_info', {method: 'GET'});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     const verinfos = await res.json();
     for (const v of verinfos) {
       await versions_func(v['tabid'], v['title'], v['icon'], v['url']);
@@ -171,6 +176,7 @@ cmdbox.init_version_modal = () => {
     // usedのバージョン情報取得
     const versions_used_func = async () => {
       const res = await fetch('versions_used', {method: 'GET'});
+      if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
       const vu =  await res.json();
       $('#versions_used').html('');
       const div = $('<div class="overflow-auto" style="height:calc(100vh - 260px);"></div>');

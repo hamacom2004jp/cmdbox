@@ -3,7 +3,7 @@ from cmdbox.app import app, client, server, web as _web
 from cmdbox.app.commons import convert
 from cmdbox.app.features.web import cmdbox_web_load_cmd
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from starlette.datastructures import UploadFile
 from typing import Dict, Any, List
 import html
@@ -32,7 +32,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
             try:
                 signin = web.check_signin(req, res)
                 if signin is not None:
-                    return dict(warn=f'Command "{title}" failed. Please log in to retrieve session.')
+                    raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
                 opt = None
                 if req.headers.get('content-type').startswith('multipart/form-data'):
                     opt = self.load_cmd(web, title)

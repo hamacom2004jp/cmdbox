@@ -1,7 +1,7 @@
 from cmdbox import version
 from cmdbox.app.features.web import cmdbox_web_exec_cmd
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import PlainTextResponse
 from pathlib import Path
 from starlette.datastructures import UploadFile
@@ -25,7 +25,7 @@ class FilerUpload(cmdbox_web_exec_cmd.ExecCmd):
         async def filer_upload(req:Request, res:Response):
             signin = web.check_signin(req, res)
             if signin is not None:
-                return signin
+                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             return await self.filer_upload(web, req, res)
 
     async def filer_upload(self, web:Web, req:Request, res:Response) -> str:

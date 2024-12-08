@@ -1,7 +1,7 @@
 from cmdbox import version
 from cmdbox.app import common, feature
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from starlette.responses import PlainTextResponse
 import json
 
@@ -22,7 +22,7 @@ class GetCmds(feature.WebFeature):
         async def get_cmds(req:Request, res:Response):
             signin = web.check_signin(req, res)
             if signin is not None:
-                return dict(warn=f'Please log in to retrieve session.')
+                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             form = await req.form()
             mode = form.get('mode')
             #ret = web.options.get_cmds(mode)

@@ -1,7 +1,7 @@
 from cmdbox import version
 from cmdbox.app import feature
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from pathlib import Path
 import cmdbox
 
@@ -22,7 +22,7 @@ class VersionsUsed(feature.WebFeature):
         async def versions_used(req:Request, res:Response):
             signin = web.check_signin(req, res)
             if signin is not None:
-                return str(dict(warn=f'Please log in to retrieve session.'))
+                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
 
             ret = []
             with open(Path(cmdbox.__file__).parent / 'licenses' / 'files.txt', 'r', encoding='utf-8') as f:

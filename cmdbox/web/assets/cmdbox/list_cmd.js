@@ -367,16 +367,19 @@ const list_cmd = async (kwd) => {
     const formData = new FormData();
     formData.append('kwd', kwd?`*${kwd}*`:'*');
     const res = await fetch('gui/list_cmd', {method: 'POST', body: formData});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }
 const get_modes = async (kwd) => {
     const res = await fetch('gui/get_modes', {method: 'GET'});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }
 const get_cmds = async (mode) => {
     const formData = new FormData();
     formData.append('mode', mode);
     const res = await fetch('gui/get_cmds', {method: 'POST', body: formData});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }
 const get_cmd_choices = async (mode, cmd) => {
@@ -384,12 +387,14 @@ const get_cmd_choices = async (mode, cmd) => {
     formData.append('mode', mode);
     formData.append('cmd', cmd);
     const res = await fetch('gui/get_cmd_choices', {method: 'POST', body: formData});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }
 const load_cmd = async (title) => {
     const formData = new FormData();
     formData.append('title', title);
     const res = await fetch('gui/load_cmd', {method: 'POST', body: formData});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }
 const save_cmd = async (title, opt) => {
@@ -397,17 +402,20 @@ const save_cmd = async (title, opt) => {
     formData.append('title', title);
     formData.append('opt', JSON.stringify(opt));
     const res = await fetch('gui/save_cmd', {method: 'POST', body: formData});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }
 const del_cmd = async (title) => {
     const formData = new FormData();
     formData.append('title', title);
     const res = await fetch('gui/del_cmd', {method: 'POST', body: formData});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }
 const exec_cmd = async (title, opt) => {
     const res = await fetch(`exec_cmd/${title}`,
         {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(opt)});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     const text = await res.text();
     try {
         return JSON.parse(text);
@@ -420,5 +428,6 @@ const raw_cmd = async (title, opt) => {
     formData.append('title', title);
     formData.append('opt', JSON.stringify(opt));
     const res = await fetch('gui/raw_cmd', {method: 'POST', body: formData});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }

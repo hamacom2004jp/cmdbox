@@ -149,12 +149,14 @@ const list_pipe = async (kwd) => {
     const formData = new FormData();
     formData.append('kwd', kwd?`*${kwd}*`:'*');
     const res = await fetch('gui/list_pipe', {method: 'POST', body: formData});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }
 const load_pipe = async (title) => {
     const formData = new FormData();
     formData.append('title', title);
     const res = await fetch('gui/load_pipe', {method: 'POST', body: formData});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }
 const save_pipe = async (title, opt) => {
@@ -162,17 +164,20 @@ const save_pipe = async (title, opt) => {
     formData.append('title', title);
     formData.append('opt', JSON.stringify(opt));
     const res = await fetch('gui/save_pipe', {method: 'POST', body: formData});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }
 const del_pipe = async (title) => {
     const formData = new FormData();
     formData.append('title', title);
     const res = await fetch('gui/del_pipe', {method: 'POST', body: formData});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }
 const exec_pipe = async (title, opt) => {
     const res = await fetch(`exec_pipe/${title}`,
         {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(opt)});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }
 const raw_pipe = async (title, opt) => {
@@ -180,5 +185,6 @@ const raw_pipe = async (title, opt) => {
     formData.append('title', title);
     formData.append('opt', JSON.stringify(opt));
     const res = await fetch('gui/raw_pipe', {method: 'POST', body: formData});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }

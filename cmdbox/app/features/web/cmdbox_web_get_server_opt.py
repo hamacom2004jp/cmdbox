@@ -1,7 +1,7 @@
 from cmdbox import version
 from cmdbox.app import feature
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 import logging
 
 
@@ -21,7 +21,7 @@ class GetServerOpt(feature.WebFeature):
         async def get_server_opt(req:Request, res:Response):
             signin = web.check_signin(req, res)
             if signin is not None:
-                return dict(warn=f'Please log in to retrieve session.')
+                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             opt = dict(host=web.redis_host, port=web.redis_port, password=web.redis_password, svname=web.svname,
                        data=str(web.data), client_only=web.client_only)
             if web.logger.level == logging.DEBUG:

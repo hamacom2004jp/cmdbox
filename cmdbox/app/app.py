@@ -106,8 +106,8 @@ class CmdBoxApp:
             return 1, msg, None
 
         common.mklogdir(args.data)
-        common.copy_sample(args.data)
-        common.copy_sample(Path.cwd())
+        common.copy_sample(args.data, ver=self.ver)
+        common.copy_sample(Path.cwd(), ver=self.ver)
 
         logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall if args.cmd != 'webcap' else True, appid=self.ver.__appid__)
         if logger.level == logging.DEBUG:

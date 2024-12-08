@@ -49,7 +49,7 @@ $(() => {
         const params = new URLSearchParams(window.location.search);
         if (params.has('error')) {
             const elem = $(`<div class="alert alert-warning alert-dismissible d-block" role="alert">`);
-            elem.append('<div>Sign in faild</div>');
+            elem.append('<div>Sign in faild: The ID or PW is incorrect or the user is not authorized.</div>');
             elem.append('<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
             $('body').prepend(elem);
         }

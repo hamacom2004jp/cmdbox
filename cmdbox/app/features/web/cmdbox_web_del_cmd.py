@@ -1,7 +1,7 @@
 from cmdbox import version
 from cmdbox.app import feature
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 
 
 class DelCmd(feature.WebFeature):
@@ -20,7 +20,7 @@ class DelCmd(feature.WebFeature):
         async def del_cmd(req:Request, res:Response):
             signin = web.check_signin(req, res)
             if signin is not None:
-                return str(dict(warn=f'Please log in to retrieve session.'))
+                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             form = await req.form()
             title = form.get('title')
 

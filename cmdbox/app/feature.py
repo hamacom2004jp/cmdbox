@@ -104,6 +104,7 @@ class WebFeature(object):
     USE_REDIS_MEIGHT:int = Feature.USE_REDIS_MEIGHT
     USE_REDIS_TRUE:int = Feature.USE_REDIS_TRUE
     DEFAULT_CAPTURE_MAXSIZE:int = Feature.DEFAULT_CAPTURE_MAXSIZE
+    DEFAULT_401_MESSAGE:str = "Unauthorized operation. Please sign in again as an authorized user."
 
     def __init__(self, ver=version):
         self.ver = ver

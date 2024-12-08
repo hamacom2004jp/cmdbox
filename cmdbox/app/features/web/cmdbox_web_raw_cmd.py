@@ -2,7 +2,7 @@ from cmdbox import version
 from cmdbox.app import common
 from cmdbox.app.features.web import cmdbox_web_gui
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from typing import Dict, Any, List
 import logging
 import json
@@ -24,7 +24,7 @@ class RawCmd(cmdbox_web_gui.Gui):
         async def raw_cmd(req:Request, res:Response):
             signin = web.check_signin(req, res)
             if signin is not None:
-                return dict(warn=f'Please log in to retrieve session.')
+                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             form = await req.form()
             title = form.get('title')
             opt = form.get('opt')

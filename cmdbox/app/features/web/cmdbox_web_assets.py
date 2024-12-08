@@ -1,7 +1,7 @@
 from cmdbox import version
 from cmdbox.app import feature
 from cmdbox.app.web import Web
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.responses import StreamingResponse
 from pathlib import Path
 import glob
@@ -24,7 +24,7 @@ class Assets(feature.WebFeature):
         def asset_func(asset_data, path):
             @app.get(f'/signin/assets/{path}')
             @app.get(f'/assets/{path}')
-            def func():
+            async def func(req:Request, res:Response):
                 mime, enc = mimetypes.guess_type(path)
                 return StreamingResponse(io.BytesIO(asset_data), media_type=mime)
 

@@ -1,7 +1,7 @@
 from cmdbox import version
 from cmdbox.app import common, feature
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
 from typing import Dict, Any
 import logging
@@ -52,9 +52,9 @@ class Gui(feature.WebFeature):
         @app.get('/gui/user_info')
         async def user_info(req:Request, res:Response):
             if 'signin' not in req.session:
-                return dict(warn='Please log in to retrieve session.')
+                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             if 'userid' not in req.session['signin']:
-                return dict(warn='Please log in to retrieve session.')
+                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             userid = req.session['signin']['userid']
             try:
                 users = web.user_list(userid)

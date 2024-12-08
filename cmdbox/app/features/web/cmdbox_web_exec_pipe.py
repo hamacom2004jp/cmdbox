@@ -3,7 +3,7 @@ from cmdbox.app import common, options, web as _web
 from cmdbox.app.commons import convert
 from cmdbox.app.features.web import cmdbox_web_load_pipe, cmdbox_web_raw_pipe
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from pathlib import Path
 from starlette.datastructures import UploadFile
 from typing import Dict, Any, List
@@ -35,7 +35,7 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
             try:
                 signin = web.check_signin(req, res)
                 if signin is not None:
-                    return dict(warn=f'Pipeline "{title}" failed. Please log in to retrieve session.')
+                    raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
                 opt = None
                 if req.headers.get('content-type').startswith('multipart/form-data'):
                     opt = self.load_pipe(web, title)
@@ -58,20 +58,32 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                     opt = await req.json()
                 else:
                     opt = self.load_pipe(web, title)
+                for cmd_title in opt['pipe_cmd']:
+                    if cmd_title == '':
+                        continue
+                    cmd_opt = self.load_cmd(web, cmd_title)
+                    if 'mode' in cmd_opt and 'cmd' in cmd_opt:
+                        if not web.check_cmd(req, res, cmd_opt['mode'], cmd_opt['cmd']):
+                            msg = f'Command "{title}" failed. Execute command denyed. mode={cmd_opt["mode"]}, cmd={cmd_opt["cmd"]}'
+                            self.callback_return_pipe_exec_func(web, title, dict(warn=msg))
+                            raise HTTPException(401, detail=msg)
                 opt['capture_stdout'] = nothread = False
                 opt['stdout_log'] = False
-                return common.to_str(self.exec_pipe(web, title, opt, nothread))
+                return common.to_str(self.exec_pipe(req, res, web, title, opt, nothread))
             except:
                 return common.to_str(dict(warn=f'Pipeline "{title}" failed. {traceback.format_exc()}'))
             finally:
                 for tfname in upfiles.values():
                     os.unlink(tfname)
 
-    def exec_pipe(self, web:Web, title:str, opt:Dict[str, Any], nothread:bool=False, capture_stdin:bool=False) -> List[Dict[str, Any]]:
+    def exec_pipe(self, req:Request, res:Response, web:Web,
+                  title:str, opt:Dict[str, Any], nothread:bool=False, capture_stdin:bool=False) -> List[Dict[str, Any]]:
         """
         パイプラインを実行する
 
         Args:
+            req (Request): リクエスト
+            res (Response): レスポンス
             web (Web): Webオブジェクト
             title (str): タイトル
             opt (dict): オプション

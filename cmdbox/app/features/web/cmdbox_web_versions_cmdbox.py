@@ -1,7 +1,7 @@
 from cmdbox import version
 from cmdbox.app import feature
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 
 
 class VersionsCmdbox(feature.WebFeature):
@@ -20,6 +20,6 @@ class VersionsCmdbox(feature.WebFeature):
         async def versions_cmdbox(req:Request, res:Response):
             signin = web.check_signin(req, res)
             if signin is not None:
-                return dict(warn=f'Please log in to retrieve session.')
+                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             logo = [version.__logo__]
             return logo + version.__description__.split('\n')
