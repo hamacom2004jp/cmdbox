@@ -161,7 +161,7 @@ class Web:
                 return None
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"Not signed in.")
-        return RedirectResponse(url=f'/signin{req.url.path}')
+        return RedirectResponse(url=f'/signin{req.url.path}?error=1')
 
     def check_cmd(self, req:Request, res:Response, mode:str, cmd:str):
         # コマンドチェック
