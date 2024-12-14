@@ -8,8 +8,8 @@ import logging
 
 
 class Gui(feature.WebFeature):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
+    def __init__(self, appcls, ver):
+        super().__init__(appcls=appcls, ver=ver)
         self.version_info = [dict(tabid='versions_cmdbox', title=version.__appid__,
                                   icon=f'assets/cmdbox/icon.png', url='versions_cmdbox')]
 

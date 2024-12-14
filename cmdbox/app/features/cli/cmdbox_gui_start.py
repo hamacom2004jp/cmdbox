@@ -1,22 +1,18 @@
-from cmdbox import version
 from cmdbox.app import common, web
 from cmdbox.app.feature import Feature
 from pathlib import Path
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 
 
 class GuiStart(Feature):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
-    def get_mode(self):
+    def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
 
         Returns:
-            str: モード
+            Union[str, List[str]]: モード
         """
         return 'gui'
 
@@ -127,9 +123,10 @@ class GuiStart(Feature):
         ssl_cert = None if args.ssl_cert is None else Path(args.ssl_cert)
         ssl_key = None if args.ssl_key is None else Path(args.ssl_key)
         ssl_ca_certs = None if args.ssl_ca_certs is None else Path(args.ssl_ca_certs)
-        w = web.Web(logger, Path(args.data), redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
-                client_only=args.client_only, doc_root=args.doc_root, gui_html=args.gui_html, filer_html=args.filer_html,
-                assets=args.assets, signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=True)
+        w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
+                    redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
+                    client_only=args.client_only, doc_root=args.doc_root, gui_html=args.gui_html, filer_html=args.filer_html,
+                    assets=args.assets, signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=True)
         w.start(args.allow_host, args.listen_port, ssl_cert=ssl_cert, ssl_key=ssl_key,
                 ssl_keypass=args.ssl_keypass, ssl_ca_certs=ssl_ca_certs,
                 session_timeout=args.session_timeout, outputs_key=args.outputs_key)

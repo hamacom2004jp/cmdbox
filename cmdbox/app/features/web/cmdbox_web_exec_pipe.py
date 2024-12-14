@@ -1,4 +1,3 @@
-from cmdbox import version
 from cmdbox.app import common, options, web as _web
 from cmdbox.app.commons import convert
 from cmdbox.app.features.web import cmdbox_web_load_pipe, cmdbox_web_raw_pipe
@@ -17,9 +16,6 @@ import traceback
 
 
 class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
     def route(self, web:Web, app:FastAPI) -> None:
         """
         webモードのルーティングを設定します

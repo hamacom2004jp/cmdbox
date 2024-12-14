@@ -1,23 +1,19 @@
-from cmdbox import version
 from cmdbox.app import common, client, filer
 from cmdbox.app.commons import convert, redis_client
 from cmdbox.app.feature import Feature
 from pathlib import Path
-from typing import Dict, Any, Tuple, List
+from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 
 
 class ClientFileRemove(Feature):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
-    def get_mode(self):
+    def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
 
         Returns:
-            str: モード
+            Union[str, List[str]]: モード
         """
         return 'client'
 

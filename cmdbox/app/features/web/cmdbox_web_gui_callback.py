@@ -1,4 +1,3 @@
-from cmdbox import version
 from cmdbox.app import common, feature
 from cmdbox.app.web import Web
 from fastapi import FastAPI, HTTPException, WebSocket
@@ -9,9 +8,6 @@ import queue
 
 
 class GuiCallback(feature.WebFeature):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
     def route(self, web:Web, app:FastAPI) -> None:
         """
         webモードのルーティングを設定します
@@ -42,7 +38,7 @@ class GuiCallback(feature.WebFeature):
                 except queue.Empty:
                     pass
                 except WebSocketDisconnect:
-                    web.logger.warning('web.sub_img: websocket disconnected.')
+                    web.logger.warning('web.gui_callback: websocket disconnected.')
                     break
                 except Exception as e:
                     web.logger.warning(f'web.gui_callback: websocket error. {e}')

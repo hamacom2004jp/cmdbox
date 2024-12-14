@@ -1,4 +1,3 @@
-from cmdbox import version
 from cmdbox.app import common
 from cmdbox.app.features.web import cmdbox_web_gui
 from cmdbox.app.web import Web
@@ -8,9 +7,6 @@ import logging
 
 
 class LoadCmd(cmdbox_web_gui.Gui):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
     def route(self, web:Web, app:FastAPI) -> None:
         """
         webモードのルーティングを設定します

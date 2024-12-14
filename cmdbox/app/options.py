@@ -9,13 +9,16 @@ import logging
 class Options:
     _instance = None
     @staticmethod
-    def getInstance():
+    def getInstance(appcls=None, ver=None):
         if Options._instance is None:
-            Options._instance = Options()
+            Options._instance = Options(appcls=appcls, ver=ver)
         return Options._instance
 
-    def __init__(self):
+    def __init__(self, appcls=None, ver=None):
+        self.appcls = appcls
+        self.ver = ver
         self._options = dict()
+        self.features_yml_data = None
         self.init_options()
 
     def get_mode_keys(self) -> List[str]:
@@ -251,10 +254,10 @@ class Options:
             self._options["mode"][key] = mode
             self._options["mode"]["choise"] += [mode]
 
-    def load_svcmd(self, package_name:str, prefix:str="cmdbox_"):
+    def load_svcmd(self, package_name:str, prefix:str="cmdbox_", appcls=None, ver=None):
         if "svcmd" not in self._options:
             self._options["svcmd"] = dict()
-        for mode, f in module.load_features(package_name, prefix).items():
+        for mode, f in module.load_features(package_name, prefix, appcls=appcls, ver=ver).items():
             if mode not in self._options["cmd"]:
                 self._options["cmd"][mode] = dict()
             for cmd, opt in f.items():
@@ -265,17 +268,28 @@ class Options:
                     self._options["svcmd"][svcmd] = fobj
         self.init_debugoption()
 
-    def load_features_file(self, ftype:str, func):
+    def load_features_file(self, ftype:str, func, appcls, ver):
         """
         フィーチャーファイル（features.yml）を読み込みます。
 
         Args:
             ftype (str): フィーチャータイプ。cli又はweb
             func (Any): フィーチャーの処理関数
+            appcls (Any): アプリケーションクラス
+            ver (Any): バージョンモジュール
         """
+        # cmdboxを拡張したアプリをカスタマイズするときのfeatures.ymlを読み込む
         features_yml = Path('features.yml')
+        if not features_yml.exists() or not features_yml.is_file():
+            # cmdboxを拡張したアプリの組み込みfeatures.ymlを読み込む
+            features_yml = Path(ver.__file__).parent / 'extensions' / 'features.yml'
+        #if not features_yml.exists() or not features_yml.is_file():
+        #    features_yml = Path('.samples/features.yml')
         if features_yml.exists() and features_yml.is_file():
-            yml = common.load_yml(features_yml)
+            if self.features_yml_data is None:
+                self.features_yml_data = yml = common.load_yml(features_yml)
+            else:
+                yml = self.features_yml_data
             if yml is None: return
             if 'features' not in yml:
                 raise Exception('features.yml is invalid. (The root element must be "features".)')
@@ -296,4 +310,50 @@ class Options:
                     continue
                 if data['prefix'] is None or data['prefix'] == "":
                     continue
-                func(data['package'], data['prefix'])
+                func(data['package'], data['prefix'], appcls, ver)
+
+    def load_features_args(self, args_dict:Dict[str, Any]):
+        yml = self.features_yml_data
+        if yml is None:
+            return
+        if 'args' not in yml or 'cli' not in yml['args']:
+            return
+
+        opts = self.list_options()
+        def _cast(self, key, val):
+            for opt in opts.values():
+                if f"--{key}" in opt['opts']:
+                    if opt['type'] == int:
+                        return int(val)
+                    elif opt['type'] == float:
+                        return float(val)
+                    elif opt['type'] == bool:
+                        return True
+                    else:
+                        return eval(val)
+            return None
+
+        for data in yml['args']['cli']:
+            if type(data) is not dict:
+                raise Exception(f'features.yml is invalid. (The “args.cli” element must be a list element must be a dictionary. data={data})')
+            if 'rule' not in data:
+                raise Exception(f'features.yml is invalid. (The “rule” element must be in the dictionary of the list element of the “args.cli” element. data={data})')
+            if data['rule'] is None:
+                continue
+            if 'default' not in data and 'coercion' not in data:
+                raise Exception(f'features.yml is invalid. (The “default” or “coercion” element must be in the dictionary of the list element of the “args.cli” element. data={data})')
+            if len([rk for rk in data['rule'] if rk not in args_dict or data['rule'][rk] != args_dict[rk]]) > 0:
+                continue
+            if data['default'] is not None:
+                for dk, dv in data['default'].items():
+                    if dk not in args_dict or args_dict[dk] is None:
+                        if type(dv) == list:
+                            args_dict[dk] = [_cast(self, dk, v) for v in dv]
+                        else:
+                            args_dict[dk] = _cast(self, dk, dv)
+            if data['coercion'] is not None:
+                for ck, cv in data['coercion'].items():
+                    if type(cv) == list:
+                        args_dict[ck] = [_cast(self, ck, v) for v in cv]
+                    else:
+                        args_dict[ck] = _cast(self, ck, cv)

@@ -22,7 +22,8 @@ import webbrowser
 
 
 class Web:
-    def __init__(self, logger:logging.Logger, data:Path, redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server',
+    def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None,
+                 redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server',
                  client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None,
                  assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
                  web_features_packages:List[str]=None, web_features_prefix:List[str]=None):
@@ -32,6 +33,8 @@ class Web:
         Args:
             logger (logging): ロガー
             data (Path): コマンドやパイプラインの設定ファイルを保存するディレクトリ
+            appcls ([type], optional): アプリケーションクラス. Defaults to None.
+            ver ([type], optional): バージョン. Defaults to None.
             redis_host (str, optional): Redisサーバーのホスト名. Defaults to "localhost".
             redis_port (int, optional): Redisサーバーのポート番号. Defaults to 6379.
             redis_password (str, optional): Redisサーバーのパスワード. Defaults to None.
@@ -51,6 +54,8 @@ class Web:
         super().__init__()
         self.logger = logger
         self.data = data
+        self.appcls = appcls
+        self.ver = ver
         self.container = dict()
         self.redis_host = redis_host
         self.redis_port = redis_port
@@ -164,6 +169,12 @@ class Web:
         return RedirectResponse(url=f'/signin{req.url.path}?error=1')
 
     def check_cmd(self, req:Request, res:Response, mode:str, cmd:str):
+        if self.signin_file is None:
+            return True
+        if self.signin_file_data is None:
+            raise ValueError(f'signin_file_data is None. ({self.signin_file})')
+        if 'signin' not in req.session or 'groups' not in req.session['signin']:
+            return False
         # コマンドチェック
         user_groups = req.session['signin']['groups']
         jadge = self.signin_file_data['cmdrule']['policy']
@@ -181,6 +192,12 @@ class Web:
         return jadge == 'allow'
     
     def get_enable_modes(self, req:Request, res:Response):
+        if self.signin_file is None:
+            return self.options.get_modes().copy()
+        if self.signin_file_data is None:
+            raise ValueError(f'signin_file_data is None. ({self.signin_file})')
+        if 'signin' not in req.session or 'groups' not in req.session['signin']:
+            return []
         modes = self.options.get_modes().copy()
         user_groups = req.session['signin']['groups']
         jadge = self.signin_file_data['cmdrule']['policy']
@@ -207,6 +224,12 @@ class Web:
         return sorted(list(set(['']+jadge_modes)), key=lambda m: m)
 
     def get_enable_cmds(self, mode:str, req:Request, res:Response):
+        if self.signin_file is None:
+            return self.options.get_cmds(mode).copy()
+        if self.signin_file_data is None:
+            raise ValueError(f'signin_file_data is None. ({self.signin_file})')
+        if 'signin' not in req.session or 'groups' not in req.session['signin']:
+            return []
         cmds = self.options.get_cmds(mode).copy()
         if mode == '':
             return cmds
@@ -254,7 +277,7 @@ class Web:
         self.aboutmenu = dict()
         # webfeatureの読込み
         def wf_route(pk, prefix, w, app):
-            for wf in module.load_webfeatures(pk, prefix):
+            for wf in module.load_webfeatures(pk, prefix, appcls=self.appcls, ver=self.ver):
                 wf.route(self, app)
                 self.filemenu |= wf.filemenu(w)
                 self.toolmenu |= wf.toolmenu(w)
@@ -268,7 +291,7 @@ class Web:
                 raise ValueError(f"web_features_prefix is not match. web_features_packages={self.web_features_packages}, web_features_prefix={self.web_features_prefix}")
             for i, pn in enumerate(self.web_features_packages):
                 wf_route(pn, self.web_features_prefix[i], self, app)
-        self.options.load_features_file('web', lambda pk, pn: wf_route(pk, pn, self, app))
+        self.options.load_features_file('web', lambda pk, pn, appcls, ver: wf_route(pk, pn, self, app), self.appcls, self.ver)
         wf_route("cmdbox.app.features.web", "cmdbox_web_", self, app)
         # 読込んだrouteの内容をログに出力
         if self.logger.level == logging.DEBUG:

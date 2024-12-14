@@ -1,22 +1,18 @@
-from cmdbox import version
 from cmdbox.app import common, web
 from cmdbox.app.feature import Feature
 from pathlib import Path
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
-import traceback
+
 
 class WebStart(Feature):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
-    def get_mode(self):
+    def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
 
         Returns:
-            str: モード
+            Union[str, List[str]]: モード
         """
         return 'web'
 
@@ -74,7 +70,7 @@ class WebStart(Feature):
                 dict(opt="ssl_ca_certs", type="file", default=None, required=False, multi=False, hide=True, choise=None,
                      discription_ja="SSLサーバーCA証明書ファイルを指定します。",
                      discription_en="Specify the SSL server CA certificate file."),
-                dict(opt="signin_file", type="file", default=".samples/user_list.yml", required=False, multi=False, hide=True, choise=None,
+                dict(opt="signin_file", type="file", default=None, required=False, multi=False, hide=True, choise=None,
                      discription_ja="サインイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。",
                      discription_en="Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required."),
                 dict(opt="session_timeout", type="int", default="600", required=False, multi=False, hide=True, choise=None,
@@ -131,7 +127,8 @@ class WebStart(Feature):
             ssl_cert = None if args.ssl_cert is None else Path(args.ssl_cert)
             ssl_key = None if args.ssl_key is None else Path(args.ssl_key)
             ssl_ca_certs = None if args.ssl_ca_certs is None else Path(args.ssl_ca_certs)
-            w = web.Web(logger, Path(args.data), redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
+            w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
+                        redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                         client_only=args.client_only, doc_root=args.doc_root, gui_html=args.gui_html, filer_html=args.filer_html,
                         assets=args.assets, signin_html=args.signin_html, signin_file=args.signin_file)
             w.start(args.allow_host, args.listen_port, ssl_cert=ssl_cert, ssl_key=ssl_key,

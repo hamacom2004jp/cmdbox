@@ -6,7 +6,6 @@ import argparse
 import argcomplete
 import logging
 import time
-import sys
 
 
 def main(args_list:list=None):
@@ -16,12 +15,12 @@ def main(args_list:list=None):
 class CmdBoxApp:
     _instance = None
     @staticmethod
-    def getInstance():
+    def getInstance(appcls=None, ver=version, cli_features_packages:List[str]=None, cli_features_prefix:List[str]=None):
         if CmdBoxApp._instance is None:
-            CmdBoxApp._instance = CmdBoxApp()
+            CmdBoxApp._instance = CmdBoxApp(appcls=appcls, ver=ver, cli_features_packages=cli_features_packages, cli_features_prefix=cli_features_prefix)
         return CmdBoxApp._instance
 
-    def __init__(self, ver=version, cli_features_packages:List[str]=None, cli_features_prefix:List[str]=None):
+    def __init__(self, appcls=None, ver=version, cli_features_packages:List[str]=None, cli_features_prefix:List[str]=None):
         """
         コンストラクタ
 
@@ -30,8 +29,9 @@ class CmdBoxApp:
             cli_package_name (str, optional): プラグインのパッケージ名. Defaults to None.
             cli_features_prefix (List[str], optional): プラグインのパッケージのモジュール名のプレフィックス. Defaults to None.
         """
-        self.options = options.Options.getInstance()
+        self.appcls = self.__class__ if appcls is None else appcls
         self.ver = ver
+        self.options = options.Options.getInstance(self.appcls, self.ver)
         self.cli_features_packages = cli_features_packages
         self.cli_features_prefix = cli_features_prefix
 
@@ -43,15 +43,15 @@ class CmdBoxApp:
                                          formatter_class=argparse.RawDescriptionHelpFormatter, exit_on_error=False)
 
         # プラグイン読込み
-        self.options.load_svcmd('cmdbox.app.features.cli')
+        self.options.load_svcmd('cmdbox.app.features.cli', appcls=self.appcls, ver=self.ver)
         if self.cli_features_packages is not None:
             if self.cli_features_prefix is None:
                 raise ValueError(f"cli_features_prefix is None. cli_features_packages={self.cli_features_packages}")
             if len(self.cli_features_prefix) != len(self.cli_features_packages):
                 raise ValueError(f"cli_features_prefix is not match. cli_features_packages={self.cli_features_packages}, cli_features_prefix={self.cli_features_prefix}")
             for i, pn in enumerate(self.cli_features_packages):
-                self.options.load_svcmd(pn, prefix=self.cli_features_prefix[i])
-        self.options.load_features_file('cli', self.options.load_svcmd)
+                self.options.load_svcmd(pn, prefix=self.cli_features_prefix[i], appcls=self.appcls, ver=self.ver)
+        self.options.load_features_file('cli', self.options.load_svcmd, self.appcls, self.ver)
 
         # コマンド引数の生成
         opts = self.options.list_options()
@@ -65,7 +65,7 @@ class CmdBoxApp:
         argcomplete.autocomplete(parser)
         # mainメソッドの起動時引数がある場合は、その引数を解析する
         try:
-            if args_list is not None:
+            if args_list is not None and len(args_list) > 0:
                 args = parser.parse_args(args=args_list)
             else:
                 args = parser.parse_args()
@@ -82,6 +82,8 @@ class CmdBoxApp:
         # 最終的に使用するオプションにマージする
         for key, val in args_dict.items():
             args_dict[key] = common.getopt(opt, key, preval=args_dict, withset=True)
+        # featuresの初期値を適用する
+        self.options.load_features_args(args_dict)
         args = argparse.Namespace(**args_dict)
 
         tm = time.perf_counter()
@@ -109,7 +111,7 @@ class CmdBoxApp:
         common.copy_sample(args.data, ver=self.ver)
         common.copy_sample(Path.cwd(), ver=self.ver)
 
-        logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall if args.cmd != 'webcap' else True, appid=self.ver.__appid__)
+        logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall if args.cmd != 'webcap' else True, ver=self.ver)
         if logger.level == logging.DEBUG:
             logger.debug(f"args.mode={args.mode}, args.cmd={args.cmd}")
             for m, mo in self.options._options["cmd"].items():

@@ -1,22 +1,18 @@
-from cmdbox import version
 from cmdbox.app import common, web
 from cmdbox.app.feature import Feature
 from pathlib import Path
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 
 
 class WebGroupList(Feature):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
-    def get_mode(self):
+    def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
 
         Returns:
-            str: モード
+            Union[str, List[str]]: モード
         """
         return 'web'
 
@@ -59,8 +55,8 @@ class WebGroupList(Feature):
                 dict(opt="group_name", type="str", default=None, required=False, multi=False, hide=False, choise=None,
                      discription_ja="グループ名を指定して取得します。省略した時は全てのグループを取得します。",
                      discription_en="Retrieved by specifying a group name. If omitted, all groups are retrieved."),
-                dict(opt="signin_file", type="file", default=".samples/user_list.yml", required=True, multi=False, hide=False, choise=None,
-                     discription_ja="サインイン可能なユーザーとパスワードを記載したファイルを指定します。",
+                dict(opt="signin_file", type="file", default=None, required=False, multi=False, hide=True, choise=None,
+                     discription_ja="サインイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。",
                      discription_en="Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required."),
                 dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                      discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
@@ -89,7 +85,8 @@ class WebGroupList(Feature):
             return 1, msg, None
         w = None
         try:
-            w = web.Web(logger, Path(args.data), redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
+            w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
+                        redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                         signin_file=args.signin_file)
             groups = w.group_list(args.group_name)
             msg = {"success":groups}

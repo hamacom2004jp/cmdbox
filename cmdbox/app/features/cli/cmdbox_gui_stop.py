@@ -1,18 +1,15 @@
-from cmdbox import version
 from cmdbox.app import common
 from cmdbox.app.features.cli import cmdbox_web_stop
+from typing import List, Union
 
 
 class GuiStop(cmdbox_web_stop.WebStop):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
-    def get_mode(self):
+    def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
 
         Returns:
-            str: モード
+            Union[str, List[str]]: モード
         """
         return 'gui'
 

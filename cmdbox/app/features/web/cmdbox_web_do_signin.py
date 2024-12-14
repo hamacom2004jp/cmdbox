@@ -1,4 +1,3 @@
-from cmdbox import version
 from cmdbox.app.features.web import cmdbox_web_signin
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response
@@ -7,9 +6,6 @@ import hashlib
 
 
 class DoSignin(cmdbox_web_signin.Signin):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
     def route(self, web:Web, app:FastAPI) -> None:
         """
         webモードのルーティングを設定します

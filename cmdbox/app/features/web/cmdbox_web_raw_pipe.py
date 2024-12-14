@@ -1,4 +1,3 @@
-from cmdbox import version
 from cmdbox.app import common
 from cmdbox.app.features.web import cmdbox_web_raw_cmd, cmdbox_web_load_cmd
 from cmdbox.app.web import Web
@@ -9,9 +8,6 @@ import json
 
 
 class RawPipe(cmdbox_web_raw_cmd.RawCmd, cmdbox_web_load_cmd.LoadCmd):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
     def route(self, web:Web, app:FastAPI) -> None:
         """
         webモードのルーティングを設定します

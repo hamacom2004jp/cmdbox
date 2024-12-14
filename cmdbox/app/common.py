@@ -81,7 +81,7 @@ def save_yml(yml_path:Path, data:dict) -> None:
     with open(yml_path, 'w') as f:
         yaml.dump(data, f, default_flow_style=False, sort_keys=False)
 
-def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, appid:str=version.__appid__) -> Tuple[logging.Logger, dict]:
+def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, ver=version) -> Tuple[logging.Logger, dict]:
     """
     指定されたモードのロガーと設定を読み込みます。
 
@@ -97,7 +97,19 @@ def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, a
         config (dict): 設定
     """
     data = Path(data) if data is not None else HOME_DIR
-    log_config = yaml.safe_load(resource_string(appid, f"logconf_{mode}.yml"))
+    log_conf_path = Path(f"logconf_{mode}.yml")
+    log_name = mode
+    if not log_conf_path.exists():
+        log_conf_path = Path(f"logconf_{ver.__appid__}.yml")
+        log_name = ver.__appid__
+    if not log_conf_path.exists():
+        log_conf_path = Path(ver.__file__).parent / f"logconf_{mode}.yml"
+        log_name = mode
+    if not log_conf_path.exists():
+        log_conf_path = Path(ver.__file__).parent / f"logconf_{ver.__appid__}.yml"
+        log_name = mode
+    with open(log_conf_path) as f:
+        log_config = yaml.safe_load(f)
     std_key = None
     for k, h in log_config['handlers'].items():
         if 'filename' in h:
@@ -110,7 +122,7 @@ def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, a
             if 'handlers' in l and std_key in l['handlers']:
                 l['handlers'].remove(std_key)
     logging.config.dictConfig(log_config)
-    logger = logging.getLogger(mode)
+    logger = logging.getLogger(log_name)
     set_debug(logger, debug)
     config = yaml.safe_load(resource_string(version.__appid__, "config.yml"))
     return logger, config

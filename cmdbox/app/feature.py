@@ -3,7 +3,7 @@ from cmdbox.app.commons import redis_client
 from cmdbox.app.web import Web
 from fastapi import FastAPI
 from pathlib import Path
-from typing import Dict, Any, Tuple, List
+from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import os
@@ -20,15 +20,16 @@ class Feature:
     default_port:int = int(os.environ.get('REDIS_PORT', '6379'))
     default_pass:str = os.environ.get('REDIS_PASSWORD', 'password')
 
-    def __init__(self, ver=version):
+    def __init__(self, appcls, ver):
         self.ver = ver
+        self.appcls = appcls
 
-    def get_mode(self) -> str:
+    def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
 
         Returns:
-            str: モード
+            Union[str, List[str]]: モード
         """
         raise NotImplementedError
 
@@ -106,8 +107,9 @@ class WebFeature(object):
     DEFAULT_CAPTURE_MAXSIZE:int = Feature.DEFAULT_CAPTURE_MAXSIZE
     DEFAULT_401_MESSAGE:str = "Unauthorized operation. Please sign in again as an authorized user."
 
-    def __init__(self, ver=version):
+    def __init__(self, appcls=None, ver=version):
         self.ver = ver
+        self.appcls = appcls
 
     def route(self, web:Web, app:FastAPI) -> None:
         """

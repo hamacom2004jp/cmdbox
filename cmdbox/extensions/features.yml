@@ -1,7 +1,12 @@
 features:
   cli:
-    - package: ""
-      prefix: ""
+    - package:
+      prefix:
   web:
-    - package: ""
-      prefix: ""
+    - package:
+      prefix:
+args:
+  cli:
+    - rule:
+      default:
+      coercion:

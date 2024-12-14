@@ -1,4 +1,3 @@
-from cmdbox import version
 from cmdbox.app import app, client, server, web as _web
 from cmdbox.app.commons import convert
 from cmdbox.app.features.web import cmdbox_web_load_cmd
@@ -14,9 +13,6 @@ import sys
 
 
 class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
     def route(self, web:Web, app:FastAPI) -> None:
         """
         webモードのルーティングを設定します
@@ -78,7 +74,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         return False, None
 
     def exec_cmd(self, req:Request, res:Response, web:Web,
-                 title:str, opt:Dict[str, Any], nothread:bool=False, appcls=app.CmdBoxApp) -> List[Dict[str, Any]]:
+                 title:str, opt:Dict[str, Any], nothread:bool=False, appcls=None) -> List[Dict[str, Any]]:
         """
         コマンドを実行する
 
@@ -93,6 +89,8 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         Returns:
             list: コマンド実行結果
         """
+        appcls = self.appcls if appcls is None else appcls
+        appcls = app.CmdBoxApp if appcls is None else appcls
         web.container['cmdbox_app'] = ap = appcls.getInstance()
         if 'mode' in opt and 'cmd' in opt:
             if not web.check_cmd(req, res, opt['mode'], opt['cmd']):
