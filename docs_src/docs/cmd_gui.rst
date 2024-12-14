@@ -1,12 +1,12 @@
 .. -*- coding: utf-8 -*-
 
 ****************************************************
-コマンドリファレンス（guiモード）
+Command Reference ( gui mode )
 ****************************************************
 
-- GUIモードのコマンド一覧です。
+- List of gui mode commands.
 
-管理画面起動 : `cmdbox -m gui -c start <Option>`
+Management screen startup : `cmdbox -m gui -c start <Option>`
 ==============================================================================
 
 .. csv-table::
@@ -14,22 +14,24 @@
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "--data <データフォルダ>","","省略した時は `$HONE/.cmdbox` を使用します。"
-    "--allow_host <接続許可するIP>","","省略した時は `0.0.0.0` を使用します。"
-    "--ssl_cert <SSLサーバー証明書ファイル>","","SSLサーバー証明書ファイルを指定します。"
-    "--ssl_key <SSLサーバー秘密鍵ファイル>","","SSLサーバー秘密鍵ファイルを指定します。"
-    "--ssl_keypass <SSLサーバー秘密鍵パスワード>","","SSLサーバー秘密鍵ファイルの複合化パスワードを指定します。"
-    "--ssl_ca_certs <SSLサーバーCA証明書ファイル>","","SSLサーバーCA証明書ファイルを指定します。"
-    "--listen_port <サービスポート>","","省略した時は `8081` を使用します。"
-    "--signin_file <ユーザーリストファイル>","","ログイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。ログインファイルは、各行が1ユーザーを示し、ユーザーID、パスワード、ハッシュアルゴリズム名の順で、「 : 」で区切って記載します。ハッシュアルゴリズム名は「plain」「md5」「sha1」「sha256」が指定できます。"
-    "--client_only","","cmdboxサーバーへの接続を行わないようにします。"
-    "--doc_root <ドキュメントルートのパス>","","カスタムファイルのドキュメントルート. フォルダ指定のカスタムファイルのパスから、doc_rootのパスを除去したパスでURLマッピングします。"
-    "--gui_html <gui.htmlファイルのパス>","","`gui.html` を指定します。省略時はcmdbox内蔵のHTMLファイルを使用します。"
-    "--filer_html <filer.htmlファイルのパス>","","`filer.html` を指定します。省略時はcmdbox内蔵のHTMLファイルを使用します。"
-    "--assets <jsやcssファイルのパス>","","htmlファイルを使用する場合に必要なアセットファイルを指定します。"
-    "--signin_html <signin.htmlファイルのパス>","","`signin.html` を指定します。省略時はcmdbox内蔵のHTMLファイルを使用します。"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
+    "--allow_host <IP to allow connection>","","If omitted, `0.0.0.0` is used."
+    "--listen_port <service port>","","If omitted, `8081` is used."
+    "--ssl_cert <SSL server certificate file>","","Specify the SSL server certificate file."
+    "--ssl_key <SSL Server Private Key File>","","Specify the SSL server private key file."
+    "--ssl_keypass <SSL Server Private Key Password>","","Specify the composite password for the SSL server private key file."
+    "--ssl_ca_certs <SSL Server CA Certificate File>","","Specify the SSL server CA certificate file."
+    "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required."
+    "--session_timeout <second>","","Specify the session timeout in seconds for signed-in users."
+    "--client_only","","Do not make connections to the server."
+    "--outputs_key <output key>","","Specify items to be displayed on the showimg and webcap screens. If omitted, all items are displayed."
+    "--doc_root <document root path>","","Document root for custom files. URL mapping from the path of a folder-specified custom file with the path of doc_root removed."
+    "--gui_html <gui.html file path>","","Specify `gui.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--filer_html <filer.html file path>","","Specify `filer.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--assets <Path to js and css files>","","Specify the asset file required when using html files."
+    "--signin_html <signin.html file path>","","Specify `signin.html`. If omitted, the cmdbox built-in HTML file is used."
 

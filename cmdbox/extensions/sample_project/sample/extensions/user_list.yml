@@ -1,0 +1,65 @@
+users:
+  - uid: 1
+    name: admin
+    password: admin
+    hash: plain
+    groups: [admin]
+  - uid: 101
+    name: user01
+    password: b75705d7e35e7014521a46b532236ec3
+    hash: md5
+    groups: [user]
+  - uid: 102
+    name: user02
+    password: a7659675668c2b34f0a456dbaa508200340dc36c
+    hash: sha1
+    groups: [readonly]
+  - uid: 103
+    name: user03
+    password: d64243e8519cce2304fffb92d31acaca622585011b40439c97e9274fae146189
+    hash: sha256
+    groups: [editor]
+groups:
+  - gid: 1
+    name: admin
+  - gid: 101
+    name: user
+  - gid: 102
+    name: readonly
+    parent: user
+  - gid: 103
+    name: editor
+    parent: user
+cmdrule:
+  policy: deny # allow, deny
+  rules:
+    - groups: [admin]
+      rule: allow
+    - groups: [user]
+      mode: client
+      cmds: [file_download, file_list, server_info, time]
+      rule: allow
+    - groups: [user]
+      mode: server
+      cmds: [list, time]
+      rule: allow
+    - groups: [editor]
+      mode: client
+      cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
+      rule: allow
+pathrule:
+  policy: deny # allow, deny
+  rules:
+    - groups: [admin]
+      paths: [/]
+      rule: allow
+    - groups: [user]
+      paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout,
+              /exec_cmd, /exec_pipe, /filer, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used, /versions_sample]
+      rule: allow
+    - groups: [readonly]
+      paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
+      rule: deny
+    - groups: [editor]
+      paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
+      rule: allow

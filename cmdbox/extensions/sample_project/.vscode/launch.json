@@ -1,0 +1,38 @@
+{
+    // IntelliSense を使用して利用可能な属性を学べます。
+    // 既存の属性の説明をホバーして表示します。
+    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.0.1",
+    "configurations": [
+        {
+            "name": "Python: sample version",
+            "type": "python",
+            "request": "launch",
+            "args": ["-v"],
+            "module": "sample",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: sample server",
+            "type": "python",
+            "request": "launch",
+            "args": ["-m","server","-c","start","--debug"],
+            "module": "sample",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: sample gui",
+            "type": "python",
+            "request": "launch",
+            "args": ["-m","gui","-c","start","--signin_file",".samples/user_list.yml"],
+            "module": "sample",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
+        }
+    ]
+}

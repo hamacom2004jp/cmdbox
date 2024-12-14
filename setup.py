@@ -13,7 +13,7 @@ URL = version.__srcurl__
 LICENSE = 'MIT'
 DOWNLOAD_URL = URL
 VERSION = version.__version__
-PYTHON_REQUIRES = '>=3.8'
+PYTHON_REQUIRES = '>=3.11'
 INSTALL_REQUIRES = [
     'argcomplete',
     'cryptography',

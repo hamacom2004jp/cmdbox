@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（serverモード） &mdash; cmdbox 2024/12/14 documentation</title>
+  <title>Command Reference ( server mode ) &mdash; cmdbox 2024/12/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=56c4699f" />
@@ -14,14 +14,14 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=4461e21a"></script>
+      <script src="../_static/documentation_options.js?v=e0196603"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="コマンドリファレンス（clientモード）" href="cmd_client.html" />
-    <link rel="prev" title="コマンドリファレンス（共通）" href="cmd_common.html" /> 
+    <link rel="next" title="Command Reference ( client mode )" href="cmd_client.html" />
+    <link rel="prev" title="Command Reference ( Common )" href="cmd_common.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,21 +44,23 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="command.html">コマンドリファレンス</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">共通オプション</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">サーバー</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-server-c-start-option">サーバー起動 : <cite>cmdbox -m server -c start &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-server-c-stop-option">サーバー停止 : <cite>cmdbox -m server -c stop &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-server-c-list-option">サーバー一覧 : <cite>cmdbox -m server -c list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#service-list-cmdbox-m-server-c-list-option">Service List : <cite>cmdbox -m server -c list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#service-launch-cmdbox-m-server-c-start-option">Service Launch : <cite>cmdbox -m server -c start &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#service-stops-cmdbox-m-server-c-stop-option">Service Stops : <cite>cmdbox -m server -c stop &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html">クライアント</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="developer.html">開発者向け情報</a></li>
-<li class="toctree-l1"><a class="reference internal" href="license.html">ライセンス</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 </ul>
 
         </div>
@@ -75,8 +77,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="command.html">コマンドリファレンス</a></li>
-      <li class="breadcrumb-item active">コマンドリファレンス（serverモード）</li>
+          <li class="breadcrumb-item"><a href="command.html">Command Reference</a></li>
+      <li class="breadcrumb-item active">Command Reference ( server mode )</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/docs/cmd_server.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -86,15 +88,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="server">
-<h1>コマンドリファレンス（serverモード）<a class="headerlink" href="#server" title="Link to this heading"></a></h1>
+  <section id="command-reference-server-mode">
+<h1>Command Reference ( server mode )<a class="headerlink" href="#command-reference-server-mode" title="Link to this heading"></a></h1>
 <ul class="simple">
-<li><p>serverモードのコマンド一覧です。</p></li>
+<li><p>List of server mode commands.</p></li>
 </ul>
-<section id="cmdbox-m-server-c-start-option">
-<h2>サーバー起動 : <cite>cmdbox -m server -c start &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-server-c-start-option" title="Link to this heading"></a></h2>
+<section id="service-list-cmdbox-m-server-c-list-option">
+<h2>Service List : <cite>cmdbox -m server -c list &lt;Option&gt;</cite><a class="headerlink" href="#service-list-cmdbox-m-server-c-list-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>installモードで <cite>cmdbox -m install -c server</cite> を実行している場合は、 <cite>docker-compose up -d</cite> を使用してください。</p></li>
+<li><p>Displays a list of servers that are running.</p></li>
+<li><p>It can also be used from the client environment.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -109,42 +112,27 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定します。</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定します。</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します。</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
-<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
-</tr>
-<tr class="row-even"><td><p>--data &lt;データフォルダ&gt;</p></td>
-<td></td>
-<td><p>省略した時は <cite>$HONE/.cmdbox</cite> を使用します。</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;再接続回数&gt;</p></td>
-<td></td>
-<td><p>Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;秒数&gt;</p></td>
-<td></td>
-<td><p>Redisサーバーに再接続までの秒数を指定します。</p></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="cmdbox-m-server-c-stop-option">
-<h2>サーバー停止 : <cite>cmdbox -m server -c stop &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-server-c-stop-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>installモードで <cite>cmdbox -m install -c server</cite> を実行している場合は、 <cite>docker-compose down</cite> を使用してください。</p></li>
-</ul>
+<section id="service-launch-cmdbox-m-server-c-start-option">
+<h2>Service Launch : <cite>cmdbox -m server -c start &lt;Option&gt;</cite><a class="headerlink" href="#service-launch-cmdbox-m-server-c-start-option" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -158,35 +146,39 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定します。</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定します。</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します。</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
 <td></td>
-<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-even"><td><p>--data &lt;data folder&gt;</p></td>
 <td></td>
-<td><p>サーバーの応答が返ってくるまでの最大待ち時間を指定します。</p></td>
+<td><p>When omitted, f`$HONE/.{version.__appid__}` is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="cmdbox-m-server-c-list-option">
-<h2>サーバー一覧 : <cite>cmdbox -m server -c list &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-server-c-list-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>起動中のサーバーの一覧を表示します。</p></li>
-<li><p>クライアント環境からの利用も可能です。</p></li>
-</ul>
+<section id="service-stops-cmdbox-m-server-c-stop-option">
+<h2>Service Stops : <cite>cmdbox -m server -c stop &lt;Option&gt;</cite><a class="headerlink" href="#service-stops-cmdbox-m-server-c-stop-option" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -200,21 +192,25 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定します。</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定します。</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します。</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
 <td></td>
-<td><p>サーバーの応答が返ってくるまでの最大待ち時間を指定します。</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 </tbody>
 </table>
@@ -225,8 +221,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cmd_common.html" class="btn btn-neutral float-left" title="コマンドリファレンス（共通）" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cmd_client.html" class="btn btn-neutral float-right" title="コマンドリファレンス（clientモード）" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cmd_common.html" class="btn btn-neutral float-left" title="Command Reference ( Common )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmd_client.html" class="btn btn-neutral float-right" title="Command Reference ( client mode )" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

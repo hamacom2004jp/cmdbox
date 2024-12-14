@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス &mdash; cmdbox 2024/12/14 documentation</title>
+  <title>Command Reference &mdash; cmdbox 2024/12/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=56c4699f" />
@@ -14,14 +14,14 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=4461e21a"></script>
+      <script src="../_static/documentation_options.js?v=e0196603"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="コマンドリファレンス（共通）" href="cmd_common.html" />
-    <link rel="prev" title="cmdbox" href="../index.html" /> 
+    <link rel="next" title="Command Reference ( Common )" href="cmd_common.html" />
+    <link rel="prev" title="Tutorial" href="tutorial.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,16 +44,18 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">コマンドリファレンス</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">共通オプション</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_server.html">サーバー</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html">クライアント</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Command Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="developer.html">開発者向け情報</a></li>
-<li class="toctree-l1"><a class="reference internal" href="license.html">ライセンス</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 </ul>
 
         </div>
@@ -70,7 +72,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">コマンドリファレンス</li>
+      <li class="breadcrumb-item active">Command Reference</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/docs/command.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -80,49 +82,49 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="id1">
-<h1>コマンドリファレンス<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
-<p>各種コマンドで使用可能なオプションは以下を参照してください。</p>
+  <section id="command-reference">
+<h1>Command Reference<a class="headerlink" href="#command-reference" title="Link to this heading"></a></h1>
+<p>See below for available options for the various commands.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="cmd_common.html">共通オプション</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cmd_common.html#id2">共通オプション</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmd_common.html">Common Options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html#id1">共通オプション</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="cmd_server.html">サーバー</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cmd_server.html#cmdbox-m-server-c-start-option">サーバー起動 : <cite>cmdbox -m server -c start &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_server.html#cmdbox-m-server-c-stop-option">サーバー停止 : <cite>cmdbox -m server -c stop &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_server.html#cmdbox-m-server-c-list-option">サーバー一覧 : <cite>cmdbox -m server -c list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmd_server.html">Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cmd_server.html#service-list-cmdbox-m-server-c-list-option">Service List : <cite>cmdbox -m server -c list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_server.html#service-launch-cmdbox-m-server-c-start-option">Service Launch : <cite>cmdbox -m server -c start &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_server.html#service-stops-cmdbox-m-server-c-stop-option">Service Stops : <cite>cmdbox -m server -c stop &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="cmd_client.html">クライアント</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#cmdbox-m-client-c-file-copy-option">クライアント(サーバーファイルコピー) : <cite>cmdbox -m client -c file_copy &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#cmdbox-m-client-c-file-download-option">クライアント(サーバーファイルダウンロード) : <cite>cmdbox -m client -c file_download &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#cmdbox-m-client-c-file-list-option">クライアント(サーバーファイルリスト) : <cite>cmdbox -m client -c file_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#cmdbox-m-client-c-file-mkdir-option">クライアント(サーバーファイルフォルダ作成) : <cite>cmdbox -m client -c file_mkdir &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#cmdbox-m-client-c-file-move-option">クライアント(サーバーファイル移動) : <cite>cmdbox -m client -c file_move &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#cmdbox-m-client-c-file-remove-option">クライアント(サーバーファイル削除) : <cite>cmdbox -m client -c file_remove &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#cmdbox-m-client-c-file-rmdir-option">クライアント(サーバーファイルフォルダ削除) : <cite>cmdbox -m client -c file_rmdir &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#cmdbox-m-client-c-file-upload-option">クライアント(サーバーファイルアップロード) : <cite>cmdbox -m client -c file_upload &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#cmdbox-m-client-c-server-info-option">クライアント(サーバー情報取得) : <cite>cmdbox -m client -c server_info &lt;Option&gt;</cite></a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmd_client.html">Client</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#client-copy-file-cmdbox-m-client-c-file-copy-option">client ( Copy File ) : <cite>cmdbox -m client -c file_copy &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#client-download-file-cmdbox-m-client-c-file-download-option">client ( Download File ) : <cite>cmdbox -m client -c file_download &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#client-list-file-cmdbox-m-client-c-file-list-option">client ( List File ) : <cite>cmdbox -m client -c file_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#client-create-folder-cmdbox-m-client-c-file-mkdir-option">client ( Create Folder ) : <cite>cmdbox -m client -c file_mkdir &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#client-move-file-cmdbox-m-client-c-file-move-option">client ( Move File ) : <cite>cmdbox -m client -c file_move &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#client-delete-file-cmdbox-m-client-c-file-remove-option">client ( Delete File ) : <cite>cmdbox -m client -c file_remove &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#client-delete-folder-cmdbox-m-client-c-file-rmdir-option">client ( Delete Folder ) : <cite>cmdbox -m client -c file_rmdir &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#client-upload-file-cmdbox-m-client-c-file-upload-option">client ( Upload File ) : <cite>cmdbox -m client -c file_upload &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#client-server-info-cmdbox-m-client-c-server-info-option">client ( Server Info ) : <cite>cmdbox -m client -c server_info &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_gui.html">GUI</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cmd_gui.html#cmdbox-m-gui-c-start-option">管理画面起動 : <cite>cmdbox -m gui -c start &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_gui.html#management-screen-startup-cmdbox-m-gui-c-start-option">Management screen startup : <cite>cmdbox -m gui -c start &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_web.html">Web</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#web-cmdbox-m-web-c-start-option">Webサービス起動 : <cite>cmdbox -m web -c start &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#web-cmdbox-m-web-c-stop-option">Webサービス停止 : <cite>cmdbox -m web -c stop &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#cmdbox-m-web-c-user-list-option">ユーザー一覧取得 : <cite>cmdbox -m web -c user_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#cmdbox-m-web-c-user-add-option">ユーザー追加 : <cite>cmdbox -m web -c user_add &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#cmdbox-m-web-c-user-edit-option">ユーザー編集 : <cite>cmdbox -m web -c user_edit &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#cmdbox-m-web-c-user-del-option">ユーザー削除 : <cite>cmdbox -m web -c user_del &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#cmdbox-m-web-c-group-list-option">グループ一覧取得 : <cite>cmdbox -m web -c group_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#cmdbox-m-web-c-group-add-option">グループ追加 : <cite>cmdbox -m web -c group_add &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#cmdbox-m-web-c-group-edit-option">グループ編集 : <cite>cmdbox -m web -c group_edit &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#cmdbox-m-web-c-group-del-option">グループ削除 : <cite>cmdbox -m web -c group_del &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#cmdbox-m-web-c-gencert-option">自己署名サーバー証明書生成 : <cite>cmdbox -m web -c gencert &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#self-signed-server-certificate-generation-cmdbox-m-web-c-gencert-option">Self-signed server certificate generation : <cite>cmdbox -m web -c gencert &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#add-group-cmdbox-m-web-c-group-add-option">Add Group : <cite>cmdbox -m web -c group_add &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#delete-group-cmdbox-m-web-c-group-del-option">Delete Group : <cite>cmdbox -m web -c group_del &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#edit-group-cmdbox-m-web-c-group-edit-option">Edit Group : <cite>cmdbox -m web -c group_edit &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#list-group-cmdbox-m-web-c-group-list-option">List Group : <cite>cmdbox -m web -c group_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#web-service-launch-cmdbox-m-web-c-start-option">Web Service Launch : <cite>cmdbox -m web -c start &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#web-service-stops-cmdbox-m-web-c-stop-option">Web Service Stops : <cite>cmdbox -m web -c stop &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#add-user-cmdbox-m-web-c-user-add-option">Add User : <cite>cmdbox -m web -c user_add &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#delete-user-cmdbox-m-web-c-user-del-option">Delete User : <cite>cmdbox -m web -c user_del &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#edit-user-cmdbox-m-web-c-user-edit-option">Edit User : <cite>cmdbox -m web -c user_edit &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#list-user-cmdbox-m-web-c-user-list-option">List User : <cite>cmdbox -m web -c user_list &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
 </ul>
@@ -133,8 +135,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../index.html" class="btn btn-neutral float-left" title="cmdbox" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cmd_common.html" class="btn btn-neutral float-right" title="コマンドリファレンス（共通）" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tutorial.html" class="btn btn-neutral float-left" title="Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmd_common.html" class="btn btn-neutral float-right" title="Command Reference ( Common )" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

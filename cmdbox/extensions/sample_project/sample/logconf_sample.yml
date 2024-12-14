@@ -1,0 +1,42 @@
+version: 1
+
+formatters:
+    fmt:
+        format: '%(levelname)s[%(asctime)s] - %(message)s'
+        class: logging.Formatter
+handlers:
+    std:
+        class: cmdbox.app.commons.loghandler.ColorfulStreamHandler
+        level: INFO
+        formatter: fmt
+        stream: ext://sys.stdout
+    sample:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/sample.log
+
+loggers:
+    client:
+        handlers: [sample, std]
+        level: INFO
+        qualname: client
+    gui:
+        handlers: [sample, std]
+        level: INFO
+        qualname: gui
+    server:
+        handlers: [sample, std]
+        level: INFO
+        qualname: server
+    web:
+        handlers: [sample, std]
+        level: INFO
+        qualname: web
+ 
+#root:
+#    handlers: [sample, std]
+#    level: NOTSET

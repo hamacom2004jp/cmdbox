@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（clientモード） &mdash; cmdbox 2024/12/14 documentation</title>
+  <title>Command Reference ( client mode ) &mdash; cmdbox 2024/12/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=56c4699f" />
@@ -14,14 +14,14 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=4461e21a"></script>
+      <script src="../_static/documentation_options.js?v=e0196603"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="コマンドリファレンス（guiモード）" href="cmd_gui.html" />
-    <link rel="prev" title="コマンドリファレンス（serverモード）" href="cmd_server.html" /> 
+    <link rel="next" title="Command Reference ( gui mode )" href="cmd_gui.html" />
+    <link rel="prev" title="Command Reference ( server mode )" href="cmd_server.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,27 +44,29 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="command.html">コマンドリファレンス</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">共通オプション</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_server.html">サーバー</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">クライアント</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-client-c-file-copy-option">クライアント(サーバーファイルコピー) : <cite>cmdbox -m client -c file_copy &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-client-c-file-download-option">クライアント(サーバーファイルダウンロード) : <cite>cmdbox -m client -c file_download &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-client-c-file-list-option">クライアント(サーバーファイルリスト) : <cite>cmdbox -m client -c file_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-client-c-file-mkdir-option">クライアント(サーバーファイルフォルダ作成) : <cite>cmdbox -m client -c file_mkdir &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-client-c-file-move-option">クライアント(サーバーファイル移動) : <cite>cmdbox -m client -c file_move &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-client-c-file-remove-option">クライアント(サーバーファイル削除) : <cite>cmdbox -m client -c file_remove &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-client-c-file-rmdir-option">クライアント(サーバーファイルフォルダ削除) : <cite>cmdbox -m client -c file_rmdir &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-client-c-file-upload-option">クライアント(サーバーファイルアップロード) : <cite>cmdbox -m client -c file_upload &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cmdbox-m-client-c-server-info-option">クライアント(サーバー情報取得) : <cite>cmdbox -m client -c server_info &lt;Option&gt;</cite></a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Client</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#client-copy-file-cmdbox-m-client-c-file-copy-option">client ( Copy File ) : <cite>cmdbox -m client -c file_copy &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-download-file-cmdbox-m-client-c-file-download-option">client ( Download File ) : <cite>cmdbox -m client -c file_download &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-list-file-cmdbox-m-client-c-file-list-option">client ( List File ) : <cite>cmdbox -m client -c file_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-create-folder-cmdbox-m-client-c-file-mkdir-option">client ( Create Folder ) : <cite>cmdbox -m client -c file_mkdir &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-move-file-cmdbox-m-client-c-file-move-option">client ( Move File ) : <cite>cmdbox -m client -c file_move &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-delete-file-cmdbox-m-client-c-file-remove-option">client ( Delete File ) : <cite>cmdbox -m client -c file_remove &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-delete-folder-cmdbox-m-client-c-file-rmdir-option">client ( Delete Folder ) : <cite>cmdbox -m client -c file_rmdir &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-upload-file-cmdbox-m-client-c-file-upload-option">client ( Upload File ) : <cite>cmdbox -m client -c file_upload &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-server-info-cmdbox-m-client-c-server-info-option">client ( Server Info ) : <cite>cmdbox -m client -c server_info &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="developer.html">開発者向け情報</a></li>
-<li class="toctree-l1"><a class="reference internal" href="license.html">ライセンス</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 </ul>
 
         </div>
@@ -81,8 +83,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="command.html">コマンドリファレンス</a></li>
-      <li class="breadcrumb-item active">コマンドリファレンス（clientモード）</li>
+          <li class="breadcrumb-item"><a href="command.html">Command Reference</a></li>
+      <li class="breadcrumb-item active">Command Reference ( client mode )</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/docs/cmd_client.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -92,13 +94,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="client">
-<h1>コマンドリファレンス（clientモード）<a class="headerlink" href="#client" title="Link to this heading"></a></h1>
-<p>clientモードのコマンド一覧です。</p>
-<section id="cmdbox-m-client-c-file-copy-option">
-<h2>クライアント(サーバーファイルコピー) : <cite>cmdbox -m client -c file_copy &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-client-c-file-copy-option" title="Link to this heading"></a></h2>
+  <section id="command-reference-client-mode">
+<h1>Command Reference ( client mode )<a class="headerlink" href="#command-reference-client-mode" title="Link to this heading"></a></h1>
+<p>List of client mode commands.</p>
+<section id="client-copy-file-cmdbox-m-client-c-file-copy-option">
+<h2>client ( Copy File ) : <cite>cmdbox -m client -c file_copy &lt;Option&gt;</cite><a class="headerlink" href="#client-copy-file-cmdbox-m-client-c-file-copy-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>サーバー側のデータフォルダ配下のファイルをコピーします。</p></li>
+<li><p>Copy the files under the data folder on the server side.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -113,59 +115,59 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定します</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定します</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
 <td></td>
-<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--from_path &lt;コピー元パス&gt;</p></td>
+<tr class="row-even"><td><p>--from_path &lt;source path&gt;</p></td>
 <td></td>
-<td><p>サーバーのデータフォルダ以下のコピー元パスを指定します。</p></td>
+<td><p>Specify the copy source path under the data folder of the inference server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--to_path &lt;コピー先パス&gt;</p></td>
+<tr class="row-odd"><td><p>--to_path &lt;destination path&gt;</p></td>
 <td></td>
-<td><p>サーバーのデータフォルダ以下のコピー先パスを指定します。</p></td>
+<td><p>Specify the path to copy under the data folder of the inference server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--orverwrite</p></td>
 <td></td>
-<td><p>コピー先に存在していても上書きします。</p></td>
+<td><p>Overwrites the file even if it exists at the copy destination.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;参照先スコープ&gt;</p></td>
+<tr class="row-odd"><td><p>--scope &lt;reference scope&gt;</p></td>
 <td></td>
-<td><p>参照先スコープを指定します。指定可能な画像タイプは <cite>client</cite> , <cite>current</cite> , <cite>server</cite> です。</p></td>
+<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;データフォルダ&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
 <td></td>
-<td><p>クライアントを参照させる場合のデータフォルダのパスを指定します。</p></td>
+<td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
-<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="cmdbox-m-client-c-file-download-option">
-<h2>クライアント(サーバーファイルダウンロード) : <cite>cmdbox -m client -c file_download &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-client-c-file-download-option" title="Link to this heading"></a></h2>
+<section id="client-download-file-cmdbox-m-client-c-file-download-option">
+<h2>client ( Download File ) : <cite>cmdbox -m client -c file_download &lt;Option&gt;</cite><a class="headerlink" href="#client-download-file-cmdbox-m-client-c-file-download-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>サーバー側のデータフォルダ配下のファイルをダウンロードします。</p></li>
 <li><p><cite>--svpath</cite> で指定したファイルを <cite>--download_file</cite> で指定した場所に保存します。</p></li>
@@ -183,62 +185,66 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定します</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定します</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
 <td></td>
-<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--svpath &lt;サーバー側パス&gt;</p></td>
+<tr class="row-even"><td><p>--svpath &lt;server-side path&gt;</p></td>
 <td></td>
-<td><p>サーバーのデータフォルダ以下のパスを指定します。</p></td>
+<td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;参照先スコープ&gt;</p></td>
+<tr class="row-odd"><td><p>--scope &lt;reference scope&gt;</p></td>
 <td></td>
-<td><p>参照先スコープを指定します。指定可能な画像タイプは <cite>client</cite> , <cite>current</cite> , <cite>server</cite> です。</p></td>
+<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--download_file &lt;クライアント側パス&gt;</p></td>
+<tr class="row-even"><td><p>--rpath &lt;client-request path&gt;</p></td>
 <td></td>
-<td><p>クライアントの保存先パスを指定します。</p></td>
+<td><p>Specifies the request path. This value is returned in the response without any modification.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_data &lt;データフォルダ&gt;</p></td>
+<tr class="row-odd"><td><p>--download_file &lt;client-side path&gt;</p></td>
 <td></td>
-<td><p>クライアントを参照させる場合のデータフォルダのパスを指定します。</p></td>
+<td><p>Specify the destination path of the client.</p></td>
 </tr>
-<tr class="row-even"><td><p>--img_thumbnail &lt;サムネイルサイズ&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
 <td></td>
-<td><p>対象が画像だった場合のサムネイルのピクセル単位のサイズを指定します。</p></td>
+<td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<tr class="row-odd"><td><p>--img_thumbnail &lt;Thumbnail size&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+<td><p>Specifies the size in pixels of the thumbnail if the subject is an image.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
-<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="cmdbox-m-client-c-file-list-option">
-<h2>クライアント(サーバーファイルリスト) : <cite>cmdbox -m client -c file_list &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-client-c-file-list-option" title="Link to this heading"></a></h2>
+<section id="client-list-file-cmdbox-m-client-c-file-list-option">
+<h2>client ( List File ) : <cite>cmdbox -m client -c file_list &lt;Option&gt;</cite><a class="headerlink" href="#client-list-file-cmdbox-m-client-c-file-list-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>サーバー側のデータフォルダ配下のファイルリストを取得します。</p></li>
-<li><p><cite>--svpath</cite> で指定したフォルダとその配下のフォルダとファイルのリストを返します。</p></li>
+<li><p>Get a list of files under the data folder.</p></li>
+<li><p>Returns the folder specified by <cite>--svpath</cite> and a list of the folders and files under it.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -253,58 +259,58 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定します</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定します</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
 <td></td>
-<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--svpath &lt;サーバー側パス&gt;</p></td>
+<tr class="row-even"><td><p>--svpath &lt;server-side path&gt;</p></td>
 <td></td>
-<td><p>サーバーのデータフォルダ以下のパスを指定します。省略時は <cite>/</cite> を使用します</p></td>
+<td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--recursive</p></td>
+<tr class="row-odd"><td><p>--scope &lt;reference scope&gt;</p></td>
 <td></td>
-<td><p>指定したパスに含まれるフォルダについて、再帰的にファイルリストを取得します</p></td>
+<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;参照先スコープ&gt;</p></td>
+<tr class="row-even"><td><p>--recursive</p></td>
 <td></td>
-<td><p>参照先スコープを指定します。指定可能な画像タイプは <cite>client</cite> , <cite>current</cite> , <cite>server</cite> です。</p></td>
+<td><p>Get a list of files recursively for a folder contained in the specified path.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_data &lt;データフォルダ&gt;</p></td>
+<tr class="row-odd"><td><p>--client_data &lt;data folder&gt;</p></td>
 <td></td>
-<td><p>クライアントを参照させる場合のデータフォルダのパスを指定します。</p></td>
+<td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
-<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="cmdbox-m-client-c-file-mkdir-option">
-<h2>クライアント(サーバーファイルフォルダ作成) : <cite>cmdbox -m client -c file_mkdir &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-client-c-file-mkdir-option" title="Link to this heading"></a></h2>
+<section id="client-create-folder-cmdbox-m-client-c-file-mkdir-option">
+<h2>client ( Create Folder ) : <cite>cmdbox -m client -c file_mkdir &lt;Option&gt;</cite><a class="headerlink" href="#client-create-folder-cmdbox-m-client-c-file-mkdir-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>サーバー側のデータフォルダ配下に新しいフォルダを作成します。</p></li>
-<li><p><cite>--svpath</cite> で指定したフォルダを作成します。</p></li>
+<li><p>Create a new folder under the data folder.</p></li>
+<li><p>Creates the folder specified by <cite>--svpath</cite>.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -319,53 +325,53 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定します</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定します</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
 <td></td>
-<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--svpath &lt;サーバー側パス&gt;</p></td>
+<tr class="row-even"><td><p>--svpath &lt;server-side path&gt;</p></td>
 <td></td>
-<td><p>サーバーのデータフォルダ以下のパスを指定します。省略時は <cite>/</cite> を使用します</p></td>
+<td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;参照先スコープ&gt;</p></td>
+<tr class="row-odd"><td><p>--scope &lt;reference scope&gt;</p></td>
 <td></td>
-<td><p>参照先スコープを指定します。指定可能な画像タイプは <cite>client</cite> , <cite>current</cite> , <cite>server</cite> です。</p></td>
+<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;データフォルダ&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
 <td></td>
-<td><p>クライアントを参照させる場合のデータフォルダのパスを指定します。</p></td>
+<td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
-<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="cmdbox-m-client-c-file-move-option">
-<h2>クライアント(サーバーファイル移動) : <cite>cmdbox -m client -c file_move &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-client-c-file-move-option" title="Link to this heading"></a></h2>
+<section id="client-move-file-cmdbox-m-client-c-file-move-option">
+<h2>client ( Move File ) : <cite>cmdbox -m client -c file_move &lt;Option&gt;</cite><a class="headerlink" href="#client-move-file-cmdbox-m-client-c-file-move-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>サーバー側のデータフォルダ配下のファイルを移動します。</p></li>
+<li><p>Move the files under the data folder.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -380,58 +386,58 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定します</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定します</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
 <td></td>
-<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--from_path &lt;移動元パス&gt;</p></td>
+<tr class="row-even"><td><p>--from_path &lt;source path&gt;</p></td>
 <td></td>
-<td><p>サーバーのデータフォルダ以下の移動元パスを指定します。</p></td>
+<td><p>Specify the source path under the data folder.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--to_path &lt;移動先パス&gt;</p></td>
+<tr class="row-odd"><td><p>--to_path &lt;destination path&gt;</p></td>
 <td></td>
-<td><p>サーバーのデータフォルダ以下の移動先パスを指定します。</p></td>
+<td><p>Specify the destination path under the data folder.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;参照先スコープ&gt;</p></td>
+<tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
 <td></td>
-<td><p>参照先スコープを指定します。指定可能な画像タイプは <cite>client</cite> , <cite>current</cite> , <cite>server</cite> です。</p></td>
+<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_data &lt;データフォルダ&gt;</p></td>
+<tr class="row-odd"><td><p>--client_data &lt;data folder&gt;</p></td>
 <td></td>
-<td><p>クライアントを参照させる場合のデータフォルダのパスを指定します。</p></td>
+<td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
-<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="cmdbox-m-client-c-file-remove-option">
-<h2>クライアント(サーバーファイル削除) : <cite>cmdbox -m client -c file_remove &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-client-c-file-remove-option" title="Link to this heading"></a></h2>
+<section id="client-delete-file-cmdbox-m-client-c-file-remove-option">
+<h2>client ( Delete File ) : <cite>cmdbox -m client -c file_remove &lt;Option&gt;</cite><a class="headerlink" href="#client-delete-file-cmdbox-m-client-c-file-remove-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>サーバー側のデータフォルダ配下のファイルを削除します。</p></li>
-<li><p><cite>--svpath</cite> で指定したファイルを削除します。</p></li>
+<li><p>Delete a file under the data folder.</p></li>
+<li><p>Deletes the file specified by <cite>--svpath</cite>.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -446,54 +452,54 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定します</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定します</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
 <td></td>
-<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--svpath &lt;サーバー側パス&gt;</p></td>
+<tr class="row-even"><td><p>--svpath &lt;server-side path&gt;</p></td>
 <td></td>
-<td><p>サーバーのデータフォルダ以下のパスを指定します。</p></td>
+<td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;参照先スコープ&gt;</p></td>
+<tr class="row-odd"><td><p>--scope &lt;reference scope&gt;</p></td>
 <td></td>
-<td><p>参照先スコープを指定します。指定可能な画像タイプは <cite>client</cite> , <cite>current</cite> , <cite>server</cite> です。</p></td>
+<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;データフォルダ&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
 <td></td>
-<td><p>クライアントを参照させる場合のデータフォルダのパスを指定します。</p></td>
+<td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
-<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="cmdbox-m-client-c-file-rmdir-option">
-<h2>クライアント(サーバーファイルフォルダ削除) : <cite>cmdbox -m client -c file_rmdir &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-client-c-file-rmdir-option" title="Link to this heading"></a></h2>
+<section id="client-delete-folder-cmdbox-m-client-c-file-rmdir-option">
+<h2>client ( Delete Folder ) : <cite>cmdbox -m client -c file_rmdir &lt;Option&gt;</cite><a class="headerlink" href="#client-delete-folder-cmdbox-m-client-c-file-rmdir-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>サーバー側のデータフォルダ配下のフォルダを削除します。</p></li>
-<li><p><cite>--svpath</cite> で指定したフォルダを削除します。</p></li>
+<li><p>Delete a folder under the data folder.</p></li>
+<li><p>Deletes the folder specified by <cite>--svpath</cite>.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -508,54 +514,54 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定します</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定します</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
 <td></td>
-<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--svpath &lt;サーバー側パス&gt;</p></td>
+<tr class="row-even"><td><p>--svpath &lt;server-side path&gt;</p></td>
 <td></td>
-<td><p>サーバーのデータフォルダ以下のパスを指定します。</p></td>
+<td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;参照先スコープ&gt;</p></td>
+<tr class="row-odd"><td><p>--scope &lt;reference scope&gt;</p></td>
 <td></td>
-<td><p>参照先スコープを指定します。指定可能な画像タイプは <cite>client</cite> , <cite>current</cite> , <cite>server</cite> です。</p></td>
+<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;データフォルダ&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
 <td></td>
-<td><p>クライアントを参照させる場合のデータフォルダのパスを指定します。</p></td>
+<td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
-<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="cmdbox-m-client-c-file-upload-option">
-<h2>クライアント(サーバーファイルアップロード) : <cite>cmdbox -m client -c file_upload &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-client-c-file-upload-option" title="Link to this heading"></a></h2>
+<section id="client-upload-file-cmdbox-m-client-c-file-upload-option">
+<h2>client ( Upload File ) : <cite>cmdbox -m client -c file_upload &lt;Option&gt;</cite><a class="headerlink" href="#client-upload-file-cmdbox-m-client-c-file-upload-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>サーバー側のデータフォルダ配下にファイルをアップロードします。</p></li>
-<li><p><cite>--upload_file</cite> で指定したファイルを <cite>--svpath</cite> で指定した場所にアップロードします。</p></li>
+<li><p>Upload a file under the data folder.</p></li>
+<li><p>Upload the file specified by <cite>--upload_file</cite> to the location specified by <cite>--svpath</cite>.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -570,65 +576,65 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定します</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定します</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
 <td></td>
-<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--svpath &lt;サーバー側パス&gt;</p></td>
+<tr class="row-even"><td><p>--svpath &lt;server-side path&gt;</p></td>
 <td></td>
-<td><p>サーバーのデータフォルダ以下のパスを指定します。</p></td>
+<td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;参照先スコープ&gt;</p></td>
+<tr class="row-odd"><td><p>--scope &lt;reference scope&gt;</p></td>
 <td></td>
-<td><p>参照先スコープを指定します。指定可能な画像タイプは <cite>client</cite> , <cite>current</cite> , <cite>server</cite> です。</p></td>
+<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--upload_file &lt;クライアント側パス&gt;</p></td>
+<tr class="row-even"><td><p>--upload_file &lt;client-side path&gt;</p></td>
 <td></td>
-<td><p>クライアントのアップロード元パスを指定します。</p></td>
+<td><p>Specify the source path of the client.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_data &lt;データフォルダ&gt;</p></td>
+<tr class="row-odd"><td><p>--client_data &lt;data folder&gt;</p></td>
 <td></td>
-<td><p>クライアントを参照させる場合のデータフォルダのパスを指定します。</p></td>
+<td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
 <tr class="row-even"><td><p>--mkdir</p></td>
 <td></td>
-<td><p>中間フォルダがない場合作成します。</p></td>
+<td><p>If there is no in between folder, create one.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--orverwrite</p></td>
 <td></td>
-<td><p>アップロード先に存在していても上書きします。</p></td>
+<td><p>Overwrites the file even if it exists at the upload destination.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
-<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="cmdbox-m-client-c-server-info-option">
-<h2>クライアント(サーバー情報取得) : <cite>cmdbox -m client -c server_info &lt;Option&gt;</cite><a class="headerlink" href="#cmdbox-m-client-c-server-info-option" title="Link to this heading"></a></h2>
+<section id="client-server-info-cmdbox-m-client-c-server-info-option">
+<h2>client ( Server Info ) : <cite>cmdbox -m client -c server_info &lt;Option&gt;</cite><a class="headerlink" href="#client-server-info-cmdbox-m-client-c-server-info-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>サーバーの情報を取得します。</p></li>
+<li><p>Retrieve server information.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -643,33 +649,33 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定します</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定します</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
 <td></td>
-<td><p>サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
-<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 </tbody>
 </table>
@@ -680,8 +686,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cmd_server.html" class="btn btn-neutral float-left" title="コマンドリファレンス（serverモード）" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cmd_gui.html" class="btn btn-neutral float-right" title="コマンドリファレンス（guiモード）" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cmd_server.html" class="btn btn-neutral float-left" title="Command Reference ( server mode )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmd_gui.html" class="btn btn-neutral float-right" title="Command Reference ( gui mode )" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

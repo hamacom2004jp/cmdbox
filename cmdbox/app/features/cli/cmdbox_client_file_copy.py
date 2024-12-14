@@ -70,7 +70,7 @@ class ClientFileCopy(Feature):
                                 "current":False}),
                 dict(opt="scope", type="str", default="client", required=True, multi=False, hide=False, choise=["client", "current", "server"],
                         discription_ja="参照先スコープを指定します。指定可能な画像タイプは `client` , `current` , `server` です。",
-                        discription_en="Specifies the scope to be referenced. When omitted, 'client' is used.",
+                        discription_en="Specifies the scope to be referenced. Possible image types are `client` , `current`, and `server`.",
                         test_true={"server":"server",
                                 "client":"client",
                                 "current":"current"}),

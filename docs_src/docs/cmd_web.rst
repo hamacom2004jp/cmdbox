@@ -1,12 +1,27 @@
 .. -*- coding: utf-8 -*-
 
 ****************************************************
-コマンドリファレンス（webモード）
+Command Reference ( web mode )
 ****************************************************
 
-- Webモードのコマンド一覧です。
+- List of web mode commands.
 
-Webサービス起動 : `cmdbox -m web -c start <Option>`
+Self-signed server certificate generation : `cmdbox -m web -c gencert <Option>`
+=================================================================================
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--webhost <Server Name>","","Specify the host name to be specified as the CN (Common Name) of the self-signed certificate."
+    "--output_cert <destination file>","","Specify the self-signed certificate file to be output.If omitted, the hostname specified in the `webhost option` .crt will be output."
+    "--output_cert_format <format>","","Specifies the file format of the self-signed certificate to be output.'PEM' and 'DER' can be specified."
+    "--output_key <destination file>","","Specifies the private key file of the self-signed certificate to be output.If omitted, the hostname specified in the `webhost option` .key will be output."
+    "--output_key_format <format>","","Specifies the private key file format of the output self-signed certificate.'PEM' and 'DER' can be specified."
+    "--overwrite","","Overwrites the self-signed certificate file to be output if it exists."
+
+Add Group : `cmdbox -m web -c group_add <Option>`
 ==============================================================================
 
 .. csv-table::
@@ -14,27 +29,17 @@ Webサービス起動 : `cmdbox -m web -c start <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "--data <データフォルダ>","","省略した時は `$HONE/.cmdbox` を使用します。"
-    "--allow_host <接続許可するIP>","","省略した時は `0.0.0.0` を使用します。"
-    "--listen_port <サービスポート>","","省略した時は `8081` を使用します。"
-    "--ssl_cert <SSLサーバー証明書ファイル>","","SSLサーバー証明書ファイルを指定します。"
-    "--ssl_key <SSLサーバー秘密鍵ファイル>","","SSLサーバー秘密鍵ファイルを指定します。"
-    "--ssl_keypass <SSLサーバー秘密鍵パスワード>","","SSLサーバー秘密鍵ファイルの複合化パスワードを指定します。"
-    "--ssl_ca_certs <SSLサーバーCA証明書ファイル>","","SSLサーバーCA証明書ファイルを指定します。"
-    "--signin_file <ユーザーリストファイル>","","ログイン可能なユーザーとパスワードを記載したファイルを指定します。"
-    "--client_only","","cmdboxサーバーへの接続を行わないようにします。"
-    "--outputs_key <表示項目>","","showimg及びwebcap画面で表示する項目を指定します。省略した場合は全ての項目を表示します。"
-    "--doc_root <ドキュメントルートのパス>","","カスタムファイルのドキュメントルート. フォルダ指定のカスタムファイルのパスから、doc_rootのパスを除去したパスでURLマッピングします。"
-    "--gui_html <gui.htmlファイルのパス>","","`gui.html` を指定します。省略時はcmdbox内蔵のHTMLファイルを使用します。"
-    "--filer_html <filer.htmlファイルのパス>","","`filer.html` を指定します。省略時はcmdbox内蔵のHTMLファイルを使用します。"
-    "--assets <jsやcssファイルのパス>","","htmlファイルを使用する場合に必要なアセットファイルを指定します。"
-    "--signin_html <signin.htmlファイルのパス>","","`signin.html` を指定します。省略時はcmdbox内蔵のHTMLファイルを使用します。"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
+    "--group_id <Group ID>","required","Specify the group ID. Do not duplicate other groups."
+    "--group_name <Group Name>","required","Specify a group name. Do not duplicate other groups."
+    "--group_parent <parent group name>","","Specifies the parent group name."
+    "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."
 
-Webサービス停止 : `cmdbox -m web -c stop <Option>`
+Delete Group : `cmdbox -m web -c group_del <Option>`
 ==============================================================================
 
 .. csv-table::
@@ -42,9 +47,15 @@ Webサービス停止 : `cmdbox -m web -c stop <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--data <データフォルダ>","","省略した時は `$HONE/.cmdbox` を使用します。"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
+    "--group_id <Group ID>","required","Specify the group ID. Do not duplicate other groups."
+    "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."
 
-ユーザー一覧取得 : `cmdbox -m web -c user_list <Option>`
+Edit Group : `cmdbox -m web -c group_edit <Option>`
 ==============================================================================
 
 .. csv-table::
@@ -52,15 +63,17 @@ Webサービス停止 : `cmdbox -m web -c stop <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "--data <データフォルダ>","","省略した時は `$HONE/.cmdbox` を使用します。"
-    "--user_name <ユーザー名>","","ユーザー名を指定して取得します。省略した時は全てのユーザーを取得します。"
-    "--signin_file <ユーザーリストファイル>","","ログイン可能なユーザーとパスワードを記載したファイルを指定します。"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
+    "--group_id <Group ID>","required","Specify the group ID. Do not duplicate other groups."
+    "--group_name <Group Name>","required","Specify a group name. Do not duplicate other groups."
+    "--group_parent <parent group name>","","Specifies the parent group name."
+    "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."
 
-ユーザー追加 : `cmdbox -m web -c user_add <Option>`
+List Group : `cmdbox -m web -c group_list <Option>`
 ==============================================================================
 
 .. csv-table::
@@ -68,19 +81,15 @@ Webサービス停止 : `cmdbox -m web -c stop <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "--data <データフォルダ>","","省略した時は `$HONE/.cmdbox` を使用します。"
-    "--user_id <ユーザーID>","〇","ユーザーIDを指定します。他のユーザーと重複しないようにしてください。"
-    "--user_name <ユーザー名>","〇","ユーザー名を指定します。他のユーザーと重複しないようにしてください。"
-    "--user_pass <ユーザーパスワード>","","ユーザーパスワードを指定します。"
-    "--user_pass_hash <ハッシュアルゴリズム>","","ユーザーパスワードのハッシュアルゴリズムを指定します。'plain', 'md5', 'sha1', 'sha256' が指定できます。"
-    "--user_group <ユーザーグループ>","〇","ユーザーが所属するグループを指定します。"
-    "--signin_file <ユーザーリストファイル>","","ログイン可能なユーザーとパスワードを記載したファイルを指定します。"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
+    "--group_name <Group Name>","","Retrieved by specifying a group name. If omitted, all groups are retrieved."
+    "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."
 
-ユーザー編集 : `cmdbox -m web -c user_edit <Option>`
+Web Service Launch : `cmdbox -m web -c start <Option>`
 ==============================================================================
 
 .. csv-table::
@@ -88,19 +97,28 @@ Webサービス停止 : `cmdbox -m web -c stop <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "--data <データフォルダ>","","省略した時は `$HONE/.cmdbox` を使用します。"
-    "--user_id <ユーザーID>","〇","ユーザーIDを指定します。"
-    "--user_name <ユーザー名>","〇","ユーザー名を指定します。他のユーザーと重複しないようにしてください。"
-    "--user_pass <ユーザーパスワード>","","ユーザーパスワードを指定します。"
-    "--user_pass_hash <ハッシュアルゴリズム>","","ユーザーパスワードのハッシュアルゴリズムを指定します。'plain', 'md5', 'sha1', 'sha256' が指定できます。"
-    "--user_group <ユーザーグループ>","〇","ユーザーが所属するグループを指定します。"
-    "--signin_file <ユーザーリストファイル>","","ログイン可能なユーザーとパスワードを記載したファイルを指定します。"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
+    "--allow_host <IP to allow connection>","","If omitted, `0.0.0.0` is used."
+    "--listen_port <service port>","","If omitted, `8081` is used."
+    "--ssl_cert <SSL server certificate file>","","Specify the SSL server certificate file."
+    "--ssl_key <SSL Server Private Key File>","","Specify the SSL server private key file."
+    "--ssl_keypass <SSL Server Private Key Password>","","Specify the composite password for the SSL server private key file."
+    "--ssl_ca_certs <SSL Server CA Certificate File>","","Specify the SSL server CA certificate file."
+    "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required."
+    "--session_timeout <second>","","Specify the session timeout in seconds for signed-in users."
+    "--client_only","","Do not make connections to the server."
+    "--outputs_key <output key>","","Specify items to be displayed on the showimg and webcap screens. If omitted, all items are displayed."
+    "--doc_root <document root path>","","Document root for custom files. URL mapping from the path of a folder-specified custom file with the path of doc_root removed."
+    "--gui_html <gui.html file path>","","Specify `gui.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--filer_html <filer.html file path>","","Specify `filer.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--assets <Path to js and css files>","","Specify the asset file required when using html files."
+    "--signin_html <signin.html file path>","","Specify `signin.html`. If omitted, the cmdbox built-in HTML file is used."
 
-ユーザー削除 : `cmdbox -m web -c user_del <Option>`
+Web Service Stops : `cmdbox -m web -c stop <Option>`
 ==============================================================================
 
 .. csv-table::
@@ -108,15 +126,9 @@ Webサービス停止 : `cmdbox -m web -c stop <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "--data <データフォルダ>","","省略した時は `$HONE/.cmdbox` を使用します。"
-    "--user_id <ユーザーID>","〇","ユーザーIDを指定します。"
-    "--signin_file <ユーザーリストファイル>","","ログイン可能なユーザーとパスワードを記載したファイルを指定します。"
+    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
 
-グループ一覧取得 : `cmdbox -m web -c group_list <Option>`
+Add User : `cmdbox -m web -c user_add <Option>`
 ==============================================================================
 
 .. csv-table::
@@ -124,15 +136,19 @@ Webサービス停止 : `cmdbox -m web -c stop <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "--data <データフォルダ>","","省略した時は `$HONE/.cmdbox` を使用します。"
-    "--group_name <グループ名>","","グループ名を指定して取得します。省略した時は全てのグループを取得します。"
-    "--signin_file <ユーザーリストファイル>","","ログイン可能なユーザーとパスワードを記載したファイルを指定します。"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
+    "--user_id <user ID>","required","Specify the user ID. Do not duplicate other users."
+    "--user_name <username>","required","Specify a user name. Do not duplicate other users."
+    "--user_pass <user password>","","Specify the user password."
+    "--user_pass_hash <hash algorithm>","","Specifies the hash algorithm for user passwords.'plain', 'md5', 'sha1', and 'sha256' can be specified."
+    "--user_group <user group>","required","Specifies the groups to which the user belongs."
+    "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."
 
-グループ追加 : `cmdbox -m web -c group_add <Option>`
+Delete User : `cmdbox -m web -c user_del <Option>`
 ==============================================================================
 
 .. csv-table::
@@ -140,17 +156,15 @@ Webサービス停止 : `cmdbox -m web -c stop <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "--data <データフォルダ>","","省略した時は `$HONE/.cmdbox` を使用します。"
-    "--group_id <グループID>","〇","グループIDを指定します。他のグループと重複しないようにしてください。"
-    "--group_name <グループ名>","〇","グループ名を指定します。他のグループと重複しないようにしてください。"
-    "--group_parent <親グループ名>","","親グループ名を指定します。"
-    "--signin_file <ユーザーリストファイル>","","ログイン可能なユーザーとパスワードを記載したファイルを指定します。"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
+    "--user_id <user ID>","required","Specify the user ID. Do not duplicate other users."
+    "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."
 
-グループ編集 : `cmdbox -m web -c group_edit <Option>`
+Edit User : `cmdbox -m web -c user_edit <Option>`
 ==============================================================================
 
 .. csv-table::
@@ -158,17 +172,19 @@ Webサービス停止 : `cmdbox -m web -c stop <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "--data <データフォルダ>","","省略した時は `$HONE/.cmdbox` を使用します。"
-    "--group_id <グループID>","〇","グループIDを指定します。"
-    "--group_name <グループ名>","〇","グループ名を指定します。他のグループと重複しないようにしてください。"
-    "--group_parent <親グループ名>","","親グループ名を指定します。"
-    "--signin_file <ユーザーリストファイル>","","ログイン可能なユーザーとパスワードを記載したファイルを指定します。"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
+    "--user_id <user ID>","required","Specify the user ID. Do not duplicate other users."
+    "--user_name <username>","required","Specify a user name. Do not duplicate other users."
+    "--user_pass <user password>","","Specify the user password."
+    "--user_pass_hash <hash algorithm>","","Specifies the hash algorithm for user passwords.'plain', 'md5', 'sha1', and 'sha256' can be specified."
+    "--user_group <user group>","required","Specifies the groups to which the user belongs."
+    "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."
 
-グループ削除 : `cmdbox -m web -c group_del <Option>`
+List User : `cmdbox -m web -c user_list <Option>`
 ==============================================================================
 
 .. csv-table::
@@ -176,26 +192,10 @@ Webサービス停止 : `cmdbox -m web -c stop <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "--data <データフォルダ>","","省略した時は `$HONE/.cmdbox` を使用します。"
-    "--group_id <グループID>","〇","グループIDを指定します。"
-    "--signin_file <ユーザーリストファイル>","","ログイン可能なユーザーとパスワードを記載したファイルを指定します。"
-
-
-自己署名サーバー証明書生成 : `cmdbox -m web -c gencert <Option>`
-==============================================================================
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--webhost <サーバー名>","","自己署名証明書のCN(Common Name)に指定するホスト名を指定します。"
-    "--output_cert <保存先>","","出力する自己署名証明書のファイルを指定します。省略した場合は `webhostオプションに指定したホスト名` .crt に出力されます。"
-    "--output_cert_format <フォーマット>","","出力する自己署名証明書のファイルフォーマットを指定します。'PEM', 'DER' が指定できます。"
-    "--output_key <保存先>","","出力する自己署名証明書の秘密鍵ファイルを指定します。省略した場合は `webhostオプションに指定したホスト名` .key に出力されます。"
-    "--output_key_format <フォーマット>","","出力する自己署名証明書の秘密鍵ファイルフォーマットを指定します。'PEM', 'DER' が指定できます。"
-    "--overwrite","","出力する自己署名証明書のファイルが存在する場合に上書きします。"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
+    "--user_name <username>","","Retrieved by specifying a user name. If omitted, all users are retrieved."
+    "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."

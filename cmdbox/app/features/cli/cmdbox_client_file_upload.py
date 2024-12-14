@@ -35,8 +35,8 @@ class ClientFileUpload(Feature):
         """
         return dict(
             type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
-            discription_ja="サーバー側のデータフォルダ配下にファイルをアップロードします。",
-            discription_en="Upload a file under the data folder on the server.",
+            discription_ja="データフォルダ配下にファイルをアップロードします。",
+            discription_en="Upload a file under the data folder.",
             choise=[
                 dict(opt="host", type="str", default=self.default_host, required=True, multi=False, hide=True, choise=None,
                         discription_ja="Redisサーバーのサービスホストを指定します。",

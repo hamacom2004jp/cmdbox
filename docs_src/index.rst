@@ -4,20 +4,19 @@
 cmdbox
 #######################################
 
-- プラグイン機構を備えたコマンドラインアプリケーションです。
-- ドキュメントは[こちら](https://hamacom2004jp.github.io/cmdbox/)。
-- cmdboxを使用することで、複雑なオプションを持つコマンドを簡単に実装できます。
-- 実装したコマンドは、RESTAPIとしても呼び出せるようになります。
-- 実装したコマンドは、redisを介してリモートサーバーで実行することが出来ます。
-- 実装したコマンドは、Webコンソールから実行できます。
-- リモートサーバーでコマンドを実行するために、必要なファイルをwebファイラーを使って転送できます。
+- It is a command line application with a plugin mechanism.
+- With cmdbox, you can easily implement commands with complex options.
+- The implemented commands can be called from the CLI / RESTAPI / Web screen.
+- The implemented commands can be executed on a remote server via redis.
 
 .. toctree::
    :maxdepth: 2
 
-   コマンドリファレンス <docs/command.rst>
-   開発者向け情報 <docs/developer.rst>
-   ライセンス <docs/license.rst>
+   Install <docs/install.rst>
+   Tutorial <docs/tutorial.rst>
+   Command Reference <docs/command.rst>
+   Developer Information <docs/developer.rst>
+   License <docs/license.rst>
 
 Indices and tables
 ==================

@@ -34,30 +34,6 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "justMyCode": false
-        },
-        {
-            "name": "Python: cmdbox webcap",
-            "type": "python",
-            "request": "launch",
-            "args": ["-m","web","-c","webcap","--listen_port", "8082",
-                     "--image_type", "capture", "--capture_count", "1", "--capture_frame_width", "1920", "--capture_frame_height", "1080", "--capture_fps", "5"],
-            "module": "cmdbox",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "justMyCode": false
-        },
-        {
-            "name": "Python: gentest",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "cmdbox/tools/gentest.py",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "justMyCode": false,
-            "env": {
-                "PYTHONPATH":"${workspaceFolder}", // 追加
-            }
         }
-        
     ]
 }

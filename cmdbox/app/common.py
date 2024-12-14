@@ -108,6 +108,12 @@ def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, v
     if not log_conf_path.exists():
         log_conf_path = Path(ver.__file__).parent / f"logconf_{ver.__appid__}.yml"
         log_name = mode
+    if not log_conf_path.exists():
+        log_conf_path = Path(version.__file__).parent / f"logconf_{mode}.yml"
+        log_name = mode
+    if not log_conf_path.exists():
+        log_conf_path = Path(version.__file__).parent / f"logconf_{ver.__appid__}.yml"
+        log_name = mode
     with open(log_conf_path) as f:
         log_config = yaml.safe_load(f)
     std_key = None

@@ -35,8 +35,8 @@ class ClientFileList(Feature):
         """
         return dict(
             type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
-            discription_ja="サーバー側のデータフォルダ配下のファイルリストを取得します。",
-            discription_en="Get a list of files under the data folder on the server.",
+            discription_ja="データフォルダ配下のファイルリストを取得します。",
+            discription_en="Get a list of files under the data folder.",
             choise=[
                 dict(opt="host", type="str", default=self.default_host, required=True, multi=False, hide=True, choise=None,
                         discription_ja="Redisサーバーのサービスホストを指定します。",

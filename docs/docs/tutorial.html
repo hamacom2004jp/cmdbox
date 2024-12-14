@@ -1,0 +1,305 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutorial &mdash; cmdbox 2024/12/15 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=56c4699f" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=e0196603"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Command Reference" href="command.html" />
+    <link rel="prev" title="Install" href="install.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-implement-a-new-command-using-cmdbox">How to implement a new command using cmdbox</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Tutorial</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/tutorial.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p>Open the <cite>.sample/sample_project</cite> folder in the current directory with VSCode.</p></li>
+</ul>
+<img alt="'image'" src="../_images/readme001.png" />
+<ul class="simple">
+<li><p>Install dependent libraries.</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+.<span class="w"> </span>.venv/bin/activate
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Run the project.</p></li>
+</ul>
+<img alt="'image'" src="../_images/readme002.png" />
+<ul class="simple">
+<li><p>The localhost web screen will open.</p></li>
+</ul>
+<img alt="'image'" src="../_images/readme003.png" />
+<ul class="simple">
+<li><p>Enter <cite>user01 / user01</cite> for the initial ID and PW to sign in.</p></li>
+<li><p>Using this web screen, you can easily execute the commands implemented in cmdbox.</p></li>
+</ul>
+<img alt="'image'" src="../_images/readme004.png" />
+<ul class="simple">
+<li><p>Let's look at the command to get a list of files as an example.</p></li>
+<li><p>Press the plus button under Commands to open the Add dialog.</p></li>
+<li><p>Then enter the following.</p></li>
+</ul>
+<img alt="'image'" src="../_images/readme005.png" />
+<ul class="simple">
+<li><p>Press the <cite>Save</cite> button once and then press the <cite>Execute</cite> button.</p></li>
+<li><p>The results of the command execution are displayed.</p></li>
+</ul>
+<img alt="'image'" src="../_images/readme006.png" />
+<ul class="simple">
+<li><p>Open the saved <cite>client_time</cite> and press the <cite>Raw</cite> button.</p></li>
+<li><p>You will see how to execute the same command on the command line; the RESTAPI URL is also displayed.</p></li>
+</ul>
+<img alt="'image'" src="../_images/readme007.png" />
+<section id="how-to-implement-a-new-command-using-cmdbox">
+<h2>How to implement a new command using cmdbox<a class="headerlink" href="#how-to-implement-a-new-command-using-cmdbox" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Under the <cite>sample/app/features/cli</cite> folder, you will find an implementation of the <cite>client_time</cite> mentioned earlier.</p></li>
+<li><p>The implementation is as follows. (Slightly abbreviated display)</p></li>
+<li><p>Create the following code and save it in the <cite>sample/app/features/cli</cite> folder.</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cmdbox.app</span> <span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">feature</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+
+<span class="k">class</span> <span class="nc">ClientTime</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">Feature</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="s2">&quot;client&quot;</span>
+
+    <span class="k">def</span> <span class="nf">get_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;time&#39;</span>
+
+    <span class="k">def</span> <span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;str&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_redis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">USE_REDIS_FALSE</span><span class="p">,</span>
+            <span class="n">discription_ja</span><span class="o">=</span><span class="s2">&quot;クライアント側の現在時刻を表示します。&quot;</span><span class="p">,</span>
+            <span class="n">discription_en</span><span class="o">=</span><span class="s2">&quot;Displays the current time at the client side.&quot;</span><span class="p">,</span>
+            <span class="n">choise</span><span class="o">=</span><span class="p">[</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">&quot;timedelta&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choise</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">discription_ja</span><span class="o">=</span><span class="s2">&quot;時差の時間数を指定します。&quot;</span><span class="p">,</span>
+                        <span class="n">discription_en</span><span class="o">=</span><span class="s2">&quot;Specify the number of hours of time difference.&quot;</span><span class="p">),</span>
+            <span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span><span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">tz</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">timedelta</span><span class="p">))</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">tz</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)))</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;success&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="kc">None</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Open the file <cite>sample/extensions/features.yml</cite>. The file should look something like this.</p></li>
+<li><p>This file specifies where new commands are to be read.</p></li>
+<li><p>For example, if you want to add a package to read, add a new <cite>package</cite> and <cite>prefix</cite> to <cite>features.cli</cite>.</p></li>
+<li><p>Note that <cite>features.web</cite> can be used to add a new web screen.</p></li>
+<li><p>If you only want to call commands added in <cite>features.cli</cite> via RESTAPI, no additional implementation is needed in <cite>features.web</cite>.</p></li>
+</ul>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">features</span><span class="p">:</span>
+<span class="nt">cli</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">package</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample.app.features.cli</span>
+<span class="w">    </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_</span>
+<span class="nt">web</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">package</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample.app.features.web</span>
+<span class="w">    </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_web_</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="nt">cli</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">rule</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
+<span class="w">    </span><span class="nt">default</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">coercion</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">assets</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">f&quot;{Path(self.ver.__file__).parent / &#39;web&#39; / &#39;assets&#39;}&quot;</span>
+<span class="w">        </span><span class="nt">doc_root</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">f&quot;{Path(self.ver.__file__).parent / &#39;web&#39;}&quot;</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">rule</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gui</span>
+<span class="w">    </span><span class="nt">default</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">coercion</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">assets</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">f&quot;{Path(self.ver.__file__).parent / &#39;web&#39; / &#39;assets&#39;}&quot;</span>
+<span class="w">        </span><span class="nt">doc_root</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">f&quot;{Path(self.ver.__file__).parent / &#39;web&#39;}&quot;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>The following files should also be known when using commands on the web screen or RESTAPI.</p></li>
+<li><p>Open the file <cite>sample/extensions/user_list.yml</cite>. The file should look something like this.</p></li>
+<li><p>This file manages the users and groups that are allowed Web access and their rules.</p></li>
+<li><p>The rule of the previous command is <cite>allow</cite> for users in the <cite>user</cite> group in <cite>cmdrule.rules</cite>.</p></li>
+</ul>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">users</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">password</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">XXXXXXXX</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">hash</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">plain</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">groups</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">admin</span><span class="p p-Indicator">]</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">101</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">user01</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">password</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">XXXXXXXX</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">hash</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">md5</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">groups</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">user</span><span class="p p-Indicator">]</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">102</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">user02</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">password</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">XXXXXXXX</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">hash</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sha1</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">groups</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">readonly</span><span class="p p-Indicator">]</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">103</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">user03</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">password</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">XXXXXXXX</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">hash</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sha256</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">groups</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">editor</span><span class="p p-Indicator">]</span>
+<span class="nt">groups</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">gid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">gid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">101</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">user</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">gid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">102</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">readonly</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">parent</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">user</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">gid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">103</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">editor</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">parent</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">user</span>
+<span class="nt">cmdrule</span><span class="p">:</span>
+<span class="nt">policy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deny</span><span class="w"> </span><span class="c1"># allow, deny</span>
+<span class="nt">rules</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">groups</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">admin</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">groups</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">user</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span>
+<span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">file_download</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_list</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">server_info</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">time</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">groups</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">user</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">time</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">groups</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">editor</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span>
+<span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">file_copy</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_mkdir</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_move</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_remove</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_rmdir</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_upload</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
+<span class="nt">pathrule</span><span class="p">:</span>
+<span class="nt">policy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deny</span><span class="w"> </span><span class="c1"># allow, deny</span>
+<span class="nt">rules</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">groups</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">admin</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">/</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">groups</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">user</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">/signin</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/assets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/bbforce_cmd</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/copyright</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/dosignin</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/dosignout</span><span class="p p-Indicator">,</span>
+<span class="w">            </span><span class="nv">/exec_cmd</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/exec_pipe</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/filer</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/gui</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/get_server_opt</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/usesignout</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/versions_cmdbox</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/versions_used</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/versions_sample</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">groups</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">readonly</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">/gui/del_cmd</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/gui/del_pipe</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/gui/save_cmd</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/gui/save_pipe</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deny</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">groups</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">editor</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">/gui/del_cmd</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/gui/del_pipe</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/gui/save_cmd</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/gui/save_pipe</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="install.html" class="btn btn-neutral float-left" title="Install" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="command.html" class="btn btn-neutral float-right" title="Command Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2024 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

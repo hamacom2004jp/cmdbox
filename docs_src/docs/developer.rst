@@ -1,45 +1,45 @@
 .. -*- coding: utf-8 -*-
 
-****************
-開発者向け情報
-****************
+********************************
+Developer Information
+********************************
 
-cmdboxの開発環境を構築するための手順を説明します。
+This section describes the steps to build a development environment for cmdbox.
 
-プロジェクトのインストール方法
+How to install the project
 ==============================
 
-プロジェクトをインストールするには、次の手順を実行します:
+To install the project, follow these steps:
 
-1. プロジェクトをクローンします:
+1. Clone project:
 
-    .. code-block:: bat
+    .. code-block:: bash
 
         git clone https://github.com/hamacom2004jp/cmdbox.git
 
-2. プロジェクトのディレクトリに移動します:
+2. Go to the project directory:
 
-    .. code-block:: bat
+    .. code-block:: bash
 
         cd cmdbox
 
-3. プロジェクトの仮想環境を作成します:
+3. Create a virtual environment for your project:
 
-    .. code-block:: bat
+    .. code-block:: bash
 
         python -m venv .venv
-        .venv\Scripts\activate
+        . .venv/bin/activate
 
-4. プロジェクトの依存関係をインストールします:
+4. Install project dependencies:
 
-    .. code-block:: bat
+    .. code-block:: bash
 
         python.exe -m pip install --upgrade pip
         pip install -r requirements.txt
 
-5. プロジェクトをビルドします:
+5. Build the project:
 
-    .. code-block:: bat
+    .. code-block:: bash
 
         sphinx-apidoc -F -o docs_src/resources cmdbox
         sphinx-build -b html docs_src docs
@@ -50,116 +50,45 @@ cmdboxの開発環境を構築するための手順を説明します。
 .. sphinx-build -b gettext docs_src docs_build
 .. sphinx-intl update -p docs_build -l en
         
-モジュールのコミット方法
+How to commit a module
 =========================
 
-開発を協力いただける方は、以下のガイドラインに従ってください:
+If you are willing to cooperate in the development, please follow these guidelines:
 
-1. 新しいブランチを作成してください:
+1. Create a new branch:
 
     .. code-block:: bat
 
         git checkout -b feature/your-feature
 
-2. 変更を加えてコミットしてください:
+2. Make your changes and commit!:
 
     .. code-block:: bat
 
         git commit -m "Add your changes"
 
-3. 作成したブランチにプッシュしてください:
+3. Push to the branch you created:
 
     .. code-block:: bat
 
         git push origin feature/your-feature
 
-4. プルリクエストを作成してください.
+4. Create a pull request.
 
-【参考】pyplにアップするための手順
-==================================
 
-1. pypiのユーザー登録
+Reference: Procedure for building a Windows environment for Redis
+====================================================================
 
-   - pyplのユーザー登録【本番】
-     https://pypi.org/account/register/
+- `cmdbox` uses Redis.
 
-   - pyplのユーザー登録【テスト】
-     https://test.pypi.org/account/register/
-
-2. それぞれ2要素認証とAPIトークンを登録
-
-3. ホームディレクトリに **.pypirc** を作成
-
-    .. code-block:: ini
-
-        [distutils]
-        index-servers =
-            pypi
-            testpypi
-
-        [pypi]
-        repository: https://upload.pypi.org/legacy/
-        username: __token__
-        password: 本番環境のAPIトークン
-
-        [testpypi]
-        repository: https://test.pypi.org/legacy/
-        username: __token__
-        password: テスト環境のAPIトークン
-
-4. テスト環境にアップロード
-
-    .. code-block:: bat
-
-        twine upload --repository testpypi dist/*
-
-5. テスト環境のモジュールをインストール
-
-    .. code-block:: bat
-
-        pip install -i https://test.pypi.org/simple/ cmdbox
-
-6. 本番環境にアップロード
-
-    .. code-block:: bat
-
-        twine upload --repository pypi dist/*
-
-7. 本番環境のモジュールをインストール
-
-    .. code-block:: bat
-
-        pip install cmdbox
-
-【参考】RedisをWindows環境を構築する手順
-=====================================================
-
-- `cmdbox` はRedisを使用しています。
-
-    1. インストーラーを `GitHub <https://github.com/MicrosoftArchive/redis/releases>`__ からダウンロードします。
-    2. ダウンロードしたインストーラー（MSIファイル）を実行します。
-    3. ウィザードの中でインストール先ディレクトリの設定があるので、設定したパスをメモしておいてください。デフォルトは `C:\\Program Files\\Redis` です。
-    4. ウィザードの中でRedisサーバーのサービスポートの設定があるので、設定したポートをメモしておいてください。デフォルトは6379です。
-    5. ウィザードの中で使用するメモリ最大量の設定があるので、必要に応じて設定してください。開発用なら100mb程度で十分です。 
-    6. インストールが完了したら、インストール先ディレクトリをエクスプローラーで開いてください。
-    7. その中の `redis.windows-service.conf` ファイルと `redis.windows-service.conf` ファイルをメモ帳などのテキストエディタで開いてください。
-    8. このファイルの中で、 `requirepass foobared` を検索し、 `#` を削除しコメントアウトを解除してください。
-    9. `requirepass foobared` の `foobared` の部分を任意のパスワードに変更してください。変更したパスワードをメモしておいてください。
-    10. このパスワードが、 `cmdbox` コマンドの中で指定するパスワードになります。
-    11. Windowsのタスクマネージャーを開いて、サービスタブを開いて `Redis` を右クリックし、サービスを再起動してください。
-
-【参考】sitemap.xmlの作成手順
-=============================
-
-1. `xml-sitemaps <https://www.xml-sitemaps.com/>`__ でsitemap.xmlを作成します。:
-2. 作成したsitemap.xmlをダウンロードします。
-3. ダウンロードしたsitemap.xmlを `docs` ディレクトリにコピーします。
-4. プロジェクトのルートディレクトリに移動して、以下のコマンドを実行します:
-
-    .. code-block:: bat
-
-        sphinx-apidoc -F -o docs_src/resources cmdbox
-        sphinx-build -b html docs_src docs
-        python setup.py sdist
-        python setup.py bdist_wheel
-
+    1. Download the installer from `GitHub <https://github.com/MicrosoftArchive/redis/releases>`__ .
+    2. Run the downloaded installer (MSI file).
+    3. The wizard will ask you to set the installation directory, so please make a note of the path you set. The default is `C:\\Program Files\\Redis` .
+    4. In the wizard, there is a setting for the service port of the Redis server, so please make a note of the port you set. The default is 6379.
+    5. There is a setting in the wizard for the maximum amount of memory to be used, so set it as needed. For development use, about 100 mb is sufficient. 
+    6. After installation is complete, open the installation directory in Explorer.
+    7. Open the `redis.windows-service.conf` and `redis.windows-service.conf` files in it with a text editor such as Notepad.
+    8. In this file, search for `requirepass foobared`, remove the `#` and uncomment it out.
+    9. Change the `foobared` part of `requirepass foobared` to your desired password. Make a note of the changed password.
+    10. This password will be the password specified in the `cmdbox` command.
+    11. Open the Windows Task Manager, open the Services tab, right-click `Redis`, and restart the service.

@@ -1,10 +1,10 @@
 .. -*- coding: utf-8 -*-
 
 ****************************************************
-コマンドリファレンス（共通）
+Command Reference ( Common )
 ****************************************************
 
-すべてのコマンドで共通して指定可能なオプションです。
+This is a common option that can be specified for all commands.
 
 
 共通オプション
@@ -15,14 +15,14 @@
     :header-rows: 1
 
     "Option","Required","Description"
-    "-h","","ヘルプ表示"
-    "-u,--useopt <オプション保存するファイル>","`-s` を指定している場合〇","オプションを保存しているファイルを使用します"
-    "-s,--saveopt","","指定しているオプションを `-u` で指定したファイルに保存します"
-    "-d,--debug","","デバックモードで起動します"
-    "-f,--format","","処理結果を見やすい形式で出力します。指定しない場合json形式で出力します。"
-    "-o, --output_json <処理結果jsonの保存先ファイル>","","処理結果jsonの保存先ファイルを指定します"
-    "-a, --output_json_append","","処理結果jsonファイルを追記保存します"
-    "--stdout_log","","GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します"
-    "--capture_stdout","","GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します"
-    "--capture_maxsize","","GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します"
-    "-v, --version","","バージョン表示"
+    "-h","","help display"
+    "-u,--useopt <Option File to save>","Required if `-s` is specified.","Use the file that stores the options."
+    "-s,--saveopt","","Save the specified options to the file specified by `-u`."
+    "-d,--debug","","Starts in debug mode."
+    "-f,--format","","Output the processing result in an easy-to-read format. If not specified, output in json format."
+    "-o, --output_json <Destination file for processing result json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append","","Save the processing result json file by appending."
+    "--stdout_log","","Available only in GUI mode. Outputs standard output to Console log when executing commands."
+    "--capture_stdout","","Available in GUI mode only. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize","","Available in GUI mode only. Specifies the maximum capture size of standard output when executing commands."
+    "-v, --version","","Display version"

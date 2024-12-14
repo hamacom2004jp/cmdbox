@@ -1,16 +1,16 @@
 .. -*- coding: utf-8 -*-
 
 ****************************************************
-コマンドリファレンス
+Command Reference
 ****************************************************
 
-各種コマンドで使用可能なオプションは以下を参照してください。
+See below for available options for the various commands.
 
 .. toctree::
    :maxdepth: 2
 
-   共通オプション <cmd_common.rst>
-   サーバー <cmd_server.rst>
-   クライアント <cmd_client.rst>
+   Common Options <cmd_common.rst>
+   Server <cmd_server.rst>
+   Client <cmd_client.rst>
    GUI <cmd_gui.rst>
    Web <cmd_web.rst>

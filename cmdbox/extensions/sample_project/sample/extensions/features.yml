@@ -1,0 +1,23 @@
+features:
+  cli:
+    - package: sample.app.features.cli
+      prefix: sample_
+  web:
+    - package: sample.app.features.web
+      prefix: sample_web_
+args:
+  cli:
+    - rule:
+        mode: web
+      default:
+      coercion:
+        assets:
+          - f"{Path(self.ver.__file__).parent / 'web' / 'assets'}"
+        doc_root: f"{Path(self.ver.__file__).parent / 'web'}"
+    - rule:
+        mode: gui
+      default:
+      coercion:
+        assets:
+          - f"{Path(self.ver.__file__).parent / 'web' / 'assets'}"
+        doc_root: f"{Path(self.ver.__file__).parent / 'web'}"

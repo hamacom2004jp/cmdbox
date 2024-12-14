@@ -97,6 +97,10 @@ class CmdBoxApp:
             common.saveopt(opt, args.useopt)
             ret = {"success":f"Save options file. {args.useopt}"}
 
+        common.mklogdir(args.data)
+        common.copy_sample(args.data, ver=self.ver)
+        common.copy_sample(Path.cwd(), ver=self.ver)
+
         if args.version:
             v = self.ver.__logo__ + '\n' + self.ver.__description__
             common.print_format(v, False, tm, None, False)
@@ -106,10 +110,6 @@ class CmdBoxApp:
             msg = {"warn":f"mode is None. Please specify the --help option."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
             return 1, msg, None
-
-        common.mklogdir(args.data)
-        common.copy_sample(args.data, ver=self.ver)
-        common.copy_sample(Path.cwd(), ver=self.ver)
 
         logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall if args.cmd != 'webcap' else True, ver=self.ver)
         if logger.level == logging.DEBUG:

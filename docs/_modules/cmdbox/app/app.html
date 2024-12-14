@@ -41,9 +41,11 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">コマンドリファレンス</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">開発者向け情報</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../docs/license.html">ライセンス</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/license.html">License</a></li>
 </ul>
 
         </div>
@@ -180,6 +182,10 @@
             <span class="n">common</span><span class="o">.</span><span class="n">saveopt</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">useopt</span><span class="p">)</span>
             <span class="n">ret</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;Save options file. </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">useopt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
 
+        <span class="n">common</span><span class="o">.</span><span class="n">mklogdir</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">copy_sample</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">copy_sample</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="n">ver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">version</span><span class="p">:</span>
             <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__logo__</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__description__</span>
             <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
@@ -189,10 +195,6 @@
             <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;mode is None. Please specify the --help option.&quot;</span><span class="p">}</span>
             <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">)</span>
             <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
-
-        <span class="n">common</span><span class="o">.</span><span class="n">mklogdir</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-        <span class="n">common</span><span class="o">.</span><span class="n">copy_sample</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
-        <span class="n">common</span><span class="o">.</span><span class="n">copy_sample</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="n">ver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">webcall</span><span class="o">=</span><span class="n">webcall</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">cmd</span> <span class="o">!=</span> <span class="s1">&#39;webcap&#39;</span> <span class="k">else</span> <span class="kc">True</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>

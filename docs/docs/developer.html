@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>開発者向け情報 &mdash; cmdbox 2024/12/14 documentation</title>
+  <title>Developer Information &mdash; cmdbox 2024/12/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=56c4699f" />
@@ -14,14 +14,14 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=4461e21a"></script>
+      <script src="../_static/documentation_options.js?v=e0196603"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="MIT License" href="license.html" />
-    <link rel="prev" title="コマンドリファレンス（webモード）" href="cmd_web.html" /> 
+    <link rel="prev" title="Command Reference ( web mode )" href="cmd_web.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,16 +44,16 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="command.html">コマンドリファレンス</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">開発者向け情報</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#id2">プロジェクトのインストール方法</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id3">モジュールのコミット方法</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#pypl">【参考】pyplにアップするための手順</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#rediswindows">【参考】RedisをWindows環境を構築する手順</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#sitemap-xml">【参考】sitemap.xmlの作成手順</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command.html">Command Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Developer Information</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-install-the-project">How to install the project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-commit-a-module">How to commit a module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reference-procedure-for-building-a-windows-environment-for-redis">Reference: Procedure for building a Windows environment for Redis</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="license.html">ライセンス</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 </ul>
 
         </div>
@@ -70,7 +70,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">開発者向け情報</li>
+      <li class="breadcrumb-item active">Developer Information</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/docs/developer.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -80,185 +80,105 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="id1">
-<h1>開発者向け情報<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
-<p>cmdboxの開発環境を構築するための手順を説明します。</p>
-<section id="id2">
-<h2>プロジェクトのインストール方法<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
-<p>プロジェクトをインストールするには、次の手順を実行します:</p>
+  <section id="developer-information">
+<h1>Developer Information<a class="headerlink" href="#developer-information" title="Link to this heading"></a></h1>
+<p>This section describes the steps to build a development environment for cmdbox.</p>
+<section id="how-to-install-the-project">
+<h2>How to install the project<a class="headerlink" href="#how-to-install-the-project" title="Link to this heading"></a></h2>
+<p>To install the project, follow these steps:</p>
 <ol class="arabic">
-<li><p>プロジェクトをクローンします:</p>
+<li><p>Clone project:</p>
 <blockquote>
-<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/hamacom2004jp/cmdbox.git
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/hamacom2004jp/cmdbox.git
 </pre></div>
 </div>
 </div></blockquote>
 </li>
-<li><p>プロジェクトのディレクトリに移動します:</p>
+<li><p>Go to the project directory:</p>
 <blockquote>
-<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span><span class="k">cd</span> cmdbox
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>cmdbox
 </pre></div>
 </div>
 </div></blockquote>
 </li>
-<li><p>プロジェクトの仮想環境を作成します:</p>
+<li><p>Create a virtual environment for your project:</p>
 <blockquote>
-<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>python -m venv .venv
-.venv\Scripts\activate
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+.<span class="w"> </span>.venv/bin/activate
 </pre></div>
 </div>
 </div></blockquote>
 </li>
-<li><p>プロジェクトの依存関係をインストールします:</p>
+<li><p>Install project dependencies:</p>
 <blockquote>
-<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>python.exe -m pip install --upgrade pip
-pip install -r requirements.txt
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python.exe<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 </pre></div>
 </div>
 </div></blockquote>
 </li>
-<li><p>プロジェクトをビルドします:</p>
+<li><p>Build the project:</p>
 <blockquote>
-<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>sphinx-apidoc -F -o docs_src/resources cmdbox
-sphinx-build -b html docs_src docs
-python -m collectlicense --out cmdbox/licenses --clear
-python setup.py sdist
-python setup.py bdist_wheel
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sphinx-apidoc<span class="w"> </span>-F<span class="w"> </span>-o<span class="w"> </span>docs_src/resources<span class="w"> </span>cmdbox
+sphinx-build<span class="w"> </span>-b<span class="w"> </span>html<span class="w"> </span>docs_src<span class="w"> </span>docs
+python<span class="w"> </span>-m<span class="w"> </span>collectlicense<span class="w"> </span>--out<span class="w"> </span>cmdbox/licenses<span class="w"> </span>--clear
+python<span class="w"> </span>setup.py<span class="w"> </span>sdist
+python<span class="w"> </span>setup.py<span class="w"> </span>bdist_wheel
 </pre></div>
 </div>
 </div></blockquote>
 </li>
 </ol>
 </section>
-<section id="id3">
-<h2>モジュールのコミット方法<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
-<p>開発を協力いただける方は、以下のガイドラインに従ってください:</p>
+<section id="how-to-commit-a-module">
+<h2>How to commit a module<a class="headerlink" href="#how-to-commit-a-module" title="Link to this heading"></a></h2>
+<p>If you are willing to cooperate in the development, please follow these guidelines:</p>
 <ol class="arabic">
-<li><p>新しいブランチを作成してください:</p>
+<li><p>Create a new branch:</p>
 <blockquote>
 <div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>git checkout -b feature/your-feature
 </pre></div>
 </div>
 </div></blockquote>
 </li>
-<li><p>変更を加えてコミットしてください:</p>
+<li><p>Make your changes and commit!:</p>
 <blockquote>
 <div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>git commit -m <span class="s2">&quot;Add your changes&quot;</span>
 </pre></div>
 </div>
 </div></blockquote>
 </li>
-<li><p>作成したブランチにプッシュしてください:</p>
+<li><p>Push to the branch you created:</p>
 <blockquote>
 <div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>git push origin feature/your-feature
 </pre></div>
 </div>
 </div></blockquote>
 </li>
-<li><p>プルリクエストを作成してください.</p></li>
+<li><p>Create a pull request.</p></li>
 </ol>
 </section>
-<section id="pypl">
-<h2>【参考】pyplにアップするための手順<a class="headerlink" href="#pypl" title="Link to this heading"></a></h2>
-<ol class="arabic">
-<li><p>pypiのユーザー登録</p>
-<ul class="simple">
-<li><p>pyplのユーザー登録【本番】
-<a class="reference external" href="https://pypi.org/account/register/">https://pypi.org/account/register/</a></p></li>
-<li><p>pyplのユーザー登録【テスト】
-<a class="reference external" href="https://test.pypi.org/account/register/">https://test.pypi.org/account/register/</a></p></li>
-</ul>
-</li>
-<li><p>それぞれ2要素認証とAPIトークンを登録</p></li>
-<li><p>ホームディレクトリに <strong>.pypirc</strong> を作成</p>
-<blockquote>
-<div><div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[distutils]</span>
-<span class="na">index-servers</span><span class="w"> </span><span class="o">=</span>
-<span class="w">    </span><span class="na">pypi</span>
-<span class="w">    </span><span class="na">testpypi</span>
-
-<span class="k">[pypi]</span>
-<span class="na">repository</span><span class="o">:</span><span class="w"> </span><span class="s">https://upload.pypi.org/legacy/</span>
-<span class="na">username</span><span class="o">:</span><span class="w"> </span><span class="s">__token__</span>
-<span class="na">password</span><span class="o">:</span><span class="w"> </span><span class="s">本番環境のAPIトークン</span>
-
-<span class="k">[testpypi]</span>
-<span class="na">repository</span><span class="o">:</span><span class="w"> </span><span class="s">https://test.pypi.org/legacy/</span>
-<span class="na">username</span><span class="o">:</span><span class="w"> </span><span class="s">__token__</span>
-<span class="na">password</span><span class="o">:</span><span class="w"> </span><span class="s">テスト環境のAPIトークン</span>
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>テスト環境にアップロード</p>
-<blockquote>
-<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>twine upload --repository testpypi dist/*
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>テスト環境のモジュールをインストール</p>
-<blockquote>
-<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>pip install -i https://test.pypi.org/simple/ cmdbox
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>本番環境にアップロード</p>
-<blockquote>
-<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>twine upload --repository pypi dist/*
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>本番環境のモジュールをインストール</p>
-<blockquote>
-<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>pip install cmdbox
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-</ol>
-</section>
-<section id="rediswindows">
-<h2>【参考】RedisをWindows環境を構築する手順<a class="headerlink" href="#rediswindows" title="Link to this heading"></a></h2>
+<section id="reference-procedure-for-building-a-windows-environment-for-redis">
+<h2>Reference: Procedure for building a Windows environment for Redis<a class="headerlink" href="#reference-procedure-for-building-a-windows-environment-for-redis" title="Link to this heading"></a></h2>
 <ul>
-<li><p><cite>cmdbox</cite> はRedisを使用しています。</p>
+<li><p><cite>cmdbox</cite> uses Redis.</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li><p>インストーラーを <a class="reference external" href="https://github.com/MicrosoftArchive/redis/releases">GitHub</a> からダウンロードします。</p></li>
-<li><p>ダウンロードしたインストーラー（MSIファイル）を実行します。</p></li>
-<li><p>ウィザードの中でインストール先ディレクトリの設定があるので、設定したパスをメモしておいてください。デフォルトは <cite>C:\Program Files\Redis</cite> です。</p></li>
-<li><p>ウィザードの中でRedisサーバーのサービスポートの設定があるので、設定したポートをメモしておいてください。デフォルトは6379です。</p></li>
-<li><p>ウィザードの中で使用するメモリ最大量の設定があるので、必要に応じて設定してください。開発用なら100mb程度で十分です。</p></li>
-<li><p>インストールが完了したら、インストール先ディレクトリをエクスプローラーで開いてください。</p></li>
-<li><p>その中の <cite>redis.windows-service.conf</cite> ファイルと <cite>redis.windows-service.conf</cite> ファイルをメモ帳などのテキストエディタで開いてください。</p></li>
-<li><p>このファイルの中で、 <cite>requirepass foobared</cite> を検索し、 <cite>#</cite> を削除しコメントアウトを解除してください。</p></li>
-<li><p><cite>requirepass foobared</cite> の <cite>foobared</cite> の部分を任意のパスワードに変更してください。変更したパスワードをメモしておいてください。</p></li>
-<li><p>このパスワードが、 <cite>cmdbox</cite> コマンドの中で指定するパスワードになります。</p></li>
-<li><p>Windowsのタスクマネージャーを開いて、サービスタブを開いて <cite>Redis</cite> を右クリックし、サービスを再起動してください。</p></li>
+<li><p>Download the installer from <a class="reference external" href="https://github.com/MicrosoftArchive/redis/releases">GitHub</a> .</p></li>
+<li><p>Run the downloaded installer (MSI file).</p></li>
+<li><p>The wizard will ask you to set the installation directory, so please make a note of the path you set. The default is <cite>C:\Program Files\Redis</cite> .</p></li>
+<li><p>In the wizard, there is a setting for the service port of the Redis server, so please make a note of the port you set. The default is 6379.</p></li>
+<li><p>There is a setting in the wizard for the maximum amount of memory to be used, so set it as needed. For development use, about 100 mb is sufficient.</p></li>
+<li><p>After installation is complete, open the installation directory in Explorer.</p></li>
+<li><p>Open the <cite>redis.windows-service.conf</cite> and <cite>redis.windows-service.conf</cite> files in it with a text editor such as Notepad.</p></li>
+<li><p>In this file, search for <cite>requirepass foobared</cite>, remove the <cite>#</cite> and uncomment it out.</p></li>
+<li><p>Change the <cite>foobared</cite> part of <cite>requirepass foobared</cite> to your desired password. Make a note of the changed password.</p></li>
+<li><p>This password will be the password specified in the <cite>cmdbox</cite> command.</p></li>
+<li><p>Open the Windows Task Manager, open the Services tab, right-click <cite>Redis</cite>, and restart the service.</p></li>
 </ol>
 </div></blockquote>
 </li>
 </ul>
-</section>
-<section id="sitemap-xml">
-<h2>【参考】sitemap.xmlの作成手順<a class="headerlink" href="#sitemap-xml" title="Link to this heading"></a></h2>
-<ol class="arabic">
-<li><p><a class="reference external" href="https://www.xml-sitemaps.com/">xml-sitemaps</a> でsitemap.xmlを作成します。:</p></li>
-<li><p>作成したsitemap.xmlをダウンロードします。</p></li>
-<li><p>ダウンロードしたsitemap.xmlを <cite>docs</cite> ディレクトリにコピーします。</p></li>
-<li><p>プロジェクトのルートディレクトリに移動して、以下のコマンドを実行します:</p>
-<blockquote>
-<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>sphinx-apidoc -F -o docs_src/resources cmdbox
-sphinx-build -b html docs_src docs
-python setup.py sdist
-python setup.py bdist_wheel
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-</ol>
 </section>
 </section>
 
@@ -266,7 +186,7 @@ python setup.py bdist_wheel
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cmd_web.html" class="btn btn-neutral float-left" title="コマンドリファレンス（webモード）" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmd_web.html" class="btn btn-neutral float-left" title="Command Reference ( web mode )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="license.html" class="btn btn-neutral float-right" title="MIT License" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
