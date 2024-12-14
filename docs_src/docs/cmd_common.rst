@@ -7,7 +7,7 @@ Command Reference ( Common )
 This is a common option that can be specified for all commands.
 
 
-共通オプション
+Common Options
 ===============
 
 .. csv-table::
