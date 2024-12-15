@@ -276,8 +276,8 @@ class Web:
         self.viewmenu = dict()
         self.aboutmenu = dict()
         # webfeatureの読込み
-        def wf_route(pk, prefix, w, app):
-            for wf in module.load_webfeatures(pk, prefix, appcls=self.appcls, ver=self.ver):
+        def wf_route(pk, prefix, w, app, logger):
+            for wf in module.load_webfeatures(pk, prefix, appcls=self.appcls, ver=self.ver, logger=logger):
                 wf.route(self, app)
                 self.filemenu |= wf.filemenu(w)
                 self.toolmenu |= wf.toolmenu(w)
@@ -291,7 +291,7 @@ class Web:
                 raise ValueError(f"web_features_prefix is not match. web_features_packages={self.web_features_packages}, web_features_prefix={self.web_features_prefix}")
             for i, pn in enumerate(self.web_features_packages):
                 wf_route(pn, self.web_features_prefix[i], self, app)
-        self.options.load_features_file('web', lambda pk, pn, appcls, ver: wf_route(pk, pn, self, app), self.appcls, self.ver)
+        self.options.load_features_file('web', lambda pk, pn, appcls, ver, logger: wf_route(pk, pn, self, app, logger), self.appcls, self.ver, self.logger)
         wf_route("cmdbox.app.features.web", "cmdbox_web_", self, app)
         # 読込んだrouteの内容をログに出力
         if self.logger.level == logging.DEBUG:

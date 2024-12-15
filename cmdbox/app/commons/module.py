@@ -2,6 +2,7 @@ from cmdbox.app import feature
 from typing import List, Dict, Any
 import importlib.util
 import inspect
+import logging
 import pkgutil
 
 
@@ -56,7 +57,7 @@ def load_features(package_name:str, prefix:str="cmdbox_", appcls=None, ver=None)
                         features[m][cmd]['feature'] = fobj
     return features
 
-def load_webfeatures(package_name:str, prefix:str="cmdbox_web_", appcls=None, ver=None) -> List[Any]:
+def load_webfeatures(package_name:str, prefix:str="cmdbox_web_", appcls=None, ver=None, logger:logging.Logger=None) -> List[Any]:
     """
     Webフィーチャーを読み込みます。
 
@@ -65,6 +66,7 @@ def load_webfeatures(package_name:str, prefix:str="cmdbox_web_", appcls=None, ve
         prefix (str, optional): プレフィックス. Defaults to "cmdbox_web_".
         appcls ([type], optional): アプリケーションクラス. Defaults to None.
         ver ([type], optional): バージョンモジュール. Defaults to None.
+        logger ([type], optional): ロガー. Defaults to None.
     Returns:
         Dict[feature.WebFeature]: Webフィーチャーのリスト
     """
@@ -78,5 +80,7 @@ def load_webfeatures(package_name:str, prefix:str="cmdbox_web_", appcls=None, ve
                 if cls is feature.WebFeature or not issubclass(cls, feature.WebFeature):
                     continue
                 fobj = cls(appcls, ver)
+                if logger is not None and logger.level == logging.DEBUG:
+                    logger.debug(f'load_webfeatures: {fobj}')
                 webfeatures.append(fobj)
     return webfeatures

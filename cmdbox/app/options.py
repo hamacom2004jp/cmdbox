@@ -325,7 +325,7 @@ class Options:
                     continue
                 if data['prefix'] is None or data['prefix'] == "":
                     continue
-                func(data['package'], data['prefix'], appcls, ver)
+                func(data['package'], data['prefix'], appcls, ver, logger)
 
     def load_features_args(self, args_dict:Dict[str, Any]):
         yml = self.features_yml_data
