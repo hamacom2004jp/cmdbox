@@ -10,7 +10,7 @@ import sys
 
 
 def main(args_list:list=None):
-    app = CmdBoxApp.getInstance()
+    app = CmdBoxApp.getInstance(appcls=CmdBoxApp, ver=version)
     return app.main(args_list)[0]
 
 class CmdBoxApp:
@@ -43,11 +43,11 @@ class CmdBoxApp:
         parser = argparse.ArgumentParser(prog=self.ver.__appid__, description=self.ver.__logo__ + '\n\n' + self.ver.__description__,
                                          formatter_class=argparse.RawDescriptionHelpFormatter, exit_on_error=False)
         if args_list is not None and '--debug' in args_list:
-            self.default_logger = common.default_logger(True, ver=self.ver)
+            self.default_logger = common.default_logger(True, ver=self.ver, webcall=webcall)
         elif sys.argv is not None and '--debug' in sys.argv:
-            self.default_logger = common.default_logger(True, ver=self.ver)
+            self.default_logger = common.default_logger(True, ver=self.ver, webcall=webcall)
         else:
-            self.default_logger = common.default_logger(False, ver=self.ver)
+            self.default_logger = common.default_logger(False, ver=self.ver, webcall=webcall)
 
         # プラグイン読込み
         self.options.load_svcmd('cmdbox.app.features.cli', appcls=self.appcls, ver=self.ver, logger=self.default_logger)

@@ -50,6 +50,8 @@ class RawPipe(cmdbox_web_raw_cmd.RawCmd, cmdbox_web_load_cmd.LoadCmd):
             cmd_ref = web.options.get_cmd_choices(cmd_opt['mode'], cmd_opt['cmd'])
             chk_stdin = len([ref for ref in cmd_ref if ref['opt'] == 'stdin']) > 0
 
+            if 'debug' in cmd_opt and cmd_opt['debug']:
+                errormsg.append(f'The "debug" option is not supported with the debug option "true". ({cmd_title})')
             if 'output_csv' in cmd_opt and cmd_opt['output_csv'] != '':
                 errormsg.append(f'The "output_csv" option is not supported in pipe. ({cmd_title})')
             if i>0:

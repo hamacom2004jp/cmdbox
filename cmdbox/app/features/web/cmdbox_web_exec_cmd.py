@@ -91,7 +91,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         """
         appcls = self.appcls if appcls is None else appcls
         appcls = app.CmdBoxApp if appcls is None else appcls
-        web.container['cmdbox_app'] = ap = appcls.getInstance()
+        web.container['cmdbox_app'] = ap = appcls.getInstance(appcls=appcls, ver=self.ver)
         if 'mode' in opt and 'cmd' in opt:
             if not web.check_cmd(req, res, opt['mode'], opt['cmd']):
                 return dict(warn=f'Command "{title}" failed. Execute command denyed. mode={opt["mode"]}, cmd={opt["cmd"]}')

@@ -83,23 +83,25 @@ def save_yml(yml_path:Path, data:dict) -> None:
     with open(yml_path, 'w') as f:
         yaml.dump(data, f, default_flow_style=False, sort_keys=False)
 
-def default_logger(debug:bool=False, ver=version) -> logging.Logger:
+def default_logger(debug:bool=False, ver=version, webcall:bool=False) -> logging.Logger:
     """
     デフォルトのロガーを生成します。
 
     Args:
         debug (bool, optional): デバッグモード. Defaults to False.
         ver (version, optional): バージョン. Defaults to version.
+        webcall (bool, optional): WebAPIからの呼出しの場合はTrue. setHandlerを削除します。. Defaults to False.
 
     Returns:
         logging.Logger: ロガー
     """
     logger = logging.getLogger(ver.__appid__)
-    formatter = logging.Formatter('%(levelname)s[%(asctime)s] - %(message)s')
-    handler = loghandler.ColorfulStreamHandler(sys.stdout)
-    handler.setLevel(logging.DEBUG if debug else logging.INFO)
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    if not webcall:
+        formatter = logging.Formatter('%(levelname)s[%(asctime)s] - %(message)s')
+        handler = loghandler.ColorfulStreamHandler(sys.stdout)
+        handler.setLevel(logging.DEBUG if debug else logging.INFO)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
     logger.setLevel(logging.DEBUG if debug else logging.INFO)
     return logger
 
@@ -129,13 +131,13 @@ def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, v
         log_name = mode
     if not log_conf_path.exists():
         log_conf_path = Path(ver.__file__).parent / f"logconf_{ver.__appid__}.yml"
-        log_name = mode
+        log_name = ver.__appid__
     if not log_conf_path.exists():
         log_conf_path = Path(version.__file__).parent / f"logconf_{mode}.yml"
         log_name = mode
     if not log_conf_path.exists():
         log_conf_path = Path(version.__file__).parent / f"logconf_{ver.__appid__}.yml"
-        log_name = mode
+        log_name = ver.__appid__
     with open(log_conf_path) as f:
         log_config = yaml.safe_load(f)
     std_key = None
