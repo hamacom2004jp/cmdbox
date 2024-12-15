@@ -52,10 +52,8 @@ with open('README.md', 'r', encoding='utf-8') as fp:
     readme = fp.read()
 LONG_DESCRIPTION = readme
 LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
-RESORCE_TEXT_FILES = dict(cmdbox=['*.yml', 'extensions/*', 'extensions/*/*', 'extensions/*/*/*',
-                                  'docker/*', 'docker/*/*', 'licenses/*',
-                                  'tools/datas/*', 'tools/datas/*/*',
-                                  'web/*', 'web/*/*', 'web/*/*/*', 'web/*/*/*/*', 'web/*/*/*/*/*'])
+RESORCE_TEXT_FILES = dict(cmdbox=['*.yml', 'extensions/**', 'extensions/sample_project/.vscode/**',
+                                  'docker/**', 'licenses/*', 'tools/datas/**', 'web/**'])
 EXCLUDE_RESORCE_TEXT_FILES =dict(cmdbox=['extensions/data/*.json', 'extensions/data/*/*.jpg', 'extensions/data/*/*.svg'])
 class CustomInstallCommand(install):
     def run(self):

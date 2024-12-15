@@ -14,5 +14,8 @@ global-exclude cmdbox/extensions/data/*.json
 global-exclude cmdbox/extensions/data/*/*.jpg
 global-exclude cmdbox/extensions/data/*/*.svg
 
+# Include specific directories
+recursive-include cmdbox extensions/**/.*
+
 # Exclude specific directories
 recursive-exclude * build
