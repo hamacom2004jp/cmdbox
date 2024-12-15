@@ -254,7 +254,17 @@ class Options:
             self._options["mode"][key] = mode
             self._options["mode"]["choise"] += [mode]
 
-    def load_svcmd(self, package_name:str, prefix:str="cmdbox_", appcls=None, ver=None):
+    def load_svcmd(self, package_name:str, prefix:str="cmdbox_", appcls=None, ver=None, logger:logging.Logger=None):
+        """
+        指定されたパッケージの指定された接頭語を持つモジュールを読み込みます。
+
+        Args:
+            package_name (str): パッケージ名
+            prefix (str): 接頭語
+            appcls (Any): アプリケーションクラス
+            ver (Any): バージョンモジュール
+            logger (logging.Logger): ロガー
+        """
         if "svcmd" not in self._options:
             self._options["svcmd"] = dict()
         for mode, f in module.load_features(package_name, prefix, appcls=appcls, ver=ver).items():
@@ -263,12 +273,14 @@ class Options:
             for cmd, opt in f.items():
                 self._options["cmd"][mode][cmd] = opt
                 fobj:feature.Feature = opt['feature']
+                if logger is not None and logger.level == logging.DEBUG:
+                    logger.debug(f"loaded features: mode={mode}, cmd={cmd}, {fobj}")
                 svcmd = fobj.get_svcmd()
                 if svcmd is not None:
                     self._options["svcmd"][svcmd] = fobj
         self.init_debugoption()
 
-    def load_features_file(self, ftype:str, func, appcls, ver):
+    def load_features_file(self, ftype:str, func, appcls, ver, logger:logging.Logger=None):
         """
         フィーチャーファイル（features.yml）を読み込みます。
 
@@ -277,6 +289,7 @@ class Options:
             func (Any): フィーチャーの処理関数
             appcls (Any): アプリケーションクラス
             ver (Any): バージョンモジュール
+            logger (logging.Logger): ロガー
         """
         # cmdboxを拡張したアプリをカスタマイズするときのfeatures.ymlを読み込む
         features_yml = Path('features.yml')
@@ -285,6 +298,8 @@ class Options:
             features_yml = Path(ver.__file__).parent / 'extensions' / 'features.yml'
         #if not features_yml.exists() or not features_yml.is_file():
         #    features_yml = Path('.samples/features.yml')
+        if logger is not None and logger.level == logging.DEBUG:
+            logger.debug(f"load features.yml: {features_yml}, is_file={features_yml.is_file()}")
         if features_yml.exists() and features_yml.is_file():
             if self.features_yml_data is None:
                 self.features_yml_data = yml = common.load_yml(features_yml)

@@ -1,5 +1,6 @@
 from cmdbox import version
 from cmdbox.app import feature
+from cmdbox.app.commons import loghandler
 from pathlib import Path
 from PIL import Image, ImageDraw
 from pkg_resources import resource_string
@@ -21,6 +22,7 @@ import subprocess
 import tempfile
 import time
 import yaml
+import sys
 
 
 HOME_DIR = Path(os.path.expanduser("~"))
@@ -80,6 +82,26 @@ def save_yml(yml_path:Path, data:dict) -> None:
     """
     with open(yml_path, 'w') as f:
         yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+
+def default_logger(debug:bool=False, ver=version) -> logging.Logger:
+    """
+    デフォルトのロガーを生成します。
+
+    Args:
+        debug (bool, optional): デバッグモード. Defaults to False.
+        ver (version, optional): バージョン. Defaults to version.
+
+    Returns:
+        logging.Logger: ロガー
+    """
+    logger = logging.getLogger(ver.__appid__)
+    formatter = logging.Formatter('%(levelname)s[%(asctime)s] - %(message)s')
+    handler = loghandler.ColorfulStreamHandler(sys.stdout)
+    handler.setLevel(logging.DEBUG if debug else logging.INFO)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG if debug else logging.INFO)
+    return logger
 
 def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, ver=version) -> Tuple[logging.Logger, dict]:
     """

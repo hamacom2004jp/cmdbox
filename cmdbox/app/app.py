@@ -1,11 +1,12 @@
 from cmdbox import version
-from cmdbox.app import common, options
+from cmdbox.app import common, feature, options
 from pathlib import Path
 from typing import List
 import argparse
 import argcomplete
 import logging
 import time
+import sys
 
 
 def main(args_list:list=None):
@@ -41,17 +42,23 @@ class CmdBoxApp:
         """
         parser = argparse.ArgumentParser(prog=self.ver.__appid__, description=self.ver.__logo__ + '\n\n' + self.ver.__description__,
                                          formatter_class=argparse.RawDescriptionHelpFormatter, exit_on_error=False)
+        if args_list is not None and '--debug' in args_list:
+            self.default_logger = common.default_logger(True, ver=self.ver)
+        elif sys.argv is not None and '--debug' in sys.argv:
+            self.default_logger = common.default_logger(True, ver=self.ver)
+        else:
+            self.default_logger = common.default_logger(False, ver=self.ver)
 
         # プラグイン読込み
-        self.options.load_svcmd('cmdbox.app.features.cli', appcls=self.appcls, ver=self.ver)
+        self.options.load_svcmd('cmdbox.app.features.cli', appcls=self.appcls, ver=self.ver, logger=self.default_logger)
         if self.cli_features_packages is not None:
             if self.cli_features_prefix is None:
                 raise ValueError(f"cli_features_prefix is None. cli_features_packages={self.cli_features_packages}")
             if len(self.cli_features_prefix) != len(self.cli_features_packages):
                 raise ValueError(f"cli_features_prefix is not match. cli_features_packages={self.cli_features_packages}, cli_features_prefix={self.cli_features_prefix}")
             for i, pn in enumerate(self.cli_features_packages):
-                self.options.load_svcmd(pn, prefix=self.cli_features_prefix[i], appcls=self.appcls, ver=self.ver)
-        self.options.load_features_file('cli', self.options.load_svcmd, self.appcls, self.ver)
+                self.options.load_svcmd(pn, prefix=self.cli_features_prefix[i], appcls=self.appcls, ver=self.ver, logger=self.default_logger)
+        self.options.load_features_file('cli', self.options.load_svcmd, self.appcls, self.ver, self.default_logger)
 
         # コマンド引数の生成
         opts = self.options.list_options()
@@ -114,15 +121,10 @@ class CmdBoxApp:
         logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall if args.cmd != 'webcap' else True, ver=self.ver)
         if logger.level == logging.DEBUG:
             logger.debug(f"args.mode={args.mode}, args.cmd={args.cmd}")
-            for m, mo in self.options._options["cmd"].items():
-                if type(mo) is not dict: continue
-                for c, co in mo.items():
-                    if type(co) is not dict: continue
-                    logger.debug(f"loaded features: mode={m}, cmd={c}, {co['feature']}")
 
-        feature = self.options.get_cmd_attr(args.mode, args.cmd, 'feature')
-        if feature is not None:
-            status, ret, obj = feature.apprun(logger, args, tm)
+        feat = self.options.get_cmd_attr(args.mode, args.cmd, 'feature')
+        if feat is not None or isinstance(feat, feature.Feature):
+            status, ret, obj = feat.apprun(logger, args, tm)
             return status, ret, obj
         else:
             msg = {"warn":f"Unkown mode or cmd. mode={args.mode}, cmd={args.cmd}"}
