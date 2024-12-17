@@ -40,6 +40,7 @@ class CmdBoxApp:
         """
         コマンドライン引数を処理し、サーバーまたはクライアントを起動し、コマンドを実行する。
         """
+        smaintime = time.perf_counter()
         parser = argparse.ArgumentParser(prog=self.ver.__appid__, description=self.ver.__logo__ + '\n\n' + self.ver.__description__,
                                          formatter_class=argparse.RawDescriptionHelpFormatter, exit_on_error=False)
         if args_list is not None and '--debug' in args_list:
@@ -50,6 +51,7 @@ class CmdBoxApp:
             self.default_logger = common.default_logger(False, ver=self.ver, webcall=webcall)
 
         # プラグイン読込み
+        sfeatureloadtime = time.perf_counter()
         self.options.load_svcmd('cmdbox.app.features.cli', appcls=self.appcls, ver=self.ver, logger=self.default_logger)
         if self.cli_features_packages is not None:
             if self.cli_features_prefix is None:
@@ -59,8 +61,10 @@ class CmdBoxApp:
             for i, pn in enumerate(self.cli_features_packages):
                 self.options.load_svcmd(pn, prefix=self.cli_features_prefix[i], appcls=self.appcls, ver=self.ver, logger=self.default_logger)
         self.options.load_features_file('cli', self.options.load_svcmd, self.appcls, self.ver, self.default_logger)
+        efeatureloadtime = time.perf_counter()
 
         # コマンド引数の生成
+        sargsparsetime = time.perf_counter()
         opts = self.options.list_options()
         for opt in opts.values():
             default = opt["default"] if opt["default"] is not None and opt["default"] != "" else None
@@ -92,41 +96,51 @@ class CmdBoxApp:
         # featuresの初期値を適用する
         self.options.load_features_args(args_dict)
         args = argparse.Namespace(**args_dict)
+        eargsparsetime = time.perf_counter()
 
-        tm = time.perf_counter()
         ret = {"success":f"Start command. {args}"}
-
         if args.saveopt:
             if args.useopt is None:
                 msg = {"warn":f"Please specify the --useopt option."}
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
+                common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
                 return 1, msg, None
             common.saveopt(opt, args.useopt)
             ret = {"success":f"Save options file. {args.useopt}"}
 
+        smakesampletime = time.perf_counter()
         common.mklogdir(args.data)
         common.copy_sample(args.data, ver=self.ver)
         common.copy_sample(Path.cwd(), ver=self.ver)
+        emakesampletime = time.perf_counter()
 
         if args.version:
             v = self.ver.__logo__ + '\n' + self.ver.__description__
-            common.print_format(v, False, tm, None, False)
+            common.print_format(v, False, smaintime, None, False)
             return 0, v, None
 
         if args.mode is None:
             msg = {"warn":f"mode is None. Please specify the --help option."}
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
+            common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
             return 1, msg, None
 
+        sloggerinittime = time.perf_counter()
         logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall if args.cmd != 'webcap' else True, ver=self.ver)
+        eloggerinittime = time.perf_counter()
         if logger.level == logging.DEBUG:
             logger.debug(f"args.mode={args.mode}, args.cmd={args.cmd}")
 
+        #scmdexectime = time.perf_counter()
         feat = self.options.get_cmd_attr(args.mode, args.cmd, 'feature')
         if feat is not None or isinstance(feat, feature.Feature):
-            status, ret, obj = feat.apprun(logger, args, tm)
+            pf = []
+            pf.append(dict(key="app_featureload", val=f"{efeatureloadtime-sfeatureloadtime:.03f}s"))
+            pf.append(dict(key="app_argsparse", val=f"{eargsparsetime-sargsparsetime:.03f}s"))
+            pf.append(dict(key="app_makesample", val=f"{emakesampletime-smakesampletime:.03f}s"))
+            pf.append(dict(key="app_loggerinit", val=f"{eloggerinittime-sloggerinittime:.03f}s"))
+            status, ret, obj = feat.apprun(logger, args, smaintime, pf)
             return status, ret, obj
         else:
             msg = {"warn":f"Unkown mode or cmd. mode={args.mode}, cmd={args.cmd}"}
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
+            common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
             return 1, msg, None
+

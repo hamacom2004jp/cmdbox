@@ -67,7 +67,7 @@ class ServerList(Feature):
             ]
         )
 
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float) -> Tuple[int, Dict[str, Any], Any]:
+    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
 
@@ -75,13 +75,14 @@ class ServerList(Feature):
             logger (logging.Logger): ロガー
             args (argparse.Namespace): 引数
             tm (float): 実行開始時間
-        
+            pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報
+
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         sv = server.Server(Path(args.data), logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname='server') # list取得なのでデフォルトのsvnameを指定
         ret = sv.list_server()
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
+        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in ret:
                 return 1, ret, sv
         return 0, ret, sv

@@ -320,7 +320,8 @@ def random_string(size:int=16):
     """
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=size))
 
-def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_json_append:bool=False, stdout:bool=True, tablefmt:str='github'):
+def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_json_append:bool=False, stdout:bool=True,
+                 tablefmt:str='github', pf:List[Dict[str, float]]=[]):
     """
     データを指定されたフォーマットで出力します。
 
@@ -332,9 +333,12 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
         output_json_append (bool, optional): JSON形式で出力するファイルパス. Defaults to False.
         stdout (bool, optional): 標準出力に出力するかどうか. Defaults to True.
         tablefmt (str, optional): テーブルのフォーマット. Defaults to 'github'.
+        pf (List[Dict[str, float]], optional): パフォーマンス情報. Defaults to [].
     Returns:
         str: 生成された文字列
     """
+    if type(data) is dict and "success" in data and "performance" in data["success"] and type(data["success"]["performance"]) is list and pf is not None:
+        data["success"]["performance"] += pf
     txt = ''
     if format:
         if 'success' in data:

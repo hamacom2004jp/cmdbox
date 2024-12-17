@@ -73,7 +73,7 @@ class WebGencert(Feature):
             ]
         )
 
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float) -> Tuple[int, Dict[str, Any], Any]:
+    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
 
@@ -81,13 +81,14 @@ class WebGencert(Feature):
             logger (logging.Logger): ロガー
             args (argparse.Namespace): 引数
             tm (float): 実行開始時間
-        
+            pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報
+
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         if args.webhost is None:
             msg = {"warn":f"Please specify the --webhost option."}
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         if args.output_cert is None:
             args.output_cert = f"{args.webhost}.crt"
@@ -97,11 +98,11 @@ class WebGencert(Feature):
         output_key = Path(args.output_key)
         if not args.overwrite and output_cert.exists():
             msg = {"warn":f"File already exists. {output_cert}"}
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         if not args.overwrite and output_key.exists():
             msg = {"warn":f"File already exists. {output_key}"}
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
 
         try:
@@ -109,7 +110,7 @@ class WebGencert(Feature):
             ret = {"success":f"Generate certificate. {output_cert}, {output_key}"}
         except Exception as e:
             msg = {"error":f"Failed to generate certificate. {e}"}
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         return 0, ret, None
 

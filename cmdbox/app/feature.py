@@ -60,7 +60,7 @@ class Feature:
         """
         return None
 
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float) -> Tuple[int, Dict[str, Any], Any]:
+    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
 
@@ -68,7 +68,8 @@ class Feature:
             logger (logging.Logger): ロガー
             args (argparse.Namespace): 引数
             tm (float): 実行開始時間
-        
+            pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報
+
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """

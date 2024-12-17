@@ -73,7 +73,7 @@ class ServerTime(feature.Feature):
         """
         return 'server_time'
 
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float) -> Tuple[int, Dict[str, Any], Any]:
+    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
 
@@ -81,14 +81,15 @@ class ServerTime(feature.Feature):
             logger (logging.Logger): ロガー
             args (argparse.Namespace): 引数
             tm (float): 実行開始時間
-        
+            pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報
+
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.redis_cli.send_cmd(self.get_svcmd(), [str(args.timedelta)],
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
+        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in ret:
             return 1, ret, None
         return 0, ret, None

@@ -106,7 +106,7 @@ class WebStart(Feature):
             ]
         )
 
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float) -> Tuple[int, Dict[str, Any], Any]:
+    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
 
@@ -114,13 +114,14 @@ class WebStart(Feature):
             logger (logging.Logger): ロガー
             args (argparse.Namespace): 引数
             tm (float): 実行開始時間
-        
+            pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報
+
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         if args.data is None:
             msg = {"warn":f"Please specify the --data option."}
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         w = None
         try:
@@ -135,9 +136,9 @@ class WebStart(Feature):
                     ssl_keypass=args.ssl_keypass, ssl_ca_certs=ssl_ca_certs,
                     session_timeout=args.session_timeout, outputs_key=args.outputs_key)
             msg = {"success":"web complate."}
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 0, msg, w
         except Exception as e:
             msg = {"warn":f"Web server start error. {e}"}
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, w
