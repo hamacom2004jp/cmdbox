@@ -5,7 +5,7 @@ from setuptools.command.install import install
 import platform
 
 
-DESCRIPTION = 'cmdbox: An application that executes AI model files in onnx or mmlab format.'
+DESCRIPTION = 'cmdbox: It is a command line application with a plugin mechanism.'
 NAME = 'cmdbox'
 AUTHOR = 'hamacom2004jp'
 AUTHOR_EMAIL = 'hamacom2004jp@gmail.com'

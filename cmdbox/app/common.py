@@ -151,6 +151,8 @@ def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, v
         for k, l in log_config['loggers'].items():
             if 'handlers' in l and std_key in l['handlers']:
                 l['handlers'].remove(std_key)
+    if 'loggers' not in log_config or log_name not in log_config['loggers']:
+        raise BaseException(f"Loggers not found.({log_name}) at log_conf_path={log_conf_path}")
     logging.config.dictConfig(log_config)
     logger = logging.getLogger(log_name)
     set_debug(logger, debug)
@@ -436,10 +438,10 @@ def cmd(cmd:str, logger:logging.Logger, slise:int=100, newenv:Dict=None) -> Tupl
             env[k] = v
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
     output = None
-    while proc.returncode is None:
-        out = proc.stdout.readline()
-        if out == b'' and proc.poll() is not None:
-            break
+    while proc.poll() is None:
+        out = proc.stdout.readline().strip()
+        if 0 >= len(out):
+            continue
         for enc in ['utf-8', 'cp932', 'utf-16', 'utf-16-le', 'utf-16-be']:
             try:
                 output = out.decode(enc).rstrip()
@@ -451,6 +453,7 @@ def cmd(cmd:str, logger:logging.Logger, slise:int=100, newenv:Dict=None) -> Tupl
                 break
             except UnicodeDecodeError:
                 pass
+    proc.stdout.read()
 
     return proc.returncode, output, cmd
 
