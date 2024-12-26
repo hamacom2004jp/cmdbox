@@ -61,7 +61,7 @@ class WebGroupAdd(Feature):
                 dict(opt="group_parent", type="str", default=None, required=False, multi=False, hide=False, choise=None,
                      discription_ja="親グループ名を指定します。",
                      discription_en="Specifies the parent group name."),
-                dict(opt="signin_file", type="file", default=None, required=False, multi=False, hide=True, choise=None,
+                dict(opt="signin_file", type="file", default=None, required=True, multi=False, hide=False, choise=None,
                      discription_ja="サインイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。",
                      discription_en="Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required."),
                 dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],

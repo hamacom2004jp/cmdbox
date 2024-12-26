@@ -6,7 +6,7 @@ import argparse
 import logging
 
 
-class WebGroupEdit(Feature):
+class WebApikeyAdd(Feature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -23,7 +23,7 @@ class WebGroupEdit(Feature):
         Returns:
             str: コマンド
         """
-        return 'group_edit'
+        return 'apikey_add'
     
     def get_option(self):
         """
@@ -34,8 +34,8 @@ class WebGroupEdit(Feature):
         """
         return dict(
             type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
-            discription_ja="Webモードのグループを編集します。",
-            discription_en="Edit a group in Web mode.",
+            discription_ja="WebモードのユーザーのApiKeyを追加します。",
+            discription_en="Add an ApiKey for a user in Web mode.",
             choise=[
                 dict(opt="host", type="str", default=self.default_host, required=False, multi=False, hide=True, choise=None,
                      discription_ja="Redisサーバーのサービスホストを指定します。",
@@ -52,15 +52,12 @@ class WebGroupEdit(Feature):
                 dict(opt="data", type="file", default=common.HOME_DIR / f".{self.ver.__appid__}", required=False, multi=False, hide=False, choise=None,
                      discription_ja="省略した時は `$HONE/.cmdbox` を使用します。",
                      discription_en="When omitted, `$HONE/.cmdbox` is used."),
-                dict(opt="group_id", type="int", default=None, required=True, multi=False, hide=False, choise=None,
-                     discription_ja="グループIDを指定します。",
-                     discription_en="Specify the group ID. Do not duplicate other groups."),
-                dict(opt="group_name", type="str", default=None, required=True, multi=False, hide=False, choise=None,
-                     discription_ja="グループ名を指定します。他のグループと重複しないようにしてください。",
-                     discription_en="Specify a group name. Do not duplicate other groups."),
-                dict(opt="group_parent", type="str", default=None, required=False, multi=False, hide=False, choise=None,
-                     discription_ja="親グループ名を指定します。",
-                     discription_en="Specifies the parent group name."),
+                dict(opt="user_name", type="str", default=None, required=True, multi=False, hide=False, choise=None,
+                     discription_ja="ユーザー名を指定します。他のユーザーと重複しないようにしてください。",
+                     discription_en="Specify a user name. Do not duplicate other users."),
+                dict(opt="apikey_name", type="str", default=None, required=True, multi=False, hide=False, choise=None,
+                     discription_ja="このユーザーのApiKey名を指定します。",
+                     discription_en="Specify the ApiKey name for this user."),
                 dict(opt="signin_file", type="file", default=None, required=True, multi=False, hide=False, choise=None,
                      discription_ja="サインイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。",
                      discription_en="Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required."),
@@ -95,9 +92,9 @@ class WebGroupEdit(Feature):
             w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
                         redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                         signin_file=args.signin_file)
-            group = dict(gid=args.group_id, name=args.group_name, parent=args.group_parent)
-            w.group_edit(group)
-            msg = {"success": f"group ID {args.group_id} has been edited."}
+            user = dict(name=args.user_name, apikey_name=args.apikey_name)
+            apikey = w.apikey_add(user)
+            msg = {"success": {"apikey":apikey, "msg":f"User ApiKey added. user_name={args.user_name} apikey_name={args.apikey_name}"}}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 0, msg, w
         except Exception as e:

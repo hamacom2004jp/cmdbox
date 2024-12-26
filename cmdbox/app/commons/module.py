@@ -84,3 +84,19 @@ def load_webfeatures(package_name:str, prefix:str="cmdbox_web_", appcls=None, ve
                     logger.debug(f'load_webfeatures: {fobj}')
                 webfeatures.append(fobj)
     return webfeatures
+
+def class_for_name(class_full_name:str):
+    """
+    クラス名からクラスを取得します。
+
+    Args:
+        class_full_name (str): クラスフルパス名
+
+    Returns:
+        [type]: クラス
+    """
+    package_name = '.'.join(class_full_name.split('.')[:-1])
+    class_name = class_full_name.split('.')[-1]
+    m = importlib.import_module(package_name)
+    c = getattr(m, class_name)
+    return c

@@ -1,6 +1,6 @@
 from cmdbox import version
 from cmdbox.app import feature
-from cmdbox.app.commons import loghandler
+from cmdbox.app.commons import module, loghandler
 from pathlib import Path
 from PIL import Image, ImageDraw
 from pkg_resources import resource_string
@@ -145,8 +145,10 @@ def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, v
         if 'filename' in h:
             h['filename'] = data / h['filename']
             mkdirs(h['filename'].parent)
-        if 'class' in h and h['class'] == 'logging.StreamHandler':
-            std_key = k
+        if 'class' in h:
+            hc = module.class_for_name(h['class'])
+            if issubclass(hc, logging.StreamHandler) and not issubclass(hc, logging.FileHandler):
+                std_key = k
     if webcall and std_key is not None:
         for k, l in log_config['loggers'].items():
             if 'handlers' in l and std_key in l['handlers']:

@@ -55,7 +55,7 @@ class WebUserDel(Feature):
                 dict(opt="user_id", type="int", default=None, required=True, multi=False, hide=False, choise=None,
                      discription_ja="ユーザーIDを指定します。",
                      discription_en="Specify the user ID."),
-                dict(opt="signin_file", type="file", default=None, required=False, multi=False, hide=True, choise=None,
+                dict(opt="signin_file", type="file", default=None, required=True, multi=False, hide=False, choise=None,
                      discription_ja="サインイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。",
                      discription_en="Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required."),
                 dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],

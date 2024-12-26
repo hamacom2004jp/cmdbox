@@ -128,7 +128,52 @@ class Web:
             return
         res.headers['Access-Control-Allow-Origin'] = res.headers['Origin']
 
-    #security = OAuth2PasswordBearer(tokenUrl="token")
+    def check_apikey(self, req:Request, res:Response):
+        """
+        ApiKeyをチェックする
+
+        Args:
+            req (Request): リクエスト
+            res (Response): レスポンス
+
+        Returns:
+            Response: サインインエラーの場合はリダイレクトレスポンス
+        """
+        self.enable_cors(req, res)
+        if self.signin_file is None:
+            return None
+        if self.signin_file_data is None:
+            raise ValueError(f'signin_file_data is None. ({self.signin_file})')
+        if 'Authorization' not in req.headers:
+            return RedirectResponse(url=f'/signin{req.url.path}?error=1')
+        auth = req.headers['Authorization']
+        if not auth.startswith('Bearer '):
+            return RedirectResponse(url=f'/signin{req.url.path}?error=1')
+        bearer, apikey = auth.split(' ')
+        find_user = None
+        for user in self.signin_file_data['users']:
+            if 'apikeys' not in user:
+                continue
+            for ak, key in user['apikeys'].items():
+                if apikey == key:
+                    find_user = user
+        if find_user is None:
+            return RedirectResponse(url=f'/signin{req.url.path}?error=1')
+
+        # パスルールチェック
+        user_groups = find_user['groups']
+        jadge = self.signin_file_data['pathrule']['policy']
+        for rule in self.signin_file_data['pathrule']['rules']:
+            if len([g for g in rule['groups'] if g in user_groups]) <= 0:
+                continue
+            if len([p for p in rule['paths'] if req.url.path.startswith(p)]) <= 0:
+                continue
+            jadge = rule['rule']
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"rule: {req.url.path}: {jadge}")
+        if jadge == 'allow':
+            return None
+        return RedirectResponse(url=f'/signin{req.url.path}?error=1')
 
     def check_signin(self, req:Request, res:Response):
         """
@@ -420,6 +465,79 @@ class Web:
             if name is None:
                 ret.append(u)
         return ret
+
+    def apikey_add(self, user:Dict[str, Any]) -> str:
+        """
+        サインインファイルにユーザーのApiKeyを追加する
+
+        Args:
+            user (Dict[str, Any]): ユーザー情報
+
+        Returns:
+            str: ApiKey
+        """
+        if self.signin_file_data is None:
+            raise ValueError(f'signin_file_data is None. ({self.signin_file})')
+        if self.signin_file is None:
+            raise ValueError(f"signin_file is None.")
+        if 'name' not in user:
+            raise ValueError(f"User name is not found. ({user})")
+        if 'apikey_name' not in user:
+            raise ValueError(f"ApiKey name is not found. ({user})")
+        if len([u for u in self.signin_file_data['users'] if u['name'] == user['name']]) <= 0:
+            raise ValueError(f"User name is not exists. ({user})")
+        apikey:str = None
+        for u in self.signin_file_data['users']:
+            if u['name'] == user['name']:
+                if 'apikeys' not in u:
+                    u['apikeys'] = dict()
+                if user['apikey_name'] in u['apikeys']:
+                    raise ValueError(f"ApiKey name is already exists. ({user})")
+                u['apikeys'][user['apikey_name']] = apikey = common.random_string(48)
+
+        if self.signin_file is None:
+            raise ValueError(f"signin_file is None.")
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"apikey_add: {user} -> {self.signin_file}")
+        common.save_yml(self.signin_file, self.signin_file_data)
+        return apikey
+
+    def apikey_del(self, user:Dict[str, Any]):
+        """
+        サインインファイルのユーザーのApiKeyを削除する
+
+        Args:
+            user (Dict[str, Any]): ユーザー情報
+        """
+        if self.signin_file_data is None:
+            raise ValueError(f'signin_file_data is None. ({self.signin_file})')
+        if self.signin_file is None:
+            raise ValueError(f"signin_file is None.")
+        if 'name' not in user:
+            raise ValueError(f"User name is not found. ({user})")
+        if 'apikey_name' not in user:
+            raise ValueError(f"ApiKey name is not found. ({user})")
+        if len([u for u in self.signin_file_data['users'] if u['name'] == user['name']]) <= 0:
+            raise ValueError(f"User name is not exists. ({user})")
+        apikey:str = None
+        for u in self.signin_file_data['users']:
+            if u['name'] == user['name']:
+                if 'apikeys' not in u:
+                    continue
+                if user['apikey_name'] not in u['apikeys']:
+                    continue
+                apikey = u['apikeys'][user['apikey_name']]
+                del u['apikeys'][user['apikey_name']]
+                if len(u['apikeys']) <= 0:
+                    del u['apikeys']
+        if apikey is None:
+            raise ValueError(f"ApiKey name is not exists. ({user})")
+
+        if self.signin_file is None:
+            raise ValueError(f"signin_file is None.")
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"apikey_del: {user} -> {self.signin_file}")
+        common.save_yml(self.signin_file, self.signin_file_data)
 
     def user_add(self, user:Dict[str, Any]):
         """
