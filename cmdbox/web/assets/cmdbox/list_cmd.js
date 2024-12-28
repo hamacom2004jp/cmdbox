@@ -76,7 +76,7 @@ const list_cmd_func_then = () => {
                     input_elem = elem.find('.row_content_template_select');
                     input_elem.removeClass('row_content_template_select');
                     if (row.choice_show) {
-                        //input_elem.attr('choice_show', JSON.stringify(row.choice_show));
+                        input_elem.addClass('choice_show');
                         input_elem.change(() => {
                             let names = []
                             for (const ns of Object.values(row.choice_show)) {
@@ -219,7 +219,7 @@ const list_cmd_func_then = () => {
                 }
             });
             // 選択肢による表示非表示の設定
-            cmd_modal.find(`[choice_show]`).each((i, elem) => {
+            cmd_modal.find(`.choice_show`).each((i, elem) => {
                 const input_elem = $(elem);
                 input_elem.change();
             });
