@@ -21,6 +21,7 @@ Management screen startup : `cmdbox -m gui -c start <Option>`
     "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
     "--allow_host <IP to allow connection>","","If omitted, `0.0.0.0` is used."
     "--listen_port <service port>","","If omitted, `8081` is used."
+    "--ssl_listen_port <service port>","","If omitted, `8443` is used."
     "--ssl_cert <SSL server certificate file>","","Specify the SSL server certificate file."
     "--ssl_key <SSL Server Private Key File>","","Specify the SSL server private key file."
     "--ssl_keypass <SSL Server Private Key Password>","","Specify the composite password for the SSL server private key file."

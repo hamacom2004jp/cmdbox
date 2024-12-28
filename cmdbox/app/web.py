@@ -344,6 +344,12 @@ class Web:
                 self.logger.debug(f"loaded webfeature: {route}")
 
     def load_signin_file(self):
+        """
+        サインインファイルを読み込む
+
+        Raises:
+            HTTPException: サインインファイルのフォーマットエラー
+        """
         if self.signin_file is not None:
             if not self.signin_file.is_file():
                 raise HTTPException(status_code=500, detail=f'signin_file is not found. ({self.signin_file})')
@@ -741,7 +747,7 @@ class Web:
             self.logger.debug(f"group_del: {gid} -> {self.signin_file}")
         common.save_yml(self.signin_file, self.signin_file_data)
 
-    def start(self, allow_host:str="0.0.0.0", listen_port:int=8081,
+    def start(self, allow_host:str="0.0.0.0", listen_port:int=8081, ssl_listen_port:int=8443,
               ssl_cert:Path=None, ssl_key:Path=None, ssl_keypass:str=None, ssl_ca_certs:Path=None,
               session_timeout:int=600, outputs_key:List[str]=[]):
         """
@@ -750,6 +756,7 @@ class Web:
         Args:
             allow_host (str, optional): 許可ホスト. Defaults to "
             listen_port (int, optional): リスンポート. Defaults to 8081.
+            ssl_listen_port (int, optional): SSLリスンポート. Defaults to 8443.
             ssl_cert (Path, optional): SSL証明書ファイル. Defaults to None.
             ssl_key (Path, optional): SSL秘密鍵ファイル. Defaults to None.
             ssl_keypass (str, optional): SSL秘密鍵パスワード. Defaults to None.
@@ -759,6 +766,7 @@ class Web:
         """
         self.allow_host = allow_host
         self.listen_port = listen_port
+        self.ssl_listen_port = ssl_listen_port
         self.ssl_cert = ssl_cert
         self.ssl_key = ssl_key
         self.ssl_keypass = ssl_keypass
@@ -768,6 +776,7 @@ class Web:
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web start parameter: allow_host={self.allow_host}")
             self.logger.debug(f"web start parameter: listen_port={self.listen_port}")
+            self.logger.debug(f"web start parameter: ssl_listen_port={self.ssl_listen_port}")
             self.logger.debug(f"web start parameter: ssl_cert={self.ssl_cert} -> {self.ssl_cert.absolute() if self.ssl_cert is not None else None}")
             self.logger.debug(f"web start parameter: ssl_key={self.ssl_key} -> {self.ssl_key.absolute() if self.ssl_key is not None else None}")
             self.logger.debug(f"web start parameter: ssl_keypass={self.ssl_keypass}")
@@ -781,20 +790,30 @@ class Web:
 
         self.is_running = True
         #uvicorn.run(app, host=self.allow_host, port=self.listen_port, workers=2)
-        th = ThreadedUvicorn(config=Config(app=app, host=self.allow_host, port=self.listen_port,
-                                           ssl_certfile=self.ssl_cert, ssl_keyfile=self.ssl_key,
-                                           ssl_keyfile_password=self.ssl_keypass, ssl_ca_certs=self.ssl_ca_certs))
+        th = ThreadedUvicorn(config=Config(app=app, host=self.allow_host, port=self.listen_port))
         th.start()
+        browser_port = self.listen_port
+        th_ssl = None
+        if self.ssl_cert is not None and self.ssl_key is not None:
+            th_ssl = ThreadedUvicorn(config=Config(app=app, host=self.allow_host, port=self.ssl_listen_port,
+                                                   ssl_certfile=self.ssl_cert, ssl_keyfile=self.ssl_key,
+                                                   ssl_keyfile_password=self.ssl_keypass, ssl_ca_certs=self.ssl_ca_certs))
+            th_ssl.start()
+            browser_port = self.ssl_listen_port
         try:
             if self.gui_mode:
-                webbrowser.open(f'http://localhost:{self.listen_port}/gui')
+                webbrowser.open(f'http://localhost:{browser_port}/gui')
             with open("web.pid", mode="w", encoding="utf-8") as f:
                 f.write(str(os.getpid()))
             while self.is_running:
                 gevent.sleep(1)
             th.stop()
+            if th_ssl is not None:
+                th_ssl.stop()
         except KeyboardInterrupt:
             th.stop()
+            if th_ssl is not None:
+                th_ssl.stop()
 
     def stop(self):
         """

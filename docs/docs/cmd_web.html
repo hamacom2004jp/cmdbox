@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( web mode ) &mdash; cmdbox 2024/12/17 documentation</title>
+  <title>Command Reference ( web mode ) &mdash; cmdbox 2024/12/28 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=56c4699f" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=73996870"></script>
+      <script src="../_static/documentation_options.js?v=36d3bb7e"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -387,55 +387,59 @@
 <td></td>
 <td><p>If omitted, <cite>8081</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--ssl_cert &lt;SSL server certificate file&gt;</p></td>
+<tr class="row-odd"><td><p>--ssl_listen_port &lt;service port&gt;</p></td>
+<td></td>
+<td><p>If omitted, <cite>8443</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--ssl_cert &lt;SSL server certificate file&gt;</p></td>
 <td></td>
 <td><p>Specify the SSL server certificate file.</p></td>
 </tr>
-<tr class="row-even"><td><p>--ssl_key &lt;SSL Server Private Key File&gt;</p></td>
+<tr class="row-odd"><td><p>--ssl_key &lt;SSL Server Private Key File&gt;</p></td>
 <td></td>
 <td><p>Specify the SSL server private key file.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--ssl_keypass &lt;SSL Server Private Key Password&gt;</p></td>
+<tr class="row-even"><td><p>--ssl_keypass &lt;SSL Server Private Key Password&gt;</p></td>
 <td></td>
 <td><p>Specify the composite password for the SSL server private key file.</p></td>
 </tr>
-<tr class="row-even"><td><p>--ssl_ca_certs &lt;SSL Server CA Certificate File&gt;</p></td>
+<tr class="row-odd"><td><p>--ssl_ca_certs &lt;SSL Server CA Certificate File&gt;</p></td>
 <td></td>
 <td><p>Specify the SSL server CA certificate file.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--signin_file &lt;user list file&gt;</p></td>
+<tr class="row-even"><td><p>--signin_file &lt;user list file&gt;</p></td>
 <td></td>
 <td><p>Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required.</p></td>
 </tr>
-<tr class="row-even"><td><p>--session_timeout &lt;second&gt;</p></td>
+<tr class="row-odd"><td><p>--session_timeout &lt;second&gt;</p></td>
 <td></td>
 <td><p>Specify the session timeout in seconds for signed-in users.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_only</p></td>
+<tr class="row-even"><td><p>--client_only</p></td>
 <td></td>
 <td><p>Do not make connections to the server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--outputs_key &lt;output key&gt;</p></td>
+<tr class="row-odd"><td><p>--outputs_key &lt;output key&gt;</p></td>
 <td></td>
 <td><p>Specify items to be displayed on the showimg and webcap screens. If omitted, all items are displayed.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--doc_root &lt;document root path&gt;</p></td>
+<tr class="row-even"><td><p>--doc_root &lt;document root path&gt;</p></td>
 <td></td>
 <td><p>Document root for custom files. URL mapping from the path of a folder-specified custom file with the path of doc_root removed.</p></td>
 </tr>
-<tr class="row-even"><td><p>--gui_html &lt;gui.html file path&gt;</p></td>
+<tr class="row-odd"><td><p>--gui_html &lt;gui.html file path&gt;</p></td>
 <td></td>
 <td><p>Specify <cite>gui.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--filer_html &lt;filer.html file path&gt;</p></td>
+<tr class="row-even"><td><p>--filer_html &lt;filer.html file path&gt;</p></td>
 <td></td>
 <td><p>Specify <cite>filer.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--assets &lt;Path to js and css files&gt;</p></td>
+<tr class="row-odd"><td><p>--assets &lt;Path to js and css files&gt;</p></td>
 <td></td>
 <td><p>Specify the asset file required when using html files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--signin_html &lt;signin.html file path&gt;</p></td>
+<tr class="row-even"><td><p>--signin_html &lt;signin.html file path&gt;</p></td>
 <td></td>
 <td><p>Specify <cite>signin.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
 </tr>

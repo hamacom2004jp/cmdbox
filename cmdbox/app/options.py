@@ -94,7 +94,7 @@ class Options:
         Returns:
             List[Dict[str, Any]]: オプションの選択肢
         """
-        return self.get_cmd_attr(mode, cmd, "choise")
+        return self.get_cmd_attr(mode, cmd, "choice")
 
     def get_cmd_opt(self, mode:str, cmd:str, opt:str) -> Dict[str, Any]:
         """
@@ -135,9 +135,9 @@ class Options:
             opt['help'] = val['discription_en'] if language.find('Japan') < 0 and language.find('ja_JP') < 0 else val['discription_ja']
             opt['default'] = val['default']
             opt['opts'] = o
-            if val['choise'] is not None:
+            if val['choice'] is not None:
                 opt['choices'] = []
-                for c in val['choise']:
+                for c in val['choice']:
                     if type(c) == dict:
                         opt['choices'] += [c['opt']]
                     elif c is not None and c != "":
@@ -148,14 +148,14 @@ class Options:
         ret = dict()
         for k, v in self._options.items():
             _list(ret, k, v)
-        #for mode in self._options["mode"]['choise']:
+        #for mode in self._options["mode"]['choice']:
         for _, cmd in self._options["cmd"].items():
             if type(cmd) is not dict:
                 continue
             for _, opt in cmd.items():
                 if type(opt) is not dict:
                     continue
-                for o in opt["choise"]:
+                for o in opt["choice"]:
                     if type(o) is not dict:
                         continue
                     _list(ret, o['opt'], o)
@@ -197,42 +197,42 @@ class Options:
     def init_options(self):
         self._options = dict()
         self._options["version"] = dict(
-            short="v", type="bool", default=None, required=False, multi=False, hide=True, choise=None,
+            short="v", type="bool", default=None, required=False, multi=False, hide=True, choice=None,
             discription_ja="バージョン表示",
             discription_en="Display version")
         self._options["useopt"] = dict(
-            short="u", type="str", default=None, required=False, multi=False, hide=True, choise=None,
+            short="u", type="str", default=None, required=False, multi=False, hide=True, choice=None,
             discription_ja="オプションを保存しているファイルを使用します。",
             discription_en="Use the file that saves the options.")
         self._options["saveopt"] = dict(
-            short="s", type="bool", default=None, required=False, multi=False, hide=True, choise=[True, False],
+            short="s", type="bool", default=None, required=False, multi=False, hide=True, choice=[True, False],
             discription_ja="指定しているオプションを `-u` で指定したファイルに保存します。",
             discription_en="Save the specified options to the file specified by `-u`.")
         self._options["debug"] = dict(
-            short="d", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False],
+            short="d", type="bool", default=False, required=False, multi=False, hide=True, choice=[True, False],
             discription_ja="デバックモードで起動します。",
             discription_en="Starts in debug mode.")
         self._options["format"] = dict(
             short="f", type="bool", default=None, required=False, multi=False, hide=True,
             discription_ja="処理結果を見やすい形式で出力します。指定しない場合json形式で出力します。",
             discription_en="Output the processing result in an easy-to-read format. If not specified, output in json format.",
-            choise=None)
+            choice=None)
         self._options["mode"] = dict(
             short="m", type="str", default=None, required=True, multi=False, hide=True,
             discription_ja="起動モードを指定します。",
             discription_en="Specify the startup mode.",
-            choise=[])
+            choice=[])
         self._options["cmd"] = dict(
             short="c", type="str", default=None, required=True, multi=False, hide=True,
             discription_ja="コマンドを指定します。",
             discription_en="Specify the command.",
-            choise=[])
+            choice=[])
         self._options["output_json"] = dict(
-            short="o", type="file", default="", required=False, multi=False, hide=True, choise=None, fileio="out",
+            short="o", type="file", default="", required=False, multi=False, hide=True, choice=None, fileio="out",
             discription_ja="処理結果jsonの保存先ファイルを指定。",
             discription_en="Specify the destination file for saving the processing result json.")
         self._options["output_json_append"] = dict(
-            short="a", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False],
+            short="a", type="bool", default=False, required=False, multi=False, hide=True, choice=[True, False],
             discription_ja="処理結果jsonファイルを追記保存します。",
             discription_en="Save the processing result json file by appending.")
 
@@ -247,12 +247,12 @@ class Options:
                 if type(c) is not dict:
                     continue
                 c["opt"] = k
-                if "debug" not in [_o['opt'] for _o in c["choise"]]:
-                    c["choise"].append(self._options["debug"])
-                if c["opt"] not in [_o['opt'] for _o in self._options["cmd"]["choise"]]:
-                    self._options["cmd"]["choise"] += [c]
+                if "debug" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["debug"])
+                if c["opt"] not in [_o['opt'] for _o in self._options["cmd"]["choice"]]:
+                    self._options["cmd"]["choice"] += [c]
             self._options["mode"][key] = mode
-            self._options["mode"]["choise"] += [mode]
+            self._options["mode"]["choice"] += [mode]
 
     def load_svcmd(self, package_name:str, prefix:str="cmdbox_", appcls=None, ver=None, logger:logging.Logger=None):
         """

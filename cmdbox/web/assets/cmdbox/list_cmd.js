@@ -61,7 +61,7 @@ const list_cmd_func_then = () => {
             const add_form_func = (i, row, next_elem) => {
                 const target_name = row.opt;
                 let input_elem, elem;
-                if(!row.choise) {
+                if(!row.choice) {
                     elem = $(cmd_modal.find('.row_content_template_str').html());
                     if (next_elem) next_elem.after(elem);
                     else row_content.append(elem);
@@ -75,7 +75,17 @@ const list_cmd_func_then = () => {
                     else row_content.append(elem);
                     input_elem = elem.find('.row_content_template_select');
                     input_elem.removeClass('row_content_template_select');
-                    input_elem.html(mkopt(row.choise));
+                    if (row.choice_show) {
+                        input_elem.attr('choice_show', JSON.stringify(row.choice_show));
+                        input_elem.change(() => {
+                            const names = [...new Set(Object.values(row.choice_show))];
+                            names.forEach(name => row_content.find(`[name="${name}"]`).parent().parent().hide());
+                            const v = input_elem.val();
+                            if (!row.choice_show[v]) return;
+                            row_content.find(`[name="${row.choice_show[v]}"]`).parent().parent().show();
+                        });
+                    }
+                    input_elem.html(mkopt(row.choice));
                     input_elem.val(`${row.default}`);
                 }
                 let index = 0;
@@ -170,6 +180,12 @@ const list_cmd_func_then = () => {
             row_content.append(show_link);
             // 非表示オプションを追加
             py_get_cmd_choices.filter(row => row.hide).forEach((row, i) => add_form_func(i, row, null));
+            // 選択肢による表示非表示の設定
+            row_content.find(`[choice_show]`).each((i, elem) => {
+                const v = JSON.parse($(elem).attr('choice_show'));
+                const names = [...new Set(Object.values(v))];
+                names.forEach(name => row_content.find(`[name="${name}"]`).parent().parent().hide());
+            });
         }
         //row_content.find('is-invalid, is-valid').removeClass('is-invalid').removeClass('is-valid');
         cmd_modal.find('[name="cmd"]').off('change');

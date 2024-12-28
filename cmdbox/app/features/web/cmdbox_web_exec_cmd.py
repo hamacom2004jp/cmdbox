@@ -68,7 +68,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                         +f'The cause is that the client_only option is specified when starting web mode.')
         if use_redis == self.USE_REDIS_TRUE:
             return True, output
-        for c in web.options.get_cmd_attr(opt['mode'], opt['cmd'], "choise"):
+        for c in web.options.get_cmd_attr(opt['mode'], opt['cmd'], "choice"):
             if c['opt'] == 'client_data' and 'client_data' in opt and opt['client_data'] is None:
                 return True, output
         return False, None
