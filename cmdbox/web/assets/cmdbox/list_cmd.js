@@ -76,13 +76,21 @@ const list_cmd_func_then = () => {
                     input_elem = elem.find('.row_content_template_select');
                     input_elem.removeClass('row_content_template_select');
                     if (row.choice_show) {
-                        input_elem.attr('choice_show', JSON.stringify(row.choice_show));
+                        //input_elem.attr('choice_show', JSON.stringify(row.choice_show));
                         input_elem.change(() => {
-                            const names = [...new Set(Object.values(row.choice_show))];
+                            let names = []
+                            for (const ns of Object.values(row.choice_show)) {
+                                if (Array.isArray(ns)) {
+                                    ns.forEach(n => names.push(n));
+                                } else {
+                                    names.push(ns);
+                                }
+                            }
+                            names = [...new Set(names)];
                             names.forEach(name => row_content.find(`[name="${name}"]`).parent().parent().hide());
                             const v = input_elem.val();
                             if (!row.choice_show[v]) return;
-                            row_content.find(`[name="${row.choice_show[v]}"]`).parent().parent().show();
+                            row.choice_show[v].forEach(n => row_content.find(`[name="${n}"]`).parent().parent().show());
                         });
                     }
                     input_elem.html(mkopt(row.choice));
@@ -180,12 +188,6 @@ const list_cmd_func_then = () => {
             row_content.append(show_link);
             // 非表示オプションを追加
             py_get_cmd_choices.filter(row => row.hide).forEach((row, i) => add_form_func(i, row, null));
-            // 選択肢による表示非表示の設定
-            row_content.find(`[choice_show]`).each((i, elem) => {
-                const v = JSON.parse($(elem).attr('choice_show'));
-                const names = [...new Set(Object.values(v))];
-                names.forEach(name => row_content.find(`[name="${name}"]`).parent().parent().hide());
-            });
         }
         //row_content.find('is-invalid, is-valid').removeClass('is-invalid').removeClass('is-valid');
         cmd_modal.find('[name="cmd"]').off('change');
@@ -215,6 +217,11 @@ const list_cmd_func_then = () => {
                 } else {
                     cmd_modal.find(`[name="${key}"]`).val(val);
                 }
+            });
+            // 選択肢による表示非表示の設定
+            cmd_modal.find(`[choice_show]`).each((i, elem) => {
+                const input_elem = $(elem);
+                input_elem.change();
             });
             $('#cmd_del').show();
             cmd_modal.find('[name="title"]').attr('readonly', true);

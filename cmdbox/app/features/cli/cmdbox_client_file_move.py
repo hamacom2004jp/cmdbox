@@ -69,7 +69,7 @@ class ClientFileMove(Feature):
                         test_true={"server":"server",
                                 "client":"client",
                                 "current":"current"}),
-                dict(opt="client_data", type="str", default=None, required=False, multi=False, hide=True, choice=None,
+                dict(opt="client_data", type="str", default=None, required=False, multi=False, hide=False, choice=None,
                         discription_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
                         discription_en="Specify the path of the data folder when local is referenced.",
                         test_true={"server":None,

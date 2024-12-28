@@ -66,7 +66,7 @@ class ClientFileUpload(Feature):
                         discription_ja="クライアントのアップロード元パスを指定します。",
                         discription_en="Specify the source path of the client.",
                         test_true={"server":"tests/dog.jpg"}),
-                dict(opt="client_data", type="str", default=None, required=False, multi=False, hide=True, choice=None,
+                dict(opt="client_data", type="str", default=None, required=False, multi=False, hide=False, choice=None,
                         discription_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
                         discription_en="Specify the path of the data folder when local is referenced.",
                         choice_show=dict(client=["client_data"]),

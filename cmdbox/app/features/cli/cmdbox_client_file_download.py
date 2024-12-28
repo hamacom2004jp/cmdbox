@@ -70,7 +70,7 @@ class ClientFileDownload(Feature):
                         discription_ja="クライアントの保存先パスを指定します。",
                         discription_en="Specify the destination path of the client.",
                         test_true={"server":"upload/dog.jpg"}),
-                dict(opt="client_data", type="str", default=None, required=False, multi=False, hide=True, choice=None,
+                dict(opt="client_data", type="str", default=None, required=False, multi=False, hide=False, choice=None,
                         discription_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
                         discription_en="Specify the path of the data folder when local is referenced.",
                         test_true={"server":None,
