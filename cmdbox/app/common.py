@@ -155,6 +155,7 @@ def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, v
                 l['handlers'].remove(std_key)
     if 'loggers' not in log_config or log_name not in log_config['loggers']:
         raise BaseException(f"Loggers not found.({log_name}) at log_conf_path={log_conf_path}")
+    log_config['disable_existing_loggers'] = False # これを入れないとdictConfigで既存のロガーが無効になる
     logging.config.dictConfig(log_config)
     logger = logging.getLogger(log_name)
     set_debug(logger, debug)
