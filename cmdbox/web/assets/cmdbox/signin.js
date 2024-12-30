@@ -13,10 +13,10 @@ $(() => {
         }
         $('html').attr('data-bs-theme', theme);
     });
-    const storage_userid_key = 'cmdbox-signin-userid';
+    const storage_name_key = 'cmdbox-signin-name';
     const storage_password_key = 'cmdbox-signin-password';
     const storage_remember_key = 'cmdbox-signin-remember';
-    const selecter_userid = '.form-signin .form-signin-userid';
+    const selecter_name = '.form-signin .form-signin-name';
     const selecter_password = '.form-signin .form-signin-password';
     const selecter_remember = '.form-signin .form-signin-remember';
     const form_signin = $('.form-signin');
@@ -24,20 +24,20 @@ $(() => {
     form_signin.off('submit').on('submit', (event) => {
         const remember = $(selecter_remember).prop('checked');
         if (remember) {
-            localStorage.setItem(storage_userid_key, $(selecter_userid).val());
+            localStorage.setItem(storage_name_key, $(selecter_name).val());
             localStorage.setItem(storage_password_key, $(selecter_password).val());
             localStorage.setItem(storage_remember_key, remember);
         } else {
-            localStorage.removeItem(storage_userid_key);
+            localStorage.removeItem(storage_name_key);
             localStorage.removeItem(storage_password_key);
             localStorage.removeItem(storage_remember_key);
         }
     });
-    const userid = localStorage.getItem(storage_userid_key);
+    const name = localStorage.getItem(storage_name_key);
     const password = localStorage.getItem(storage_password_key);
     const remember = localStorage.getItem(storage_remember_key);
-    if (userid) {
-        $(selecter_userid).val(userid);
+    if (name) {
+        $(selecter_name).val(name);
     }
     if (password) {
         $(selecter_password).val(password);

@@ -171,7 +171,10 @@ const list_cmd_func_then = () => {
                 title.html('');
                 title.attr('title', window.navigator.language=='ja'?row.discription_ja:row.discription_en)
                 if (row.required) {
-                    title.append('<span class="text-danger">*</span>');
+                    title.append('<span class="text-danger" title="required">*</span>');
+                }
+                if (row.choice_show) {
+                    title.append('<span class="text-primary" title="choice_show">*</span>');
                 }
                 title.append(`<span>${row.opt}</span>`);
                 if (row.hide) {

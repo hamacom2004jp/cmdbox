@@ -24,7 +24,7 @@ import webbrowser
 class Web:
     def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None,
                  redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server',
-                 client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None,
+                 client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None, users_html:str=None,
                  assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
                  web_features_packages:List[str]=None, web_features_prefix:List[str]=None):
         """
@@ -43,7 +43,7 @@ class Web:
             doc_root (Path, optional): カスタムファイルのドキュメントルート. フォルダ指定のカスタムファイルのパスから、doc_rootのパスを除去したパスでURLマッピングします。Defaults to None.
             gui_html (str, optional): GUIのHTMLファイル. Defaults to None.
             filer_html (str, optional): ファイラーのHTMLファイル. Defaults to None.
-            anno_html (str, optional): アノテーション画面のHTMLファイル. Defaults to None.
+            users_html (str, optional): ユーザーのHTMLファイル. Defaults to None.
             assets (List[str], optional): 静的ファイルのリスト. Defaults to None.
             signin_html (str, optional): ログイン画面のHTMLファイル. Defaults to None.
             signin_file (str, optional): ログイン情報のファイル. Defaults to args.signin_file.
@@ -67,6 +67,7 @@ class Web:
         self.doc_root = Path(doc_root) if doc_root is not None else Path(__file__).parent.parent / 'web'
         self.gui_html = Path(gui_html) if gui_html is not None else Path(__file__).parent.parent / 'web' / 'gui.html'
         self.filer_html = Path(filer_html) if filer_html is not None else Path(__file__).parent.parent / 'web' / 'filer.html'
+        self.users_html = Path(users_html) if users_html is not None else Path(__file__).parent.parent / 'web' / 'users.html'
         self.assets = []
         if assets is not None:
             if not isinstance(assets, list):
@@ -81,6 +82,7 @@ class Web:
         self.signin_file = Path(signin_file) if signin_file is not None else None
         self.gui_html_data = None
         self.filer_html_data = None
+        self.users_html_data = None
         self.assets_data = None
         self.signin_html_data = None
         self.signin_file_data = None
@@ -107,6 +109,7 @@ class Web:
             self.logger.debug(f"web init parameter: client_only={self.client_only}")
             self.logger.debug(f"web init parameter: gui_html={self.gui_html} -> {self.gui_html.absolute() if self.gui_html is not None else None}")
             self.logger.debug(f"web init parameter: filer_html={self.filer_html} -> {self.filer_html.absolute() if self.filer_html is not None else None}")
+            self.logger.debug(f"web init parameter: users_html={self.users_html} -> {self.users_html.absolute() if self.users_html is not None else None}")
             self.logger.debug(f"web init parameter: assets={self.assets} -> {[a.absolute() for a in self.assets] if self.assets is not None else None}")
             self.logger.debug(f"web init parameter: signin_html={self.signin_html} -> {self.signin_html.absolute() if self.signin_html is not None else None}")
             self.logger.debug(f"web init parameter: signin_file={self.signin_file} -> {self.signin_file.absolute() if self.signin_file is not None else None}")
@@ -192,9 +195,9 @@ class Web:
         if self.signin_file_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if 'signin' in req.session:
-            userid = req.session['signin']['userid']
+            name = req.session['signin']['name']
             passwd = req.session['signin']['password']
-            if userid in self.signin_file_data and passwd == self.signin_file_data[userid]['password']:
+            if name in self.signin_file_data and passwd == self.signin_file_data[name]['password']:
                 return None
             # パスルールチェック
             user_groups = req.session['signin']['groups']
@@ -408,7 +411,7 @@ class Web:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found in "cmdrule.rules" ({self.signin_file})')
                 if type(rule['groups']) is not list:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not list type in "cmdrule.rules". ({self.signin_file})')
-                rule['groups'] = list(set(self.correct_group(rule['groups'], yml['groups'])))
+                rule['groups'] = list(set(copy.deepcopy(self.correct_group(rule['groups'], yml['groups']))))
                 if 'rule' not in rule:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "rule" not found in "cmdrule.rules" ({self.signin_file})')
                 if rule['rule'] not in ['allow', 'deny']:
@@ -437,7 +440,7 @@ class Web:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found in "pathrule.rules" ({self.signin_file})')
                 if type(rule['groups']) is not list:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not list type in "pathrule.rules". ({self.signin_file})')
-                rule['groups'] = list(set(self.correct_group(rule['groups'], yml['groups'])))
+                rule['groups'] = list(set(copy.deepcopy(self.correct_group(rule['groups'], yml['groups']))))
                 if 'rule' not in rule:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "rule" not found in "pathrule.rules" ({self.signin_file})')
                 if rule['rule'] not in ['allow', 'deny']:
@@ -465,7 +468,9 @@ class Web:
             raise ValueError(f"signin_file is None.")
         ret = []
         for u in copy.deepcopy(self.signin_file_data['users']):
-            del u['password']
+            u['password'] = '********'
+            if 'apikeys' in u:
+                u['apikeys'] = dict([(ak, '********') for ak in u['apikeys']])
             if u['name'] == name:
                 return [u]
             if name is None:
@@ -556,16 +561,20 @@ class Web:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
-        if 'uid' not in user:
-            raise ValueError(f"User uid is not found. ({user})")
-        if 'name' not in user:
-            raise ValueError(f"User name is not found. ({user})")
-        if 'password' not in user:
-            raise ValueError(f"User password is not found. ({user})")
-        if 'hash' not in user:
-            raise ValueError(f"User hash is not found. ({user})")
-        if 'groups' not in user:
-            raise ValueError(f"User groups is not found. ({user})")
+        if 'uid' not in user or user['uid'] == '':
+            raise ValueError(f"User uid is not found or empty. ({user})")
+        try:
+            user['uid'] = int(user['uid'])
+        except:
+            raise ValueError(f"User uid is not number. ({user})")
+        if 'name' not in user or user['name'] == '':
+            raise ValueError(f"User name is not found or empty. ({user})")
+        if 'password' not in user or user['password'] == '':
+            raise ValueError(f"User password is not found or empty. ({user})")
+        if 'hash' not in user or user['hash'] == '':
+            raise ValueError(f"User hash is not found or empty. ({user})")
+        if 'groups' not in user or type(user['groups']) is not list:
+            raise ValueError(f"User groups is not found or empty. ({user})")
         for gn in user['groups']:
             if len(self.group_list(gn)) <= 0:
                 raise ValueError(f"Group is not found. ({gn})")
@@ -594,29 +603,32 @@ class Web:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
-        if 'uid' not in user:
-            raise ValueError(f"User uid is not found. ({user})")
-        if 'name' not in user:
-            raise ValueError(f"User name is not found. ({user})")
-        if 'password' not in user:
-            raise ValueError(f"User password is not found. ({user})")
-        if 'hash' not in user:
-            raise ValueError(f"User hash is not found. ({user})")
-        if 'groups' not in user:
-            raise ValueError(f"User groups is not found. ({user})")
+        if 'uid' not in user or user['uid'] == '':
+            raise ValueError(f"User uid is not found or empty. ({user})")
+        try:
+            user['uid'] = int(user['uid'])
+        except:
+            raise ValueError(f"User uid is not number. ({user})")
+        if 'name' not in user or user['name'] == '':
+            raise ValueError(f"User name is not found or empty. ({user})")
+        if 'hash' not in user or user['hash'] == '':
+            raise ValueError(f"User hash is not found or empty. ({user})")
+        if 'groups' not in user or type(user['groups']) is not list:
+            raise ValueError(f"User groups is not found or empty. ({user})")
         for gn in user['groups']:
             if len(self.group_list(gn)) <= 0:
                 raise ValueError(f"Group is not found. ({gn})")
         if len([u for u in self.signin_file_data['users'] if u['uid'] == user['uid']]) <= 0:
             raise ValueError(f"User uid is not found. ({user})")
-        if len([u for u in self.signin_file_data['users'] if u['name'] == user['name']]) > 0:
-            raise ValueError(f"User name is already exists. ({user})")
+        if len([u for u in self.signin_file_data['users'] if u['name'] == user['name']]) <= 0:
+            raise ValueError(f"User name is not found. ({user})")
         if user['hash'] not in ['plain', 'md5', 'sha1', 'sha256']:
             raise ValueError(f"User hash is not supported. ({user})")
         for u in self.signin_file_data['users']:
             if u['uid'] == user['uid']:
                 u['name'] = user['name']
-                u['password'] = common.hash_password(user['password'], user['hash'])
+                if 'password' in user and user['password'] != '':
+                    u['password'] = common.hash_password(user['password'], user['hash'])
                 u['hash'] = user['hash']
                 u['groups'] = user['groups']
         if self.signin_file is None:
@@ -636,6 +648,10 @@ class Web:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
+        try:
+            uid = int(uid)
+        except:
+            raise ValueError(f"User uid is not number. ({uid})")
         users = [u for u in self.signin_file_data['users'] if u['uid'] != uid]
         if len(users) == len(self.signin_file_data['users']):
             raise ValueError(f"User uid is not found. ({uid})")
@@ -676,12 +692,18 @@ class Web:
             raise ValueError(f"signin_file is None.")
         if 'gid' not in group:
             raise ValueError(f"Group gid is not found. ({group})")
+        try:
+            group['gid'] = int(group['gid'])
+        except:
+            raise ValueError(f"Group gid is not number. ({group})")
         if 'name' not in group:
             raise ValueError(f"Group name is not found. ({group})")
-        if 'parent' not in group:
+        if 'parent' in group and (group['parent'] is None or group['parent'] == ''):
+            del group['parent']
+        elif 'parent' in group and group['parent'] not in [g['name'] for g in self.signin_file_data['groups']]:
             raise ValueError(f"Group parent is not found. ({group})")
-        if group['parent'] not in [g['name'] for g in self.signin_file_data['groups']]:
-            raise ValueError(f"Group parent is not found. ({group})")
+        if 'parent' in group and group['parent'] == group['name']:
+            raise ValueError(f"Group parent is same as group name. ({group})")
         if len([g for g in self.signin_file_data['groups'] if g['gid'] == group['gid']]) > 0:
             raise ValueError(f"Group gid is already exists. ({group})")
         if len([g for g in self.signin_file_data['groups'] if g['name'] == group['name']]) > 0:
@@ -706,16 +728,22 @@ class Web:
             raise ValueError(f"signin_file is None.")
         if 'gid' not in group:
             raise ValueError(f"Group gid is not found. ({group})")
+        try:
+            group['gid'] = int(group['gid'])
+        except:
+            raise ValueError(f"Group gid is not number. ({group})")
         if 'name' not in group:
             raise ValueError(f"Group name is not found. ({group})")
-        if 'parent' not in group:
+        if 'parent' in group and (group['parent'] is None or group['parent'] == ''):
+            del group['parent']
+        elif 'parent' in group and group['parent'] not in [g['name'] for g in self.signin_file_data['groups']]:
             raise ValueError(f"Group parent is not found. ({group})")
-        if group['parent'] not in [g['name'] for g in self.signin_file_data['groups']]:
-            raise ValueError(f"Group parent is not found. ({group})")
+        if 'parent' in group and group['parent'] == group['name']:
+            raise ValueError(f"Group parent is same as group name. ({group})")
         if len([g for g in self.signin_file_data['groups'] if g['gid'] == group['gid']]) <= 0:
             raise ValueError(f"Group gid is not found. ({group})")
-        if len([g for g in self.signin_file_data['groups'] if g['name'] == group['name']]) > 0:
-            raise ValueError(f"Group name is already exists. ({group})")
+        if len([g for g in self.signin_file_data['groups'] if g['name'] == group['name']]) <= 0:
+            raise ValueError(f"Group name is not found. ({group})")
         for g in self.signin_file_data['groups']:
             if g['gid'] == group['gid']:
                 g['name'] = group['name']
@@ -737,9 +765,41 @@ class Web:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
+        try:
+            gid = int(gid)
+        except:
+            raise ValueError(f"Group gid is not number. ({gid})")
+        # グループがユーザーに使用されているかチェック
+        user_group_ids = []
+        for user in self.signin_file_data['users']:
+            for group in user['groups']:
+                user_group_ids += [g['gid'] for g in self.signin_file_data['groups'] if g['name'] == group]
+        if gid in user_group_ids:
+            raise ValueError(f"Group gid is used by user. ({gid})")
+        # グループが親グループに使用されているかチェック
+        parent_group_ids = []
+        for group in self.signin_file_data['groups']:
+            if 'parent' in group:
+                parent_group_ids += [g['gid'] for g in self.signin_file_data['groups'] if g['name'] == group['parent']]
+        if gid in parent_group_ids:
+            raise ValueError(f"Group gid is used by parent group. ({gid})")
+        # グループがcmdruleグループに使用されているかチェック
+        cmdrule_group_ids = []
+        for rule in self.signin_file_data['cmdrule']['rules']:
+            for group in rule['groups']:
+                cmdrule_group_ids += [g['gid'] for g in self.signin_file_data['groups'] if g['name'] == group]
+        if gid in cmdrule_group_ids:
+            raise ValueError(f"Group gid is used by cmdrule group. ({gid})")
+        # グループがpathruleグループに使用されているかチェック
+        pathrule_group_ids = []
+        for rule in self.signin_file_data['pathrule']['rules']:
+            for group in rule['groups']:
+                pathrule_group_ids += [g['gid'] for g in self.signin_file_data['groups'] if g['name'] == group]
+        if gid in pathrule_group_ids:
+            raise ValueError(f"Group gid is used by pathrule group. ({gid})")
+
+        # グループ削除
         groups = [g for g in self.signin_file_data['groups'] if g['gid'] != gid]
-        if self.signin_file is None:
-            raise ValueError(f"signin_file is None.")
         if len(groups) == len(self.signin_file_data['groups']):
             raise ValueError(f"Group gid is not found. ({gid})")
         self.signin_file_data['groups'] = groups

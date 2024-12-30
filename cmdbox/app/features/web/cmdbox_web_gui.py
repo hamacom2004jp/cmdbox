@@ -53,11 +53,11 @@ class Gui(feature.WebFeature):
         async def user_info(req:Request, res:Response):
             if 'signin' not in req.session:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
-            if 'userid' not in req.session['signin']:
+            if 'name' not in req.session['signin']:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
-            userid = req.session['signin']['userid']
+            name = req.session['signin']['name']
             try:
-                users = web.user_list(userid)
+                users = web.user_list(name)
                 if users is None or len(users) == 0:
                     return dict(warn='User information is not found.')
                 return users[0]

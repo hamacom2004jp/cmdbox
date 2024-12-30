@@ -1,0 +1,225 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+    .card-hover:hover {
+        box-shadow: 0 0 8px gray;
+        cursor: pointer;
+    }
+    </style>
+</head>
+<body lang="ja" class="overflow-hidden p-2" style="background-color:rgb(33, 37, 41)">
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="svg_signin_ico" viewBox="0 0 16 16">
+            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"></path>
+            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"></path>
+        </symbol>
+        <symbol id="svg_window_stack" viewBox="0 0 16 16">
+            <path d="M4.5 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1ZM6 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
+            <path d="M12 1a2 2 0 0 1 2 2 2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h10ZM2 12V5a2 2 0 0 1 2-2h9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm1-4v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8H3Zm12-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2h12Z"/>
+        </symbol>
+        <symbol id="svg_window" viewBox="0 0 16 16">
+            <path d="M2.5 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1 .5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+            <path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm13 2v2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zM2 14a1 1 0 0 1-1-1V6h14v7a1 1 0 0 1-1 1H2z"/>
+        </symbol>
+        <symbol id="svg_add_btn" viewBox="0 0 16 16">
+            <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+        </symbol>
+        <symbol id="svg_edit_btn" viewBox="0 0 16 16">
+            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+        </symbol>
+        <symbol id="svg_puls_btn" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+        </symbol>
+        <symbol id="svg_trash_btn" viewBox="0 0 16 16">
+            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+        </symbol>
+    </svg>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar navbar-expand-sm fixed-top p-2">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">cmdbox</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="viewMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            View
+                        </a>
+                        <ul class="dropdown-menu viewmenu">
+                            <li><a class="dropdown-item" href="#" onclick="cmdbox.change_dark_mode();">Change Dark Mode</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="$(`#console_modal`).modal(`show`);">Console log</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="aboutMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            About
+                        </a>
+                        <ul class="dropdown-menu aboutmenu" aria-labelledby="aboutMenuLink">
+                            <li><a class="dropdown-item" href="#" onclick="$(`#versions_modal`).modal(`show`);">Versions</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="d-none dropdown user_info">
+                    <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle show" data-bs-toggle="dropdown" aria-expanded="true" style="fill:gray;">
+                        <svg class="m-1" width="24" height="24" viewBox="0 0 16 16">
+                            <use href="#svg_signin_ico"></use>
+                        </svg>
+                        <span class="username">UserName</span>
+                    </a>
+                    <ul class="dropdown-menu text-small shadow" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);" data-popper-placement="bottom-end">
+                        <div class="user_info_note ps-3 pe-3"></div>
+                        <li><hr class="dropdown-divider"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div id="main_container" class="container-fluid overflow-auto" style="margin-top:66px;height:calc(100vh - 120px);">
+        <form class="d-none filer_form">
+            <input name="filer_host" type="hidden" class="filer_host">
+            <input name="filer_port" type="hidden" class="filer_port">
+            <input name="filer_password" type="hidden" class="filer_password">
+            <input name="filer_svname" type="hidden" class="filer_svname">
+            <input name="filer_scope" type="hidden" class="filer_scope">
+            <input name="filer_client_data" type="hidden" class="filer_client_data">
+        </form>
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="users-tab" data-bs-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="true">Users</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="groups-tab" data-bs-toggle="tab" href="#groups" role="tab" aria-controls="groups" aria-selected="false">Groups</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="cmdrules-tab" data-bs-toggle="tab" href="#cmdrules" role="tab" aria-controls="cmdrules" aria-selected="false">Command Rules</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="pathrules-tab" data-bs-toggle="tab" href="#pathrules" role="tab" aria-controls="pathrules" aria-selected="false">Path Rules</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="users-tab">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-2 mt-2" id="users_list"></div>
+            </div>
+            <div class="tab-pane fade" id="groups" role="tabpanel" aria-labelledby="groups-tab">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-2 mt-2" id="groups_list"></div>
+            </div>
+            <div class="tab-pane fade" id="cmdrules" role="tabpanel" aria-labelledby="cmdrules-tab">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-2 mt-2" id="cmdrules_list"></div>
+            </div>
+            <div class="tab-pane fade" id="pathrules" role="tabpanel" aria-labelledby="pathrules-tab">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-2 mt-2" id="pathrules_list"></div>
+            </div>
+        </div>
+    </div>
+    <!-- usersモーダル -->
+    <div id="users_modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="users_form" class="modal-content novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="btn btn_window_stack">
+                        <svg width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
+                            <use href="#svg_window_stack"></use>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn_window">
+                        <svg width="16" height="16" fill="currentColor" class="bi bi-window" viewBox="0 0 16 16">
+                            <use href="#svg_window"></use>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row row_content"></div>
+                    <div class="row d-none row_content_template_str">
+                        <div class="col-6 mb-3">
+                            <div class="input-group">
+                                <label class="input-group-text row_content_template_title">title</label>
+                                <input type="text" class="form-control row_content_template_input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row d-none row_content_template_choice">
+                        <div class="col-6 mb-3">
+                            <div class="input-group">
+                                <label class="input-group-text row_content_template_title">title</label>
+                                <select class="form-select row_content_template_select">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cmd_add_apikey" type="button" class="btn btn-info">Add apikey</button>
+                    <button id="cmd_del_apikey" type="button" class="btn btn-warning">Del apikey</button>
+                    <button id="cmd_save" type="button" class="btn btn-success">Save</button>
+                    <button id="cmd_del" type="button" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- versionsモーダル -->
+    <div id="versions_modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="console_form" class="modal-content novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Versions
+                    </h5>
+                    <button type="button" class="btn btn_window_stack">
+                        <svg width="16" height="16" fill="currentColor" class="bi bi-window-stack">
+                            <use href="#svg_window_stack"></use>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn_window">
+                        <svg width="16" height="16" fill="currentColor" class="bi bi-window">
+                            <use href="#svg_window"></use>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs version-tabs" role="tablist"></ul>
+                    <div class="tab-content version-content"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- ローディングマスク -->
+    <div id="loading" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(0, 0, 0, 0.3);z-index:10000;">
+        <div class="text-center position-absolute top-50 start-50 w-100 translate-middle">
+            <div class="spinner-border text-light" role="status">
+                <span class="sr-only"></span>
+            </div>
+            <div>
+                <button type="button" class="btn btn-outline-danger mt-3 bbforce">Back by force</button>
+            </div>
+        </div>
+    </div>
+    <!-- フッター -->
+    <footer class="fixed-bottom text-center p-2 copyright"></footer>
+</body>
+<link rel="stylesheet" href="assets/bootstrap/bootstrap.min.5.3.0.css">
+<link rel="stylesheet" href="assets/lightbox2/css/lightbox.min.css">
+<link rel="stylesheet" href="assets/tree-menu/css/tree-menu.css">
+<script type="text/javascript" src="assets/bootstrap/bootstrap.bundle.min.5.3.0.js"></script>
+<script type="text/javascript" src="assets/jquery/jquery.min.3.2.0.js"></script>
+<script type="text/javascript" src="assets/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="assets/jquery-resizable/jquery-resizable.min.js"></script>
+<script type="text/javascript" src="assets/tree-menu/js/tree-menu.js"></script>
+<script type="text/javascript" src="assets/lightbox2/js/lightbox.min.js"></script>
+<script type="text/javascript" src="assets/cmdbox/common.js"></script>
+<script type="text/javascript" src="assets/cmdbox/users.js"></script>
+</html>

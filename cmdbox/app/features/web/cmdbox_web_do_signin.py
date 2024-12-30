@@ -17,11 +17,11 @@ class DoSignin(cmdbox_web_signin.Signin):
         @app.post('/dosignin/{next}', response_class=HTMLResponse)
         async def do_signin(next:str, req:Request, res:Response):
             form = await req.form()
-            userid = form.get('userid')
+            name = form.get('name')
             passwd = form.get('password')
-            if userid == '' or passwd == '':
+            if name == '' or passwd == '':
                 return RedirectResponse(url=f'/signin/{next}?error=1')
-            user = [u for u in web.signin_file_data['users'] if u['name'] == userid]
+            user = [u for u in web.signin_file_data['users'] if u['name'] == name]
             if len(user) <= 0:
                 return RedirectResponse(url=f'/signin/{next}?error=1')
             hash = user[0]['hash']
@@ -32,6 +32,7 @@ class DoSignin(cmdbox_web_signin.Signin):
             if passwd != user[0]['password']:
                 return RedirectResponse(url=f'/signin/{next}?error=1')
             group_names = list(set(web.correct_group(user[0]['groups'])))
-            req.session['signin'] = dict(userid=userid, password=passwd, groups=group_names)
+            gids = [g['gid'] for g in web.signin_file_data['groups'] if g['name'] in group_names]
+            req.session['signin'] = dict(uid=user[0]['uid'], name=name, password=passwd, gids=gids, groups=group_names)
             return RedirectResponse(url=f'/{next}')
 
