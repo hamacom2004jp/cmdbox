@@ -125,22 +125,25 @@ class CmdBoxApp:
 
         sloggerinittime = time.perf_counter()
         logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall if args.cmd != 'webcap' else True, ver=self.ver)
-        eloggerinittime = time.perf_counter()
-        if logger.level == logging.DEBUG:
-            logger.debug(f"args.mode={args.mode}, args.cmd={args.cmd}")
+        try:
+            eloggerinittime = time.perf_counter()
+            if logger.level == logging.DEBUG:
+                logger.debug(f"args.mode={args.mode}, args.cmd={args.cmd}")
 
-        #scmdexectime = time.perf_counter()
-        feat = self.options.get_cmd_attr(args.mode, args.cmd, 'feature')
-        if feat is not None or isinstance(feat, feature.Feature):
-            pf = []
-            pf.append(dict(key="app_featureload", val=f"{efeatureloadtime-sfeatureloadtime:.03f}s"))
-            pf.append(dict(key="app_argsparse", val=f"{eargsparsetime-sargsparsetime:.03f}s"))
-            pf.append(dict(key="app_makesample", val=f"{emakesampletime-smakesampletime:.03f}s"))
-            pf.append(dict(key="app_loggerinit", val=f"{eloggerinittime-sloggerinittime:.03f}s"))
-            status, ret, obj = feat.apprun(logger, args, smaintime, pf)
-            return status, ret, obj
-        else:
-            msg = {"warn":f"Unkown mode or cmd. mode={args.mode}, cmd={args.cmd}"}
-            common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
-            return 1, msg, None
-
+            #scmdexectime = time.perf_counter()
+            feat = self.options.get_cmd_attr(args.mode, args.cmd, 'feature')
+            if feat is not None or isinstance(feat, feature.Feature):
+                pf = []
+                pf.append(dict(key="app_featureload", val=f"{efeatureloadtime-sfeatureloadtime:.03f}s"))
+                pf.append(dict(key="app_argsparse", val=f"{eargsparsetime-sargsparsetime:.03f}s"))
+                pf.append(dict(key="app_makesample", val=f"{emakesampletime-smakesampletime:.03f}s"))
+                pf.append(dict(key="app_loggerinit", val=f"{eloggerinittime-sloggerinittime:.03f}s"))
+                status, ret, obj = feat.apprun(logger, args, smaintime, pf)
+                return status, ret, obj
+            else:
+                msg = {"warn":f"Unkown mode or cmd. mode={args.mode}, cmd={args.cmd}"}
+                common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
+                return 1, msg, None
+        finally:
+            # ログの状態をwebcallから戻す
+            common.load_config(args.mode, debug=args.debug, data=args.data, webcall=False, ver=self.ver)
