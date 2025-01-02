@@ -28,18 +28,18 @@ Configuration items in `features.yml`
     * - 1
       - features
       - dict
-      - -
-      - -
+      - 
+      - 
     * - 2
       - cli
       - list
-      - -
+      - 
       - Specify a list of package names in which the module implementing the command is located.
     * - 3
-      - -
+      - 
       - dict
-      - -
-      - -
+      - 
+      - 
     * - 4
       - package
       - str
@@ -53,13 +53,13 @@ Configuration items in `features.yml`
     * - 2
       - web
       - list
-      - -
+      - 
       - Specify a list of package names with modules that implement web screens and RESTAPIs.
     * - 3
-      - -
+      - 
       - dict
-      - -
-      - -
+      - 
+      - 
     * - 4
       - package
       - str
@@ -73,18 +73,18 @@ Configuration items in `features.yml`
     * - 1
       - args
       - dict
-      - -
+      - 
       - Specifies default or forced arguments for the specified command.
     * - 2
       - cli
       - list
-      - -
+      - 
       - Specify rules to apply default values or force arguments.
     * - 3
-      - -
+      - 
       - dict
-      - -
-      - -
+      - 
+      - 
     * - 4
       - rule
       - dict

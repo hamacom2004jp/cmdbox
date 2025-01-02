@@ -34,5 +34,5 @@ class DoSignin(cmdbox_web_signin.Signin):
             group_names = list(set(web.correct_group(user[0]['groups'])))
             gids = [g['gid'] for g in web.signin_file_data['groups'] if g['name'] in group_names]
             req.session['signin'] = dict(uid=user[0]['uid'], name=name, password=passwd, gids=gids, groups=group_names)
-            return RedirectResponse(url=f'/{next}')
+            return RedirectResponse(url=f'../{next}') # nginxのリバプロ対応のための相対パス
 
