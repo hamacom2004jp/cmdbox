@@ -116,8 +116,9 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 return
             if 'capture_stdout' in opt and opt['capture_stdout']:
                 sys.stdout = captured_output = io.StringIO()
+            ret_main = {}
             try:
-                status, ret, obj = cmdbox_app.main(args_list=opt_list, file_dict=file_dict, webcall=True)
+                status, ret_main, obj = cmdbox_app.main(args_list=opt_list, file_dict=file_dict, webcall=True)
                 if isinstance(obj, server.Server):
                     cmdbox_app.sv = obj
                 elif isinstance(obj, client.Client):
@@ -164,7 +165,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     try:
                         ret = to_json(output)
                     except:
-                        ret = output
+                        ret = ret_main
                 if nothread:
                     return ret
                 self.callback_return_cmd_exec_func(web, title, ret)
