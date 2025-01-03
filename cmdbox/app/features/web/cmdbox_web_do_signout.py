@@ -18,4 +18,4 @@ class DoSignout(feature.WebFeature):
         async def do_signout(next, req:Request, res:Response):
             if 'signin' in req.session:
                 del req.session['signin']
-            return RedirectResponse(url=f'/signin/{next}')
+            return RedirectResponse(url=f'../signin/{next}') # nginxのリバプロ対応のための相対パス
