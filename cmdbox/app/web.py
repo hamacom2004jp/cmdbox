@@ -153,6 +153,7 @@ class Web:
         if not auth.startswith('Bearer '):
             return RedirectResponse(url=f'/signin{req.url.path}?error=1')
         bearer, apikey = auth.split(' ')
+        apikey = common.hash_password(apikey, 'sha1')
         find_user = None
         for user in self.signin_file_data['users']:
             if 'apikeys' not in user:
@@ -163,6 +164,10 @@ class Web:
         if find_user is None:
             return RedirectResponse(url=f'/signin{req.url.path}?error=1')
 
+        group_names = list(set(self.correct_group(find_user['groups'])))
+        gids = [g['gid'] for g in self.signin_file_data['groups'] if g['name'] in group_names]
+        req.session['signin'] = dict(uid=find_user['uid'], name=find_user['name'], password=find_user['password'],
+                                     gids=gids, groups=group_names)
         # パスルールチェック
         user_groups = find_user['groups']
         jadge = self.signin_file_data['pathrule']['policy']
@@ -504,7 +509,8 @@ class Web:
                     u['apikeys'] = dict()
                 if user['apikey_name'] in u['apikeys']:
                     raise ValueError(f"ApiKey name is already exists. ({user})")
-                u['apikeys'][user['apikey_name']] = apikey = common.random_string(48)
+                apikey = common.random_string(64)
+                u['apikeys'][user['apikey_name']] = common.hash_password(apikey, 'sha1')
 
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
