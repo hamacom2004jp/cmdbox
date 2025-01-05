@@ -227,20 +227,27 @@ const list_cmd_func_then = () => {
                 input_elem.change();
             });
             $('#cmd_del').show();
-            cmd_modal.find('[name="title"]').attr('readonly', true);
-            cmd_modal.find('[name="mode"]').css('pointer-events', 'none').css('background-color', '#e9ecef');
-            cmd_modal.find('[name="cmd"]').css('pointer-events', 'none').css('background-color', '#e9ecef');
-            cmd_modal.find('[name="name"]').attr('readonly', true);
+            cmd_modal.find('[name="title_disabled"]').val(cmd_modal.find('[name="title"]').hide().val()).show();
+            cmd_modal.find('[name="mode_disabled"]').val(cmd_modal.find('[name="mode"]').hide().val()).show();
+            cmd_modal.find('[name="cmd_disabled"]').val(cmd_modal.find('[name="cmd"]').hide().val()).show();
+            if (cmd_modal.find('[name="name_disabled"]').length == 0) {
+                cmd_modal.find('[name="name"]').after('<input name="name_disabled" type="text" class="form-control" disabled="disabled" style="display:none;">');
+            }
+            cmd_modal.find('[name="name_disabled"]').val(cmd_modal.find('[name="name"]').hide().val()).show();
         } else {
             // 新規コマンドファイルの作成
             modal_title = 'New Command';
             await mode_change();
             $('#cmd_del').hide();
             cmd_modal.find('[name="title"]').val('');
-            cmd_modal.find('[name="title"]').attr('readonly', false);
-            cmd_modal.find('[name="mode"]').css('pointer-events', 'auto').css('background-color', 'transparent');
-            cmd_modal.find('[name="cmd"]').css('pointer-events', 'auto').css('background-color', 'transparent');
-            cmd_modal.find('[name="name"]').attr('readonly', false);
+            cmd_modal.find('[name="title"]').css('border-top-right-radius','6px').css('border-bottom-right-radius','6px').show();
+            cmd_modal.find('[name="title_disabled"]').val('').hide();
+            cmd_modal.find('[name="mode"]').css('border-top-right-radius','6px').css('border-bottom-right-radius','6px').show();
+            cmd_modal.find('[name="mode_disabled"]').val('').hide();
+            cmd_modal.find('[name="cmd"]').css('border-top-right-radius','6px').css('border-bottom-right-radius','6px').show();
+            cmd_modal.find('[name="cmd_disabled"]').val('').hide();
+            cmd_modal.find('[name="name"]').css('border-top-right-radius','6px').css('border-bottom-right-radius','6px').show();
+            cmd_modal.find('[name="name_disabled"]').val('').hide();
         }
         cmd_modal.find('.modal-title').text(`Command : ${modal_title}`);
         cmd_modal.find('.row_content_hide').hide();

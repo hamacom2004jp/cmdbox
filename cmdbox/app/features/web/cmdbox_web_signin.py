@@ -1,7 +1,9 @@
+import urllib.parse
 from cmdbox.app import feature
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
+import urllib
 
 
 class Signin(feature.WebFeature):
@@ -27,3 +29,28 @@ class Signin(feature.WebFeature):
             res.headers['Access-Control-Allow-Origin'] = '*'
             return web.signin_html_data
 
+        # https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest
+        @app.get('/oauth2/google/{next}')
+        async def oauth2_google(next:str, req:Request):
+            conf = web.signin_file_data['oauth2']['providers']['google']
+            data = {'scope': ' '.join(conf['scope']),
+                    'access_type': 'offline',
+                    'response_type': 'code',
+                    'redirect_uri': conf['redirect_uri'],
+                    'client_id': conf['client_id'],
+                    'state': next}
+            query = '&'.join([f'{k}={urllib.parse.quote(v)}' for k, v in data.items()])
+            return RedirectResponse(url=f'https://accounts.google.com/o/oauth2/auth?{query}')
+
+        # https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes
+        @app.get('/oauth2/github/{next}')
+        async def oauth2_github(next:str, req:Request):
+            conf = web.signin_file_data['oauth2']['providers']['github']
+            data = {'scope': ' '.join(conf['scope']),
+                    'access_type': 'offline',
+                    'response_type': 'code',
+                    'redirect_uri': conf['redirect_uri'],
+                    'client_id': conf['client_id'],
+                    'state': next}
+            query = '&'.join([f'{k}={urllib.parse.quote(v)}' for k, v in data.items()])
+            return RedirectResponse(url=f'https://github.com/login/oauth/authorize?{query}')

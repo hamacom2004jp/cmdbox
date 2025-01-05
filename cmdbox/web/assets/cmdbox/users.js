@@ -44,7 +44,7 @@ users.users_list = async () => {
                 const row = $(modal.find('.row_content_template_choice').html()).appendTo(row_content);
                 row_content.find('.row_content_template_title').removeClass('row_content_template_title').text(col);
                 const select = row_content.find('.row_content_template_select').removeClass('row_content_template_select');
-                for (const h of ['', 'plain', 'md5', 'sha1', 'sha256']) {
+                for (const h of ['', 'oauth2', 'plain', 'md5', 'sha1', 'sha256']) {
                     $('<option>').text(h).val(h).appendTo(select);
                 }
                 select.attr('name', col).val(user && user[col] ? user[col] : '');
@@ -403,15 +403,19 @@ users.cmdrules_list = async () => {
         for (const row of cmdrules_data) {
             for (const key in row) cols.add(key);
         }
+        $('<th>').text('#').attr('scope', 'col').attr('width', '40').appendTo(cmdrule_thead_tr);
         for (const col of cols) {
             $('<th>').text(col).attr('scope', 'col').appendTo(cmdrule_thead_tr);
         }
     }
     // 明細行を作成
     const cmdrule_tbody = $('<tbody>').appendTo(cmdrule_table);
+    let i_row=0;
     for (const cmdrule_data of cmdrules_data) {
+        i_row++;
         const cmdrule_tbody_tr = $('<tr>').appendTo(cmdrule_tbody);
         // 明細項目
+        $('<td>').text(i_row).appendTo(cmdrule_tbody_tr);
         for (const col of cols) {
             const data = cmdrule_data[col];
             if (data && Array.isArray(data)) {
@@ -460,14 +464,18 @@ users.pathrules_list = async () => {
         for (const row of pathrules_data) {
             for (const key in row) cols.add(key);
         }
+        $('<th>').text('#').attr('scope', 'col').attr('width', '40').appendTo(pathrule_thead_tr);
         for (const col of cols) {
             $('<th>').text(col).attr('scope', 'col').appendTo(pathrule_thead_tr);
         }
     }
     // 明細行を作成
     const pathrule_tbody = $('<tbody>').appendTo(pathrule_table);
+    let i_row=0;
     for (const pathrule_data of pathrules_data) {
+        i_row++;
         const pathrule_tbody_tr = $('<tr>').appendTo(pathrule_tbody);
+        $('<td>').text(i_row).appendTo(pathrule_tbody_tr);
         // 明細項目
         for (const col of cols) {
             const data = pathrule_data[col];

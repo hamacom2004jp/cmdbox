@@ -145,7 +145,8 @@ Add User : `cmdbox -m web -c user_add <Option>`
     "--user_id <user ID>","required","Specify the user ID. Do not duplicate other users."
     "--user_name <username>","required","Specify a user name. Do not duplicate other users."
     "--user_pass <user password>","","Specify the user password."
-    "--user_pass_hash <hash algorithm>","","Specifies the hash algorithm for user passwords.'plain', 'md5', 'sha1', and 'sha256' can be specified."
+    "--user_pass_hash <hash algorithm>","","Specifies the hash algorithm for user passwords.'oauth2', 'plain', 'md5', 'sha1', and 'sha256' can be specified."
+    "--user_email <user email>","","Specify the user email. Required when `user_pass_hash` is `oauth2`."
     "--user_group <user group>","required","Specifies the groups to which the user belongs."
     "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."
 
@@ -181,7 +182,8 @@ Edit User : `cmdbox -m web -c user_edit <Option>`
     "--user_id <user ID>","required","Specify the user ID. Do not duplicate other users."
     "--user_name <username>","required","Specify a user name. Do not duplicate other users."
     "--user_pass <user password>","","Specify the user password."
-    "--user_pass_hash <hash algorithm>","","Specifies the hash algorithm for user passwords.'plain', 'md5', 'sha1', and 'sha256' can be specified."
+    "--user_pass_hash <hash algorithm>","","Specifies the hash algorithm for user passwords.'oauth2', 'plain', 'md5', 'sha1', and 'sha256' can be specified."
+    "--user_email <user email>","","Specify the user email. Required when `user_pass_hash` is `oauth2`."
     "--user_group <user group>","required","Specifies the groups to which the user belongs."
     "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."
 

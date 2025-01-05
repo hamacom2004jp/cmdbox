@@ -3,7 +3,7 @@ import datetime
 dt_now = datetime.datetime(2025, 1, 3)
 __appid__ = 'cmdbox'
 __title__ = 'cmdbox'
-__version__ = '0.2.4.5'
+__version__ = '0.2.5'
 __copyright__ = f'Copyright © 2023-{dt_now.strftime("%Y")} hamacom2004jp'
 __pypiurl__ = 'https://pypi.org/project/cmdbox/'
 __srcurl__ = 'https://github.com/hamacom2004jp/cmdbox'

@@ -61,9 +61,12 @@ class WebUserEdit(Feature):
                 dict(opt="user_pass", type="str", default=None, required=False, multi=False, hide=False, choice=None,
                      discription_ja="ユーザーパスワードを指定します。",
                      discription_en="Specify the user password."),
-                dict(opt="user_pass_hash", type="str", default='sha1', required=False, multi=False, hide=False, choice=['plain', 'md5', 'sha1', 'sha256'],
+                dict(opt="user_pass_hash", type="str", default='sha1', required=False, multi=False, hide=False, choice=['oauth2', 'plain', 'md5', 'sha1', 'sha256'],
                      discription_ja="ユーザーパスワードのハッシュアルゴリズムを指定します。",
                      discription_en="Specifies the hash algorithm for user passwords."),
+                dict(opt="user_email", type="str", default=None, required=False, multi=False, hide=False, choice=None,
+                     discription_ja="ユーザーメールアドレスを指定します。 `user_pass_hash` が `oauth2` の時は必須です。",
+                     discription_en="Specify the user email. Required when `user_pass_hash` is `oauth2`."),
                 dict(opt="user_group", type="str", default=None, required=True, multi=True, hide=False, choice=None,
                      discription_ja="ユーザーが所属するグループを指定します。",
                      discription_en="Specifies the groups to which the user belongs."),
@@ -101,7 +104,8 @@ class WebUserEdit(Feature):
             w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
                         redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                         signin_file=args.signin_file)
-            user = dict(uid=args.user_id, name=args.user_name, password=args.user_pass, hash=args.user_pass_hash, groups=args.user_group)
+            user = dict(uid=args.user_id, name=args.user_name, password=args.user_pass, hash=args.user_pass_hash,
+                        email=args.user_email, groups=args.user_group)
             w.user_edit(user)
             msg = {"success": f"User ID {args.user_id} has been edited."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

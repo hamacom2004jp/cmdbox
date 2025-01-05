@@ -30,17 +30,22 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 if signin is not None:
                     raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
                 opt = None
-                if req.headers.get('content-type').startswith('multipart/form-data'):
+                content_type = req.headers.get('content-type')
+                if content_type is None:
+                    opt = self.load_cmd(web, title)
+                elif content_type.startswith('multipart/form-data'):
                     opt = self.load_cmd(web, title)
                     form = await req.form()
                     files = {key: value for key, value in form.items() if isinstance(value, UploadFile)}
                     for fn in files.keys():
                         opt[fn] = files[fn].file
                         if fn == 'input_file': opt['stdin'] = False
-                elif req.headers.get('content-type').startswith('application/json'):
+                elif content_type.startswith('application/json'):
                     opt = await req.json()
                 else:
                     opt = self.load_cmd(web, title)
+                if 'mode' not in opt or 'cmd' not in opt:
+                    raise HTTPException(status_code=404, detail='mode or cmd is not found.')
                 opt['capture_stdout'] = nothread = True
                 opt['stdout_log'] = False
                 return self.exec_cmd(req, res, web, title, opt, nothread)

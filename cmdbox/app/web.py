@@ -200,10 +200,6 @@ class Web:
         if self.signin_file_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if 'signin' in req.session:
-            name = req.session['signin']['name']
-            passwd = req.session['signin']['password']
-            if name in self.signin_file_data and passwd == self.signin_file_data[name]['password']:
-                return None
             # パスルールチェック
             user_groups = req.session['signin']['groups']
             jadge = self.signin_file_data['pathrule']['policy']
@@ -378,8 +374,8 @@ class Web:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "password" not found or empty. ({self.signin_file})')
                 if 'hash' not in user or user['hash'] == '':
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "hash" not found or empty. ({self.signin_file})')
-                if user['hash'] not in ['plain', 'md5', 'sha1', 'sha256']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. Algorithms not supported. ({self.signin_file}). hash={user["hash"]} "plain", "md5", "sha1", "sha256" only.')
+                if user['hash'] not in ['oauth2', 'plain', 'md5', 'sha1', 'sha256']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. Algorithms not supported. ({self.signin_file}). hash={user["hash"]} "oauth2", "plain", "md5", "sha1", "sha256" only.')
                 if 'groups' not in user or type(user['groups']) is not list:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found or not list type. ({self.signin_file})')
                 if len([ug for ug in user['groups'] if ug not in groups]) > 0:
@@ -454,6 +450,43 @@ class Web:
                     rule['paths'] = []
                 if type(rule['paths']) is not list:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "paths" not list type in "pathrule.rules". ({self.signin_file})')
+            # oauth2のフォーマットチェック
+            if 'oauth2' not in yml:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "oauth2" not found. ({self.signin_file})')
+            if 'providers' not in yml['oauth2']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "providers" not found in "oauth2". ({self.signin_file})')
+            if 'google' not in yml['oauth2']['providers']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "google" not found in "providers". ({self.signin_file})')
+            if 'enabled' not in yml['oauth2']['providers']['google']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "google". ({self.signin_file})')
+            if type(yml['oauth2']['providers']['google']['enabled']) is not bool:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "google". ({self.signin_file})')
+            if 'client_id' not in yml['oauth2']['providers']['google']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "client_id" not found in "google". ({self.signin_file})')
+            if 'client_secret' not in yml['oauth2']['providers']['google']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "client_secret" not found in "google". ({self.signin_file})')
+            if 'redirect_uri' not in yml['oauth2']['providers']['google']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "redirect_uri" not found in "google". ({self.signin_file})')
+            if 'scope' not in yml['oauth2']['providers']['google']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not found in "google". ({self.signin_file})')
+            if type(yml['oauth2']['providers']['google']['scope']) is not list:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not list type in "google". ({self.signin_file})')
+            if 'github' not in yml['oauth2']['providers']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "github" not found in "providers". ({self.signin_file})')
+            if 'enabled' not in yml['oauth2']['providers']['github']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "github". ({self.signin_file})')
+            if type(yml['oauth2']['providers']['github']['enabled']) is not bool:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "github". ({self.signin_file})')
+            if 'client_id' not in yml['oauth2']['providers']['github']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "client_id" not found in "github". ({self.signin_file})')
+            if 'client_secret' not in yml['oauth2']['providers']['github']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "client_secret" not found in "github". ({self.signin_file})')
+            if 'redirect_uri' not in yml['oauth2']['providers']['github']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "redirect_uri" not found in "github". ({self.signin_file})')
+            if 'scope' not in yml['oauth2']['providers']['github']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not found in "github". ({self.signin_file})')
+            if type(yml['oauth2']['providers']['github']['scope']) is not list:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not list type in "github". ({self.signin_file})')
             # フォーマットチェックOK
             self.signin_file_data = yml
 
@@ -575,10 +608,15 @@ class Web:
             raise ValueError(f"User uid is not number. ({user})")
         if 'name' not in user or user['name'] == '':
             raise ValueError(f"User name is not found or empty. ({user})")
-        if 'password' not in user or user['password'] == '':
-            raise ValueError(f"User password is not found or empty. ({user})")
         if 'hash' not in user or user['hash'] == '':
             raise ValueError(f"User hash is not found or empty. ({user})")
+        hash = user['hash']
+        if hash!='oauth2' and ('password' not in user or user['password'] == ''):
+            raise ValueError(f"User password is not found or empty. ({user})")
+        if 'email' not in user:
+            raise ValueError(f"User email is not found. ({user})")
+        if hash=='oauth2' and (user['email'] is None or user['email']==''):
+            raise ValueError(f"Required when `email` is `oauth2`. ({user})")
         if 'groups' not in user or type(user['groups']) is not list:
             raise ValueError(f"User groups is not found or empty. ({user})")
         for gn in user['groups']:
@@ -588,9 +626,10 @@ class Web:
             raise ValueError(f"User uid is already exists. ({user})")
         if len([u for u in self.signin_file_data['users'] if u['name'] == user['name']]) > 0:
             raise ValueError(f"User name is already exists. ({user})")
-        if user['hash'] not in ['plain', 'md5', 'sha1', 'sha256']:
+        if hash not in ['oauth2', 'plain', 'md5', 'sha1', 'sha256']:
             raise ValueError(f"User hash is not supported. ({user})")
-        user['password'] = common.hash_password(user['password'], user['hash'])
+        if hash != 'plain':
+            user['password'] = common.hash_password(user['password'], hash if hash != 'oauth2' else 'sha1')
         self.signin_file_data['users'].append(user)
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -619,6 +658,11 @@ class Web:
             raise ValueError(f"User name is not found or empty. ({user})")
         if 'hash' not in user or user['hash'] == '':
             raise ValueError(f"User hash is not found or empty. ({user})")
+        if 'email' not in user:
+            raise ValueError(f"User email is not found. ({user})")
+        hash = user['hash']
+        if hash=='oauth2' and (user['email'] is None or user['email']==''):
+            raise ValueError(f"Required when `email` is `oauth2`. ({user})")
         if 'groups' not in user or type(user['groups']) is not list:
             raise ValueError(f"User groups is not found or empty. ({user})")
         for gn in user['groups']:
@@ -628,13 +672,13 @@ class Web:
             raise ValueError(f"User uid is not found. ({user})")
         if len([u for u in self.signin_file_data['users'] if u['name'] == user['name']]) <= 0:
             raise ValueError(f"User name is not found. ({user})")
-        if user['hash'] not in ['plain', 'md5', 'sha1', 'sha256']:
+        if hash not in ['oauth2', 'plain', 'md5', 'sha1', 'sha256']:
             raise ValueError(f"User hash is not supported. ({user})")
         for u in self.signin_file_data['users']:
             if u['uid'] == user['uid']:
                 u['name'] = user['name']
-                if 'password' in user and user['password'] != '':
-                    u['password'] = common.hash_password(user['password'], user['hash'])
+                if 'password' in user and user['password'] != '' and hash != 'plain':
+                    u['password'] = common.hash_password(user['password'], hash if hash != 'oauth2' else 'sha1')
                 u['hash'] = user['hash']
                 u['groups'] = user['groups']
         if self.signin_file is None:
@@ -905,6 +949,7 @@ class ThreadedUvicorn:
         self.thread = threading.Thread(daemon=True, target=self.server.run)
 
     def start(self):
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         self.thread.start()
         asyncio.run(self.wait_for_started())
 

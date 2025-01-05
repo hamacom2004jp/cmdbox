@@ -33,7 +33,10 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                 if signin is not None:
                     raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
                 opt = None
-                if req.headers.get('content-type').startswith('multipart/form-data'):
+                content_type = req.headers.get('content-type')
+                if content_type is None:
+                    opt = self.load_pipe(web, title)
+                if content_type.startswith('multipart/form-data'):
                     opt = self.load_pipe(web, title)
                     opt['request_files'] = dict()
                     form = await req.form()
@@ -50,7 +53,7 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                                     tf.flush()
                                     opt['request_files'][fn] = tf.name
                                     if fn == 'input_file': opt['request_files']['stdin'] = False
-                elif req.headers.get('content-type').startswith('application/json'):
+                elif content_type.startswith('application/json'):
                     opt = await req.json()
                 else:
                     opt = self.load_pipe(web, title)

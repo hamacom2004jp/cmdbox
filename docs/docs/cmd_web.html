@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( web mode ) &mdash; cmdbox 2025/01/02 documentation</title>
+  <title>Command Reference ( web mode ) &mdash; cmdbox 2025/01/05 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=56c4699f" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=9520652c"></script>
+      <script src="../_static/documentation_options.js?v=5ea9f5e1"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -517,13 +517,17 @@
 </tr>
 <tr class="row-even"><td><p>--user_pass_hash &lt;hash algorithm&gt;</p></td>
 <td></td>
-<td><p>Specifies the hash algorithm for user passwords.'plain', 'md5', 'sha1', and 'sha256' can be specified.</p></td>
+<td><p>Specifies the hash algorithm for user passwords.'oauth2', 'plain', 'md5', 'sha1', and 'sha256' can be specified.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--user_group &lt;user group&gt;</p></td>
+<tr class="row-odd"><td><p>--user_email &lt;user email&gt;</p></td>
+<td></td>
+<td><p>Specify the user email. Required when <cite>user_pass_hash</cite> is <cite>oauth2</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p>--user_group &lt;user group&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specifies the groups to which the user belongs.</p></td>
 </tr>
-<tr class="row-even"><td><p>--signin_file &lt;user list file&gt;</p></td>
+<tr class="row-odd"><td><p>--signin_file &lt;user list file&gt;</p></td>
 <td></td>
 <td><p>Specify a file containing users and passwords with which they can signin.</p></td>
 </tr>
@@ -625,13 +629,17 @@
 </tr>
 <tr class="row-even"><td><p>--user_pass_hash &lt;hash algorithm&gt;</p></td>
 <td></td>
-<td><p>Specifies the hash algorithm for user passwords.'plain', 'md5', 'sha1', and 'sha256' can be specified.</p></td>
+<td><p>Specifies the hash algorithm for user passwords.'oauth2', 'plain', 'md5', 'sha1', and 'sha256' can be specified.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--user_group &lt;user group&gt;</p></td>
+<tr class="row-odd"><td><p>--user_email &lt;user email&gt;</p></td>
+<td></td>
+<td><p>Specify the user email. Required when <cite>user_pass_hash</cite> is <cite>oauth2</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p>--user_group &lt;user group&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specifies the groups to which the user belongs.</p></td>
 </tr>
-<tr class="row-even"><td><p>--signin_file &lt;user list file&gt;</p></td>
+<tr class="row-odd"><td><p>--signin_file &lt;user list file&gt;</p></td>
 <td></td>
 <td><p>Specify a file containing users and passwords with which they can signin.</p></td>
 </tr>

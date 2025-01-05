@@ -45,6 +45,14 @@ $(() => {
     if (remember) {
         $(selecter_remember).prop('checked', true);
     }
+    $('.btn-google').off('click').on('click', async (event) => {
+        const path = window.location.pathname.replace('/signin', '');
+        window.location.href = `../oauth2/google${path}?n=${cmdbox.randam_string(8)}`;
+    });
+    $('.btn-github').off('click').on('click', async (event) => {
+        const path = window.location.pathname.replace('/signin', '');
+        window.location.href = `../oauth2/github${path}?n=${cmdbox.randam_string(8)}`;
+    });
     if (window.location.search) {
         const params = new URLSearchParams(window.location.search);
         if (params.has('error')) {

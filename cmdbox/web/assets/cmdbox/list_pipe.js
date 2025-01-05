@@ -70,13 +70,14 @@ list_pipe_func_then = () => {
                 }
             });
             $('#cmd_del').show();
-            pipe_modal.find('[name="title"]').attr('readonly', true);
+            pipe_modal.find('[name="title_disabled"]').val(pipe_modal.find('[name="title"]').hide().val()).show();
         } else {
             // 新規パイプラインファイルの作成
             modal_title = 'New Pipeline';
             $('#cmd_del').hide();
             pipe_modal.find('[name="title"]').val('');
-            pipe_modal.find('[name="title"]').attr('readonly', false);
+            pipe_modal.find('[name="title"]').css('border-top-right-radius','6px').css('border-bottom-right-radius','6px').show();
+            pipe_modal.find('[name="title_disabled"]').val('').hide();
             pipe_modal.find('[name="description"]').val('');
             const py_list_cmd = await list_cmd(null);
             cmd_select_template_func(pipe_modal.find('.row_content_common .row_content .add_buton'), py_list_cmd)
