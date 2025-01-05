@@ -148,70 +148,92 @@ args:
 
 ```yml
 users:
-  - uid: 1
-    name: admin
-    password: XXXXXXXX
-    hash: plain
-    groups: [admin]
-  - uid: 101
-    name: user01
-    password: XXXXXXXX
-    hash: md5
-    groups: [user]
-  - uid: 102
-    name: user02
-    password: XXXXXXXX
-    hash: sha1
-    groups: [readonly]
-  - uid: 103
-    name: user03
-    password: XXXXXXXX
-    hash: sha256
-    groups: [editor]
+- uid: 1
+  name: admin
+  password: XXXXXXXXXXX
+  hash: plain
+  groups: [admin]
+  email: admin@aaa.bbb.jp
+- uid: 101
+  name: user01
+  password: XXXXXXXXXXX
+  hash: md5
+  groups: [user]
+  email: user01@aaa.bbb.jp
+- uid: 102
+  name: user02
+  password: XXXXXXXXXXX
+  hash: sha1
+  groups: [readonly]
+  email: user02@aaa.bbb.jp
+- uid: 103
+  name: user03
+  password: XXXXXXXXXXX
+  hash: sha256
+  groups: [editor]
+  email: user03@aaa.bbb.jp
 groups:
-  - gid: 1
-    name: admin
-  - gid: 101
-    name: user
-  - gid: 102
-    name: readonly
-    parent: user
-  - gid: 103
-    name: editor
-    parent: user
+- gid: 1
+  name: admin
+- gid: 101
+  name: user
+- gid: 102
+  name: readonly
+  parent: user
+- gid: 103
+  name: editor
+  parent: user
 cmdrule:
   policy: deny # allow, deny
   rules:
-    - groups: [admin]
-      rule: allow
-    - groups: [user]
-      mode: client
-      cmds: [file_download, file_list, server_info, time]
-      rule: allow
-    - groups: [user]
-      mode: server
-      cmds: [list, time]
-      rule: allow
-    - groups: [editor]
-      mode: client
-      cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
-      rule: allow
+  - groups: [admin]
+    rule: allow
+  - groups: [user]
+    mode: client
+    cmds: [file_download, file_list, server_info]
+    rule: allow
+  - groups: [user]
+    mode: server
+    cmds: [list]
+    rule: allow
+  - groups: [editor]
+    mode: client
+    cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
+    rule: allow
 pathrule:
   policy: deny # allow, deny
   rules:
-    - groups: [admin]
-      paths: [/]
-      rule: allow
-    - groups: [user]
-      paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout,
-              /exec_cmd, /exec_pipe, /filer, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used, /versions_sample]
-      rule: allow
-    - groups: [readonly]
-      paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
-      rule: deny
-    - groups: [editor]
-      paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
-      rule: allow
+  - groups: [admin]
+    paths: [/]
+    rule: allow
+  - groups: [user]
+    paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout,
+            /exec_cmd, /exec_pipe, /filer, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
+    rule: allow
+  - groups: [readonly]
+    paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
+    rule: deny
+  - groups: [editor]
+    paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
+    rule: allow
+oauth2:
+  providers:
+    google:
+      enabled: false
+      client_id: XXXXXXXXXXX
+      client_secret: XXXXXXXXXXX
+      redirect_uri: https://localhost:8443/oauth2/google/callback
+      scope: ['email']
+      note:
+      - https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest
+    github:
+      enabled: false
+      client_id: XXXXXXXXXXX
+      client_secret: XXXXXXXXXXX
+      redirect_uri: https://localhost:8443/oauth2/github/callback
+      scope: ['user:email']
+      note:
+      - https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes
 ```
 
 - See the documentation for references to each file.

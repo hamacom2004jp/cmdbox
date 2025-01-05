@@ -4,6 +4,9 @@
 Tutorial
 **************
 
+How to run the cmdbox sample project in VSCode
+======================================================
+
 - Open the `.sample/sample_project` folder in the current directory with VSCode.
 
 .. image:: ../static/ss/readme001.png
@@ -59,6 +62,7 @@ How to implement a new command using cmdbox
 - Under the `sample/app/features/cli` folder, you will find an implementation of the `client_time` mentioned earlier.
 - The implementation is as follows. (Slightly abbreviated display)
 - Create the following code and save it in the `sample/app/features/cli` folder.
+- See `sample_client_time.py` .
 
 .. code-block:: python
 
@@ -95,6 +99,141 @@ How to implement a new command using cmdbox
             if 'success' not in ret:
                 return 1, ret, None
             return 0, ret, None
+
+- You can also add commands to be executed on the server side.
+- The commands are sent to the server via Redis.
+- This mechanism allows multiple servers to process the data, thereby increasing throughput.
+- See `sample_server_time` .
+
+.. code-block:: python
+
+    from cmdbox.app import common, client, feature
+    from cmdbox.app.commons import redis_client
+    from pathlib import Path
+    from typing import Dict, Any, Tuple, Union, List
+    import argparse
+    import datetime
+    import logging
+
+
+    class ServerTime(feature.Feature):
+        def get_mode(self) -> Union[str, List[str]]:
+            """
+            この機能のモードを返します
+
+            Returns:
+                Union[str, List[str]]: モード
+            """
+            return "server"
+
+        def get_cmd(self):
+            """
+            この機能のコマンドを返します
+
+            Returns:
+                str: コマンド
+            """
+            return 'time'
+
+        def get_option(self):
+            """
+            この機能のオプションを返します
+
+            Returns:
+                Dict[str, Any]: オプション
+            """
+            return dict(
+                type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+                discription_ja="サーバー側の現在時刻を表示します。",
+                discription_en="Displays the current time at the server side.",
+                choice=[
+                    dict(opt="host", type="str", default=self.default_host, required=True, multi=False, hide=True, choice=None,
+                            discription_ja="Redisサーバーのサービスホストを指定します。",
+                            discription_en="Specify the service host of the Redis server."),
+                    dict(opt="port", type="int", default=self.default_port, required=True, multi=False, hide=True, choice=None,
+                            discription_ja="Redisサーバーのサービスポートを指定します。",
+                            discription_en="Specify the service port of the Redis server."),
+                    dict(opt="password", type="str", default=self.default_pass, required=True, multi=False, hide=True, choice=None,
+                            discription_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
+                            discription_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
+                    dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choice=None,
+                            discription_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
+                            discription_en="Specify the service name of the inference server. If omitted, `server` is used."),
+                    dict(opt="timedelta", type="int", default=9, required=False, multi=False, hide=False, choice=None,
+                            discription_ja="時差の時間数を指定します。",
+                            discription_en="Specify the number of hours of time difference."),
+                    dict(opt="retry_count", type="int", default=3, required=False, multi=False, hide=True, choice=None,
+                            discription_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",
+                            discription_en="Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."),
+                    dict(opt="retry_interval", type="int", default=5, required=False, multi=False, hide=True, choice=None,
+                            discription_ja="Redisサーバーに再接続までの秒数を指定します。",
+                            discription_en="Specifies the number of seconds before reconnecting to the Redis server."),
+                    dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choice=None,
+                            discription_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
+                            discription_en="Specify the maximum waiting time until the server responds."),
+                ])
+
+        def get_svcmd(self):
+            """
+            この機能のサーバー側のコマンドを返します
+
+            Returns:
+                str: サーバー側のコマンド
+            """
+            return 'server_time'
+
+        def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+            """
+            この機能の実行を行います
+
+            Args:
+                logger (logging.Logger): ロガー
+                args (argparse.Namespace): 引数
+                tm (float): 実行開始時間
+                pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報
+
+            Returns:
+                Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
+            """
+            cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
+            ret = cl.redis_cli.send_cmd(self.get_svcmd(), [str(args.timedelta)],
+                                        retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
+            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            if 'success' not in ret:
+                return 1, ret, None
+            return 0, ret, None
+
+        def is_cluster_redirect(self):
+            """
+            クラスター宛のメッセージの場合、メッセージを転送するかどうかを返します
+
+            Returns:
+                bool: メッセージを転送する場合はTrue
+            """
+            return False
+
+        def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
+                sessions:Dict[str, Dict[str, Any]]) -> int:
+            """
+            この機能のサーバー側の実行を行います
+
+            Args:
+                data_dir (Path): データディレクトリ
+                logger (logging.Logger): ロガー
+                redis_cli (redis_client.RedisClient): Redisクライアント
+                msg (List[str]): 受信メッセージ
+                sessions (Dict[str, Dict[str, Any]]): セッション情報
+            
+            Returns:
+                int: 終了コード
+            """
+            td = 9 if msg[2] == None else int(msg[2])
+            tz = datetime.timezone(datetime.timedelta(hours=td))
+            dt = datetime.datetime.now(tz)
+            ret = dict(success=dict(data=dt.strftime('%Y-%m-%d %H:%M:%S')))
+            redis_cli.rpush(msg[1], ret)
+            return self.RESP_SCCESS
+
 
 - Open the file `sample/extensions/features.yml`. The file should look something like this.
 - This file specifies where new commands are to be read.
@@ -133,72 +272,128 @@ How to implement a new command using cmdbox
 - This file manages the users and groups that are allowed Web access and their rules.
 - The rule of the previous command is `allow` for users in the `user` group in `cmdrule.rules`.
 
-
 .. code-block:: yaml
 
     users:
-    - uid: 1
-        name: admin
-        password: XXXXXXXX
-        hash: plain
-        groups: [admin]
-    - uid: 101
-        name: user01
-        password: XXXXXXXX
-        hash: md5
-        groups: [user]
-    - uid: 102
-        name: user02
-        password: XXXXXXXX
-        hash: sha1
-        groups: [readonly]
-    - uid: 103
-        name: user03
-        password: XXXXXXXX
-        hash: sha256
-        groups: [editor]
+        - uid: 1
+            name: admin
+            password: XXXXXXXXXXX
+            hash: plain
+            groups: [admin]
+            email: admin@aaa.bbb.jp
+        - uid: 101
+            name: user01
+            password: XXXXXXXXXXX
+            hash: md5
+            groups: [user]
+            email: user01@aaa.bbb.jp
+        - uid: 102
+            name: user02
+            password: XXXXXXXXXXX
+            hash: sha1
+            groups: [readonly]
+            email: user02@aaa.bbb.jp
+        - uid: 103
+            name: user03
+            password: XXXXXXXXXXX
+            hash: sha256
+            groups: [editor]
+            email: user03@aaa.bbb.jp
     groups:
-    - gid: 1
-        name: admin
-    - gid: 101
-        name: user
-    - gid: 102
-        name: readonly
-        parent: user
-    - gid: 103
-        name: editor
-        parent: user
+        - gid: 1
+            name: admin
+        - gid: 101
+            name: user
+        - gid: 102
+            name: readonly
+            parent: user
+        - gid: 103
+            name: editor
+            parent: user
     cmdrule:
-    policy: deny # allow, deny
-    rules:
-        - groups: [admin]
-        rule: allow
-        - groups: [user]
-        mode: client
-        cmds: [file_download, file_list, server_info, time]
-        rule: allow
-        - groups: [user]
-        mode: server
-        cmds: [list, time]
-        rule: allow
-        - groups: [editor]
-        mode: client
-        cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
-        rule: allow
+        policy: deny # allow, deny
+        rules:
+            - groups: [admin]
+                rule: allow
+            - groups: [user]
+                mode: client
+                cmds: [file_download, file_list, server_info]
+                rule: allow
+            - groups: [user]
+                mode: server
+                cmds: [list]
+                rule: allow
+            - groups: [editor]
+                mode: client
+                cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
+                rule: allow
     pathrule:
-    policy: deny # allow, deny
-    rules:
-        - groups: [admin]
-        paths: [/]
-        rule: allow
-        - groups: [user]
-        paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout,
-                /exec_cmd, /exec_pipe, /filer, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used, /versions_sample]
-        rule: allow
-        - groups: [readonly]
-        paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
-        rule: deny
-        - groups: [editor]
-        paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
-        rule: allow
+        policy: deny # allow, deny
+        rules:
+            - groups: [admin]
+                paths: [/]
+                rule: allow
+            - groups: [user]
+                paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout,
+                        /exec_cmd, /exec_pipe, /filer, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
+                rule: allow
+            - groups: [readonly]
+                paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
+                rule: deny
+            - groups: [editor]
+                paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
+                rule: allow
+    oauth2:
+        providers:
+            google:
+            enabled: false
+            client_id: XXXXXXXXXXX
+            client_secret: XXXXXXXXXXX
+            redirect_uri: https://localhost:8443/oauth2/google/callback
+            scope: ['email']
+            note:
+                - https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest
+            github:
+            enabled: false
+            client_id: XXXXXXXXXXX
+            client_secret: XXXXXXXXXXX
+            redirect_uri: https://localhost:8443/oauth2/github/callback
+            scope: ['user:email']
+            note:
+                - https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes
 
+How to edit users and groups in Web mode
+======================================================
+
+- Open the `http://localhost:8081/gui` screen in the browser.
+- Enter `admin / admin` for the initial ID and PW to sign in.
+- Select `Users` from the `Tool` menu.
+
+.. image:: ../static/ss/readme008.png
+   :alt: 'image'
+
+- Users and groups can be edited on this screen.
+- Command rules and path rules can also be checked.
+
+.. image:: ../static/ss/readme009.png
+   :alt: 'image'
+
+- If you specify `oauth2` in the `hash` field, you can set the user to have OAuth2 authentication enabled.
+
+.. image:: ../static/ss/readme010.png
+   :alt: 'image'
+
+- To enable `oauth2` in the cmdbox, set the `oauth2` entry in `.sample/user_list.yml`.
+- Below is an example of Google and GitHub settings.
+- `oauth2/providers/google/enabled` と `oauth2/providers/github/enabled` を `true` に設定します。
+- The `client_id` and `client_secret` should be obtained and set in each provider's configuration screen.
+- The `redirect_uri` should be set to accept in each provider's configuration screen.
+- The `scope` is basically unchanged.
+
+.. image:: ../static/ss/readme011.png
+   :alt: 'image'
+
+- Restart web mode and open `http://localhost:8081/gui` to see the OAuth2 authentication button.
+
+.. image:: ../static/ss/readme012.png
+   :alt: 'image'

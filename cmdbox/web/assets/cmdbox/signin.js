@@ -45,13 +45,21 @@ $(() => {
     if (remember) {
         $(selecter_remember).prop('checked', true);
     }
-    $('.btn-google').off('click').on('click', async (event) => {
+    const btn_google = $('.btn-google');
+    const btn_github = $('.btn-github');
+    btn_google.off('click').on('click', async (event) => {
         const path = window.location.pathname.replace('/signin', '');
         window.location.href = `../oauth2/google${path}?n=${cmdbox.randam_string(8)}`;
     });
-    $('.btn-github').off('click').on('click', async (event) => {
+    btn_github.off('click').on('click', async (event) => {
         const path = window.location.pathname.replace('/signin', '');
         window.location.href = `../oauth2/github${path}?n=${cmdbox.randam_string(8)}`;
+    });
+    oauth2_enabled().then((res) => {
+        if (res.google) btn_google.show();
+        else btn_google.hide();
+        if (res.github) btn_github.show();
+        else btn_github.hide();
     });
     if (window.location.search) {
         const params = new URLSearchParams(window.location.search);
@@ -69,5 +77,9 @@ const get_client_data = async () => {
 }
 const bbforce_cmd = async () => {
     const res = await fetch('bbforce_cmd', {method: 'GET'});
+    return await res.json();
+}
+const oauth2_enabled = async () => {
+    const res = await fetch('../oauth2/enabled', {method: 'GET'});
     return await res.json();
 }

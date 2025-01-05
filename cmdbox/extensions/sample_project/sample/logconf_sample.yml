@@ -20,23 +20,11 @@ handlers:
         filename: .logs/sample.log
 
 loggers:
-    client:
+    sample:
         handlers: [sample, std]
         level: INFO
-        qualname: client
-    gui:
-        handlers: [sample, std]
-        level: INFO
-        qualname: gui
-    server:
-        handlers: [sample, std]
-        level: INFO
-        qualname: server
-    web:
-        handlers: [sample, std]
-        level: INFO
-        qualname: web
- 
+        qualname: sample
+
 #root:
 #    handlers: [sample, std]
 #    level: NOTSET
