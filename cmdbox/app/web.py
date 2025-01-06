@@ -12,6 +12,7 @@ import ctypes
 import gevent
 import logging
 import os
+import platform
 import requests
 import queue
 import signal
@@ -148,12 +149,16 @@ class Web:
         if self.signin_file_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if 'Authorization' not in req.headers:
-            return RedirectResponse(url=f'/signin{req.url.path}?error=1')
+            self.logger.warning(f"Authorization not found. headers={req.headers}")
+            return RedirectResponse(url=f'/signin{req.url.path}?error=2')
         auth = req.headers['Authorization']
         if not auth.startswith('Bearer '):
-            return RedirectResponse(url=f'/signin{req.url.path}?error=1')
+            self.logger.warning(f"Bearer not found. headers={req.headers}")
+            return RedirectResponse(url=f'/signin{req.url.path}?error=3')
         bearer, apikey = auth.split(' ')
-        apikey = common.hash_password(apikey, 'sha1')
+        apikey = common.hash_password(apikey.strip(), 'sha1')
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"hashed apikey: {apikey}")
         find_user = None
         for user in self.signin_file_data['users']:
             if 'apikeys' not in user:
@@ -162,12 +167,15 @@ class Web:
                 if apikey == key:
                     find_user = user
         if find_user is None:
-            return RedirectResponse(url=f'/signin{req.url.path}?error=1')
+            self.logger.warning(f"No matching user found for apikey.")
+            return RedirectResponse(url=f'/signin{req.url.path}?error=4')
 
         group_names = list(set(self.correct_group(find_user['groups'])))
         gids = [g['gid'] for g in self.signin_file_data['groups'] if g['name'] in group_names]
         req.session['signin'] = dict(uid=find_user['uid'], name=find_user['name'], password=find_user['password'],
                                      gids=gids, groups=group_names)
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"find user: name={find_user['name']}, group_names={group_names}")
         # パスルールチェック
         user_groups = find_user['groups']
         jadge = self.signin_file_data['pathrule']['policy']
@@ -949,7 +957,8 @@ class ThreadedUvicorn:
         self.thread = threading.Thread(daemon=True, target=self.server.run)
 
     def start(self):
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+        if platform.system() == "Windows":
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         self.thread.start()
         asyncio.run(self.wait_for_started())
 
