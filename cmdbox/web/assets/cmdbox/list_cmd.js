@@ -193,10 +193,12 @@ const list_cmd_func_then = () => {
             py_get_cmd_choices.filter(row => row.hide).forEach((row, i) => add_form_func(i, row, null));
         }
         //row_content.find('is-invalid, is-valid').removeClass('is-invalid').removeClass('is-valid');
+        cmd_modal.find('[name="modal_mode"]').val('');
         cmd_modal.find('[name="cmd"]').off('change');
         cmd_modal.find('[name="cmd"]').change(cmd_change);
         let modal_title = $(e.currentTarget).find('.cmd_title').text();
         if(modal_title != '') {
+            cmd_modal.find('[name="modal_mode"]').val('edit');
             // コマンドファイルの読み込み
             const py_load_cmd = await load_cmd(modal_title);
             cmd_modal.find('[name="mode"]').val(py_load_cmd.mode);
@@ -226,7 +228,8 @@ const list_cmd_func_then = () => {
                 const input_elem = $(elem);
                 input_elem.change();
             });
-            $('#cmd_del').show();
+            cmd_modal.find('#cmd_del').show();
+            cmd_modal.find('#cmd_copy').show();
             cmd_modal.find('[name="title_disabled"]').val(cmd_modal.find('[name="title"]').hide().val()).show();
             cmd_modal.find('[name="mode_disabled"]').val(cmd_modal.find('[name="mode"]').hide().val()).show();
             cmd_modal.find('[name="cmd_disabled"]').val(cmd_modal.find('[name="cmd"]').hide().val()).show();
@@ -235,10 +238,12 @@ const list_cmd_func_then = () => {
             }
             cmd_modal.find('[name="name_disabled"]').val(cmd_modal.find('[name="name"]').hide().val()).show();
         } else {
+            cmd_modal.find('[name="modal_mode"]').val('add');
             // 新規コマンドファイルの作成
             modal_title = 'New Command';
             await mode_change();
-            $('#cmd_del').hide();
+            cmd_modal.find('#cmd_del').hide();
+            cmd_modal.find('#cmd_copy').hide();
             cmd_modal.find('[name="title"]').val('');
             cmd_modal.find('[name="title"]').css('border-top-right-radius','6px').css('border-bottom-right-radius','6px').show();
             cmd_modal.find('[name="title_disabled"]').val('').hide();
@@ -256,6 +261,22 @@ const list_cmd_func_then = () => {
         cmdbox.hide_loading();
     }
     $('.cmd_card').off('click').on('click', cmd_card_func);
+    $('#cmd_copy').off('click').on('click', async () => {
+        const cmd_modal = $('#cmd_modal');
+        modal_title = 'New Command';
+        cmd_modal.find('.modal-title').text(`Command : ${modal_title}`);
+        cmd_modal.find('[name="modal_mode"]').val('add');
+        cmd_modal.find('#cmd_copy').hide();
+        cmd_modal.find('[name="title"]').val(cmd_modal.find('[name="title"]').val() + '_copy');
+        cmd_modal.find('[name="title"]').show();
+        cmd_modal.find('[name="title_disabled"]').val('').hide();
+        cmd_modal.find('[name="mode"]').show();
+        cmd_modal.find('[name="mode_disabled"]').val('').hide();
+        cmd_modal.find('[name="cmd"]').show();
+        cmd_modal.find('[name="cmd_disabled"]').val('').hide();
+        cmd_modal.find('[name="name"]').show();
+        cmd_modal.find('[name="name_disabled"]').val('').hide();
+    });
     // コマンドファイルの保存
     $('#cmd_save').off('click').on('click', async () => {
         const cmd_modal = $('#cmd_modal');
@@ -320,6 +341,7 @@ const get_param = (modal_elem) => {
     modal_elem.find('.is-invalid, .is-valid').removeClass('is-invalid').removeClass('is-valid');
     const opt = {};
     const title = modal_elem.find('[name="title"]').val();
+    opt["modal_mode"] = modal_elem.find('[name="modal_mode"]').val();
     opt["mode"] = modal_elem.find('[name="mode"]').val();
     opt["cmd"] = modal_elem.find('[name="cmd"]').val();
     if(!opt["mode"]) delete opt["mode"];

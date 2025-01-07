@@ -36,10 +36,11 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 elif content_type.startswith('multipart/form-data'):
                     opt = self.load_cmd(web, title)
                     form = await req.form()
-                    files = {key: value for key, value in form.items() if isinstance(value, UploadFile)}
-                    for fn in files.keys():
-                        opt[fn] = files[fn].file
-                        if fn == 'input_file': opt['stdin'] = False
+                    #files = {key: value for key, value in form.multi_items() if isinstance(value, UploadFile)}
+                    for key, fv in form.multi_items():
+                        if not isinstance(fv, UploadFile): continue
+                        opt[key] = fv.file
+                        if key == 'input_file': opt['stdin'] = False
                 elif content_type.startswith('application/json'):
                     opt = await req.json()
                 else:

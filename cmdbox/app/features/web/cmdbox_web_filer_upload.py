@@ -43,10 +43,10 @@ class FilerUpload(cmdbox_web_exec_cmd.ExecCmd):
                    host=q['host'], port=q['port'], password=q['password'], svname=q['svname'],
                    scope=q["scope"], client_data=q['client_data'], orverwrite=('orverwrite' in q))
         form = await req.form()
-        files = {key: value for key, value in form.items() if isinstance(value, UploadFile)}
-        for fn in files.keys():
-            with tempfile.TemporaryDirectory() as tmpdir:
-                raw_filename = files[fn].filename.replace('\\','/').replace('//','/')
+        with tempfile.TemporaryDirectory() as tmpdir:
+            for _, fv in form.multi_items():
+                if not isinstance(fv, UploadFile): continue
+                raw_filename = fv.filename.replace('\\','/').replace('//','/')
                 raw_filename = raw_filename if not raw_filename.startswith('/') else raw_filename[1:]
                 upload_file:Path = Path(tmpdir) / raw_filename
                 if not upload_file.parent.exists():
@@ -54,7 +54,7 @@ class FilerUpload(cmdbox_web_exec_cmd.ExecCmd):
                 opt['svpath'] = str(svpath / Path(raw_filename).parent)
                 opt['upload_file'] = str(upload_file).replace('"','')
                 opt['capture_stdout'] = True
-                shutil.copyfileobj(files[fn].file, Path(opt['upload_file']).open('wb'))
+                shutil.copyfileobj(fv.file, Path(opt['upload_file']).open('wb'))
                 ret = self.exec_cmd(req, res, web, "file_upload", opt, nothread=True)
                 if type(ret) is dict and 'success' not in ret:
                     return str(ret)

@@ -41,5 +41,11 @@ class SaveCmd(feature.WebFeature):
             return dict(warn=f'The title contains invalid characters."{title}"')
         opt_path = web.cmds_path / f"cmd-{title}.json"
         web.logger.info(f"save_cmd: opt_path={opt_path}, opt={opt}")
+        modal_mode = opt.get('modal_mode', False)
+        if modal_mode == 'add' and opt_path.exists():
+            return dict(warn=f'Command "{title}" already exists')
+        if 'title_disabled' in opt: del opt['title_disabled']
+        if 'cmd_disabled' in opt: del opt['cmd_disabled']
+        if 'name_disabled' in opt: del opt['name_disabled']
         common.saveopt(opt, opt_path)
         return dict(success=f'Command "{title}" saved in "{opt_path}".')

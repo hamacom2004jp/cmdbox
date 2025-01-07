@@ -40,7 +40,7 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                     opt = self.load_pipe(web, title)
                     opt['request_files'] = dict()
                     form = await req.form()
-                    files = {key: value for key, value in form.items() if isinstance(value, UploadFile)}
+                    files = {key: value for key, value in form.multi_items() if isinstance(value, UploadFile)}
                     for cmd_title in opt['pipe_cmd']:
                         if cmd_title == '':
                             continue
