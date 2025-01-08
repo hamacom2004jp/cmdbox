@@ -436,7 +436,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
               + `<td><img src="assets/tree-menu/image/${png}"></td>`
               + '<td>'
                 + '<div class="droudown">'
-                  + `<a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">${_n['name']}</a>`
+                  + `<a class="dropdown-toggle" href="#">${_n['name']}</a>`
                   + '<ul class="dropdown-menu"/>'
                 + '</div>'
               + '</td>'
@@ -473,6 +473,22 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
           tr.find('.move').off('click').on('click', mk_move(_t, _p, _e, _n["is_dir"], _l));
           tr.find('.view').off('click').on('click', mk_view(_p, tr.find('.mime_type').text(), tr.find('.file_size').text(), _l));
           tr.find('.edit').off('click').on('click', mk_editer(_p, tr.find('.mime_type').text(), tr.find('.file_size').text(), _l));
+          tr.find('.droudown').off('contextmenu').on('contextmenu', (e) => {
+            target.find('.dropdown-menu').hide();
+            const fl = target.find('.file-list');
+            //tr.find('.dropdown-menu').css('top', `calc(${e.pageY}px - ${fl.css('top')})`).css('left', `calc(${e.pageX}px - ${fl.css('left')})`).show();
+            tr.find('.dropdown-menu').show();
+            e.preventDefault();
+            return false;
+          });
+          if (_n["is_dir"]) {
+            tr.find('.dropdown-toggle').off('click').on('click', mk_tree(_t, _p, _e, _l));
+          }
+          tr.off('contextmenu').on('contextmenu', (e) => {
+            target.find('.dropdown-menu').hide();
+            e.preventDefault();
+            return false;
+          });
           return tr;
         };
         // ディレクトリを先に表示
@@ -489,6 +505,30 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
         });
       }
     });
+    const fl_elem = target.find('.file-list').off('contextmenu').on('contextmenu', (e) => {
+      target.find('.file-list-dropdown-menu').css('top', e.offsetY).css('left', e.offsetX).show();
+      //e.preventDefault();
+      return false;
+    }).off('click').on('click', (e) => {
+      target.find('.dropdown-menu').hide();
+    });
+    const ul_elem = $('<ul class="dropdown-menu file-list-dropdown-menu"/>');
+    fl_elem.append(ul_elem);
+    ul_elem.append($('<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>'));
+    // フォルダ作成関数の生成
+    const _mk_mkdir = (_t, _e, _l) => {return ()=>{
+      const _p = _t.find('.filer_address').val();
+      //_p = _p.substring(0, _p.lastIndexOf('/')+1);
+      const prompt_text = prompt('Enter a new folder name.');
+      if(prompt_text) {
+        const exec_cmd = _l ? fsapi.local_exec_cmd : cmdbox.sv_exec_cmd;
+        cmdbox.file_mkdir(fsapi.right, `${_p=="/"?"":_p}/${prompt_text}`.replace("//","/"), undefined, exec_cmd).then(res => {
+          cmdbox.hide_loading();
+          fsapi.tree(_t, res['path'], _e, _l);
+        });
+      }
+    }};
+    ul_elem.find('.mkdir').off('click').on('click', _mk_mkdir(target, current_ul_elem, is_local));
   }).catch((e) => {
     console.log(e);
   }).finally(() => {

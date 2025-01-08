@@ -10,23 +10,39 @@ const view_raw_func = (title, result) => {
     table.append(table_body);
     result_modal.find('.modal-body').append(table);
     // list型の結果をテーブルに変換
-    list2table = (data, table_head, table_body) => {
+    list2table = (data, title, table_head, table_body) => {
         data.forEach((row,i) => {
             const tr = $('<tr></tr>');
             if (typeof row === 'string'){
                 tr.append($(`<td>${row}</td>`));
             }
             else {
-                Object.entries(row).forEach(([key, val]) => {
+                let found = false;
+                for (const [key, val] of Object.entries(row)) {
                     if(i==0) {
                         table_head.append($(`<th scope="col">${key}</th>`));
                     }
+                    try {
+                        if (found) {
+                            const url = URL.parse(val.replace('curl ', ''));
+                            url.host = window.location.host;
+                            const td = $('<td>curl </td>').appendTo(tr);
+                            const anc = $(`<a href="#">${url.href}</a>`).appendTo(td);
+                            anc.off('click').on('click', (e) => {
+                                if (!window.confirm(`May I execute '${title}' ?`)) return;
+                                window.open(url.href, '_blank');
+                            });
+                            found = false;
+                            continue;
+                        }
+                        if (val == 'curlcmd') found = true;
+                    } catch (e) {}
                     tr.append($(`<td>${val}</td>`));
-                });
+                }
             }
             table_body.append(tr);
         });
     }
-    list2table(result, table_head, table_body);
+    list2table(result, title, table_head, table_body);
     result_modal.modal('show');
 }

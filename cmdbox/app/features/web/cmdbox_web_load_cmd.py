@@ -39,4 +39,9 @@ class LoadCmd(cmdbox_web_gui.Gui):
         opt_path = web.cmds_path / f"cmd-{title}.json"
         if web.logger.level == logging.DEBUG:
             web.logger.debug(f"web.load_cmd: title={title}, opt_path={opt_path}")
-        return common.loadopt(opt_path)
+        opt = common.loadopt(opt_path)
+        if 'title_disabled' in opt: del opt['title_disabled']
+        if 'cmd_disabled' in opt: del opt['cmd_disabled']
+        if 'name_disabled' in opt: del opt['name_disabled']
+        if 'modal_mode' in opt: del opt['modal_mode']
+        return opt

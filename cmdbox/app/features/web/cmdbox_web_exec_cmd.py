@@ -31,10 +31,16 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
                 opt = None
                 content_type = req.headers.get('content-type')
+                def _marge_opt(opt, param):
+                    for k in opt.keys():
+                        if k in param: opt[k] = param[k]
+                    return opt
                 if content_type is None:
                     opt = self.load_cmd(web, title)
+                    opt = _marge_opt(opt, req.query_params)
                 elif content_type.startswith('multipart/form-data'):
                     opt = self.load_cmd(web, title)
+                    opt = _marge_opt(opt, req.query_params)
                     form = await req.form()
                     #files = {key: value for key, value in form.multi_items() if isinstance(value, UploadFile)}
                     for key, fv in form.multi_items():
@@ -45,6 +51,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     opt = await req.json()
                 else:
                     opt = self.load_cmd(web, title)
+                    opt = _marge_opt(opt, req.query_params)
                 if 'mode' not in opt or 'cmd' not in opt:
                     raise HTTPException(status_code=404, detail='mode or cmd is not found.')
                 opt['capture_stdout'] = nothread = True
