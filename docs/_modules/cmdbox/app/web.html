@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.web &mdash; cmdbox 2025/01/08 documentation</title>
+  <title>cmdbox.app.web &mdash; cmdbox 2025/01/09 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=56c4699f" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=25335850"></script>
+      <script src="../../../_static/documentation_options.js?v=814bdc49"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -1004,7 +1004,7 @@
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.start">[docs]</a>
     <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">allow_host</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">listen_port</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">8081</span><span class="p">,</span> <span class="n">ssl_listen_port</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">8443</span><span class="p">,</span>
               <span class="n">ssl_cert</span><span class="p">:</span><span class="n">Path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ssl_key</span><span class="p">:</span><span class="n">Path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ssl_keypass</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ssl_ca_certs</span><span class="p">:</span><span class="n">Path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-              <span class="n">session_timeout</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">outputs_key</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">[]):</span>
+              <span class="n">session_domain</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">session_path</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">session_secure</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">session_timeout</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">outputs_key</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">[]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Webサーバを起動する</span>
 
@@ -1016,6 +1016,9 @@
 <span class="sd">            ssl_key (Path, optional): SSL秘密鍵ファイル. Defaults to None.</span>
 <span class="sd">            ssl_keypass (str, optional): SSL秘密鍵パスワード. Defaults to None.</span>
 <span class="sd">            ssl_ca_certs (Path, optional): SSL CA証明書ファイル. Defaults to None.</span>
+<span class="sd">            session_domain (str, optional): セッションドメイン. Defaults to None.</span>
+<span class="sd">            session_path (str, optional): セッションパス. Defaults to &#39;/&#39;.</span>
+<span class="sd">            session_secure (bool, optional): セッションセキュア. Defaults to False.</span>
 <span class="sd">            session_timeout (int, optional): セッションタイムアウト. Defaults to 600.</span>
 <span class="sd">            outputs_key (list, optional): 出力キー. Defaults to [].</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1027,6 +1030,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ssl_keypass</span> <span class="o">=</span> <span class="n">ssl_keypass</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ssl_ca_certs</span> <span class="o">=</span> <span class="n">ssl_ca_certs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outputs_key</span> <span class="o">=</span> <span class="n">outputs_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_domain</span> <span class="o">=</span> <span class="n">session_domain</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_path</span> <span class="o">=</span> <span class="n">session_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_secure</span> <span class="o">=</span> <span class="n">session_secure</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">session_timeout</span> <span class="o">=</span> <span class="n">session_timeout</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: allow_host=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -1037,10 +1043,18 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: ssl_keypass=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ssl_keypass</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: ssl_ca_certs=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ssl_ca_certs</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ssl_ca_certs</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">ssl_ca_certs</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="kc">None</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: outputs_key=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">outputs_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: session_domain=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">session_domain</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: session_path=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">session_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: session_secure=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">session_secure</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: session_timeout=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">session_timeout</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">()</span>
-        <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">SessionMiddleware</span><span class="p">,</span> <span class="n">secret_key</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">random_string</span><span class="p">())</span>
+        <span class="n">mwparam</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">session_path</span><span class="p">,</span> <span class="n">max_age</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">session_timeout</span><span class="p">,</span> <span class="n">secret_key</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">random_string</span><span class="p">())</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mwparam</span><span class="p">[</span><span class="s1">&#39;domain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_domain</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_secure</span><span class="p">:</span>
+            <span class="n">mwparam</span><span class="p">[</span><span class="s1">&#39;https_only&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">SessionMiddleware</span><span class="p">,</span> <span class="o">**</span><span class="n">mwparam</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_webfeatures</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">True</span>

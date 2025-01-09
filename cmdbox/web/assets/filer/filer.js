@@ -391,6 +391,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
         }};
         // ビューアー関数の生成
         const mk_view = (_p, _mime, _size, _l) => {return ()=>{
+          let bigfile = false;
           if (_size.indexOf('G') >= 0 || _size.indexOf('T') >= 0) {
             cmdbox.message({warn: `The file size is too large to view. (${_size})`});
             return;
@@ -399,11 +400,20 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
             if (!window.confirm(`The file size is too large to view. (${_size} > 5M)\nDo you still want to open the Viewer?`)) {
               return;
             }
+            bigfile = true;
           }
           const exec_cmd = _l ? fsapi.local_exec_cmd : cmdbox.sv_exec_cmd;
           cmdbox.file_download(fsapi.right, _p, undefined, exec_cmd).then(res => {
             if(!res) return;
-            fsapi.viewer(_p, res['data'], _mime);
+            if (_l) {
+              if (bigfile) cmdbox.message({warn: `Files that are too large may cause display errors in the viewer.`});
+              fsapi.viewer(_p, res['data'], null, _mime);
+            } else {
+              const opt = cmdbox.get_server_opt(false, fsapi.right);
+              const thum_size = "0";
+              const constr = btoa(`${opt['host']}\t${opt['port']}\t${opt['svname']}\t${opt['password']}\t${encodeURIComponent(_p)}\t${opt['scope']}\t${thum_size}`);
+              fsapi.viewer(_p, res['data'], `filer/download/${constr}?r=${cmdbox.randam_string(8)}`, _mime);
+            }
           }).finally(() => {
             cmdbox.hide_loading();
           });
@@ -631,7 +641,7 @@ fsapi.local_exec_cmd = async (opt) => {
   }
   return {"warn": "Unknown command."}
 };
-fsapi.viewer = (title, data, mime) => {
+fsapi.viewer = (title, data, path, mime) => {
   const viewer = $('#viewer_modal');
   viewer.find('.modal-title').text(title);
   viewer.find('.btn-save').remove();
@@ -639,8 +649,14 @@ fsapi.viewer = (title, data, mime) => {
   viewer_body.html('');
   if (mime.indexOf('image') >= 0) {
     const img = $('<img class="img-fluid" />');
-    img.attr('src', `data:${mime};base64,${data}`);
+    if (path) img.attr('src', path);
+    else img.attr('src', `data:${mime};base64,${data}`);
     viewer_body.append(img);
+  } else if (mime.indexOf('pdf') >= 0) {
+    const pdf = $(`<embed class="w-100 h-100" type="${mime}"></embed>`);
+    if (path) pdf.attr('src', path);
+    else  pdf.attr('src', `data:${mime};base64,${data}`);
+    viewer_body.append(pdf);
   } else {
     cls = '';
     cls = mime == 'application/json' ? 'language-json' : cls;

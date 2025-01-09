@@ -867,7 +867,7 @@ class Web:
 
     def start(self, allow_host:str="0.0.0.0", listen_port:int=8081, ssl_listen_port:int=8443,
               ssl_cert:Path=None, ssl_key:Path=None, ssl_keypass:str=None, ssl_ca_certs:Path=None,
-              session_timeout:int=600, outputs_key:List[str]=[]):
+              session_domain:str=None, session_path:str='/', session_secure:bool=False, session_timeout:int=600, outputs_key:List[str]=[]):
         """
         Webサーバを起動する
 
@@ -879,6 +879,9 @@ class Web:
             ssl_key (Path, optional): SSL秘密鍵ファイル. Defaults to None.
             ssl_keypass (str, optional): SSL秘密鍵パスワード. Defaults to None.
             ssl_ca_certs (Path, optional): SSL CA証明書ファイル. Defaults to None.
+            session_domain (str, optional): セッションドメイン. Defaults to None.
+            session_path (str, optional): セッションパス. Defaults to '/'.
+            session_secure (bool, optional): セッションセキュア. Defaults to False.
             session_timeout (int, optional): セッションタイムアウト. Defaults to 600.
             outputs_key (list, optional): 出力キー. Defaults to [].
         """
@@ -890,6 +893,9 @@ class Web:
         self.ssl_keypass = ssl_keypass
         self.ssl_ca_certs = ssl_ca_certs
         self.outputs_key = outputs_key
+        self.session_domain = session_domain
+        self.session_path = session_path
+        self.session_secure = session_secure
         self.session_timeout = session_timeout
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web start parameter: allow_host={self.allow_host}")
@@ -900,10 +906,18 @@ class Web:
             self.logger.debug(f"web start parameter: ssl_keypass={self.ssl_keypass}")
             self.logger.debug(f"web start parameter: ssl_ca_certs={self.ssl_ca_certs} -> {self.ssl_ca_certs.absolute() if self.ssl_ca_certs is not None else None}")
             self.logger.debug(f"web start parameter: outputs_key={self.outputs_key}")
+            self.logger.debug(f"web start parameter: session_domain={self.session_domain}")
+            self.logger.debug(f"web start parameter: session_path={self.session_path}")
+            self.logger.debug(f"web start parameter: session_secure={self.session_secure}")
             self.logger.debug(f"web start parameter: session_timeout={self.session_timeout}")
 
         app = FastAPI()
-        app.add_middleware(SessionMiddleware, secret_key=common.random_string())
+        mwparam = dict(path=self.session_path, max_age=self.session_timeout, secret_key=common.random_string())
+        if self.session_domain is not None:
+            mwparam['domain'] = self.session_domain
+        if self.session_secure:
+            mwparam['https_only'] = True
+        app.add_middleware(SessionMiddleware, **mwparam)
         self.init_webfeatures(app)
 
         self.is_running = True

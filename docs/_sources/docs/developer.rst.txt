@@ -49,7 +49,7 @@ To install the project, follow these steps:
 
 .. sphinx-build -b gettext docs_src docs_build
 .. sphinx-intl update -p docs_build -l en
-        
+
 How to commit a module
 =========================
 

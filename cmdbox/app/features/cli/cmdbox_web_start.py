@@ -76,6 +76,15 @@ class WebStart(Feature):
                 dict(opt="signin_file", type="file", default=None, required=False, multi=False, hide=True, choice=None,
                      discription_ja="サインイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。",
                      discription_en="Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required."),
+                dict(opt="session_domain", type="str", default=None, required=False, multi=False, hide=True, choice=None,
+                     discription_ja="サインインしたユーザーのセッションが有効なドメインを指定します。",
+                     discription_en="Specify the domain for which the signed-in user's session is valid."),
+                dict(opt="session_path", type="str", default="/", required=False, multi=False, hide=True, choice=None,
+                     discription_ja="サインインしたユーザーのセッションが有効なパスを指定します。",
+                     discription_en="Specify the session timeout in seconds for signed-in users."),
+                dict(opt="session_secure", type="bool", default=False, required=False, multi=False, hide=True, choice=[True, False],
+                     discription_ja="サインインしたユーザーのセッションにSecureフラグを設定します。",
+                     discription_en="Set the Secure flag for the signed-in user's session."),
                 dict(opt="session_timeout", type="int", default="600", required=False, multi=False, hide=True, choice=None,
                      discription_ja="サインインしたユーザーのセッションタイムアウトの時間を秒で指定します。",
                      discription_en="Specify the session timeout in seconds for signed-in users."),
@@ -137,7 +146,9 @@ class WebStart(Feature):
                         assets=args.assets, signin_html=args.signin_html, signin_file=args.signin_file)
             w.start(args.allow_host, args.listen_port, ssl_listen_port=args.ssl_listen_port,
                     ssl_cert=ssl_cert, ssl_key=ssl_key, ssl_keypass=args.ssl_keypass, ssl_ca_certs=ssl_ca_certs,
-                    session_timeout=args.session_timeout, outputs_key=args.outputs_key)
+                    session_domain=args.session_domain, session_path=args.session_path,
+                    session_secure=args.session_secure, session_timeout=args.session_timeout,
+                    outputs_key=args.outputs_key)
             msg = {"success":"web complate."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 0, msg, w

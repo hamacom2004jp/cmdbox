@@ -27,6 +27,8 @@ Management screen startup : `cmdbox -m gui -c start <Option>`
     "--ssl_keypass <SSL Server Private Key Password>","","Specify the composite password for the SSL server private key file."
     "--ssl_ca_certs <SSL Server CA Certificate File>","","Specify the SSL server CA certificate file."
     "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required."
+    "--session_domain <domain>","","Specify the domain for which the signed-in user's session is valid."
+    "--session_path <path>","","Specify the session timeout in seconds for signed-in users."
     "--session_timeout <second>","","Specify the session timeout in seconds for signed-in users."
     "--client_only","","Do not make connections to the server."
     "--outputs_key <output key>","","Specify items to be displayed on the showimg and webcap screens. If omitted, all items are displayed."
