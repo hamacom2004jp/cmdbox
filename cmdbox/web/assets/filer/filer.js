@@ -484,8 +484,8 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
           tr.find('.view').off('click').on('click', mk_view(_p, tr.find('.mime_type').text(), tr.find('.file_size').text(), _l));
           tr.find('.edit').off('click').on('click', mk_editer(_p, tr.find('.mime_type').text(), tr.find('.file_size').text(), _l));
           tr.find('.droudown').off('contextmenu').on('contextmenu', (e) => {
-            target.find('.dropdown-menu').hide();
             const fl = target.find('.file-list');
+            fl.find('.dropdown-menu').hide();
             //tr.find('.dropdown-menu').css('top', `calc(${e.pageY}px - ${fl.css('top')})`).css('left', `calc(${e.pageX}px - ${fl.css('left')})`).show();
             tr.find('.dropdown-menu').show();
             e.preventDefault();
@@ -495,7 +495,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
             tr.find('.dropdown-toggle').off('click').on('click', mk_tree(_t, _p, _e, _l));
           }
           tr.off('contextmenu').on('contextmenu', (e) => {
-            target.find('.dropdown-menu').hide();
+            target.find('.file-list').find('.dropdown-menu').hide();
             e.preventDefault();
             return false;
           });
@@ -516,11 +516,11 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
       }
     });
     const fl_elem = target.find('.file-list').off('contextmenu').on('contextmenu', (e) => {
+      target.find('.file-list').find('.dropdown-menu').hide();
       target.find('.file-list-dropdown-menu').css('top', e.offsetY).css('left', e.offsetX).show();
-      //e.preventDefault();
       return false;
     }).off('click').on('click', (e) => {
-      target.find('.dropdown-menu').hide();
+      target.find('.file-list').find('.dropdown-menu').hide();
     });
     const ul_elem = $('<ul class="dropdown-menu file-list-dropdown-menu"/>');
     fl_elem.append(ul_elem);
