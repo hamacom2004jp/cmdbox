@@ -34,9 +34,14 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                     raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
                 opt = None
                 content_type = req.headers.get('content-type')
+                def _marge_opt(opt, param):
+                    for k in opt.keys():
+                        if k in param: opt[k] = param[k]
+                    return opt
                 if content_type is None:
                     opt = self.load_pipe(web, title)
-                if content_type.startswith('multipart/form-data'):
+                    opt = _marge_opt(opt, req.query_params)
+                elif content_type.startswith('multipart/form-data'):
                     opt = self.load_pipe(web, title)
                     opt['request_files'] = dict()
                     form = await req.form()

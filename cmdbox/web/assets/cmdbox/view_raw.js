@@ -24,9 +24,10 @@ const view_raw_func = (title, result) => {
                     }
                     try {
                         if (found) {
-                            const url = URL.parse(val.replace('curl ', ''));
+                            const url = URL.parse(val.replace(/curl.+[^(http)](https?:\/\/[\w/:%#\$&\?\(\)~\.=\+\-]+)/, '$1'));
                             url.host = window.location.host;
-                            const td = $('<td>curl </td>').appendTo(tr);
+                            const curl = val.replace(/^(curl.+[^(http)])(https?:\/\/[\w/:%#\$&\?\(\)~\.=\+\-]+)/, '$1');
+                            const td = $(`<td>${curl}</td>`).appendTo(tr);
                             const anc = $(`<a href="#">${url.href}</a>`).appendTo(td);
                             anc.off('click').on('click', (e) => {
                                 if (!window.confirm(`May I execute '${title}' ?`)) return;
