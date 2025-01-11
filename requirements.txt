@@ -8,6 +8,7 @@ numpy
 Pillow
 python-multipart
 redis
+requests
 six
 sphinx
 sphinx-rtd-theme

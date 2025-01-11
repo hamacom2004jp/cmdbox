@@ -314,7 +314,8 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
       target.find('.file-list').html('');
       target.find('.file-list').append(table);
       table.append(table_body);
-      const children = node['children'];
+      const upn = {'__':{'name':'..', 'is_dir':true, 'path':node['path'].substring(0, node['path'].lastIndexOf('/')), 'size':0, 'last':''}};
+      const children = {...upn, ...node['children']};
       if(children) {
         // ツリー表示関数の生成
         const mk_tree = (_t, _p, _e, _l) => {return ()=>fsapi.tree(_t, _p, _e, _l)}

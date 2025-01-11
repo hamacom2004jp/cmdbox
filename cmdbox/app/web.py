@@ -336,10 +336,10 @@ class Web:
         def wf_route(pk, prefix, w, app, appcls, ver, logger):
             for wf in module.load_webfeatures(pk, prefix, appcls=appcls, ver=ver, logger=logger):
                 wf.route(self, app)
-                self.filemenu |= wf.filemenu(w)
-                self.toolmenu |= wf.toolmenu(w)
-                self.viewmenu |= wf.viewmenu(w)
-                self.aboutmenu |= wf.aboutmenu(w)
+                self.filemenu = {**self.filemenu, **wf.filemenu(w)}
+                self.toolmenu = {**self.toolmenu, **wf.toolmenu(w)}
+                self.viewmenu = {**self.viewmenu, **wf.viewmenu(w)}
+                self.aboutmenu = {**self.aboutmenu, **wf.aboutmenu(w)}
 
         if self.web_features_packages is not None:
             if self.web_features_prefix is None:

@@ -41,8 +41,12 @@ class CmdBoxApp:
         コマンドライン引数を処理し、サーバーまたはクライアントを起動し、コマンドを実行する。
         """
         smaintime = time.perf_counter()
-        parser = argparse.ArgumentParser(prog=self.ver.__appid__, description=self.ver.__logo__ + '\n\n' + self.ver.__description__,
-                                         formatter_class=argparse.RawDescriptionHelpFormatter, exit_on_error=False)
+        if sys.version_info[0] >= 3 and sys.version_info[1] >= 9:
+            parser = argparse.ArgumentParser(prog=self.ver.__appid__, description=self.ver.__logo__ + '\n\n' + self.ver.__description__,
+                                            formatter_class=argparse.RawDescriptionHelpFormatter, exit_on_error=False)
+        else:
+            parser = argparse.ArgumentParser(prog=self.ver.__appid__, description=self.ver.__logo__ + '\n\n' + self.ver.__description__,
+                                            formatter_class=argparse.RawDescriptionHelpFormatter)
         if args_list is not None and '--debug' in args_list:
             self.default_logger = common.default_logger(True, ver=self.ver, webcall=webcall)
         elif sys.argv is not None and '--debug' in sys.argv:
