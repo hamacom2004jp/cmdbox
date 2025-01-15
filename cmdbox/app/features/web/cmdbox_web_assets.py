@@ -38,5 +38,8 @@ class Assets(feature.WebFeature):
                 if not asset.is_file():
                     raise FileNotFoundError(f'asset is not found. ({asset})')
                 with open(asset, 'rb') as f:
-                    path = Path(asset).relative_to(web.doc_root / 'assets')
+                    try:
+                        path = Path(asset).relative_to(web.doc_root / 'assets')
+                    except ValueError:
+                        path = Path(str(asset)[str(asset).find('assets')+len('assets/'):])
                     asset_func(f.read(), str(path).replace('\\', '/'))

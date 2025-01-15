@@ -61,7 +61,7 @@ class Colors:
 
     _colorize_suffix = S + str(ResetAll) + E
     
-    success_word = re.compile(r"SUCCESS|OK|PASSED|DONE|COMPLETE|START|FINISH|OPEN|CONNECTED|ALLOW", re.IGNORECASE)
+    success_word = re.compile(r"SUCCESS|OK|PASSED|DONE|COMPLETE|START|FINISH|OPEN|CONNECTED|ALLOW|EXEC", re.IGNORECASE)
     warning_word = re.compile(r"WARNING|WARN|CAUTION|NOTICE|STOP|DISCONNECTED|DENY", re.IGNORECASE)
     error_word = re.compile(r"ERROR|ALERT|CRITICAL|FATAL|ABORT|FAILED", re.IGNORECASE)
 

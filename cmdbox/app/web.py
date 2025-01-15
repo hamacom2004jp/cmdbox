@@ -79,6 +79,8 @@ class Web:
                     self.assets += [p for p in asset.glob('**/*') if p.is_file()]
                 elif asset.is_file():
                     self.assets.append(asset)
+                else:
+                    logger.warning(f'assets not found. ({asset})')
         self.signin_html = Path(signin_html) if signin_html is not None else Path(__file__).parent.parent / 'web' / 'signin.html'
         self.signin_file = Path(signin_file) if signin_file is not None else None
         self.gui_html_data = None
@@ -333,8 +335,8 @@ class Web:
         self.viewmenu = dict()
         self.aboutmenu = dict()
         # webfeatureの読込み
-        def wf_route(pk, prefix, w, app, appcls, ver, logger):
-            for wf in module.load_webfeatures(pk, prefix, appcls=appcls, ver=ver, logger=logger):
+        def wf_route(pk, prefix, excludes, w, app, appcls, ver, logger):
+            for wf in module.load_webfeatures(pk, prefix, excludes, appcls=appcls, ver=ver, logger=logger):
                 wf.route(self, app)
                 self.filemenu = {**self.filemenu, **wf.filemenu(w)}
                 self.toolmenu = {**self.toolmenu, **wf.toolmenu(w)}
@@ -347,9 +349,9 @@ class Web:
             if len(self.web_features_prefix) != len(self.web_features_packages):
                 raise ValueError(f"web_features_prefix is not match. web_features_packages={self.web_features_packages}, web_features_prefix={self.web_features_prefix}")
             for i, pn in enumerate(self.web_features_packages):
-                wf_route(pn, self.web_features_prefix[i], self, app, self.appcls, self.ver, self.logger)
-        self.options.load_features_file('web', lambda pk, pn, appcls, ver, logger: wf_route(pk, pn, self, app, appcls, ver, logger), self.appcls, self.ver, self.logger)
-        wf_route("cmdbox.app.features.web", "cmdbox_web_", self, app, self.appcls, self.ver, self.logger)
+                wf_route(pn, self.web_features_prefix[i], [], self, app, self.appcls, self.ver, self.logger)
+        self.options.load_features_file('web', lambda pk, pn, excludes, appcls, ver, logger: wf_route(pk, pn, excludes, self, app, appcls, ver, logger), self.appcls, self.ver, self.logger)
+        wf_route("cmdbox.app.features.web", "cmdbox_web_", [], self, app, self.appcls, self.ver, self.logger)
         # 読込んだrouteの内容をログに出力
         if self.logger.level == logging.DEBUG:
             for route in app.routes:

@@ -254,20 +254,21 @@ class Options:
             self._options["mode"][key] = mode
             self._options["mode"]["choice"] += [mode]
 
-    def load_svcmd(self, package_name:str, prefix:str="cmdbox_", appcls=None, ver=None, logger:logging.Logger=None):
+    def load_svcmd(self, package_name:str, prefix:str="cmdbox_", excludes:list=[], appcls=None, ver=None, logger:logging.Logger=None):
         """
         指定されたパッケージの指定された接頭語を持つモジュールを読み込みます。
 
         Args:
             package_name (str): パッケージ名
             prefix (str): 接頭語
+            excludes (list): 除外するモジュール名のリスト
             appcls (Any): アプリケーションクラス
             ver (Any): バージョンモジュール
             logger (logging.Logger): ロガー
         """
         if "svcmd" not in self._options:
             self._options["svcmd"] = dict()
-        for mode, f in module.load_features(package_name, prefix, appcls=appcls, ver=ver).items():
+        for mode, f in module.load_features(package_name, prefix, excludes, appcls=appcls, ver=ver).items():
             if mode not in self._options["cmd"]:
                 self._options["cmd"][mode] = dict()
             for cmd, opt in f.items():
@@ -325,7 +326,12 @@ class Options:
                     continue
                 if data['prefix'] is None or data['prefix'] == "":
                     continue
-                func(data['package'], data['prefix'], appcls, ver, logger)
+                exclude_modules = []
+                if 'exclude_modules' in data:
+                    if type(data['exclude_modules']) is not list:
+                        raise Exception(f'features.yml is invalid. (The “exclude_modules” element must be a list element. data={data})')
+                    exclude_modules = data['exclude_modules']
+                func(data['package'], data['prefix'], exclude_modules, appcls, ver, logger)
 
     def load_features_args(self, args_dict:Dict[str, Any]):
         yml = self.features_yml_data

@@ -1,5 +1,5 @@
 from cmdbox.app import app, client, server, web as _web
-from cmdbox.app.commons import convert
+from cmdbox.app.commons import convert, loghandler
 from cmdbox.app.features.web import cmdbox_web_load_cmd
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
@@ -131,6 +131,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 sys.stdout = captured_output = io.StringIO()
             ret_main = {}
             try:
+                old_stdout.write(loghandler.colorize_msg(f'EXEC:     {opt_list}\n'))
                 status, ret_main, obj = cmdbox_app.main(args_list=opt_list, file_dict=file_dict, webcall=True)
                 if isinstance(obj, server.Server):
                     cmdbox_app.sv = obj
@@ -157,9 +158,12 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                             output = [dict(warn=f'The captured stdout was discarded because its size was larger than {capture_maxsize} bytes.')]
                 else:
                     output = [dict(warn='capture_stdout is off.')]
+                old_stdout.write(loghandler.colorize_msg(f'EXEC:     {output}\n'))
             except Exception as e:
                 web.logger.disabled = False # ログ出力を有効にする
-                web.logger.info(f'exec_cmd error. {traceback.format_exc()}')
+                msg = f'exec_cmd error. {traceback.format_exc()}'
+                old_stdout.write(loghandler.colorize_msg(f'EXEC:     {msg}\n'))
+                web.logger.warning(msg)
                 output = [dict(warn=f'<pre>{html.escape(traceback.format_exc())}</pre>')]
             sys.stdout = old_stdout
             if 'stdout_log' in opt and opt['stdout_log']:

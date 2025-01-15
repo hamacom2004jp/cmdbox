@@ -1,10 +1,10 @@
 features:
   cli:
-    - package:
-      prefix:
+    - package: cmdbox.app.features.cli
+      prefix: cmdbox_
   web:
-    - package:
-      prefix:
+    - package: cmdbox.app.features.web
+      prefix: cmdbox_web_
 args:
   cli:
     - rule:

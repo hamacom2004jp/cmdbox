@@ -56,14 +56,14 @@ class CmdBoxApp:
 
         # プラグイン読込み
         sfeatureloadtime = time.perf_counter()
-        self.options.load_svcmd('cmdbox.app.features.cli', appcls=self.appcls, ver=self.ver, logger=self.default_logger)
+        self.options.load_svcmd('cmdbox.app.features.cli', prefix="cmdbox_", excludes=[], appcls=self.appcls, ver=self.ver, logger=self.default_logger)
         if self.cli_features_packages is not None:
             if self.cli_features_prefix is None:
                 raise ValueError(f"cli_features_prefix is None. cli_features_packages={self.cli_features_packages}")
             if len(self.cli_features_prefix) != len(self.cli_features_packages):
                 raise ValueError(f"cli_features_prefix is not match. cli_features_packages={self.cli_features_packages}, cli_features_prefix={self.cli_features_prefix}")
             for i, pn in enumerate(self.cli_features_packages):
-                self.options.load_svcmd(pn, prefix=self.cli_features_prefix[i], appcls=self.appcls, ver=self.ver, logger=self.default_logger)
+                self.options.load_svcmd(pn, prefix=self.cli_features_prefix[i], excludes=[], appcls=self.appcls, ver=self.ver, logger=self.default_logger)
         self.options.load_features_file('cli', self.options.load_svcmd, self.appcls, self.ver, self.default_logger)
         efeatureloadtime = time.perf_counter()
 
@@ -136,7 +136,7 @@ class CmdBoxApp:
 
             #scmdexectime = time.perf_counter()
             feat = self.options.get_cmd_attr(args.mode, args.cmd, 'feature')
-            if feat is not None or isinstance(feat, feature.Feature):
+            if feat is not None and isinstance(feat, feature.Feature):
                 pf = []
                 pf.append(dict(key="app_featureload", val=f"{efeatureloadtime-sfeatureloadtime:.03f}s"))
                 pf.append(dict(key="app_argsparse", val=f"{eargsparsetime-sargsparsetime:.03f}s"))

@@ -19,13 +19,14 @@ def get_module_list(package_name) -> List[str]:
     package = __import__(package_name, fromlist=[''])
     return [name for _, name, _ in pkgutil.iter_modules(package.__path__)]
 
-def load_features(package_name:str, prefix:str="cmdbox_", appcls=None, ver=None) -> Dict[str, Any]:
+def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], appcls=None, ver=None) -> Dict[str, Any]:
     """
     フィーチャーを読み込みます。
 
     Args:
         package_name (str): パッケージ名
         prefix (str, optional): プレフィックス. Defaults to "cmdbox_".
+        excludes (list, optional): 除外するモジュール名のリスト. Defaults to [].
         appcls ([type], optional): アプリケーションクラス. Defaults to None.
         ver ([type], optional): バージョンモジュール. Defaults to None.
     Returns:
@@ -35,6 +36,8 @@ def load_features(package_name:str, prefix:str="cmdbox_", appcls=None, ver=None)
     package = __import__(package_name, fromlist=[''])
     for finder, name, ispkg in pkgutil.iter_modules(package.__path__):
         if name.startswith(prefix):
+            if name in excludes:
+                continue
             mod = importlib.import_module(f"{package_name}.{name}")
             members = inspect.getmembers(mod, inspect.isclass)
             for name, cls in members:
@@ -57,13 +60,14 @@ def load_features(package_name:str, prefix:str="cmdbox_", appcls=None, ver=None)
                         features[m][cmd]['feature'] = fobj
     return features
 
-def load_webfeatures(package_name:str, prefix:str="cmdbox_web_", appcls=None, ver=None, logger:logging.Logger=None) -> List[Any]:
+def load_webfeatures(package_name:str, prefix:str="cmdbox_web_", excludes:list=[], appcls=None, ver=None, logger:logging.Logger=None) -> List[Any]:
     """
     Webフィーチャーを読み込みます。
 
     Args:
         package_name (str): パッケージ名
         prefix (str, optional): プレフィックス. Defaults to "cmdbox_web_".
+        excludes (list, optional): 除外するモジュール名のリスト. Defaults to [].
         appcls ([type], optional): アプリケーションクラス. Defaults to None.
         ver ([type], optional): バージョンモジュール. Defaults to None.
         logger ([type], optional): ロガー. Defaults to None.
@@ -74,6 +78,10 @@ def load_webfeatures(package_name:str, prefix:str="cmdbox_web_", appcls=None, ve
     package = __import__(package_name, fromlist=[''])
     for finder, name, ispkg in pkgutil.iter_modules(package.__path__):
         if name.startswith(prefix):
+            if name in excludes:
+                if logger.level == logging.DEBUG:
+                    logger.warning(f'load_webfeatures: {name} is excludes feature.')
+                continue
             mod = importlib.import_module(f"{package_name}.{name}")
             members = inspect.getmembers(mod, inspect.isclass)
             for name, cls in members:
