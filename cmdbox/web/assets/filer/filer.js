@@ -124,7 +124,14 @@ fsapi.filer = (svpath, is_local) => {
         return list_downloads;
       };
       const path = file_list.pop()
-      const list_downloads = (!path[1] || !path[1]['children']) ? [] : get_list(path[1]);
+      const list_downloads = [];
+      if (path[1] && path[1]['is_dir'] && !path[1]['children']) {
+        list_downloads.push(...get_list(path[1]));
+      } else if (path[1] && !path[1]['is_dir']) {
+        let rpath = path[1]['path'].replace(fsapi.right.find('.filer_address').val(), '');
+        rpath = rpath.startsWith('/') ? rpath.substring(1) : rpath;
+        list_downloads.push({'svpath':path[1]['path'],'rpath':rpath});
+      }
       const jobs = [];
       fsapi.download_now = 0;
       cmdbox.progress(0, list_downloads.length, fsapi.download_now, '', true, false)

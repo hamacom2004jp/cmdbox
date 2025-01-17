@@ -78,7 +78,20 @@ class Filer(object):
         def _path_tree(file_list:Path, cpart:str, i, recursive:bool=False):
             children = dict()
             if not file_list.is_dir():
-                return None, dict()
+                tparts = str(file_list)[data_dir_len:].replace("\\","/").split("/")
+                tpath = "/".join(tparts[0:i+1])
+                tpath = f'.{tpath}' if current_path_parts[0] == '.' else tpath
+                #tpath = '/'.join(current_path_parts[:i+1])
+                tpath = '/' if tpath=='' else tpath
+                tpath_key = common.safe_fname(tpath)
+                cpart = '/' if cpart=='' else cpart
+                return tpath_key, dict(name=cpart,
+                                   is_dir=False,
+                                   path=tpath,
+                                   children=children,
+                                   size=file_list.stat().st_size,
+                                   last=_ts2str(file_list.stat().st_mtime),
+                                   depth=len(tparts))
             for f in sorted(list(file_list.iterdir())):
                 parts = str(f)[data_dir_len:].replace("\\","/").split("/")
                 path = "/".join(parts[0:i+2])
