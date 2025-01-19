@@ -65,6 +65,7 @@ class CmdBoxApp:
             for i, pn in enumerate(self.cli_features_packages):
                 self.options.load_svcmd(pn, prefix=self.cli_features_prefix[i], excludes=[], appcls=self.appcls, ver=self.ver, logger=self.default_logger)
         self.options.load_features_file('cli', self.options.load_svcmd, self.appcls, self.ver, self.default_logger)
+        self.options.load_features_aliases_cli(self.default_logger)
         efeatureloadtime = time.perf_counter()
 
         # コマンド引数の生成

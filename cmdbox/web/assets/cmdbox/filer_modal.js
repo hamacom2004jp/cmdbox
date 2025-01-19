@@ -13,10 +13,10 @@ fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_di
         if (!c_path) return;
         const key = c_path.replace(/[\s\:\\\/\,\.\#\$\%\^\&\!\@\*\(\)\{\}\[\]\'\"\`]/g, `_`);
         const current_node = $(`#${key}`);
-        if (current_node.length <= 0) {
+        /*if (current_node.length <= 0) {
             alert(`invalid path:${c_path}`);
             return;
-        }
+        }*/
         await reload_tree(target_id, filer_modal.find('.tree-menu'), c_path, filer_modal.find('.file-list'));
     });
 
@@ -51,7 +51,13 @@ fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_di
         });
         const py_list_tree_keys = Object.keys(py_list_tree);
         if (py_list_tree_keys.length > 0) {
-            const node = py_list_tree[py_list_tree_keys[py_list_tree_keys.length-1]];
+            getdir = (list_tree, keys) => {
+                for (const n of Object.values(list_tree).toReversed()) {
+                    if (n['is_dir']) return n;
+                }
+                return list_tree[keys[0]];
+            };
+            const node = getdir(py_list_tree, py_list_tree_keys);
             const table = $('<table class="table table-bordered table-hover table-sm"></table>');
             filer_modal.find('.file-list').html('');
             filer_modal.find('.file-list').append(table);
@@ -139,7 +145,7 @@ fmodal.list_tree_server = async (current_path) => {
         const res = await cmdbox.sv_exec_cmd(opt);
         if(!res[0] || !res[0]['success']) {
             cmdbox.message(res);
-            return;
+            return {};
         }
         const data = Object.entries(res[0]['success']).sort();
         const ret = {};

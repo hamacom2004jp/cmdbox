@@ -18,88 +18,46 @@ Reading order of `features.yml`
 Configuration items in `features.yml`
 ========================================
 
-.. list-table::
+.. code-block:: yml
 
-    * - level
-      - Setting items
-      - type
-      - e.g.
-      - Description
-    * - 1
-      - features
-      - dict
-      - 
-      - 
-    * - 2
-      - cli
-      - list
-      - 
-      - Specify a list of package names in which the module implementing the command is located.
-    * - 3
-      - 
-      - dict
-      - 
-      - 
-    * - 4
-      - package
-      - str
-      - sample.app.features.cli
-      - Package Name. Classes inheriting from `cmdbox.app.feature.Feature` .
-    * - 4
-      - prefix
-      - str
-      - `sample_`
-      - Module name prefix. Modules that begin with this letter are eligible.
-    * - 2
-      - web
-      - list
-      - 
-      - Specify a list of package names with modules that implement web screens and RESTAPIs.
-    * - 3
-      - 
-      - dict
-      - 
-      - 
-    * - 4
-      - package
-      - str
-      - sample.app.features.cli
-      - Package Name. Classes inheriting from `cmdbox.app.feature.WebFeature` .
-    * - 4
-      - prefix
-      - str
-      - `sample_web_`
-      - Module name prefix. Modules that begin with this letter are eligible.
-    * - 1
-      - args
-      - dict
-      - 
-      - Specifies default or forced arguments for the specified command.
-    * - 2
-      - cli
-      - list
-      - 
-      - Specify rules to apply default values or force arguments.
-    * - 3
-      - 
-      - dict
-      - 
-      - 
-    * - 4
-      - rule
-      - dict
-      - mode: web
-      - Specify the rules for applying default values and forced arguments for each command line option.
-    * - 4
-      - default
-      - dict
-      - doc_root: f"{Path(self.ver.__file__).parent / 'web'}"
-      - Specify a default value for each item to be set when a rule is matched.
-    * - 4
-      - coercion
-      - dict
-      - doc_root: f"{Path(self.ver.__file__).parent / 'web'}"
-      - Specify a coercion value for each item to be set when a rule is matched.
+  features:
+    cli:                                  # Specify a list of package names in which the module implementing the command is located.
+      - package: cmdbox.app.features.cli  # Package Name. Classes inheriting from cmdbox.app.feature.Feature.
+        prefix: cmdbox_                   # Module name prefix. Modules that begin with this letter are eligible.
+    web:                                  # Specify a list of package names with modules that implement web screens and RESTAPIs.
+      - package: cmdbox.app.features.web  # Package Name. Classes inheriting from cmdbox.app.feature.WebFeature .
+        prefix: cmdbox_web_               # Module name prefix. Modules that begin with this letter are eligible.
+  args:                                   # Specifies default or forced arguments for the specified command.
+    cli:                                  # Specify rules to apply default values or force arguments.
+      - rule:                             # Specify the rules for applying default values and forced arguments for each command line option.
+                                          #   e.g. mode: web
+        default:                          # Specify a default value for each item to be set when a rule is matched.
+                                          #   e.g. doc_root: f"{Path(self.ver.__file__).parent / 'web'}"
+        coercion:                         # Specify a coercion value for each item to be set when a rule is matched.
+                                          #   e.g. doc_root: f"{Path(self.ver.__file__).parent / 'web'}"
+  aliases:                                # Specify the alias for the specified command.
+    cli:                                  # Specify the alias for the command line.
+      - source:                           # Specifies the command from which the alias originates.
+          mode:                           # Specify the mode of the source command. The exact match "mode" is selected.
+                                          #   e.g. client
+          cmd:                            # Specify the source command to be aliased. The regex match "cmd" is selected.
+                                          #   e.g. (.+)_(.+)
+        target:                           # Specifies the command to be aliased to.
+          mode:                           # Specify the mode of the target command. Create an alias for this “mode”.
+                                          #   e.g. CLIENT
+          cmd:                            # Specify the target command to be aliased. Create an alias for this “cmd”, referring to the regular expression group of source by "{n}".
+                                          #   e.g. {2}_{1}
+          move:                           # Specify whether to move the regular expression group of the source to the target.
+                                          #   e.g. true
+    web:                                  # Specify the alias for the RESTAPI.
+      - source:                           # Specifies the RESTAPI from which the alias originates.
+          path:                           # Specify the path of the source RESTAPI. The regex match "path" is selected.
+                                          #   e.g. /exec_(.+)
+        target:                           # Specifies the RESTAPI to be aliased to.
+          path:                           # Specify the path of the target RESTAPI. Create an alias for this “path”, referring to the regular expression group of source by "{n}".
+                                          #   e.g. /{1}_exec
+          move: true                      # Specify whether to move the regular expression group of the source to the target.
+                                          #   e.g. true
 
 - See also the contents of `.sample/sample_project/sample/extensions/features.yml`.
 

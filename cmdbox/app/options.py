@@ -1,9 +1,12 @@
 from cmdbox.app import common, feature
 from cmdbox.app.commons import module
+from fastapi.routing import APIRoute
 from pathlib import Path
+from starlette.routing import Route
 from typing import List, Dict, Any 
 import locale
 import logging
+import re
 
 
 class Options:
@@ -354,27 +357,139 @@ class Options:
                         return eval(val)
             return None
 
-        for data in yml['args']['cli']:
-            if type(data) is not dict:
-                raise Exception(f'features.yml is invalid. (The “args.cli” element must be a list element must be a dictionary. data={data})')
-            if 'rule' not in data:
-                raise Exception(f'features.yml is invalid. (The “rule” element must be in the dictionary of the list element of the “args.cli” element. data={data})')
-            if data['rule'] is None:
+        for rule in yml['args']['cli']:
+            if type(rule) is not dict:
+                raise Exception(f'features.yml is invalid. (The “args.cli” element must be a list element must be a dictionary. rule={rule})')
+            if 'rule' not in rule:
+                raise Exception(f'features.yml is invalid. (The “rule” element must be in the dictionary of the list element of the “args.cli” element. rule={rule})')
+            if rule['rule'] is None:
                 continue
-            if 'default' not in data and 'coercion' not in data:
-                raise Exception(f'features.yml is invalid. (The “default” or “coercion” element must be in the dictionary of the list element of the “args.cli” element. data={data})')
-            if len([rk for rk in data['rule'] if rk not in args_dict or data['rule'][rk] != args_dict[rk]]) > 0:
+            if 'default' not in rule and 'coercion' not in rule:
+                raise Exception(f'features.yml is invalid. (The “default” or “coercion” element must be in the dictionary of the list element of the “args.cli” element. rule={rule})')
+            if len([rk for rk in rule['rule'] if rk not in args_dict or rule['rule'][rk] != args_dict[rk]]) > 0:
                 continue
-            if data['default'] is not None:
-                for dk, dv in data['default'].items():
+            if rule['default'] is not None:
+                for dk, dv in rule['default'].items():
                     if dk not in args_dict or args_dict[dk] is None:
                         if type(dv) == list:
                             args_dict[dk] = [_cast(self, dk, v) for v in dv]
                         else:
                             args_dict[dk] = _cast(self, dk, dv)
-            if data['coercion'] is not None:
-                for ck, cv in data['coercion'].items():
+            if rule['coercion'] is not None:
+                for ck, cv in rule['coercion'].items():
                     if type(cv) == list:
                         args_dict[ck] = [_cast(self, ck, v) for v in cv]
                     else:
                         args_dict[ck] = _cast(self, ck, cv)
+
+    def load_features_aliases_cli(self, logger:logging.Logger):
+        yml = self.features_yml_data
+        if yml is None: return
+        if 'aliases' not in yml or 'cli' not in yml['aliases']:
+            return
+
+        opt_cmd = self._options["cmd"].copy()
+        for rule in yml['aliases']['cli']:
+            if type(rule) is not dict:
+                raise Exception(f'features.yml is invalid. (The aliases.cli” element must be a list element must be a dictionary. rule={rule})')
+            if 'source' not in rule:
+                raise Exception(f'features.yml is invalid. (The source element must be in the dictionary of the list element of the aliases.cli” element. rule={rule})')
+            if 'target' not in rule:
+                raise Exception(f'features.yml is invalid. (The target element must be in the dictionary of the list element of the aliases.cli” element. rule={rule})')
+            if rule['source'] is None or rule['target'] is None:
+                if logger.level == logging.DEBUG:
+                    logger.debug(f'Skip cli rule in features.yml. (The source or target element is None. rule={rule})')
+                continue
+            if type(rule['source']) is not dict:
+                raise Exception(f'features.yml is invalid. (The aliases.cli.source” element must be a dictionary element must. rule={rule})')
+            if type(rule['target']) is not dict:
+                raise Exception(f'features.yml is invalid. (The aliases.cli.target element must be a dictionary element must. rule={rule})')
+            if 'mode' not in rule['source'] or 'cmd' not in rule['source']:
+                raise Exception(f'features.yml is invalid. (The aliases.cli.source element must have "mode" and "cmd" specified. rule={rule})')
+            if 'mode' not in rule['target'] or 'cmd' not in rule['target']:
+                raise Exception(f'features.yml is invalid. (The aliases.cli.target element must have "mode" and "cmd" specified. rule={rule})')
+            if rule['source']['mode'] is None or rule['source']['cmd'] is None:
+                if logger.level == logging.DEBUG:
+                    logger.debug(f'Skip cli rule in features.yml. (The source mode or cmd element is None. rule={rule})')
+                continue
+            if rule['target']['mode'] is None or rule['target']['cmd'] is None:
+                if logger.level == logging.DEBUG:
+                    logger.debug(f'Skip cli rule in features.yml. (The target mode or cmd element is None. rule={rule})')
+                continue
+            tgt_move = True if 'move' in rule['target'] and rule['target']['move'] else False
+            reg_src_cmd = re.compile(rule['source']['cmd'])
+            for mk, mv in opt_cmd.items():
+                if type(mv) is not dict: continue
+                if mk != rule['source']['mode']: continue
+                src_mode = mk
+                tgt_mode = rule['target']['mode']
+                self._options["cmd"][tgt_mode] = dict()
+                self._options["mode"][tgt_mode] = dict()
+                find = False
+                for ck, cv in mv.copy().items():
+                    if type(cv) is not dict: continue
+                    ck_match:re.Match = reg_src_cmd.search(ck)
+                    if ck_match is None: continue
+                    find = True
+                    src_cmd = ck
+                    tgt_cmd = rule['target']['cmd'].format(*([ck_match.string]+list(ck_match.groups())))
+                    self._options["cmd"][tgt_mode][tgt_cmd] = cv
+                    self._options["mode"][tgt_mode][tgt_cmd] = cv
+                    if tgt_move:
+                        del self._options["cmd"][src_mode][src_cmd]
+                if not find:
+                    logger.warning(f'Skip cli rule in features.yml. (Command matching the rule not found. rule={rule})')
+
+    def load_features_aliases_web(self, routes:List[Route], logger:logging.Logger):
+        yml = self.features_yml_data
+        if yml is None: return
+        if routes is None or type(routes) is not list or len(routes) == 0:
+            raise Exception(f'routes is invalid. (The routes must be a list element.) routes={routes}')
+        if 'aliases' not in yml or 'web' not in yml['aliases']:
+            return
+
+        for rule in yml['aliases']['web']:
+            if type(rule) is not dict:
+                raise Exception(f'features.yml is invalid. (The aliases.web element must be a list element must be a dictionary. rule={rule})')
+            if 'source' not in rule:
+                raise Exception(f'features.yml is invalid. (The source element must be in the dictionary of the list element of the aliases.web element. rule={rule})')
+            if 'target' not in rule:
+                raise Exception(f'features.yml is invalid. (The target element must be in the dictionary of the list element of the aliases.web element. rule={rule})')
+            if rule['source'] is None or rule['target'] is None:
+                if logger.level == logging.DEBUG:
+                    logger.debug(f'Skip web rule in features.yml. (The source or target element is None. rule={rule})')
+                continue
+            if type(rule['source']) is not dict:
+                raise Exception(f'features.yml is invalid. (The aliases.web.source” element must be a dictionary element must. rule={rule})')
+            if type(rule['target']) is not dict:
+                raise Exception(f'features.yml is invalid. (The aliases.web.target element must be a dictionary element must. rule={rule})')
+            if 'path' not in rule['source']:
+                raise Exception(f'features.yml is invalid. (The aliases.web.source element must have "path" specified. rule={rule})')
+            if 'path' not in rule['target']:
+                raise Exception(f'features.yml is invalid. (The aliases.web.target element must have "path" specified. rule={rule})')
+            if rule['source']['path'] is None:
+                if logger.level == logging.DEBUG:
+                    logger.debug(f'Skip web rule in features.yml. (The source path element is None. rule={rule})')
+                continue
+            if rule['target']['path'] is None:
+                if logger.level == logging.DEBUG:
+                    logger.debug(f'Skip web rule in features.yml. (The target path element is None. rule={rule})')
+                continue
+            tgt_move = True if 'move' in rule['target'] and rule['target']['move'] else False
+            reg_src_path = re.compile(rule['source']['path'])
+            find = False
+            for route in routes.copy():
+                if not isinstance(route, APIRoute):
+                    continue
+                route_path = route.path
+                path_match:re.Match = reg_src_path.search(route_path)
+                if path_match is None: continue
+                find = True
+                tgt_Path = rule['target']['path'].format(*([path_match.string]+list(path_match.groups())))
+                tgt_route = APIRoute(tgt_Path, route.endpoint, methods=route.methods, name=route.name,
+                                  include_in_schema=route.include_in_schema)
+                routes.append(tgt_route)
+                if tgt_move:
+                    routes.remove(route)
+            if not find:
+                logger.warning(f'Skip web rule in features.yml. (Command matching the rule not found. rule={rule})')

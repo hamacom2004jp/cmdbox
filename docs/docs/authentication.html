@@ -1,0 +1,217 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Authentication &mdash; cmdbox 2025/01/19 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=70ec5266"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Developer Information" href="developer.html" />
+    <link rel="prev" title="Features" href="features.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Authentication</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-items-in-user-list-yml">Configuration items in <cite>user_list.yml</cite></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Authentication</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/authentication.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="authentication">
+<h1>Authentication<a class="headerlink" href="#authentication" title="Permalink to this heading"></a></h1>
+<ul class="simple">
+<li><p>There is a <cite>user_list.yml</cite> mechanism to authenticate web mode access users.</p></li>
+<li><p>This section describes how to use <cite>user_list.yml</cite>.</p></li>
+</ul>
+<section id="configuration-items-in-user-list-yml">
+<h2>Configuration items in <cite>user_list.yml</cite><a class="headerlink" href="#configuration-items-in-user-list-yml" title="Permalink to this heading"></a></h2>
+<div class="highlight-yml notranslate"><div class="highlight"><pre><span></span>users:                         # A list of users, each of which is a map that contains the following fields.
+- uid: 1                       # An ID that identifies a user. No two users can have the same ID.
+  name: admin                  # A name that identifies the user. No two users can have the same name.
+  password: admin              # The user&#39;s password. The value is hashed with the hash function specified in the next hash field.
+  hash: plain                  # The hash function used to hash the password, which can be plain, md5, sha1, or sha256.
+  groups: [admin]              # A list of groups to which the user belongs, as specified in the groups field.
+  email: admin@aaa.bbb.jp      # The email address of the user, used when authenticating using the provider specified in the oauth2 field.
+- uid: 101
+  name: user01
+  password: b75705d7e35e7014521a46b532236ec3
+  hash: md5
+  groups: [user]
+  email: user01@aaa.bbb.jp
+- uid: 102
+  name: user02
+  password: a7659675668c2b34f0a456dbaa508200340dc36c
+  hash: sha1
+  groups: [readonly]
+  email: user02@aaa.bbb.jp
+- uid: 103
+  name: user03
+  password: d64243e8519cce2304fffb92d31acaca622585011b40439c97e9274fae146189
+  hash: sha256
+  groups: [editor]
+  email: user03@aaa.bbb.jp
+groups:                        # A list of groups, each of which is a map that contains the following fields.
+- gid: 1                       # An ID that identifies a group. No two groups can have the same ID.
+  name: admin                  # A name that identifies the group. No two groups can have the same name.
+- gid: 101
+  name: user
+- gid: 102
+  name: readonly
+  parent: user                 # The parent group of the group. If the parent group is not specified, the group is a top-level group.
+- gid: 103
+  name: editor
+  parent: user
+cmdrule:                       # A list of command rules, Specify a rule that determines whether or not a command is executable when executed by a user in web mode.
+  policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
+  rules:                       # Specify rules to allow or deny execution of the command, depending on the group the user belongs to.
+  - groups: [admin]
+    rule: allow
+  - groups: [user]             # Specify the groups to which the rule applies.
+    mode: client               # Specify the &quot;mode&quot; as the condition for applying the rule.
+    cmds: [file_download, file_list, server_info] # Specify the &quot;cmd&quot; to which the rule applies. Multiple items can be specified in a list.
+    rule: allow                # Specifies whether or not the specified command is allowed for the specified group. The value can be allow or deny.
+  - groups: [user]
+    mode: server
+    cmds: [list]
+    rule: allow
+  - groups: [editor]
+    mode: client
+    cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
+    rule: allow
+pathrule:                      # List of RESTAPI rules, rules that determine whether or not a RESTAPI can be executed when a user in web mode accesses it.
+  policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
+  rules:                       # Specify rules to allow or deny execution of the RESTAPI, depending on the group the user belongs to.
+  - groups: [admin]            # Specify the groups to which the rule applies.
+    paths: [/]                 # Specify the &quot;path&quot; to which the rule applies. Multiple items can be specified in a list.
+    rule: allow                # Specifies whether or not the specified RESTAPI is allowed for the specified group. The value can be allow or deny.
+  - groups: [user]
+    paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout,
+            /exec_cmd, /exec_pipe, /filer, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
+    rule: allow
+  - groups: [readonly]
+    paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
+    rule: deny
+  - groups: [editor]
+    paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
+    rule: allow
+oauth2:                             # OAuth2 settings.
+  providers:                        # This is a per-provider setting for OAuth2.
+    google:                         # Google&#39;s OAuth2 configuration.
+      enabled: false                # Specify whether to enable Google&#39;s OAuth2.
+      client_id: XXXXXXXXXXX        # Specify Google&#39;s OAuth2 client ID.
+      client_secret: XXXXXXXXXXX    # Specify Google&#39;s OAuth2 client secret.
+      redirect_uri: https://localhost:8443/oauth2/google/callback # Specify Google&#39;s OAuth2 redirect URI.
+      scope: [&#39;email&#39;]              # Specify the scope you want to retrieve with Google&#39;s OAuth2. Usually, just reading the email is sufficient.
+      note:                         # Specify a description such as Google&#39;s OAuth2 reference site.
+      - https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest
+    github:                         # OAuth2 settings for GitHub.
+      enabled: false                # Specify whether to enable OAuth2 for GitHub.
+      client_id: XXXXXXXXXXX        # Specify the OAuth2 client ID for GitHub.
+      client_secret: XXXXXXXXXXX    # Specify the GitHub OAuth2 client secret.
+      redirect_uri: https://localhost:8443/oauth2/github/callback # Specify the OAuth2 redirect URI for GitHub.
+      scope: [&#39;user:email&#39;]         # Specify the scope you want to get from GitHub&#39;s OAuth2. Usually, just reading the email is sufficient.
+      note:                         # Specify a description, such as a reference site for OAuth2 on GitHub.
+      - https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>See also the contents of <cite>.sample/sample_project/sample/extensions/user_list.yml</cite>.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="features.html" class="btn btn-neutral float-left" title="Features" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="developer.html" class="btn btn-neutral float-right" title="Developer Information" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2025 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

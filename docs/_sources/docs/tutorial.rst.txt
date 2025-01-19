@@ -235,42 +235,28 @@ How to implement a new command using cmdbox
             return self.RESP_SCCESS
 
 
-- Open the file `sample/extensions/features.yml`. The file should look something like this.
+- Open the file `.sample/extensions/features.yml`. The file should look something like this.
 - This file specifies where new commands are to be read.
 - For example, if you want to add a package to read, add a new `package` and `prefix` to `features.cli`.
 - Note that `features.web` can be used to add a new web screen.
 - If you only want to call commands added in `features.cli` via RESTAPI, no additional implementation is needed in `features.web`.
+- There are other items that can be set in addition to the above, please refer to :doc:`./features` for details.
 
 .. code-block:: yaml
 
-    features:
+  features:
     cli:
-        - package: sample.app.features.cli
+      - package: sample.app.features.cli
         prefix: sample_
     web:
-        - package: sample.app.features.web
+      - package: sample.app.features.web
         prefix: sample_web_
-    args:
-    cli:
-        - rule:
-            mode: web
-        default:
-        coercion:
-            assets:
-            - f"{Path(self.ver.__file__).parent / 'web' / 'assets'}"
-            doc_root: f"{Path(self.ver.__file__).parent / 'web'}"
-        - rule:
-            mode: gui
-        default:
-        coercion:
-            assets:
-            - f"{Path(self.ver.__file__).parent / 'web' / 'assets'}"
-            doc_root: f"{Path(self.ver.__file__).parent / 'web'}"
 
 - The following files should also be known when using commands on the web screen or RESTAPI.
-- Open the file `sample/extensions/user_list.yml`. The file should look something like this.
+- Open the file `.sample/extensions/user_list.yml`. The file should look something like this.
 - This file manages the users and groups that are allowed Web access and their rules.
 - The rule of the previous command is `allow` for users in the `user` group in `cmdrule.rules`.
+- There are other items that can be set in addition to the above, please refer to :doc:`./authentication` for details.
 
 .. code-block:: yaml
 
@@ -311,7 +297,7 @@ How to implement a new command using cmdbox
             name: editor
             parent: user
     cmdrule:
-        policy: deny # allow, deny
+        policy: deny
         rules:
             - groups: [admin]
                 rule: allow
@@ -328,7 +314,7 @@ How to implement a new command using cmdbox
                 cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
                 rule: allow
     pathrule:
-        policy: deny # allow, deny
+        policy: deny
         rules:
             - groups: [admin]
                 paths: [/]
@@ -343,24 +329,6 @@ How to implement a new command using cmdbox
             - groups: [editor]
                 paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
                 rule: allow
-    oauth2:
-        providers:
-            google:
-            enabled: false
-            client_id: XXXXXXXXXXX
-            client_secret: XXXXXXXXXXX
-            redirect_uri: https://localhost:8443/oauth2/google/callback
-            scope: ['email']
-            note:
-                - https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest
-            github:
-            enabled: false
-            client_id: XXXXXXXXXXX
-            client_secret: XXXXXXXXXXX
-            redirect_uri: https://localhost:8443/oauth2/github/callback
-            scope: ['user:email']
-            note:
-                - https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes
 
 How to edit users and groups in Web mode
 ======================================================

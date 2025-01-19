@@ -34,7 +34,7 @@ class Server(filer.Filer):
         self.sessions:Dict[str, Dict[str, Any]] = {}
         self.is_running = False
         self.train_thread = None
-        self.cleaning_interval = 10
+        self.cleaning_interval = 60
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"server init parameter: data={self.data_dir} -> {self.data_dir.absolute()}")
             self.logger.debug(f"server init parameter: redis_host={self.redis_host}")

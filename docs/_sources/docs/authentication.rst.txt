@@ -1,0 +1,105 @@
+.. -*- coding: utf-8 -*-
+
+*******************
+Authentication
+*******************
+
+- There is a `user_list.yml` mechanism to authenticate web mode access users.
+- This section describes how to use `user_list.yml`.
+
+Configuration items in `user_list.yml`
+========================================
+
+.. code-block:: yml
+
+  users:                         # A list of users, each of which is a map that contains the following fields.
+  - uid: 1                       # An ID that identifies a user. No two users can have the same ID.
+    name: admin                  # A name that identifies the user. No two users can have the same name.
+    password: admin              # The user's password. The value is hashed with the hash function specified in the next hash field.
+    hash: plain                  # The hash function used to hash the password, which can be plain, md5, sha1, or sha256.
+    groups: [admin]              # A list of groups to which the user belongs, as specified in the groups field.
+    email: admin@aaa.bbb.jp      # The email address of the user, used when authenticating using the provider specified in the oauth2 field.
+  - uid: 101
+    name: user01
+    password: b75705d7e35e7014521a46b532236ec3
+    hash: md5
+    groups: [user]
+    email: user01@aaa.bbb.jp
+  - uid: 102
+    name: user02
+    password: a7659675668c2b34f0a456dbaa508200340dc36c
+    hash: sha1
+    groups: [readonly]
+    email: user02@aaa.bbb.jp
+  - uid: 103
+    name: user03
+    password: d64243e8519cce2304fffb92d31acaca622585011b40439c97e9274fae146189
+    hash: sha256
+    groups: [editor]
+    email: user03@aaa.bbb.jp
+  groups:                        # A list of groups, each of which is a map that contains the following fields.
+  - gid: 1                       # An ID that identifies a group. No two groups can have the same ID.
+    name: admin                  # A name that identifies the group. No two groups can have the same name.
+  - gid: 101
+    name: user
+  - gid: 102
+    name: readonly
+    parent: user                 # The parent group of the group. If the parent group is not specified, the group is a top-level group.
+  - gid: 103
+    name: editor
+    parent: user
+  cmdrule:                       # A list of command rules, Specify a rule that determines whether or not a command is executable when executed by a user in web mode.
+    policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
+    rules:                       # Specify rules to allow or deny execution of the command, depending on the group the user belongs to.
+    - groups: [admin]
+      rule: allow
+    - groups: [user]             # Specify the groups to which the rule applies.
+      mode: client               # Specify the "mode" as the condition for applying the rule.
+      cmds: [file_download, file_list, server_info] # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
+      rule: allow                # Specifies whether or not the specified command is allowed for the specified group. The value can be allow or deny.
+    - groups: [user]
+      mode: server
+      cmds: [list]
+      rule: allow
+    - groups: [editor]
+      mode: client
+      cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
+      rule: allow
+  pathrule:                      # List of RESTAPI rules, rules that determine whether or not a RESTAPI can be executed when a user in web mode accesses it.
+    policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
+    rules:                       # Specify rules to allow or deny execution of the RESTAPI, depending on the group the user belongs to.
+    - groups: [admin]            # Specify the groups to which the rule applies.
+      paths: [/]                 # Specify the "path" to which the rule applies. Multiple items can be specified in a list.
+      rule: allow                # Specifies whether or not the specified RESTAPI is allowed for the specified group. The value can be allow or deny.
+    - groups: [user]
+      paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout,
+              /exec_cmd, /exec_pipe, /filer, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
+      rule: allow
+    - groups: [readonly]
+      paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
+      rule: deny
+    - groups: [editor]
+      paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
+      rule: allow
+  oauth2:                             # OAuth2 settings.
+    providers:                        # This is a per-provider setting for OAuth2.
+      google:                         # Google's OAuth2 configuration.
+        enabled: false                # Specify whether to enable Google's OAuth2.
+        client_id: XXXXXXXXXXX        # Specify Google's OAuth2 client ID.
+        client_secret: XXXXXXXXXXX    # Specify Google's OAuth2 client secret.
+        redirect_uri: https://localhost:8443/oauth2/google/callback # Specify Google's OAuth2 redirect URI.
+        scope: ['email']              # Specify the scope you want to retrieve with Google's OAuth2. Usually, just reading the email is sufficient.
+        note:                         # Specify a description such as Google's OAuth2 reference site.
+        - https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest
+      github:                         # OAuth2 settings for GitHub.
+        enabled: false                # Specify whether to enable OAuth2 for GitHub.
+        client_id: XXXXXXXXXXX        # Specify the OAuth2 client ID for GitHub.
+        client_secret: XXXXXXXXXXX    # Specify the GitHub OAuth2 client secret.
+        redirect_uri: https://localhost:8443/oauth2/github/callback # Specify the OAuth2 redirect URI for GitHub.
+        scope: ['user:email']         # Specify the scope you want to get from GitHub's OAuth2. Usually, just reading the email is sufficient.
+        note:                         # Specify a description, such as a reference site for OAuth2 on GitHub.
+        - https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes
+
+
+- See also the contents of `.sample/sample_project/sample/extensions/user_list.yml`.
+

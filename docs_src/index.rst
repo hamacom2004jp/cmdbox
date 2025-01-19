@@ -16,6 +16,7 @@ cmdbox
    Tutorial <docs/tutorial.rst>
    Command Reference <docs/command.rst>
    Features <docs/features.rst>
+   Authentication <docs/authentication.rst>
    Developer Information <docs/developer.rst>
    License <docs/license.rst>
 

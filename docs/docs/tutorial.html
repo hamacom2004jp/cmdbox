@@ -6,15 +6,15 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial &mdash; cmdbox 2025/01/13 documentation</title>
+  <title>Tutorial &mdash; cmdbox 2025/01/19 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=56c4699f" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=c0ff6f1a"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=70ec5266"></script>
       <script src="../_static/doctools.js?v=888ff710"></script>
       <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -53,6 +53,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="command.html">Command Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Information</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 </ul>
@@ -305,42 +306,28 @@ pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </s
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>Open the file <cite>sample/extensions/features.yml</cite>. The file should look something like this.</p></li>
+<li><p>Open the file <cite>.sample/extensions/features.yml</cite>. The file should look something like this.</p></li>
 <li><p>This file specifies where new commands are to be read.</p></li>
 <li><p>For example, if you want to add a package to read, add a new <cite>package</cite> and <cite>prefix</cite> to <cite>features.cli</cite>.</p></li>
 <li><p>Note that <cite>features.web</cite> can be used to add a new web screen.</p></li>
 <li><p>If you only want to call commands added in <cite>features.cli</cite> via RESTAPI, no additional implementation is needed in <cite>features.web</cite>.</p></li>
+<li><p>There are other items that can be set in addition to the above, please refer to <a class="reference internal" href="features.html"><span class="doc">Features</span></a> for details.</p></li>
 </ul>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">features</span><span class="p">:</span>
-<span class="nt">cli</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">cli</span><span class="p">:</span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">package</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample.app.features.cli</span>
-<span class="w">    </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_</span>
-<span class="nt">web</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_</span>
+<span class="w">  </span><span class="nt">web</span><span class="p">:</span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">package</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample.app.features.web</span>
-<span class="w">    </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_web_</span>
-<span class="nt">args</span><span class="p">:</span>
-<span class="nt">cli</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">rule</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
-<span class="w">    </span><span class="nt">default</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">coercion</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">assets</span><span class="p">:</span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">f&quot;{Path(self.ver.__file__).parent / &#39;web&#39; / &#39;assets&#39;}&quot;</span>
-<span class="w">        </span><span class="nt">doc_root</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">f&quot;{Path(self.ver.__file__).parent / &#39;web&#39;}&quot;</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">rule</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gui</span>
-<span class="w">    </span><span class="nt">default</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">coercion</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">assets</span><span class="p">:</span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">f&quot;{Path(self.ver.__file__).parent / &#39;web&#39; / &#39;assets&#39;}&quot;</span>
-<span class="w">        </span><span class="nt">doc_root</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">f&quot;{Path(self.ver.__file__).parent / &#39;web&#39;}&quot;</span>
+<span class="w">      </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sample_web_</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>The following files should also be known when using commands on the web screen or RESTAPI.</p></li>
-<li><p>Open the file <cite>sample/extensions/user_list.yml</cite>. The file should look something like this.</p></li>
+<li><p>Open the file <cite>.sample/extensions/user_list.yml</cite>. The file should look something like this.</p></li>
 <li><p>This file manages the users and groups that are allowed Web access and their rules.</p></li>
 <li><p>The rule of the previous command is <cite>allow</cite> for users in the <cite>user</cite> group in <cite>cmdrule.rules</cite>.</p></li>
+<li><p>There are other items that can be set in addition to the above, please refer to <a class="reference internal" href="authentication.html"><span class="doc">Authentication</span></a> for details.</p></li>
 </ul>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">users</span><span class="p">:</span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
@@ -379,7 +366,7 @@ pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </s
 <span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">editor</span>
 <span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">parent</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">user</span>
 <span class="nt">cmdrule</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">policy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deny</span><span class="w"> </span><span class="c1"># allow, deny</span>
+<span class="w">    </span><span class="nt">policy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deny</span>
 <span class="w">    </span><span class="nt">rules</span><span class="p">:</span>
 <span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">groups</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">admin</span><span class="p p-Indicator">]</span>
 <span class="w">            </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
@@ -396,7 +383,7 @@ pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </s
 <span class="w">            </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">file_copy</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_mkdir</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_move</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_remove</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_rmdir</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_upload</span><span class="p p-Indicator">]</span>
 <span class="w">            </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
 <span class="nt">pathrule</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">policy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deny</span><span class="w"> </span><span class="c1"># allow, deny</span>
+<span class="w">    </span><span class="nt">policy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deny</span>
 <span class="w">    </span><span class="nt">rules</span><span class="p">:</span>
 <span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">groups</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">admin</span><span class="p p-Indicator">]</span>
 <span class="w">            </span><span class="nt">paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">/</span><span class="p p-Indicator">]</span>
@@ -411,24 +398,6 @@ pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </s
 <span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">groups</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">editor</span><span class="p p-Indicator">]</span>
 <span class="w">            </span><span class="nt">paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">/gui/del_cmd</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/gui/del_pipe</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/gui/save_cmd</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/gui/save_pipe</span><span class="p p-Indicator">]</span>
 <span class="w">            </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
-<span class="nt">oauth2</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">providers</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">google</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<span class="w">        </span><span class="nt">client_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">XXXXXXXXXXX</span>
-<span class="w">        </span><span class="nt">client_secret</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">XXXXXXXXXXX</span>
-<span class="w">        </span><span class="nt">redirect_uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://localhost:8443/oauth2/google/callback</span>
-<span class="w">        </span><span class="nt">scope</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;email&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">        </span><span class="nt">note</span><span class="p">:</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest</span>
-<span class="w">        </span><span class="nt">github</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<span class="w">        </span><span class="nt">client_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">XXXXXXXXXXX</span>
-<span class="w">        </span><span class="nt">client_secret</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">XXXXXXXXXXX</span>
-<span class="w">        </span><span class="nt">redirect_uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://localhost:8443/oauth2/github/callback</span>
-<span class="w">        </span><span class="nt">scope</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;user:email&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">        </span><span class="nt">note</span><span class="p">:</span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes</span>
 </pre></div>
 </div>
 </section>

@@ -69,7 +69,7 @@ def load_yml(yml_path:Path) -> dict:
     Returns:
         dict: 読み込んだYAMLファイルの内容
     """
-    with open(yml_path) as f:
+    with open(yml_path, encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 def save_yml(yml_path:Path, data:dict) -> None:

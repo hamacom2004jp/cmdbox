@@ -5,15 +5,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.app &mdash; cmdbox 2025/01/13 documentation</title>
+  <title>cmdbox.app.app &mdash; cmdbox 2025/01/19 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=56c4699f" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=c0ff6f1a"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=70ec5266"></script>
       <script src="../../../_static/doctools.js?v=888ff710"></script>
       <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -141,6 +141,7 @@
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cli_features_packages</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">load_svcmd</span><span class="p">(</span><span class="n">pn</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cli_features_prefix</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">excludes</span><span class="o">=</span><span class="p">[],</span> <span class="n">appcls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_logger</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">load_features_file</span><span class="p">(</span><span class="s1">&#39;cli&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">load_svcmd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">appcls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_logger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">load_features_aliases_cli</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_logger</span><span class="p">)</span>
         <span class="n">efeatureloadtime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
 
         <span class="c1"># コマンド引数の生成</span>
@@ -212,7 +213,7 @@
 
             <span class="c1">#scmdexectime = time.perf_counter()</span>
             <span class="n">feat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">cmd</span><span class="p">,</span> <span class="s1">&#39;feature&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">feat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">feature</span><span class="o">.</span><span class="n">Feature</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">feat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">feature</span><span class="o">.</span><span class="n">Feature</span><span class="p">):</span>
                 <span class="n">pf</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="n">pf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;app_featureload&quot;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">efeatureloadtime</span><span class="o">-</span><span class="n">sfeatureloadtime</span><span class="si">:</span><span class="s2">.03f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">))</span>
                 <span class="n">pf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;app_argsparse&quot;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">eargsparsetime</span><span class="o">-</span><span class="n">sargsparsetime</span><span class="si">:</span><span class="s2">.03f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">))</span>
