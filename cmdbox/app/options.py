@@ -171,7 +171,7 @@ class Options:
         for key, val in opt.items():
             if key in ['stdout_log', 'capture_stdout']:
                 continue
-            schema = [schema for schema in opt_schema if schema['opt'] == key]
+            schema = [schema for schema in opt_schema if type(schema) is dict and schema['opt'] == key]
             if len(schema) == 0 or val == '':
                 continue
             if schema[0]['type'] == 'bool':
@@ -423,8 +423,8 @@ class Options:
                 if mk != rule['source']['mode']: continue
                 src_mode = mk
                 tgt_mode = rule['target']['mode']
-                self._options["cmd"][tgt_mode] = dict()
-                self._options["mode"][tgt_mode] = dict()
+                self._options["cmd"][tgt_mode] = dict() if tgt_mode not in self._options["cmd"] else self._options["cmd"][tgt_mode]
+                self._options["mode"][tgt_mode] = dict() if tgt_mode not in self._options["mode"] else self._options["mode"][tgt_mode]
                 find = False
                 for ck, cv in mv.copy().items():
                     if type(cv) is not dict: continue
@@ -436,9 +436,18 @@ class Options:
                     self._options["cmd"][tgt_mode][tgt_cmd] = cv
                     self._options["mode"][tgt_mode][tgt_cmd] = cv
                     if tgt_move:
+                        if logger.level == logging.DEBUG:
+                            logger.debug(f'move command: src=({src_mode},{src_cmd}) -> tgt=({tgt_mode},{tgt_cmd})')
                         del self._options["cmd"][src_mode][src_cmd]
+                    else:
+                        if logger.level == logging.DEBUG:
+                            logger.debug(f'copy command: src=({src_mode},{src_cmd}) -> tgt=({tgt_mode},{tgt_cmd})')
                 if not find:
                     logger.warning(f'Skip cli rule in features.yml. (Command matching the rule not found. rule={rule})')
+                if len(self._options["cmd"][src_mode]) == 1:
+                    del self._options["cmd"][src_mode]
+                if len(self._options["mode"][src_mode]) == 1:
+                    del self._options["mode"][src_mode]
 
     def load_features_aliases_web(self, routes:List[Route], logger:logging.Logger):
         yml = self.features_yml_data
@@ -490,6 +499,11 @@ class Options:
                                   include_in_schema=route.include_in_schema)
                 routes.append(tgt_route)
                 if tgt_move:
+                    if logger.level == logging.DEBUG:
+                        logger.debug(f'move route: src=({route_path}) -> tgt=({tgt_Path})')
                     routes.remove(route)
+                else:
+                    if logger.level == logging.DEBUG:
+                        logger.debug(f'copy route: src=({route_path}) -> tgt=({tgt_Path})')
             if not find:
                 logger.warning(f'Skip web rule in features.yml. (Command matching the rule not found. rule={rule})')
