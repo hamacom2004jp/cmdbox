@@ -20,7 +20,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Developer Information" href="developer.html" />
+    <link rel="next" title="Authentication" href="authentication.html" />
     <link rel="prev" title="Command Reference ( web mode )" href="cmd_web.html" /> 
 </head>
 
@@ -53,6 +53,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#implement-a-class-that-extends-cmdbox-app-feature-feature">Implement a class that extends <cite>cmdbox.app.feature.Feature</cite></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Information</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 </ul>
@@ -99,44 +100,44 @@
 </section>
 <section id="configuration-items-in-features-yml">
 <h2>Configuration items in <cite>features.yml</cite><a class="headerlink" href="#configuration-items-in-features-yml" title="Permalink to this heading"></a></h2>
-<div class="highlight-yml notranslate"><div class="highlight"><pre><span></span>features:
-  cli:                                  # Specify a list of package names in which the module implementing the command is located.
-    - package: cmdbox.app.features.cli  # Package Name. Classes inheriting from cmdbox.app.feature.Feature.
-      prefix: cmdbox_                   # Module name prefix. Modules that begin with this letter are eligible.
-  web:                                  # Specify a list of package names with modules that implement web screens and RESTAPIs.
-    - package: cmdbox.app.features.web  # Package Name. Classes inheriting from cmdbox.app.feature.WebFeature .
-      prefix: cmdbox_web_               # Module name prefix. Modules that begin with this letter are eligible.
-args:                                   # Specifies default or forced arguments for the specified command.
-  cli:                                  # Specify rules to apply default values or force arguments.
-    - rule:                             # Specify the rules for applying default values and forced arguments for each command line option.
-                                        #   e.g. mode: web
-      default:                          # Specify a default value for each item to be set when a rule is matched.
-                                        #   e.g. doc_root: f&quot;{Path(self.ver.__file__).parent / &#39;web&#39;}&quot;
-      coercion:                         # Specify a coercion value for each item to be set when a rule is matched.
-                                        #   e.g. doc_root: f&quot;{Path(self.ver.__file__).parent / &#39;web&#39;}&quot;
-aliases:                                # Specify the alias for the specified command.
-  cli:                                  # Specify the alias for the command line.
-    - source:                           # Specifies the command from which the alias originates.
-        mode:                           # Specify the mode of the source command. The exact match &quot;mode&quot; is selected.
-                                        #   e.g. client
-        cmd:                            # Specify the source command to be aliased. The regex match &quot;cmd&quot; is selected.
-                                        #   e.g. (.+)_(.+)
-      target:                           # Specifies the command to be aliased to.
-        mode:                           # Specify the mode of the target command. Create an alias for this “mode”.
-                                        #   e.g. CLIENT
-        cmd:                            # Specify the target command to be aliased. Create an alias for this “cmd”, referring to the regular expression group of source by &quot;{n}&quot;.
-                                        #   e.g. {2}_{1}
-        move:                           # Specify whether to move the regular expression group of the source to the target.
-                                        #   e.g. true
-  web:                                  # Specify the alias for the RESTAPI.
-    - source:                           # Specifies the RESTAPI from which the alias originates.
-        path:                           # Specify the path of the source RESTAPI. The regex match &quot;path&quot; is selected.
-                                        #   e.g. /exec_(.+)
-      target:                           # Specifies the RESTAPI to be aliased to.
-        path:                           # Specify the path of the target RESTAPI. Create an alias for this “path”, referring to the regular expression group of source by &quot;{n}&quot;.
-                                        #   e.g. /{1}_exec
-        move: true                      # Specify whether to move the regular expression group of the source to the target.
-                                        #   e.g. true
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">features</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">cli</span><span class="p">:</span><span class="w">                                    </span><span class="c1"># Specify a list of package names in which the module implementing the command is located.</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">package</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cmdbox.app.features.cli</span><span class="w">  </span><span class="c1"># Package Name. Classes inheriting from cmdbox.app.feature.Feature.</span>
+<span class="w">          </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cmdbox_</span><span class="w">                   </span><span class="c1"># Module name prefix. Modules that begin with this letter are eligible.</span>
+<span class="w">    </span><span class="nt">web</span><span class="p">:</span><span class="w">                                    </span><span class="c1"># Specify a list of package names with modules that implement web screens and RESTAPIs.</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">package</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cmdbox.app.features.web</span><span class="w">  </span><span class="c1"># Package Name. Classes inheriting from cmdbox.app.feature.WebFeature .</span>
+<span class="w">          </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cmdbox_web_</span><span class="w">               </span><span class="c1"># Module name prefix. Modules that begin with this letter are eligible.</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w">                                   </span><span class="c1"># Specifies default or forced arguments for the specified command.</span>
+<span class="w">        </span><span class="nt">cli</span><span class="p">:</span><span class="w">                                </span><span class="c1"># Specify rules to apply default values or force arguments.</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">rule</span><span class="p">:</span><span class="w">                         </span><span class="c1"># Specify the rules for applying default values and forced arguments for each command line option.</span>
+<span class="w">                                            </span><span class="c1">#   e.g. mode: web</span>
+<span class="w">              </span><span class="nt">default</span><span class="p">:</span><span class="w">                      </span><span class="c1"># Specify a default value for each item to be set when a rule is matched.</span>
+<span class="w">                                            </span><span class="c1">#   e.g. doc_root: f&quot;{Path(self.ver.__file__).parent / &#39;web&#39;}&quot;</span>
+<span class="w">              </span><span class="nt">coercion</span><span class="p">:</span><span class="w">                     </span><span class="c1"># Specify a coercion value for each item to be set when a rule is matched.</span>
+<span class="w">                                            </span><span class="c1">#   e.g. doc_root: f&quot;{Path(self.ver.__file__).parent / &#39;web&#39;}&quot;</span>
+<span class="nt">aliases</span><span class="p">:</span><span class="w">                                    </span><span class="c1"># Specify the alias for the specified command.</span>
+<span class="w">    </span><span class="nt">cli</span><span class="p">:</span><span class="w">                                    </span><span class="c1"># Specify the alias for the command line.</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specifies the command from which the alias originates.</span>
+<span class="w">            </span><span class="nt">mode</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specify the mode of the source command. The exact match &quot;mode&quot; is selected.</span>
+<span class="w">                                            </span><span class="c1">#   e.g. client</span>
+<span class="w">            </span><span class="nt">cmd</span><span class="p">:</span><span class="w">                            </span><span class="c1"># Specify the source command to be aliased. The regex match &quot;cmd&quot; is selected.</span>
+<span class="w">                                            </span><span class="c1">#   e.g. (.+)_(.+)</span>
+<span class="w">          </span><span class="nt">target</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specifies the command to be aliased to.</span>
+<span class="w">            </span><span class="nt">mode</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specify the mode of the target command. Create an alias for this “mode”.</span>
+<span class="w">                                            </span><span class="c1">#   e.g. CLIENT</span>
+<span class="w">            </span><span class="nt">cmd</span><span class="p">:</span><span class="w">                            </span><span class="c1"># Specify the target command to be aliased. Create an alias for this “cmd”, referring to the regular expression group of source by &quot;{n}&quot;.</span>
+<span class="w">                                            </span><span class="c1">#   e.g. {2}_{1}</span>
+<span class="w">            </span><span class="nt">move</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specify whether to move the regular expression group of the source to the target.</span>
+<span class="w">                                            </span><span class="c1">#   e.g. true</span>
+<span class="w">    </span><span class="nt">web</span><span class="p">:</span><span class="w">                                    </span><span class="c1"># Specify the alias for the RESTAPI.</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specifies the RESTAPI from which the alias originates.</span>
+<span class="w">            </span><span class="nt">path</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specify the path of the source RESTAPI. The regex match &quot;path&quot; is selected.</span>
+<span class="w">                                            </span><span class="c1">#   e.g. /exec_(.+)</span>
+<span class="w">          </span><span class="nt">target</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specifies the RESTAPI to be aliased to.</span>
+<span class="w">            </span><span class="nt">path</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specify the path of the target RESTAPI. Create an alias for this “path”, referring to the regular expression group of source by &quot;{n}&quot;.</span>
+<span class="w">                                            </span><span class="c1">#   e.g. /{1}_exec</span>
+<span class="w">            </span><span class="nt">move</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specify whether to move the regular expression group of the source to the target.</span>
+<span class="w">                                            </span><span class="c1">#   e.g. true</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -258,7 +259,7 @@ aliases:                                # Specify the alias for the specified co
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="cmd_web.html" class="btn btn-neutral float-left" title="Command Reference ( web mode )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="developer.html" class="btn btn-neutral float-right" title="Developer Information" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="authentication.html" class="btn btn-neutral float-right" title="Authentication" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

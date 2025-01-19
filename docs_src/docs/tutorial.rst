@@ -59,7 +59,7 @@ How to run the cmdbox sample project in VSCode
 How to implement a new command using cmdbox
 ======================================================
 
-- Under the `sample/app/features/cli` folder, you will find an implementation of the `client_time` mentioned earlier.
+- Under the `sample/app/features/cli` folder, you will find an implementation of the `sample_client_time` mentioned earlier.
 - The implementation is as follows. (Slightly abbreviated display)
 - Create the following code and save it in the `sample/app/features/cli` folder.
 - See `sample_client_time.py` .
@@ -118,30 +118,12 @@ How to implement a new command using cmdbox
 
     class ServerTime(feature.Feature):
         def get_mode(self) -> Union[str, List[str]]:
-            """
-            この機能のモードを返します
-
-            Returns:
-                Union[str, List[str]]: モード
-            """
             return "server"
 
         def get_cmd(self):
-            """
-            この機能のコマンドを返します
-
-            Returns:
-                str: コマンド
-            """
             return 'time'
 
         def get_option(self):
-            """
-            この機能のオプションを返します
-
-            Returns:
-                Dict[str, Any]: オプション
-            """
             return dict(
                 type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                 discription_ja="サーバー側の現在時刻を表示します。",
@@ -174,27 +156,9 @@ How to implement a new command using cmdbox
                 ])
 
         def get_svcmd(self):
-            """
-            この機能のサーバー側のコマンドを返します
-
-            Returns:
-                str: サーバー側のコマンド
-            """
             return 'server_time'
 
         def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
-            """
-            この機能の実行を行います
-
-            Args:
-                logger (logging.Logger): ロガー
-                args (argparse.Namespace): 引数
-                tm (float): 実行開始時間
-                pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報
-
-            Returns:
-                Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
-            """
             cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
             ret = cl.redis_cli.send_cmd(self.get_svcmd(), [str(args.timedelta)],
                                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
@@ -204,29 +168,10 @@ How to implement a new command using cmdbox
             return 0, ret, None
 
         def is_cluster_redirect(self):
-            """
-            クラスター宛のメッセージの場合、メッセージを転送するかどうかを返します
-
-            Returns:
-                bool: メッセージを転送する場合はTrue
-            """
             return False
 
         def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
                 sessions:Dict[str, Dict[str, Any]]) -> int:
-            """
-            この機能のサーバー側の実行を行います
-
-            Args:
-                data_dir (Path): データディレクトリ
-                logger (logging.Logger): ロガー
-                redis_cli (redis_client.RedisClient): Redisクライアント
-                msg (List[str]): 受信メッセージ
-                sessions (Dict[str, Dict[str, Any]]): セッション情報
-            
-            Returns:
-                int: 終了コード
-            """
             td = 9 if msg[2] == None else int(msg[2])
             tz = datetime.timezone(datetime.timedelta(hours=td))
             dt = datetime.datetime.now(tz)
@@ -244,13 +189,13 @@ How to implement a new command using cmdbox
 
 .. code-block:: yaml
 
-  features:
-    cli:
-      - package: sample.app.features.cli
-        prefix: sample_
-    web:
-      - package: sample.app.features.web
-        prefix: sample_web_
+    features:
+        cli:
+            - package: sample.app.features.cli
+              prefix: sample_
+        web:
+            - package: sample.app.features.web
+              prefix: sample_web_
 
 - The following files should also be known when using commands on the web screen or RESTAPI.
 - Open the file `.sample/extensions/user_list.yml`. The file should look something like this.
@@ -262,73 +207,73 @@ How to implement a new command using cmdbox
 
     users:
         - uid: 1
-            name: admin
-            password: XXXXXXXXXXX
-            hash: plain
-            groups: [admin]
-            email: admin@aaa.bbb.jp
+          name: admin
+          password: XXXXXXXXXXX
+          hash: plain
+          groups: [admin]
+          email: admin@aaa.bbb.jp
         - uid: 101
-            name: user01
-            password: XXXXXXXXXXX
-            hash: md5
-            groups: [user]
-            email: user01@aaa.bbb.jp
+          name: user01
+          password: XXXXXXXXXXX
+          hash: md5
+          groups: [user]
+          email: user01@aaa.bbb.jp
         - uid: 102
-            name: user02
-            password: XXXXXXXXXXX
-            hash: sha1
-            groups: [readonly]
-            email: user02@aaa.bbb.jp
+          name: user02
+          password: XXXXXXXXXXX
+          hash: sha1
+          groups: [readonly]
+          email: user02@aaa.bbb.jp
         - uid: 103
-            name: user03
-            password: XXXXXXXXXXX
-            hash: sha256
-            groups: [editor]
-            email: user03@aaa.bbb.jp
+          name: user03
+          password: XXXXXXXXXXX
+          hash: sha256
+          groups: [editor]
+          email: user03@aaa.bbb.jp
     groups:
         - gid: 1
-            name: admin
+          name: admin
         - gid: 101
-            name: user
+          name: user
         - gid: 102
-            name: readonly
-            parent: user
+          name: readonly
+          parent: user
         - gid: 103
-            name: editor
-            parent: user
+          name: editor
+          parent: user
     cmdrule:
         policy: deny
         rules:
             - groups: [admin]
-                rule: allow
+              rule: allow
             - groups: [user]
-                mode: client
-                cmds: [file_download, file_list, server_info]
-                rule: allow
+              mode: client
+              cmds: [file_download, file_list, server_info]
+              rule: allow
             - groups: [user]
-                mode: server
-                cmds: [list]
-                rule: allow
+              mode: server
+              cmds: [list]
+              rule: allow
             - groups: [editor]
-                mode: client
-                cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
-                rule: allow
+              mode: client
+              cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
+              rule: allow
     pathrule:
         policy: deny
         rules:
             - groups: [admin]
-                paths: [/]
-                rule: allow
+              paths: [/]
+              rule: allow
             - groups: [user]
-                paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout,
-                        /exec_cmd, /exec_pipe, /filer, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
-                rule: allow
+              paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout,
+                      /exec_cmd, /exec_pipe, /filer, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
+              rule: allow
             - groups: [readonly]
-                paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
-                rule: deny
+              paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
+              rule: deny
             - groups: [editor]
-                paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
-                rule: allow
+              paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
+              rule: allow
 
 How to edit users and groups in Web mode
 ======================================================
