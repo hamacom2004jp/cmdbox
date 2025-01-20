@@ -2,6 +2,7 @@ features:
   cli:                                  # Specify a list of package names in which the module implementing the command is located.
     - package: cmdbox.app.features.cli  # Package Name. Classes inheriting from cmdbox.app.feature.Feature.
       prefix: cmdbox_                   # Module name prefix. Modules that begin with this letter are eligible.
+      exclude_modules: []               # Specify the module name to exclude from the list of modules to be loaded.
   web:                                  # Specify a list of package names with modules that implement web screens and RESTAPIs.
     - package: cmdbox.app.features.web  # Package Name. Classes inheriting from cmdbox.app.feature.WebFeature .
       prefix: cmdbox_web_               # Module name prefix. Modules that begin with this letter are eligible.

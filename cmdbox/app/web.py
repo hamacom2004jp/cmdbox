@@ -642,6 +642,8 @@ class Web:
             raise ValueError(f"User hash is not supported. ({user})")
         if hash != 'plain':
             user['password'] = common.hash_password(user['password'], hash if hash != 'oauth2' else 'sha1')
+        else:
+            user['password'] = user['password']
         self.signin_file_data['users'].append(user)
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -689,8 +691,11 @@ class Web:
         for u in self.signin_file_data['users']:
             if u['uid'] == user['uid']:
                 u['name'] = user['name']
-                if 'password' in user and user['password'] != '' and hash != 'plain':
-                    u['password'] = common.hash_password(user['password'], hash if hash != 'oauth2' else 'sha1')
+                if 'password' in user and user['password'] != '':
+                    if hash != 'plain':
+                        u['password'] = common.hash_password(user['password'], hash if hash != 'oauth2' else 'sha1')
+                    else:
+                        u['password'] = user['password']
                 u['hash'] = user['hash']
                 u['groups'] = user['groups']
         if self.signin_file is None:

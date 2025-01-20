@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Authentication &mdash; cmdbox 2025/01/19 documentation</title>
+  <title>Authentication &mdash; cmdbox 2025/01/20 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=70ec5266"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=5a5795bc"></script>
       <script src="../_static/doctools.js?v=888ff710"></script>
       <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -165,6 +165,7 @@
 <span class="w">            </span><span class="nt">client_secret</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">XXXXXXXXXXX</span><span class="w">    </span><span class="c1"># Specify Google&#39;s OAuth2 client secret.</span>
 <span class="w">            </span><span class="nt">redirect_uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://localhost:8443/oauth2/google/callback</span><span class="w"> </span><span class="c1"># Specify Google&#39;s OAuth2 redirect URI.</span>
 <span class="w">            </span><span class="nt">scope</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;email&#39;</span><span class="p p-Indicator">]</span><span class="w">              </span><span class="c1"># Specify the scope you want to retrieve with Google&#39;s OAuth2. Usually, just reading the email is sufficient.</span>
+<span class="w">            </span><span class="nt">signin_module</span><span class="p">:</span><span class="w">                </span><span class="c1"># Specify the module name that implements the sign-in. see, cmdbox.app.signin.SignIn</span>
 <span class="w">            </span><span class="nt">note</span><span class="p">:</span><span class="w">                         </span><span class="c1"># Specify a description such as Google&#39;s OAuth2 reference site.</span>
 <span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest</span>
 <span class="w">        </span><span class="nt">github</span><span class="p">:</span><span class="w">                         </span><span class="c1"># OAuth2 settings for GitHub.</span>
@@ -173,6 +174,7 @@
 <span class="w">            </span><span class="nt">client_secret</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">XXXXXXXXXXX</span><span class="w">    </span><span class="c1"># Specify the GitHub OAuth2 client secret.</span>
 <span class="w">            </span><span class="nt">redirect_uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://localhost:8443/oauth2/github/callback</span><span class="w"> </span><span class="c1"># Specify the OAuth2 redirect URI for GitHub.</span>
 <span class="w">            </span><span class="nt">scope</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;user:email&#39;</span><span class="p p-Indicator">]</span><span class="w">         </span><span class="c1"># Specify the scope you want to get from GitHub&#39;s OAuth2. Usually, just reading the email is sufficient.</span>
+<span class="w">            </span><span class="nt">signin_module</span><span class="p">:</span><span class="w">                </span><span class="c1"># Specify the module name that implements the sign-in. see, cmdbox.app.signin.SignIn</span>
 <span class="w">            </span><span class="nt">note</span><span class="p">:</span><span class="w">                         </span><span class="c1"># Specify a description, such as a reference site for OAuth2 on GitHub.</span>
 <span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes</span>
 </pre></div>

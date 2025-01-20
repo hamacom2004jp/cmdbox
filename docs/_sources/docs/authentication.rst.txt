@@ -89,6 +89,7 @@ Configuration items in `user_list.yml`
                 client_secret: XXXXXXXXXXX    # Specify Google's OAuth2 client secret.
                 redirect_uri: https://localhost:8443/oauth2/google/callback # Specify Google's OAuth2 redirect URI.
                 scope: ['email']              # Specify the scope you want to retrieve with Google's OAuth2. Usually, just reading the email is sufficient.
+                signin_module:                # Specify the module name that implements the sign-in. see, cmdbox.app.signin.SignIn
                 note:                         # Specify a description such as Google's OAuth2 reference site.
                     - https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest
             github:                         # OAuth2 settings for GitHub.
@@ -97,6 +98,7 @@ Configuration items in `user_list.yml`
                 client_secret: XXXXXXXXXXX    # Specify the GitHub OAuth2 client secret.
                 redirect_uri: https://localhost:8443/oauth2/github/callback # Specify the OAuth2 redirect URI for GitHub.
                 scope: ['user:email']         # Specify the scope you want to get from GitHub's OAuth2. Usually, just reading the email is sufficient.
+                signin_module:                # Specify the module name that implements the sign-in. see, cmdbox.app.signin.SignIn
                 note:                         # Specify a description, such as a reference site for OAuth2 on GitHub.
                     - https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes
 

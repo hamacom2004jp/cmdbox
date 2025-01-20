@@ -2,7 +2,7 @@ users:                         # A list of users, each of which is a map that co
 - uid: 1                       # An ID that identifies a user. No two users can have the same ID.
   name: admin                  # A name that identifies the user. No two users can have the same name.
   password: admin              # The user's password. The value is hashed with the hash function specified in the next hash field.
-  hash: plain                  # The hash function used to hash the password, which can be plain, md5, sha1, or sha256.
+  hash: plain                  # The hash function used to hash the password, which can be plain, md5, sha1, or sha256, or oauth2.
   groups: [admin]              # A list of groups to which the user belongs, as specified in the groups field.
   email: admin@aaa.bbb.jp      # The email address of the user, used when authenticating using the provider specified in the oauth2 field.
 - uid: 101
@@ -75,6 +75,7 @@ oauth2:                             # OAuth2 settings.
       client_secret: XXXXXXXXXXX    # Specify Google's OAuth2 client secret.
       redirect_uri: https://localhost:8443/oauth2/google/callback # Specify Google's OAuth2 redirect URI.
       scope: ['email']              # Specify the scope you want to retrieve with Google's OAuth2. Usually, just reading the email is sufficient.
+      signin_module:                # Specify the module name that implements the sign-in. see, cmdbox.app.signin.SignIn
       note:                         # Specify a description such as Google's OAuth2 reference site.
       - https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest
     github:                         # OAuth2 settings for GitHub.
@@ -83,5 +84,6 @@ oauth2:                             # OAuth2 settings.
       client_secret: XXXXXXXXXXX    # Specify the GitHub OAuth2 client secret.
       redirect_uri: https://localhost:8443/oauth2/github/callback # Specify the OAuth2 redirect URI for GitHub.
       scope: ['user:email']         # Specify the scope you want to get from GitHub's OAuth2. Usually, just reading the email is sufficient.
+      signin_module:                # Specify the module name that implements the sign-in. see, cmdbox.app.signin.SignIn
       note:                         # Specify a description, such as a reference site for OAuth2 on GitHub.
       - https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes
