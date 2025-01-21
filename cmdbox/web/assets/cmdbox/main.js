@@ -9,7 +9,8 @@ $(() => {
     list_pipe_func().then(list_pipe_func_then);
     // パイプライン一覧の検索
     $('#pipe_kwd').off('change').on('change', (e) => list_pipe_func().then(list_pipe_func_then));
-
+    // アイコンを表示
+    cmdbox.set_logoicon('.navbar-brand');
     // copyright表示
     cmdbox.copyright();
     // バージョン情報モーダル初期化

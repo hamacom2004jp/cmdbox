@@ -11,6 +11,7 @@ class Gui(feature.WebFeature):
     def __init__(self, appcls, ver):
         super().__init__(appcls=appcls, ver=ver)
         self.version_info = [dict(tabid='versions_cmdbox', title=version.__appid__,
+                                  thisapp=True if version.__appid__ == ver.__appid__ else False,
                                   icon=f'assets/cmdbox/icon.png', url='versions_cmdbox')]
 
     def route(self, web:Web, app:FastAPI) -> None:

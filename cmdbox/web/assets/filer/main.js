@@ -3,6 +3,8 @@ $(() => {
   cmdbox.change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
   // スプリッター初期化
   $('.split-pane').splitPane();
+  // アイコンを表示
+  cmdbox.set_logoicon('.navbar-brand');
   // copyright表示
   cmdbox.copyright();
   // バージョン情報モーダル初期化

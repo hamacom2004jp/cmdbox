@@ -86,6 +86,21 @@ cmdbox.appid = async (sel) => {
   head.append(`<link rel="icon" type="image/x-icon" href="assets/${appid}/favicon.ico">`);
 };
 /**
+ * 指定のセレクタの前要素にロゴ画像を設定
+ * 
+ * @param {string} sel - セレクタ
+ **/
+cmdbox.set_logoicon = async (sel) => {
+  const res = await fetch('gui/version_info', {method: 'GET'});
+  if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+  const verinfos = await res.json();
+  for (const v of verinfos) {
+    if (!v['thisapp']) continue;
+    $(sel).before(`<img class="icon-logo me-3" src="${v['icon']}" width="40" height="40"/>`);
+    break;
+  }
+};
+/**
  * サインアウト
  * @param {string} sitepath - サイトパス
  **/
