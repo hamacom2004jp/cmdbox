@@ -30,7 +30,16 @@
             "request": "launch",
             "args": ["-m","web","-c","start","--signin_file",".samples/user_list.yml",
             "--ssl_cert","server.cert","--ssl_key","server.key","--debug"],//,  "--client_only", "--filer_html", "filer2.html", "--assets", "README.md", "--assets", "setup.py"
-            //"args": ["--version"],
+            "module": "cmdbox",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: cmdbox genpass",
+            "type": "python",
+            "request": "launch",
+            "args": ["-m","web","-c","genpass","-f"],
             "module": "cmdbox",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",

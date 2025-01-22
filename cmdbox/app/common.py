@@ -313,17 +313,18 @@ def rmdirs(dir_path:Path, ignore_errors:bool=True):
     """
     shutil.rmtree(dir_path, ignore_errors=ignore_errors)
 
-def random_string(size:int=16):
+def random_string(size:int=16, chars=string.ascii_uppercase + string.digits) -> str:
     """
     ランダムな文字列を生成します。
 
     Args:
         size (int, optional): 文字列の長さ. Defaults to 16.
+        chars ([type], optional): 使用する文字. Defaults to string.ascii_uppercase + string.digits.
 
     Returns:
         str: 生成された文字列
     """
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=size))
+    return ''.join(random.choices(chars, k=size))
 
 def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_json_append:bool=False, stdout:bool=True,
                  tablefmt:str='github', pf:List[Dict[str, float]]=[]):

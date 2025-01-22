@@ -497,6 +497,43 @@ cmdbox.user_info = async () => {
   return user;
 };
 /**
+ * 新しいパスワード取得
+ * @param {number} pass_length - パスワードの長さ
+ * @param {number} pass_count - パスワードの数
+ * @param {string} use_alphabet - アルファベットを使用するかどうか
+ * @param {string} use_number - 数字を使用するかどうか
+ * @param {string} use_symbol - 記号を使用するかどうか
+ * @param {string} similar - 似た文字を除外するかどうか
+ * @param {function} error_func - エラー時のコールバック関数
+ * @returns {Promise} - レスポンス
+ **/
+cmdbox.genpass = (pass_length=16, pass_count=1, use_alphabet="both", use_number="use", use_symbol="use", similar="exclude", error_func=undefined) => {
+  const opt = {};
+  opt['mode'] = 'web';
+  opt['cmd'] = 'genpass';
+  opt['pass_length'] = pass_length;
+  opt['pass_count'] = pass_count;
+  opt['use_alphabet'] = use_alphabet;
+  opt['use_number'] = use_number;
+  opt['use_symbol'] = use_symbol;
+  opt['similar'] = similar;
+  opt['capture_stdout'] = true;
+  cmdbox.show_loading();
+  return cmdbox.sv_exec_cmd(opt).then(res => {
+    if(!res[0] || !res[0]['success']) {
+      if (error_func) {
+        error_func(res);
+        return;
+      }
+      cmdbox.hide_loading();
+      return res[0];
+    }
+    const ret = res[0]['success'];
+    cmdbox.hide_loading();
+    return ret['passwords'];
+  });
+};
+/**
  * ファイルリスト取得
  * @param {$} target - 接続先情報のhidden要素を含む祖先要素
  * @param {string} svpath - サーバーパス

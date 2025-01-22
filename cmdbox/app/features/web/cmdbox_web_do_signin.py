@@ -102,7 +102,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 if not jadge:
                     return RedirectResponse(url=f'/signin/{next}?error=2')
                 # グループ取得
-                group_names, gids = self.google_signin.get_groups(user, copy_signin_data)
+                group_names, gids = self.google_signin.get_groups(access_token, user, copy_signin_data)
                 # セッションに保存
                 req.session['signin'] = dict(uid=user['uid'], name=user['name'], gids=gids,
                                             groups=group_names, email=email)

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( web mode ) &mdash; cmdbox 2025/01/20 documentation</title>
+  <title>Command Reference ( web mode ) &mdash; cmdbox 2025/01/22 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=5a5795bc"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=c9d79bcf"></script>
       <script src="../_static/doctools.js?v=888ff710"></script>
       <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -53,6 +53,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Web</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#self-signed-server-certificate-generation-cmdbox-m-web-c-gencert-option">Self-signed server certificate generation : <cite>cmdbox -m web -c gencert &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#password-generation-cmdbox-m-web-c-genpass-option">Password generation : <cite>cmdbox -m web -c genpass &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#add-group-cmdbox-m-web-c-group-add-option">Add Group : <cite>cmdbox -m web -c group_add &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#delete-group-cmdbox-m-web-c-group-del-option">Delete Group : <cite>cmdbox -m web -c group_del &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edit-group-cmdbox-m-web-c-group-edit-option">Edit Group : <cite>cmdbox -m web -c group_edit &lt;Option&gt;</cite></a></li>
@@ -105,6 +106,9 @@
 </ul>
 <section id="self-signed-server-certificate-generation-cmdbox-m-web-c-gencert-option">
 <h2>Self-signed server certificate generation : <cite>cmdbox -m web -c gencert &lt;Option&gt;</cite><a class="headerlink" href="#self-signed-server-certificate-generation-cmdbox-m-web-c-gencert-option" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Generate a self-signed certificate for simple implementation of SSL in web mode.</p></li>
+</ul>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -145,8 +149,56 @@
 </tbody>
 </table>
 </section>
+<section id="password-generation-cmdbox-m-web-c-genpass-option">
+<h2>Password generation : <cite>cmdbox -m web -c genpass &lt;Option&gt;</cite><a class="headerlink" href="#password-generation-cmdbox-m-web-c-genpass-option" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Generates a password string that can be used in web mode.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--pass_length &lt;length&gt;</p></td>
+<td></td>
+<td><p>Specifies the length of the password.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--pass_count &lt;count&gt;</p></td>
+<td></td>
+<td><p>Specify the number of passwords to be generated.</p></td>
+</tr>
+<tr class="row-even"><td><p>--use_alphabet &lt;type&gt;</p></td>
+<td></td>
+<td><p>Specifies the type of alphabet used for the password. <cite>notuse</cite> , <cite>upper</cite> , <cite>lower</cite> , <cite>both</cite> can be specified.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--use_number &lt;type&gt;</p></td>
+<td></td>
+<td><p>Specify the type of number to be used for the password. <cite>notuse</cite> , <cite>use</cite> can be specified.</p></td>
+</tr>
+<tr class="row-even"><td><p>--use_symbol &lt;type&gt;</p></td>
+<td></td>
+<td><p>Specifies the type of symbol used in the password. <cite>notuse</cite> , <cite>use</cite> can be specified.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--similar &lt;type&gt;</p></td>
+<td></td>
+<td><p>Specifies whether certain similar characters should be used. <cite>exclude</cite> , <cite>include</cite> can be specified.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="add-group-cmdbox-m-web-c-group-add-option">
 <h2>Add Group : <cite>cmdbox -m web -c group_add &lt;Option&gt;</cite><a class="headerlink" href="#add-group-cmdbox-m-web-c-group-add-option" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Add a group in Web mode.</p></li>
+</ul>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -201,6 +253,9 @@
 </section>
 <section id="delete-group-cmdbox-m-web-c-group-del-option">
 <h2>Delete Group : <cite>cmdbox -m web -c group_del &lt;Option&gt;</cite><a class="headerlink" href="#delete-group-cmdbox-m-web-c-group-del-option" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Del a group in Web mode.</p></li>
+</ul>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -247,6 +302,9 @@
 </section>
 <section id="edit-group-cmdbox-m-web-c-group-edit-option">
 <h2>Edit Group : <cite>cmdbox -m web -c group_edit &lt;Option&gt;</cite><a class="headerlink" href="#edit-group-cmdbox-m-web-c-group-edit-option" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Edit a group in Web mode.</p></li>
+</ul>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -301,6 +359,9 @@
 </section>
 <section id="list-group-cmdbox-m-web-c-group-list-option">
 <h2>List Group : <cite>cmdbox -m web -c group_list &lt;Option&gt;</cite><a class="headerlink" href="#list-group-cmdbox-m-web-c-group-list-option" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Get a list of users in Web mode.</p></li>
+</ul>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -347,6 +408,9 @@
 </section>
 <section id="web-service-launch-cmdbox-m-web-c-start-option">
 <h2>Web Service Launch : <cite>cmdbox -m web -c start &lt;Option&gt;</cite><a class="headerlink" href="#web-service-launch-cmdbox-m-web-c-start-option" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Start Web mode.</p></li>
+</ul>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -457,6 +521,9 @@
 </section>
 <section id="web-service-stops-cmdbox-m-web-c-stop-option">
 <h2>Web Service Stops : <cite>cmdbox -m web -c stop &lt;Option&gt;</cite><a class="headerlink" href="#web-service-stops-cmdbox-m-web-c-stop-option" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Stop Web mode.</p></li>
+</ul>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -479,6 +546,9 @@
 </section>
 <section id="add-user-cmdbox-m-web-c-user-add-option">
 <h2>Add User : <cite>cmdbox -m web -c user_add &lt;Option&gt;</cite><a class="headerlink" href="#add-user-cmdbox-m-web-c-user-add-option" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Add a user in Web mode.</p></li>
+</ul>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -545,6 +615,9 @@
 </section>
 <section id="delete-user-cmdbox-m-web-c-user-del-option">
 <h2>Delete User : <cite>cmdbox -m web -c user_del &lt;Option&gt;</cite><a class="headerlink" href="#delete-user-cmdbox-m-web-c-user-del-option" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Delete a user in Web mode.</p></li>
+</ul>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -591,6 +664,9 @@
 </section>
 <section id="edit-user-cmdbox-m-web-c-user-edit-option">
 <h2>Edit User : <cite>cmdbox -m web -c user_edit &lt;Option&gt;</cite><a class="headerlink" href="#edit-user-cmdbox-m-web-c-user-edit-option" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Edit users in Web mode.</p></li>
+</ul>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -657,6 +733,9 @@
 </section>
 <section id="list-user-cmdbox-m-web-c-user-list-option">
 <h2>List User : <cite>cmdbox -m web -c user_list &lt;Option&gt;</cite><a class="headerlink" href="#list-user-cmdbox-m-web-c-user-list-option" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Get a list of users in Web mode.</p></li>
+</ul>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />

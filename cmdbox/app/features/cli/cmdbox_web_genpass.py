@@ -9,9 +9,11 @@ from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import re
+import string
 
 
-class WebGencert(Feature):
+class WebGenpass(Feature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -28,7 +30,7 @@ class WebGencert(Feature):
         Returns:
             str: コマンド
         """
-        return 'gencert'
+        return 'genpass'
     
     def get_option(self):
         """
@@ -39,27 +41,27 @@ class WebGencert(Feature):
         """
         return dict(
             type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
-            discription_ja="webモードでSSLを簡易的に実装するために自己署名証明書を生成します。",
-            discription_en="Generate a self-signed certificate for simple implementation of SSL in web mode.",
+            discription_ja="webモードで使用できるパスワード文字列を生成します。",
+            discription_en="Generates a password string that can be used in web mode.",
             choice=[
-                dict(opt="webhost", type="str", default="localhost", required=True, multi=False, hide=False, choice=None,
-                        discription_ja="自己署名証明書のCN(Common Name)に指定するホスト名を指定します。",
-                        discription_en="Specify the host name to be specified as the CN (Common Name) of the self-signed certificate."),
-                dict(opt="output_cert", type="file", default=None, required=False, multi=False, hide=False, choice=None,
-                        discription_ja="出力する自己署名証明書のファイルを指定します。省略した場合は `webhostオプションに指定したホスト名` .crt に出力されます。",
-                        discription_en="Specify the self-signed certificate file to be output.If omitted, the hostname specified in the `webhost option` .crt will be output."),
-                dict(opt="output_cert_format", type="str", default="PEM", required=False, multi=False, hide=False, choice=["DER", "PEM"],
-                        discription_ja="出力する自己署名証明書のファイルフォーマットを指定します。",
-                        discription_en="Specifies the file format of the self-signed certificate to be output."),
-                dict(opt="output_key", type="file", default=None, required=False, multi=False, hide=False, choice=None,
-                        discription_ja="出力する自己署名証明書の秘密鍵ファイルを指定します。省略した場合は `webhostオプションに指定したホスト名` .key に出力されます。",
-                        discription_en="Specifies the private key file of the self-signed certificate to be output.If omitted, the hostname specified in the `webhost option` .key will be output."),
-                dict(opt="output_key_format", type="str", default="PEM", required=False, multi=False, hide=False, choice=["DER", "PEM"],
-                        discription_ja="出力する自己署名証明書の秘密鍵ファイルフォーマットを指定します。",
-                        discription_en="Specifies the private key file format of the output self-signed certificate."),
-                dict(opt="overwrite", type="bool", default=False, required=False, multi=False, hide=True, choice=[True, False],
-                        discription_ja="出力する自己署名証明書のファイルが存在する場合に上書きします。",
-                        discription_en="Overwrites the self-signed certificate file to be output if it exists."),
+                dict(opt="pass_length", type="int", default=16, required=False, multi=False, hide=False, choice=None,
+                        discription_ja="パスワードの長さを指定します。",
+                        discription_en="Specifies the length of the password."),
+                dict(opt="pass_count", type="int", default=5, required=False, multi=False, hide=False, choice=None,
+                        discription_ja="生成するパスワードの件数を指定します。",
+                        discription_en="Specify the number of passwords to be generated."),
+                dict(opt="use_alphabet", type="str", default='both', required=False, multi=False, hide=False, choice=['notuse','upper','lower','both'],
+                        discription_ja="パスワードに使用するアルファベットの種類を指定します。 `notuse` , `upper` , `lower` , `both` が指定できます。",
+                        discription_en="Specifies the type of alphabet used for the password. `notuse` , `upper` , `lower` , `both` can be specified."),
+                dict(opt="use_number", type="str", default="use", required=False, multi=False, hide=False, choice=['notuse', 'use'],
+                        discription_ja="パスワードに使用する数字の種類を指定します。 `notuse` , `use` が指定できます。",
+                        discription_en="Specify the type of number to be used for the password. `notuse` , `use` can be specified."),
+                dict(opt="use_symbol", type="str", default='use', required=False, multi=False, hide=False, choice=['notuse','use'],
+                        discription_ja="パスワードに使用する記号の種類を指定します。 `notuse` , `use` が指定できます。",
+                        discription_en="Specifies the type of symbol used in the password. `notuse` , `use` can be specified."),
+                dict(opt="similar", type="str", default='exclude', required=False, multi=False, hide=True, choice=['exclude', 'include'],
+                        discription_ja="特定の似た文字を使用するかどうかを指定します。 `exclude` , `include` が指定できます。",
+                        discription_en="Specifies whether certain similar characters should be used. `exclude` , `include` can be specified."),
                 dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choice=[True, False],
                         discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
                         discription_en="Available only in GUI mode. Outputs standard output during command execution to Console log."),
@@ -85,30 +87,39 @@ class WebGencert(Feature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if args.webhost is None:
-            msg = {"warn":f"Please specify the --webhost option."}
+        if args.pass_length < 1:
+            msg = {"warn":"The password length must be 1 or more."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
-        if args.output_cert is None:
-            args.output_cert = f"{args.webhost}.crt"
-        if args.output_key is None:
-            args.output_key = f"{args.webhost}.key"
-        output_cert = Path(args.output_cert)
-        output_key = Path(args.output_key)
-        if not args.overwrite and output_cert.exists():
-            msg = {"warn":f"File already exists. {output_cert}"}
+        if args.pass_count < 1:
+            msg = {"warn":"The number of passwords to generate must be 1 or more."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
-        if not args.overwrite and output_key.exists():
-            msg = {"warn":f"File already exists. {output_key}"}
+        if args.pass_count >= 40:
+            msg = {"warn":"The number of passwords to generate must be less than 40."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
-
+        ret = {}
         try:
-            self.gen_cert(logger, args.webhost, output_cert, output_key)
-            ret = {"success":f"Generate certificate. {output_cert}, {output_key}"}
+            chars = ""
+            if args.use_alphabet == 'upper' or args.use_alphabet == 'both':
+                chars += string.ascii_uppercase
+            if args.use_alphabet == 'lower' or args.use_alphabet == 'both':
+                chars += string.ascii_lowercase
+            if args.use_number == 'use':
+                chars += string.digits
+            if args.use_symbol == 'use':
+                chars += '!#$%&()=-~^|@;+:*{}[]<>/_,.'
+            if args.similar == 'exclude':
+                chars = re.sub('[\{\}\[\]Il1\|Oo0\.\,:;]', '', chars)
+
+            passwords = []
+            for i in range(args.pass_count):
+                passwords.append(dict(password=common.random_string(args.pass_length, chars)))
+            ret = {"success":{"passwords":passwords}}
+            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         except Exception as e:
-            msg = {"error":f"Failed to generate certificate. {e}"}
+            msg = {"error":f"Failed to generate password. {e}"}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         return 0, ret, None

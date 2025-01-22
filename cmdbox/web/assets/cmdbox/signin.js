@@ -45,6 +45,17 @@ $(() => {
     if (remember) {
         $(selecter_remember).prop('checked', true);
     }
+    const btn_eye = $('.eye_buton');
+    btn_eye.off('click').on('click', (event) => {
+        const input = $('.form-signin-password');
+        if (input.attr('type') == 'password') {
+            input.attr('type', 'text');
+            btn_eye.find('use').attr('href', '#svg_eye_btn');
+        } else {
+            input.attr('type', 'password');
+            btn_eye.find('use').attr('href', '#svg_eyeslash_btn');
+        }
+    });
     const btn_google = $('.btn-google');
     const btn_github = $('.btn-github');
     btn_google.off('click').on('click', async (event) => {

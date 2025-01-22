@@ -9,6 +9,8 @@ Command Reference ( web mode )
 Self-signed server certificate generation : `cmdbox -m web -c gencert <Option>`
 =================================================================================
 
+- Generate a self-signed certificate for simple implementation of SSL in web mode.
+
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
@@ -21,8 +23,27 @@ Self-signed server certificate generation : `cmdbox -m web -c gencert <Option>`
     "--output_key_format <format>","","Specifies the private key file format of the output self-signed certificate.'PEM' and 'DER' can be specified."
     "--overwrite","","Overwrites the self-signed certificate file to be output if it exists."
 
+Password generation : `cmdbox -m web -c genpass <Option>`
+=================================================================================
+
+- Generates a password string that can be used in web mode.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--pass_length <length>","","Specifies the length of the password."
+    "--pass_count <count>","","Specify the number of passwords to be generated."
+    "--use_alphabet <type>","","Specifies the type of alphabet used for the password. `notuse` , `upper` , `lower` , `both` can be specified."
+    "--use_number <type>","","Specify the type of number to be used for the password. `notuse` , `use` can be specified."
+    "--use_symbol <type>","","Specifies the type of symbol used in the password. `notuse` , `use` can be specified."
+    "--similar <type>","","Specifies whether certain similar characters should be used. `exclude` , `include` can be specified."
+
 Add Group : `cmdbox -m web -c group_add <Option>`
 ==============================================================================
+
+- Add a group in Web mode.
 
 .. csv-table::
     :widths: 20, 10, 70
@@ -42,6 +63,8 @@ Add Group : `cmdbox -m web -c group_add <Option>`
 Delete Group : `cmdbox -m web -c group_del <Option>`
 ==============================================================================
 
+- Del a group in Web mode.
+
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
@@ -57,6 +80,8 @@ Delete Group : `cmdbox -m web -c group_del <Option>`
 
 Edit Group : `cmdbox -m web -c group_edit <Option>`
 ==============================================================================
+
+- Edit a group in Web mode.
 
 .. csv-table::
     :widths: 20, 10, 70
@@ -76,6 +101,8 @@ Edit Group : `cmdbox -m web -c group_edit <Option>`
 List Group : `cmdbox -m web -c group_list <Option>`
 ==============================================================================
 
+- Get a list of users in Web mode.
+
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
@@ -91,6 +118,8 @@ List Group : `cmdbox -m web -c group_list <Option>`
 
 Web Service Launch : `cmdbox -m web -c start <Option>`
 ==============================================================================
+
+- Start Web mode.
 
 .. csv-table::
     :widths: 20, 10, 70
@@ -124,6 +153,8 @@ Web Service Launch : `cmdbox -m web -c start <Option>`
 Web Service Stops : `cmdbox -m web -c stop <Option>`
 ==============================================================================
 
+- Stop Web mode.
+
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
@@ -133,6 +164,8 @@ Web Service Stops : `cmdbox -m web -c stop <Option>`
 
 Add User : `cmdbox -m web -c user_add <Option>`
 ==============================================================================
+
+- Add a user in Web mode.
 
 .. csv-table::
     :widths: 20, 10, 70
@@ -155,6 +188,8 @@ Add User : `cmdbox -m web -c user_add <Option>`
 Delete User : `cmdbox -m web -c user_del <Option>`
 ==============================================================================
 
+- Delete a user in Web mode.
+
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
@@ -170,6 +205,8 @@ Delete User : `cmdbox -m web -c user_del <Option>`
 
 Edit User : `cmdbox -m web -c user_edit <Option>`
 ==============================================================================
+
+- Edit users in Web mode.
 
 .. csv-table::
     :widths: 20, 10, 70
@@ -191,6 +228,8 @@ Edit User : `cmdbox -m web -c user_edit <Option>`
 
 List User : `cmdbox -m web -c user_list <Option>`
 ==============================================================================
+
+- Get a list of users in Web mode.
 
 .. csv-table::
     :widths: 20, 10, 70

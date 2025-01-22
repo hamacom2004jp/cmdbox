@@ -38,6 +38,25 @@ users.users_list = async () => {
                 row_content.find('.row_content_template_title').removeClass('row_content_template_title').text(col);
                 const input = row_content.find('.row_content_template_input').removeClass('row_content_template_input');
                 input.attr('name', col).attr('type', 'password');
+                const btn_e = $('<button class="btn btn-secondary eye_buton" type="button"></button>');
+                btn_e.append('<svg width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16"><use href="#svg_eyeslash_btn"></use></svg>');
+                btn_e.appendTo(row.find('.input-group')).click(() => {
+                    if (input.attr('type') == 'password') {
+                        input.attr('type', 'text');
+                        btn_e.find('use').attr('href', '#svg_eyeslash_btn');
+                    } else {
+                        input.attr('type', 'password');
+                        btn_e.find('use').attr('href', '#svg_eye_btn');
+                    }
+                });
+                const btn_m = $('<button class="btn btn-secondary gen_buton" type="button"></button>');
+                btn_m.append('<svg width="16" height="16" fill="currentColor" class="bi bi-magic" viewBox="0 0 16 16"><use href="#svg_magic_btn"></use></svg>');
+                btn_m.appendTo(row.find('.input-group')).click(() => {
+                    cmdbox.genpass().then((pass) => {
+                        if (pass.length == 0) return;
+                        input.val(pass[0]['password']);
+                    });
+                });
                 continue;
             }
             if (col == 'hash') {

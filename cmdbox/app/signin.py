@@ -10,6 +10,7 @@ class Signin(object):
     def jadge(self, access_token:str, email:str, signin_file_data:Dict[str, Any]) -> Tuple[bool, Dict[str, Any]]:
         """
         サインインを成功させるかどうかを判定します。
+        返すユーザーデータには、uid, name, email, groups, hash が必要です。
 
         Args:
             access_token (str): アクセストークン
@@ -22,11 +23,12 @@ class Signin(object):
         users = [u for u in signin_file_data['users'] if u['email'] == email and u['hash'] == 'oauth2']
         return len(users) > 0, users[0] if len(users) > 0 else None
 
-    def get_groups(self, user:Dict[str, Any], signin_file_data:Dict[str, Any]) -> Tuple[List[str], List[int]]:
+    def get_groups(self, access_token:str, user:Dict[str, Any], signin_file_data:Dict[str, Any]) -> Tuple[List[str], List[int]]:
         """
         ユーザーのグループを取得します
 
         Args:
+            access_token (str): アクセストークン
             user (Dict[str, Any]): ユーザーデータ
             signin_file_data (Dict[str, Any]): サインインファイルデータ（変更不可）
 
