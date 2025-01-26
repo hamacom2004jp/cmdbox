@@ -185,7 +185,7 @@ cmdbox.passchange = async () => {
     const newinput = new_pass.find('input');
     const confinput = confirm_pass.find('input');
     cmdbox.genpass().then((pass) => {
-      if (pass.length == 0) return;
+      if (!pass || pass.length == 0) return;
       newinput.val(pass[0]['password']);
       confinput.val(pass[0]['password']);
     });
@@ -632,6 +632,7 @@ cmdbox.genpass = (pass_length=16, pass_count=1, use_alphabet="both", use_number=
         error_func(res);
         return;
       }
+      cmdbox.message(res);
       return res[0];
     }
     const ret = res[0]['success'];
