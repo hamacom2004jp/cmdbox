@@ -216,6 +216,16 @@ def saveopt(opt:dict, opt_path:Path) -> None:
     with open(opt_path, 'w') as f:
         json.dump(opt, f, indent=4, default=default_json_enc)
 
+def saveuser(user_data:dict, user_path:Path) -> None:
+    """
+    ユーザーファイルを保存します。
+
+    Args:
+        user_data (dict): ユーザーファイル
+        user_path (Path): 保存先のファイルパス
+    """
+    saveopt(user_data, user_path)
+
 def loadopt(opt_path:str) -> dict:
     """
     JSON形式のファイルからコマンドラインオプションを読み込みます。
@@ -231,6 +241,18 @@ def loadopt(opt_path:str) -> dict:
     with open(opt_path) as f:
         opt = json.load(f)
         return opt
+
+def loaduser(user_path:str) -> dict:
+    """
+    JSON形式のユーザーファイルを読み込みます。
+
+    Args:
+        user_path (str): ユーザーファイルのパス
+
+    Returns:
+        dict: 読み込んだユーザーファイル
+    """
+    return loadopt(user_path)
 
 def getopt(opt:dict, key:str, preval=None, defval=None, withset=False) -> any:
     """

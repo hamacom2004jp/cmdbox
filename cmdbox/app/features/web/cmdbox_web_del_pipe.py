@@ -23,5 +23,8 @@ class DelPipe(feature.WebFeature):
             opt_path = web.pipes_path / f"pipe-{title}.json"
             web.logger.info(f"del_pipe: opt_path={opt_path}")
             opt_path.unlink()
+            if 'signin' in req.session and req.session['signin'] is not None:
+                sess = req.session['signin']
+                web.user_data(req, sess['uid'], sess['name'], 'pipepins', title, delkey=True)
             return {}
 

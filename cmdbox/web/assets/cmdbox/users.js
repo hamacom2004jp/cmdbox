@@ -38,17 +38,6 @@ users.users_list = async () => {
                 row_content.find('.row_content_template_title').removeClass('row_content_template_title').text(col);
                 const input = row_content.find('.row_content_template_input').removeClass('row_content_template_input');
                 input.attr('name', col).attr('type', 'password');
-                const btn_e = $('<button class="btn btn-secondary eye_buton" type="button"></button>');
-                btn_e.append('<svg width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16"><use href="#svg_eyeslash_btn"></use></svg>');
-                btn_e.appendTo(row.find('.input-group')).click(() => {
-                    if (input.attr('type') == 'password') {
-                        input.attr('type', 'text');
-                        btn_e.find('use').attr('href', '#svg_eyeslash_btn');
-                    } else {
-                        input.attr('type', 'password');
-                        btn_e.find('use').attr('href', '#svg_eye_btn');
-                    }
-                });
                 const btn_m = $('<button class="btn btn-secondary gen_buton" type="button"></button>');
                 btn_m.append('<svg width="16" height="16" fill="currentColor" class="bi bi-magic" viewBox="0 0 16 16"><use href="#svg_magic_btn"></use></svg>');
                 btn_m.appendTo(row.find('.input-group')).click(() => {
@@ -56,6 +45,17 @@ users.users_list = async () => {
                         if (pass.length == 0) return;
                         input.val(pass[0]['password']);
                     });
+                });
+                const btn_e = $('<button class="btn btn-secondary eye_buton" type="button"></button>');
+                btn_e.append('<svg width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16"><use href="#svg_eyeslash_btn"></use></svg>');
+                btn_e.appendTo(row.find('.input-group')).click(() => {
+                    if (input.attr('type') == 'password') {
+                        input.attr('type', 'text');
+                        btn_e.find('use').attr('href', '#svg_eye_btn');
+                    } else {
+                        input.attr('type', 'password');
+                        btn_e.find('use').attr('href', '#svg_eyeslash_btn');
+                    }
                 });
                 continue;
             }
@@ -184,7 +184,9 @@ users.users_list = async () => {
                 cmdbox.message({'error':`${res.status}: ${res.statusText}`});
                 return;
             }
-            cmdbox.message(await res.json());
+            const ret = await res.json();
+            cmdbox.message(ret);
+            if (!ret['success']) return
             users.users_list();
             users.groups_list();
             modal.modal('hide');
@@ -518,6 +520,47 @@ users.pathrules_list = async () => {
         }
     }
 };
+// パスワード設定一覧
+users.passsetting_list = async () => {
+    const passsetting_res = await fetch('passsetting/list', {method: 'GET'});
+    if (passsetting_res.status != 200) {
+        cmdbox.message({'error':`${passsetting_res.status}: ${passsetting_res.statusText}`});
+        return;
+    }
+    const passsetting_root_data = await passsetting_res.json();
+    const policy_data = passsetting_root_data['policy'];
+    const expiration_data = passsetting_root_data['expiration'];
+    const passsetting_elem = $('#passsetting_list');
+    passsetting_elem.html('');
+    const policy_card_elem = $('<div class="card m-3"/>').appendTo(passsetting_elem);
+    const policy_cardbody_elem = $('<div class="card-body"/>').appendTo(policy_card_elem);
+    policy_cardbody_elem.append('<h5 class="card-title">Password Policy</h5>');
+    const policy_table_elem = $('<table class="table table-bordered table-hover"/>').appendTo(policy_cardbody_elem);
+    const policy_thead_elem = $('<thead><tr><th>#</th><th>setting</th><th>value</th></tr></thead>').appendTo(policy_table_elem);
+    const policy_tbody_elem = $('<tbody/>').appendTo(policy_table_elem);
+    let i_row=0;
+    for (const key in policy_data) {
+        i_row++;
+        const tr = $('<tr>').appendTo(policy_tbody_elem);
+        $('<td>').text(i_row).appendTo(tr);
+        $('<td>').text(key).appendTo(tr);
+        $('<td>').text(policy_data[key]).appendTo(tr);
+    }
+    const expiration_card_elem = $('<div class="card m-3"/>').appendTo(passsetting_elem);
+    const expiration_cardbody_elem = $('<div class="card-body"/>').appendTo(expiration_card_elem);
+    expiration_cardbody_elem.append('<h5 class="card-title">Password Expiration</h5>');
+    const expiration_table_elem = $('<table class="table table-bordered table-hover"/>').appendTo(expiration_cardbody_elem);
+    const expiration_thead_elem = $('<thead><tr><th>#</th><th>setting</th><th>value</th></tr></thead>').appendTo(expiration_table_elem);
+    const expiration_tbody_elem = $('<tbody/>').appendTo(expiration_table_elem);
+    i_row=0;
+    for (const key in expiration_data) {
+        i_row++;
+        const tr = $('<tr>').appendTo(expiration_tbody_elem);
+        $('<td>').text(i_row).appendTo(tr);
+        $('<td>').text(key).appendTo(tr);
+        $('<td>').text(expiration_data[key]).appendTo(tr);
+    }
+};
 $(() => {
     // ダークモード対応
     cmdbox.change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -536,5 +579,6 @@ $(() => {
         users.groups_list();
         users.cmdrules_list();
         users.pathrules_list();
+        users.passsetting_list();
     });
 });

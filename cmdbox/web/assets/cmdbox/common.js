@@ -110,6 +110,108 @@ cmdbox.singout = (sitepath) => {
     location.href = `dosignout/${sitepath}?r=${rand}`;
   }
 };
+/**
+ * 現在のユーザーのパスワード変更
+ */
+cmdbox.passchange = async () => {
+  const user = await cmdbox.user_info();
+  if (!user) {
+    cmdbox.message('user not found');
+    return;
+  }
+  if (user['hash']=='oauth2') {
+    cmdbox.message('This account is an OAuth2 account and cannot be changed.');
+    return;
+  }
+  const chpass_modal = $('#chpass_modal').length?$('#chpass_modal'):$(`<div id="chpass_modal" class="modal" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
+  chpass_modal.html('');
+  const daialog = $(`<div class="modal-dialog ui-draggable ui-draggable-handle"/>`).appendTo(chpass_modal);
+  const form = $(`<form id="chpass_form" class="modal-content novalidate"/>`).appendTo(daialog);
+  const header = $(`<div class="modal-header"/>`).appendTo(form);
+  header.append('<h5 class="modal-title">Change Password</h5>');
+  header.append('<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>');
+  const body = $(`<div class="modal-body"/>`).appendTo(form);
+  const row_content = $(`<div class="row row_content"/>`).appendTo(body);
+  const crrent_pass = $(`<div class="col-12 mb-3"><div class="input-group">`+
+    `<label class="input-group-text">Current Password</label>`+
+    `<input type="password" class="form-control" name="password"/>`+
+    `<button class="btn btn-secondary eye_buton" type="button"><svg width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16"><use href="#svg_eyeslash_btn"></use></svg></button>`+
+    `</div>`).appendTo(row_content);
+  crrent_pass.find('.eye_buton').off('click').on('click', () => {
+    const input = crrent_pass.find('input');
+    const btn = crrent_pass.find('.eye_buton');
+    if (input.attr('type') == 'password') {
+      input.attr('type', 'text');
+      btn.find('use').attr('href', '#svg_eye_btn');
+    } else {
+      input.attr('type', 'password');
+      btn.find('use').attr('href', '#svg_eyeslash_btn');
+    }
+  });
+  const new_pass = $(`<div class="col-12 mb-3"><div class="input-group">`+
+    `<label class="input-group-text">New Password</label>`+
+    `<input type="password" class="form-control" name="new_password"/>`+
+    `<button class="btn btn-secondary gen_buton" type="button"><svg width="16" height="16" fill="currentColor" class="bi bi-magic" viewBox="0 0 16 16"><use href="#svg_magic_btn"></use></svg></button>`+
+    `<button class="btn btn-secondary eye_buton" type="button"><svg width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16"><use href="#svg_eyeslash_btn"></use></svg></button>`+
+    `</div>`).appendTo(row_content);
+  new_pass.find('.eye_buton').off('click').on('click', () => {
+    const input = new_pass.find('input');
+    const btn = new_pass.find('.eye_buton');
+    if (input.attr('type') == 'password') {
+      input.attr('type', 'text');
+      btn.find('use').attr('href', '#svg_eye_btn');
+    } else {
+      input.attr('type', 'password');
+      btn.find('use').attr('href', '#svg_eyeslash_btn');
+    }
+  });
+  const confirm_pass = $(`<div class="col-12 mb-3"><div class="input-group">`+
+    `<label class="input-group-text">Confirm Password</label>`+
+    `<input type="password" class="form-control" name="confirm_password"/>`+
+    `<button class="btn btn-secondary eye_buton" type="button"><svg width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16"><use href="#svg_eyeslash_btn"></use></svg></button>`+
+    `</div>`).appendTo(row_content);
+    confirm_pass.find('.eye_buton').off('click').on('click', () => {
+    const input = confirm_pass.find('input');
+    const btn = confirm_pass.find('.eye_buton');
+    if (input.attr('type') == 'password') {
+      input.attr('type', 'text');
+      btn.find('use').attr('href', '#svg_eye_btn');
+    } else {
+      input.attr('type', 'password');
+      btn.find('use').attr('href', '#svg_eyeslash_btn');
+    }
+  });
+  new_pass.find('.gen_buton').off('click').on('click', () => {
+    const newinput = new_pass.find('input');
+    const confinput = confirm_pass.find('input');
+    cmdbox.genpass().then((pass) => {
+      if (pass.length == 0) return;
+      newinput.val(pass[0]['password']);
+      confinput.val(pass[0]['password']);
+    });
+  });
+  const footer = $(`<div class="modal-footer"/>`).appendTo(form);
+  footer.append('<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>');
+  const change = $(`<button type="button" class="btn btn-success">Change</button>`).appendTo(footer);
+  change.off('click').on('click', async (event) => {
+    cmdbox.show_loading();
+    const res = await fetch('password/change', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        'user_name': user['name'],
+        'password': crrent_pass.find('input').val(),
+        'new_password': new_pass.find('input').val(),
+        'confirm_password': confirm_pass.find('input').val()
+      })
+    });
+    cmdbox.hide_loading();
+    cmdbox.message(await res.json());
+  });
+  chpass_modal.appendTo('body');
+  daialog.draggable({cursor:'move',cancel:'.modal-body'});
+  chpass_modal.modal('show');
+};
 $(()=>{
   // サインアウトメニューを表示
   fetch('usesignout', {method: 'GET'}).then(async res => {
@@ -122,6 +224,10 @@ $(()=>{
       if (!user) return;
       const user_info_menu = $('.user_info');
       user_info_menu.removeClass('d-none').addClass('d-flex');
+      if (!user_info_menu.find('.dropdown-menu .changepass-menu-item').length) {
+        const changepass_item = $(`<li><a class="dropdown-item changepass-menu-item" href="#" onclick="cmdbox.passchange();">Change Password</a></li>`);
+        user_info_menu.find('.dropdown-menu').append(changepass_item);
+      }
       if (!user_info_menu.find('.dropdown-menu .signout-menu-item').length) {
         const parts = location.pathname.split('/');
         const sitepath = parts[parts.length-1];
@@ -521,11 +627,11 @@ cmdbox.genpass = (pass_length=16, pass_count=1, use_alphabet="both", use_number=
   cmdbox.show_loading();
   return cmdbox.sv_exec_cmd(opt).then(res => {
     if(!res[0] || !res[0]['success']) {
+      cmdbox.hide_loading();
       if (error_func) {
         error_func(res);
         return;
       }
-      cmdbox.hide_loading();
       return res[0];
     }
     const ret = res[0]['success'];
@@ -837,3 +943,55 @@ cmdbox.progress = (_min, _max, _now, _text, _show, _cycle) => {
     }, 20);
   }
 };
+/**
+ * コマンドピンを保存
+ * @param {string} title - タイトル
+ * @param {bool} pin - ピン
+ */
+cmdbox.save_cmd_pin = async (title, pin) => {
+  const formData = new FormData();
+  formData.append('title', title);
+  formData.append('pin', pin?'on':'off');
+  const res = await fetch('gui/save_cmd_pin', {method:'POST', body:formData});
+  if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+  const msg = await res.json()
+};
+/**
+ * コマンドピンをロード
+ * @param {string} title - タイトル
+ * @returns {Promise}
+ */
+cmdbox.load_cmd_pin = async (title) => {
+  const formData = new FormData();
+  if (title) formData.append('title', title);
+  const res = await fetch('gui/load_cmd_pin', {method:'POST', body:formData});
+  if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+  const pins = await res.json();
+  return pins;
+};
+/**
+ * パイプピンを保存
+ * @param {string} title - タイトル
+ * @param {bool} pin - ピン
+ */
+cmdbox.save_pipe_pin = async (title, pin) => {
+  const formData = new FormData();
+  formData.append('title', title);
+  formData.append('pin', pin?'on':'off');
+  const res = await fetch('gui/save_pipe_pin', {method:'POST', body:formData});
+  if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+  const msg = await res.json()
+};
+/**
+ * パイプピンをロード
+ * @param {string} title - タイトル
+ * @returns {Promise}
+ */
+cmdbox.load_pipe_pin = async (title) => {
+  const formData = new FormData();
+  if (title) formData.append('title', title);
+  const res = await fetch('gui/load_pipe_pin', {method:'POST', body:formData});
+  if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+  const pins = await res.json();
+  return pins;
+}

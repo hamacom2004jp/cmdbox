@@ -4,13 +4,22 @@ const list_cmd_func = async () => {
     const kwd = $('#cmd_kwd').val();
     const py_list_cmd = await list_cmd(kwd?`*${kwd}*`:'*');
     $('#cmd_items').append($($('#cmd_add').html()));
-    py_list_cmd.forEach(row => {
+    const data = await cmdbox.load_cmd_pin(null);
+    const pins = data && data['success'] ? data['success'] : {};
+    const card_func = (row, ispin) => {
+        if (ispin && pins[row.title]!='on') return;
+        else if (!ispin && pins[row.title]=='on') return;
         const elem = $($('#cmd_template').html());
+        if (pins[row.title]=='on') {
+            elem.find('.cmd_title').after('<svg class="bi bi-pin-fill d-inline-block ms-auto" width="24" height="24" fill="currentColor"><use href="#btn_pin_fill"></use></svg>');
+        }
         elem.find('.cmd_title').text(row.title);
         elem.find('.cmd_mode').text(row.mode);
         elem.find('.cmd_cmd').text(row.cmd);
         $('#cmd_items').append(elem);
-    });
+    };
+    py_list_cmd.forEach(row => {card_func(row, true)});
+    py_list_cmd.forEach(row => {card_func(row, false)});
 }
 // コマンドファイルの取得が出来た時の処理
 const list_cmd_func_then = () => {
@@ -253,6 +262,36 @@ const list_cmd_func_then = () => {
             cmd_modal.find('[name="cmd_disabled"]').val('').hide();
             cmd_modal.find('[name="name"]').css('border-top-right-radius','6px').css('border-bottom-right-radius','6px').show();
             cmd_modal.find('[name="name_disabled"]').val('').hide();
+        }
+        cmd_modal.find('.btn_pin_angle').off('click').on('click', () => {
+            const title = cmd_modal.find('[name="title"]').val();
+            cmd_modal.find('.btn_pin_angle').hide();
+            cmd_modal.find('.btn_pin_fill').show();
+            cmdbox.save_cmd_pin(title, true).then(() => list_cmd_func().then(list_cmd_func_then));
+        });
+        cmd_modal.find('.btn_pin_fill').off('click').on('click', () => {
+            const title = cmd_modal.find('[name="title"]').val();
+            cmd_modal.find('.btn_pin_fill').hide();
+            cmd_modal.find('.btn_pin_angle').show();
+            cmdbox.save_cmd_pin(title, false).then(() => list_cmd_func().then(list_cmd_func_then));
+        });
+        const title = cmd_modal.find('[name="title"]').val();
+        if (title) {
+            cmdbox.load_cmd_pin(title).then((result) => {
+                if (!result['success']) {
+                    cmd_modal.find('.btn_pin_fill').hide();
+                    cmd_modal.find('.btn_pin_angle').hide();
+                } else if (result['success']=='on') {
+                    cmd_modal.find('.btn_pin_fill').show();
+                    cmd_modal.find('.btn_pin_angle').hide();
+                } else {
+                    cmd_modal.find('.btn_pin_fill').hide();
+                    cmd_modal.find('.btn_pin_angle').show();
+                }
+            });
+        } else {
+            cmd_modal.find('.btn_pin_fill').hide();
+            cmd_modal.find('.btn_pin_angle').hide();
         }
         cmd_modal.find('.modal-title').text(`Command : ${modal_title}`);
         cmd_modal.find('.row_content_hide').hide();

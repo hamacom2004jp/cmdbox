@@ -36,6 +36,16 @@
             "justMyCode": false
         },
         {
+            "name": "Python: cmdbox web nosignin",
+            "type": "python",
+            "request": "launch",
+            "args": ["-m","web","-c","start","--debug"],
+            "module": "cmdbox",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
+        },
+        {
             "name": "Python: cmdbox genpass",
             "type": "python",
             "request": "launch",

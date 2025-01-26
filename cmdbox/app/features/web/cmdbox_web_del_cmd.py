@@ -23,4 +23,7 @@ class DelCmd(feature.WebFeature):
             opt_path = web.cmds_path / f"cmd-{title}.json"
             web.logger.info(f"del_cmd: opt_path={opt_path}")
             opt_path.unlink()
+            if 'signin' in req.session and req.session['signin'] is not None:
+                sess = req.session['signin']
+                web.user_data(req, sess['uid'], sess['name'], 'cmdpins', title, delkey=True)
             return {}

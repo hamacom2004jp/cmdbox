@@ -76,8 +76,13 @@ $(() => {
         const params = new URLSearchParams(window.location.search);
         if (params.has('error')) {
             const elem = $(`<div class="alert alert-warning alert-dismissible d-block" role="alert">`);
-            elem.append('<div>Sign in faild: The ID or PW is incorrect or the user is not authorized.</div>');
-            elem.append('<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
+            const msgelem = $('<div>Sign in faild: The ID or PW is incorrect or the user is not authorized.</div>').appendTo(elem);
+            if (params.get('error') == 'noauth') msgelem.text('Sign in faild: No credentials are available. Please sign in.');
+            if (params.get('error') == 'expirationofpassword') msgelem.text('Sign in faild: The password has expired.');
+            if (params.get('error') == 'appdeny') msgelem.text('OAuth2 succeeded but app not allowed.');
+            if (params.get('error') == 'apikeyfail') msgelem.text('Authentication failed due to incorrect apikey.');
+            if (params.get('error') == 'unauthorizedsite') msgelem.text('Access to an unauthorized site.');
+            $('<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>').appendTo(elem);
             $('body').prepend(elem);
         }
     }

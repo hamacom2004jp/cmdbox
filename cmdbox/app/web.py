@@ -4,11 +4,12 @@ from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import RedirectResponse
 from pathlib import Path
 from starlette.middleware.sessions import SessionMiddleware
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 from uvicorn.config import Config
 import asyncio
 import copy
 import ctypes
+import datetime
 import gevent
 import logging
 import os
@@ -16,6 +17,7 @@ import platform
 import requests
 import queue
 import signal
+import string
 import threading
 import traceback
 import uvicorn
@@ -94,9 +96,11 @@ class Web:
         self.web_features_prefix = web_features_prefix
         self.cmds_path = self.data / ".cmds"
         self.pipes_path = self.data / ".pipes"
+        self.users_path = self.data / ".users"
         self.static_root = Path(__file__).parent.parent / 'web'
         common.mkdirs(self.cmds_path)
         common.mkdirs(self.pipes_path)
+        common.mkdirs(self.users_path)
         self.pipe_th = None
         self.img_queue = queue.Queue(1000)
         self.cb_queue = queue.Queue(1000)
@@ -121,6 +125,7 @@ class Web:
             self.logger.debug(f"web init parameter: web_features_prefix={self.web_features_prefix}")
             self.logger.debug(f"web init parameter: cmds_path={self.cmds_path} -> {self.cmds_path.absolute() if self.cmds_path is not None else None}")
             self.logger.debug(f"web init parameter: pipes_path={self.pipes_path} -> {self.pipes_path.absolute() if self.pipes_path is not None else None}")
+            self.logger.debug(f"web init parameter: users_path={self.users_path} -> {self.users_path.absolute() if self.users_path is not None else None}")
 
     def enable_cors(self, req:Request, res:Response) -> None:
         """
@@ -152,11 +157,11 @@ class Web:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if 'Authorization' not in req.headers:
             self.logger.warning(f"Authorization not found. headers={req.headers}")
-            return RedirectResponse(url=f'/signin{req.url.path}?error=2')
+            return RedirectResponse(url=f'/signin{req.url.path}?error=noauth')
         auth = req.headers['Authorization']
         if not auth.startswith('Bearer '):
             self.logger.warning(f"Bearer not found. headers={req.headers}")
-            return RedirectResponse(url=f'/signin{req.url.path}?error=3')
+            return RedirectResponse(url=f'/signin{req.url.path}?error=apikeyfail')
         bearer, apikey = auth.split(' ')
         apikey = common.hash_password(apikey.strip(), 'sha1')
         if self.logger.level == logging.DEBUG:
@@ -170,7 +175,7 @@ class Web:
                     find_user = user
         if find_user is None:
             self.logger.warning(f"No matching user found for apikey.")
-            return RedirectResponse(url=f'/signin{req.url.path}?error=4')
+            return RedirectResponse(url=f'/signin{req.url.path}?error=apikeyfail')
 
         group_names = list(set(self.correct_group(find_user['groups'])))
         gids = [g['gid'] for g in self.signin_file_data['groups'] if g['name'] in group_names]
@@ -191,7 +196,8 @@ class Web:
             self.logger.debug(f"rule: {req.url.path}: {jadge}")
         if jadge == 'allow':
             return None
-        return RedirectResponse(url=f'/signin{req.url.path}?error=1')
+        self.logger.warning(f"Unauthorized site. user={find_user['name']}, path={req.url.path}")
+        return RedirectResponse(url=f'/signin{req.url.path}?error=unauthorizedsite')
 
     def check_signin(self, req:Request, res:Response):
         """
@@ -223,9 +229,13 @@ class Web:
                 self.logger.debug(f"rule: {req.url.path}: {jadge}")
             if jadge == 'allow':
                 return None
-        if self.logger.level == logging.DEBUG:
+            else:
+                self.logger.warning(f"Unauthorized site. user={req.session['signin']['name']}, path={req.url.path}")
+                return RedirectResponse(url=f'/signin{req.url.path}?error=unauthorizedsite')
+        ret = self.check_apikey(req, res)
+        if ret is not None and self.logger.level == logging.DEBUG:
             self.logger.debug(f"Not signed in.")
-        return RedirectResponse(url=f'/signin{req.url.path}?error=1')
+        return ret
 
     def check_cmd(self, req:Request, res:Response, mode:str, cmd:str):
         if self.signin_file is None:
@@ -462,6 +472,56 @@ class Web:
                     rule['paths'] = []
                 if type(rule['paths']) is not list:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "paths" not list type in "pathrule.rules". ({self.signin_file})')
+            # passwordのフォーマットチェック
+            if 'password' in yml:
+                if 'policy' not in yml['password']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "policy" not found in "password". ({self.signin_file})')
+                if 'enabled' not in yml['password']['policy']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "password.policy". ({self.signin_file})')
+                if type(yml['password']['policy']['enabled']) is not bool:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "password.policy". ({self.signin_file})')
+                if 'min_length' not in yml['password']['policy']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_length" not found in "password.policy". ({self.signin_file})')
+                if type(yml['password']['policy']['min_length']) is not int:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_length" not int type in "password.policy". ({self.signin_file})')
+                if 'max_length' not in yml['password']['policy']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "max_length" not found in "password.policy". ({self.signin_file})')
+                if type(yml['password']['policy']['max_length']) is not int:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "max_length" not int type in "password.policy". ({self.signin_file})')
+                if 'min_lowercase' not in yml['password']['policy']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_lowercase" not found in "password.policy". ({self.signin_file})')
+                if type(yml['password']['policy']['min_lowercase']) is not int:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_lowercase" not int type in "password.policy". ({self.signin_file})')
+                if 'min_uppercase' not in yml['password']['policy']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_uppercase" not found in "password.policy". ({self.signin_file})')
+                if type(yml['password']['policy']['min_uppercase']) is not int:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_uppercase" not int type in "password.policy". ({self.signin_file})')
+                if 'min_digit' not in yml['password']['policy']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_digit" not found in "password.policy". ({self.signin_file})')
+                if type(yml['password']['policy']['min_digit']) is not int:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_digit" not int type in "password.policy". ({self.signin_file})')
+                if 'min_symbol' not in yml['password']['policy']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_symbol" not found in "password.policy". ({self.signin_file})')
+                if type(yml['password']['policy']['min_symbol']) is not int:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_symbol" not int type in "password.policy". ({self.signin_file})')
+                if 'not_contain_username' not in yml['password']['policy']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "not_contain_username" not found in "password.policy". ({self.signin_file})')
+                if type(yml['password']['policy']['not_contain_username']) is not bool:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "not_contain_username" not bool type in "password.policy". ({self.signin_file})')
+                if 'expiration' not in yml['password']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "expiration" not found in "password". ({self.signin_file})')
+                if 'enabled' not in yml['password']['expiration']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "password.expiration". ({self.signin_file})')
+                if type(yml['password']['expiration']['enabled']) is not bool:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "password.expiration". ({self.signin_file})')
+                if 'period' not in yml['password']['expiration']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "period" not found in "password.expiration". ({self.signin_file})')
+                if type(yml['password']['expiration']['period']) is not int:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "period" not int type in "password.expiration". ({self.signin_file})')
+                if 'notify' not in yml['password']['expiration']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "notify" not found in "password.expiration". ({self.signin_file})')
+                if type(yml['password']['expiration']['notify']) is not int:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "notify" not int type in "password.expiration". ({self.signin_file})')
             # oauth2のフォーマットチェック
             if 'oauth2' not in yml:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "oauth2" not found. ({self.signin_file})')
@@ -502,6 +562,86 @@ class Web:
             # フォーマットチェックOK
             self.signin_file_data = yml
 
+    def check_password_policy(self, user_name:str, password:str) -> Tuple[bool, str]:
+        """
+        パスワードポリシーをチェックする
+
+        Args:
+            user_name (str): ユーザー名
+            password (str): パスワード
+        Returns:
+            bool: True:ポリシーOK, False:ポリシーNG
+            str: メッセージ
+        """
+        if self.signin_file_data is None or 'password' not in self.signin_file_data:
+            return True, "There is no password policy set."
+        policy = self.signin_file_data['password']['policy']
+        if not policy['enabled']:
+            return True, "Password policy is disabled."
+        if len(password) < policy['min_length'] or len(password) > policy['max_length']:
+            self.logger.warning(f"Password policy error. min_length={policy['min_length']}, max_length={policy['max_length']}")
+            return False, f"Password policy error. min_length={policy['min_length']}, max_length={policy['max_length']}"
+        if len([c for c in password if c.islower()]) < policy['min_lowercase']:
+            self.logger.warning(f"Password policy error. min_lowercase={policy['min_lowercase']}")
+            return False, f"Password policy error. min_lowercase={policy['min_lowercase']}"
+        if len([c for c in password if c.isupper()]) < policy['min_uppercase']:
+            self.logger.warning(f"Password policy error. min_uppercase={policy['min_uppercase']}")
+            return False, f"Password policy error. min_uppercase={policy['min_uppercase']}"
+        if len([c for c in password if c.isdigit()]) < policy['min_digit']:
+            self.logger.warning(f"Password policy error. min_digit={policy['min_digit']}")
+            return False, f"Password policy error. min_digit={policy['min_digit']}"
+        if len([c for c in password if c in string.punctuation]) < policy['min_symbol']:
+            self.logger.warning(f"Password policy error. min_symbol={policy['min_symbol']}")
+            return False, f"Password policy error. min_symbol={policy['min_symbol']}"
+        if policy['not_contain_username'] and (user_name is None or user_name in password):
+            self.logger.warning(f"Password policy error. not_contain_username=True")
+            return False, f"Password policy error. not_contain_username=True"
+        self.logger.info(f"Password policy OK.")
+        return True, "Password policy OK."
+    
+    def change_password(self, user_name:str, password:str, new_password:str, confirm_password:str):
+        """
+        パスワードを変更する
+
+        Args:
+            user_name (str): ユーザー名
+            new_password (str): 新しいパスワード
+            confirm_password (str): 確認用パスワード
+
+        Raises:
+            HTTPException: パスワードが一致しない場合
+            HTTPException: ユーザーが存在しない場合
+        """
+        if self.signin_file_data is None:
+            raise ValueError(f'signin_file_data is None. ({self.signin_file})')
+        if self.signin_file is None:
+            raise ValueError(f"signin_file is None.")
+        if user_name is None or user_name == '':
+            return dict(warn="User name is empty.")
+        if password is None or password == '':
+            return dict(warn="Password is empty.")
+        if new_password is None or new_password == '':
+            return dict(warn="New password is empty.")
+        if confirm_password is None or confirm_password == '':
+            return dict(warn="Confirm password is empty.")
+        if new_password != confirm_password:
+            return dict(warn="Password does not match.")
+        for u in self.signin_file_data['users']:
+            if u['name'] == user_name:
+                p = password if u['hash'] == 'plain' else common.hash_password(password, u['hash'])
+                if u['password'] != p:
+                    return dict(warn="Password does not match.")
+                jadge, msg = self.check_password_policy(user_name, new_password)
+                if not jadge:
+                    return dict(warn=msg)
+                u['password'] = new_password if u['hash'] == 'plain' else common.hash_password(new_password, u['hash'])
+                # パスワード更新日時の保存
+                self.user_data(None, u['uid'], user_name, 'password', 'last_update', datetime.datetime.now())
+                # サインインファイルの保存
+                common.save_yml(self.signin_file, self.signin_file_data)
+                return dict(success="Password changed.")
+        return dict(warn="User not found.")
+
     def user_list(self, name:str=None) -> List[Dict[str, Any]]:
         """
         サインインファイルのユーザー一覧を取得する
@@ -523,8 +663,9 @@ class Web:
                 u['apikeys'] = dict([(ak, '********') for ak in u['apikeys']])
             if u['name'] == name:
                 return [u]
+            last_signin = self.user_data(None, u['uid'], u['name'], 'signin', 'last_update')
             if name is None:
-                ret.append(u)
+                ret.append(dict(**u, last_signin=last_signin))
         return ret
 
     def apikey_add(self, user:Dict[str, Any]) -> str:
@@ -640,15 +781,19 @@ class Web:
             raise ValueError(f"User name is already exists. ({user})")
         if hash not in ['oauth2', 'plain', 'md5', 'sha1', 'sha256']:
             raise ValueError(f"User hash is not supported. ({user})")
+        jadge, msg = self.check_password_policy(user['name'], user['password'])
+        if not jadge:
+            raise ValueError(msg)
         if hash != 'plain':
             user['password'] = common.hash_password(user['password'], hash if hash != 'oauth2' else 'sha1')
         else:
             user['password'] = user['password']
         self.signin_file_data['users'].append(user)
-        if self.signin_file is None:
-            raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"user_add: {user} -> {self.signin_file}")
+        # パスワード更新日時の保存
+        self.user_data(None, user['uid'], user['name'], 'password', 'last_update', datetime.datetime.now())
+        # サインインファイルの保存
         common.save_yml(self.signin_file, self.signin_file_data)
 
     def user_edit(self, user:Dict[str, Any]):
@@ -692,16 +837,20 @@ class Web:
             if u['uid'] == user['uid']:
                 u['name'] = user['name']
                 if 'password' in user and user['password'] != '':
+                    jadge, msg = self.check_password_policy(user['name'], user['password'])
+                    if not jadge:
+                        raise ValueError(msg)
                     if hash != 'plain':
                         u['password'] = common.hash_password(user['password'], hash if hash != 'oauth2' else 'sha1')
                     else:
                         u['password'] = user['password']
+                    # パスワード更新日時の保存
+                    self.user_data(None, user['uid'], user['name'], 'password', 'last_update', datetime.datetime.now())
                 u['hash'] = user['hash']
                 u['groups'] = user['groups']
-        if self.signin_file is None:
-            raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"user_edit: {user} -> {self.signin_file}")
+        # サインインファイルの保存
         common.save_yml(self.signin_file, self.signin_file_data)
 
     def user_del(self, uid:int):
@@ -874,6 +1023,54 @@ class Web:
             self.logger.debug(f"group_del: {gid} -> {self.signin_file}")
         common.save_yml(self.signin_file, self.signin_file_data)
 
+    def user_data(self, req:Request, uid:str, user_name:str, categoly:str, key:str=None, val:Any=None, delkey:bool=False) -> Any:
+        """
+        ユーザーデータを取得または設定する
+
+        Args:
+            req (Request): リクエスト
+            uid (str): ユーザーID
+            user_name (str): ユーザー名
+            categoly (str): カテゴリ
+            key (str, optional): キー. Defaults to None.
+            val (Any, optional): 値. Defaults to None.
+            delkey (bool, optional): キー削除. Defaults to False.
+
+        Returns:
+            Any: 値 or カテゴリのデータ
+        """
+        user_path = self.users_path / f"user-{uid}_{user_name}.json"
+        # ユーザーデータの取得
+        if req is not None and 'user_data' in req.session:
+            # セッションにユーザーデータがある場合はそれを使用する
+            user_data = req.session['user_data']
+        else:
+            # セッションにユーザーデータがない場合はファイルから読み込む
+            if user_path.exists():
+                user_data = common.loaduser(user_path)
+            else:
+                user_data = dict()
+            if req is not None:
+                # セッションにユーザーデータを保存する
+                req.session['user_data'] = user_data
+        if categoly not in user_data:
+            user_data[categoly] = dict()
+        # キー削除の場合
+        if delkey:
+            if key is not None and key in user_data[categoly]:
+                del user_data[categoly][key]
+                common.saveuser(user_data, user_path)
+            return None
+        # キーが指定されていない場合はカテゴリのデータを返す
+        if key is None:
+            return user_data[categoly] if categoly in user_data else None
+        # キーが指定されている場合は値を設定または取得する
+        if val is None:
+            return user_data[categoly][key] if key in user_data[categoly] else None
+        user_data[categoly][key] = val
+        common.saveuser(user_data, user_path)
+        return val
+
     def start(self, allow_host:str="0.0.0.0", listen_port:int=8081, ssl_listen_port:int=8443,
               ssl_cert:Path=None, ssl_key:Path=None, ssl_keypass:str=None, ssl_ca_certs:Path=None,
               session_domain:str=None, session_path:str='/', session_secure:bool=False, session_timeout:int=600, outputs_key:List[str]=[]):
@@ -1007,7 +1204,7 @@ class RaiseThread(threading.Thread):
 
     def get_id(self):
         return self.id
-        
+
     def raise_exception(self):
         res = ctypes.pythonapi.PyThreadState_SetAsyncExc(
             ctypes.c_long(self.get_id()), 

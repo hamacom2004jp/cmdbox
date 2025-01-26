@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app package &mdash; cmdbox 2025/01/22 documentation</title>
+  <title>cmdbox.app package &mdash; cmdbox 2025/01/26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=c9d79bcf"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=35a68168"></script>
       <script src="../_static/doctools.js?v=888ff710"></script>
       <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -561,6 +561,23 @@ config (dict): 設定</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.common.loaduser">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.common.</span></span><span class="sig-name descname"><span class="pre">loaduser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/common.html#loaduser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.common.loaduser" title="Permalink to this definition"></a></dt>
+<dd><p>JSON形式のユーザーファイルを読み込みます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user_path</strong> (<em>str</em>) -- ユーザーファイルのパス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>読み込んだユーザーファイル</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="cmdbox.app.common.mkdirs">
 <span class="sig-prename descclassname"><span class="pre">cmdbox.app.common.</span></span><span class="sig-name descname"><span class="pre">mkdirs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/common.html#mkdirs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.common.mkdirs" title="Permalink to this definition"></a></dt>
 <dd><p>ディレクトリを中間パスも含めて作成します。</p>
@@ -688,6 +705,20 @@ config (dict): 設定</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>opt</strong> (<em>dict</em>) -- コマンドラインオプション</p></li>
 <li><p><strong>opt_path</strong> (<em>Path</em>) -- 保存先のファイルパス</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.common.saveuser">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.common.</span></span><span class="sig-name descname"><span class="pre">saveuser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/common.html#saveuser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.common.saveuser" title="Permalink to this definition"></a></dt>
+<dd><p>ユーザーファイルを保存します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_data</strong> (<em>dict</em>) -- ユーザーファイル</p></li>
+<li><p><strong>user_path</strong> (<em>Path</em>) -- 保存先のファイルパス</p></li>
 </ul>
 </dd>
 </dl>
@@ -1535,6 +1566,27 @@ dict: メッセージ</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.web.Web.change_password">
+<span class="sig-name descname"><span class="pre">change_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confirm_password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.change_password"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.change_password" title="Permalink to this definition"></a></dt>
+<dd><p>パスワードを変更する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_name</strong> (<em>str</em>) -- ユーザー名</p></li>
+<li><p><strong>new_password</strong> (<em>str</em>) -- 新しいパスワード</p></li>
+<li><p><strong>confirm_password</strong> (<em>str</em>) -- 確認用パスワード</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>HTTPException</strong> -- パスワードが一致しない場合</p></li>
+<li><p><strong>HTTPException</strong> -- ユーザーが存在しない場合</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.web.Web.check_apikey">
 <span class="sig-name descname"><span class="pre">check_apikey</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Response</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.check_apikey"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.check_apikey" title="Permalink to this definition"></a></dt>
 <dd><p>ApiKeyをチェックする</p>
@@ -1558,6 +1610,27 @@ dict: メッセージ</p>
 <dt class="sig sig-object py" id="cmdbox.app.web.Web.check_cmd">
 <span class="sig-name descname"><span class="pre">check_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.check_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.check_cmd" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.web.Web.check_password_policy">
+<span class="sig-name descname"><span class="pre">check_password_policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.check_password_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.check_password_policy" title="Permalink to this definition"></a></dt>
+<dd><p>パスワードポリシーをチェックする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_name</strong> (<em>str</em>) -- ユーザー名</p></li>
+<li><p><strong>password</strong> (<em>str</em>) -- パスワード</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True:ポリシーOK, False:ポリシーNG
+str: メッセージ</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.web.Web.check_signin">
@@ -1711,6 +1784,31 @@ dict: メッセージ</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>user</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- ユーザー情報</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.web.Web.user_data">
+<span class="sig-name descname"><span class="pre">user_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categoly</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delkey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.user_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.user_data" title="Permalink to this definition"></a></dt>
+<dd><p>ユーザーデータを取得または設定する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>req</strong> (<em>Request</em>) -- リクエスト</p></li>
+<li><p><strong>uid</strong> (<em>str</em>) -- ユーザーID</p></li>
+<li><p><strong>user_name</strong> (<em>str</em>) -- ユーザー名</p></li>
+<li><p><strong>categoly</strong> (<em>str</em>) -- カテゴリ</p></li>
+<li><p><strong>key</strong> (<em>str</em><em>, </em><em>optional</em>) -- キー. Defaults to None.</p></li>
+<li><p><strong>val</strong> (<em>Any</em><em>, </em><em>optional</em>) -- 値. Defaults to None.</p></li>
+<li><p><strong>delkey</strong> (<em>bool</em><em>, </em><em>optional</em>) -- キー削除. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>値 or カテゴリのデータ</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
 </dd>
 </dl>
 </dd></dl>

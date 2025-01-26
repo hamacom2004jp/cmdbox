@@ -115,6 +115,9 @@
             <li class="nav-item" role="presentation">
                 <a class="nav-link" id="pathrules-tab" data-bs-toggle="tab" href="#pathrules" role="tab" aria-controls="pathrules" aria-selected="false">Path Rules</a>
             </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="passsetting-tab" data-bs-toggle="tab" href="#passsetting" role="tab" aria-controls="passsetting" aria-selected="false">Password Settings</a>
+            </li>
         </ul>
         <div class="tab-content">
             <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="users-tab">
@@ -128,6 +131,9 @@
             </div>
             <div class="tab-pane fade" id="pathrules" role="tabpanel" aria-labelledby="pathrules-tab">
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-2 mt-2" id="pathrules_list"></div>
+            </div>
+            <div class="tab-pane fade" id="passsetting" role="tabpanel" aria-labelledby="passsetting-tab">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-2 mt-2" id="passsetting_list"></div>
             </div>
         </div>
     </div>
@@ -182,7 +188,7 @@
     <!-- versionsモーダル -->
     <div id="versions_modal" class="modal" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <form id="console_form" class="modal-content novalidate">
+            <form id="version_form" class="modal-content novalidate">
                 <div class="modal-header">
                     <h5 class="modal-title">
                         Versions

@@ -4,12 +4,21 @@ list_pipe_func = async () => {
     const kwd = $('#pipe_kwd').val();
     const py_list_pipe = await list_pipe(kwd?`*${kwd}*`:'*');
     $('#pipe_items').append($($('#pipe_add').html()));
-    py_list_pipe.forEach(row => {
+    const data = await cmdbox.load_pipe_pin(null);
+    const pins = data && data['success'] ? data['success'] : {};
+    const card_func = (row, ispin) => {
+        if (ispin && pins[row.title]!='on') return;
+        else if (!ispin && pins[row.title]=='on') return;
         const elem = $($('#pipe_template').html());
-        elem.find('.pipe_title').text(row['title']);
-        elem.find('.pipe_desc').text(row['description']);
+        if (pins[row.title]=='on') {
+            elem.find('.pipe_title').after('<svg class="bi bi-pin-fill d-inline-block ms-auto" width="24" height="24" fill="currentColor"><use href="#btn_pin_fill"></use></svg>');
+        }
+        elem.find('.pipe_title').text(row.title);
+        elem.find('.pipe_desc').text(row.description);
         $('#pipe_items').append(elem);
-    });
+    };
+    py_list_pipe.forEach(row => {card_func(row, true)});
+    py_list_pipe.forEach(row => {card_func(row, false)});
 }
 list_pipe_func_then = () => {
     // パイプラインカードクリック時の処理（モーダルダイアログを開く）
@@ -81,6 +90,36 @@ list_pipe_func_then = () => {
             pipe_modal.find('[name="description"]').val('');
             const py_list_cmd = await list_cmd(null);
             cmd_select_template_func(pipe_modal.find('.row_content_common .row_content .add_buton'), py_list_cmd)
+        }
+        pipe_modal.find('.btn_pin_angle').off('click').on('click', () => {
+            const title = pipe_modal.find('[name="title"]').val();
+            pipe_modal.find('.btn_pin_angle').hide();
+            pipe_modal.find('.btn_pin_fill').show();
+            cmdbox.save_pipe_pin(title, true).then(() => list_pipe_func().then(list_pipe_func_then));
+        });
+        pipe_modal.find('.btn_pin_fill').off('click').on('click', () => {
+            const title = pipe_modal.find('[name="title"]').val();
+            pipe_modal.find('.btn_pin_fill').hide();
+            pipe_modal.find('.btn_pin_angle').show();
+            cmdbox.save_pipe_pin(title, false).then(() => list_pipe_func().then(list_pipe_func_then));
+        });
+        const title = pipe_modal.find('[name="title"]').val();
+        if (title) {
+            cmdbox.load_pipe_pin(title).then((result) => {
+                if (!result['success']) {
+                    pipe_modal.find('.btn_pin_fill').hide();
+                    pipe_modal.find('.btn_pin_angle').hide();
+                } else if (result['success']=='on') {
+                    pipe_modal.find('.btn_pin_fill').show();
+                    pipe_modal.find('.btn_pin_angle').hide();
+                } else {
+                    pipe_modal.find('.btn_pin_fill').hide();
+                    pipe_modal.find('.btn_pin_angle').show();
+                }
+            });
+        } else {
+            pipe_modal.find('.btn_pin_fill').hide();
+            pipe_modal.find('.btn_pin_angle').hide();
         }
         pipe_modal.find('.modal-title').text(`Pipeline : ${modal_title}`);
         pipe_modal.modal('show');

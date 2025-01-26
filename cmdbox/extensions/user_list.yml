@@ -47,6 +47,10 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     mode: server
     cmds: [list]
     rule: allow
+  - groups: [user]
+    mode: web
+    cmds: [genpass]
+    rule: allow
   - groups: [editor]
     mode: client
     cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
@@ -58,7 +62,7 @@ pathrule:                      # List of RESTAPI rules, rules that determine whe
     paths: [/]                 # Specify the "path" to which the rule applies. Multiple items can be specified in a list.
     rule: allow                # Specifies whether or not the specified RESTAPI is allowed for the specified group. The value can be allow or deny.
   - groups: [user]
-    paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout,
+    paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout, /password/change,
             /exec_cmd, /exec_pipe, /filer, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
     rule: allow
   - groups: [readonly]
@@ -67,6 +71,20 @@ pathrule:                      # List of RESTAPI rules, rules that determine whe
   - groups: [editor]
     paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
     rule: allow
+password:
+  policy:
+    enabled: false              # Specify whether or not to enable password policy.
+    min_length: 8               # Specify the minimum length of the password.
+    max_length: 64              # Specify the maximum length of the password.
+    min_lowercase: 1            # Specify the minimum number of lowercase letters in the password.
+    min_uppercase: 1            # Specify the minimum number of uppercase letters in the password.
+    min_digit: 1                # Specify the minimum number of digits in the password.
+    min_symbol: 1               # Specify the minimum number of symbol characters in the password.
+    not_contain_username: true  # Specify whether or not to include the username in the password.
+  expiration:
+    enabled: false              # Specify whether or not to enable password expiration.
+    period: 90                  # Specify the number of days after which the password will expire.
+    notify: 7                   # Specify the number of days before the password expires that a notification will be sent.
 oauth2:                             # OAuth2 settings.
   providers:                        # This is a per-provider setting for OAuth2.
     google:                         # Google's OAuth2 configuration.

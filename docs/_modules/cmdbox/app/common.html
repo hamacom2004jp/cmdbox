@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.common &mdash; cmdbox 2025/01/22 documentation</title>
+  <title>cmdbox.app.common &mdash; cmdbox 2025/01/26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=c9d79bcf"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=35a68168"></script>
       <script src="../../../_static/doctools.js?v=888ff710"></script>
       <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -293,6 +293,16 @@
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">opt_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default_json_enc</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="saveuser"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.saveuser">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">saveuser</span><span class="p">(</span><span class="n">user_data</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">user_path</span><span class="p">:</span><span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ユーザーファイルを保存します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user_data (dict): ユーザーファイル</span>
+<span class="sd">        user_path (Path): 保存先のファイルパス</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">saveopt</span><span class="p">(</span><span class="n">user_data</span><span class="p">,</span> <span class="n">user_path</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="loadopt"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.loadopt">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">loadopt</span><span class="p">(</span><span class="n">opt_path</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    JSON形式のファイルからコマンドラインオプションを読み込みます。</span>
@@ -308,6 +318,18 @@
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">opt_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">opt</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">opt</span></div>
+
+<div class="viewcode-block" id="loaduser"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.loaduser">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">loaduser</span><span class="p">(</span><span class="n">user_path</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    JSON形式のユーザーファイルを読み込みます。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user_path (str): ユーザーファイルのパス</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: 読み込んだユーザーファイル</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">loadopt</span><span class="p">(</span><span class="n">user_path</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="getopt"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.getopt">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">getopt</span><span class="p">(</span><span class="n">opt</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">preval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">defval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">withset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>

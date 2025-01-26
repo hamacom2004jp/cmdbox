@@ -1,10 +1,10 @@
-from cmdbox.app import signin
+from cmdbox.app import common, signin
 from cmdbox.app.features.web import cmdbox_web_signin
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 import copy
-import hashlib
+import datetime
 import importlib
 import inspect
 import requests
@@ -32,15 +32,37 @@ class DoSignin(cmdbox_web_signin.Signin):
                 return RedirectResponse(url=f'/signin/{next}?error=1')
             hash = user[0]['hash']
             if hash != 'plain':
-                h = hashlib.new(hash)
-                h.update(passwd.encode('utf-8'))
-                passwd = h.hexdigest()
+                passwd = common.hash_password(passwd, hash)
             if passwd != user[0]['password']:
                 return RedirectResponse(url=f'/signin/{next}?error=1')
             group_names = list(set(web.correct_group(user[0]['groups'])))
             gids = [g['gid'] for g in web.signin_file_data['groups'] if g['name'] in group_names]
+            uid = user[0]['uid']
             email = user[0].get('email', '')
-            req.session['signin'] = dict(uid=user[0]['uid'], name=name, password=passwd, gids=gids,
+            # 最終サインイン日時更新
+            web.user_data(req, uid, name, 'signin', 'last_update', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+            # パスワード認証の場合はパスワード有効期限チェック
+            if user[0]['hash']!='oauth2' and 'password' in web.signin_file_data:
+                # パスワード最終更新日時
+                last_update = web.user_data(req, uid, name, 'password', 'last_update')
+                if last_update is None:
+                    last_update = web.user_data(req, uid, name, 'password', 'last_update', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+                last_update = datetime.datetime.strptime(last_update, '%Y-%m-%dT%H:%M:%S')
+                # パスワード有効期限
+                expiration = web.signin_file_data['password']['expiration']
+                if expiration['enabled']:
+                    period = expiration['period']
+                    notify = expiration['notify']
+                    # パスワード有効期限チェック
+                    if datetime.datetime.now() > last_update + datetime.timedelta(days=period):
+                        return RedirectResponse(url=f'/signin/{next}?error=expirationofpassword')
+                    if datetime.datetime.now() > last_update + datetime.timedelta(days=notify):
+                        # セッションに保存
+                        req.session['signin'] = dict(uid=uid, name=name, password=passwd, gids=gids,
+                                                     groups=group_names, email=email)
+                        return RedirectResponse(url=f'../{next}?warn=passchange') # nginxのリバプロ対応のための相対パス
+            # セッションに保存
+            req.session['signin'] = dict(uid=uid, name=name, password=passwd, gids=gids,
                                          groups=group_names, email=email)
             return RedirectResponse(url=f'../{next}') # nginxのリバプロ対応のための相対パス
 
@@ -100,9 +122,13 @@ class DoSignin(cmdbox_web_signin.Signin):
                 copy_signin_data = copy.deepcopy(web.signin_file_data)
                 jadge, user = self.google_signin.jadge(access_token, email, copy_signin_data)
                 if not jadge:
-                    return RedirectResponse(url=f'/signin/{next}?error=2')
+                    return RedirectResponse(url=f'/signin/{next}?error=appdeny')
                 # グループ取得
                 group_names, gids = self.google_signin.get_groups(access_token, user, copy_signin_data)
+                # 最終サインイン日時更新
+                web.user_data(req, user['uid'], user['name'], 'signin', 'last_update', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+                # パスワード最終更新日時削除
+                web.user_data(req, user['uid'], user['name'], 'password', 'last_update', delkey=True)
                 # セッションに保存
                 req.session['signin'] = dict(uid=user['uid'], name=user['name'], gids=gids,
                                             groups=group_names, email=email)
@@ -145,9 +171,13 @@ class DoSignin(cmdbox_web_signin.Signin):
                 copy_signin_data = copy.deepcopy(web.signin_file_data)
                 jadge, user = self.github_signin.jadge(access_token, email, copy_signin_data)
                 if not jadge:
-                    return RedirectResponse(url=f'/signin/{next}?error=2')
+                    return RedirectResponse(url=f'/signin/{next}?error=appdeny')
                 # グループ取得
                 group_names, gids = self.github_signin.get_groups(user, copy_signin_data)
+                # 最終サインイン日時更新
+                web.user_data(req, user['uid'], user['name'], 'signin', 'last_update', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+                # パスワード最終更新日時削除
+                web.user_data(req, user['uid'], user['name'], 'password', 'last_update', delkey=True)
                 # セッションに保存
                 req.session['signin'] = dict(uid=user['uid'], name=user['name'], gids=gids,
                                             groups=group_names, email=email)

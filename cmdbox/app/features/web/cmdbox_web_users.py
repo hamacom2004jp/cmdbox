@@ -38,7 +38,7 @@ class Users(feature.WebFeature):
             if signin is not None:
                 return signin
             if web.signin_file_data is None:
-                return {'error': 'signin_file_data is None.'}
+                return dict(error='signin_file_data is None.')
             return web.user_list(None)
 
         @app.post('/users/add')
@@ -47,13 +47,13 @@ class Users(feature.WebFeature):
             if signin is not None:
                 return signin
             if web.signin_file_data is None:
-                return {'error': 'signin_file_data is None.'}
+                return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
                 web.user_add(form)
-                return {'success': 'add user'}
+                return dict(success='add user')
             except Exception as e:
-                return {'error': str(e)}
+                return dict(error=str(e))
 
         @app.post('/users/edit')
         async def users_edit(req:Request, res:Response):
@@ -61,13 +61,13 @@ class Users(feature.WebFeature):
             if signin is not None:
                 return signin
             if web.signin_file_data is None:
-                return {'error': 'signin_file_data is None.'}
+                return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
                 web.user_edit(form)
-                return {'success': 'edit user'}
+                return dict(success='edit user')
             except Exception as e:
-                return {'error': str(e)}
+                return dict(error=str(e))
 
         @app.post('/users/del')
         async def users_del(req:Request, res:Response):
@@ -75,15 +75,15 @@ class Users(feature.WebFeature):
             if signin is not None:
                 return signin
             if web.signin_file_data is None:
-                return {'error': 'signin_file_data is None.'}
+                return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
                 if req.session['signin']['uid'] == form.get('uid', None):
                     raise ValueError('You cannot delete yourself.')
                 web.user_del(form.get('uid', None))
-                return {'success': 'delete user'}
+                return dict(success='delete user')
             except Exception as e:
-                return {'error': str(e)}
+                return dict(error=str(e))
 
         @app.post('/users/apikey/add')
         async def users_apikey_add(req:Request, res:Response):
@@ -91,13 +91,13 @@ class Users(feature.WebFeature):
             if signin is not None:
                 return signin
             if web.signin_file_data is None:
-                return {'error': 'signin_file_data is None.'}
+                return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
                 apikey = web.apikey_add(form)
-                return {'success': apikey}
+                return dict(success=apikey)
             except Exception as e:
-                return {'error': str(e)}
+                return dict(error=str(e))
 
         @app.post('/users/apikey/del')
         async def users_apikey_del(req:Request, res:Response):
@@ -105,13 +105,13 @@ class Users(feature.WebFeature):
             if signin is not None:
                 return signin
             if web.signin_file_data is None:
-                return {'error': 'signin_file_data is None.'}
+                return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
                 apikey = web.apikey_del(form)
-                return {'success': apikey}
+                return dict(success=apikey)
             except Exception as e:
-                return {'error': str(e)}
+                return dict(error=str(e))
 
         @app.get('/groups/list')
         async def groups_list(req:Request, res:Response):
@@ -119,11 +119,11 @@ class Users(feature.WebFeature):
             if signin is not None:
                 return signin
             if web.signin_file_data is None:
-                return {'error': 'signin_file_data is None.'}
+                return dict(error='signin_file_data is None.')
             try:
                 return web.group_list(None)
             except Exception as e:
-                return {'error': str(e)}
+                return dict(error=str(e))
 
         @app.post('/groups/add')
         async def groups_add(req:Request, res:Response):
@@ -131,13 +131,13 @@ class Users(feature.WebFeature):
             if signin is not None:
                 return signin
             if web.signin_file_data is None:
-                return {'error': 'signin_file_data is None.'}
+                return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
                 web.group_add(form)
-                return {'success': 'add group'}
+                return dict(success='add group')
             except Exception as e:
-                return {'error': str(e)}
+                return dict(error=str(e))
 
         @app.post('/groups/edit')
         async def groups_edit(req:Request, res:Response):
@@ -145,13 +145,13 @@ class Users(feature.WebFeature):
             if signin is not None:
                 return signin
             if web.signin_file_data is None:
-                return {'error': 'signin_file_data is None.'}
+                return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
                 web.group_edit(form)
-                return {'success': 'edit group'}
+                return dict(success='edit group')
             except Exception as e:
-                return {'error': str(e)}
+                return dict(error=str(e))
 
         @app.post('/groups/del')
         async def groups_del(req:Request, res:Response):
@@ -159,15 +159,15 @@ class Users(feature.WebFeature):
             if signin is not None:
                 return signin
             if web.signin_file_data is None:
-                return {'error': 'signin_file_data is None.'}
+                return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
                 if form.get('gid', None) in req.session['signin']['gids']:
                     raise ValueError('You cannot delete yourself group.')
                 web.group_del(form.get('gid', None))
-                return {'success': 'delete group'}
+                return dict(success='delete group')
             except Exception as e:
-                return {'error': str(e)}
+                return dict(error=str(e))
 
         @app.get('/cmdrules/list')
         async def cmdrules_list(req:Request, res:Response):
@@ -175,11 +175,11 @@ class Users(feature.WebFeature):
             if signin is not None:
                 return signin
             if web.signin_file_data is None:
-                return {'error': 'signin_file_data is None.'}
+                return dict(error='signin_file_data is None.')
             try:
                 return web.signin_file_data['cmdrule']
             except Exception as e:
-                return {'error': str(e)}
+                return dict(error=str(e))
 
         @app.get('/pathrules/list')
         async def pathrules_list(req:Request, res:Response):
@@ -187,11 +187,38 @@ class Users(feature.WebFeature):
             if signin is not None:
                 return signin
             if web.signin_file_data is None:
-                return {'error': 'signin_file_data is None.'}
+                return dict(error='signin_file_data is None.')
             try:
                 return web.signin_file_data['pathrule']
             except Exception as e:
-                return {'error': str(e)}
+                return dict(error=str(e))
+
+        @app.get('/passsetting/list')
+        async def passsetting_list(req:Request, res:Response):
+            signin = web.check_signin(req, res)
+            if signin is not None:
+                return signin
+            if web.signin_file_data is None:
+                return dict(error='signin_file_data is None.')
+            try:
+                return web.signin_file_data['password']
+            except Exception as e:
+                return dict(error=str(e))
+
+        @app.post('/password/change')
+        async def password_change(req:Request, res:Response):
+            signin = web.check_signin(req, res)
+            if signin is not None:
+                return signin
+            if web.signin_file_data is None:
+                return dict(error='signin_file_data is None.')
+            form = await req.json()
+            try:
+                ret = web.change_password(form.get('user_name', None), form.get('password', None),
+                                    form.get('new_password', None), form.get('confirm_password', None))
+                return ret
+            except Exception as e:
+                return dict(error=str(e))
 
     def toolmenu(self, web:Web) -> Dict[str, Any]:
         """
