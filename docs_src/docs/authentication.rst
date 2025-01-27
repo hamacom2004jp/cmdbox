@@ -81,6 +81,24 @@ Configuration items in `user_list.yml`
             - groups: [editor]
               paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
               rule: allow
+    password:
+      policy:
+        enabled: false              # Specify whether or not to enable password policy.
+        min_length: 8               # Specify the minimum length of the password.
+        max_length: 64              # Specify the maximum length of the password.
+        min_lowercase: 1            # Specify the minimum number of lowercase letters in the password.
+        min_uppercase: 1            # Specify the minimum number of uppercase letters in the password.
+        min_digit: 1                # Specify the minimum number of digits in the password.
+        min_symbol: 1               # Specify the minimum number of symbol characters in the password.
+        not_contain_username: true  # Specify whether or not to include the username in the password.
+      expiration:
+        enabled: false              # Specify whether or not to enable password expiration.
+        period: 90                  # Specify the number of days after which the password will expire.
+        notify: 7                   # Specify the number of days before the password expires that a notification will be sent.
+      lockout:
+        enabled: true               # Specify whether or not to enable account lockout.
+        threshold: 5                # Specify the number of failed login attempts before the account is locked.
+        reset: 30                   # Specify the number of minutes after which the failed login count will be reset.
     oauth2:                             # OAuth2 settings.
         providers:                        # This is a per-provider setting for OAuth2.
             google:                         # Google's OAuth2 configuration.

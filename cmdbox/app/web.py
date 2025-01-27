@@ -384,17 +384,20 @@ class Web:
             if 'users' not in yml:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "users" not found. ({self.signin_file})')
             uids = set()
+            unames = set()
             groups = [g['name'] for g in yml['groups']]
             for user in yml['users']:
-                if 'uid' not in user or user['uid'] == '':
+                if 'uid' not in user or user['uid'] is None:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "uid" not found or empty. ({self.signin_file})')
                 if user['uid'] in uids:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate uid found. ({self.signin_file}). uid={user["uid"]}')
-                if 'name' not in user or user['name'] == '':
+                if 'name' not in user or user['name'] is None:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "name" not found or empty. ({self.signin_file})')
-                if 'password' not in user or user['password'] == '':
+                if user['name'] in unames:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate name found. ({self.signin_file}). name={user["name"]}')
+                if 'password' not in user:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "password" not found or empty. ({self.signin_file})')
-                if 'hash' not in user or user['hash'] == '':
+                if 'hash' not in user or user['hash'] is None:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "hash" not found or empty. ({self.signin_file})')
                 if user['hash'] not in ['oauth2', 'plain', 'md5', 'sha1', 'sha256']:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. Algorithms not supported. ({self.signin_file}). hash={user["hash"]} "oauth2", "plain", "md5", "sha1", "sha256" only.')
@@ -403,21 +406,26 @@ class Web:
                 if len([ug for ug in user['groups'] if ug not in groups]) > 0:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. Group not found. ({self.signin_file}). {user["groups"]}')
                 uids.add(user['uid'])
+                unames.add(user['name'])
             # groupsのフォーマットチェック
             if 'groups' not in yml:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found. ({self.signin_file})')
             gids = set()
+            gnames = set()
             for group in yml['groups']:
-                if 'gid' not in group or group['gid'] == '':
+                if 'gid' not in group or group['gid'] is None:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "gid" not found or empty. ({self.signin_file})')
                 if group['gid'] in gids:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate gid found. ({self.signin_file}). gid={group["gid"]}')
-                if 'name' not in group or group['name'] == '':
+                if 'name' not in group or group['name'] is None:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "name" not found or empty. ({self.signin_file})')
+                if group['name'] in gnames:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate name found. ({self.signin_file}). name={group["name"]}')
                 if 'parent' in group:
                     if group['parent'] not in groups:
                         raise HTTPException(status_code=500, detail=f'signin_file format error. Parent group not found. ({self.signin_file}). parent={group["parent"]}')
                 gids.add(group['gid'])
+                gnames.add(group['name'])
             # cmdruleのフォーマットチェック
             if 'cmdrule' not in yml:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "cmdrule" not found. ({self.signin_file})')
@@ -522,6 +530,20 @@ class Web:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "notify" not found in "password.expiration". ({self.signin_file})')
                 if type(yml['password']['expiration']['notify']) is not int:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "notify" not int type in "password.expiration". ({self.signin_file})')
+                if 'lockout' not in yml['password']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "lockout" not found in "password". ({self.signin_file})')
+                if 'enabled' not in yml['password']['lockout']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "password.lockout". ({self.signin_file})')
+                if type(yml['password']['lockout']['enabled']) is not bool:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "password.lockout". ({self.signin_file})')
+                if 'threshold' not in yml['password']['lockout']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "threshold" not found in "password.lockout". ({self.signin_file})')
+                if type(yml['password']['lockout']['threshold']) is not int:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "threshold" not int type in "password.lockout". ({self.signin_file})')
+                if 'reset' not in yml['password']['lockout']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "reset" not found in "password.lockout". ({self.signin_file})')
+                if type(yml['password']['lockout']['reset']) is not int:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "reset" not int type in "password.lockout". ({self.signin_file})')
             # oauth2のフォーマットチェック
             if 'oauth2' not in yml:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "oauth2" not found. ({self.signin_file})')

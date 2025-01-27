@@ -82,6 +82,7 @@ $(() => {
             if (params.get('error') == 'appdeny') msgelem.text('OAuth2 succeeded but app not allowed.');
             if (params.get('error') == 'apikeyfail') msgelem.text('Authentication failed due to incorrect apikey.');
             if (params.get('error') == 'unauthorizedsite') msgelem.text('Access to an unauthorized site.');
+            if (params.get('error') == 'lockout') msgelem.text('The account is locked.');
             $('<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>').appendTo(elem);
             $('body').prepend(elem);
         }

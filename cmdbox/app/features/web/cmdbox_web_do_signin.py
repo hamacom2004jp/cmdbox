@@ -30,19 +30,42 @@ class DoSignin(cmdbox_web_signin.Signin):
             user = [u for u in web.signin_file_data['users'] if u['name'] == name and u['hash'] != 'oauth2']
             if len(user) <= 0:
                 return RedirectResponse(url=f'/signin/{next}?error=1')
-            hash = user[0]['hash']
+            user = user[0]
+            uid = user['uid']
+            # ロックアウトチェック
+            pass_miss_count = web.user_data(req, uid, name, 'password', 'pass_miss_count')
+            pass_miss_count = 0 if pass_miss_count is None else int(pass_miss_count)
+            if 'password' in web.signin_file_data and web.signin_file_data['password']['lockout']['enabled']:
+                threshold = web.signin_file_data['password']['lockout']['threshold']
+                reset = web.signin_file_data['password']['lockout']['reset']
+                pass_miss_last = web.user_data(req, uid, name, 'password', 'pass_miss_last')
+                if pass_miss_last is None:
+                    pass_miss_last = web.user_data(req, uid, name, 'password', 'pass_miss_last', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+                pass_miss_last = datetime.datetime.strptime(pass_miss_last, '%Y-%m-%dT%H:%M:%S')
+                if datetime.datetime.now() > pass_miss_last + datetime.timedelta(minutes=reset):
+                    # ロックアウトリセット
+                    pass_miss_count = 0
+                    web.user_data(req, uid, name, 'password', 'pass_miss_count', pass_miss_count)
+                    web.logger.info(f'Reset pass_miss_count. name={name}')
+                if pass_miss_count >= threshold:
+                    # ロックアウト
+                    web.user_data(req, uid, name, 'password', 'pass_miss_count', )
+                    return RedirectResponse(url=f'/signin/{next}?error=lockout')
+            # パスワード認証
+            hash = user['hash']
             if hash != 'plain':
                 passwd = common.hash_password(passwd, hash)
-            if passwd != user[0]['password']:
+            if passwd != user['password']:
+                # パスワード間違いの日時と回数を記録
+                web.user_data(req, uid, name, 'password', 'pass_miss_last', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+                web.user_data(req, uid, name, 'password', 'pass_miss_count', pass_miss_count+1)
+                web.logger.warning(f'Failed to signin. name={name}, pass_miss_count={pass_miss_count+1}')
                 return RedirectResponse(url=f'/signin/{next}?error=1')
-            group_names = list(set(web.correct_group(user[0]['groups'])))
+            group_names = list(set(web.correct_group(user['groups'])))
             gids = [g['gid'] for g in web.signin_file_data['groups'] if g['name'] in group_names]
-            uid = user[0]['uid']
-            email = user[0].get('email', '')
-            # 最終サインイン日時更新
-            web.user_data(req, uid, name, 'signin', 'last_update', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+            email = user.get('email', '')
             # パスワード認証の場合はパスワード有効期限チェック
-            if user[0]['hash']!='oauth2' and 'password' in web.signin_file_data:
+            if user['hash']!='oauth2' and 'password' in web.signin_file_data:
                 # パスワード最終更新日時
                 last_update = web.user_data(req, uid, name, 'password', 'last_update')
                 if last_update is None:
@@ -58,15 +81,23 @@ class DoSignin(cmdbox_web_signin.Signin):
                         return RedirectResponse(url=f'/signin/{next}?error=expirationofpassword')
                     if datetime.datetime.now() > last_update + datetime.timedelta(days=notify):
                         # セッションに保存
-                        req.session['signin'] = dict(uid=uid, name=name, password=passwd, gids=gids,
-                                                     groups=group_names, email=email)
+                        _set_session(req, dict(uid=uid, name=name), email, passwd, None, group_names, gids)
                         return RedirectResponse(url=f'../{next}?warn=passchange') # nginxのリバプロ対応のための相対パス
             # セッションに保存
-            req.session['signin'] = dict(uid=uid, name=name, password=passwd, gids=gids,
-                                         groups=group_names, email=email)
+            _set_session(req, dict(uid=uid, name=name), email, passwd, None, group_names, gids)
             return RedirectResponse(url=f'../{next}') # nginxのリバプロ対応のための相対パス
 
         def _load_signin(signin_module:str, appcls, ver):
+            """
+            サインインオブジェクトを読込む
+            
+            Args:
+                signin_module (str): サインインオブジェクトのモジュール名
+                appcls (class): アプリケーションクラス
+                ver (str): バージョン
+            Returns:
+                signin.Signin: サインインオブジェクト
+            """
             if signin_module is None:
                 return None
             try:
@@ -92,6 +123,34 @@ class DoSignin(cmdbox_web_signin.Signin):
             if 'signin_module' in web.signin_file_data['oauth2']['providers']['google']:
                 sobj = _load_signin(web.signin_file_data['oauth2']['providers']['github']['signin_module'], self.appcls, self.ver)
                 self.github_signin = sobj if sobj is not None else self.github_signin
+
+        def _set_session(req:Request, user:dict, email:str, hashed_password:str, access_token:str, group_names:list, gids:list):
+            """
+            セッションに保存する
+
+            Args:
+                req (Request): Requestオブジェクト
+                user (dict): ユーザー情報
+                email (str): メールアドレス
+                hashed_password (str): パスワード
+                access_token (str): アクセストークン
+                group_names (list): グループ名リスト
+                gids (list): グループIDリスト
+            """
+            # 最終サインイン日時更新
+            web.user_data(req, user['uid'], user['name'], 'signin', 'last_update', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+            if access_token is not None:
+                # パスワード最終更新日時削除
+                web.user_data(req, user['uid'], user['name'], 'password', 'last_update', delkey=True)
+            else:
+                # パスワード間違いの日時削除
+                web.user_data(req, user['uid'], user['name'], 'password', 'pass_miss_last', None, delkey=True)
+                # パスワード間違い回数削除
+                web.user_data(req, user['uid'], user['name'], 'password', 'pass_miss_count', 0, delkey=True)
+            # セッションに保存
+            req.session['signin'] = dict(uid=user['uid'], name=user['name'],
+                                         password=hashed_password, access_token=access_token,
+                                         gids=gids, groups=group_names, email=email)
 
         @app.get('/oauth2/google/callback')
         async def oauth2_google_callback(req:Request):
@@ -125,13 +184,8 @@ class DoSignin(cmdbox_web_signin.Signin):
                     return RedirectResponse(url=f'/signin/{next}?error=appdeny')
                 # グループ取得
                 group_names, gids = self.google_signin.get_groups(access_token, user, copy_signin_data)
-                # 最終サインイン日時更新
-                web.user_data(req, user['uid'], user['name'], 'signin', 'last_update', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
-                # パスワード最終更新日時削除
-                web.user_data(req, user['uid'], user['name'], 'password', 'last_update', delkey=True)
                 # セッションに保存
-                req.session['signin'] = dict(uid=user['uid'], name=user['name'], gids=gids,
-                                            groups=group_names, email=email)
+                _set_session(req, user, email, None, access_token, group_names, gids)
                 return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
             except Exception as e:
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
@@ -173,15 +227,10 @@ class DoSignin(cmdbox_web_signin.Signin):
                 if not jadge:
                     return RedirectResponse(url=f'/signin/{next}?error=appdeny')
                 # グループ取得
-                group_names, gids = self.github_signin.get_groups(user, copy_signin_data)
-                # 最終サインイン日時更新
-                web.user_data(req, user['uid'], user['name'], 'signin', 'last_update', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
-                # パスワード最終更新日時削除
-                web.user_data(req, user['uid'], user['name'], 'password', 'last_update', delkey=True)
+                group_names, gids = self.github_signin.get_groups(access_token, user, copy_signin_data)
                 # セッションに保存
-                req.session['signin'] = dict(uid=user['uid'], name=user['name'], gids=gids,
-                                            groups=group_names, email=email)
+                _set_session(req, user, email, None, access_token, group_names, gids)
                 return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
             except Exception as e:
-                web.logger.warning(f'Failed to get token. {e}')
+                web.logger.warning(f'Failed to get token. {e}', exc_info=True)
                 raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')

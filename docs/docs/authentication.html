@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Authentication &mdash; cmdbox 2025/01/26 documentation</title>
+  <title>Authentication &mdash; cmdbox 2025/01/27 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=35a68168"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=91de0571"></script>
       <script src="../_static/doctools.js?v=888ff710"></script>
       <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -157,6 +157,24 @@
 <span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">groups</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">editor</span><span class="p p-Indicator">]</span>
 <span class="w">          </span><span class="nt">paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">/gui/del_cmd</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/gui/del_pipe</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/gui/save_cmd</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">/gui/save_pipe</span><span class="p p-Indicator">]</span>
 <span class="w">          </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
+<span class="nt">password</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">policy</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">              </span><span class="c1"># Specify whether or not to enable password policy.</span>
+<span class="w">    </span><span class="nt">min_length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span><span class="w">               </span><span class="c1"># Specify the minimum length of the password.</span>
+<span class="w">    </span><span class="nt">max_length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">64</span><span class="w">              </span><span class="c1"># Specify the maximum length of the password.</span>
+<span class="w">    </span><span class="nt">min_lowercase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">            </span><span class="c1"># Specify the minimum number of lowercase letters in the password.</span>
+<span class="w">    </span><span class="nt">min_uppercase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">            </span><span class="c1"># Specify the minimum number of uppercase letters in the password.</span>
+<span class="w">    </span><span class="nt">min_digit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">                </span><span class="c1"># Specify the minimum number of digits in the password.</span>
+<span class="w">    </span><span class="nt">min_symbol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">               </span><span class="c1"># Specify the minimum number of symbol characters in the password.</span>
+<span class="w">    </span><span class="nt">not_contain_username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">  </span><span class="c1"># Specify whether or not to include the username in the password.</span>
+<span class="w">  </span><span class="nt">expiration</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">              </span><span class="c1"># Specify whether or not to enable password expiration.</span>
+<span class="w">    </span><span class="nt">period</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">90</span><span class="w">                  </span><span class="c1"># Specify the number of days after which the password will expire.</span>
+<span class="w">    </span><span class="nt">notify</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7</span><span class="w">                   </span><span class="c1"># Specify the number of days before the password expires that a notification will be sent.</span>
+<span class="w">  </span><span class="nt">lockout</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">               </span><span class="c1"># Specify whether or not to enable account lockout.</span>
+<span class="w">    </span><span class="nt">threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w">                </span><span class="c1"># Specify the number of failed login attempts before the account is locked.</span>
+<span class="w">    </span><span class="nt">reset</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span><span class="w">                   </span><span class="c1"># Specify the number of minutes after which the failed login count will be reset.</span>
 <span class="nt">oauth2</span><span class="p">:</span><span class="w">                             </span><span class="c1"># OAuth2 settings.</span>
 <span class="w">    </span><span class="nt">providers</span><span class="p">:</span><span class="w">                        </span><span class="c1"># This is a per-provider setting for OAuth2.</span>
 <span class="w">        </span><span class="nt">google</span><span class="p">:</span><span class="w">                         </span><span class="c1"># Google&#39;s OAuth2 configuration.</span>

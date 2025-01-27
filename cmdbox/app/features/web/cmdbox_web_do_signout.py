@@ -17,5 +17,6 @@ class DoSignout(feature.WebFeature):
         @app.post('/dosignout/{next}', response_class=HTMLResponse)
         async def do_signout(next, req:Request, res:Response):
             if 'signin' in req.session:
-                del req.session['signin']
+                for key in list(req.session.keys()).copy():
+                    del req.session[key]
             return RedirectResponse(url=f'../signin/{next}') # nginxのリバプロ対応のための相対パス
