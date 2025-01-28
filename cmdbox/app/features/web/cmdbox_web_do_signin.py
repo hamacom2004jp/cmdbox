@@ -64,12 +64,11 @@ class DoSignin(cmdbox_web_signin.Signin):
             group_names = list(set(web.correct_group(user['groups'])))
             gids = [g['gid'] for g in web.signin_file_data['groups'] if g['name'] in group_names]
             email = user.get('email', '')
+            # パスワード最終更新日時取得
+            last_update = web.user_data(req, uid, name, 'password', 'last_update')
+            notify_passchange = True if last_update is None else False
             # パスワード認証の場合はパスワード有効期限チェック
-            if user['hash']!='oauth2' and 'password' in web.signin_file_data:
-                # パスワード最終更新日時
-                last_update = web.user_data(req, uid, name, 'password', 'last_update')
-                if last_update is None:
-                    last_update = web.user_data(req, uid, name, 'password', 'last_update', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+            if user['hash']!='oauth2' and 'password' in web.signin_file_data and not notify_passchange:
                 last_update = datetime.datetime.strptime(last_update, '%Y-%m-%dT%H:%M:%S')
                 # パスワード有効期限
                 expiration = web.signin_file_data['password']['expiration']
@@ -85,7 +84,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                         return RedirectResponse(url=f'../{next}?warn=passchange') # nginxのリバプロ対応のための相対パス
             # セッションに保存
             _set_session(req, dict(uid=uid, name=name), email, passwd, None, group_names, gids)
-            return RedirectResponse(url=f'../{next}') # nginxのリバプロ対応のための相対パス
+            return RedirectResponse(url=f'../{next}{"?warn=passchange" if notify_passchange else ""}') # nginxのリバプロ対応のための相対パス
 
         def _load_signin(signin_module:str, appcls, ver):
             """

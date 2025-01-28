@@ -241,6 +241,23 @@ $(()=>{
   cmdbox.appid('.navbar-brand');
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
   const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+  // サインイン関連エラーがある場合表示
+  if (window.location.search) {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('error') || params.has('warn')) {
+        const elem = $(`<div class="alert alert-warning alert-dismissible d-block" role="alert">`).css('z-index', '10000');
+        const msgelem = $('<div>Sign in faild: The ID or PW is incorrect or the user is not authorized.</div>').appendTo(elem);
+        if (params.get('error') == 'noauth') msgelem.text('Sign in faild: No credentials are available. Please sign in.');
+        if (params.get('error') == 'expirationofpassword') msgelem.text('Sign in faild: The password has expired.');
+        if (params.get('error') == 'appdeny') msgelem.text('OAuth2 succeeded but app not allowed.');
+        if (params.get('error') == 'apikeyfail') msgelem.text('Authentication failed due to incorrect apikey.');
+        if (params.get('error') == 'unauthorizedsite') msgelem.text('Access to an unauthorized site.');
+        if (params.get('error') == 'lockout') msgelem.text('The account is locked.');
+        if (params.get('warn') == 'passchange') msgelem.text('Your password has not been changed or is about to expire. Please change your password.');
+        $('<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>').appendTo(elem);
+        $('body').prepend(elem);
+    }
+  }
 });
 /**
  * バージョンモーダルを初期化

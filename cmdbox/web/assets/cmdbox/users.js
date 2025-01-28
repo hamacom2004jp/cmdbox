@@ -528,38 +528,27 @@ users.passsetting_list = async () => {
         return;
     }
     const passsetting_root_data = await passsetting_res.json();
-    const policy_data = passsetting_root_data['policy'];
-    const expiration_data = passsetting_root_data['expiration'];
     const passsetting_elem = $('#passsetting_list');
     passsetting_elem.html('');
-    const policy_card_elem = $('<div class="card m-3"/>').appendTo(passsetting_elem);
-    const policy_cardbody_elem = $('<div class="card-body"/>').appendTo(policy_card_elem);
-    policy_cardbody_elem.append('<h5 class="card-title">Password Policy</h5>');
-    const policy_table_elem = $('<table class="table table-bordered table-hover"/>').appendTo(policy_cardbody_elem);
-    const policy_thead_elem = $('<thead><tr><th>#</th><th>setting</th><th>value</th></tr></thead>').appendTo(policy_table_elem);
-    const policy_tbody_elem = $('<tbody/>').appendTo(policy_table_elem);
-    let i_row=0;
-    for (const key in policy_data) {
-        i_row++;
-        const tr = $('<tr>').appendTo(policy_tbody_elem);
-        $('<td>').text(i_row).appendTo(tr);
-        $('<td>').text(key).appendTo(tr);
-        $('<td>').text(policy_data[key]).appendTo(tr);
-    }
-    const expiration_card_elem = $('<div class="card m-3"/>').appendTo(passsetting_elem);
-    const expiration_cardbody_elem = $('<div class="card-body"/>').appendTo(expiration_card_elem);
-    expiration_cardbody_elem.append('<h5 class="card-title">Password Expiration</h5>');
-    const expiration_table_elem = $('<table class="table table-bordered table-hover"/>').appendTo(expiration_cardbody_elem);
-    const expiration_thead_elem = $('<thead><tr><th>#</th><th>setting</th><th>value</th></tr></thead>').appendTo(expiration_table_elem);
-    const expiration_tbody_elem = $('<tbody/>').appendTo(expiration_table_elem);
-    i_row=0;
-    for (const key in expiration_data) {
-        i_row++;
-        const tr = $('<tr>').appendTo(expiration_tbody_elem);
-        $('<td>').text(i_row).appendTo(tr);
-        $('<td>').text(key).appendTo(tr);
-        $('<td>').text(expiration_data[key]).appendTo(tr);
-    }
+    const mk_card = (setting_elem, title, data) => {
+        const card_elem = $('<div class="card m-3"/>').appendTo(setting_elem);
+        const cardbody_elem = $('<div class="card-body"/>').appendTo(card_elem);
+        cardbody_elem.append(`<h5 class="card-title">${title}</h5>`);
+        const table_elem = $('<table class="table table-bordered table-hover"/>').appendTo(cardbody_elem);
+        const thead_elem = $('<thead><tr><th>#</th><th>setting</th><th>value</th></tr></thead>').appendTo(table_elem);
+        const tbody_elem = $('<tbody/>').appendTo(table_elem);
+        let i_row=0;
+        for (const key in data) {
+            i_row++;
+            const tr = $('<tr>').appendTo(tbody_elem);
+            $('<td>').text(i_row).appendTo(tr);
+            $('<td>').text(key).appendTo(tr);
+            $('<td>').text(data[key]).appendTo(tr);
+        }
+    };
+    mk_card(passsetting_elem, 'Password Policy', passsetting_root_data['policy']);
+    mk_card(passsetting_elem, 'Password Expiration', passsetting_root_data['expiration']);
+    mk_card(passsetting_elem, 'Account Lockout', passsetting_root_data['lockout']);
 };
 $(() => {
     // ダークモード対応

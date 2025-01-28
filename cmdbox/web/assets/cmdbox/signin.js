@@ -72,21 +72,6 @@ $(() => {
         if (res.github) btn_github.show();
         else btn_github.hide();
     });
-    if (window.location.search) {
-        const params = new URLSearchParams(window.location.search);
-        if (params.has('error')) {
-            const elem = $(`<div class="alert alert-warning alert-dismissible d-block" role="alert">`);
-            const msgelem = $('<div>Sign in faild: The ID or PW is incorrect or the user is not authorized.</div>').appendTo(elem);
-            if (params.get('error') == 'noauth') msgelem.text('Sign in faild: No credentials are available. Please sign in.');
-            if (params.get('error') == 'expirationofpassword') msgelem.text('Sign in faild: The password has expired.');
-            if (params.get('error') == 'appdeny') msgelem.text('OAuth2 succeeded but app not allowed.');
-            if (params.get('error') == 'apikeyfail') msgelem.text('Authentication failed due to incorrect apikey.');
-            if (params.get('error') == 'unauthorizedsite') msgelem.text('Access to an unauthorized site.');
-            if (params.get('error') == 'lockout') msgelem.text('The account is locked.');
-            $('<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>').appendTo(elem);
-            $('body').prepend(elem);
-        }
-    }
 });
 const get_client_data = async () => {
     const res = await fetch('gui/get_client_data', {method: 'GET'});
