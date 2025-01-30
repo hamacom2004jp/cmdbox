@@ -56,7 +56,8 @@ class CmdBoxApp:
 
         # プラグイン読込み
         sfeatureloadtime = time.perf_counter()
-        self.options.load_svcmd('cmdbox.app.features.cli', prefix="cmdbox_", excludes=[], appcls=self.appcls, ver=self.ver, logger=self.default_logger)
+        self.options.load_svcmd('cmdbox.app.features.cli', prefix="cmdbox_", excludes=[], appcls=self.appcls, ver=self.ver, logger=self.default_logger,
+                                isloaded=self.options.is_features_loaded('cli'))
         if self.cli_features_packages is not None:
             if self.cli_features_prefix is None:
                 raise ValueError(f"cli_features_prefix is None. cli_features_packages={self.cli_features_packages}")

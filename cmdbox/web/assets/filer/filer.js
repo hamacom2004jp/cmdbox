@@ -555,6 +555,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
 }
 // ローカル操作 ==============================================================
 fsapi.safe_fname = (fname) => {
+  fname = fname.replace(/[_]/g, '-_-');
   return fname.replace(/[\s:\\\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]/g, '_');
 }
 fsapi.handles = {};

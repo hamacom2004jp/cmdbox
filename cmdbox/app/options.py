@@ -22,6 +22,9 @@ class Options:
         self.ver = ver
         self._options = dict()
         self.features_yml_data = None
+        self.features_loaded = dict()
+        self.aliases_loaded_cli = False
+        self.aliases_loaded_web = False
         self.init_options()
 
     def get_mode_keys(self) -> List[str]:
@@ -257,7 +260,7 @@ class Options:
             self._options["mode"][key] = mode
             self._options["mode"]["choice"] += [mode]
 
-    def load_svcmd(self, package_name:str, prefix:str="cmdbox_", excludes:list=[], appcls=None, ver=None, logger:logging.Logger=None):
+    def load_svcmd(self, package_name:str, prefix:str="cmdbox_", excludes:list=[], appcls=None, ver=None, logger:logging.Logger=None, isloaded:bool=True):
         """
         指定されたパッケージの指定された接頭語を持つモジュールを読み込みます。
 
@@ -268,6 +271,7 @@ class Options:
             appcls (Any): アプリケーションクラス
             ver (Any): バージョンモジュール
             logger (logging.Logger): ロガー
+            isloaded (bool): 読み込み済みかどうか
         """
         if "svcmd" not in self._options:
             self._options["svcmd"] = dict()
@@ -277,12 +281,23 @@ class Options:
             for cmd, opt in f.items():
                 self._options["cmd"][mode][cmd] = opt
                 fobj:feature.Feature = opt['feature']
-                if logger is not None and logger.level == logging.DEBUG:
+                if not isloaded and logger is not None and logger.level == logging.DEBUG:
                     logger.debug(f"loaded features: mode={mode}, cmd={cmd}, {fobj}")
                 svcmd = fobj.get_svcmd()
                 if svcmd is not None:
                     self._options["svcmd"][svcmd] = fobj
         self.init_debugoption()
+    
+    def is_features_loaded(self, ftype:str) -> bool:
+        """
+        指定されたフィーチャータイプが読み込まれているかどうかを返します。
+
+        Args:
+            ftype (str): フィーチャータイプ
+        Returns:
+            bool: 読み込まれているかどうか
+        """
+        return ftype in self.features_loaded and self.features_loaded[ftype]
 
     def load_features_file(self, ftype:str, func, appcls, ver, logger:logging.Logger=None):
         """
@@ -295,6 +310,9 @@ class Options:
             ver (Any): バージョンモジュール
             logger (logging.Logger): ロガー
         """
+        # 読込み済みかどうかの判定
+        if self.is_features_loaded(ftype):
+            return
         # cmdboxを拡張したアプリをカスタマイズするときのfeatures.ymlを読み込む
         features_yml = Path('features.yml')
         if not features_yml.exists() or not features_yml.is_file():
@@ -334,7 +352,8 @@ class Options:
                     if type(data['exclude_modules']) is not list:
                         raise Exception(f'features.yml is invalid. (The “exclude_modules” element must be a list element. data={data})')
                     exclude_modules = data['exclude_modules']
-                func(data['package'], data['prefix'], exclude_modules, appcls, ver, logger)
+                func(data['package'], data['prefix'], exclude_modules, appcls, ver, logger, self.is_features_loaded(ftype))
+                self.features_loaded[ftype] = True
 
     def load_features_args(self, args_dict:Dict[str, Any]):
         yml = self.features_yml_data
@@ -385,6 +404,7 @@ class Options:
     def load_features_aliases_cli(self, logger:logging.Logger):
         yml = self.features_yml_data
         if yml is None: return
+        if self.aliases_loaded_cli: return
         if 'aliases' not in yml or 'cli' not in yml['aliases']:
             return
 
@@ -448,10 +468,12 @@ class Options:
                     del self._options["cmd"][src_mode]
                 if len(self._options["mode"][src_mode]) == 1:
                     del self._options["mode"][src_mode]
+        self.aliases_loaded_cli = True
 
     def load_features_aliases_web(self, routes:List[Route], logger:logging.Logger):
         yml = self.features_yml_data
         if yml is None: return
+        if self.aliases_loaded_web: return
         if routes is None or type(routes) is not list or len(routes) == 0:
             raise Exception(f'routes is invalid. (The routes must be a list element.) routes={routes}')
         if 'aliases' not in yml or 'web' not in yml['aliases']:
@@ -507,3 +529,4 @@ class Options:
                         logger.debug(f'copy route: src=({route_path}) -> tgt=({tgt_Path})')
             if not find:
                 logger.warning(f'Skip web rule in features.yml. (Command matching the rule not found. rule={rule})')
+        self.aliases_loaded_web = True

@@ -106,7 +106,8 @@ users.users_list = async () => {
             }
             const row = $(modal.find('.row_content_template_str').html()).appendTo(row_content);
             row_content.find('.row_content_template_title').removeClass('row_content_template_title').text(col);
-            row_content.find('.row_content_template_input').removeClass('row_content_template_input').attr('name', col).val(user ? user[col] : '');
+            const input = row_content.find('.row_content_template_input').removeClass('row_content_template_input').attr('name', col).val(user ? user[col] : '');
+            col!='email' && input.attr('disabled', 'disabled');
         }
         // apikey追加実行
         modal.find('#cmd_add_apikey').off('click').on('click', async () => {

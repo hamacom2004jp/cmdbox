@@ -344,6 +344,8 @@ class Web:
         self.toolmenu = dict()
         self.viewmenu = dict()
         self.aboutmenu = dict()
+        if self.options.is_features_loaded('web'):
+            return
         # webfeatureの読込み
         def wf_route(pk, prefix, excludes, w, app, appcls, ver, logger):
             for wf in module.load_webfeatures(pk, prefix, excludes, appcls=appcls, ver=ver, logger=logger):
@@ -360,7 +362,7 @@ class Web:
                 raise ValueError(f"web_features_prefix is not match. web_features_packages={self.web_features_packages}, web_features_prefix={self.web_features_prefix}")
             for i, pn in enumerate(self.web_features_packages):
                 wf_route(pn, self.web_features_prefix[i], [], self, app, self.appcls, self.ver, self.logger)
-        self.options.load_features_file('web', lambda pk, pn, excludes, appcls, ver, logger: wf_route(pk, pn, excludes, self, app, appcls, ver, logger), self.appcls, self.ver, self.logger)
+        self.options.load_features_file('web', lambda pk, pn, excludes, appcls, ver, logger, _: wf_route(pk, pn, excludes, self, app, appcls, ver, logger), self.appcls, self.ver, self.logger)
         wf_route("cmdbox.app.features.web", "cmdbox_web_", [], self, app, self.appcls, self.ver, self.logger)
         # エイリアスの登録
         self.options.load_features_aliases_web(app.routes, self.logger)
@@ -685,9 +687,14 @@ class Web:
                 u['apikeys'] = dict([(ak, '********') for ak in u['apikeys']])
             if u['name'] == name:
                 return [u]
-            last_signin = self.user_data(None, u['uid'], u['name'], 'signin', 'last_update')
+            signin_last = self.user_data(None, u['uid'], u['name'], 'signin', 'last_update')
+            pass_last_update = self.user_data(None, u['uid'], u['name'], 'password', 'last_update')
+            pass_miss_count = self.user_data(None, u['uid'], u['name'], 'password', 'pass_miss_count')
+            pass_miss_last = self.user_data(None, u['uid'], u['name'], 'password', 'pass_miss_last')
+
             if name is None:
-                ret.append(dict(**u, last_signin=last_signin))
+                ret.append(dict(**u, last_signin=signin_last, pass_last_update=pass_last_update,
+                                pass_miss_count=pass_miss_count, pass_miss_last=pass_miss_last))
         return ret
 
     def apikey_add(self, user:Dict[str, Any]) -> str:

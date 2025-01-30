@@ -33,23 +33,23 @@ class DoSignin(cmdbox_web_signin.Signin):
             user = user[0]
             uid = user['uid']
             # ロックアウトチェック
-            pass_miss_count = web.user_data(req, uid, name, 'password', 'pass_miss_count')
+            pass_miss_count = web.user_data(None, uid, name, 'password', 'pass_miss_count')
             pass_miss_count = 0 if pass_miss_count is None else int(pass_miss_count)
             if 'password' in web.signin_file_data and web.signin_file_data['password']['lockout']['enabled']:
                 threshold = web.signin_file_data['password']['lockout']['threshold']
                 reset = web.signin_file_data['password']['lockout']['reset']
-                pass_miss_last = web.user_data(req, uid, name, 'password', 'pass_miss_last')
+                pass_miss_last = web.user_data(None, uid, name, 'password', 'pass_miss_last')
                 if pass_miss_last is None:
-                    pass_miss_last = web.user_data(req, uid, name, 'password', 'pass_miss_last', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+                    pass_miss_last = web.user_data(None, uid, name, 'password', 'pass_miss_last', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
                 pass_miss_last = datetime.datetime.strptime(pass_miss_last, '%Y-%m-%dT%H:%M:%S')
                 if datetime.datetime.now() > pass_miss_last + datetime.timedelta(minutes=reset):
                     # ロックアウトリセット
                     pass_miss_count = 0
-                    web.user_data(req, uid, name, 'password', 'pass_miss_count', pass_miss_count)
+                    web.user_data(None, uid, name, 'password', 'pass_miss_count', pass_miss_count)
                     web.logger.info(f'Reset pass_miss_count. name={name}')
                 if pass_miss_count >= threshold:
                     # ロックアウト
-                    web.user_data(req, uid, name, 'password', 'pass_miss_count', )
+                    web.user_data(None, uid, name, 'password', 'pass_miss_count', )
                     return RedirectResponse(url=f'/signin/{next}?error=lockout')
             # パスワード認証
             hash = user['hash']
@@ -57,15 +57,15 @@ class DoSignin(cmdbox_web_signin.Signin):
                 passwd = common.hash_password(passwd, hash)
             if passwd != user['password']:
                 # パスワード間違いの日時と回数を記録
-                web.user_data(req, uid, name, 'password', 'pass_miss_last', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
-                web.user_data(req, uid, name, 'password', 'pass_miss_count', pass_miss_count+1)
+                web.user_data(None, uid, name, 'password', 'pass_miss_last', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+                web.user_data(None, uid, name, 'password', 'pass_miss_count', pass_miss_count+1)
                 web.logger.warning(f'Failed to signin. name={name}, pass_miss_count={pass_miss_count+1}')
                 return RedirectResponse(url=f'/signin/{next}?error=1')
             group_names = list(set(web.correct_group(user['groups'])))
             gids = [g['gid'] for g in web.signin_file_data['groups'] if g['name'] in group_names]
             email = user.get('email', '')
             # パスワード最終更新日時取得
-            last_update = web.user_data(req, uid, name, 'password', 'last_update')
+            last_update = web.user_data(None, uid, name, 'password', 'last_update')
             notify_passchange = True if last_update is None else False
             # パスワード認証の場合はパスワード有効期限チェック
             if user['hash']!='oauth2' and 'password' in web.signin_file_data and not notify_passchange:
@@ -137,15 +137,15 @@ class DoSignin(cmdbox_web_signin.Signin):
                 gids (list): グループIDリスト
             """
             # 最終サインイン日時更新
-            web.user_data(req, user['uid'], user['name'], 'signin', 'last_update', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+            web.user_data(None, user['uid'], user['name'], 'signin', 'last_update', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
             if access_token is not None:
                 # パスワード最終更新日時削除
-                web.user_data(req, user['uid'], user['name'], 'password', 'last_update', delkey=True)
+                web.user_data(None, user['uid'], user['name'], 'password', 'last_update', delkey=True)
             else:
                 # パスワード間違いの日時削除
-                web.user_data(req, user['uid'], user['name'], 'password', 'pass_miss_last', None, delkey=True)
+                web.user_data(None, user['uid'], user['name'], 'password', 'pass_miss_last', None, delkey=True)
                 # パスワード間違い回数削除
-                web.user_data(req, user['uid'], user['name'], 'password', 'pass_miss_count', 0, delkey=True)
+                web.user_data(None, user['uid'], user['name'], 'password', 'pass_miss_count', 0, delkey=True)
             # セッションに保存
             req.session['signin'] = dict(uid=user['uid'], name=user['name'],
                                          password=hashed_password, access_token=access_token,

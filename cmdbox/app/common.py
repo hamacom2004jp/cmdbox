@@ -296,6 +296,7 @@ def safe_fname(fname:str) -> str:
     Returns:
         str: 置換後のファイル名
     """
+    fname = re.sub('[_]', '-_-',str(fname))
     return re.sub('[\s:;\\\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]', '_',str(fname))
 
 def check_fname(fname:str) -> bool:
