@@ -40,4 +40,4 @@ class LoadPipe(feature.WebFeature):
         opt_path = web.pipes_path / f"pipe-{title}.json"
         if web.logger.level == logging.DEBUG:
             web.logger.debug(f"web.load_pipe: title={title}")
-        return common.loadopt(opt_path)
+        return common.loadopt(opt_path, True)

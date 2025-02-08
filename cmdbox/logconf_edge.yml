@@ -1,0 +1,30 @@
+version: 1
+
+formatters:
+    fmt:
+        format: '%(levelname)s[%(asctime)s] - %(message)s'
+        class: logging.Formatter
+handlers:
+    std:
+        class: cmdbox.app.commons.loghandler.ColorfulStreamHandler
+        level: INFO
+        formatter: fmt
+        stream: ext://sys.stdout
+    edge:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/cmdbox_edge.log
+
+loggers:
+    edge:
+        handlers: [edge]
+        level: INFO
+        qualname: edge
+ 
+#root:
+#    handlers: [std]
+#    level: NOTSET

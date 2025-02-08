@@ -124,7 +124,7 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                     return
             cmdline = None
             has_warn = False
-            for cl in self.raw_pipe(web, title, opt):
+            for cl in self.raw_pipe(web, title, opt, True):
                 if cl['type'] == 'cmdline':
                     cmdline = cl['raw']
                 if cl['type'] == 'warn':

@@ -7,6 +7,9 @@ itsdangerous
 numpy
 Pillow
 python-multipart
+plyer             # For desktop notifications
+pystray           # For system tray icon
+#pyobjus          # Mac OS only
 redis
 requests
 six

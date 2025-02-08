@@ -37,16 +37,16 @@ class GuiStart(Feature):
             discription_ja="GUIモードを起動します。",
             discription_en="Start GUI mode.",
             choice=[
-                dict(opt="host", type="str", default=self.default_host, required=False, multi=False, hide=True, choice=None,
+                dict(opt="host", type="str", default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
                      discription_ja="Redisサーバーのサービスホストを指定します。",
                      discription_en="Specify the service host of the Redis server."),
-                dict(opt="port", type="int", default=self.default_port, required=False, multi=False, hide=True, choice=None,
+                dict(opt="port", type="int", default=self.default_port, required=True, multi=False, hide=True, choice=None, web="mask",
                      discription_ja="Redisサーバーのサービスポートを指定します。",
                      discription_en="Specify the service port of the Redis server."),
-                dict(opt="password", type="str", default=self.default_pass, required=False, multi=False, hide=True, choice=None,
+                dict(opt="password", type="str", default=self.default_pass, required=True, multi=False, hide=True, choice=None, web="mask",
                      discription_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
                      discription_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
-                dict(opt="svname", type="str", default="server", required=False, multi=False, hide=True, choice=None,
+                dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choice=None, web="readonly",
                      discription_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
                      discription_en="Specify the service name of the inference server. If omitted, `server` is used."),
                 dict(opt="data", type="file", default=common.HOME_DIR / f".{self.ver.__appid__}", required=False, multi=False, hide=False, choice=None,
@@ -134,7 +134,7 @@ class GuiStart(Feature):
         if args.data is None:
             msg = {"warn":f"Please specify the --data option."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg
+            return 1, msg, None
 
         ssl_cert = None if args.ssl_cert is None else Path(args.ssl_cert)
         ssl_key = None if args.ssl_key is None else Path(args.ssl_key)
@@ -150,4 +150,4 @@ class GuiStart(Feature):
                 outputs_key=args.outputs_key)
         msg = {"success":"gui complate."}
         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-        return 0, msg
+        return 0, msg, None

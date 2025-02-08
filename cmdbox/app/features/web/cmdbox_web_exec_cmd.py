@@ -108,6 +108,10 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         if 'mode' in opt and 'cmd' in opt:
             if not web.check_cmd(req, res, opt['mode'], opt['cmd']):
                 return dict(warn=f'Command "{title}" failed. Execute command denyed. mode={opt["mode"]}, cmd={opt["cmd"]}')
+        if 'host' in opt: opt['host'] = web.redis_host
+        if 'port' in opt: opt['port'] = web.redis_port
+        if 'password' in opt: opt['password'] = web.redis_password
+        if 'svname' in opt: opt['svname'] = web.svname
         ap.sv = None
         ap.cl = None
         ap.web = None

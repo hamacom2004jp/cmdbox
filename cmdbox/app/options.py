@@ -91,28 +91,40 @@ class Options:
             return None
         return self._options["svcmd"][svcmd]
 
-    def get_cmd_choices(self, mode:str, cmd:str) -> List[Dict[str, Any]]:
+    def get_cmd_choices(self, mode:str, cmd:str, webmode:bool=False) -> List[Dict[str, Any]]:
         """
         コマンドのオプション一覧を取得します。
         Args:
             mode: 起動モード
             cmd: コマンド
+            webmode (bool, optional): Webモードからの呼び出し. Defaults to False
         Returns:
             List[Dict[str, Any]]: オプションの選択肢
         """
-        return self.get_cmd_attr(mode, cmd, "choice")
+        opts = self.get_cmd_attr(mode, cmd, "choice")
+        ret = []
+        for o in opts:
+            if not webmode or type(o) is not dict:
+                ret.append(o)
+                continue
+            o = o.copy()
+            if 'web' in o and o['web'] == 'mask':
+                o['default'] = '********'
+            ret.append(o)
+        return ret
 
-    def get_cmd_opt(self, mode:str, cmd:str, opt:str) -> Dict[str, Any]:
+    def get_cmd_opt(self, mode:str, cmd:str, opt:str, webmode:bool=False) -> Dict[str, Any]:
         """
         コマンドのオプションを取得します。
         Args:
             mode: 起動モード
             cmd: コマンド
             opt: オプション
+            webmode (bool, optional): Webモードからの呼び出し. Defaults to False
         Returns:
             Dict[str, Any]: オプションの値
         """
-        opts = self.get_cmd_choices(mode, cmd)
+        opts = self.get_cmd_choices(mode, cmd, webmode)
         for o in opts:
             if 'opt' in o and o['opt'] == opt:
                 return o
@@ -167,8 +179,8 @@ class Options:
                     _list(ret, o['opt'], o)
         return ret
 
-    def mk_opt_list(self, opt:dict):
-        opt_schema = self.get_cmd_choices(opt['mode'], opt['cmd'])
+    def mk_opt_list(self, opt:dict, webmode:bool=False) -> List[str]:
+        opt_schema = self.get_cmd_choices(opt['mode'], opt['cmd'], webmode)
         opt_list = ['-m', opt['mode'], '-c', opt['cmd']]
         file_dict = dict()
         for key, val in opt.items():

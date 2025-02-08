@@ -20,5 +20,5 @@ class GetCmdChoices(feature.WebFeature):
             form = await req.form()
             mode = form.get('mode')
             cmd = form.get('cmd')
-            ret = web.options.get_cmd_choices(mode, cmd)
+            ret = web.options.get_cmd_choices(mode, cmd, True)
             return ret

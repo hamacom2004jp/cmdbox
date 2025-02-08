@@ -1,5 +1,5 @@
 from cmdbox import version
-from cmdbox.app import feature
+from cmdbox.app import feature, options, web
 from cmdbox.app.commons import module, loghandler
 from pathlib import Path
 from PIL import Image, ImageDraw
@@ -203,16 +203,27 @@ def default_json_enc(o) -> Any:
         return 'object'
     raise TypeError(f"Type {type(o)} not serializable")
 
-def saveopt(opt:dict, opt_path:Path) -> None:
+def saveopt(opt:dict, opt_path:Path, webmode:bool=False) -> None:
     """
     コマンドラインオプションをJSON形式でファイルに保存します。
 
     Args:
         opt (dict): コマンドラインオプション
         opt_path (Path): 保存先のファイルパス
+        webmode (bool, optional): Webモードからの呼び出し. Defaults to False.
     """
     if opt_path is None:
         return
+    if webmode and 'mode' in opt and 'cmd' in opt:
+        refs = options.Options.getInstance().get_cmd_choices(opt['mode'], opt['cmd'])
+        lopts = loadopt(opt_path)
+        for r in refs:
+            if 'opt' not in r or 'web' not in r:
+                continue
+            if r['web'] in ['mask', 'readonly']:
+                k = r['opt']
+                d = r['default'] if 'default' in r else None
+                opt[k] = d if k not in lopts else lopts.get(k, d)
     with open(opt_path, 'w') as f:
         json.dump(opt, f, indent=4, default=default_json_enc)
 
@@ -226,12 +237,13 @@ def saveuser(user_data:dict, user_path:Path) -> None:
     """
     saveopt(user_data, user_path)
 
-def loadopt(opt_path:str) -> dict:
+def loadopt(opt_path:str, webmode:bool=False) -> dict:
     """
     JSON形式のファイルからコマンドラインオプションを読み込みます。
 
     Args:
         opt_path (str): 読み込むファイルパス
+        webmode (bool, optional): Webモードからの呼び出し. Defaults to False
 
     Returns:
         dict: 読み込んだコマンドラインオプション
@@ -240,6 +252,15 @@ def loadopt(opt_path:str) -> dict:
         return dict()
     with open(opt_path) as f:
         opt = json.load(f)
+        if webmode:
+            if 'mode' not in opt or 'cmd' not in opt:
+                return opt
+            refs = options.Options.getInstance().get_cmd_choices(opt['mode'], opt['cmd'], webmode)
+            for r in refs:
+                if 'opt' not in r:
+                    continue
+                if 'web' in r and r['web'] == 'mask':
+                    opt[r['opt']] = '********'
         return opt
 
 def loaduser(user_path:str) -> dict:

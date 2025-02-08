@@ -143,7 +143,7 @@ class RedisClient(object):
                     raise Exception(f"Response timed out.")
                 res = self.redis_cli.lpop(reskey)
                 if res is None or len(res) <= 0:
-                    time.sleep(0.0001)
+                    time.sleep(0.001)
                     continue
                 return self._res_cmd(reskey, res, sreqtime)
             raise KeyboardInterrupt(f"Stop command.")

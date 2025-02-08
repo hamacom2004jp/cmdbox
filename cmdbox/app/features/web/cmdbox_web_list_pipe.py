@@ -43,7 +43,7 @@ class ListPipe(feature.WebFeature):
         if web.logger.level == logging.DEBUG:
             web.logger.debug(f"web.list_pipe: kwd={kwd}")
         paths = glob.glob(str(web.pipes_path / f"pipe-{kwd}.json"))
-        pipes = [common.loadopt(path) for path in paths]
+        pipes = [common.loadopt(path, True) for path in paths]
         pipes = sorted(pipes, key=lambda cmd: cmd["title"])
         pipes = [pipe for pipe in pipes if self.chk_pipe(web, pipe['pipe_cmd'], req, res)]
         return pipes
@@ -53,5 +53,7 @@ class ListPipe(feature.WebFeature):
         return len(pipe_cmd) == len(cmd)
 
     def chk_opt(self, web:Web, title:str, req:Request, res:Response) -> Dict[str, Any]:
-        opt = common.loadopt(web.cmds_path / f'cmd-{title}.json')
+        opt = common.loadopt(web.cmds_path / f'cmd-{title}.json', True)
+        if 'mode' not in opt or 'cmd' not in opt:
+            return False
         return web.check_cmd(req, res, opt['mode'], opt['cmd'])

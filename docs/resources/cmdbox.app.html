@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app package &mdash; cmdbox 2025/01/30 documentation</title>
+  <title>cmdbox.app package &mdash; cmdbox 2025/02/08 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=3e9845f8"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=87114215"></script>
       <script src="../_static/doctools.js?v=888ff710"></script>
       <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -545,11 +545,14 @@ config (dict): 設定</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cmdbox.app.common.loadopt">
-<span class="sig-prename descclassname"><span class="pre">cmdbox.app.common.</span></span><span class="sig-name descname"><span class="pre">loadopt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/common.html#loadopt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.common.loadopt" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.common.</span></span><span class="sig-name descname"><span class="pre">loadopt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">webmode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/common.html#loadopt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.common.loadopt" title="Permalink to this definition"></a></dt>
 <dd><p>JSON形式のファイルからコマンドラインオプションを読み込みます。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>opt_path</strong> (<em>str</em>) -- 読み込むファイルパス</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>opt_path</strong> (<em>str</em>) -- 読み込むファイルパス</p></li>
+<li><p><strong>webmode</strong> (<em>bool</em><em>, </em><em>optional</em>) -- Webモードからの呼び出し. Defaults to False</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>読み込んだコマンドラインオプション</p>
@@ -698,13 +701,14 @@ config (dict): 設定</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cmdbox.app.common.saveopt">
-<span class="sig-prename descclassname"><span class="pre">cmdbox.app.common.</span></span><span class="sig-name descname"><span class="pre">saveopt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/common.html#saveopt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.common.saveopt" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.common.</span></span><span class="sig-name descname"><span class="pre">saveopt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">webmode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/common.html#saveopt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.common.saveopt" title="Permalink to this definition"></a></dt>
 <dd><p>コマンドラインオプションをJSON形式でファイルに保存します。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>opt</strong> (<em>dict</em>) -- コマンドラインオプション</p></li>
 <li><p><strong>opt_path</strong> (<em>Path</em>) -- 保存先のファイルパス</p></li>
+<li><p><strong>webmode</strong> (<em>bool</em><em>, </em><em>optional</em>) -- Webモードからの呼び出し. Defaults to False.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1300,10 +1304,12 @@ dict: メッセージ</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.options.Options.get_cmd_choices">
-<span class="sig-name descname"><span class="pre">get_cmd_choices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/options.html#Options.get_cmd_choices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.options.Options.get_cmd_choices" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_cmd_choices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">webmode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/options.html#Options.get_cmd_choices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.options.Options.get_cmd_choices" title="Permalink to this definition"></a></dt>
 <dd><p>コマンドのオプション一覧を取得します。
 :param mode: 起動モード
-:param cmd: コマンド</p>
+:param cmd: コマンド
+:param webmode: Webモードからの呼び出し. Defaults to False
+:type webmode: bool, optional</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>オプションの選択肢</p>
@@ -1321,11 +1327,13 @@ dict: メッセージ</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.options.Options.get_cmd_opt">
-<span class="sig-name descname"><span class="pre">get_cmd_opt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/options.html#Options.get_cmd_opt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.options.Options.get_cmd_opt" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_cmd_opt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">webmode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/options.html#Options.get_cmd_opt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.options.Options.get_cmd_opt" title="Permalink to this definition"></a></dt>
 <dd><p>コマンドのオプションを取得します。
 :param mode: 起動モード
 :param cmd: コマンド
-:param opt: オプション</p>
+:param opt: オプション
+:param webmode: Webモードからの呼び出し. Defaults to False
+:type webmode: bool, optional</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>オプションの値</p>
@@ -1466,7 +1474,7 @@ dict: メッセージ</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.options.Options.mk_opt_list">
-<span class="sig-name descname"><span class="pre">mk_opt_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/options.html#Options.mk_opt_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.options.Options.mk_opt_list" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">mk_opt_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">webmode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/options.html#Options.mk_opt_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.options.Options.mk_opt_list" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>

@@ -149,7 +149,7 @@ class Gui(feature.WebFeature):
         if 'mode' not in cmd_opt or 'cmd' not in cmd_opt:
             return ""
         curl_fileup = set()
-        for ref in web.options.get_cmd_choices(cmd_opt['mode'], cmd_opt['cmd']):
+        for ref in web.options.get_cmd_choices(cmd_opt['mode'], cmd_opt['cmd'], True):
             if 'fileio' not in ref or ref['fileio'] != 'in':
                 continue
             if ref['opt'] in cmd_opt and cmd_opt[ref['opt']] != '':

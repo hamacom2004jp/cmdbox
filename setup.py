@@ -22,6 +22,8 @@ INSTALL_REQUIRES = [
     'itsdangerous',
     'numpy',
     'Pillow',
+    'plyer',
+    'pystray',
     'python-multipart',
     'redis',
     'requests',

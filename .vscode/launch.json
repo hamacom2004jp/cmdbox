@@ -29,6 +29,7 @@
             "type": "python",
             "request": "launch",
             "args": ["-m","web","-c","start","--signin_file",".samples/user_list.yml", "--session_path", "/",
+            //"--host", "abc", "--port", "1234", "--password", "1qazxsw2", "--svname", "PPPPP",
             "--ssl_cert","server.cert","--ssl_key","server.key","--debug"],//,  "--client_only", "--filer_html", "filer2.html", "--assets", "README.md", "--assets", "setup.py"
             "module": "cmdbox",
             "console": "integratedTerminal",
@@ -46,10 +47,14 @@
             "justMyCode": false
         },
         {
-            "name": "Python: cmdbox genpass",
+            "name": "Python: cmdbox edge",
             "type": "python",
             "request": "launch",
-            "args": ["-m","web","-c","genpass","-f"],
+            "args": ["-m","edge","-c","start","--endpoint","http://localhost:8081",
+                     "--auth_type","apikey", // noauth, idpw, apikey, oauth2
+                     "--user","admin","--password","admin",
+                     "--apikey","0ZDTW1WNVG6SWUYXUFLY6SFKNTAFLCYY36KJ7K427FNABYHYDGRM9RTW1J08O98Y",
+                     "--oauth2","google","--oauth2_client_id","a","--oauth2_client_secret","a"],
             "module": "cmdbox",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",

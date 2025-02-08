@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.options &mdash; cmdbox 2025/01/30 documentation</title>
+  <title>cmdbox.app.options &mdash; cmdbox 2025/02/08 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=3e9845f8"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=87114215"></script>
       <script src="../../../_static/doctools.js?v=888ff710"></script>
       <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -168,28 +168,40 @@
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;svcmd&quot;</span><span class="p">][</span><span class="n">svcmd</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Options.get_cmd_choices"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_cmd_choices">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd_choices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<div class="viewcode-block" id="Options.get_cmd_choices"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_cmd_choices">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd_choices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">webmode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        コマンドのオプション一覧を取得します。</span>
 <span class="sd">        Args:</span>
 <span class="sd">            mode: 起動モード</span>
 <span class="sd">            cmd: コマンド</span>
+<span class="sd">            webmode (bool, optional): Webモードからの呼び出し. Defaults to False</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            List[Dict[str, Any]]: オプションの選択肢</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="s2">&quot;choice&quot;</span><span class="p">)</span></div>
+        <span class="n">opts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="s2">&quot;choice&quot;</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">webmode</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">dict</span><span class="p">:</span>
+                <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">if</span> <span class="s1">&#39;web&#39;</span> <span class="ow">in</span> <span class="n">o</span> <span class="ow">and</span> <span class="n">o</span><span class="p">[</span><span class="s1">&#39;web&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;mask&#39;</span><span class="p">:</span>
+                <span class="n">o</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;********&#39;</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
 
-<div class="viewcode-block" id="Options.get_cmd_opt"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_cmd_opt">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd_opt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="Options.get_cmd_opt"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_cmd_opt">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd_opt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">webmode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        コマンドのオプションを取得します。</span>
 <span class="sd">        Args:</span>
 <span class="sd">            mode: 起動モード</span>
 <span class="sd">            cmd: コマンド</span>
 <span class="sd">            opt: オプション</span>
+<span class="sd">            webmode (bool, optional): Webモードからの呼び出し. Defaults to False</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            Dict[str, Any]: オプションの値</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">opts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmd_choices</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+        <span class="n">opts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmd_choices</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">webmode</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;opt&#39;</span> <span class="ow">in</span> <span class="n">o</span> <span class="ow">and</span> <span class="n">o</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">opt</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">o</span>
@@ -244,8 +256,8 @@
                     <span class="n">_list</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">o</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">],</span> <span class="n">o</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span></div>
 
-<div class="viewcode-block" id="Options.mk_opt_list"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.mk_opt_list">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">mk_opt_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
-        <span class="n">opt_schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmd_choices</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">])</span>
+<div class="viewcode-block" id="Options.mk_opt_list"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.mk_opt_list">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">mk_opt_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">webmode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">opt_schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmd_choices</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">],</span> <span class="n">webmode</span><span class="p">)</span>
         <span class="n">opt_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">]]</span>
         <span class="n">file_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">opt</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>

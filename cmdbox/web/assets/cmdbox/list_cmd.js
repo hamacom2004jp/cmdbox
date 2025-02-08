@@ -119,6 +119,10 @@ const list_cmd_func_then = () => {
                 input_elem.attr('required', row.required);
                 input_elem.attr('param_data_type', row.type);
                 input_elem.attr('param_data_multi', row.multi);
+                input_elem.attr('param_data_web', row.web);
+                if (row.web=='mask' || row.web=='readonly') {
+                    input_elem.attr('disabled', 'disabled');
+                }
                 // ファイルタイプの場合はファイラーモーダルを開くボタンを追加
                 if(row.type=='file'){
                     const btn = $('<button class="btn btn-secondary" type="button">file</button>');
@@ -407,10 +411,11 @@ const get_param = (modal_elem) => {
         const data_name = $(elem).attr('name');
         let data_val = $(elem).val();
         const data_type = $(elem).attr('param_data_type');
+        const data_web = $(elem).attr('param_data_web');
         const data_multi = $(elem).attr('param_data_multi');
         if ($(elem).attr('required') && (!data_val || data_val=='')) {
             $(elem).addClass('is-invalid');
-        } else if (data_type=='int') {
+        } else if (data_type=='int' && !data_web) {
             if(data_val && data_val!='') {
                 if(!isInt(data_val)) $(elem).addClass('is-invalid');
                 else {

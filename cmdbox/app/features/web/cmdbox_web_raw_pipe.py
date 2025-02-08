@@ -27,13 +27,15 @@ class RawPipe(cmdbox_web_raw_cmd.RawCmd, cmdbox_web_load_cmd.LoadCmd):
             ret = self.raw_pipe(web, title, json.loads(opt))
             return ret
 
-    def raw_pipe(self, web:Web, title:str, opt:Dict[str, Any]) -> List[Dict[str, Any]]:
+    def raw_pipe(self, web:Web, title:str, opt:Dict[str, Any], setredis:bool=False) -> List[Dict[str, Any]]:
         """
         パイプラインのコマンドライン文字列、curlコマンド文字列を作成する
 
         Args:
+            web (Web): Webオブジェクト
             title (str): タイトル
             opt (dict): オプション
+            setredis (bool): Webインスタンスのredis接続情報をオプションにセットするかどうか
         
         Returns:
             list[Dict[str, Any]]: コマンドライン文字列、curlコマンド文字列
@@ -47,7 +49,7 @@ class RawPipe(cmdbox_web_raw_cmd.RawCmd, cmdbox_web_load_cmd.LoadCmd):
             if cmd_title == '':
                 continue
             cmd_opt = self.load_cmd(web, cmd_title)
-            cmd_ref = web.options.get_cmd_choices(cmd_opt['mode'], cmd_opt['cmd'])
+            cmd_ref = web.options.get_cmd_choices(cmd_opt['mode'], cmd_opt['cmd'], True)
             chk_stdin = len([ref for ref in cmd_ref if ref['opt'] == 'stdin']) > 0
 
             if 'debug' in cmd_opt and cmd_opt['debug']:
@@ -69,6 +71,11 @@ class RawPipe(cmdbox_web_raw_cmd.RawCmd, cmdbox_web_load_cmd.LoadCmd):
                             cmd_opt[fn] = opt['request_files'][fn]
                 curl_cmd_file = self.mk_curl_fileup(web, cmd_opt)
 
+            if setredis:
+                if 'host' in cmd_opt: cmd_opt['host'] = web.redis_host
+                if 'port' in cmd_opt: cmd_opt['port'] = web.redis_port
+                if 'password' in cmd_opt: cmd_opt['password'] = web.redis_password
+                if 'svname' in cmd_opt: cmd_opt['svname'] = web.svname
             cmd_output = self.raw_cmd(web, cmd_title, cmd_opt)
             cmdlines.append(cmd_output[0]["raw"])
 

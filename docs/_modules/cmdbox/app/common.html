@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.common &mdash; cmdbox 2025/01/30 documentation</title>
+  <title>cmdbox.app.common &mdash; cmdbox 2025/02/08 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=3e9845f8"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=87114215"></script>
       <script src="../../../_static/doctools.js?v=888ff710"></script>
       <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -76,7 +76,7 @@
              
   <h1>Source code for cmdbox.app.common</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">feature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">feature</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">web</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">module</span><span class="p">,</span> <span class="n">loghandler</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">ImageDraw</span>
@@ -280,16 +280,27 @@
         <span class="k">return</span> <span class="s1">&#39;object&#39;</span>
     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="si">}</span><span class="s2"> not serializable&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="saveopt"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.saveopt">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">saveopt</span><span class="p">(</span><span class="n">opt</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">opt_path</span><span class="p">:</span><span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="saveopt"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.saveopt">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">saveopt</span><span class="p">(</span><span class="n">opt</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">opt_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">webmode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    コマンドラインオプションをJSON形式でファイルに保存します。</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        opt (dict): コマンドラインオプション</span>
 <span class="sd">        opt_path (Path): 保存先のファイルパス</span>
+<span class="sd">        webmode (bool, optional): Webモードからの呼び出し. Defaults to False.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">opt_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span>
+    <span class="k">if</span> <span class="n">webmode</span> <span class="ow">and</span> <span class="s1">&#39;mode&#39;</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="s1">&#39;cmd&#39;</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span>
+        <span class="n">refs</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span><span class="o">.</span><span class="n">get_cmd_choices</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">])</span>
+        <span class="n">lopts</span> <span class="o">=</span> <span class="n">loadopt</span><span class="p">(</span><span class="n">opt_path</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">refs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;opt&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">r</span> <span class="ow">or</span> <span class="s1">&#39;web&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;web&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="s1">&#39;readonly&#39;</span><span class="p">]:</span>
+                <span class="n">k</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;default&#39;</span> <span class="ow">in</span> <span class="n">r</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="n">opt</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lopts</span> <span class="k">else</span> <span class="n">lopts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">opt_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default_json_enc</span><span class="p">)</span></div>
 
@@ -303,12 +314,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">saveopt</span><span class="p">(</span><span class="n">user_data</span><span class="p">,</span> <span class="n">user_path</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="loadopt"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.loadopt">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">loadopt</span><span class="p">(</span><span class="n">opt_path</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<div class="viewcode-block" id="loadopt"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.loadopt">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">loadopt</span><span class="p">(</span><span class="n">opt_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">webmode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    JSON形式のファイルからコマンドラインオプションを読み込みます。</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        opt_path (str): 読み込むファイルパス</span>
+<span class="sd">        webmode (bool, optional): Webモードからの呼び出し. Defaults to False</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: 読み込んだコマンドラインオプション</span>
@@ -317,6 +329,15 @@
         <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">opt_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">opt</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">webmode</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;mode&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">or</span> <span class="s1">&#39;cmd&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">opt</span>
+            <span class="n">refs</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span><span class="o">.</span><span class="n">get_cmd_choices</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">],</span> <span class="n">webmode</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">refs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;opt&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="s1">&#39;web&#39;</span> <span class="ow">in</span> <span class="n">r</span> <span class="ow">and</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;web&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;mask&#39;</span><span class="p">:</span>
+                    <span class="n">opt</span><span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="s1">&#39;********&#39;</span>
         <span class="k">return</span> <span class="n">opt</span></div>
 
 <div class="viewcode-block" id="loaduser"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.loaduser">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">loaduser</span><span class="p">(</span><span class="n">user_path</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
