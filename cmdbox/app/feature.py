@@ -1,4 +1,5 @@
 from cmdbox import version
+from cmdbox.app import edge
 from cmdbox.app.commons import redis_client
 from cmdbox.app.web import Web
 from fastapi import FastAPI
@@ -8,7 +9,8 @@ import argparse
 import logging
 import os
 
-class Feature:
+
+class Feature(object):
     USE_REDIS_FALSE:int = -1
     USE_REDIS_MEIGHT:int = 0
     USE_REDIS_TRUE:int = 1
@@ -100,6 +102,23 @@ class Feature:
             int: 終了コード
         """
         raise NotImplementedError
+
+    def edgerun(self, opt:Dict[str, Any], tool:edge.Tool, logger:logging.Logger, prevres:Any=None) -> Tuple[int, Dict[str, Any]]:
+        """
+        この機能のエッジ側の実行を行います
+
+        Args:
+            opt (Dict[str, Any]): オプション
+            tool (edge.Tool): 通知関数などedge側のUI操作を行うためのクラス
+            logger (logging.Logger): ロガー
+            prevres (Any): 前コマンドの結果。pipeline実行の実行結果を参照する時に使用します。
+
+        Returns:
+            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果
+        """
+        status, res = tool.exec_cmd(opt, logger, prevres)
+        tool.notify(res)
+        return status, res
 
 class WebFeature(object):
     USE_REDIS_FALSE:int = Feature.USE_REDIS_FALSE

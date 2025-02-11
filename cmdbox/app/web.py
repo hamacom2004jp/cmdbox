@@ -18,6 +18,7 @@ import requests
 import queue
 import signal
 import string
+import time
 import threading
 import traceback
 import uvicorn
@@ -152,6 +153,7 @@ class Web:
         """
         self.enable_cors(req, res)
         if self.signin_file is None:
+            res.headers['signin'] = 'success'
             return None
         if self.signin_file_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
@@ -195,6 +197,7 @@ class Web:
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"rule: {req.url.path}: {jadge}")
         if jadge == 'allow':
+            res.headers['signin'] = 'success'
             return None
         self.logger.warning(f"Unauthorized site. user={find_user['name']}, path={req.url.path}")
         return RedirectResponse(url=f'/signin{req.url.path}?error=unauthorizedsite')
@@ -693,8 +696,8 @@ class Web:
             pass_miss_last = self.user_data(None, u['uid'], u['name'], 'password', 'pass_miss_last')
 
             if name is None:
-                ret.append(dict(**u, last_signin=signin_last, pass_last_update=pass_last_update,
-                                pass_miss_count=pass_miss_count, pass_miss_last=pass_miss_last))
+                ret.append({**u, **dict(last_signin=signin_last, pass_last_update=pass_last_update,
+                                pass_miss_count=pass_miss_count, pass_miss_last=pass_miss_last)})
         return ret
 
     def apikey_add(self, user:Dict[str, Any]) -> str:
@@ -877,6 +880,7 @@ class Web:
                     self.user_data(None, user['uid'], user['name'], 'password', 'last_update', datetime.datetime.now())
                 u['hash'] = user['hash']
                 u['groups'] = user['groups']
+                u['email'] = user['email']
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"user_edit: {user} -> {self.signin_file}")
         # サインインファイルの保存
@@ -1203,7 +1207,7 @@ class Web:
 class ThreadedUvicorn:
     def __init__(self, config: Config):
         self.server = uvicorn.Server(config)
-        self.thread = threading.Thread(daemon=True, target=self.server.run)
+        self.thread = RaiseThread(daemon=True, target=self.server.run)
 
     def start(self):
         if platform.system() == "Windows":
@@ -1218,8 +1222,12 @@ class ThreadedUvicorn:
     def stop(self):
         if self.thread.is_alive():
             self.server.should_exit = True
+            self.thread.raise_exception()
             while self.thread.is_alive():
-                continue
+                time.sleep(0.1)
+
+    def is_alive(self):
+        return self.thread.is_alive()
 
 class RaiseThread(threading.Thread):
     def __init__(self, *args, **kwargs):

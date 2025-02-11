@@ -166,7 +166,7 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                     output = [dict(warn='capture_stdout is off.')]
             except Exception as e:
                 output = [dict(warn=f'<pre>{html.escape(traceback.format_exc())}</pre>')]
-            if 'stdout_log' in opt and cmd_opt['stdout_log']:
+            if 'stdout_log' in opt and opt['stdout_log']:
                 self.callback_console_modal_log_func(web, output)
             try:
                 try:

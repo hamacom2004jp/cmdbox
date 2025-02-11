@@ -49,6 +49,10 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                         if key == 'input_file': opt['stdin'] = False
                 elif content_type.startswith('application/json'):
                     opt = await req.json()
+                elif content_type.startswith('application/octet-stream'):
+                    opt = self.load_cmd(web, title)
+                    opt = _marge_opt(opt, req.query_params)
+                    opt['_stdin_body'] = await req.body()
                 else:
                     opt = self.load_cmd(web, title)
                     opt = _marge_opt(opt, req.query_params)
@@ -116,6 +120,10 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         ap.cl = None
         ap.web = None
         def _exec_cmd(cmdbox_app:app.CmdBoxApp, title, opt, nothread=False):
+            _stdin_body = None
+            if '_stdin_body' in opt:
+                _stdin_body = opt['_stdin_body']
+                del opt['_stdin_body']
             web.logger.info(f"exec_cmd: title={title}, opt={opt}")
             ret, output = self.chk_client_only(web, opt)
             if ret:
@@ -125,12 +133,14 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
 
             opt_list, file_dict = web.options.mk_opt_list(opt)
             old_stdout = sys.stdout
-
             if 'capture_stdout' in opt and opt['capture_stdout'] and 'stdin' in opt and opt['stdin']:
                 output = dict(warn=f'The "stdin" and "capture_stdout" options cannot be enabled at the same time. This is because it may cause a memory squeeze.')
                 if nothread: return output
                 self.callback_return_pipe_exec_func(web, title, output)
                 return
+            old_stdin = sys.stdin
+            if _stdin_body is not None:
+                sys.stdin = io.BytesIO(_stdin_body)
             if 'capture_stdout' in opt and opt['capture_stdout']:
                 sys.stdout = captured_output = io.StringIO()
             ret_main = {}
@@ -170,6 +180,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 web.logger.warning(msg)
                 output = [dict(warn=f'<pre>{html.escape(traceback.format_exc())}</pre>')]
             sys.stdout = old_stdout
+            sys.stdin = old_stdin
             if 'stdout_log' in opt and opt['stdout_log']:
                 self.callback_console_modal_log_func(web, output)
             try:

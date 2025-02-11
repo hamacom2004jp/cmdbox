@@ -81,10 +81,10 @@ class DoSignin(cmdbox_web_signin.Signin):
                     if datetime.datetime.now() > last_update + datetime.timedelta(days=notify):
                         # セッションに保存
                         _set_session(req, dict(uid=uid, name=name), email, passwd, None, group_names, gids)
-                        return RedirectResponse(url=f'../{next}?warn=passchange') # nginxのリバプロ対応のための相対パス
+                        return RedirectResponse(url=f'../{next}?warn=passchange', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス
             # セッションに保存
             _set_session(req, dict(uid=uid, name=name), email, passwd, None, group_names, gids)
-            return RedirectResponse(url=f'../{next}{"?warn=passchange" if notify_passchange else ""}') # nginxのリバプロ対応のための相対パス
+            return RedirectResponse(url=f'../{next}{"?warn=passchange" if notify_passchange else ""}', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス
 
         def _load_signin(signin_module:str, appcls, ver):
             """
@@ -152,7 +152,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                                          gids=gids, groups=group_names, email=email)
 
         @app.get('/oauth2/google/callback')
-        async def oauth2_google_callback(req:Request):
+        async def oauth2_google_callback(req:Request, res:Response):
             conf = web.signin_file_data['oauth2']['providers']['google']
             headers = {'Content-Type': 'application/x-www-form-urlencoded'}
             next = req.query_params['state']
@@ -168,6 +168,14 @@ class DoSignin(cmdbox_web_signin.Signin):
                 token_resp.raise_for_status()
                 token_json = token_resp.json()
                 access_token = token_json['access_token']
+                return await oauth2_google_session(req, res, access_token)
+            except Exception as e:
+                web.logger.warning(f'Failed to get token. {e}', exc_info=True)
+                raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
+
+        @app.get('/oauth2/google/session/{access_token}')
+        async def oauth2_google_session(req:Request, res:Response, access_token:str):
+            try:
                 # ユーザー情報取得(email)
                 user_info_resp = requests.get(
                     url='https://www.googleapis.com/oauth2/v1/userinfo',
@@ -185,13 +193,13 @@ class DoSignin(cmdbox_web_signin.Signin):
                 group_names, gids = self.google_signin.get_groups(access_token, user, copy_signin_data)
                 # セッションに保存
                 _set_session(req, user, email, None, access_token, group_names, gids)
-                return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
+                return RedirectResponse(url=f'../../{next}', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス
             except Exception as e:
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
                 raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
 
         @app.get('/oauth2/github/callback')
-        async def oauth2_github_callback(req:Request):
+        async def oauth2_github_callback(req:Request, res:Response):
             conf = web.signin_file_data['oauth2']['providers']['github']
             headers = {'Content-Type': 'application/x-www-form-urlencoded',
                        'Accept': 'application/json'}
@@ -207,6 +215,14 @@ class DoSignin(cmdbox_web_signin.Signin):
                 token_resp.raise_for_status()
                 token_json = token_resp.json()
                 access_token = token_json['access_token']
+                return await oauth2_github_session(req, res, access_token)
+            except Exception as e:
+                web.logger.warning(f'Failed to get token. {e}', exc_info=True)
+                raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
+
+        @app.get('/oauth2/github/session/{access_token}')
+        async def oauth2_github_session(req:Request, res:Response, access_token:str):
+            try:
                 # ユーザー情報取得(email)
                 user_info_resp = requests.get(
                     url='https://api.github.com/user/emails',
@@ -229,7 +245,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 group_names, gids = self.github_signin.get_groups(access_token, user, copy_signin_data)
                 # セッションに保存
                 _set_session(req, user, email, None, access_token, group_names, gids)
-                return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
+                return RedirectResponse(url=f'../../{next}', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス
             except Exception as e:
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
                 raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')

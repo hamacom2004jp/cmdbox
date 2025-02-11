@@ -10,6 +10,7 @@ python-multipart
 plyer             # For desktop notifications
 pystray           # For system tray icon
 #pyobjus          # Mac OS only
+questionary
 redis
 requests
 six

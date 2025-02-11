@@ -49,6 +49,7 @@ class ListPipe(feature.WebFeature):
         return pipes
 
     def chk_pipe(self, web:Web, pipe_cmd:list, req:Request, res:Response) -> Dict[str, Any]:
+        pipe_cmd = [title for title in pipe_cmd if title != '']
         cmd = [title for title in pipe_cmd if self.chk_opt(web, title, req, res)]
         return len(pipe_cmd) == len(cmd)
 
