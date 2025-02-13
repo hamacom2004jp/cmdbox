@@ -1,21 +1,21 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="jp" data-content_root="../../../">
+<html class="writer-html5" lang="jp">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.feature &mdash; cmdbox 2024/12/17 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+  <title>cmdbox.app.feature &mdash; cmdbox 2025/02/13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=56c4699f" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=73996870"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=f7b52b34"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -45,6 +45,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">Command Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/authentication.html">Authentication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">Developer Information</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/license.html">License</a></li>
 </ul>
@@ -74,19 +75,19 @@
            <div itemprop="articleBody">
              
   <h1>Source code for cmdbox.app.feature</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">cmdbox</span> <span class="kn">import</span> <span class="n">version</span>
-<span class="kn">from</span> <span class="nn">cmdbox.app.commons</span> <span class="kn">import</span> <span class="n">redis_client</span>
-<span class="kn">from</span> <span class="nn">cmdbox.app.web</span> <span class="kn">import</span> <span class="n">Web</span>
-<span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">FastAPI</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">edge</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">redis_client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.web</span><span class="w"> </span><span class="kn">import</span> <span class="n">Web</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<div class="viewcode-block" id="Feature">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature">[docs]</a>
-<span class="k">class</span> <span class="nc">Feature</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Feature"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Feature</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">USE_REDIS_FALSE</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
     <span class="n">USE_REDIS_MEIGHT</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">USE_REDIS_TRUE</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
@@ -98,13 +99,11 @@
     <span class="n">default_port</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;REDIS_PORT&#39;</span><span class="p">,</span> <span class="s1">&#39;6379&#39;</span><span class="p">))</span>
     <span class="n">default_pass</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;REDIS_PASSWORD&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ver</span> <span class="o">=</span> <span class="n">ver</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">appcls</span> <span class="o">=</span> <span class="n">appcls</span>
 
-<div class="viewcode-block" id="Feature.get_mode">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_mode">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<div class="viewcode-block" id="Feature.get_mode"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_mode">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        この機能のモードを返します</span>
 
@@ -113,10 +112,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-
-<div class="viewcode-block" id="Feature.get_cmd">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_cmd">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="Feature.get_cmd"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_cmd">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        この機能のコマンドを返します</span>
 
@@ -125,10 +121,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-
-<div class="viewcode-block" id="Feature.get_option">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_option">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="Feature.get_option"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_option">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        この機能のオプションを返します</span>
 
@@ -137,10 +130,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-
-<div class="viewcode-block" id="Feature.get_svcmd">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_svcmd">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_svcmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Feature.get_svcmd"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_svcmd">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_svcmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        この機能のサーバー側のコマンドを返します</span>
 
@@ -149,10 +139,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-
-<div class="viewcode-block" id="Feature.apprun">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.apprun">[docs]</a>
-    <span class="k">def</span> <span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">pf</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="Feature.apprun"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.apprun">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">pf</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        この機能の実行を行います</span>
 
@@ -167,10 +154,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-
-<div class="viewcode-block" id="Feature.is_cluster_redirect">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.is_cluster_redirect">[docs]</a>
-    <span class="k">def</span> <span class="nf">is_cluster_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Feature.is_cluster_redirect"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.is_cluster_redirect">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">is_cluster_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        クラスター宛のメッセージの場合、メッセージを転送するかどうかを返します</span>
 
@@ -179,10 +163,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-
-<div class="viewcode-block" id="Feature.svrun">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.svrun">[docs]</a>
-    <span class="k">def</span> <span class="nf">svrun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">:</span><span class="n">redis_client</span><span class="o">.</span><span class="n">RedisClient</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<div class="viewcode-block" id="Feature.svrun"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.svrun">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">svrun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">:</span><span class="n">redis_client</span><span class="o">.</span><span class="n">RedisClient</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
               <span class="n">sessions</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        この機能のサーバー側の実行を行います</span>
@@ -198,25 +179,37 @@
 <span class="sd">            int: 終了コード</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
-</div>
 
+<div class="viewcode-block" id="Feature.edgerun"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.edgerun">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">edgerun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">tool</span><span class="p">:</span><span class="n">edge</span><span class="o">.</span><span class="n">Tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">prevres</span><span class="p">:</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        この機能のエッジ側の実行を行います</span>
 
-<div class="viewcode-block" id="WebFeature">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature">[docs]</a>
-<span class="k">class</span> <span class="nc">WebFeature</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="sd">        Args:</span>
+<span class="sd">            opt (Dict[str, Any]): オプション</span>
+<span class="sd">            tool (edge.Tool): 通知関数などedge側のUI操作を行うためのクラス</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">            timeout (int): タイムアウト時間</span>
+<span class="sd">            prevres (Any): 前コマンドの結果。pipeline実行の実行結果を参照する時に使用します。</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">status</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">tool</span><span class="o">.</span><span class="n">exec_cmd</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">prevres</span><span class="p">)</span>
+        <span class="n">tool</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">status</span><span class="p">,</span> <span class="n">res</span></div></div>
+
+<div class="viewcode-block" id="WebFeature"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">WebFeature</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">USE_REDIS_FALSE</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">Feature</span><span class="o">.</span><span class="n">USE_REDIS_FALSE</span>
     <span class="n">USE_REDIS_MEIGHT</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">Feature</span><span class="o">.</span><span class="n">USE_REDIS_MEIGHT</span>
     <span class="n">USE_REDIS_TRUE</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">Feature</span><span class="o">.</span><span class="n">USE_REDIS_TRUE</span>
     <span class="n">DEFAULT_CAPTURE_MAXSIZE</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">Feature</span><span class="o">.</span><span class="n">DEFAULT_CAPTURE_MAXSIZE</span>
     <span class="n">DEFAULT_401_MESSAGE</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Unauthorized operation. Please sign in again as an authorized user.&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appcls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="n">version</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appcls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="n">version</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ver</span> <span class="o">=</span> <span class="n">ver</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">appcls</span> <span class="o">=</span> <span class="n">appcls</span>
 
-<div class="viewcode-block" id="WebFeature.route">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.route">[docs]</a>
-    <span class="k">def</span> <span class="nf">route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">app</span><span class="p">:</span><span class="n">FastAPI</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="WebFeature.route"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.route">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">app</span><span class="p">:</span><span class="n">FastAPI</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        webモードのルーティングを設定します</span>
 
@@ -226,10 +219,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-
-<div class="viewcode-block" id="WebFeature.filemenu">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.filemenu">[docs]</a>
-    <span class="k">def</span> <span class="nf">filemenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="WebFeature.filemenu"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.filemenu">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">filemenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ファイルメニューの情報を返します</span>
 
@@ -254,10 +244,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span></div>
 
-
-<div class="viewcode-block" id="WebFeature.toolmenu">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.toolmenu">[docs]</a>
-    <span class="k">def</span> <span class="nf">toolmenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="WebFeature.toolmenu"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.toolmenu">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">toolmenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ツールメニューの情報を返します</span>
 
@@ -282,10 +269,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span></div>
 
-
-<div class="viewcode-block" id="WebFeature.viewmenu">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.viewmenu">[docs]</a>
-    <span class="k">def</span> <span class="nf">viewmenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="WebFeature.viewmenu"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.viewmenu">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">viewmenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Viewメニューの情報を返します</span>
 
@@ -310,10 +294,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span></div>
 
-
-<div class="viewcode-block" id="WebFeature.aboutmenu">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.aboutmenu">[docs]</a>
-    <span class="k">def</span> <span class="nf">aboutmenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="WebFeature.aboutmenu"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.aboutmenu">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">aboutmenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Aboutメニューの情報を返します</span>
 
@@ -336,9 +317,7 @@
 <span class="sd">                    }</span>
 <span class="sd">                }</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span></div>
-</div>
-
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span></div></div>
 </pre></div>
 
            </div>
@@ -348,7 +327,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright Copyright (c) 2023-2024 hamacom2004jp All Rights Reserved..</p>
+    <p>&#169; Copyright Copyright (c) 2023-2025 hamacom2004jp All Rights Reserved..</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

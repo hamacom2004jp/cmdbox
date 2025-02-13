@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox package &mdash; cmdbox 2025/02/08 documentation</title>
+  <title>cmdbox package &mdash; cmdbox 2025/02/13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=87114215"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=f7b52b34"></script>
       <script src="../_static/doctools.js?v=888ff710"></script>
       <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -112,9 +112,11 @@
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.check_fname"><code class="docutils literal notranslate"><span class="pre">check_fname()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.cmd"><code class="docutils literal notranslate"><span class="pre">cmd()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.copy_sample"><code class="docutils literal notranslate"><span class="pre">copy_sample()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.decrypt"><code class="docutils literal notranslate"><span class="pre">decrypt()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.default_json_enc"><code class="docutils literal notranslate"><span class="pre">default_json_enc()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.default_logger"><code class="docutils literal notranslate"><span class="pre">default_logger()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.download_file"><code class="docutils literal notranslate"><span class="pre">download_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.encrypt"><code class="docutils literal notranslate"><span class="pre">encrypt()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.getopt"><code class="docutils literal notranslate"><span class="pre">getopt()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.hash_password"><code class="docutils literal notranslate"><span class="pre">hash_password()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.load_config"><code class="docutils literal notranslate"><span class="pre">load_config()</span></code></a></li>
@@ -147,6 +149,7 @@
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.feature.Feature.default_host"><code class="docutils literal notranslate"><span class="pre">Feature.default_host</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.feature.Feature.default_pass"><code class="docutils literal notranslate"><span class="pre">Feature.default_pass</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.feature.Feature.default_port"><code class="docutils literal notranslate"><span class="pre">Feature.default_port</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.feature.Feature.edgerun"><code class="docutils literal notranslate"><span class="pre">Feature.edgerun()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.feature.Feature.get_cmd"><code class="docutils literal notranslate"><span class="pre">Feature.get_cmd()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.feature.Feature.get_mode"><code class="docutils literal notranslate"><span class="pre">Feature.get_mode()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.feature.Feature.get_option"><code class="docutils literal notranslate"><span class="pre">Feature.get_option()</span></code></a></li>
@@ -229,6 +232,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.ThreadedUvicorn"><code class="docutils literal notranslate"><span class="pre">ThreadedUvicorn</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.ThreadedUvicorn.is_alive"><code class="docutils literal notranslate"><span class="pre">ThreadedUvicorn.is_alive()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.ThreadedUvicorn.start"><code class="docutils literal notranslate"><span class="pre">ThreadedUvicorn.start()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.ThreadedUvicorn.stop"><code class="docutils literal notranslate"><span class="pre">ThreadedUvicorn.stop()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.web.ThreadedUvicorn.wait_for_started"><code class="docutils literal notranslate"><span class="pre">ThreadedUvicorn.wait_for_started()</span></code></a></li>

@@ -1,8 +1,8 @@
 from cmdbox import version
-from cmdbox.app import feature, options, web
-from cmdbox.app.commons import module, loghandler
+from cmdbox.app import feature, options
+from cmdbox.app.commons import convert, module, loghandler
+from cryptography.fernet import Fernet
 from pathlib import Path
-from PIL import Image, ImageDraw
 from pkg_resources import resource_string
 from tabulate import tabulate
 from typing import List, Tuple, Dict, Any
@@ -520,3 +520,39 @@ def hash_password(password:str, hash:str) -> str:
     h.update(password.encode('utf-8'))
     passwd = h.hexdigest()
     return passwd
+
+def encrypt(message:str, password:str) -> str:
+    """
+    メッセージを暗号化します。
+
+    Args:
+        message (str): メッセージ
+        password (str): パスワード
+
+    Returns:
+        str: 暗号化されたメッセージ
+    """
+    pass32 = convert.str2b64str(hash_password(password, 'md5'))
+    fernet = Fernet(bytes(pass32, encoding='utf-8'))
+    enc_message = fernet.encrypt(bytes(message, encoding='utf-8'))
+    return convert.bytes2b64str(enc_message)
+
+def decrypt(enc_message:str, password:str) -> str:
+    """
+    メッセージを復号化します。
+
+    Args:
+        enc_message (str): 暗号化されたメッセージ
+        password (str): パスワード
+
+    Returns:
+        str: 復号化されたメッセージ。失敗した場合はNone
+    """
+    try:
+        pass32 = convert.str2b64str(hash_password(password, 'md5'))
+        fernet = Fernet(bytes(pass32, encoding='utf-8'))
+        enc_message = convert.b64str2bytes(enc_message)
+        message = fernet.decrypt(enc_message)
+        return message.decode(encoding='utf-8')
+    except:
+        return None

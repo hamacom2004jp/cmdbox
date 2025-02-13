@@ -25,6 +25,8 @@ INSTALL_REQUIRES = [
     'plyer',
     'pystray',
     'python-multipart',
+    'pycryptodome',
+    'questionary',
     'redis',
     'requests',
     'six',

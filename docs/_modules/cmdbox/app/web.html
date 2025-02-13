@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.web &mdash; cmdbox 2025/01/30 documentation</title>
+  <title>cmdbox.app.web &mdash; cmdbox 2025/02/13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=3e9845f8"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=f7b52b34"></script>
       <script src="../../../_static/doctools.js?v=888ff710"></script>
       <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -95,6 +95,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">queue</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">signal</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">string</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">uvicorn</span>
@@ -229,6 +230,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">enable_cors</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;success&#39;</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;signin_file_data is None. (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
@@ -272,6 +274,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;rule: </span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">jadge</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">jadge</span> <span class="o">==</span> <span class="s1">&#39;allow&#39;</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;success&#39;</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unauthorized site. user=</span><span class="si">{</span><span class="n">find_user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, path=</span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/signin</span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">?error=unauthorizedsite&#39;</span><span class="p">)</span></div>
@@ -770,8 +773,8 @@
             <span class="n">pass_miss_last</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">],</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;pass_miss_last&#39;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="o">**</span><span class="n">u</span><span class="p">,</span> <span class="n">last_signin</span><span class="o">=</span><span class="n">signin_last</span><span class="p">,</span> <span class="n">pass_last_update</span><span class="o">=</span><span class="n">pass_last_update</span><span class="p">,</span>
-                                <span class="n">pass_miss_count</span><span class="o">=</span><span class="n">pass_miss_count</span><span class="p">,</span> <span class="n">pass_miss_last</span><span class="o">=</span><span class="n">pass_miss_last</span><span class="p">))</span>
+                <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="o">**</span><span class="n">u</span><span class="p">,</span> <span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="n">last_signin</span><span class="o">=</span><span class="n">signin_last</span><span class="p">,</span> <span class="n">pass_last_update</span><span class="o">=</span><span class="n">pass_last_update</span><span class="p">,</span>
+                                <span class="n">pass_miss_count</span><span class="o">=</span><span class="n">pass_miss_count</span><span class="p">,</span> <span class="n">pass_miss_last</span><span class="o">=</span><span class="n">pass_miss_last</span><span class="p">)})</span>
         <span class="k">return</span> <span class="n">ret</span></div>
 
 <div class="viewcode-block" id="Web.apikey_add"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.apikey_add">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">apikey_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -954,6 +957,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">],</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;last_update&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
                 <span class="n">u</span><span class="p">[</span><span class="s1">&#39;hash&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;hash&#39;</span><span class="p">]</span>
                 <span class="n">u</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]</span>
+                <span class="n">u</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;user_edit: </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># サインインファイルの保存</span>
@@ -1280,7 +1284,7 @@
 <div class="viewcode-block" id="ThreadedUvicorn"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.ThreadedUvicorn">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ThreadedUvicorn</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Config</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">uvicorn</span><span class="o">.</span><span class="n">Server</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">run</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread</span> <span class="o">=</span> <span class="n">RaiseThread</span><span class="p">(</span><span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">run</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ThreadedUvicorn.start"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.ThreadedUvicorn.start">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Windows&quot;</span><span class="p">:</span>
@@ -1295,8 +1299,12 @@
 <div class="viewcode-block" id="ThreadedUvicorn.stop"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.ThreadedUvicorn.stop">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">should_exit</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">raise_exception</span><span class="p">()</span>
             <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
-                <span class="k">continue</span></div></div>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ThreadedUvicorn.is_alive"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.ThreadedUvicorn.is_alive">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">is_alive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span></div></div>
 
 <div class="viewcode-block" id="RaiseThread"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.RaiseThread">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RaiseThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

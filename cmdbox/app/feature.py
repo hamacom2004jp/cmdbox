@@ -103,7 +103,7 @@ class Feature(object):
         """
         raise NotImplementedError
 
-    def edgerun(self, opt:Dict[str, Any], tool:edge.Tool, logger:logging.Logger, prevres:Any=None) -> Tuple[int, Dict[str, Any]]:
+    def edgerun(self, opt:Dict[str, Any], tool:edge.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
         """
         この機能のエッジ側の実行を行います
 
@@ -111,14 +111,15 @@ class Feature(object):
             opt (Dict[str, Any]): オプション
             tool (edge.Tool): 通知関数などedge側のUI操作を行うためのクラス
             logger (logging.Logger): ロガー
+            timeout (int): タイムアウト時間
             prevres (Any): 前コマンドの結果。pipeline実行の実行結果を参照する時に使用します。
 
-        Returns:
+        Yields:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果
         """
-        status, res = tool.exec_cmd(opt, logger, prevres)
+        status, res = tool.exec_cmd(opt, logger, timeout, prevres)
         tool.notify(res)
-        return status, res
+        yield status, res
 
 class WebFeature(object):
     USE_REDIS_FALSE:int = Feature.USE_REDIS_FALSE

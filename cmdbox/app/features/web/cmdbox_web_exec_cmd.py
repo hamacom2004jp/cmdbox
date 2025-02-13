@@ -133,7 +133,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
 
             opt_list, file_dict = web.options.mk_opt_list(opt)
             old_stdout = sys.stdout
-            if 'capture_stdout' in opt and opt['capture_stdout'] and 'stdin' in opt and opt['stdin']:
+            if 'capture_stdout' in opt and opt['capture_stdout'] and 'stdin' in opt and opt['stdin'] and _stdin_body is None:
                 output = dict(warn=f'The "stdin" and "capture_stdout" options cannot be enabled at the same time. This is because it may cause a memory squeeze.')
                 if nothread: return output
                 self.callback_return_pipe_exec_func(web, title, output)
@@ -190,6 +190,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                         img_npy = convert.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
                         img_bytes = convert.npy2imgfile(img_npy, image_type='png')
                         res_json["output_image"] = convert.bytes2b64str(img_bytes)
+                        res_json['output_image_name'] += '.png'
                     return res_json
                 try:
                     ret = [to_json(o) for o in output.split('\n') if o.strip() != '']

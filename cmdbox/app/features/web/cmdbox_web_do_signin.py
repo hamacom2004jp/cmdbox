@@ -1,4 +1,5 @@
 from cmdbox.app import common, signin
+from cmdbox.app.commons import convert
 from cmdbox.app.features.web import cmdbox_web_signin
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
@@ -7,6 +8,7 @@ import copy
 import datetime
 import importlib
 import inspect
+import json
 import requests
 import urllib.parse
 
@@ -22,15 +24,40 @@ class DoSignin(cmdbox_web_signin.Signin):
         """
         @app.post('/dosignin/{next}', response_class=HTMLResponse)
         async def do_signin(next:str, req:Request, res:Response):
+            return await do_signin_token(None, next, req, res)
+
+        @app.get('/dosignin_token/{token}/{next}', response_class=HTMLResponse)
+        async def do_signin_token(token:str, next:str, req:Request, res:Response):
             form = await req.form()
             name = form.get('name')
             passwd = form.get('password')
-            if name == '' or passwd == '':
-                return RedirectResponse(url=f'/signin/{next}?error=1')
-            user = [u for u in web.signin_file_data['users'] if u['name'] == name and u['hash'] != 'oauth2']
-            if len(user) <= 0:
-                return RedirectResponse(url=f'/signin/{next}?error=1')
-            user = user[0]
+            # edgeからtokenによる認証の場合
+            token_ok = False
+            if token is not None:
+                token = convert.b64str2str(token)
+                token = json.loads(token)
+                name = token['user']
+                user = [u for u in web.signin_file_data['users'] if u['name'] == name]
+                if len(user) <= 0:
+                    raise HTTPException(status_code=401, detail='Unauthorized')
+                user = user[0]
+                if token['auth_type'] =="idpw" and 'password' in user:
+                    jg = common.decrypt(token['token'], user['password'])
+                    token_ok = True if jg is not None else False
+                elif token['auth_type'] =="apikey" and 'apikeys' in user:
+                    for ak, at in user['apikeys'].items():
+                        try:
+                            jg = common.decrypt(token['token'], at)
+                            token_ok = True if jg is not None else False
+                        except:
+                            pass
+            if not token_ok:
+                if name == '' or passwd == '':
+                    return RedirectResponse(url=f'/signin/{next}?error=1')
+                user = [u for u in web.signin_file_data['users'] if u['name'] == name and u['hash'] != 'oauth2']
+                if len(user) <= 0:
+                    return RedirectResponse(url=f'/signin/{next}?error=1')
+                user = user[0]
             uid = user['uid']
             # ロックアウトチェック
             pass_miss_count = web.user_data(None, uid, name, 'password', 'pass_miss_count')
@@ -51,16 +78,18 @@ class DoSignin(cmdbox_web_signin.Signin):
                     # ロックアウト
                     web.user_data(None, uid, name, 'password', 'pass_miss_count', )
                     return RedirectResponse(url=f'/signin/{next}?error=lockout')
-            # パスワード認証
-            hash = user['hash']
-            if hash != 'plain':
-                passwd = common.hash_password(passwd, hash)
-            if passwd != user['password']:
-                # パスワード間違いの日時と回数を記録
-                web.user_data(None, uid, name, 'password', 'pass_miss_last', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
-                web.user_data(None, uid, name, 'password', 'pass_miss_count', pass_miss_count+1)
-                web.logger.warning(f'Failed to signin. name={name}, pass_miss_count={pass_miss_count+1}')
-                return RedirectResponse(url=f'/signin/{next}?error=1')
+
+            if not token_ok:
+                # パスワード認証
+                hash = user['hash']
+                if hash != 'plain':
+                    passwd = common.hash_password(passwd, hash)
+                if passwd != user['password']:
+                    # パスワード間違いの日時と回数を記録
+                    web.user_data(None, uid, name, 'password', 'pass_miss_last', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+                    web.user_data(None, uid, name, 'password', 'pass_miss_count', pass_miss_count+1)
+                    web.logger.warning(f'Failed to signin. name={name}, pass_miss_count={pass_miss_count+1}')
+                    return RedirectResponse(url=f'/signin/{next}?error=1')
             group_names = list(set(web.correct_group(user['groups'])))
             gids = [g['gid'] for g in web.signin_file_data['groups'] if g['name'] in group_names]
             email = user.get('email', '')
@@ -81,9 +110,11 @@ class DoSignin(cmdbox_web_signin.Signin):
                     if datetime.datetime.now() > last_update + datetime.timedelta(days=notify):
                         # セッションに保存
                         _set_session(req, dict(uid=uid, name=name), email, passwd, None, group_names, gids)
+                        next = f"../{next}" if token_ok else next
                         return RedirectResponse(url=f'../{next}?warn=passchange', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス
             # セッションに保存
             _set_session(req, dict(uid=uid, name=name), email, passwd, None, group_names, gids)
+            next = f"../{next}" if token_ok else next
             return RedirectResponse(url=f'../{next}{"?warn=passchange" if notify_passchange else ""}', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス
 
         def _load_signin(signin_module:str, appcls, ver):
@@ -168,13 +199,13 @@ class DoSignin(cmdbox_web_signin.Signin):
                 token_resp.raise_for_status()
                 token_json = token_resp.json()
                 access_token = token_json['access_token']
-                return await oauth2_google_session(req, res, access_token)
+                return await oauth2_google_session(next, access_token, req, res)
             except Exception as e:
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
                 raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
 
-        @app.get('/oauth2/google/session/{access_token}')
-        async def oauth2_google_session(req:Request, res:Response, access_token:str):
+        @app.get('/oauth2/google/session/{access_token}/{next}')
+        async def oauth2_google_session(access_token:str, next:str, req:Request, res:Response):
             try:
                 # ユーザー情報取得(email)
                 user_info_resp = requests.get(
@@ -215,13 +246,13 @@ class DoSignin(cmdbox_web_signin.Signin):
                 token_resp.raise_for_status()
                 token_json = token_resp.json()
                 access_token = token_json['access_token']
-                return await oauth2_github_session(req, res, access_token)
+                return await oauth2_github_session(next, access_token, req, res)
             except Exception as e:
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
                 raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
 
-        @app.get('/oauth2/github/session/{access_token}')
-        async def oauth2_github_session(req:Request, res:Response, access_token:str):
+        @app.get('/oauth2/github/session/{access_token}/{next}')
+        async def oauth2_github_session(access_token:str, next:str, req:Request, res:Response):
             try:
                 # ユーザー情報取得(email)
                 user_info_resp = requests.get(
