@@ -76,8 +76,8 @@ class Server(filer.Filer):
             self.redis_cli = redis_client.RedisClient(self.logger, host=self.redis_host, port=self.redis_port, password=self.redis_password, svname=self.svname)
         svlist = self.redis_cli.list_server()
         if len(svlist) <= 0:
-            return {"warn": "No server is running."}
-        return {"success": svlist}
+            return dict(warn="No server is running.")
+        return dict(success=svlist)
 
     def _clean_server(self):
         """

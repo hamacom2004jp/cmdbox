@@ -1,12 +1,11 @@
-from cmdbox.app import common, web
-from cmdbox.app.feature import Feature
+from cmdbox.app import common, feature, web
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 
 
-class WebApikeyAdd(Feature):
+class WebApikeyAdd(feature.Feature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -87,7 +86,7 @@ class WebApikeyAdd(Feature):
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         if args.data is None:
-            msg = {"warn":f"Please specify the --data option."}
+            msg = dict(warn=f"Please specify the --data option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         w = None
@@ -97,10 +96,10 @@ class WebApikeyAdd(Feature):
                         signin_file=args.signin_file)
             user = dict(name=args.user_name, apikey_name=args.apikey_name)
             apikey = w.apikey_add(user)
-            msg = {"success": {"apikey":apikey, "msg":f"User ApiKey added. user_name={args.user_name} apikey_name={args.apikey_name}"}}
+            msg = dict(success=dict(apikey=apikey, msg=f"User ApiKey added. user_name={args.user_name} apikey_name={args.apikey_name}"))
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 0, msg, w
         except Exception as e:
-            msg = {"warn":f"{e}"}
+            msg = dict(warn=f"{e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, w

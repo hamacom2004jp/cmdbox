@@ -9,6 +9,7 @@ import datetime
 import importlib
 import inspect
 import json
+import logging
 import requests
 import urllib.parse
 
@@ -34,6 +35,8 @@ class DoSignin(cmdbox_web_signin.Signin):
             # edgeからtokenによる認証の場合
             token_ok = False
             if token is not None:
+                if web.logger.level == logging.DEBUG:
+                    web.logger.debug(f'token={token}')
                 token = convert.b64str2str(token)
                 token = json.loads(token)
                 name = token['user']
@@ -58,6 +61,8 @@ class DoSignin(cmdbox_web_signin.Signin):
                 if len(user) <= 0:
                     return RedirectResponse(url=f'/signin/{next}?error=1')
                 user = user[0]
+            if web.logger.level == logging.DEBUG:
+                web.logger.debug(f'Try signin, uid={user["uid"]}, user_name={user["name"]}')
             uid = user['uid']
             # ロックアウトチェック
             pass_miss_count = web.user_data(None, uid, name, 'password', 'pass_miss_count')
@@ -181,6 +186,8 @@ class DoSignin(cmdbox_web_signin.Signin):
             req.session['signin'] = dict(uid=user['uid'], name=user['name'],
                                          password=hashed_password, access_token=access_token,
                                          gids=gids, groups=group_names, email=email)
+            if web.logger.level == logging.DEBUG:
+                web.logger.debug(f'Set session, uid={user["uid"]}, name={user["name"]}, email={email}, gids={gids}, groups={group_names}')
 
         @app.get('/oauth2/google/callback')
         async def oauth2_google_callback(req:Request, res:Response):

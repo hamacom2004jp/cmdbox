@@ -1,12 +1,11 @@
-from cmdbox.app import common, server
-from cmdbox.app.feature import Feature
+from cmdbox.app import common, feature, server
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 
 
-class ServerList(Feature):
+class ServerList(feature.EdgeNotifyFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

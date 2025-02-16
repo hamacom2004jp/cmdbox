@@ -3,8 +3,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography import x509
 from datetime import datetime, timedelta, timezone
-from cmdbox.app import common
-from cmdbox.app.feature import Feature
+from cmdbox.app import common, feature
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -13,7 +12,7 @@ import re
 import string
 
 
-class WebGenpass(Feature):
+class WebGenpass(feature.Feature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -91,15 +90,15 @@ class WebGenpass(Feature):
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         if args.pass_length < 1:
-            msg = {"warn":"The password length must be 1 or more."}
+            msg = dict(warn="The password length must be 1 or more.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         if args.pass_count < 1:
-            msg = {"warn":"The number of passwords to generate must be 1 or more."}
+            msg = dict(warn="The number of passwords to generate must be 1 or more.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         if args.pass_count >= 40:
-            msg = {"warn":"The number of passwords to generate must be less than 40."}
+            msg = dict(warn="The number of passwords to generate must be less than 40.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         ret = {}
@@ -119,10 +118,10 @@ class WebGenpass(Feature):
             passwords = []
             for i in range(args.pass_count):
                 passwords.append(dict(password=common.random_string(args.pass_length, chars)))
-            ret = {"success":{"passwords":passwords}}
+            ret = dict(success=dict(passwords=passwords))
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         except Exception as e:
-            msg = {"error":f"Failed to generate password. {e}"}
+            msg = dict(error=f"Failed to generate password. {e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         return 0, ret, None

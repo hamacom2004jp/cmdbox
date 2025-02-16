@@ -235,6 +235,7 @@ class Web:
             else:
                 self.logger.warning(f"Unauthorized site. user={req.session['signin']['name']}, path={req.url.path}")
                 return RedirectResponse(url=f'/signin{req.url.path}?error=unauthorizedsite')
+        self.logger.info(f"Not found siginin session. Try check_apikey. path={req.url.path}")
         ret = self.check_apikey(req, res)
         if ret is not None and self.logger.level == logging.DEBUG:
             self.logger.debug(f"Not signed in.")

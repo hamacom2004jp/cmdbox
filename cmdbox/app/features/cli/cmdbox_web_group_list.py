@@ -1,12 +1,11 @@
-from cmdbox.app import common, web
-from cmdbox.app.feature import Feature
+from cmdbox.app import common, feature, web
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 
 
-class WebGroupList(Feature):
+class WebGroupList(feature.EdgeNotifyFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -84,7 +83,7 @@ class WebGroupList(Feature):
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         if args.data is None:
-            msg = {"warn":f"Please specify the --data option."}
+            msg = dict(warn=f"Please specify the --data option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         w = None
@@ -93,10 +92,10 @@ class WebGroupList(Feature):
                         redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                         signin_file=args.signin_file)
             groups = w.group_list(args.group_name)
-            msg = {"success":groups}
+            msg = dict(success=groups)
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 0, msg, w
         except Exception as e:
-            msg = {"warn":f"{e}"}
+            msg = dict(warn=f"{e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, w

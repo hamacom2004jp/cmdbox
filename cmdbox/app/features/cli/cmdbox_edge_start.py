@@ -1,20 +1,10 @@
-from cmdbox import version
-from cmdbox.app import common, edge, options
-from cmdbox.app.feature import Feature
-from fastapi import FastAPI, Request, Response, HTTPException
-from fastapi.responses import HTMLResponse, RedirectResponse
-from pathlib import Path
-from PIL import Image
+from cmdbox.app import common, edge, feature
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
-import requests
-import urllib.parse
-import uvicorn
-import webbrowser
 
 
-class EdgeStart(Feature):
+class EdgeStart(feature.EdgeNotifyFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -69,7 +59,7 @@ class EdgeStart(Feature):
         app = edge.Edge(logger, args.data, self.appcls, self.ver)
         msg = app.start()
 
-        msg = {"success":"edge complate."}
+        msg = dict(success="edge complate.")
         common.print_format(msg, True, tm, None, False, pf=pf)
         return 0, msg, None
 

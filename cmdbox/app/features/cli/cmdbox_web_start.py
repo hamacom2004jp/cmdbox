@@ -1,12 +1,11 @@
-from cmdbox.app import common, web
-from cmdbox.app.feature import Feature
+from cmdbox.app import common, feature, web
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 
 
-class WebStart(Feature):
+class WebStart(feature.EdgeNotifyFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -135,7 +134,7 @@ class WebStart(Feature):
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         if args.data is None:
-            msg = {"warn":f"Please specify the --data option."}
+            msg = dict(warn=f"Please specify the --data option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         w = None
@@ -152,10 +151,10 @@ class WebStart(Feature):
                     session_domain=args.session_domain, session_path=args.session_path,
                     session_secure=args.session_secure, session_timeout=args.session_timeout,
                     outputs_key=args.outputs_key)
-            msg = {"success":"web complate."}
+            msg = dict(success="web complate.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 0, msg, w
         except Exception as e:
-            msg = {"warn":f"Web server start error. {e}"}
+            msg = dict(warn=f"Web server start error. {e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, w

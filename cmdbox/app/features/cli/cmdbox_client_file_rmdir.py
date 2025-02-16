@@ -1,13 +1,12 @@
-from cmdbox.app import common, client, filer
+from cmdbox.app import common, client, feature, filer
 from cmdbox.app.commons import convert, redis_client
-from cmdbox.app.feature import Feature
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 
 
-class ClientFileRmdir(Feature):
+class ClientFileRmdir(feature.Feature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -119,7 +118,7 @@ class ClientFileRmdir(Feature):
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         if args.svname is None:
-            msg = {"warn":f"Please specify the --svname option."}
+            msg = dict(warn=f"Please specify the --svname option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -185,6 +184,6 @@ class ClientFileRmdir(Feature):
             return rescode
         except Exception as e:
             logger.warning(f"Failed to remove directory: {e}", exc_info=True)
-            redis_cli.rpush(reskey, {"warn": f"Failed to remove directory: {e}"})
+            redis_cli.rpush(reskey, dict(warn=f"Failed to remove directory: {e}"))
             return self.RESP_WARN
 

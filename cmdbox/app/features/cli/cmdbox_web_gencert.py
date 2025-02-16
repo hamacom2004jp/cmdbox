@@ -3,15 +3,14 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography import x509
 from datetime import datetime, timedelta, timezone
-from cmdbox.app import common
-from cmdbox.app.feature import Feature
+from cmdbox.app import common, feature
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 
 
-class WebGencert(Feature):
+class WebGencert(feature.Feature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -86,7 +85,7 @@ class WebGencert(Feature):
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         if args.webhost is None:
-            msg = {"warn":f"Please specify the --webhost option."}
+            msg = dict(warn=f"Please specify the --webhost option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         if args.output_cert is None:
@@ -96,19 +95,19 @@ class WebGencert(Feature):
         output_cert = Path(args.output_cert)
         output_key = Path(args.output_key)
         if not args.overwrite and output_cert.exists():
-            msg = {"warn":f"File already exists. {output_cert}"}
+            msg = dict(warn=f"File already exists. {output_cert}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         if not args.overwrite and output_key.exists():
-            msg = {"warn":f"File already exists. {output_key}"}
+            msg = dict(warn=f"File already exists. {output_key}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
 
         try:
             self.gen_cert(logger, args.webhost, output_cert, output_key)
-            ret = {"success":f"Generate certificate. {output_cert}, {output_key}"}
+            ret = dict(success=f"Generate certificate. {output_cert}, {output_key}")
         except Exception as e:
-            msg = {"error":f"Failed to generate certificate. {e}"}
+            msg = dict(error=f"Failed to generate certificate. {e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         return 0, ret, None

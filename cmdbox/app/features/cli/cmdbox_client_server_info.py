@@ -1,13 +1,12 @@
-from cmdbox.app import common, client
+from cmdbox.app import common, client, feature
 from cmdbox.app.commons import redis_client
-from cmdbox.app.feature import Feature
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 
 
-class ClientServerInfo(Feature):
+class ClientServerInfo(feature.EdgeNotifyFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -100,7 +99,7 @@ class ClientServerInfo(Feature):
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         if args.svname is None:
-            msg = {"warn":f"Please specify the --svname option."}
+            msg = dict(warn=f"Please specify the --svname option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -157,10 +156,10 @@ class ClientServerInfo(Feature):
         """
         try:
             server_info = dict(svname=redis_cli.svname, redis_host=redis_cli.host, redis_port=redis_cli.port, redis_password=redis_cli.password, data_dir=data_dir)
-            msg = {"success": server_info}
+            msg = dict(success=server_info)
             redis_cli.rpush(reskey, msg)
             return self.RESP_SCCESS
         except Exception as e:
             logger.warning(f"Failed to get server info: {e}", exc_info=True)
-            redis_cli.rpush(reskey, {"warn": f"Failed to get server info: {e}"})
+            redis_cli.rpush(reskey, dict(warn=f"Failed to get server info: {e}"))
             return self.RESP_WARN

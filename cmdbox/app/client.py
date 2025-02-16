@@ -67,7 +67,7 @@ class Client(object):
                 return res_json
             else:
                 self.logger.warning(f"client_data is empty.")
-                return {"error": f"client_data is empty."}
+                return dict(warn=f"client_data is empty.")
         elif scope == "current":
             f = filer.Filer(Path.cwd(), self.logger)
             _, res_json = f.file_list(svpath, recursive)
@@ -78,7 +78,7 @@ class Client(object):
             return res_json
         else:
             self.logger.warning(f"scope is invalid. {scope}")
-            return {"error": f"scope is invalid. {scope}"}
+            return dict(warn=f"scope is invalid. {scope}")
 
     def file_mkdir(self, svpath:str, scope:str="client", client_data:Path = None,
                    retry_count:int=3, retry_interval:int=5, timeout:int = 60):
@@ -103,7 +103,7 @@ class Client(object):
                 return res_json
             else:
                 self.logger.warning(f"client_data is empty.")
-                return {"error": f"client_data is empty."}
+                return dict(warn=f"client_data is empty.")
         elif scope == "current":
             f = filer.Filer(Path.cwd(), self.logger)
             _, res_json = f.file_mkdir(svpath)
@@ -114,7 +114,7 @@ class Client(object):
             return res_json
         else:
             self.logger.warning(f"scope is invalid. {scope}")
-            return {"error": f"scope is invalid. {scope}"}
+            return dict(warn=f"scope is invalid. {scope}")
     
     def file_rmdir(self, svpath:str, scope:str="client", client_data:Path = None,
                    retry_count:int=3, retry_interval:int=5, timeout:int = 60):
@@ -139,7 +139,7 @@ class Client(object):
                 return res_json
             else:
                 self.logger.warning(f"client_data is empty.")
-                return {"error": f"client_data is empty."}
+                return dict(warn=f"client_data is empty.")
         elif scope == "current":
             f = filer.Filer(Path.cwd(), self.logger)
             _, res_json = f.file_rmdir(svpath)
@@ -150,7 +150,7 @@ class Client(object):
             return res_json
         else:
             self.logger.warning(f"scope is invalid. {scope}")
-            return {"error": f"scope is invalid. {scope}"}
+            return dict(warn=f"scope is invalid. {scope}")
     
     def file_download(self, svpath:str, download_file:Path, scope:str="client", client_data:Path = None, rpath:str="", img_thumbnail:float=0.0,
                       retry_count:int=3, retry_interval:int=5, timeout:int = 60):
@@ -177,7 +177,7 @@ class Client(object):
                 _, res_json = f.file_download(svpath, img_thumbnail)
             else:
                 self.logger.warning(f"client_data is empty.")
-                return {"error": f"client_data is empty."}
+                return dict(warn=f"client_data is empty.")
         elif scope == "current":
             f = filer.Filer(Path.cwd(), self.logger)
             _, res_json = f.file_download(svpath, img_thumbnail)
@@ -186,7 +186,7 @@ class Client(object):
                                                retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         else:
             self.logger.warning(f"scope is invalid. {scope}")
-            return {"error": f"scope is invalid. {scope}"}
+            return dict(warn=f"scope is invalid. {scope}")
         if "success" in res_json:
             res_json["success"]["rpath"] = rpath
             res_json["success"]["svpath"] = svpath
@@ -195,7 +195,7 @@ class Client(object):
                     download_file = download_file / res_json["success"]["name"]
                 if download_file.exists():
                     self.logger.warning(f"download_file {download_file} already exists.")
-                    return {"error": f"download_file {download_file} already exists."}
+                    return dict(warn=f"download_file {download_file} already exists.")
                 with open(download_file, "wb") as f:
                     f.write(base64.b64decode(res_json["success"]["data"]))
                     del res_json["success"]["data"]
@@ -223,13 +223,13 @@ class Client(object):
         """
         if upload_file is None:
             self.logger.warning(f"upload_file is empty.")
-            return {"error": f"upload_file is empty."}
+            return dict(warn=f"upload_file is empty.")
         if not upload_file.exists():
             self.logger.warning(f"input_file {upload_file} does not exist.")
-            return {"error": f"input_file {upload_file} does not exist."}
+            return dict(warn=f"input_file {upload_file} does not exist.")
         if upload_file.is_dir():
             self.logger.warning(f"input_file {upload_file} is directory.")
-            return {"error": f"input_file {upload_file} is directory."}
+            return dict(warn=f"input_file {upload_file} is directory.")
         with open(upload_file, "rb") as f:
             if scope == "client":
                 if client_data is not None:
@@ -238,7 +238,7 @@ class Client(object):
                     return res_json
                 else:
                     self.logger.warning(f"client_data is empty.")
-                    return {"error": f"client_data is empty."}
+                    return dict(warn=f"client_data is empty.")
             elif scope == "current":
                 fi = filer.Filer(Path.cwd(), self.logger)
                 _, res_json = fi.file_upload(svpath, upload_file.name, f.read(), mkdir, orverwrite)
@@ -254,7 +254,7 @@ class Client(object):
                 return res_json
             else:
                 self.logger.warning(f"scope is invalid. {scope}")
-                return {"error": f"scope is invalid. {scope}"}
+                return dict(warn=f"scope is invalid. {scope}")
 
     def file_remove(self, svpath:str, scope:str="client", client_data:Path = None,
                     retry_count:int=3, retry_interval:int=5, timeout:int = 60):
@@ -279,7 +279,7 @@ class Client(object):
                 return res_json
             else:
                 self.logger.warning(f"client_data is empty.")
-                return {"error": f"client_data is empty."}
+                return dict(warn=f"client_data is empty.")
         elif scope == "current":
             f = filer.Filer(Path.cwd(), self.logger)
             _, res_json = f.file_remove(svpath)
@@ -290,7 +290,7 @@ class Client(object):
             return res_json
         else:
             self.logger.warning(f"scope is invalid. {scope}")
-            return {"error": f"scope is invalid. {scope}"}
+            return dict(warn=f"scope is invalid. {scope}")
 
     def file_copy(self, from_path:str, to_path:str, orverwrite:bool=False, scope:str="client", client_data:Path = None,
                     retry_count:int=3, retry_interval:int=5, timeout:int = 60):
@@ -317,7 +317,7 @@ class Client(object):
                 return res_json
             else:
                 self.logger.warning(f"client_data is empty.")
-                return {"error": f"client_data is empty."}
+                return dict(warn=f"client_data is empty.")
         elif scope == "current":
             f = filer.Filer(Path.cwd(), self.logger)
             _, res_json = f.file_copy(from_path, to_path, orverwrite)
@@ -328,7 +328,7 @@ class Client(object):
             return res_json
         else:
             self.logger.warning(f"scope is invalid. {scope}")
-            return {"error": f"scope is invalid. {scope}"}
+            return dict(warn=f"scope is invalid. {scope}")
 
     def file_move(self, from_path:str, to_path:str, scope:str="client", client_data:Path = None,
                     retry_count:int=3, retry_interval:int=5, timeout:int = 60):
@@ -354,7 +354,7 @@ class Client(object):
                 return res_json
             else:
                 self.logger.warning(f"client_data is empty.")
-                return {"error": f"client_data is empty."}
+                return dict(warn=f"client_data is empty.")
         elif scope == "current":
             f = filer.Filer(Path.cwd(), self.logger)
             _, res_json = f.file_move(from_path, to_path)
@@ -365,7 +365,7 @@ class Client(object):
             return res_json
         else:
             self.logger.warning(f"scope is invalid. {scope}")
-            return {"error": f"scope is invalid. {scope}"}
+            return dict(warn=f"scope is invalid. {scope}")
 
     def server_info(self, retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """

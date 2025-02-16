@@ -118,6 +118,11 @@ class Feature(object):
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果
         """
         status, res = tool.exec_cmd(opt, logger, timeout, prevres)
+        yield status, res
+
+class EdgeNotifyFeature(Feature):
+    def edgerun(self, opt:Dict[str, Any], tool:edge.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
+        status, res = next(super().edgerun(opt, tool, logger, timeout, prevres))
         tool.notify(res)
         yield status, res
 

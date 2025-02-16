@@ -1,12 +1,11 @@
-from cmdbox.app import common, edge
-from cmdbox.app.feature import Feature
+from cmdbox.app import common, edge, feature
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 
 
-class EdgeConfig(Feature):
+class EdgeConfig(feature.Feature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -77,7 +76,10 @@ class EdgeConfig(Feature):
                 dict(opt="data", type="file", default=common.HOME_DIR / f".{self.ver.__appid__}", required=False, multi=False, hide=True, choice=None,
                      discription_ja=f"省略した時は f`$HONE/.{self.ver.__appid__}` を使用します。",
                      discription_en=f"When omitted, f`$HONE/.{self.ver.__appid__}` is used."),
-                dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=False, choice=None,
+                dict(opt="svcert_no_verify", type="bool", default=False, required=False, multi=False, hide=True, choice=[False, True],
+                     discription_ja="HTTPSリクエストの時にサーバー証明書の検証を行いません。",
+                     discription_en="Do not verify server certificates during HTTPS requests."),
+                dict(opt="timeout", type="int", default="30", required=False, multi=False, hide=True, choice=None,
                      discription_ja="リクエストが完了するまでのタイムアウト時間を指定します。",
                      discription_en="Specifies the timeout period before the request completes."),
             ]

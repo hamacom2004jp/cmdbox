@@ -34,6 +34,7 @@ class Edge(object):
         if self.data is None:
             raise ValueError('data is None')
         self.user_info = None
+        self.svcert_no_verify = False
 
     def configure(self, edge_mode:str, edge_cmd:str, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Dict[str, str]:
         """
@@ -86,7 +87,7 @@ class Edge(object):
             conf[opt] = value
         # 設定ファイルに保存
         common.saveopt(conf, conf_file)
-        msg = {"success":"configure complate."}
+        msg = dict(success="configure complate.")
         return msg
 
     def start(self) -> Dict[str, str]:
@@ -150,6 +151,8 @@ class Edge(object):
             if not opt['oauth2_timeout'].isdigit():
                 msg = dict(warn=f"Please set the numeric value in the oauth2_timeout. oauth2_timeout={opt['oauth2_timeout']}")
                 return msg
+            if 'svcert_no_verify' not in opt or opt['svcert_no_verify'] is not True:
+                opt['svcert_no_verify'] = False
             if 'timeout' not in opt or opt['timeout'] is None:
                 msg = dict(warn=f"Please run the `edge config` command. And please set the timeout.")
                 return msg
@@ -160,49 +163,22 @@ class Edge(object):
             # サインイン
             status, msg = self.signin(icon_path, opt['endpoint'], opt['auth_type'], opt['user'], opt['password'], opt['apikey'],
                                       opt['oauth2'], int(opt['oauth2_port']), opt['oauth2_client_id'], opt['oauth2_client_secret'],
-                                      int(opt['oauth2_timeout']), int(opt['timeout']))
+                                      int(opt['oauth2_timeout']), opt['svcert_no_verify'], int(opt['timeout']))
             if status != 0:
                 return msg
 
             # 常駐開始
             self.start_tray(opt['endpoint'], icon_path, int(opt['timeout']))
-
+            msg = dict(success="Complate.")
             return msg
         except Exception as e:
-            msg = {"error":f"{e}"}
+            self.logger.error(f"{e}", exc_info=True)
+            msg = dict(error=f"{e}")
             return msg
         finally:
             if msg is not None:
                 self.tool.notify(msg)
 
-    def exec_cmd(self, endpoint:str, icon_path:Path, timeout:int, opt:Dict[str, str], prevres=None):
-        """
-        コマンドを実行します
-
-        Args:
-            endpoint (str): エンドポイント
-            icon_path (Path): アイコン画像のパス
-            timeout (int): タイムアウト時間
-            opt (Dict[str, str]): コマンドオプション
-            prevres (Any): 前コマンドの結果
-
-        yield:
-            Union[int, Dict[str, str]]: 終了コード, メッセージ
-        """
-        feat = self.options.get_cmd_attr(opt['mode'], opt['cmd'], 'feature')
-        if feat is not None and isinstance(feat, feature.Feature):
-            tool = Tool(self.logger, self.appcls, self.ver)
-            tool.set_session(self.session, endpoint, icon_path, self.user_info)
-            for status, ret in feat.edgerun(opt, tool, self.logger, timeout, prevres):
-                if status != 0:
-                    return status, ret
-                yield status, ret
-            msg = {"success":f"feature complate. mode={opt['mode']}, cmd={opt['cmd']}"}
-        else:
-            msg = {"warn":f"feature not found. mode={opt['mode']}, cmd={opt['cmd']}"}
-            self.tool.notify(msg, icon_path)
-        return 1, msg
-    
     def exec_pipe(self, endpoint:str, icon_path:Path, timeout:int, opt:Dict[str, str]) -> Dict[str, str]:
         """
         パイプを実行します
@@ -219,10 +195,11 @@ class Edge(object):
         #application/octet-stream
         def _req(func, path:str, headers:Dict[str, str]=None, data:Any=None) -> Tuple[int, Any]:
             path = f"/{path}" if not path.startswith('/') else path
-            res = func(f"{endpoint}{path}", headers=headers, data=data, timeout=timeout, allow_redirects=False)
+            res = func(f"{endpoint}{path}", headers=headers, data=data,
+                       verify=not self.svcert_no_verify, timeout=timeout, allow_redirects=False)
             if res.status_code != 200:
                 msg = dict(warn=f"Access failed. status_code={res.status_code}")
-                self.tool.notify(msg, icon_path)
+                self.tool.notify(msg)
                 return 1, msg
             return 0, res.content
 
@@ -232,7 +209,7 @@ class Edge(object):
         res = json.loads(res)
         if 'pipe_cmd' not in res:
             msg = dict(warn=f"pipe_cmd not found. title={opt['title']}")
-            self.tool.notify(msg, icon_path)
+            self.tool.notify(msg)
             return 1, msg
         pipeline = []
         for cmd_title in res['pipe_cmd']:
@@ -247,16 +224,26 @@ class Edge(object):
 
         # パイプラインを実行
         def _job(pipe_cmd, prevq:queue.Queue):
-            resq = pipe_cmd['resq']
+            resq:queue.Queue = pipe_cmd['resq']
             del pipe_cmd['resq']
-            prevres = None if prevq is None else prevq.get(pipe_cmd['timeout'])
-            for status, res in self.exec_cmd(endpoint, icon_path, timeout, pipe_cmd, prevres):
-                resq.put(res)
+            tool = Tool(self.logger, self.appcls, self.ver)
+            tool.set_session(self.session, self.svcert_no_verify, endpoint, icon_path, self.user_info)
+            feat:feature.Feature = self.options.get_cmd_attr(pipe_cmd['mode'], pipe_cmd['cmd'], 'feature')
+            while True:
+                prevres = None if prevq is None else prevq.get(pipe_cmd['timeout'])
+                if prevres is False:
+                    resq.put(False)
+                    break
+                for status, ret in feat.edgerun(pipe_cmd, tool, self.logger, timeout, prevres):
+                    if status != 0:
+                        resq.put(False)
+                        return
+                    resq.put(ret)
         for i, pipe_cmd in enumerate(pipeline):
             prevq = None if i == 0 else pipeline[i-1]['resq']
             th = threading.Thread(target=_job, name=pipe_cmd['title'], args=(pipe_cmd, prevq))
             th.start()
-        msg = {"success":"Pipeline start."}
+        msg = dict(success="Pipeline start.")
         return 0, msg
 
     def start_tray(self, endpoint:str, icon_path:Path, timeout:int) -> Dict[str, str]:
@@ -271,10 +258,11 @@ class Edge(object):
             for opt in opts:
                 def mkcmd(endpoint, icon_path, timeout, opt):
                     def _ex():
-                        for st, ret in self.exec_cmd(endpoint, icon_path, timeout, opt):
-                            if st != 0:
-                                return ret
-                        return ret
+                        tool = Tool(self.logger, self.appcls, self.ver)
+                        tool.set_session(self.session, self.svcert_no_verify, endpoint, icon_path, self.user_info)
+                        feat:feature.Feature = self.options.get_cmd_attr(opt['mode'], opt['cmd'], 'feature')
+                        for status, ret in feat.edgerun(opt, tool, self.logger, timeout):
+                            pass
                     return _ex
                 items.append(pystray.MenuItem(opt['title'], mkcmd(endpoint, icon_path, timeout, opt)))
             return items
@@ -294,7 +282,7 @@ class Edge(object):
                 pystray.MenuItem('Pipelines',pystray.Menu(*list_pipe(endpoint, icon_path, timeout))),
                 pystray.MenuItem('Quit', lambda: icon.stop()),)
         icon = pystray.Icon(self.ver.__appid__, Image.open(icon_path), self.ver.__title__, menu)
-        msg = {"success":"Edge start."}
+        msg = dict(success="Edge start.")
         self.tool.notify(msg)
         icon.run()
 
@@ -306,7 +294,7 @@ class Edge(object):
 
     def signin(self, icon_path:Path, endpoint:str, auth_type:str, user:str, password:str, apikey:str,
                oauth2:str, oauth2_port:int, oauth2_client_id:str, oauth2_client_secret:str,
-               oauth2_timeout:int, timeout:int) -> Tuple[int, Dict[str, Any]]:
+               oauth2_timeout:int, svcert_no_verify:bool, timeout:int) -> Tuple[int, Dict[str, Any]]:
         """
         サインインを行います
 
@@ -322,15 +310,18 @@ class Edge(object):
             oauth2_client_id (str): OAuth2クライアントID
             oauth2_client_secret (str): OAuth2クライアントシークレット
             oauth2_timeout (int): OAuth2タイムアウト
+            svcert_no_verify (bool): サーバー証明書の検証を行わない
             timeout (int): タイムアウト時間
 
         Returns:
             Tuple[int, Dict[str, Any]]: 終了コード, メッセージ
         """
         self.session = requests.Session()
+        self.svcert_no_verify = svcert_no_verify
         self.signed_in = False
         if auth_type == "noauth":
-            res = self.session.get(f"{endpoint}/gui", timeout=timeout, allow_redirects=False)
+            res = self.session.get(f"{endpoint}/gui",
+                                   verify=not self.svcert_no_verify, timeout=timeout, allow_redirects=False)
             if res.status_code != 200:
                 return res.status_code, dict(warn=f"Access failed. status_code={res.status_code}")
             status_code, self.user_info = self.load_user_info(endpoint, timeout)
@@ -347,7 +338,7 @@ class Edge(object):
                 return 1, dict(warn="Please specify the --password option.")
 
             res = self.session.post(f"{endpoint}/dosignin/gui", data=dict(name=user, password=password),
-                                    timeout=timeout, allow_redirects=False)
+                                    verify=not self.svcert_no_verify, timeout=timeout, allow_redirects=False)
             if not res.ok or res.headers.get('signin') is None:
                 return res.status_code, dict(warn=f"Signin failed.")
             status_code, self.user_info = self.load_user_info(endpoint, timeout)
@@ -362,7 +353,8 @@ class Edge(object):
             if apikey is None:
                 return 1, dict(warn="Please specify the --apikey option.")
             headers = {"Authorization": f"Bearer {apikey}"}
-            res = self.session.get(f"{endpoint}/gui", headers=headers, timeout=timeout, allow_redirects=False)
+            res = self.session.get(f"{endpoint}/gui", headers=headers,
+                                   verify=not self.svcert_no_verify, timeout=timeout, allow_redirects=False)
             if not res.ok or res.headers.get('signin') is None:
                 return res.status_code, dict(warn=f"Signin failed.")
             status_code, self.user_info = self.load_user_info(endpoint, timeout)
@@ -398,12 +390,13 @@ class Edge(object):
                             'grant_type': 'authorization_code'}
                     query = '&'.join([f'{k}={urllib.parse.quote(v)}' for k, v in data.items()])
                     try:
-                        token_resp = requests.post(url='https://oauth2.googleapis.com/token', headers=headers, data=query)
+                        token_resp = self.session.post(url='https://oauth2.googleapis.com/token', headers=headers, data=query,
+                                                       verify=not self.svcert_no_verify)
                         token_resp.raise_for_status()
                         token_json = token_resp.json()
                         access_token = token_json['access_token']
                         res = self.session.get(f"{endpoint}/oauth2/google/session/{access_token}/gui",
-                                               timeout=timeout, allow_redirects=False)
+                                               verify=not self.svcert_no_verify, timeout=timeout, allow_redirects=False)
                         if not res.ok or res.headers.get('signin') is None:
                             return res.status_code, dict(warn=f"Signin failed.")
                         status_code, self.user_info = self.load_user_info(endpoint, timeout)
@@ -464,12 +457,13 @@ class Edge(object):
                             'redirect_uri': redirect_uri}
                     query = '&'.join([f'{k}={urllib.parse.quote(v)}' for k, v in data.items()])
                     try:
-                        token_resp = requests.post(url='https://github.com/login/oauth/access_token', headers=headers, data=query)
+                        token_resp = self.session.post(url='https://github.com/login/oauth/access_token', headers=headers, data=query,
+                                                       verify=not self.svcert_no_verify)
                         token_resp.raise_for_status()
                         token_json = token_resp.json()
                         access_token = token_json['access_token']
                         res = self.session.get(f"{endpoint}/oauth2/github/session/{access_token}/gui",
-                                               timeout=timeout, allow_redirects=False)
+                                               verify=not self.svcert_no_verify, timeout=timeout, allow_redirects=False)
                         if not res.ok or res.headers.get('signin') is None:
                             return res.status_code, dict(warn=f"Signin failed.")
                         status_code, self.user_info = self.load_user_info(endpoint, timeout)
@@ -520,10 +514,18 @@ class Tool(object):
         Args:
             message (dict): メッセージ
         """
+        if type(message) is list:
+            message = message[0]
         if type(message) is not dict:
             message = {"info":str(message)}
-        common.print_format(message, False, 0, None, False)
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"notify: {common.to_str(message, slise=256)}")
         try:
+            if 'success' in message and type(message['success']) == dict:
+                message = "\n".join([f"{k}:{v}" for k, v in message['success'].items()])
+                message = f'Success\n{message}'
+            else:
+                message = "\n".join([f"{k} : {v}" for k, v in message.items()])
             import plyer
             if hasattr(self, 'icon_path') and self.icon_path is not None:
                 plyer.notification.notify(title=self.ver.__title__, message=str(message)[:256], app_icon=str(self.icon_path))
@@ -532,17 +534,19 @@ class Tool(object):
         except Exception as e:
             self.logger.error(f"notify error. {e}", exc_info=True)
 
-    def set_session(self, session:requests.Session, endpoint:str, icon_path:Path, user_info:Dict[str, Any]):
+    def set_session(self, session:requests.Session, svcert_no_verify:bool, endpoint:str, icon_path:Path, user_info:Dict[str, Any]):
         """
         セッションを設定します
 
         Args:
             session (requests.Session): セッション
+            svcert_no_verify (bool): サーバー証明書の検証を行わない
             endpoint (str): エンドポイント
             icon_path (Path): アイコン画像のパス
             user_info (Dict[str, Any]): ユーザー情報
         """
         self.session = session
+        self.svcert_no_verify = svcert_no_verify
         self.endpoint = endpoint
         self.icon_path = icon_path
         self.user = user_info
@@ -564,10 +568,10 @@ class Tool(object):
             headers = {'content-type':'application/octet-stream'}
             prevres = common.to_str(prevres)
             res = self.session.post(f"{self.endpoint}/exec_cmd/{opt['title']}", headers=headers, data=prevres,
-                                    timeout=timeout, allow_redirects=False)
+                                    verify=not self.svcert_no_verify, timeout=timeout, allow_redirects=False)
         else:
             res = self.session.post(f"{self.endpoint}/exec_cmd/{opt['title']}",
-                                    timeout=timeout, allow_redirects=False)
+                                    verify=not self.svcert_no_verify, timeout=timeout, allow_redirects=False)
 
         if res.status_code != 200:
             msg = dict(warn=f"Access failed. status_code={res.status_code}")

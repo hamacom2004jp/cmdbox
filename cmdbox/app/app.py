@@ -87,7 +87,7 @@ class CmdBoxApp:
             else:
                 args = parser.parse_args()
         except argparse.ArgumentError as e:
-            msg = {"error":f"ArgumentError: {e}"}
+            msg = dict(warn=f"ArgumentError: {e}")
             common.print_format(msg, False, 0, None, False)
             return 1, msg, None
         # 起動時引数で指定されたオプションをファイルから読み込んだオプションで上書きする
@@ -104,14 +104,14 @@ class CmdBoxApp:
         args = argparse.Namespace(**args_dict)
         eargsparsetime = time.perf_counter()
 
-        ret = {"success":f"Start command. {args}"}
+        ret = dict(success=f"Start command. {args}")
         if args.saveopt:
             if args.useopt is None:
-                msg = {"warn":f"Please specify the --useopt option."}
+                msg = dict(warn=f"Please specify the --useopt option.")
                 common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
                 return 1, msg, None
             common.saveopt(opt, args.useopt)
-            ret = {"success":f"Save options file. {args.useopt}"}
+            ret = dict(success=f"Save options file. {args.useopt}")
 
         smakesampletime = time.perf_counter()
         common.mklogdir(args.data)
@@ -125,7 +125,7 @@ class CmdBoxApp:
             return 0, v, None
 
         if args.mode is None:
-            msg = {"warn":f"mode is None. Please specify the --help option."}
+            msg = dict(warn=f"mode is None. Please specify the --help option.")
             common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
             return 1, msg, None
 
@@ -147,7 +147,7 @@ class CmdBoxApp:
                 status, ret, obj = feat.apprun(logger, args, smaintime, pf)
                 return status, ret, obj
             else:
-                msg = {"warn":f"Unkown mode or cmd. mode={args.mode}, cmd={args.cmd}"}
+                msg = dict(warn=f"Unkown mode or cmd. mode={args.mode}, cmd={args.cmd}")
                 common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
                 return 1, msg, None
         finally:

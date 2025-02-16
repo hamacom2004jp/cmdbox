@@ -1,12 +1,11 @@
-from cmdbox.app import common, web
-from cmdbox.app.feature import Feature
+from cmdbox.app import common, feature, web
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 
 
-class WebStop(Feature):
+class WebStop(feature.EdgeNotifyFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -67,6 +66,6 @@ class WebStop(Feature):
         """
         w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver)
         w.stop()
-        msg = {"success":"web complate."}
+        msg = dict(success="web complate.")
         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         return 0, msg, w
