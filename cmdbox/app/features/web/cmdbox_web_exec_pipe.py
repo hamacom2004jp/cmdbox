@@ -104,6 +104,7 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                 img_npy = convert.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
                 img_bytes = convert.npy2imgfile(img_npy, image_type='png')
                 res_json["output_image"] = convert.bytes2b64str(img_bytes)
+                res_json['output_image_name'] = f"{res_json['output_image_name'].strip()}.png"
             return res_json
         def _exec_pipe(title, opt, container, nothread=False, capture_stdin=False):
             capture_stdout = True

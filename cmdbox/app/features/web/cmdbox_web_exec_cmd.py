@@ -190,7 +190,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                         img_npy = convert.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
                         img_bytes = convert.npy2imgfile(img_npy, image_type='png')
                         res_json["output_image"] = convert.bytes2b64str(img_bytes)
-                        res_json['output_image_name'] += '.png'
+                        res_json['output_image_name'] = f"{res_json['output_image_name'].strip()}.png"
                     return res_json
                 try:
                     ret = [to_json(o) for o in output.split('\n') if o.strip() != '']
