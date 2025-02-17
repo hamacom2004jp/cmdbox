@@ -5,7 +5,7 @@ import argparse
 import logging
 
 
-class WebStop(feature.EdgeNotifyFeature):
+class WebStop(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

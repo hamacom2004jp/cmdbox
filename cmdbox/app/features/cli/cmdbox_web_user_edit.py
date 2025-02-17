@@ -5,7 +5,7 @@ import argparse
 import logging
 
 
-class WebUserEdit(feature.Feature):
+class WebUserEdit(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

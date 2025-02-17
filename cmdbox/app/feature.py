@@ -126,6 +126,12 @@ class EdgeNotifyFeature(Feature):
         tool.notify(res)
         yield status, res
 
+class UnsupportEdgeFeature(Feature):
+    def edgerun(self, opt:Dict[str, Any], tool:edge.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
+        res = dict(warn=f'Unsupported edgerun. mode="{opt["mode"]}", cmd="{opt["cmd"]}"')
+        tool.notify(res)
+        yield 1, res
+
 class WebFeature(object):
     USE_REDIS_FALSE:int = Feature.USE_REDIS_FALSE
     USE_REDIS_MEIGHT:int = Feature.USE_REDIS_MEIGHT

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( Common ) &mdash; cmdbox 2025/02/17 documentation</title>
+  <title>Command Reference ( edge mode ) &mdash; cmdbox 2025/02/17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -20,8 +20,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Command Reference ( server mode )" href="cmd_server.html" />
-    <link rel="prev" title="Command Reference" href="command.html" /> 
+    <link rel="next" title="Features" href="features.html" />
+    <link rel="prev" title="Command Reference ( web mode )" href="cmd_web.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -47,15 +47,16 @@
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Common Options</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#common-options">Common Options</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Edge</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#set-the-edge-mode-cmdbox-m-edge-c-config-option">Set the edge mode. : <cite>cmdbox -m edge -c config &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#start-edge-mode-cmdbox-m-edge-c-start-option">Start Edge mode. : <cite>cmdbox -m edge -c start &lt;Option&gt;</cite></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
@@ -79,9 +80,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="command.html">Command Reference</a></li>
-      <li class="breadcrumb-item active">Command Reference ( Common )</li>
+      <li class="breadcrumb-item active">Command Reference ( edge mode )</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/docs/cmd_common.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/docs/cmd_edge.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -89,11 +90,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="command-reference-common">
-<h1>Command Reference ( Common )<a class="headerlink" href="#command-reference-common" title="Permalink to this heading"></a></h1>
-<p>This is a common option that can be specified for all commands.</p>
-<section id="common-options">
-<h2>Common Options<a class="headerlink" href="#common-options" title="Permalink to this heading"></a></h2>
+  <section id="command-reference-edge-mode">
+<h1>Command Reference ( edge mode )<a class="headerlink" href="#command-reference-edge-mode" title="Permalink to this heading"></a></h1>
+<ul class="simple">
+<li><p>List of edge mode commands.</p></li>
+</ul>
+<section id="set-the-edge-mode-cmdbox-m-edge-c-config-option">
+<h2>Set the edge mode. : <cite>cmdbox -m edge -c config &lt;Option&gt;</cite><a class="headerlink" href="#set-the-edge-mode-cmdbox-m-edge-c-config-option" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Create the configuration necessary to run edge start.</p></li>
+</ul>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -107,49 +113,87 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>-h</p></td>
+<tr class="row-even"><td><p>--endpoint &lt;url&gt;</p></td>
 <td></td>
-<td><p>help display</p></td>
+<td><p>Specify the URL of the endpoint.</p></td>
 </tr>
-<tr class="row-odd"><td><p>-u,--useopt &lt;Option File to save&gt;</p></td>
-<td><p>Required if <cite>-s</cite> is specified.</p></td>
-<td><p>Use the file that stores the options.</p></td>
-</tr>
-<tr class="row-even"><td><p>-s,--saveopt</p></td>
+<tr class="row-odd"><td><p>--icon_path &lt;path&gt;</p></td>
 <td></td>
-<td><p>Save the specified options to the file specified by <cite>-u</cite>.</p></td>
+<td><p>Specify the path to the icon image.</p></td>
 </tr>
-<tr class="row-odd"><td><p>-d,--debug</p></td>
+<tr class="row-even"><td><p>--auth_type &lt;type&gt;</p></td>
 <td></td>
-<td><p>Starts in debug mode.</p></td>
+<td><p>Specifies the authentication method for endpoint connections.</p></td>
 </tr>
-<tr class="row-even"><td><p>-f,--format</p></td>
+<tr class="row-odd"><td><p>--user &lt;user_name&gt;</p></td>
 <td></td>
-<td><p>Output the processing result in an easy-to-read format. If not specified, output in json format.</p></td>
+<td><p>Specifies the user connecting to the endpoint.</p></td>
 </tr>
-<tr class="row-odd"><td><p>-o, --output_json &lt;Destination file for processing result json&gt;</p></td>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
 <td></td>
-<td><p>Specify the destination file for saving the processing result json.</p></td>
+<td><p>Specify the password for connecting to the endpoint.</p></td>
 </tr>
-<tr class="row-even"><td><p>-a, --output_json_append</p></td>
+<tr class="row-odd"><td><p>--apikey &lt;apikey&gt;</p></td>
 <td></td>
-<td><p>Save the processing result json file by appending.</p></td>
+<td><p>Specify the APIKEY to connect to the endpoint.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--stdout_log</p></td>
+<tr class="row-even"><td><p>--oauth2 &lt;provider&gt;</p></td>
 <td></td>
-<td><p>Available only in GUI mode. Outputs standard output to Console log when executing commands.</p></td>
+<td><p>Connect to the endpoint using OAuth2 authentication.</p></td>
 </tr>
-<tr class="row-even"><td><p>--capture_stdout</p></td>
+<tr class="row-odd"><td><p>--oauth2_port &lt;port&gt;</p></td>
 <td></td>
-<td><p>Available in GUI mode only. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+<td><p>Specifies the callback port when OAuth2 authentication is used. If omitted, <cite>8091</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--capture_maxsize</p></td>
+<tr class="row-even"><td><p>--oauth2_client_id &lt;client_id&gt;</p></td>
 <td></td>
-<td><p>Available in GUI mode only. Specifies the maximum capture size of standard output when executing commands.</p></td>
+<td><p>Specifies the client ID when OAuth2 authentication is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>-v, --version</p></td>
+<tr class="row-odd"><td><p>--oauth2_client_secret &lt;client_secret&gt;</p></td>
 <td></td>
-<td><p>Display version</p></td>
+<td><p>Specifies the client secret when OAuth2 authentication is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--oauth2_timeout &lt;sec&gt;</p></td>
+<td></td>
+<td><p>Specify the timeout period before OAuth2 authentication completes.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--data &lt;path&gt;</p></td>
+<td></td>
+<td><p>When omitted, <cite>$HONE/.{self.ver.__appid__}</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--svcert_no_verify</p></td>
+<td></td>
+<td><p>Do not verify server certificates during HTTPS requests.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--timeout &lt;sec&gt;</p></td>
+<td></td>
+<td><p>Specifies the timeout period before the request completes.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="start-edge-mode-cmdbox-m-edge-c-start-option">
+<h2>Start Edge mode. : <cite>cmdbox -m edge -c start &lt;Option&gt;</cite><a class="headerlink" href="#start-edge-mode-cmdbox-m-edge-c-start-option" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Start Edge mode.</p></li>
+<li><p>In the case of windows, it will reside in the task tray.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--data &lt;path&gt;</p></td>
+<td></td>
+<td><p>When omitted, <cite>$HONE/.{self.ver.__appid__}</cite> is used.</p></td>
 </tr>
 </tbody>
 </table>
@@ -160,8 +204,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="command.html" class="btn btn-neutral float-left" title="Command Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cmd_server.html" class="btn btn-neutral float-right" title="Command Reference ( server mode )" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cmd_web.html" class="btn btn-neutral float-left" title="Command Reference ( web mode )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="features.html" class="btn btn-neutral float-right" title="Features" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

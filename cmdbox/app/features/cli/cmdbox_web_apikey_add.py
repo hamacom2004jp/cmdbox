@@ -5,7 +5,7 @@ import argparse
 import logging
 
 
-class WebApikeyAdd(feature.Feature):
+class WebApikeyAdd(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

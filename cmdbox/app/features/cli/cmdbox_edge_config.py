@@ -5,7 +5,7 @@ import argparse
 import logging
 
 
-class EdgeConfig(feature.Feature):
+class EdgeConfig(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -34,7 +34,7 @@ class EdgeConfig(feature.Feature):
         return dict(
             type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
             discription_ja="端末モードの設定を行います。",
-            discription_en="Set the terminal mode.",
+            discription_en="Set the edge mode.",
             choice=[
                 dict(opt="endpoint", type="str", default="http://localhost:8081", required=False, multi=False, hide=False, choice=None,
                      discription_ja="エンドポイントのURLを指定します。",

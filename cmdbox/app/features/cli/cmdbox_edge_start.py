@@ -4,7 +4,7 @@ import argparse
 import logging
 
 
-class EdgeStart(feature.EdgeNotifyFeature):
+class EdgeStart(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

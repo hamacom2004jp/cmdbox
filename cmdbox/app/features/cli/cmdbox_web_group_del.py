@@ -5,7 +5,7 @@ import argparse
 import logging
 
 
-class WebGroupDel(feature.Feature):
+class WebGroupDel(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

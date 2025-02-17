@@ -5,7 +5,7 @@ import argparse
 import logging
 
 
-class WebUserList(feature.EdgeNotifyFeature):
+class WebUserList(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

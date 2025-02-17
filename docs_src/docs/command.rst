@@ -14,3 +14,4 @@ See below for available options for the various commands.
    Client <cmd_client.rst>
    GUI <cmd_gui.rst>
    Web <cmd_web.rst>
+   Edge <cmd_edge.rst>
