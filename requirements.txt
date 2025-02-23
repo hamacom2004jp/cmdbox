@@ -3,6 +3,7 @@ collectlicense
 cryptography
 fastapi
 gevent
+gunicorn
 itsdangerous
 numpy
 Pillow

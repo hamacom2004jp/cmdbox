@@ -19,6 +19,7 @@ INSTALL_REQUIRES = [
     'cryptography',
     'fastapi',
     'gevent',
+    'gunicorn',
     'itsdangerous',
     'numpy',
     'Pillow',

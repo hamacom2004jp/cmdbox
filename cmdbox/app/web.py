@@ -1175,12 +1175,13 @@ class Web:
 
         self.is_running = True
         #uvicorn.run(app, host=self.allow_host, port=self.listen_port, workers=2)
-        th = ThreadedUvicorn(config=Config(app=app, host=self.allow_host, port=self.listen_port))
+        th = ThreadedUvicorn(self.logger, config=Config(app=app, host=self.allow_host, port=self.listen_port))
         th.start()
         browser_port = self.listen_port
         th_ssl = None
         if self.ssl_cert is not None and self.ssl_key is not None:
-            th_ssl = ThreadedUvicorn(config=Config(app=app, host=self.allow_host, port=self.ssl_listen_port,
+            th_ssl = ThreadedUvicorn(self.logger,
+                                     config=Config(app=app, host=self.allow_host, port=self.ssl_listen_port,
                                                    ssl_certfile=self.ssl_cert, ssl_keyfile=self.ssl_key,
                                                    ssl_keyfile_password=self.ssl_keypass, ssl_ca_certs=self.ssl_ca_certs))
             th_ssl.start()
@@ -1219,29 +1220,66 @@ class Web:
             self.logger.info(f"Exit web.")
 
 class ThreadedUvicorn:
-    def __init__(self, config: Config):
-        self.server = uvicorn.Server(config)
-        self.thread = RaiseThread(daemon=True, target=self.server.run)
+    def __init__(self, logger:logging.Logger, config:Config):
+        self.logger = logger
+        if platform.system() == "Windows":
+            self.server = uvicorn.Server(config)
+            self.thread = RaiseThread(daemon=True, target=self.server.run)
+        else:
+            from gunicorn.app.wsgiapp import WSGIApplication
+            import multiprocessing
+            class App(WSGIApplication):
+                def __init__(self, app, options=None):
+                    self.options = options or {}
+                    self.application = app
+                    self.started = True
+                    super().__init__()
+                def load_config(self):
+                    config = {key: value for key, value in self.options.items() if key in self.cfg.settings and value is not None}
+                    for key, value in config.items():
+                        self.cfg.set(key.lower(), value)
+                def load(self):
+                    return self.application
+            opt = dict(bind=f"{config.host}:{config.port}",
+                       workers=multiprocessing.cpu_count()*2,
+                       worker_class="uvicorn.workers.UvicornWorker",
+                       access_log_format='[%(t)s] %(p)s %(l)s %(h)s "%(r)s" %(s)s',
+                       loglevel=logging.getLevelName(self.logger.level),
+                       keyfile=config.ssl_keyfile, certfile=config.ssl_certfile,
+                       ca_certs=config.ssl_ca_certs, keyfile_password=config.ssl_keyfile_password,
+                       limit_request_line=8190, limit_request_fields=100, limit_request_field_size=8190)
+            self.server = App(config.app, opt)
+            #self.thread = RaiseThread(daemon=True, target=self.server.run)
 
     def start(self):
         if platform.system() == "Windows":
             asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-        self.thread.start()
-        asyncio.run(self.wait_for_started())
+            self.thread.start()
+            asyncio.run(self.wait_for_started())
+        else:
+            async def run():
+                self.server.run()
+            asyncio.run(run())
 
     async def wait_for_started(self):
         while not self.server.started:
             await asyncio.sleep(0.1)
 
     def stop(self):
-        if self.thread.is_alive():
-            self.server.should_exit = True
-            self.thread.raise_exception()
-            while self.thread.is_alive():
-                time.sleep(0.1)
+        if platform.system() == "Windows":
+            if self.thread.is_alive():
+                self.server.should_exit = True
+                self.thread.raise_exception()
+                while self.thread.is_alive():
+                    time.sleep(0.1)
+        else:
+            self.server.started = False
 
     def is_alive(self):
-        return self.thread.is_alive()
+        if platform.system() == "Windows":
+            return self.thread.is_alive()
+        else:
+            return self.server.started
 
 class RaiseThread(threading.Thread):
     def __init__(self, *args, **kwargs):
