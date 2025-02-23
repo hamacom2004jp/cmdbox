@@ -35,6 +35,8 @@ Management screen startup : `cmdbox -m gui -c start <Option>`
     "--doc_root <document root path>","","Document root for custom files. URL mapping from the path of a folder-specified custom file with the path of doc_root removed."
     "--gui_html <gui.html file path>","","Specify `gui.html`. If omitted, the cmdbox built-in HTML file is used."
     "--filer_html <filer.html file path>","","Specify `filer.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--result_html <result.html file path>","","Specify `result.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--users_html <users.html file path>","","Specify `users.html`. If omitted, the cmdbox built-in HTML file is used."
     "--assets <Path to js and css files>","","Specify the asset file required when using html files."
     "--signin_html <signin.html file path>","","Specify `signin.html`. If omitted, the cmdbox built-in HTML file is used."
 

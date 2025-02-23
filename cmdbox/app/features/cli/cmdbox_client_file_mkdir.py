@@ -6,7 +6,7 @@ import argparse
 import logging
 
 
-class ClientFileMkdir(feature.Feature):
+class ClientFileMkdir(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

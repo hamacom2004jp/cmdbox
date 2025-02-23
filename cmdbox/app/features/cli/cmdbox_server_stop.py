@@ -6,7 +6,7 @@ import argparse
 import logging
 
 
-class ServerStop(feature.EdgeNotifyFeature):
+class ServerStop(feature.OneshotNotifyEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

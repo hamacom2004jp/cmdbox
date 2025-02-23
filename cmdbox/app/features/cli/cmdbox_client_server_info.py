@@ -6,7 +6,7 @@ import argparse
 import logging
 
 
-class ClientServerInfo(feature.EdgeNotifyFeature):
+class ClientServerInfo(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

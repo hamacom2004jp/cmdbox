@@ -12,7 +12,7 @@ import re
 import string
 
 
-class WebGenpass(feature.Feature):
+class WebGenpass(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

@@ -17,6 +17,7 @@ class GuiCallback(feature.WebFeature):
             app (FastAPI): FastAPIオブジェクト
         """
         @app.websocket('/gui/callback')
+        @app.websocket('/result/callback')
         async def gui_callback(websocket: WebSocket=None):
             if websocket is None:
                 raise HTTPException(status_code=200, detail='ok.')

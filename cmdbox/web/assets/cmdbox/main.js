@@ -42,7 +42,7 @@ $(() => {
                     output = JSON.stringify(output);
                 }
                 const text = elem.val() + output;
-                elem.val(text);
+                elem.text(text);
                 elem.get(0).setSelectionRange(text.length-1, text.length-1);
             }
             else if (cmd == 'js_return_cmd_exec_func') {

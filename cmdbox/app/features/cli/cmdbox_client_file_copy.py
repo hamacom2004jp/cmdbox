@@ -6,7 +6,7 @@ import argparse
 import logging
 
 
-class ClientFileCopy(feature.Feature):
+class ClientFileCopy(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

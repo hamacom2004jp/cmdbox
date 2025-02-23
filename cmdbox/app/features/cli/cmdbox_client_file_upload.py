@@ -6,7 +6,7 @@ import argparse
 import logging
 
 
-class ClientFileUpload(feature.Feature):
+class ClientFileUpload(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

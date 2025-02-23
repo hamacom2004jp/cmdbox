@@ -152,15 +152,15 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                             if len(o) < self.DEFAULT_CAPTURE_MAXSIZE:
                                 try:
                                     o = to_json(o)
-                                except:
-                                    pass
-                                self.callback_return_stream_log_func(web, o)
+                                    self.callback_return_pipe_exec_func(web, title, o)
+                                except Exception as e:
+                                    self.callback_console_modal_log_func(web, o)
                             else:
                                 o = [dict(warn=f'The captured stdout was discarded because its size was larger than {options.Options.DEFAULT_CAPTURE_MAXSIZE} bytes.')]
-                                self.callback_return_stream_log_func(web, o)
+                                self.callback_return_pipe_exec_func(web, title, o)
                         except:
                             o = [dict(warn=f'<pre>{html.escape(o)}</pre><br><pre>{html.escape(traceback.format_exc())}</pre>')]
-                            self.callback_return_stream_log_func(web, o)
+                            self.callback_return_pipe_exec_func(web, title, o)
                 if capture_stdout:
                     container['pipe_proc'].stdout.read() # 最後のストリームは読み捨て
                 else:

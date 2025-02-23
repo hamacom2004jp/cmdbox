@@ -90,9 +90,12 @@ class Edge(object):
         msg = dict(success="configure complate.")
         return msg
 
-    def start(self) -> Dict[str, str]:
+    def start(self, resignin:bool=False) -> Dict[str, str]:
         """
         Edgeを起動します
+
+        Args:
+            resignin (bool): サインインを再実行する
 
         Returns:
             Dict[str, str]: メッセージ
@@ -111,9 +114,9 @@ class Edge(object):
             if 'icon_path' not in opt or opt['icon_path'] is None:
                 msg = dict(warn=f"Please run the `edge config` command. And please set the icon_path.")
                 return msg
-            icon_path = Path(opt['icon_path'])
-            if not icon_path.is_file():
-                msg = dict(warn=f"icon file not found. icon_path={icon_path}")
+            self.icon_path = Path(opt['icon_path'])
+            if not self.icon_path.is_file():
+                msg = dict(warn=f"icon file not found. icon_path={self.icon_path}")
                 return msg
             if 'endpoint' not in opt or opt['endpoint'] is None:
                 msg = dict(warn=f"Please run the `edge config` command. And please set the endpoint.")
@@ -161,14 +164,15 @@ class Edge(object):
                 return msg
 
             # サインイン
-            status, msg = self.signin(icon_path, opt['endpoint'], opt['auth_type'], opt['user'], opt['password'], opt['apikey'],
+            status, msg = self.signin(opt['endpoint'], opt['auth_type'], opt['user'], opt['password'], opt['apikey'],
                                       opt['oauth2'], int(opt['oauth2_port']), opt['oauth2_client_id'], opt['oauth2_client_secret'],
                                       int(opt['oauth2_timeout']), opt['svcert_no_verify'], int(opt['timeout']))
             if status != 0:
                 return msg
 
-            # 常駐開始
-            self.start_tray(opt['endpoint'], icon_path, int(opt['timeout']))
+            if not resignin:
+                # 常駐開始
+                self.start_tray(opt['endpoint'], int(opt['timeout']))
             msg = dict(success="Complate.")
             return msg
         except Exception as e:
@@ -179,13 +183,12 @@ class Edge(object):
             if msg is not None:
                 self.tool.notify(msg)
 
-    def exec_pipe(self, endpoint:str, icon_path:Path, timeout:int, opt:Dict[str, str]) -> Dict[str, str]:
+    def exec_pipe(self, endpoint:str, timeout:int, opt:Dict[str, str]) -> Dict[str, str]:
         """
         パイプを実行します
 
         Args:
             endpoint (str): エンドポイント
-            icon_path (Path): アイコン画像のパス
             timeout (int): タイムアウト時間
             opt (Dict[str, str]): パイプオプション
 
@@ -223,65 +226,103 @@ class Edge(object):
             pipeline.append({**cmd_opt, **dict(title=cmd_title, timeout=timeout, resq=queue.Queue())})
 
         # パイプラインを実行
-        def _job(pipe_cmd, prevq:queue.Queue):
+        def _job(thevent:threading.Event, pipe_cmd, prevq:queue.Queue):
             resq:queue.Queue = pipe_cmd['resq']
             del pipe_cmd['resq']
             tool = Tool(self.logger, self.appcls, self.ver)
-            tool.set_session(self.session, self.svcert_no_verify, endpoint, icon_path, self.user_info)
+            tool.set_session(self.session, self.svcert_no_verify, endpoint, self.icon_path, self.user_info)
             feat:feature.Feature = self.options.get_cmd_attr(pipe_cmd['mode'], pipe_cmd['cmd'], 'feature')
-            while True:
+            while not thevent.is_set():
                 prevres = None if prevq is None else prevq.get(pipe_cmd['timeout'])
                 if prevres is False:
                     resq.put(False)
                     break
                 for status, ret in feat.edgerun(pipe_cmd, tool, self.logger, timeout, prevres):
-                    if status != 0:
+                    if status != 0 or thevent.is_set():
+                        resq.put(ret)
                         resq.put(False)
                         return
                     resq.put(ret)
+
+        self.stop_jobs(True)
         for i, pipe_cmd in enumerate(pipeline):
             prevq = None if i == 0 else pipeline[i-1]['resq']
-            th = threading.Thread(target=_job, name=pipe_cmd['title'], args=(pipe_cmd, prevq))
+            th = web.RaiseThread(target=_job, name=pipe_cmd['title'], args=(self.threading_event, pipe_cmd, prevq), daemon=True)
             th.start()
+            self.threadings.append(th)
         msg = dict(success="Pipeline start.")
         return 0, msg
 
-    def start_tray(self, endpoint:str, icon_path:Path, timeout:int) -> Dict[str, str]:
+    def stop_jobs(self, no_notify:bool) -> None:
+        if hasattr(self, 'threading_event'):
+            self.threading_event.set()
+        self.threading_event = threading.Event()
+        if hasattr(self, 'threadings'):
+            for th in self.threadings:
+                th:web.RaiseThread = th
+                if th.is_alive():
+                    th.raise_exception()
+            if not no_notify:
+                if len(self.threadings) > 0:
+                    self.tool.notify(dict(success="Jobs stopped."))
+                else:
+                    self.tool.notify(dict(warn="Jobs not running."))
+        elif not no_notify:
+            self.tool.notify(dict(warn="Jobs not running."))
+        self.threadings = []
+
+    def start_tray(self, endpoint:str, timeout:int) -> Dict[str, str]:
         # トレイアイコンを起動
         import pystray
-        def list_cmd(endpoint:str, icon_path:Path, timeout:int):
+        def list_cmd(endpoint:str, timeout:int):
             res = self.session.post(f"{endpoint}/gui/list_cmd", timeout=timeout, allow_redirects=False)
             if res.status_code != 200:
                 raise Exception(f"Access failed. status_code={res.status_code}")
             opts = res.json()
             items = []
             for opt in opts:
-                def mkcmd(endpoint, icon_path, timeout, opt):
+                def mkcmd(endpoint, timeout, opt):
                     def _ex():
                         tool = Tool(self.logger, self.appcls, self.ver)
-                        tool.set_session(self.session, self.svcert_no_verify, endpoint, icon_path, self.user_info)
+                        tool.set_session(self.session, self.svcert_no_verify, endpoint, self.icon_path, self.user_info)
                         feat:feature.Feature = self.options.get_cmd_attr(opt['mode'], opt['cmd'], 'feature')
                         for status, ret in feat.edgerun(opt, tool, self.logger, timeout):
                             pass
                     return _ex
-                items.append(pystray.MenuItem(opt['title'], mkcmd(endpoint, icon_path, timeout, opt)))
+                items.append(pystray.MenuItem(opt['title'], mkcmd(endpoint, timeout, opt)))
             return items
-        def list_pipe(endpoint:str, icon_path:Path, timeout:int):
+        def list_pipe(endpoint:str, timeout:int):
             res = self.session.post(f"{endpoint}/gui/list_pipe", timeout=timeout, allow_redirects=False)
             if res.status_code != 200:
                 raise Exception(f"Access failed. status_code={res.status_code}")
             opts = res.json()
             items = []
             for opt in opts:
-                def mkpipe(endpoint, icon_path, timeout, opt):
-                    return lambda: self.exec_pipe(endpoint, icon_path, timeout, opt)
-                items.append(pystray.MenuItem(opt['title'], mkpipe(endpoint, icon_path, timeout, opt)))
+                def mkpipe(endpoint, timeout, opt):
+                    return lambda: self.exec_pipe(endpoint, timeout, opt)
+                items.append(pystray.MenuItem(opt['title'], mkpipe(endpoint, timeout, opt)))
+            return items
+        def list_opens(endpoint:str, timeout:int):
+            res = self.session.get(f"{endpoint}/gui/toolmenu", timeout=timeout, allow_redirects=False)
+            if res.status_code != 200:
+                raise Exception(f"Access failed. status_code={res.status_code}")
+            opens = res.json()
+            items = []
+            items.append(pystray.MenuItem('Gui', lambda: self.tool.open_browser('/gui')))
+            for k, op in opens.items():
+                def mkop(tool:Tool, href):
+                    return lambda: tool.open_browser(href)
+                items.append(pystray.MenuItem(op['html'], mkop(self.tool, op['href'])))
             return items
         menu = pystray.Menu(
-                pystray.MenuItem('Commands',pystray.Menu(*list_cmd(endpoint, icon_path, timeout))),
-                pystray.MenuItem('Pipelines',pystray.Menu(*list_pipe(endpoint, icon_path, timeout))),
+                pystray.MenuItem('Open', pystray.Menu(*list_opens(endpoint, timeout))),
+                pystray.MenuItem('Commands',pystray.Menu(*list_cmd(endpoint, timeout))),
+                pystray.MenuItem('Pipelines',pystray.Menu(*list_pipe(endpoint, timeout))),
+                pystray.MenuItem('Actions', pystray.Menu(
+                    pystray.MenuItem('Retry signin', lambda: self.start(True)),
+                    pystray.MenuItem('Stop jobs', lambda: self.stop_jobs(False)),)),
                 pystray.MenuItem('Quit', lambda: icon.stop()),)
-        icon = pystray.Icon(self.ver.__appid__, Image.open(icon_path), self.ver.__title__, menu)
+        icon = pystray.Icon(self.ver.__appid__, Image.open(self.icon_path), self.ver.__title__, menu)
         msg = dict(success="Edge start.")
         self.tool.notify(msg)
         icon.run()
@@ -292,14 +333,13 @@ class Edge(object):
             return res.status_code, dict(warn=f"Access failed. status_code={res.status_code}")
         return res.status_code, res.json()
 
-    def signin(self, icon_path:Path, endpoint:str, auth_type:str, user:str, password:str, apikey:str,
+    def signin(self, endpoint:str, auth_type:str, user:str, password:str, apikey:str,
                oauth2:str, oauth2_port:int, oauth2_client_id:str, oauth2_client_secret:str,
                oauth2_timeout:int, svcert_no_verify:bool, timeout:int) -> Tuple[int, Dict[str, Any]]:
         """
         サインインを行います
 
         Args:
-            icon_path (Path): アイコン画像のパス
             endpoint (str): エンドポイント
             auth_type (str): 認証タイプ
             user (str): ユーザー名
@@ -328,6 +368,7 @@ class Edge(object):
             self.user_info['auth_type'] = auth_type
             if status_code != 200:
                 return status_code, dict(warn=f"Access failed. status_code={status_code}")
+            self.tool.set_session(self.session, self.svcert_no_verify, endpoint, self.icon_path, self.user_info)
             return 0, dict(success="No auth.")
 
         # ID/PW認証を使用する場合
@@ -346,6 +387,7 @@ class Edge(object):
             self.user_info['password'] = password
             if status_code != 200:
                 return status_code, dict(warn=f"Access failed. status_code={status_code}")
+            self.tool.set_session(self.session, self.svcert_no_verify, endpoint, self.icon_path, self.user_info)
             return 0, dict(success="Signin Success.")
 
         # APIKEY認証を使用する場合
@@ -362,6 +404,7 @@ class Edge(object):
             self.user_info['apikey'] = apikey
             if status_code != 200:
                 return status_code, dict(warn=f"Access failed. status_code={status_code}")
+            self.tool.set_session(self.session, self.svcert_no_verify, endpoint, self.icon_path, self.user_info)
             return 0, dict(success="Signin Success.")
 
         # OAuth2認証を使用する場合
@@ -405,6 +448,7 @@ class Edge(object):
                         if status_code != 200:
                             return status_code, dict(warn=f"Access failed. status_code={status_code}")
                         self.signed_in = True
+                        self.tool.set_session(self.session, self.svcert_no_verify, endpoint, self.icon_path, self.user_info)
                         return dict(success="Signin success. Please close your browser.")
                     except Exception as e:
                         raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
@@ -472,6 +516,7 @@ class Edge(object):
                         if status_code != 200:
                             return status_code, dict(warn=f"Access failed. status_code={status_code}")
                         self.signed_in = True
+                        self.tool.set_session(self.session, self.svcert_no_verify, endpoint, self.icon_path, self.user_info)
                         return dict(success="Signin success. Please close your browser.")
                     except Exception as e:
                         raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
@@ -564,6 +609,8 @@ class Tool(object):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果
         """
+        if logger.level == logging.DEBUG:
+            logger.debug(f"exec_cmd: {self.endpoint}/exec_cmd/{opt['title']}")
         if prevres is not None:
             headers = {'content-type':'application/octet-stream'}
             prevres = common.to_str(prevres)
@@ -573,6 +620,42 @@ class Tool(object):
             res = self.session.post(f"{self.endpoint}/exec_cmd/{opt['title']}",
                                     verify=not self.svcert_no_verify, timeout=timeout, allow_redirects=False)
 
+        if res.status_code != 200:
+            msg = dict(warn=f"Access failed. status_code={res.status_code}")
+            logger.warning(f"Access failed. status_code={res.status_code}")
+            return 1, msg
+        else:
+            ret = msg = res.json()
+            if isinstance(msg, list):
+                if len(msg) == 0:
+                    logger.warning(f"No result.")
+                    return 1, dict(warn="No result.")
+                msg = msg[0]
+            if isinstance(msg, dict) and 'success' not in msg:
+                logger.warning(f"{msg}")
+                return 1, ret
+            if logger.level == logging.DEBUG:
+                logger.debug(f"{common.to_str(ret, slise=255)}")
+            return 0, ret
+
+    def pub_result(self, title:str, output:str, timeout:int) -> Tuple[int, Dict[str, Any]]:
+        """
+        結果を公開します
+
+        Args:
+            title (str): タイトル
+            output (str): 出力
+            logger (logging.Logger): ロガー
+            timeout (int): タイムアウト時間
+
+        Returns:
+            Tuple[int, Dict[str, Any]]: 終了コード, メッセージ
+        """
+        output = common.to_str(output)
+        data = f'title={urllib.parse.quote(title)}&output={urllib.parse.quote(output)}'
+        headers = {'content-type':'application/x-www-form-urlencoded'}
+        res = self.session.post(f"{self.endpoint}/result/pub", headers=headers, data=data,
+                                verify=not self.svcert_no_verify, timeout=timeout, allow_redirects=False)
         if res.status_code != 200:
             msg = dict(warn=f"Access failed. status_code={res.status_code}")
             return 1, msg
@@ -592,12 +675,15 @@ class Tool(object):
             Tuple[int, Dict[str, str]]: 終了コード, メッセージ
         """
         path = f"/{path}" if not path.startswith('/') else path
+        if not hasattr(self, 'user'):
+            webbrowser.open(f"{self.endpoint}{path}")
+            return 0, dict(success="Open browser.")
         token = dict(auth_type=self.user['auth_type'])
         if self.user['auth_type'] == "noauth":
             webbrowser.open(f"{self.endpoint}{path}")
             return 0, dict(success="Open browser.")
         elif self.user['auth_type'] == "idpw":
-            hashed = common.hash_password(self.user['password'], self.user['hash'])
+            hashed = self.user['password'] if self.user['hash']=='plain' else common.hash_password(self.user['password'], self.user['hash'])
             token = dict(**token, **dict(user=self.user['name'], token=common.encrypt(path, hashed)))
             token = convert.str2b64str(common.to_str(token))
             webbrowser.open(f"{self.endpoint}/dosignin_token/{token}{path}")

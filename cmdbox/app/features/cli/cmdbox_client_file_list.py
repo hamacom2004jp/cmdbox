@@ -6,7 +6,7 @@ import argparse
 import logging
 
 
-class ClientFileList(feature.Feature):
+class ClientFileList(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

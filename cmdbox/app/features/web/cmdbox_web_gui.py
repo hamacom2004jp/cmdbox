@@ -71,7 +71,13 @@ class Gui(feature.WebFeature):
 
         @app.get('/gui/toolmenu')
         async def toolmenu(req:Request, res:Response):
-            return web.toolmenu
+            ret = dict()
+            for k, v in web.toolmenu.items():
+                path_jadge = web.check_path(req, v['href'])
+                if path_jadge is not None:
+                    continue
+                ret[k] = v
+            return ret
 
         @app.get('/gui/viewmenu')
         async def viewmenu(req:Request, res:Response):

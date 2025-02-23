@@ -28,7 +28,7 @@ import webbrowser
 class Web:
     def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None,
                  redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server',
-                 client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None, users_html:str=None,
+                 client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None, result_html:str=None, users_html:str=None,
                  assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
                  web_features_packages:List[str]=None, web_features_prefix:List[str]=None):
         """
@@ -47,6 +47,7 @@ class Web:
             doc_root (Path, optional): カスタムファイルのドキュメントルート. フォルダ指定のカスタムファイルのパスから、doc_rootのパスを除去したパスでURLマッピングします。Defaults to None.
             gui_html (str, optional): GUIのHTMLファイル. Defaults to None.
             filer_html (str, optional): ファイラーのHTMLファイル. Defaults to None.
+            result_html (str, optional): 結果のHTMLファイル. Defaults to None.
             users_html (str, optional): ユーザーのHTMLファイル. Defaults to None.
             assets (List[str], optional): 静的ファイルのリスト. Defaults to None.
             signin_html (str, optional): ログイン画面のHTMLファイル. Defaults to None.
@@ -71,6 +72,7 @@ class Web:
         self.doc_root = Path(doc_root) if doc_root is not None else Path(__file__).parent.parent / 'web'
         self.gui_html = Path(gui_html) if gui_html is not None else Path(__file__).parent.parent / 'web' / 'gui.html'
         self.filer_html = Path(filer_html) if filer_html is not None else Path(__file__).parent.parent / 'web' / 'filer.html'
+        self.result_html = Path(result_html) if result_html is not None else Path(__file__).parent.parent / 'web' / 'result.html'
         self.users_html = Path(users_html) if users_html is not None else Path(__file__).parent.parent / 'web' / 'users.html'
         self.assets = []
         if assets is not None:
@@ -88,6 +90,7 @@ class Web:
         self.signin_file = Path(signin_file) if signin_file is not None else None
         self.gui_html_data = None
         self.filer_html_data = None
+        self.result_html_data = None
         self.users_html_data = None
         self.assets_data = None
         self.signin_html_data = None
@@ -117,6 +120,7 @@ class Web:
             self.logger.debug(f"web init parameter: client_only={self.client_only}")
             self.logger.debug(f"web init parameter: gui_html={self.gui_html} -> {self.gui_html.absolute() if self.gui_html is not None else None}")
             self.logger.debug(f"web init parameter: filer_html={self.filer_html} -> {self.filer_html.absolute() if self.filer_html is not None else None}")
+            self.logger.debug(f"web init parameter: result_html={self.result_html} -> {self.result_html.absolute() if self.result_html is not None else None}")
             self.logger.debug(f"web init parameter: users_html={self.users_html} -> {self.users_html.absolute() if self.users_html is not None else None}")
             self.logger.debug(f"web init parameter: assets={self.assets} -> {[a.absolute() for a in self.assets] if self.assets is not None else None}")
             self.logger.debug(f"web init parameter: signin_html={self.signin_html} -> {self.signin_html.absolute() if self.signin_html is not None else None}")
@@ -219,27 +223,36 @@ class Web:
         if self.signin_file_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if 'signin' in req.session:
-            # パスルールチェック
-            user_groups = req.session['signin']['groups']
-            jadge = self.signin_file_data['pathrule']['policy']
-            for rule in self.signin_file_data['pathrule']['rules']:
-                if len([g for g in rule['groups'] if g in user_groups]) <= 0:
-                    continue
-                if len([p for p in rule['paths'] if req.url.path.startswith(p)]) <= 0:
-                    continue
-                jadge = rule['rule']
-            if self.logger.level == logging.DEBUG:
-                self.logger.debug(f"rule: {req.url.path}: {jadge}")
-            if jadge == 'allow':
-                return None
-            else:
-                self.logger.warning(f"Unauthorized site. user={req.session['signin']['name']}, path={req.url.path}")
-                return RedirectResponse(url=f'/signin{req.url.path}?error=unauthorizedsite')
+            path_jadge = self.check_path(req, req.url.path)
+            if path_jadge is not None:
+                return path_jadge
+            return None
         self.logger.info(f"Not found siginin session. Try check_apikey. path={req.url.path}")
         ret = self.check_apikey(req, res)
         if ret is not None and self.logger.level == logging.DEBUG:
             self.logger.debug(f"Not signed in.")
         return ret
+
+    def check_path(self, req:Request, path:str):
+        if 'signin' not in req.session:
+            return None
+        path = path if path.startswith('/') else f'/{path}'
+        # パスルールチェック
+        user_groups = req.session['signin']['groups']
+        jadge = self.signin_file_data['pathrule']['policy']
+        for rule in self.signin_file_data['pathrule']['rules']:
+            if len([g for g in rule['groups'] if g in user_groups]) <= 0:
+                continue
+            if len([p for p in rule['paths'] if path.startswith(p)]) <= 0:
+                continue
+            jadge = rule['rule']
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"rule: {path}: {jadge}")
+        if jadge == 'allow':
+            return None
+        else:
+            self.logger.warning(f"Unauthorized site. user={req.session['signin']['name']}, path={path}")
+            return RedirectResponse(url=f'/signin{path}?error=unauthorizedsite')
 
     def check_cmd(self, req:Request, res:Response, mode:str, cmd:str):
         if self.signin_file is None:
