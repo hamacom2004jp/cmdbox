@@ -116,7 +116,7 @@ class Feature(object):
             prevres (Any): 前コマンドの結果。pipeline実行の実行結果を参照する時に使用します。
 
         Yields:
-            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果
+            Tuple[int, Dict[str, Any]]: 終了コード, 結果
         """
         status, res = tool.exec_cmd(opt, logger, timeout, prevres)
         yield status, res
