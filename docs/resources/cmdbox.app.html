@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app package &mdash; cmdbox 2025/02/22 documentation</title>
+  <title>cmdbox.app package &mdash; cmdbox 2025/02/26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=fe9ddfe1"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=02ecc546"></script>
       <script src="../_static/doctools.js?v=888ff710"></script>
       <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -881,7 +881,7 @@ config (dict): 設定</p>
 </ul>
 </dd>
 <dt class="field-even">Yields<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>Tuple[int, Dict[str, Any], Any]</em> -- 終了コード, 結果</p>
+<dd class="field-even"><p><em>Tuple[int, Dict[str, Any]]</em> -- 終了コード, 結果</p>
 </dd>
 </dl>
 </dd></dl>
@@ -982,12 +982,13 @@ config (dict): 設定</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="cmdbox.app.feature.NotifyEdgeFeature">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cmdbox.app.feature.</span></span><span class="sig-name descname"><span class="pre">NotifyEdgeFeature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">appcls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#NotifyEdgeFeature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.NotifyEdgeFeature" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="cmdbox.app.feature.OneshotEdgeFeature">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cmdbox.app.feature.</span></span><span class="sig-name descname"><span class="pre">OneshotEdgeFeature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">appcls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#OneshotEdgeFeature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.OneshotEdgeFeature" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cmdbox.app.feature.Feature" title="cmdbox.app.feature.Feature"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feature</span></code></a></p>
+<p>一度だけ実行するエッジ機能の基底クラス</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="cmdbox.app.feature.NotifyEdgeFeature.edgerun">
-<span class="sig-name descname"><span class="pre">edgerun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prevres</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#NotifyEdgeFeature.edgerun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.NotifyEdgeFeature.edgerun" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="cmdbox.app.feature.OneshotEdgeFeature.edgerun">
+<span class="sig-name descname"><span class="pre">edgerun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prevres</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#OneshotEdgeFeature.edgerun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.OneshotEdgeFeature.edgerun" title="Permalink to this definition"></a></dt>
 <dd><p>この機能のエッジ側の実行を行います</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1000,7 +1001,7 @@ config (dict): 設定</p>
 </ul>
 </dd>
 <dt class="field-even">Yields<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>Tuple[int, Dict[str, Any], Any]</em> -- 終了コード, 結果</p>
+<dd class="field-even"><p><em>Tuple[int, Dict[str, Any]]</em> -- 終了コード, 結果</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1008,12 +1009,13 @@ config (dict): 設定</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="cmdbox.app.feature.OpenSiteEdgeFeature">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cmdbox.app.feature.</span></span><span class="sig-name descname"><span class="pre">OpenSiteEdgeFeature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">appcls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#OpenSiteEdgeFeature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.OpenSiteEdgeFeature" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cmdbox.app.feature.Feature" title="cmdbox.app.feature.Feature"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feature</span></code></a></p>
+<dt class="sig sig-object py" id="cmdbox.app.feature.OneshotNotifyEdgeFeature">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cmdbox.app.feature.</span></span><span class="sig-name descname"><span class="pre">OneshotNotifyEdgeFeature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">appcls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#OneshotNotifyEdgeFeature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.OneshotNotifyEdgeFeature" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cmdbox.app.feature.OneshotEdgeFeature" title="cmdbox.app.feature.OneshotEdgeFeature"><code class="xref py py-class docutils literal notranslate"><span class="pre">OneshotEdgeFeature</span></code></a></p>
+<p>実行結果の通知を行うエッジ機能の基底クラス</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="cmdbox.app.feature.OpenSiteEdgeFeature.edgerun">
-<span class="sig-name descname"><span class="pre">edgerun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prevres</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#OpenSiteEdgeFeature.edgerun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.OpenSiteEdgeFeature.edgerun" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="cmdbox.app.feature.OneshotNotifyEdgeFeature.edgerun">
+<span class="sig-name descname"><span class="pre">edgerun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prevres</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#OneshotNotifyEdgeFeature.edgerun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.OneshotNotifyEdgeFeature.edgerun" title="Permalink to this definition"></a></dt>
 <dd><p>この機能のエッジ側の実行を行います</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1026,15 +1028,64 @@ config (dict): 設定</p>
 </ul>
 </dd>
 <dt class="field-even">Yields<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>Tuple[int, Dict[str, Any], Any]</em> -- 終了コード, 結果</p>
+<dd class="field-even"><p><em>Tuple[int, Dict[str, Any]]</em> -- 終了コード, 結果</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="cmdbox.app.feature.OpenSiteEdgeFeature.last_open">
-<span class="sig-name descname"><span class="pre">last_open</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#cmdbox.app.feature.OpenSiteEdgeFeature.last_open" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.feature.OneshotResultEdgeFeature">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cmdbox.app.feature.</span></span><span class="sig-name descname"><span class="pre">OneshotResultEdgeFeature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">appcls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#OneshotResultEdgeFeature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.OneshotResultEdgeFeature" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cmdbox.app.feature.ResultEdgeFeature" title="cmdbox.app.feature.ResultEdgeFeature"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResultEdgeFeature</span></code></a></p>
+<p>一度だけ実行結果をWebブラウザで表示するエッジ機能の基底クラス</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.feature.OneshotResultEdgeFeature.edgerun">
+<span class="sig-name descname"><span class="pre">edgerun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prevres</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#OneshotResultEdgeFeature.edgerun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.OneshotResultEdgeFeature.edgerun" title="Permalink to this definition"></a></dt>
+<dd><p>この機能のエッジ側の実行を行います</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>opt</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- オプション</p></li>
+<li><p><strong>tool</strong> (<em>edge.Tool</em>) -- 通知関数などedge側のUI操作を行うためのクラス</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>timeout</strong> (<em>int</em>) -- タイムアウト時間</p></li>
+<li><p><strong>prevres</strong> (<em>Any</em>) -- 前コマンドの結果。pipeline実行の実行結果を参照する時に使用します。</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Tuple[int, Dict[str, Any]]</em> -- 終了コード, 結果</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cmdbox.app.feature.ResultEdgeFeature">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cmdbox.app.feature.</span></span><span class="sig-name descname"><span class="pre">ResultEdgeFeature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">appcls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#ResultEdgeFeature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.ResultEdgeFeature" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cmdbox.app.feature.Feature" title="cmdbox.app.feature.Feature"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feature</span></code></a></p>
+<p>実行結果をWebブラウザで表示するエッジ機能の基底クラス</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.feature.ResultEdgeFeature.edgerun">
+<span class="sig-name descname"><span class="pre">edgerun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prevres</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#ResultEdgeFeature.edgerun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.ResultEdgeFeature.edgerun" title="Permalink to this definition"></a></dt>
+<dd><p>この機能のエッジ側の実行を行います</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>opt</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- オプション</p></li>
+<li><p><strong>tool</strong> (<em>edge.Tool</em>) -- 通知関数などedge側のUI操作を行うためのクラス</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>timeout</strong> (<em>int</em>) -- タイムアウト時間</p></li>
+<li><p><strong>prevres</strong> (<em>Any</em>) -- 前コマンドの結果。pipeline実行の実行結果を参照する時に使用します。</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Tuple[int, Dict[str, Any]]</em> -- 終了コード, 結果</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -1042,6 +1093,7 @@ config (dict): 設定</p>
 <dt class="sig sig-object py" id="cmdbox.app.feature.UnsupportEdgeFeature">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cmdbox.app.feature.</span></span><span class="sig-name descname"><span class="pre">UnsupportEdgeFeature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">appcls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#UnsupportEdgeFeature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.UnsupportEdgeFeature" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cmdbox.app.feature.Feature" title="cmdbox.app.feature.Feature"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feature</span></code></a></p>
+<p>サポートされていないエッジ機能の基底クラス</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.feature.UnsupportEdgeFeature.edgerun">
 <span class="sig-name descname"><span class="pre">edgerun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prevres</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/feature.html#UnsupportEdgeFeature.edgerun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.feature.UnsupportEdgeFeature.edgerun" title="Permalink to this definition"></a></dt>
@@ -1057,7 +1109,7 @@ config (dict): 設定</p>
 </ul>
 </dd>
 <dt class="field-even">Yields<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>Tuple[int, Dict[str, Any], Any]</em> -- 終了コード, 結果</p>
+<dd class="field-even"><p><em>Tuple[int, Dict[str, Any]]</em> -- 終了コード, 結果</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1683,7 +1735,7 @@ dict: メッセージ</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cmdbox.app.web.ThreadedUvicorn">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cmdbox.app.web.</span></span><span class="sig-name descname"><span class="pre">ThreadedUvicorn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#ThreadedUvicorn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.ThreadedUvicorn" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cmdbox.app.web.</span></span><span class="sig-name descname"><span class="pre">ThreadedUvicorn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#ThreadedUvicorn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.ThreadedUvicorn" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.web.ThreadedUvicorn.is_alive">
@@ -1787,13 +1839,14 @@ dict: メッセージ</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.web.Web.check_password_policy">
-<span class="sig-name descname"><span class="pre">check_password_policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.check_password_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.check_password_policy" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">check_password_policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.check_password_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.check_password_policy" title="Permalink to this definition"></a></dt>
 <dd><p>パスワードポリシーをチェックする</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>user_name</strong> (<em>str</em>) -- ユーザー名</p></li>
-<li><p><strong>password</strong> (<em>str</em>) -- パスワード</p></li>
+<li><p><strong>password</strong> (<em>str</em>) -- 元パスワード</p></li>
+<li><p><strong>new_password</strong> (<em>str</em>) -- 新しいパスワード</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1805,6 +1858,11 @@ str: メッセージ</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.web.Web.check_path">
+<span class="sig-name descname"><span class="pre">check_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/web.html#Web.check_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.web.Web.check_path" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.web.Web.check_signin">

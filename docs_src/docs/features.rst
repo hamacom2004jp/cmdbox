@@ -70,7 +70,6 @@ Implement a class that extends `cmdbox.app.feature.Feature`
 - Implementing methods of this class defines the behavior of the command.
 - Below is a description of the methods of `cmdbox.app.feature`.
 
-
 .. code-block:: python
 
     class Feature:
@@ -171,3 +170,52 @@ Implement a class that extends `cmdbox.app.feature.Feature`
                 int: exit code
             """
             raise NotImplementedError
+
+        def edgerun(self, opt:Dict[str, Any], tool:edge.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
+            """
+            Performs edge-side execution of this function
+
+            Args:
+                opt (Dict[str, Any]): option
+                tool (edge.Tool): Classes for edge-side UI operations such as notification functions
+                logger (logging.Logger): logger
+                timeout (int): Timeout time
+                prevres (Any): Result of the previous command, used when referencing the results of a pipeline run.
+
+            Yields:
+                Tuple[int, Dict[str, Any]]: 終了コード, 結果
+            """
+            status, res = tool.exec_cmd(opt, logger, timeout, prevres)
+            yield status, res
+
+
+- エッジ側の実装を簡単にするために、 `cmdbox.app.feature` を継承したいくつかのクラスを用意しています。
+- 詳しくは `cmdbox.app.feature` モジュールを参照してください。
+
+
+.. code-block:: python
+
+    class OneshotEdgeFeature(Feature):
+        """
+        Base class for edge functions that execute only once.
+        """
+
+    class OneshotNotifyEdgeFeature(OneshotEdgeFeature):
+        """
+        Base class for edge functionality that provides notification of execution results.
+        """
+
+    class ResultEdgeFeature(Feature):
+        """
+        Base class for edge functionality that displays execution results in a web browser.
+        """
+
+    class OneshotResultEdgeFeature(ResultEdgeFeature):
+        """
+        Base class for edge functionality that displays the result of a one-time execution in a web browser.
+        """
+
+    class UnsupportEdgeFeature(Feature):
+        """
+        Base class for unsupported edge features.
+        """

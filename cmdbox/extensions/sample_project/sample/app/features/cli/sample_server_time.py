@@ -124,3 +124,21 @@ class ServerTime(feature.Feature):
         ret = dict(success=dict(data=dt.strftime('%Y-%m-%d %H:%M:%S')))
         redis_cli.rpush(msg[1], ret)
         return self.RESP_SCCESS
+
+    def edgerun(self, opt, tool, logger, timeout, prevres = None):
+        """
+        この機能のエッジ側の実行を行います
+
+        Args:
+            opt (Dict[str, Any]): オプション
+            tool (edge.Tool): 通知関数などedge側のUI操作を行うためのクラス
+            logger (logging.Logger): ロガー
+            timeout (int): タイムアウト時間
+            prevres (Any): 前コマンドの結果。pipeline実行の実行結果を参照する時に使用します。
+
+        Yields:
+            Tuple[int, Dict[str, Any]]: 終了コード, 結果
+        """
+        status, res = tool.exec_cmd(opt, logger, timeout, prevres)
+        tool.notify(res)
+        yield 1, res

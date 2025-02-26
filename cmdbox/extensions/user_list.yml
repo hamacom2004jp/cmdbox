@@ -80,6 +80,7 @@ pathrule:                      # List of RESTAPI rules, rules that determine whe
 password:                       # Password settings.
   policy:                       # Password policy settings.
     enabled: true               # Specify whether or not to enable password policy.
+    not_same_before: true       # Specify whether or not to allow the same password as the previous one.
     min_length: 16              # Specify the minimum length of the password.
     max_length: 64              # Specify the maximum length of the password.
     min_lowercase: 1            # Specify the minimum number of lowercase letters in the password.

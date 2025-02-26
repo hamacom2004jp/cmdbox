@@ -1,10 +1,12 @@
 # cmdbox
 
-- It is a command line application with a plugin mechanism.
+- It is a command development application with a plugin mechanism.
 - Documentation is [here](https://hamacom2004jp.github.io/cmdbox/).
 - With cmdbox, you can easily implement commands with complex options.
-- The implemented commands can be called from the CLI / RESTAPI / Web screen.
+- The implemented commands can be called from the CLI / RESTAPI / Web / Edge screen.
 - The implemented commands can be executed on a remote server via redis.
+
+![cmdbox operation image](https://github.com/hamacom2004jp/cmdbox/raw/main/docs_src/static/orverview.drawio.png)
 
 # Install
 
@@ -105,6 +107,11 @@ class ClientTime(feature.Feature):
         if 'success' not in ret:
             return 1, ret, None
         return 0, ret, None
+
+    def edgerun(self, opt, tool, logger, timeout, prevres = None):
+        status, res = tool.exec_cmd(opt, logger, timeout, prevres)
+        tool.notify(res)
+        yield 1, res
 ```
 
 - Open the file ```sample/extensions/features.yml```. The file should look something like this.
@@ -116,28 +123,44 @@ class ClientTime(feature.Feature):
 
 ```yml
 features:
-  cli:
-    - package: sample.app.features.cli
-      prefix: sample_
-  web:
-    - package: sample.app.features.web
-      prefix: sample_web_
-args:
-  cli:
-    - rule:
-        mode: web
-      default:
-      coercion:
-        assets:
-          - f"{Path(self.ver.__file__).parent / 'web' / 'assets'}"
-        doc_root: f"{Path(self.ver.__file__).parent / 'web'}"
-    - rule:
-        mode: gui
-      default:
-      coercion:
-        assets:
-          - f"{Path(self.ver.__file__).parent / 'web' / 'assets'}"
-        doc_root: f"{Path(self.ver.__file__).parent / 'web'}"
+  cli:                                  # Specify a list of package names in which the module implementing the command is located.
+    - package: cmdbox.app.features.cli  # Package Name. Classes inheriting from cmdbox.app.feature.Feature.
+      prefix: cmdbox_                   # Module name prefix. Modules that begin with this letter are eligible.
+      exclude_modules: []               # Specify the module name to exclude from the list of modules to be loaded.
+  web:                                  # Specify a list of package names with modules that implement web screens and RESTAPIs.
+    - package: cmdbox.app.features.web  # Package Name. Classes inheriting from cmdbox.app.feature.WebFeature .
+      prefix: cmdbox_web_               # Module name prefix. Modules that begin with this letter are eligible.
+args:                                   # Specifies default or forced arguments for the specified command.
+  cli:                                  # Specify rules to apply default values or force arguments.
+    - rule:                             # Specify the rules for applying default values and forced arguments for each command line option.
+                                        #   e.g. mode: web
+      default:                          # Specify a default value for each item to be set when a rule is matched.
+                                        #   e.g. doc_root: f"{Path(self.ver.__file__).parent / 'web'}"
+      coercion:                         # Specify a coercion value for each item to be set when a rule is matched.
+                                        #   e.g. doc_root: f"{Path(self.ver.__file__).parent / 'web'}"
+aliases:                                # Specify the alias for the specified command.
+  cli:                                  # Specify the alias for the command line.
+    - source:                           # Specifies the command from which the alias originates.
+        mode:                           # Specify the mode of the source command. The exact match "mode" is selected.
+                                        #   e.g. client
+        cmd:                            # Specify the source command to be aliased. The regex match "cmd" is selected.
+                                        #   e.g. (.+)_(.+)
+      target:                           # Specifies the command to be aliased to.
+        mode:                           # Specify the mode of the target command. Create an alias for this “mode”.
+                                        #   e.g. CLIENT
+        cmd:                            # Specify the target command to be aliased. Create an alias for this “cmd”, referring to the regular expression group of source by "{n}".
+                                        #   e.g. {2}_{1}
+        move:                           # Specify whether to move the regular expression group of the source to the target.
+                                        #   e.g. true
+  web:                                  # Specify the alias for the RESTAPI.
+    - source:                           # Specifies the RESTAPI from which the alias originates.
+        path:                           # Specify the path of the source RESTAPI. The regex match "path" is selected.
+                                        #   e.g. /exec_(.+)
+      target:                           # Specifies the RESTAPI to be aliased to.
+        path:                           # Specify the path of the target RESTAPI. Create an alias for this “path”, referring to the regular expression group of source by "{n}".
+                                        #   e.g. /{1}_exec
+        move:                           # Specify whether to move the regular expression group of the source to the target.
+                                        #   e.g. true
 ```
 
 - The following files should also be known when using commands on the web screen or RESTAPI.
@@ -147,13 +170,13 @@ args:
 
 
 ```yml
-users:
-- uid: 1
-  name: admin
-  password: XXXXXXXXXXX
-  hash: plain
-  groups: [admin]
-  email: admin@aaa.bbb.jp
+users:                         # A list of users, each of which is a map that contains the following fields.
+- uid: 1                       # An ID that identifies a user. No two users can have the same ID.
+  name: admin                  # A name that identifies the user. No two users can have the same name.
+  password: XXXXXXXXXXX        # The user's password. The value is hashed with the hash function specified in the next hash field.
+  hash: plain                  # The hash function used to hash the password, which can be plain, md5, sha1, or sha256, or oauth2.
+  groups: [admin]              # A list of groups to which the user belongs, as specified in the groups field.
+  email: admin@aaa.bbb.jp      # The email address of the user, used when authenticating using the provider specified in the oauth2 field.
 - uid: 101
   name: user01
   password: XXXXXXXXXXX
@@ -172,42 +195,52 @@ users:
   hash: sha256
   groups: [editor]
   email: user03@aaa.bbb.jp
-groups:
-- gid: 1
-  name: admin
+groups:                        # A list of groups, each of which is a map that contains the following fields.
+- gid: 1                       # An ID that identifies a group. No two groups can have the same ID.
+  name: admin                  # A name that identifies the group. No two groups can have the same name.
+- gid: 2
+  name: guest
 - gid: 101
   name: user
 - gid: 102
   name: readonly
-  parent: user
+  parent: user                 # The parent group of the group. If the parent group is not specified, the group is a top-level group.
 - gid: 103
   name: editor
   parent: user
-cmdrule:
-  policy: deny # allow, deny
-  rules:
+cmdrule:                       # A list of command rules, Specify a rule that determines whether or not a command is executable when executed by a user in web mode.
+  policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
+  rules:                       # Specify rules to allow or deny execution of the command, depending on the group the user belongs to.
   - groups: [admin]
     rule: allow
-  - groups: [user]
-    mode: client
-    cmds: [file_download, file_list, server_info]
-    rule: allow
+  - groups: [user]             # Specify the groups to which the rule applies.
+    mode: client               # Specify the "mode" as the condition for applying the rule.
+    cmds: [file_download, file_list, server_info] # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
+    rule: allow                # Specifies whether or not the specified command is allowed for the specified group. The value can be allow or deny.
   - groups: [user]
     mode: server
     cmds: [list]
+    rule: allow
+  - groups: [user, guest]
+    mode: web
+    cmds: [genpass]
     rule: allow
   - groups: [editor]
     mode: client
     cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
     rule: allow
-pathrule:
-  policy: deny # allow, deny
-  rules:
-  - groups: [admin]
-    paths: [/]
+pathrule:                      # List of RESTAPI rules, rules that determine whether or not a RESTAPI can be executed when a user in web mode accesses it.
+  policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
+  rules:                       # Specify rules to allow or deny execution of the RESTAPI, depending on the group the user belongs to.
+  - groups: [admin]            # Specify the groups to which the rule applies.
+    paths: [/]                 # Specify the "path" to which the rule applies. Multiple items can be specified in a list.
+    rule: allow                # Specifies whether or not the specified RESTAPI is allowed for the specified group. The value can be allow or deny.
+  - groups: [guest]
+    paths: [/signin, /assets, /copyright, /dosignin, /dosignout, /password/change,
+            /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
     rule: allow
   - groups: [user]
-    paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout,
+    paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout, /password/change,
             /exec_cmd, /exec_pipe, /filer, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
     rule: allow
   - groups: [readonly]
@@ -216,23 +249,44 @@ pathrule:
   - groups: [editor]
     paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
     rule: allow
-oauth2:
-  providers:
-    google:
-      enabled: false
-      client_id: XXXXXXXXXXX
-      client_secret: XXXXXXXXXXX
-      redirect_uri: https://localhost:8443/oauth2/google/callback
-      scope: ['email']
-      note:
+password:                       # Password settings.
+  policy:                       # Password policy settings.
+    enabled: true               # Specify whether or not to enable password policy.
+    not_same_before: true       # Specify whether or not to allow the same password as the previous one.
+    min_length: 16              # Specify the minimum length of the password.
+    max_length: 64              # Specify the maximum length of the password.
+    min_lowercase: 1            # Specify the minimum number of lowercase letters in the password.
+    min_uppercase: 1            # Specify the minimum number of uppercase letters in the password.
+    min_digit: 1                # Specify the minimum number of digits in the password.
+    min_symbol: 1               # Specify the minimum number of symbol characters in the password.
+    not_contain_username: true  # Specify whether or not to include the username in the password.
+  expiration:                   # Password expiration settings.
+    enabled: true               # Specify whether or not to enable password expiration.
+    period: 90                  # Specify the number of days after which the password will expire.
+    notify: 7                   # Specify the number of days before the password expires that a notification will be sent.
+  lockout:                      # Account lockout settings.
+    enabled: true               # Specify whether or not to enable account lockout.
+    threshold: 5                # Specify the number of failed login attempts before the account is locked.
+    reset: 30                   # Specify the number of minutes after which the failed login count will be reset.
+oauth2:                             # OAuth2 settings.
+  providers:                        # This is a per-provider setting for OAuth2.
+    google:                         # Google's OAuth2 configuration.
+      enabled: false                # Specify whether to enable Google's OAuth2.
+      client_id: XXXXXXXXXXX        # Specify Google's OAuth2 client ID.
+      client_secret: XXXXXXXXXXX    # Specify Google's OAuth2 client secret.
+      redirect_uri: https://localhost:8443/oauth2/google/callback # Specify Google's OAuth2 redirect URI.
+      scope: ['email']              # Specify the scope you want to retrieve with Google's OAuth2. Usually, just reading the email is sufficient.
+      signin_module:                # Specify the module name that implements the sign-in. see, cmdbox.app.signin.SignIn
+      note:                         # Specify a description such as Google's OAuth2 reference site.
       - https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest
-    github:
-      enabled: false
-      client_id: XXXXXXXXXXX
-      client_secret: XXXXXXXXXXX
-      redirect_uri: https://localhost:8443/oauth2/github/callback
-      scope: ['user:email']
-      note:
+    github:                         # OAuth2 settings for GitHub.
+      enabled: false                # Specify whether to enable OAuth2 for GitHub.
+      client_id: XXXXXXXXXXX        # Specify the OAuth2 client ID for GitHub.
+      client_secret: XXXXXXXXXXX    # Specify the GitHub OAuth2 client secret.
+      redirect_uri: https://localhost:8443/oauth2/github/callback # Specify the OAuth2 redirect URI for GitHub.
+      scope: ['user:email']         # Specify the scope you want to get from GitHub's OAuth2. Usually, just reading the email is sufficient.
+      signin_module:                # Specify the module name that implements the sign-in. see, cmdbox.app.signin.SignIn
+      note:                         # Specify a description, such as a reference site for OAuth2 on GitHub.
       - https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes
 ```
 

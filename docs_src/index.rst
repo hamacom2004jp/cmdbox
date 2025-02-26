@@ -4,10 +4,13 @@
 cmdbox
 #######################################
 
-- It is a command line application with a plugin mechanism.
+- It is a command development application with a plugin mechanism.
 - With cmdbox, you can easily implement commands with complex options.
-- The implemented commands can be called from the CLI / RESTAPI / Web screen.
+- The implemented commands can be called from the CLI / RESTAPI / Web / Edge screen.
 - The implemented commands can be executed on a remote server via redis.
+
+.. image:: ./static/orverview.drawio.png
+   :alt: 'cmdbox operation image'
 
 .. toctree::
    :maxdepth: 2

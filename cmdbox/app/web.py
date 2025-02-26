@@ -507,6 +507,8 @@ class Web:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "password.policy". ({self.signin_file})')
                 if type(yml['password']['policy']['enabled']) is not bool:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "password.policy". ({self.signin_file})')
+                if type(yml['password']['policy']['not_same_before']) is not bool:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "not_same_before" not bool type in "password.policy". ({self.signin_file})')
                 if 'min_length' not in yml['password']['policy']:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "min_length" not found in "password.policy". ({self.signin_file})')
                 if type(yml['password']['policy']['min_length']) is not int:
@@ -603,13 +605,14 @@ class Web:
             # フォーマットチェックOK
             self.signin_file_data = yml
 
-    def check_password_policy(self, user_name:str, password:str) -> Tuple[bool, str]:
+    def check_password_policy(self, user_name:str, password:str, new_password:str) -> Tuple[bool, str]:
         """
         パスワードポリシーをチェックする
 
         Args:
             user_name (str): ユーザー名
-            password (str): パスワード
+            password (str): 元パスワード
+            new_password (str): 新しいパスワード
         Returns:
             bool: True:ポリシーOK, False:ポリシーNG
             str: メッセージ
@@ -619,22 +622,25 @@ class Web:
         policy = self.signin_file_data['password']['policy']
         if not policy['enabled']:
             return True, "Password policy is disabled."
-        if len(password) < policy['min_length'] or len(password) > policy['max_length']:
+        if policy['not_same_before'] and password == new_password:
+            self.logger.warning(f"Password policy error. The same password cannot be changed.")
+            return False, f"Password policy error. The same password cannot be changed."
+        if len(new_password) < policy['min_length'] or len(new_password) > policy['max_length']:
             self.logger.warning(f"Password policy error. min_length={policy['min_length']}, max_length={policy['max_length']}")
             return False, f"Password policy error. min_length={policy['min_length']}, max_length={policy['max_length']}"
-        if len([c for c in password if c.islower()]) < policy['min_lowercase']:
+        if len([c for c in new_password if c.islower()]) < policy['min_lowercase']:
             self.logger.warning(f"Password policy error. min_lowercase={policy['min_lowercase']}")
             return False, f"Password policy error. min_lowercase={policy['min_lowercase']}"
-        if len([c for c in password if c.isupper()]) < policy['min_uppercase']:
+        if len([c for c in new_password if c.isupper()]) < policy['min_uppercase']:
             self.logger.warning(f"Password policy error. min_uppercase={policy['min_uppercase']}")
             return False, f"Password policy error. min_uppercase={policy['min_uppercase']}"
-        if len([c for c in password if c.isdigit()]) < policy['min_digit']:
+        if len([c for c in new_password if c.isdigit()]) < policy['min_digit']:
             self.logger.warning(f"Password policy error. min_digit={policy['min_digit']}")
             return False, f"Password policy error. min_digit={policy['min_digit']}"
-        if len([c for c in password if c in string.punctuation]) < policy['min_symbol']:
+        if len([c for c in new_password if c in string.punctuation]) < policy['min_symbol']:
             self.logger.warning(f"Password policy error. min_symbol={policy['min_symbol']}")
             return False, f"Password policy error. min_symbol={policy['min_symbol']}"
-        if policy['not_contain_username'] and (user_name is None or user_name in password):
+        if policy['not_contain_username'] and (user_name is None or user_name in new_password):
             self.logger.warning(f"Password policy error. not_contain_username=True")
             return False, f"Password policy error. not_contain_username=True"
         self.logger.info(f"Password policy OK.")
@@ -672,7 +678,7 @@ class Web:
                 p = password if u['hash'] == 'plain' else common.hash_password(password, u['hash'])
                 if u['password'] != p:
                     return dict(warn="Password does not match.")
-                jadge, msg = self.check_password_policy(user_name, new_password)
+                jadge, msg = self.check_password_policy(user_name, password, new_password)
                 if not jadge:
                     return dict(warn=msg)
                 u['password'] = new_password if u['hash'] == 'plain' else common.hash_password(new_password, u['hash'])
@@ -827,7 +833,7 @@ class Web:
             raise ValueError(f"User name is already exists. ({user})")
         if hash not in ['oauth2', 'plain', 'md5', 'sha1', 'sha256']:
             raise ValueError(f"User hash is not supported. ({user})")
-        jadge, msg = self.check_password_policy(user['name'], user['password'])
+        jadge, msg = self.check_password_policy(user['name'], '', user['password'])
         if not jadge:
             raise ValueError(msg)
         if hash != 'plain':
@@ -883,7 +889,7 @@ class Web:
             if u['uid'] == user['uid']:
                 u['name'] = user['name']
                 if 'password' in user and user['password'] != '':
-                    jadge, msg = self.check_password_policy(user['name'], user['password'])
+                    jadge, msg = self.check_password_policy(user['name'], u['password'], user['password'])
                     if not jadge:
                         raise ValueError(msg)
                     if hash != 'plain':

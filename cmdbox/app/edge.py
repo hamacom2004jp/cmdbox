@@ -260,7 +260,7 @@ class Edge(object):
         self.stop_jobs(True)
         for i, pipe_cmd in enumerate(pipeline):
             prevq = None if i == 0 else pipeline[i-1]['resq']
-            th = web.RaiseThread(target=_job, name=pipe_cmd['title'], args=(self.threading_event, pipe_cmd, prevq), daemon=True)
+            th = threading.Thread(target=_job, name=pipe_cmd['title'], args=(self.threading_event, pipe_cmd, prevq), daemon=True)
             th.start()
             self.threadings.append(th)
         msg = dict(success="Pipeline start.")
@@ -269,12 +269,16 @@ class Edge(object):
     def stop_jobs(self, no_notify:bool) -> None:
         if hasattr(self, 'threading_event'):
             self.threading_event.set()
-        self.threading_event = threading.Event()
         if hasattr(self, 'threadings'):
-            for th in self.threadings:
-                th:web.RaiseThread = th
-                if th.is_alive():
-                    th.raise_exception()
+            while True:
+                run_found = False
+                for th in self.threadings:
+                    th:threading.Thread = th
+                    if th.is_alive():
+                        run_found = True
+                        break
+                if not run_found:
+                    break
             if not no_notify:
                 if len(self.threadings) > 0:
                     self.tool.notify(dict(success="Jobs stopped."))
@@ -282,6 +286,7 @@ class Edge(object):
                     self.tool.notify(dict(warn="Jobs not running."))
         elif not no_notify:
             self.tool.notify(dict(warn="Jobs not running."))
+        self.threading_event = threading.Event()
         self.threadings = []
 
     def start_tray(self) -> Dict[str, str]:
@@ -694,4 +699,3 @@ class Tool(object):
             webbrowser.open(f"{self.endpoint}/oauth2/github/session/{self.user['access_token']}/{path}")
             return 0, dict(success="Open browser.")
         return 1, dict(warn="unsupported auth_type.")
-    

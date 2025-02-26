@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Features &mdash; cmdbox 2025/02/22 documentation</title>
+  <title>Features &mdash; cmdbox 2025/02/26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=fe9ddfe1"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=02ecc546"></script>
       <script src="../_static/doctools.js?v=888ff710"></script>
       <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -250,6 +250,53 @@
 <span class="sd">            int: exit code</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">edgerun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">tool</span><span class="p">:</span><span class="n">edge</span><span class="o">.</span><span class="n">Tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">prevres</span><span class="p">:</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs edge-side execution of this function</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            opt (Dict[str, Any]): option</span>
+<span class="sd">            tool (edge.Tool): Classes for edge-side UI operations such as notification functions</span>
+<span class="sd">            logger (logging.Logger): logger</span>
+<span class="sd">            timeout (int): Timeout time</span>
+<span class="sd">            prevres (Any): Result of the previous command, used when referencing the results of a pipeline run.</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            Tuple[int, Dict[str, Any]]: 終了コード, 結果</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">status</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">tool</span><span class="o">.</span><span class="n">exec_cmd</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">prevres</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">status</span><span class="p">,</span> <span class="n">res</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>エッジ側の実装を簡単にするために、 <cite>cmdbox.app.feature</cite> を継承したいくつかのクラスを用意しています。</p></li>
+<li><p>詳しくは <cite>cmdbox.app.feature</cite> モジュールを参照してください。</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">OneshotEdgeFeature</span><span class="p">(</span><span class="n">Feature</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for edge functions that execute only once.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">OneshotNotifyEdgeFeature</span><span class="p">(</span><span class="n">OneshotEdgeFeature</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for edge functionality that provides notification of execution results.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ResultEdgeFeature</span><span class="p">(</span><span class="n">Feature</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for edge functionality that displays execution results in a web browser.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">OneshotResultEdgeFeature</span><span class="p">(</span><span class="n">ResultEdgeFeature</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for edge functionality that displays the result of a one-time execution in a web browser.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">UnsupportEdgeFeature</span><span class="p">(</span><span class="n">Feature</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for unsupported edge features.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 </pre></div>
 </div>
 </section>
