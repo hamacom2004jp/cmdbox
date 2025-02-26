@@ -1,4 +1,4 @@
-# cmdbox
+# cmdbox (Command Development Application)
 
 - It is a command development application with a plugin mechanism.
 - Documentation is [here](https://hamacom2004jp.github.io/cmdbox/).
