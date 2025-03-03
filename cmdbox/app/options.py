@@ -10,7 +10,22 @@ import re
 
 
 class Options:
+    T_INT = 'int'
+    T_FLOAT = 'float'
+    T_BOOL = 'bool'
+    T_STR = 'str'
+    T_DICT = 'dict'
+    T_TEXT = 'text'
+    T_FILE = 'file'
+    T_DIR = 'dir'
+    
+    def __setattr__(self, name:str, value):
+        if name.startswith("T_") and name in self.__dict__:
+            raise ValueError(f'Cannot set attribute. ({name})')
+        self.__dict__[name] = value
+
     _instance = None
+
     @staticmethod
     def getInstance(appcls=None, ver=None):
         if Options._instance is None:
@@ -20,7 +35,6 @@ class Options:
     def __init__(self, appcls=None, ver=None):
         self.appcls = appcls
         self.ver = ver
-        self._options = dict()
         self.features_yml_data = None
         self.features_loaded = dict()
         self.aliases_loaded_cli = False
@@ -135,15 +149,20 @@ class Options:
             if type(val) != dict or 'type' not in val:
                 return
             opt = dict()
-            if val['type'] == 'int':
+            if val['type'] == Options.T_INT:
                 opt['type'] = int
                 opt['action'] = 'append' if val['multi'] else None
-            elif val['type'] == 'float':
+            elif val['type'] == Options.T_FLOAT:
                 opt['type'] = float
                 opt['action'] = 'append' if val['multi'] else None
-            elif val['type'] == 'bool':
-                opt['type'] = None
+            elif val['type'] == Options.T_BOOL:
+                opt['type'] = bool
                 opt['action'] = 'store_true'
+            elif val['type'] == Options.T_DICT:
+                opt['type'] = dict
+                if not val['multi']:
+                    raise ValueError(f'list_options: The multi must be True if type is dict. key={key}, val={val}')
+                opt['action'] = 'append'
             else:
                 opt['type'] = str
                 opt['action'] = 'append' if val['multi'] else None
@@ -152,6 +171,8 @@ class Options:
             language, _ = locale.getlocale()
             opt['help'] = val['discription_en'] if language.find('Japan') < 0 and language.find('ja_JP') < 0 else val['discription_ja']
             opt['default'] = val['default']
+            if val['multi'] and val['default'] is not None:
+                raise ValueError(f'list_options: The default value must be None if multi is True. key={key}, val={val}')
             opt['opts'] = o
             if val['choice'] is not None:
                 opt['choices'] = []
@@ -189,7 +210,7 @@ class Options:
             schema = [schema for schema in opt_schema if type(schema) is dict and schema['opt'] == key]
             if len(schema) == 0 or val == '':
                 continue
-            if schema[0]['type'] == 'bool':
+            if schema[0]['type'] == Options.T_BOOL:
                 if val:
                     opt_list.append(f"--{key}")
                 continue
@@ -202,6 +223,14 @@ class Options:
                         opt_list.append(f'"{v}"')
                     else:
                         opt_list.append(str(v))
+            elif type(val) == dict:
+                for k,v in val.items():
+                    if k is None or k == '' or v is None or v == '':
+                        continue
+                    opt_list.append(f"--{key}")
+                    k = f'"{k}"' if str(k).find(' ') >= 0 else str(k)
+                    v = f'"{v}"' if str(v).find(' ') >= 0 else str(v)
+                    opt_list.append(f'{k}={v}')
             elif val is not None and val != '':
                 opt_list.append(f"--{key}")
                 if str(val).find(' ') >= 0:
@@ -215,42 +244,42 @@ class Options:
     def init_options(self):
         self._options = dict()
         self._options["version"] = dict(
-            short="v", type="bool", default=None, required=False, multi=False, hide=True, choice=None,
+            short="v", type=Options.T_BOOL, default=None, required=False, multi=False, hide=True, choice=None,
             discription_ja="バージョン表示",
             discription_en="Display version")
         self._options["useopt"] = dict(
-            short="u", type="str", default=None, required=False, multi=False, hide=True, choice=None,
+            short="u", type=Options.T_STR, default=None, required=False, multi=False, hide=True, choice=None,
             discription_ja="オプションを保存しているファイルを使用します。",
             discription_en="Use the file that saves the options.")
         self._options["saveopt"] = dict(
-            short="s", type="bool", default=None, required=False, multi=False, hide=True, choice=[True, False],
+            short="s", type=Options.T_BOOL, default=None, required=False, multi=False, hide=True, choice=[True, False],
             discription_ja="指定しているオプションを `-u` で指定したファイルに保存します。",
             discription_en="Save the specified options to the file specified by `-u`.")
         self._options["debug"] = dict(
-            short="d", type="bool", default=False, required=False, multi=False, hide=True, choice=[True, False],
+            short="d", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
             discription_ja="デバックモードで起動します。",
             discription_en="Starts in debug mode.")
         self._options["format"] = dict(
-            short="f", type="bool", default=None, required=False, multi=False, hide=True,
+            short="f", type=Options.T_BOOL, default=None, required=False, multi=False, hide=True,
             discription_ja="処理結果を見やすい形式で出力します。指定しない場合json形式で出力します。",
             discription_en="Output the processing result in an easy-to-read format. If not specified, output in json format.",
             choice=None)
         self._options["mode"] = dict(
-            short="m", type="str", default=None, required=True, multi=False, hide=True,
+            short="m", type=Options.T_STR, default=None, required=True, multi=False, hide=True,
             discription_ja="起動モードを指定します。",
             discription_en="Specify the startup mode.",
             choice=[])
         self._options["cmd"] = dict(
-            short="c", type="str", default=None, required=True, multi=False, hide=True,
+            short="c", type=Options.T_STR, default=None, required=True, multi=False, hide=True,
             discription_ja="コマンドを指定します。",
             discription_en="Specify the command.",
             choice=[])
         self._options["output_json"] = dict(
-            short="o", type="file", default="", required=False, multi=False, hide=True, choice=None, fileio="out",
+            short="o", type=Options.T_FILE, default="", required=False, multi=False, hide=True, choice=None, fileio="out",
             discription_ja="処理結果jsonの保存先ファイルを指定。",
             discription_en="Specify the destination file for saving the processing result json.")
         self._options["output_json_append"] = dict(
-            short="a", type="bool", default=False, required=False, multi=False, hide=True, choice=[True, False],
+            short="a", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
             discription_ja="処理結果jsonファイルを追記保存します。",
             discription_en="Save the processing result json file by appending.")
 
@@ -399,14 +428,14 @@ class Options:
                 raise Exception(f'features.yml is invalid. (The “default” or “coercion” element must be in the dictionary of the list element of the “args.cli” element. rule={rule})')
             if len([rk for rk in rule['rule'] if rk not in args_dict or rule['rule'][rk] != args_dict[rk]]) > 0:
                 continue
-            if rule['default'] is not None:
+            if 'default' in rule and rule['default'] is not None:
                 for dk, dv in rule['default'].items():
                     if dk not in args_dict or args_dict[dk] is None:
                         if type(dv) == list:
                             args_dict[dk] = [_cast(self, dk, v) for v in dv]
                         else:
                             args_dict[dk] = _cast(self, dk, dv)
-            if rule['coercion'] is not None:
+            if 'coercion' in rule and rule['coercion'] is not None:
                 for ck, cv in rule['coercion'].items():
                     if type(cv) == list:
                         args_dict[ck] = [_cast(self, ck, v) for v in cv]

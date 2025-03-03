@@ -69,7 +69,7 @@ pip install -r requirements.txt
 
 ## How to implement a new command using cmdbox
 
-- Under the ```sample/app/features/cli``` folder, you will find an implementation of the ```client_time``` mentioned earlier.
+- Under the ```sample/app/features/cli``` folder, you will find an implementation of the ```sample_client_time``` mentioned earlier.
 - The implementation is as follows. (Slightly abbreviated display)
 - Create the following code and save it in the ```sample/app/features/cli``` folder.
 
@@ -90,11 +90,11 @@ class ClientTime(feature.Feature):
 
     def get_option(self):
         return dict(
-            type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
             discription_ja="クライアント側の現在時刻を表示します。",
             discription_en="Displays the current time at the client side.",
             choice=[
-                dict(opt="timedelta", type="int", default=9, required=False, multi=False, hide=False, choice=None,
+                dict(opt="timedelta", type=Options.T_INT, default=9, required=False, multi=False, hide=False, choice=None,
                         discription_ja="時差の時間数を指定します。",
                         discription_en="Specify the number of hours of time difference."),
             ])
@@ -107,6 +107,88 @@ class ClientTime(feature.Feature):
         if 'success' not in ret:
             return 1, ret, None
         return 0, ret, None
+
+    def edgerun(self, opt, tool, logger, timeout, prevres = None):
+        status, res = tool.exec_cmd(opt, logger, timeout, prevres)
+        tool.notify(res)
+        yield 1, res
+```
+
+- If you want to implement server-side processing, please refer to ```sample_server_time```.
+
+```python
+from cmdbox.app import common, client, feature
+from cmdbox.app.commons import redis_client
+from cmdbox.app.options import Options
+from pathlib import Path
+from typing import Dict, Any, Tuple, Union, List
+import argparse
+import datetime
+import logging
+
+
+class ServerTime(feature.Feature):
+    def get_mode(self) -> Union[str, List[str]]:
+        return "server"
+
+    def get_cmd(self):
+        return 'time'
+
+    def get_option(self):
+        return dict(
+            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            discription_ja="サーバー側の現在時刻を表示します。",
+            discription_en="Displays the current time at the server side.",
+            choice=[
+                dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None,
+                        discription_ja="Redisサーバーのサービスホストを指定します。",
+                        discription_en="Specify the service host of the Redis server."),
+                dict(opt="port", type=Options.T_INT, default=self.default_port, required=True, multi=False, hide=True, choice=None,
+                        discription_ja="Redisサーバーのサービスポートを指定します。",
+                        discription_en="Specify the service port of the Redis server."),
+                dict(opt="password", type=Options.T_STR, default=self.default_pass, required=True, multi=False, hide=True, choice=None,
+                        discription_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
+                        discription_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
+                dict(opt="svname", type=Options.T_STR, default="server", required=True, multi=False, hide=True, choice=None,
+                        discription_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
+                        discription_en="Specify the service name of the inference server. If omitted, `server` is used."),
+                dict(opt="timedelta", type=Options.T_INT, default=9, required=False, multi=False, hide=False, choice=None,
+                        discription_ja="時差の時間数を指定します。",
+                        discription_en="Specify the number of hours of time difference."),
+                dict(opt="retry_count", type=Options.T_INT, default=3, required=False, multi=False, hide=True, choice=None,
+                        discription_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",
+                        discription_en="Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."),
+                dict(opt="retry_interval", type=Options.T_INT, default=5, required=False, multi=False, hide=True, choice=None,
+                        discription_ja="Redisサーバーに再接続までの秒数を指定します。",
+                        discription_en="Specifies the number of seconds before reconnecting to the Redis server."),
+                dict(opt="timeout", type=Options.T_INT, default="15", required=False, multi=False, hide=True, choice=None,
+                        discription_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
+                        discription_en="Specify the maximum waiting time until the server responds."),
+            ])
+
+    def get_svcmd(self):
+        return 'server_time'
+
+    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+        cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
+        ret = cl.redis_cli.send_cmd(self.get_svcmd(), [str(args.timedelta)],
+                                    retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
+        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        if 'success' not in ret:
+            return 1, ret, None
+        return 0, ret, None
+
+    def is_cluster_redirect(self):
+        return False
+
+    def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
+              sessions:Dict[str, Dict[str, Any]]) -> int:
+        td = 9 if msg[2] == None else int(msg[2])
+        tz = datetime.timezone(datetime.timedelta(hours=td))
+        dt = datetime.datetime.now(tz)
+        ret = dict(success=dict(data=dt.strftime('%Y-%m-%d %H:%M:%S')))
+        redis_cli.rpush(msg[1], ret)
+        return self.RESP_SCCESS
 
     def edgerun(self, opt, tool, logger, timeout, prevres = None):
         status, res = tool.exec_cmd(opt, logger, timeout, prevres)

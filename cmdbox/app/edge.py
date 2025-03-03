@@ -1,5 +1,6 @@
 from cmdbox.app import common, feature, options, web
 from cmdbox.app.commons import convert
+from cmdbox.app.options import Options
 from fastapi import FastAPI, Request, HTTPException
 from pathlib import Path
 from PIL import Image
@@ -85,9 +86,9 @@ class Edge(object):
                 value = questionary.select(f"{opt}:({help}):", choice, default=default).ask()
             else:
                 value = questionary.text(f"{opt}:({help}):", default=default, validate=lambda v:not required or len(v)>0).ask()
-            if r['type'] == 'bool': value = value=='True'
-            if r['type'] == 'int': value = int(value)
-            if r['type'] == 'float': value = float(value)
+            if r['type'] == Options.T_BOOL: value = value=='True'
+            if r['type'] == Options.T_INT: value = int(value)
+            if r['type'] == Options.T_FLOAT: value = float(value)
             conf[opt] = value
         # 設定ファイルに保存
         common.saveopt(conf, conf_file)

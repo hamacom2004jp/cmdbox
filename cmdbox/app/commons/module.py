@@ -50,6 +50,8 @@ def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], appc
                     if mode not in features:
                         features[mode] = dict()
                     features[mode][cmd] = fobj.get_option()
+                    if features[mode][cmd] is None:
+                        raise ValueError(f'load_features: Cannot get options from {fobj}. The get_option() method returns None.')
                     features[mode][cmd]['feature'] = fobj
                 elif type(mode) is list:
                     for m in mode:
@@ -57,6 +59,8 @@ def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], appc
                         if m not in features:
                             features[m] = dict()
                         features[m][cmd] = fobj.get_option()
+                        if features[m][cmd] is None:
+                            raise ValueError(f'load_features: Cannot get options from {fobj}. The get_option() method returns None.')
                         features[m][cmd]['feature'] = fobj
     return features
 

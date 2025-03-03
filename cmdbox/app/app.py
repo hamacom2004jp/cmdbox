@@ -99,6 +99,14 @@ class CmdBoxApp:
         # 最終的に使用するオプションにマージする
         for key, val in args_dict.items():
             args_dict[key] = common.getopt(opt, key, preval=args_dict, withset=True)
+            # オプションの型が辞書の場合は、文字列から辞書に変換する
+            if opts[key]["type"] is dict:
+                if isinstance(args_dict[key], list):
+                    d = dict()
+                    for v in args_dict[key]:
+                        kv = v.split('=')
+                        d[kv[0]] = kv[1]
+                    args_dict[key] = d
         # featuresの初期値を適用する
         self.options.load_features_args(args_dict)
         args = argparse.Namespace(**args_dict)

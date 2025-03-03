@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature
+from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, Union, List
 import argparse
 import datetime
@@ -32,11 +33,11 @@ class ClientTime(feature.Feature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
             discription_ja="クライアント側の現在時刻を表示します。",
             discription_en="Displays the current time at the client side.",
             choice=[
-                dict(opt="timedelta", type="int", default=9, required=False, multi=False, hide=False, choice=None,
+                dict(opt="timedelta", type=Options.T_INT, default=9, required=False, multi=False, hide=False, choice=None,
                         discription_ja="時差の時間数を指定します。",
                         discription_en="Specify the number of hours of time difference."),
             ])

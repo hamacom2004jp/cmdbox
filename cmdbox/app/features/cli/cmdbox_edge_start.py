@@ -1,4 +1,5 @@
 from cmdbox.app import common, edge, feature
+from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
@@ -31,11 +32,11 @@ class EdgeStart(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
+            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
             discription_ja="端末モードを起動します。",
             discription_en="Start Edge mode.",
             choice=[
-                dict(opt="data", type="file", default=common.HOME_DIR / f".{self.ver.__appid__}", required=True, multi=False, hide=True, choice=None,
+                dict(opt="data", type=Options.T_FILE, default=common.HOME_DIR / f".{self.ver.__appid__}", required=True, multi=False, hide=True, choice=None,
                      discription_ja=f"省略した時は f`$HONE/.{self.ver.__appid__}` を使用します。",
                      discription_en=f"When omitted, f`$HONE/.{self.ver.__appid__}` is used."),
             ]

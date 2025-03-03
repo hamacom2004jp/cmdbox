@@ -1,9 +1,10 @@
+from cmdbox.app import common, feature
+from cmdbox.app.options import Options
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography import x509
 from datetime import datetime, timedelta, timezone
-from cmdbox.app import common, feature
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -39,38 +40,38 @@ class WebGenpass(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
             discription_ja="webモードで使用できるパスワード文字列を生成します。",
             discription_en="Generates a password string that can be used in web mode.",
             choice=[
-                dict(opt="pass_length", type="int", default=16, required=False, multi=False, hide=False, choice=None,
+                dict(opt="pass_length", type=Options.T_INT, default=16, required=False, multi=False, hide=False, choice=None,
                      discription_ja="パスワードの長さを指定します。",
                      discription_en="Specifies the length of the password."),
-                dict(opt="pass_count", type="int", default=5, required=False, multi=False, hide=False, choice=None,
+                dict(opt="pass_count", type=Options.T_INT, default=5, required=False, multi=False, hide=False, choice=None,
                      discription_ja="生成するパスワードの件数を指定します。",
                      discription_en="Specify the number of passwords to be generated."),
-                dict(opt="use_alphabet", type="str", default='both', required=False, multi=False, hide=False, choice=['notuse','upper','lower','both'],
+                dict(opt="use_alphabet", type=Options.T_STR, default='both', required=False, multi=False, hide=False, choice=['notuse','upper','lower','both'],
                      discription_ja="パスワードに使用するアルファベットの種類を指定します。 `notuse` , `upper` , `lower` , `both` が指定できます。",
                      discription_en="Specifies the type of alphabet used for the password. `notuse` , `upper` , `lower` , `both` can be specified."),
-                dict(opt="use_number", type="str", default="use", required=False, multi=False, hide=False, choice=['notuse', 'use'],
+                dict(opt="use_number", type=Options.T_STR, default="use", required=False, multi=False, hide=False, choice=['notuse', 'use'],
                      discription_ja="パスワードに使用する数字の種類を指定します。 `notuse` , `use` が指定できます。",
                      discription_en="Specify the type of number to be used for the password. `notuse` , `use` can be specified."),
-                dict(opt="use_symbol", type="str", default='use', required=False, multi=False, hide=False, choice=['notuse','use'],
+                dict(opt="use_symbol", type=Options.T_STR, default='use', required=False, multi=False, hide=False, choice=['notuse','use'],
                      discription_ja="パスワードに使用する記号の種類を指定します。 `notuse` , `use` が指定できます。",
                      discription_en="Specifies the type of symbol used in the password. `notuse` , `use` can be specified."),
-                dict(opt="similar", type="str", default='exclude', required=False, multi=False, hide=True, choice=['exclude', 'include'],
+                dict(opt="similar", type=Options.T_STR, default='exclude', required=False, multi=False, hide=True, choice=['exclude', 'include'],
                      discription_ja="特定の似た文字を使用するかどうかを指定します。 `exclude` , `include` が指定できます。",
                      discription_en="Specifies whether certain similar characters should be used. `exclude` , `include` can be specified."),
-                dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choice=[True, False],
+                dict(opt="stdout_log", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
                      discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
                      discription_en="Available only in GUI mode. Outputs standard output during command execution to Console log."),
-                dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choice=[True, False],
+                dict(opt="stdout_log", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
                      discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
                      discription_en="Available only in GUI mode. Outputs standard output during command execution to Console log."),
-                dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choice=[True, False],
+                dict(opt="capture_stdout", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
                      discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                      discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
-                dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choice=None,
+                dict(opt="capture_maxsize", type=Options.T_INT, default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choice=None,
                      discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
                      discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
             ]

@@ -478,18 +478,18 @@ def cmd(cmd:str, logger:logging.Logger, slise:int=100, newenv:Dict=None) -> Tupl
     Returns:
         Tuple[int, str, str]: コマンドの戻り値と出力とコマンド
     """
-    if logger.level == logging.DEBUG:
-        logger.debug(f"cmd: {cmd}")
     env = os.environ.copy()
     if newenv is not None:
         for k, v in newenv.items():
             env[k] = v
+    if logger.level == logging.DEBUG:
+        logger.debug(f"cmd={cmd}, newenv={newenv}")
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
     output = None
-    while proc.poll() is None:
-        out = proc.stdout.readline().strip()
-        if 0 >= len(out):
-            continue
+    while proc.returncode is None:
+        out = proc.stdout.readline()
+        if out == b'' and proc.poll() is not None:
+            break
         for enc in ['utf-8', 'cp932', 'utf-16', 'utf-16-le', 'utf-16-be']:
             try:
                 output = out.decode(enc).rstrip()
@@ -501,7 +501,7 @@ def cmd(cmd:str, logger:logging.Logger, slise:int=100, newenv:Dict=None) -> Tupl
                 break
             except UnicodeDecodeError:
                 pass
-    proc.stdout.read()
+    #proc.stdout.read()
 
     return proc.returncode, output, cmd
 

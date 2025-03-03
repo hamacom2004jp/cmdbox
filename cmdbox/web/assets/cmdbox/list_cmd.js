@@ -71,7 +71,13 @@ const list_cmd_func_then = () => {
                 const target_name = row.opt;
                 let input_elem, elem;
                 if(!row.choice) {
-                    elem = $(cmd_modal.find('.row_content_template_str').html());
+                    if(row.type=='text') {
+                        elem = $(cmd_modal.find('.row_content_template_text').html());
+                    } else if(row.type=='dict') {
+                        elem = $(cmd_modal.find('.row_content_template_dict').html());
+                    } else {
+                        elem = $(cmd_modal.find('.row_content_template_str').html());
+                    }
                     if (next_elem) next_elem.after(elem);
                     else row_content.append(elem);
                     input_elem = elem.find('.row_content_template_input');
@@ -114,8 +120,15 @@ const list_cmd_func_then = () => {
                     });
                 }
                 input_elem.attr('name', target_name);
-                input_elem.attr('id', target_name + index);
-                input_elem.attr('param_data_index', index);
+                if(row.type=='dict') {
+                    input_elem.each((i, e) => {
+                        $(e).attr('id', target_name + (index + i));
+                        $(e).attr('param_data_index', (index + i));
+                    });
+                } else {
+                    input_elem.attr('id', target_name + index);
+                    input_elem.attr('param_data_index', index);
+                }
                 input_elem.attr('required', row.required);
                 input_elem.attr('param_data_type', row.type);
                 input_elem.attr('param_data_multi', row.multi);
@@ -166,7 +179,8 @@ const list_cmd_func_then = () => {
                     }
                     btn_a.click(mk_func(row, input_elem.parent().parent()));
                     // 2個目以降は削除ボタンを追加
-                    if (cmd_modal.find(`[name="${target_name}"]`).length > 1) {
+                    const len = cmd_modal.find(`[name="${target_name}"]`).length;
+                    if (row.type!='dict' && len > 1 || row.type=='dict' && len > 2) {
                         mk_func = (del_elem, row) => {
                             // del_elemの値を残すためにクロージャーにする
                             return () => del_elem.remove();
@@ -231,6 +245,15 @@ const list_cmd_func_then = () => {
                     cmd_modal.find(`[name="${key}"]`).each((i, e) => {
                         if (val[i] && val[i]!="" || i==0) $(e).val(val[i]);
                         else $(e).parent().parent().remove();
+                    });
+                } else if((typeof val)=="object") {
+                    let index = 0;
+                    Object.entries(val).forEach(([k, v]) => {
+                        cmd_modal.find(`#${key}${index}`).val(k);
+                        cmd_modal.find(`#${key}${index+1}`).val(v);
+                        const btn = cmd_modal.find(`#${key}${index}`).parent().find('.add_buton')[0];
+                        $(btn).click();
+                        index+=2;
                     });
                 } else {
                     cmd_modal.find(`[name="${key}"]`).val(val);
@@ -407,11 +430,13 @@ const get_param = (modal_elem) => {
         }
     }
     // フォームの入力値をチェック（不正な値があればフォームに'is-invalid'クラスを付加する）
-    modal_elem.find('.row_content, .row_content_common').find('input, select').each((i, elem) => {
+    const dict_buf = {};
+    modal_elem.find('.row_content, .row_content_common').find('input, select, textarea').each((i, elem) => {
         const data_name = $(elem).attr('name');
         let data_val = $(elem).val();
         const data_type = $(elem).attr('param_data_type');
         const data_web = $(elem).attr('param_data_web');
+        const data_index = parseInt($(elem).attr('param_data_index'));
         const data_multi = $(elem).attr('param_data_multi');
         if ($(elem).attr('required') && (!data_val || data_val=='')) {
             $(elem).addClass('is-invalid');
@@ -446,14 +471,35 @@ const get_param = (modal_elem) => {
                 $(elem).removeClass('is-invalid');
                 $(elem).addClass('is-valid');
             }
+        } else if (data_type=='dict') {
+            if(data_val.indexOf(' ')>=0) $(elem).addClass('is-invalid');
+            else {
+                $(elem).removeClass('is-invalid');
+                $(elem).addClass('is-valid');
+            }
+        } else if (data_type=='text') {
+            $(elem).removeClass('is-invalid');
+            $(elem).addClass('is-valid');
         } else {
             $(elem).removeClass('is-invalid');
             $(elem).addClass('is-valid');
         }
-        if(data_multi=='true'){
-            if(!opt[data_name]) opt[data_name] = [];
-            if(data_val && data_val!='') opt[data_name].push(data_val);
-            else if(data_val==false) opt[data_name].push(data_val);
+        if(data_multi=='true' || data_type=='dict') {
+            if (data_type=='dict') {
+                if(!opt[data_name]) {
+                    opt[data_name] = {};
+                    dict_buf[data_name] = {};
+                }
+                if(data_index%2==0) dict_buf[data_name]['key'] = data_val;
+                else if (dict_buf[data_name]['key']) {
+                    opt[data_name][dict_buf[data_name]['key']] = data_val;
+                    delete dict_buf[data_name]['key'];
+                }
+            } else {
+                if(!opt[data_name]) opt[data_name] = [];
+                if(data_val && data_val!='') opt[data_name].push(data_val);
+                else if(data_val==false) opt[data_name].push(data_val);
+            }
         } else {
             if(data_val && data_val!='') opt[data_name] = data_val;
             else if(data_val==false) opt[data_name] = data_val;
