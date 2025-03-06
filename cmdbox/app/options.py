@@ -275,7 +275,7 @@ class Options:
             discription_en="Specify the command.",
             choice=[])
         self._options["output_json"] = dict(
-            short="o", type=Options.T_FILE, default="", required=False, multi=False, hide=True, choice=None, fileio="out",
+            short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
             discription_ja="処理結果jsonの保存先ファイルを指定。",
             discription_en="Specify the destination file for saving the processing result json.")
         self._options["output_json_append"] = dict(

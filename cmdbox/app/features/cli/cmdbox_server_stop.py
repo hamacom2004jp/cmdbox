@@ -59,7 +59,7 @@ class ServerStop(feature.OneshotNotifyEdgeFeature):
                 dict(opt="timeout", type=Options.T_INT, default="15", required=False, multi=False, hide=True, choice=None,
                      discription_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                      discription_en="Specify the maximum waiting time until the server responds."),
-                dict(opt="output_json", short="o", type=Options.T_FILE, default="", required=False, multi=False, hide=True, choice=None, fileio="out",
+                dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                      discription_ja="処理結果jsonの保存先ファイルを指定。",
                      discription_en="Specify the destination file for saving the processing result json."),
                 dict(opt="output_json_append", short="a", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
