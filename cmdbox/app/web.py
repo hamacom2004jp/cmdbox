@@ -311,7 +311,8 @@ class Web:
 
     def get_enable_cmds(self, mode:str, req:Request, res:Response):
         if self.signin_file is None:
-            return self.options.get_cmds(mode).copy()
+            cmds = self.options.get_cmds(mode).copy()
+            return cmds
         if self.signin_file_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if 'signin' not in req.session or 'groups' not in req.session['signin']:

@@ -31,7 +31,7 @@ class GuiStop(cmdbox_web_stop.WebStop):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
             discription_ja="GUIモードを停止します。",
             discription_en="Stop GUI mode.",
             choice=[

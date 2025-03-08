@@ -494,12 +494,40 @@ class Options:
                     find = True
                     src_cmd = ck
                     tgt_cmd = rule['target']['cmd'].format(*([ck_match.string]+list(ck_match.groups())))
+                    cv = cv.copy()
+                    cv['opt'] = tgt_cmd
+                    # cmd/[target mode]/[target cmd]に追加
                     self._options["cmd"][tgt_mode][tgt_cmd] = cv
+                    # mode/[target mode]/[target cmd]に追加
                     self._options["mode"][tgt_mode][tgt_cmd] = cv
+                    # mode/choiceにtarget modeがない場合は追加
+                    found_mode_choice = False
+                    for i, me in enumerate(self._options["mode"]["choice"]):
+                        if me['opt'] == tgt_mode:
+                            me[tgt_cmd] = cv.copy()
+                            found_mode_choice = True
+                        # 移動の場合は元を削除
+                        if tgt_move and me['opt'] == src_mode and src_cmd in me:
+                            del me[src_cmd]
+                    if not found_mode_choice:
+                        self._options["mode"]["choice"].append({'opt':tgt_mode, tgt_cmd:cv})
+                    # cmd/choiceにtarget cmdがない場合は追加
+                    found_cmd_choice = False
+                    for i, ce in enumerate(self._options["cmd"]["choice"]):
+                        if ce['opt'] == tgt_cmd:
+                            self._options["cmd"]["choice"][i] = cv
+                            found_cmd_choice = True
+                        # 移動の場合は元を削除(この処理をするとモード違いの同名コマンドが使えなくなるのでコメントアウト)
+                        #if tgt_move and ce['opt'] == src_cmd:
+                        #    self._options["cmd"]["choice"].remove(ce)
+                    if not found_cmd_choice:
+                        self._options["cmd"]["choice"].append(cv)
+                    # 移動の場合は元を削除
                     if tgt_move:
                         if logger.level == logging.DEBUG:
                             logger.debug(f'move command: src=({src_mode},{src_cmd}) -> tgt=({tgt_mode},{tgt_cmd})')
-                        del self._options["cmd"][src_mode][src_cmd]
+                        if src_cmd in self._options["cmd"][src_mode]:
+                            del self._options["cmd"][src_mode][src_cmd]
                     else:
                         if logger.level == logging.DEBUG:
                             logger.debug(f'copy command: src=({src_mode},{src_cmd}) -> tgt=({tgt_mode},{tgt_cmd})')

@@ -248,12 +248,13 @@ const list_cmd_func_then = () => {
                     });
                 } else if((typeof val)=="object") {
                     let index = 0;
+                    const valsize = Object.keys(val).length * 2;
                     Object.entries(val).forEach(([k, v]) => {
                         cmd_modal.find(`#${key}${index}`).val(k);
                         cmd_modal.find(`#${key}${index+1}`).val(v);
                         const btn = cmd_modal.find(`#${key}${index}`).parent().find('.add_buton')[0];
-                        $(btn).click();
                         index+=2;
+                        if (index < valsize) $(btn).click();
                     });
                 } else {
                     cmd_modal.find(`[name="${key}"]`).val(val);

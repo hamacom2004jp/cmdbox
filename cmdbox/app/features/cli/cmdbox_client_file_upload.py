@@ -34,7 +34,7 @@ class ClientFileUpload(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
             discription_ja="データフォルダ配下にファイルをアップロードします。",
             discription_en="Upload a file under the data folder.",
             choice=[

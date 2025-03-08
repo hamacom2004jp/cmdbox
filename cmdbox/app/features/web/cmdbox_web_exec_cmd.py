@@ -1,4 +1,4 @@
-from cmdbox.app import app, client, server, web as _web
+from cmdbox.app import app, client, options, server, web as _web
 from cmdbox.app.commons import convert, loghandler
 from cmdbox.app.features.web import cmdbox_web_load_cmd
 from cmdbox.app.web import Web
@@ -60,6 +60,10 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     raise HTTPException(status_code=404, detail='mode or cmd is not found.')
                 opt['capture_stdout'] = nothread = True
                 opt['stdout_log'] = False
+
+                if options.Options.getInstance().get_cmd_attr(opt['mode'], opt['cmd'], "nouse_webmode"):
+                    return dict(warn=f'Command "{title}" failed. This command is not available in web mode.')
+
                 return self.exec_cmd(req, res, web, title, opt, nothread)
             except:
                 return dict(warn=f'Command "{title}" failed. {traceback.format_exc()}')

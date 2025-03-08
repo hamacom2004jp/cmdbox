@@ -33,7 +33,7 @@ class WebUserList(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
             discription_ja="Webモードのユーザー一覧を取得します。",
             discription_en="Get a list of users in Web mode.",
             choice=[

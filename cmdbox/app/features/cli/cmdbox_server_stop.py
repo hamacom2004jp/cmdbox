@@ -34,7 +34,7 @@ class ServerStop(feature.OneshotNotifyEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_TRUE,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=True,
             discription_ja="サーバーを停止します。installモードで `cmdbox -m install -c server` を実行している場合は、 `docker-compose down` を使用してください。",
             discription_en="Stop the inference server. If you are running `cmdbox -m install -c server` in install mode, use `docker-compose down`.",
             choice=[

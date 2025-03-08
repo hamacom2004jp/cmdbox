@@ -38,7 +38,7 @@ class WebGencert(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
             discription_ja="webモードでSSLを簡易的に実装するために自己署名証明書を生成します。",
             discription_en="Generate a self-signed certificate for simple implementation of SSL in web mode.",
             choice=[

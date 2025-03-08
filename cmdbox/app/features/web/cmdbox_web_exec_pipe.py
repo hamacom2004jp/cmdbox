@@ -67,8 +67,12 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                         continue
                     cmd_opt = self.load_cmd(web, cmd_title)
                     if 'mode' in cmd_opt and 'cmd' in cmd_opt:
+                        if options.Options.getInstance().get_cmd_attr(cmd_opt['mode'], cmd_opt['cmd'], "nouse_webmode"):
+                            msg = f'Command "{cmd_title}" failed. This command is not available in web mode.'
+                            self.callback_return_pipe_exec_func(web, title, dict(warn=msg))
+                            raise HTTPException(401, detail=msg)
                         if not web.check_cmd(req, res, cmd_opt['mode'], cmd_opt['cmd']):
-                            msg = f'Command "{title}" failed. Execute command denyed. mode={cmd_opt["mode"]}, cmd={cmd_opt["cmd"]}'
+                            msg = f'Command "{cmd_title}" failed. Execute command denyed. mode={cmd_opt["mode"]}, cmd={cmd_opt["cmd"]}'
                             self.callback_return_pipe_exec_func(web, title, dict(warn=msg))
                             raise HTTPException(401, detail=msg)
                 opt['capture_stdout'] = nothread = False
@@ -156,7 +160,7 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                                 except Exception as e:
                                     self.callback_console_modal_log_func(web, o)
                             else:
-                                o = [dict(warn=f'The captured stdout was discarded because its size was larger than {options.Options.DEFAULT_CAPTURE_MAXSIZE} bytes.')]
+                                o = [dict(warn=f'The captured stdout was discarded because its size was larger than {self.DEFAULT_CAPTURE_MAXSIZE} bytes.')]
                                 self.callback_return_pipe_exec_func(web, title, o)
                         except:
                             o = [dict(warn=f'<pre>{html.escape(o)}</pre><br><pre>{html.escape(traceback.format_exc())}</pre>')]

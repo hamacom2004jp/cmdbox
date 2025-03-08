@@ -33,7 +33,7 @@ class WebStart(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=True,
             discription_ja="Webモードを起動します。",
             discription_en="Start Web mode.",
             choice=[

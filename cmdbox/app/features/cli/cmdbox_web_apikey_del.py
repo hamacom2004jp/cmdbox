@@ -33,7 +33,7 @@ class WebApikeyDel(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
             discription_ja="WebモードのユーザーのApiKeyを削除します。",
             discription_en="Del an ApiKey for a user in Web mode.",
             choice=[

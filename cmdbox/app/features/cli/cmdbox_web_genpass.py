@@ -40,7 +40,7 @@ class WebGenpass(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
             discription_ja="webモードで使用できるパスワード文字列を生成します。",
             discription_en="Generates a password string that can be used in web mode.",
             choice=[

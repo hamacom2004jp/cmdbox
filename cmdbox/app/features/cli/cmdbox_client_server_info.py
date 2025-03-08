@@ -34,7 +34,7 @@ class ClientServerInfo(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False,
             discription_ja="サーバーの情報を取得します。",
             discription_en="Retrieve server information.",
             choice=[

@@ -34,7 +34,7 @@ class ClientFileMove(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
             discription_ja="データフォルダ配下のファイルを移動します。",
             discription_en="Move the files under the data folder.",
             choice=[
