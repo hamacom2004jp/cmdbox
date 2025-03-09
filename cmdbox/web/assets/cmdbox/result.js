@@ -28,16 +28,17 @@ $(() => {
             const cmd = data['cmd'];
             const title = data['title'];
             let output = data['output'];
+            const res_size = -1;
             if (cmd == 'js_return_stream_log_func') {
                 const size_th = 1024*1024*5;
                 const console_modal = $('#console_modal');
                 if (typeof output != 'object') {
                     output = console_modal.find('.result-body').html() +'<br/>'+ output;
                 }
-                result_func(console_modal, 'stream log', output);
+                result_func(console_modal, 'stream log', output, res_size);
                 console_modal.find('.btn_window').click();
             } else {
-                result_func($('#result_form'), title, output);
+                result_func($('#result_form'), title, output, res_size);
             }
             cmdbox.hide_loading();
         };
@@ -58,13 +59,13 @@ $(() => {
     };
     gui_callback();
 });
-const result_func = (content_elem, title, result) => {
+const result_func = (content_elem, title, result, res_size) => {
     content_elem.find('.modal-title').text(title);
     if (!result || result.length <= 0) {
         return;
     }
     content_elem.find('.result-body').html('');
-    render_result_func(content_elem.find('.result-body'), result);
+    render_result_func(content_elem.find('.result-body'), result, res_size);
     cmdbox.hide_loading();
 }
 const get_client_data = async () => {

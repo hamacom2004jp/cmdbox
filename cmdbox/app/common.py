@@ -6,10 +6,12 @@ from pathlib import Path
 from pkg_resources import resource_string
 from tabulate import tabulate
 from typing import List, Tuple, Dict, Any
+import asyncio
 import datetime
 import logging
 import logging.config
 import hashlib
+import inspect
 import json
 import numpy as np
 import os
@@ -556,3 +558,39 @@ def decrypt(enc_message:str, password:str) -> str:
         return message.decode(encoding='utf-8')
     except:
         return None
+
+def is_event_loop_running() -> bool:
+    """
+    イベントループが実行中かどうかを取得します。
+
+    Returns:
+        bool: イベントループが実行中の場合はTrue
+    """
+    try:
+        asyncio.get_running_loop()
+        return True
+    except RuntimeError:
+        return False
+
+def exec_sync(func, *args, **kwargs) -> Any:
+    """"
+    指定された関数が非同期関数であっても同期的に実行します。
+
+    Args:
+        func (function): 関数
+        args (Any): 引数
+        kwargs (Any): キーワード引数
+
+    Returns:
+        Any: 関数の戻り値
+    """
+    if inspect.iscoroutinefunction(func):
+        if is_event_loop_running():
+            loop = asyncio.get_running_loop()
+            futuer = asyncio.run_coroutine_threadsafe(func(*args, **kwargs), loop)
+            while futuer.done() or futuer.cancelled():
+                time.sleep(0.1)
+            ret = futuer.result()
+            return ret
+        return asyncio.run(func(*args, **kwargs))
+    return func(*args, **kwargs)

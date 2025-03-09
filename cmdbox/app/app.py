@@ -152,7 +152,7 @@ class CmdBoxApp:
                 pf.append(dict(key="app_argsparse", val=f"{eargsparsetime-sargsparsetime:.03f}s"))
                 pf.append(dict(key="app_makesample", val=f"{emakesampletime-smakesampletime:.03f}s"))
                 pf.append(dict(key="app_loggerinit", val=f"{eloggerinittime-sloggerinittime:.03f}s"))
-                status, ret, obj = feat.apprun(logger, args, smaintime, pf)
+                status, ret, obj = common.exec_sync(feat.apprun, logger, args, smaintime, pf)
                 return status, ret, obj
             else:
                 msg = dict(warn=f"Unkown mode or cmd. mode={args.mode}, cmd={args.cmd}")

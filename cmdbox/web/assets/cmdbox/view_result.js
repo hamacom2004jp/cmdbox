@@ -1,24 +1,26 @@
-const cell_chop = (val) => {
-    if(val && val.length > 150){
-        return `${val.substring(0, 150)}...`;
+const cell_chop = (val, res_size) => {
+    res_size = res_size==-1 && res_size ? res_size : 150;
+    if(val && res_size>0 && val.length > res_size){
+        return `${val.substring(0, res_size)}...`;
     }
     return val;
 }
 // 実行結果をモーダルダイアログに表示
-const view_result_func = (title, result) => {
+const view_result_func = (title, result, res_size) => {
     const result_modal = $('#result_modal');
     result_modal.find('.modal-title').text(title);
     if (!result || result.length <= 0) {
         result_modal.modal('show');
         return;
     }
+    res_size = res_size || 150;
     result_modal.find('.modal-body').html('');
-    render_result_func(result_modal.find('.modal-body'), result);
+    render_result_func(result_modal.find('.modal-body'), result, res_size);
     result_modal.modal('show');
     cmdbox.hide_loading();
 }
 
-const render_result_func = (target_elem, result) => {
+const render_result_func = (target_elem, result, res_size) => {
     if (!result || Array.isArray(result) && result.length<=0) return;
     const mk_table_func = () => {
         const table = $('<table class="table table-bordered table-hover table-sm"></table>');
@@ -47,7 +49,7 @@ const render_result_func = (target_elem, result) => {
             if(Array.isArray(row) && row.length > 0 && typeof row[0] != "object"){
                 const tr = $('<tr></tr>');
                 table_body.append(tr);
-                val = cell_chop(JSON.stringify(row));
+                val = cell_chop(JSON.stringify(row), res_size);
                 tr.append($(`<td>${row}</td>`));
                 return;
             }
@@ -71,6 +73,13 @@ const render_result_func = (target_elem, result) => {
                     td.append(tbl);
                     tr.append(td);
                     dict2table(val['success'], tbl.find('thead'), tbl.find('tbody'));
+                }
+                else if(val && !Array.isArray(val) && typeof val == "object"){
+                    const tbl = mk_table_func()
+                    const td = $('<td></td>');
+                    td.append(tbl);
+                    tr.append(td);
+                    dict2table(val, tbl.find('thead'), tbl.find('tbody'));
                 }
                 else if(val && Array.isArray(val) && val.length > 0 && typeof val[0] == "object"){
                     const tbl = mk_table_func()
@@ -108,7 +117,7 @@ const render_result_func = (target_elem, result) => {
                         list2table(val, tbl.find('thead'), tbl.find('tbody'));
                         val = td.html();
                     } else {
-                        val = cell_chop(JSON.stringify(val));
+                        val = cell_chop(JSON.stringify(val), res_size);
                     }
                 }
                 else if (typeof val == "object") {
@@ -118,8 +127,8 @@ const render_result_func = (target_elem, result) => {
                     dict2table(val, tbl.find('thead'), tbl.find('tbody'));
                     val = td.html();
                 }
-                else if ((typeof val === 'string' || val instanceof String) && val.length > 150) {
-                    val = cell_chop(val);
+                else if (typeof val === 'string' || val instanceof String) {
+                    val = cell_chop(val, res_size);
                 }
             }
             tr.append($(`<td style="overflow-wrap:break-word;word-break:break-all;">${val}</td>`));

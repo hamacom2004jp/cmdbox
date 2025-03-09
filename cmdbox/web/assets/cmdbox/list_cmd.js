@@ -218,6 +218,7 @@ const list_cmd_func_then = () => {
             row_content.append(show_link);
             // 非表示オプションを追加
             py_get_cmd_choices.filter(row => row.hide).forEach((row, i) => add_form_func(i, row, null));
+            cmd_modal.find('.choice_show').change();
         }
         //row_content.find('is-invalid, is-valid').removeClass('is-invalid').removeClass('is-valid');
         cmd_modal.find('[name="modal_mode"]').val('');
@@ -324,6 +325,7 @@ const list_cmd_func_then = () => {
         cmd_modal.find('.modal-title').text(`Command : ${modal_title}`);
         cmd_modal.find('.row_content_hide').hide();
         cmd_modal.find('.btn_window_stack').click();
+        cmd_modal.find('.choice_show').change();
         cmd_modal.modal('show');
         cmdbox.hide_loading();
     }
@@ -355,7 +357,10 @@ const list_cmd_func_then = () => {
         const result = await save_cmd(title, opt);
         await list_cmd_func();
         $('.cmd_card').off('click').on('click', cmd_card_func);
-        if (result.success) alert(result.success);
+        if (result.success) {
+            cmd_modal.find('[name="modal_mode"]').val('edit');
+            alert(result.success);
+        }
         else if (result.warn) alert(result.warn);
         cmdbox.hide_loading();
     });
