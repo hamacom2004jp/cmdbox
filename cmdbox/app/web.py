@@ -111,6 +111,7 @@ class Web:
         self.options = options.Options.getInstance()
         self.webcap_client = requests.Session()
         self.load_signin_file()
+        
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web init parameter: data={self.data} -> {self.data.absolute() if self.data is not None else None}")
             self.logger.debug(f"web init parameter: redis_host={self.redis_host}")
@@ -173,6 +174,7 @@ class Web:
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"hashed apikey: {apikey}")
         find_user = None
+        self.load_signin_file() # サインインファイルの更新をチェック
         for user in self.signin_file_data['users']:
             if 'apikeys' not in user:
                 continue
@@ -223,6 +225,7 @@ class Web:
         if self.signin_file_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if 'signin' in req.session:
+            self.load_signin_file() # サインインファイルの更新をチェック
             path_jadge = self.check_path(req, req.url.path)
             if path_jadge is not None:
                 return path_jadge
@@ -399,6 +402,12 @@ class Web:
         if self.signin_file is not None:
             if not self.signin_file.is_file():
                 raise HTTPException(status_code=500, detail=f'signin_file is not found. ({self.signin_file})')
+            # サインインファイル読込み済みなら返すが、別プロセスがサインインファイルを更新していたら読込みを実施する。
+            if not hasattr(self, 'signin_file_last'):
+                self.signin_file_last = self.signin_file.stat().st_mtime
+            if self.signin_file_last >= self.signin_file.stat().st_mtime and self.signin_file_data is not None:
+                return
+            self.signin_file_last = self.signin_file.stat().st_mtime
             yml = common.load_yml(self.signin_file)
             # usersのフォーマットチェック
             if 'users' not in yml:
@@ -1100,7 +1109,7 @@ class Web:
             user_data = req.session['user_data']
         else:
             # セッションにユーザーデータがない場合はファイルから読み込む
-            if user_path.exists():
+            if user_path.is_file():
                 user_data = common.loaduser(user_path)
             else:
                 user_data = dict()

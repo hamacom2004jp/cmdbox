@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.options &mdash; cmdbox 2025/03/07 documentation</title>
+  <title>cmdbox.app.options &mdash; cmdbox 2025/03/09 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7dcdddcd"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=31affa16"></script>
       <script src="../../../_static/doctools.js?v=888ff710"></script>
       <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -571,12 +571,40 @@
                     <span class="n">find</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="n">src_cmd</span> <span class="o">=</span> <span class="n">ck</span>
                     <span class="n">tgt_cmd</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">][</span><span class="s1">&#39;cmd&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="p">([</span><span class="n">ck_match</span><span class="o">.</span><span class="n">string</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="n">ck_match</span><span class="o">.</span><span class="n">groups</span><span class="p">())))</span>
+                    <span class="n">cv</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                    <span class="n">cv</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tgt_cmd</span>
+                    <span class="c1"># cmd/[target mode]/[target cmd]に追加</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">][</span><span class="n">tgt_mode</span><span class="p">][</span><span class="n">tgt_cmd</span><span class="p">]</span> <span class="o">=</span> <span class="n">cv</span>
+                    <span class="c1"># mode/[target mode]/[target cmd]に追加</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">][</span><span class="n">tgt_mode</span><span class="p">][</span><span class="n">tgt_cmd</span><span class="p">]</span> <span class="o">=</span> <span class="n">cv</span>
+                    <span class="c1"># mode/choiceにtarget modeがない場合は追加</span>
+                    <span class="n">found_mode_choice</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">me</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">][</span><span class="s2">&quot;choice&quot;</span><span class="p">]):</span>
+                        <span class="k">if</span> <span class="n">me</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">tgt_mode</span><span class="p">:</span>
+                            <span class="n">me</span><span class="p">[</span><span class="n">tgt_cmd</span><span class="p">]</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                            <span class="n">found_mode_choice</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="c1"># 移動の場合は元を削除</span>
+                        <span class="k">if</span> <span class="n">tgt_move</span> <span class="ow">and</span> <span class="n">me</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">src_mode</span> <span class="ow">and</span> <span class="n">src_cmd</span> <span class="ow">in</span> <span class="n">me</span><span class="p">:</span>
+                            <span class="k">del</span> <span class="n">me</span><span class="p">[</span><span class="n">src_cmd</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">found_mode_choice</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">][</span><span class="s2">&quot;choice&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;opt&#39;</span><span class="p">:</span><span class="n">tgt_mode</span><span class="p">,</span> <span class="n">tgt_cmd</span><span class="p">:</span><span class="n">cv</span><span class="p">})</span>
+                    <span class="c1"># cmd/choiceにtarget cmdがない場合は追加</span>
+                    <span class="n">found_cmd_choice</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ce</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">][</span><span class="s2">&quot;choice&quot;</span><span class="p">]):</span>
+                        <span class="k">if</span> <span class="n">ce</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">tgt_cmd</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">][</span><span class="s2">&quot;choice&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">cv</span>
+                            <span class="n">found_cmd_choice</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="c1"># 移動の場合は元を削除(この処理をするとモード違いの同名コマンドが使えなくなるのでコメントアウト)</span>
+                        <span class="c1">#if tgt_move and ce[&#39;opt&#39;] == src_cmd:</span>
+                        <span class="c1">#    self._options[&quot;cmd&quot;][&quot;choice&quot;].remove(ce)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">found_cmd_choice</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">][</span><span class="s2">&quot;choice&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cv</span><span class="p">)</span>
+                    <span class="c1"># 移動の場合は元を削除</span>
                     <span class="k">if</span> <span class="n">tgt_move</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
                             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;move command: src=(</span><span class="si">{</span><span class="n">src_mode</span><span class="si">}</span><span class="s1">,</span><span class="si">{</span><span class="n">src_cmd</span><span class="si">}</span><span class="s1">) -&gt; tgt=(</span><span class="si">{</span><span class="n">tgt_mode</span><span class="si">}</span><span class="s1">,</span><span class="si">{</span><span class="n">tgt_cmd</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
-                        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">][</span><span class="n">src_mode</span><span class="p">][</span><span class="n">src_cmd</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">src_cmd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">][</span><span class="n">src_mode</span><span class="p">]:</span>
+                            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">][</span><span class="n">src_mode</span><span class="p">][</span><span class="n">src_cmd</span><span class="p">]</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
                             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;copy command: src=(</span><span class="si">{</span><span class="n">src_mode</span><span class="si">}</span><span class="s1">,</span><span class="si">{</span><span class="n">src_cmd</span><span class="si">}</span><span class="s1">) -&gt; tgt=(</span><span class="si">{</span><span class="n">tgt_mode</span><span class="si">}</span><span class="s1">,</span><span class="si">{</span><span class="n">tgt_cmd</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
