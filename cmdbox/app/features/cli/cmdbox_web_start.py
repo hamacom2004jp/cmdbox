@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import multiprocessing
 
 
 class WebStart(feature.UnsupportEdgeFeature):
@@ -88,6 +89,12 @@ class WebStart(feature.UnsupportEdgeFeature):
                 dict(opt="session_timeout", type=Options.T_INT, default="600", required=False, multi=False, hide=True, choice=None,
                      discription_ja="サインインしたユーザーのセッションタイムアウトの時間を秒で指定します。",
                      discription_en="Specify the session timeout in seconds for signed-in users."),
+                dict(opt="guvicorn_workers", type=Options.T_INT, default=multiprocessing.cpu_count()*2, required=False, multi=False, hide=True, choice=None,
+                     discription_ja="guvicornワーカー数を指定します。Linux環境でのみ有効です。-1又は未指定の場合はCPU数の2倍を使用します。",
+                     discription_en="Specifies the number of guvicorn workers, valid only in Linux environment. If -1 or unspecified, twice the number of CPUs is used."),
+                dict(opt="guvicorn_timeout", type=Options.T_INT, default=30, required=False, multi=False, hide=True, choice=None,
+                     discription_ja="guvicornワーカーのタイムアウトの時間を秒で指定します。",
+                     discription_en="Specify the timeout duration of the guvicorn worker in seconds."),
                 dict(opt="client_only", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
                      discription_ja="サーバーへの接続を行わないようにします。",
                      discription_en="Do not make connections to the server."),
@@ -158,7 +165,8 @@ class WebStart(feature.UnsupportEdgeFeature):
                     ssl_cert=ssl_cert, ssl_key=ssl_key, ssl_keypass=args.ssl_keypass, ssl_ca_certs=ssl_ca_certs,
                     session_domain=args.session_domain, session_path=args.session_path,
                     session_secure=args.session_secure, session_timeout=args.session_timeout,
-                    outputs_key=args.outputs_key)
+                    outputs_key=args.outputs_key, guvicorn_workers=args.guvicorn_workers, guvicorn_timeout=args.guvicorn_timeout)
+
             msg = dict(success="web complate.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 0, msg, w
