@@ -28,7 +28,10 @@ const view_raw_func = (title, result) => {
                             url.host = window.location.host;
                             const curl = val.replace(/^(curl.+[^(http)])(https?:\/\/[\w/:%#\$&\?\(\)~\.=\+\-]+)/, '$1');
                             const td = $(`<td>${curl}</td>`).appendTo(tr);
-                            const anc = $(`<a href="#">${url.href}</a>`).appendTo(td);
+                            const ctx_Path_mt = document.cookie.match(/Path=([^;]+)/);
+                            const ctx_Path = ctx_Path_mt && ctx_Path_mt.length>0 ? ctx_Path_mt[1] : '/';
+                            const href = `${url.protocol}//${url.host}${ctx_Path}${url.pathname.replace(new RegExp(`^${ctx_Path}`), '')}`;
+                            const anc = $(`<a href="#">${href}</a>`).appendTo(td);
                             anc.off('click').on('click', (e) => {
                                 if (!window.confirm(`May I execute '${title}' ?`)) return;
                                 window.open(url.href, '_blank');
