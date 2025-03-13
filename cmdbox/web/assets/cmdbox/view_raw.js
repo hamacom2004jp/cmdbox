@@ -25,16 +25,15 @@ const view_raw_func = (title, result) => {
                     try {
                         if (found) {
                             const url = URL.parse(val.replace(/curl.+[^(http)](https?:\/\/[\w/:%#\$&\?\(\)~\.=\+\-]+)/, '$1'));
-                            url.host = window.location.host;
                             const curl = val.replace(/^(curl.+[^(http)])(https?:\/\/[\w/:%#\$&\?\(\)~\.=\+\-]+)/, '$1');
                             const td = $(`<td>${curl}</td>`).appendTo(tr);
-                            const ctx_Path_mt = document.cookie.match(/Path=([^;]+)/);
+                            const ctx_Path_mt = document.cookie.match(/context_path="?([^;"]+)"?/);
                             const ctx_Path = ctx_Path_mt && ctx_Path_mt.length>0 ? ctx_Path_mt[1] : '/';
-                            const href = `${url.protocol}//${url.host}${ctx_Path}${url.pathname.replace(new RegExp(`^${ctx_Path}`), '')}`;
+                            const href = `${window.location.protocol}//${window.location.host}${ctx_Path}${url.pathname.replace(new RegExp(`^${ctx_Path}`), '')}`;
                             const anc = $(`<a href="#">${href}</a>`).appendTo(td);
                             anc.off('click').on('click', (e) => {
                                 if (!window.confirm(`May I execute '${title}' ?`)) return;
-                                window.open(url.href, '_blank');
+                                window.open(href, '_blank');
                             });
                             found = false;
                             continue;

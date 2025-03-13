@@ -60,7 +60,8 @@ class Colors:
     BackgroundWhite        = 107
 
     _colorize_suffix = S + str(ResetAll) + E
-    
+
+    product_word = re.compile(r"CMDBOX|IINFER|USOUND|GAIAN|GAIC|WITSHAPE", re.IGNORECASE)
     success_word = re.compile(r"SUCCESS|OK|PASSED|DONE|COMPLETE|START|FINISH|OPEN|CONNECTED|ALLOW|EXEC", re.IGNORECASE)
     warning_word = re.compile(r"WARNING|WARN|CAUTION|NOTICE|STOP|DISCONNECTED|DENY", re.IGNORECASE)
     error_word = re.compile(r"ERROR|ALERT|CRITICAL|FATAL|ABORT|FAILED", re.IGNORECASE)
@@ -72,6 +73,7 @@ def colorize_msg(msg) -> str:
     msg = Colors.success_word.sub(colorize(r"\g<0>", Colors.Green), msg)
     msg = Colors.warning_word.sub(colorize(r"\g<0>", Colors.Yellow), msg)
     msg = Colors.error_word.sub(colorize(r"\g<0>", Colors.Red), msg)
+    msg = Colors.product_word.sub(colorize(r"\g<0>", Colors.LightBlue), msg)
     return msg
 
 level_mapping = {

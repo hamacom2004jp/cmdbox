@@ -353,7 +353,7 @@ cmdbox.init_modal_button = () => {
   $('.btn_window').off('click').on('click', () => {
     $('.btn_window_stack').css('margin-left', 'auto').show();
     $('.btn_window').css('margin-left', '0px').hide();
-    $('.btn_window_stack').parents('.modal-dialog').addClass('modal-fullscreen');
+    $('.btn_window_stack').parents('.modal-dialog').css('top', '').css('left', '').addClass('modal-fullscreen');
   });
   $('.btn_window_stack').css('margin-left', '0px').hide();
   $('.btn_window').css('margin-left', 'auto').show();

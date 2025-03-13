@@ -1189,11 +1189,17 @@ class Web:
             self.logger.debug(f"web start parameter: guvicorn_timeout={self.guvicorn_timeout}")
 
         app = FastAPI()
+        @app.middleware("http")
+        async def set_context_cookie(req:Request, call_next):
+            res:Response = await call_next(req)
+            res.set_cookie("context_path", self.session_path, path=self.session_path, domain=self.session_domain)
+            return res
+
         mwparam = dict(path=self.session_path, max_age=self.session_timeout, secret_key=common.random_string())
         if self.session_domain is not None:
             mwparam['domain'] = self.session_domain
         if self.session_secure:
-            mwparam['https_only'] = True
+            mwparam['https_only'] = True # セッションハイジャック対策
         app.add_middleware(SessionMiddleware, **mwparam)
         self.init_webfeatures(app)
 
