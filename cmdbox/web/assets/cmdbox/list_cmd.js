@@ -71,6 +71,7 @@ const list_cmd_func_then = () => {
                 const target_name = row.opt;
                 let input_elem, elem;
                 if(!row.choice) {
+                    // 選択肢がない場合
                     if(row.type=='text') {
                         elem = $(cmd_modal.find('.row_content_template_text').html());
                     } else if(row.type=='dict') {
@@ -85,11 +86,16 @@ const list_cmd_func_then = () => {
                     input_elem.val(row.default);
                 }
                 else {
-                    elem = $(cmd_modal.find('.row_content_template_choice').html());
+                    // 選択肢がある場合
+                    if(row.type=='dict') {
+                        elem = $(cmd_modal.find('.row_content_template_dict_choice').html());
+                    } else {
+                        elem = $(cmd_modal.find('.row_content_template_choice').html());
+                    }
                     if (next_elem) next_elem.after(elem);
                     else row_content.append(elem);
-                    input_elem = elem.find('.row_content_template_select');
-                    input_elem.removeClass('row_content_template_select');
+                    input_elem = elem.find('.row_content_template_select,.row_content_template_input');
+                    input_elem.removeClass('row_content_template_select').removeClass('row_content_template_input');
                     if (row.choice_show) {
                         input_elem.addClass('choice_show');
                         input_elem.change(() => {
@@ -109,7 +115,7 @@ const list_cmd_func_then = () => {
                         });
                     }
                     input_elem.html(mkopt(row.choice));
-                    input_elem.val(`${row.default}`);
+                    input_elem.val(`${row.default!=null?row.default:''}`);
                 }
                 let index = 0;
                 if (cmd_modal.find(`[name="${target_name}"]`).length > 0) {
@@ -478,6 +484,7 @@ const get_param = (modal_elem) => {
                 $(elem).addClass('is-valid');
             }
         } else if (data_type=='dict') {
+            data_val = data_val ? data_val : '';
             if(data_val.indexOf(' ')>=0) $(elem).addClass('is-invalid');
             else {
                 $(elem).removeClass('is-invalid');
