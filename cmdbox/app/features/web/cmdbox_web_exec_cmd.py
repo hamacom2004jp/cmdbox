@@ -26,7 +26,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         @app.post('/exec_cmd/{title}')
         async def exec_cmd(req:Request, res:Response, title:str=None):
             try:
-                signin = web.check_signin(req, res)
+                signin = web.signin.check_signin(req, res)
                 if signin is not None:
                     raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
                 opt = None
@@ -114,7 +114,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         appcls = app.CmdBoxApp if appcls is None else appcls
         web.container['cmdbox_app'] = ap = appcls.getInstance(appcls=appcls, ver=self.ver)
         if 'mode' in opt and 'cmd' in opt:
-            if not web.check_cmd(req, res, opt['mode'], opt['cmd']):
+            if not web.signin.check_cmd(req, res, opt['mode'], opt['cmd']):
                 return dict(warn=f'Command "{title}" failed. Execute command denyed. mode={opt["mode"]}, cmd={opt["cmd"]}')
         if 'host' in opt: opt['host'] = web.redis_host
         if 'port' in opt: opt['port'] = web.redis_port

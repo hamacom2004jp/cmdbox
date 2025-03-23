@@ -130,6 +130,16 @@ Configuration items in `user_list.yml`
           signin_module:                # Specify the module name that implements the sign-in. see, cmdbox.app.signin.SignIn
           note:                         # Specify a description, such as a reference site for OAuth2 on GitHub.
           - https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes
+        azure:                          # OAuth2 settings for Azure AD.
+          enabled: false                # Specify whether to enable OAuth2 for Azure AD.
+          tenant_id: XXXXXXXXXXX        # Specify the tenant ID for Azure AD.
+          client_id: XXXXXXXXXXX        # Specify the OAuth2 client ID for Azure AD.
+          client_secret: XXXXXXXXXXX    # Specify the Azure AD OAuth2 client secret.
+          redirect_uri: https://localhost:8443/oauth2/azure/callback # Specify the OAuth2 redirect URI for Azure AD.
+          scope: ['openid', 'profile', 'email', 'https://graph.microsoft.com/mail.read']
+          signin_module:                # Specify the module name that implements the sign-in. see, cmdbox.app.signin.SignIn
+          note:                         # Specify a description, such as a reference site for Azure AD's OAuth2.
+          - https://learn.microsoft.com/ja-jp/entra/identity-platform/v2-oauth2-auth-code-flow
 
 
 - See also the contents of `.sample/sample_project/sample/extensions/user_list.yml`.

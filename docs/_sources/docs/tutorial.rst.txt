@@ -380,8 +380,9 @@ How to edit users and groups in Web mode
 
 - To enable `oauth2` in the cmdbox, set the `oauth2` entry in `.sample/user_list.yml`.
 - Below is an example of Google and GitHub settings.
-- `oauth2/providers/google/enabled` と `oauth2/providers/github/enabled` を `true` に設定します。
+- Set `oauth2/providers/google/enabled` and `oauth2/providers/github/enabled` and `oauth2/providers/azure/enabled` to `true`.
 - The `client_id` and `client_secret` should be obtained and set in each provider's configuration screen.
+- For Azure, the `tenant_id` must also be set.
 - The `redirect_uri` should be set to accept in each provider's configuration screen.
 - The `scope` is basically unchanged.
 

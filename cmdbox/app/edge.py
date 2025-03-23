@@ -149,6 +149,9 @@ class Edge(object):
                     msg = dict(warn=f"Please set the numeric value in the oauth2_port. oauth2_port={opt['oauth2_port']}")
                     return msg
                 opt['oauth2_port'] = int(opt['oauth2_port'])
+            if opt['oauth2'] == 'azure' and ('oauth2_tenant_id' not in opt or opt['oauth2_tenant_id'] is None):
+                msg = dict(warn=f"Please run the `edge config` command. And please set the oauth2_tenant_id.")
+                return msg
             if opt['auth_type'] == 'oauth2' and ('oauth2_client_id' not in opt or opt['oauth2_client_id'] is None):
                 msg = dict(warn=f"Please run the `edge config` command. And please set the oauth2_client_id.")
                 return msg
@@ -181,7 +184,8 @@ class Edge(object):
             if self.svcert_no_verify:
                 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
             status, msg = self.signin(opt['auth_type'], opt['user'], opt['password'], opt['apikey'],
-                                      opt['oauth2'], int(opt['oauth2_port']), opt['oauth2_client_id'], opt['oauth2_client_secret'],
+                                      opt['oauth2'], int(opt['oauth2_port']),
+                                      opt['oauth2_tenant_id'], opt['oauth2_client_id'], opt['oauth2_client_secret'],
                                       int(opt['oauth2_timeout']))
             if status != 0:
                 return msg
@@ -348,7 +352,7 @@ class Edge(object):
         return status, json.loads(res)
 
     def signin(self, auth_type:str, user:str, password:str, apikey:str,
-               oauth2:str, oauth2_port:int, oauth2_client_id:str, oauth2_client_secret:str,
+               oauth2:str, oauth2_port:int, oauth2_tenant_id:str, oauth2_client_id:str, oauth2_client_secret:str,
                oauth2_timeout:int) -> Tuple[int, Dict[str, Any]]:
         """
         サインインを行います
@@ -360,6 +364,7 @@ class Edge(object):
             apikey (str): APIキー
             oauth2 (str): OAuth2
             oauth2_port (int): OAuth2ポート
+            oauth2_tenant_id (str): OAuth2テナントID
             oauth2_client_id (str): OAuth2クライアントID
             oauth2_client_secret (str): OAuth2クライアントシークレット
             oauth2_timeout (int): OAuth2タイムアウト
@@ -543,6 +548,79 @@ class Edge(object):
                     time.sleep(1)
                 return 0, dict(success="Signin success.")
 
+
+            # Azure OAuth2を使用する場合
+            elif oauth2 == "azure":
+                if oauth2_tenant_id is None:
+                    return 1, dict(warn="Please specify the --oauth2_tenant_id option.")
+                if oauth2_client_id is None:
+                    return 1, dict(warn="Please specify the --oauth2_client_id option.")
+                if oauth2_client_secret is None:
+                    return 1, dict(warn="Please specify the --oauth2_client_secret option.")
+                if oauth2_timeout is None:
+                    return 1, dict(warn="Please specify the --oauth2_timeout option.")
+
+                redirect_uri = f'http://localhost:{oauth2_port}/oauth2/azure/callback'
+                # OAuth2認証のコールバックを受けるFastAPIサーバーを起動
+                fastapi = FastAPI()
+                @fastapi.get('/oauth2/azure/callback')
+                async def oauth2_azure_callback(req:Request):
+                    if req.query_params['state'] != 'edge':
+                        return dict(warn="Invalid state.")
+                    # アクセストークン取得
+                    headers = {'Content-Type': 'application/x-www-form-urlencoded',
+                               'Accept': 'application/json'}
+                    data = {'tenant': oauth2_tenant_id,
+                            'code': req.query_params['code'],
+                            'scope': " ".join(conf['scope']),
+                            'client_id': oauth2_client_id,
+                            'client_secret': oauth2_client_secret,
+                            'redirect_uri': redirect_uri,
+                            'grant_type': 'authorization_code'}
+                    query = '&'.join([f'{k}={urllib.parse.quote(v)}' for k, v in data.items()])
+                    try:
+                        token_resp = self.session.post(url=f'https://login.microsoftonline.com/{oauth2_tenant_id}/oauth2/v2.0/token', headers=headers, data=query,
+                                                       verify=not self.svcert_no_verify)
+                        token_resp.raise_for_status()
+                        token_json = token_resp.json()
+                        access_token = token_json['access_token']
+                        status, res, headers = self.site_request(self.session.get, f"/oauth2/azure/session/{access_token}/gui", ok_status=[200, 307])
+                        if status != 0 or headers.get('signin') is None:
+                            return dict(warn=f"Signin failed.")
+                        status, self.user_info = self.load_user_info()
+                        self.user_info['auth_type'] = auth_type
+                        self.user_info['access_token'] = access_token
+                        if status != 0: return status, res
+                        self.signed_in = True
+                        self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info)
+                        return dict(success="Signin success. Please close your browser.")
+                    except Exception as e:
+                        raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
+
+                if not hasattr(self, 'thUvicorn') or not self.thUvicorn.is_alive():
+                    self.thUvicorn = web.ThreadedUvicorn(config=Config(app=fastapi, host='localhost', port=oauth2_port))
+                    self.thUvicorn.start()
+                    time.sleep(1)
+
+                # OAuth2認証のリクエストを送信
+                data = {'scope': 'profile、openid、email',
+                        'access_type': 'offline',
+                        'response_type': 'code',
+                        'redirect_uri': redirect_uri,
+                        'client_id': oauth2_client_id,
+                        'response_mode': 'query',
+                        'state': 'edge'}
+                query = '&'.join([f'{k}={urllib.parse.quote(v)}' for k, v in data.items()])
+                webbrowser.open(f'https://login.microsoftonline.com/{oauth2_tenant_id}/oauth2/v2.0/authorize?{query}')
+
+                # 認証完了まで指定秒数待つ
+                tm = time.time()
+                while not self.signed_in:
+                    if time.time() - tm > oauth2_timeout:
+                        return 1, dict(warn="Signin Timeout.")
+                    time.sleep(1)
+                return 0, dict(success="Signin success.")
+
         return 1, dict(warn="unsupported auth_type.")
 
 class Tool(object):
@@ -698,5 +776,8 @@ class Tool(object):
             return 0, dict(success="Open browser.")
         elif self.user['auth_type'] == "oauth2" and self.oauth2 == 'github':
             webbrowser.open(f"{self.endpoint}/oauth2/github/session/{self.user['access_token']}/{path}")
+            return 0, dict(success="Open browser.")
+        elif self.user['auth_type'] == "oauth2" and self.oauth2 == 'azure':
+            webbrowser.open(f"{self.endpoint}/oauth2/azure/session/{self.user['access_token']}/{path}")
             return 0, dict(success="Open browser.")
         return 1, dict(warn="unsupported auth_type.")

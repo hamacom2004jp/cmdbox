@@ -19,7 +19,7 @@ class FilerUpload(cmdbox_web_exec_cmd.ExecCmd):
         """
         @app.post('/filer/upload', response_class=PlainTextResponse)
         async def filer_upload(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             return await self.filer_upload(web, req, res)

@@ -15,7 +15,7 @@ class Copyright(feature.WebFeature):
         """
         @app.get('/copyright', response_class=PlainTextResponse)
         async def copyright(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             return self.ver.__copyright__

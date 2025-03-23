@@ -23,7 +23,7 @@ class Result(feature.WebFeature):
 
         @app.post('/result/pub')
         async def result(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
             form = await req.form()
@@ -39,7 +39,7 @@ class Result(feature.WebFeature):
         @app.post('/result', response_class=HTMLResponse)
         @app.get('/result', response_class=HTMLResponse)
         async def result_html(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
             res.headers['Access-Control-Allow-Origin'] = '*'

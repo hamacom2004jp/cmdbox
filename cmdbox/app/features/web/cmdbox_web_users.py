@@ -1,10 +1,8 @@
-from cmdbox import version
-from cmdbox.app import common, feature
+from cmdbox.app import feature
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response, HTTPException
-from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
+from fastapi import FastAPI, Request, Response
+from fastapi.responses import HTMLResponse
 from typing import Dict, Any
-import logging
 
 
 class Users(feature.WebFeature):
@@ -26,7 +24,7 @@ class Users(feature.WebFeature):
         @app.get('/users', response_class=HTMLResponse)
         @app.post('/users', response_class=HTMLResponse)
         async def users(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
             res.headers['Access-Control-Allow-Origin'] = '*'
@@ -34,19 +32,19 @@ class Users(feature.WebFeature):
 
         @app.get('/users/list')
         async def users_list(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin_file_data is None:
+            if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
             return web.user_list(None)
 
         @app.post('/users/add')
         async def users_add(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin_file_data is None:
+            if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
@@ -57,10 +55,10 @@ class Users(feature.WebFeature):
 
         @app.post('/users/edit')
         async def users_edit(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin_file_data is None:
+            if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
@@ -71,10 +69,10 @@ class Users(feature.WebFeature):
 
         @app.post('/users/del')
         async def users_del(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin_file_data is None:
+            if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
@@ -87,10 +85,10 @@ class Users(feature.WebFeature):
 
         @app.post('/users/apikey/add')
         async def users_apikey_add(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin_file_data is None:
+            if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
@@ -101,10 +99,10 @@ class Users(feature.WebFeature):
 
         @app.post('/users/apikey/del')
         async def users_apikey_del(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin_file_data is None:
+            if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
@@ -115,10 +113,10 @@ class Users(feature.WebFeature):
 
         @app.get('/groups/list')
         async def groups_list(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin_file_data is None:
+            if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
             try:
                 return web.group_list(None)
@@ -127,10 +125,10 @@ class Users(feature.WebFeature):
 
         @app.post('/groups/add')
         async def groups_add(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin_file_data is None:
+            if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
@@ -141,10 +139,10 @@ class Users(feature.WebFeature):
 
         @app.post('/groups/edit')
         async def groups_edit(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin_file_data is None:
+            if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
@@ -155,10 +153,10 @@ class Users(feature.WebFeature):
 
         @app.post('/groups/del')
         async def groups_del(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin_file_data is None:
+            if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
@@ -171,46 +169,46 @@ class Users(feature.WebFeature):
 
         @app.get('/cmdrules/list')
         async def cmdrules_list(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin_file_data is None:
+            if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
             try:
-                return web.signin_file_data['cmdrule']
+                return web.signin.get_data()['cmdrule']
             except Exception as e:
                 return dict(error=str(e))
 
         @app.get('/pathrules/list')
         async def pathrules_list(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin_file_data is None:
+            if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
             try:
-                return web.signin_file_data['pathrule']
+                return web.signin.get_data()['pathrule']
             except Exception as e:
                 return dict(error=str(e))
 
         @app.get('/passsetting/list')
         async def passsetting_list(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin_file_data is None:
+            if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
             try:
-                return web.signin_file_data['password']
+                return web.signin.get_data()['password']
             except Exception as e:
                 return dict(error=str(e))
 
         @app.post('/password/change')
         async def password_change(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin_file_data is None:
+            if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:

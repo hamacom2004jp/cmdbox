@@ -35,7 +35,7 @@ class Gui(feature.WebFeature):
         @app.get('/gui', response_class=HTMLResponse)
         @app.post('/gui', response_class=HTMLResponse)
         async def gui(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
             res.headers['Access-Control-Allow-Origin'] = '*'
@@ -73,7 +73,7 @@ class Gui(feature.WebFeature):
         async def toolmenu(req:Request, res:Response):
             ret = dict()
             for k, v in web.toolmenu.items():
-                path_jadge = web.check_path(req, v['href'])
+                path_jadge = web.signin.check_path(req, v['href'])
                 if path_jadge is not None:
                     continue
                 ret[k] = v

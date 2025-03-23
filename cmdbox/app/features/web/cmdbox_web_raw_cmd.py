@@ -18,7 +18,7 @@ class RawCmd(cmdbox_web_gui.Gui):
         """
         @app.post('/gui/raw_cmd')
         async def raw_cmd(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             form = await req.form()

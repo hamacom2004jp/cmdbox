@@ -40,7 +40,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 token = convert.b64str2str(token)
                 token = json.loads(token)
                 name = token['user']
-                user = [u for u in web.signin_file_data['users'] if u['name'] == name]
+                user = [u for u in web.signin.get_data()['users'] if u['name'] == name]
                 if len(user) <= 0:
                     raise HTTPException(status_code=401, detail='Unauthorized')
                 user = user[0]
@@ -57,7 +57,7 @@ class DoSignin(cmdbox_web_signin.Signin):
             if not token_ok:
                 if name == '' or passwd == '':
                     return RedirectResponse(url=f'/signin/{next}?error=1')
-                user = [u for u in web.signin_file_data['users'] if u['name'] == name and u['hash'] != 'oauth2']
+                user = [u for u in web.signin.get_data()['users'] if u['name'] == name and u['hash'] != 'oauth2']
                 if len(user) <= 0:
                     return RedirectResponse(url=f'/signin/{next}?error=1')
                 user = user[0]
@@ -67,9 +67,9 @@ class DoSignin(cmdbox_web_signin.Signin):
             # ロックアウトチェック
             pass_miss_count = web.user_data(None, uid, name, 'password', 'pass_miss_count')
             pass_miss_count = 0 if pass_miss_count is None else int(pass_miss_count)
-            if 'password' in web.signin_file_data and web.signin_file_data['password']['lockout']['enabled']:
-                threshold = web.signin_file_data['password']['lockout']['threshold']
-                reset = web.signin_file_data['password']['lockout']['reset']
+            if 'password' in web.signin.get_data() and web.signin.get_data()['password']['lockout']['enabled']:
+                threshold = web.signin.get_data()['password']['lockout']['threshold']
+                reset = web.signin.get_data()['password']['lockout']['reset']
                 pass_miss_last = web.user_data(None, uid, name, 'password', 'pass_miss_last')
                 if pass_miss_last is None:
                     pass_miss_last = web.user_data(None, uid, name, 'password', 'pass_miss_last', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
@@ -95,17 +95,17 @@ class DoSignin(cmdbox_web_signin.Signin):
                     web.user_data(None, uid, name, 'password', 'pass_miss_count', pass_miss_count+1)
                     web.logger.warning(f'Failed to signin. name={name}, pass_miss_count={pass_miss_count+1}')
                     return RedirectResponse(url=f'/signin/{next}?error=1')
-            group_names = list(set(web.correct_group(user['groups'])))
-            gids = [g['gid'] for g in web.signin_file_data['groups'] if g['name'] in group_names]
+            group_names = list(set(web.signin.__class__.correct_group(web.signin.get_data(), user['groups'], None)))
+            gids = [g['gid'] for g in web.signin.get_data()['groups'] if g['name'] in group_names]
             email = user.get('email', '')
             # パスワード最終更新日時取得
             last_update = web.user_data(None, uid, name, 'password', 'last_update')
             notify_passchange = True if last_update is None else False
             # パスワード認証の場合はパスワード有効期限チェック
-            if user['hash']!='oauth2' and 'password' in web.signin_file_data and not notify_passchange:
+            if user['hash']!='oauth2' and 'password' in web.signin.get_data() and not notify_passchange:
                 last_update = datetime.datetime.strptime(last_update, '%Y-%m-%dT%H:%M:%S')
                 # パスワード有効期限
-                expiration = web.signin_file_data['password']['expiration']
+                expiration = web.signin.get_data()['password']['expiration']
                 if expiration['enabled']:
                     period = expiration['period']
                     notify = expiration['notify']
@@ -148,16 +148,20 @@ class DoSignin(cmdbox_web_signin.Signin):
                 web.logger.error(f'Failed to load signin. {e}', exc_info=True)
                 raise e
 
-        self.google_signin = signin.Signin(app, web.ver)
-        self.github_signin = signin.Signin(app, web.ver)
-        if web.signin_file_data is not None:
+        self.google_signin = signin.Signin(web.logger, web.signin_file, web.signin.get_data(), self.appcls, self.ver)
+        self.github_signin = signin.Signin(web.logger, web.signin_file, web.signin.get_data(), self.appcls, self.ver)
+        self.azure_signin = signin.Signin(web.logger, web.signin_file, web.signin.get_data(), self.appcls, self.ver)
+        if web.signin.get_data() is not None:
             # signinオブジェクトの指定があった場合読込む
-            if 'signin_module' in web.signin_file_data['oauth2']['providers']['google']:
-                sobj = _load_signin(web.signin_file_data['oauth2']['providers']['google']['signin_module'], self.appcls, self.ver)
+            if 'signin_module' in web.signin.get_data()['oauth2']['providers']['google']:
+                sobj = _load_signin(web.signin.get_data()['oauth2']['providers']['google']['signin_module'], self.appcls, self.ver)
                 self.google_signin = sobj if sobj is not None else self.google_signin
-            if 'signin_module' in web.signin_file_data['oauth2']['providers']['google']:
-                sobj = _load_signin(web.signin_file_data['oauth2']['providers']['github']['signin_module'], self.appcls, self.ver)
+            if 'signin_module' in web.signin.get_data()['oauth2']['providers']['github']:
+                sobj = _load_signin(web.signin.get_data()['oauth2']['providers']['github']['signin_module'], self.appcls, self.ver)
                 self.github_signin = sobj if sobj is not None else self.github_signin
+            if 'signin_module' in web.signin.get_data()['oauth2']['providers']['azure']:
+                sobj = _load_signin(web.signin.get_data()['oauth2']['providers']['azure']['signin_module'], self.appcls, self.ver)
+                self.azure_signin = sobj if sobj is not None else self.azure_signin
 
         def _set_session(req:Request, user:dict, email:str, hashed_password:str, access_token:str, group_names:list, gids:list):
             """
@@ -191,7 +195,7 @@ class DoSignin(cmdbox_web_signin.Signin):
 
         @app.get('/oauth2/google/callback')
         async def oauth2_google_callback(req:Request, res:Response):
-            conf = web.signin_file_data['oauth2']['providers']['google']
+            conf = web.signin.get_data()['oauth2']['providers']['google']
             headers = {'Content-Type': 'application/x-www-form-urlencoded'}
             next = req.query_params['state']
             data = {'code': req.query_params['code'],
@@ -206,7 +210,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 token_resp.raise_for_status()
                 token_json = token_resp.json()
                 access_token = token_json['access_token']
-                return await oauth2_google_session(next, access_token, req, res)
+                return await oauth2_google_session(access_token, next, req, res)
             except Exception as e:
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
                 raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
@@ -223,12 +227,11 @@ class DoSignin(cmdbox_web_signin.Signin):
                 user_info_json = user_info_resp.json()
                 email = user_info_json['email']
                 # サインイン判定
-                copy_signin_data = copy.deepcopy(web.signin_file_data)
-                jadge, user = self.google_signin.jadge(access_token, email, copy_signin_data)
+                jadge, user = self.google_signin.jadge(access_token, email)
                 if not jadge:
                     return RedirectResponse(url=f'/signin/{next}?error=appdeny')
                 # グループ取得
-                group_names, gids = self.google_signin.get_groups(access_token, user, copy_signin_data)
+                group_names, gids = self.google_signin.get_groups(access_token, user)
                 # セッションに保存
                 _set_session(req, user, email, None, access_token, group_names, gids)
                 return RedirectResponse(url=f'../../{next}', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス
@@ -238,7 +241,7 @@ class DoSignin(cmdbox_web_signin.Signin):
 
         @app.get('/oauth2/github/callback')
         async def oauth2_github_callback(req:Request, res:Response):
-            conf = web.signin_file_data['oauth2']['providers']['github']
+            conf = web.signin.get_data()['oauth2']['providers']['github']
             headers = {'Content-Type': 'application/x-www-form-urlencoded',
                        'Accept': 'application/json'}
             next = req.query_params['state']
@@ -253,7 +256,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 token_resp.raise_for_status()
                 token_json = token_resp.json()
                 access_token = token_json['access_token']
-                return await oauth2_github_session(next, access_token, req, res)
+                return await oauth2_github_session(access_token, next, req, res)
             except Exception as e:
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
                 raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
@@ -275,12 +278,62 @@ class DoSignin(cmdbox_web_signin.Signin):
                             email = u['email']
                             break
                 # サインイン判定
-                copy_signin_data = copy.deepcopy(web.signin_file_data)
-                jadge, user = self.github_signin.jadge(access_token, email, copy_signin_data)
+                jadge, user = self.github_signin.jadge(access_token, email)
                 if not jadge:
                     return RedirectResponse(url=f'/signin/{next}?error=appdeny')
                 # グループ取得
-                group_names, gids = self.github_signin.get_groups(access_token, user, copy_signin_data)
+                group_names, gids = self.github_signin.get_groups(access_token, user)
+                # セッションに保存
+                _set_session(req, user, email, None, access_token, group_names, gids)
+                return RedirectResponse(url=f'../../{next}', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス
+            except Exception as e:
+                web.logger.warning(f'Failed to get token. {e}', exc_info=True)
+                raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
+
+        @app.get('/oauth2/azure/callback')
+        async def oauth2_azure_callback(req:Request, res:Response):
+            conf = web.signin.get_data()['oauth2']['providers']['azure']
+            headers = {'Content-Type': 'application/x-www-form-urlencoded',
+                       'Accept': 'application/json'}
+            next = req.query_params['state']
+            data = {'tenant': conf['tenant_id'],
+                    'code': req.query_params['code'],
+                    'scope': " ".join(conf['scope']),
+                    'client_id': conf['client_id'],
+                    #'client_secret': conf['client_secret'],
+                    'redirect_uri': conf['redirect_uri'],
+                    'grant_type': 'authorization_code'}
+            query = '&'.join([f'{k}={urllib.parse.quote(v)}' for k, v in data.items()])
+            try:
+                # アクセストークン取得
+                token_resp = requests.post(url=f'https://login.microsoftonline.com/{conf["tenant_id"]}/oauth2/v2.0/token', headers=headers, data=query)
+                token_resp.raise_for_status()
+                token_json = token_resp.json()
+                access_token = token_json['access_token']
+                return await oauth2_azure_session(access_token, next, req, res)
+            except Exception as e:
+                web.logger.warning(f'Failed to get token. {e}', exc_info=True)
+                raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
+
+        @app.get('/oauth2/azure/session/{access_token}/{next}')
+        async def oauth2_azure_session(access_token:str, next:str, req:Request, res:Response):
+            try:
+                # ユーザー情報取得(email)
+                user_info_resp = requests.get(
+                    url='https://graph.microsoft.com/v1.0/me',
+                    #url='https://graph.microsoft.com/v1.0/me/transitiveMemberOf?$Top=999',
+                    headers={'Authorization': f'Bearer {access_token}'}
+                )
+                user_info_resp.raise_for_status()
+                user_info_json = user_info_resp.json()
+                if isinstance(user_info_json, dict):
+                    email = user_info_json.get('mail', 'notfound')
+                # サインイン判定
+                jadge, user = self.azure_signin.jadge(access_token, email)
+                if not jadge:
+                    return RedirectResponse(url=f'/signin/{next}?error=appdeny')
+                # グループ取得
+                group_names, gids = self.azure_signin.get_groups(access_token, user)
                 # セッションに保存
                 _set_session(req, user, email, None, access_token, group_names, gids)
                 return RedirectResponse(url=f'../../{next}', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス

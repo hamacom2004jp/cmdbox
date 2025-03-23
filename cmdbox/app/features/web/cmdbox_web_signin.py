@@ -1,5 +1,5 @@
 import urllib.parse
-from cmdbox.app import feature
+from cmdbox.app import feature, signin
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -15,7 +15,7 @@ class Signin(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        web.load_signin_file()
+        web.signin.signin_file_data = web.signin.load_signin_file(web.signin_file, web.signin.get_data())
         if web.signin_html is not None:
             if not web.signin_html.is_file():
                 raise HTTPException(status_code=500, detail=f'signin_html is not found. ({web.signin_html})')
@@ -24,8 +24,8 @@ class Signin(feature.WebFeature):
 
         @app.get('/signin/{next}', response_class=HTMLResponse)
         @app.post('/signin/{next}', response_class=HTMLResponse)
-        async def signin(next:str, req:Request, res:Response):
-            web.enable_cors(req, res)
+        async def _signin(next:str, req:Request, res:Response):
+            web.signin.enable_cors(req, res)
             res.headers['Access-Control-Allow-Origin'] = '*'
             return web.signin_html_data
 
@@ -34,7 +34,7 @@ class Signin(feature.WebFeature):
         async def oauth2_google(next:str, req:Request, res:Response):
             if web.signin_html_data is None:
                 return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
-            conf = web.signin_file_data['oauth2']['providers']['google']
+            conf = web.signin.get_data()['oauth2']['providers']['google']
             data = {'scope': ' '.join(conf['scope']),
                     'access_type': 'offline',
                     'response_type': 'code',
@@ -49,7 +49,7 @@ class Signin(feature.WebFeature):
         async def oauth2_github(next:str, req:Request, res:Response):
             if web.signin_html_data is None:
                 return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
-            conf = web.signin_file_data['oauth2']['providers']['github']
+            conf = web.signin.get_data()['oauth2']['providers']['github']
             data = {'scope': ' '.join(conf['scope']),
                     'access_type': 'offline',
                     'response_type': 'code',
@@ -59,9 +59,26 @@ class Signin(feature.WebFeature):
             query = '&'.join([f'{k}={urllib.parse.quote(v)}' for k, v in data.items()])
             return RedirectResponse(url=f'https://github.com/login/oauth/authorize?{query}')
 
+        # https://learn.microsoft.com/ja-jp/entra/identity-platform/v2-oauth2-auth-code-flow
+        @app.get('/oauth2/azure/{next}')
+        async def oauth2_azure(next:str, req:Request, res:Response):
+            if web.signin_html_data is None:
+                return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
+            conf = web.signin.get_data()['oauth2']['providers']['azure']
+            data = {'scope': ' '.join(conf['scope']),
+                    'access_type': 'offline',
+                    'response_type': 'code',
+                    'redirect_uri': conf['redirect_uri'],
+                    'client_id': conf['client_id'],
+                    'response_mode': 'query',
+                    'state': next}
+            query = '&'.join([f'{k}={urllib.parse.quote(v)}' for k, v in data.items()])
+            return RedirectResponse(url=f'https://login.microsoftonline.com/{conf["tenant_id"]}/oauth2/v2.0/authorize?{query}')
+
         @app.get('/oauth2/enabled')
         async def oauth2_enabled(req:Request, res:Response):
             if web.signin_html_data is None:
-                return dict(google=False, github=False)
-            return dict(google=web.signin_file_data['oauth2']['providers']['google']['enabled'],
-                        github=web.signin_file_data['oauth2']['providers']['github']['enabled'])
+                return dict(google=False, github=False, azure=False)
+            return dict(google=web.signin.get_data()['oauth2']['providers']['google']['enabled'],
+                        github=web.signin.get_data()['oauth2']['providers']['github']['enabled'],
+                        azure=web.signin.get_data()['oauth2']['providers']['azure']['enabled'],)

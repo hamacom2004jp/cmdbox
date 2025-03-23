@@ -1,8 +1,6 @@
-from cmdbox.app import common, feature
+from cmdbox.app import feature
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
-from typing import Dict, Any
-import json
 
 
 class LoadPin(feature.WebFeature):
@@ -16,7 +14,7 @@ class LoadPin(feature.WebFeature):
         """
         @app.post('/gui/load_cmd_pin')
         async def load_cmd_pin(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             if 'signin' not in req.session or req.session['signin'] is None:
@@ -31,7 +29,7 @@ class LoadPin(feature.WebFeature):
 
         @app.post('/gui/load_pipe_pin')
         async def load_pipe_pin(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             if 'signin' not in req.session or req.session['signin'] is None:

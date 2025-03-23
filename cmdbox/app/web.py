@@ -1,4 +1,4 @@
-from cmdbox.app import common, options
+from cmdbox.app import common, options, signin
 from cmdbox.app.commons import module
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import RedirectResponse
@@ -95,7 +95,6 @@ class Web:
         self.users_html_data = None
         self.assets_data = None
         self.signin_html_data = None
-        self.signin_file_data = None
         self.gui_mode = gui_mode
         self.web_features_packages = web_features_packages
         self.web_features_prefix = web_features_prefix
@@ -111,7 +110,8 @@ class Web:
         self.cb_queue = queue.Queue(1000)
         self.options = options.Options.getInstance()
         self.webcap_client = requests.Session()
-        self.load_signin_file()
+        signin_file_data = signin.Signin.load_signin_file(self.signin_file)
+        self.signin = signin.Signin(self.logger, self.signin_file, signin_file_data, self.appcls, self.ver)
         
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web init parameter: data={self.data} -> {self.data.absolute() if self.data is not None else None}")
@@ -133,233 +133,6 @@ class Web:
             self.logger.debug(f"web init parameter: cmds_path={self.cmds_path} -> {self.cmds_path.absolute() if self.cmds_path is not None else None}")
             self.logger.debug(f"web init parameter: pipes_path={self.pipes_path} -> {self.pipes_path.absolute() if self.pipes_path is not None else None}")
             self.logger.debug(f"web init parameter: users_path={self.users_path} -> {self.users_path.absolute() if self.users_path is not None else None}")
-
-    def enable_cors(self, req:Request, res:Response) -> None:
-        """
-        CORSを有効にする
-
-        Args:
-            req (Request): リクエスト
-            res (Response): レスポンス
-        """
-        if req is None or not 'Origin' in req.headers.keys():
-            return
-        res.headers['Access-Control-Allow-Origin'] = res.headers['Origin']
-
-    def check_apikey(self, req:Request, res:Response):
-        """
-        ApiKeyをチェックする
-
-        Args:
-            req (Request): リクエスト
-            res (Response): レスポンス
-
-        Returns:
-            Response: サインインエラーの場合はリダイレクトレスポンス
-        """
-        self.enable_cors(req, res)
-        if self.signin_file is None:
-            res.headers['signin'] = 'success'
-            return None
-        if self.signin_file_data is None:
-            raise ValueError(f'signin_file_data is None. ({self.signin_file})')
-        if 'Authorization' not in req.headers:
-            self.logger.warning(f"Authorization not found. headers={req.headers}")
-            return RedirectResponse(url=f'/signin{req.url.path}?error=noauth')
-        auth = req.headers['Authorization']
-        if not auth.startswith('Bearer '):
-            self.logger.warning(f"Bearer not found. headers={req.headers}")
-            return RedirectResponse(url=f'/signin{req.url.path}?error=apikeyfail')
-        bearer, apikey = auth.split(' ')
-        apikey = common.hash_password(apikey.strip(), 'sha1')
-        if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"hashed apikey: {apikey}")
-        find_user = None
-        self.load_signin_file() # サインインファイルの更新をチェック
-        for user in self.signin_file_data['users']:
-            if 'apikeys' not in user:
-                continue
-            for ak, key in user['apikeys'].items():
-                if apikey == key:
-                    find_user = user
-        if find_user is None:
-            self.logger.warning(f"No matching user found for apikey.")
-            return RedirectResponse(url=f'/signin{req.url.path}?error=apikeyfail')
-
-        group_names = list(set(self.correct_group(find_user['groups'])))
-        gids = [g['gid'] for g in self.signin_file_data['groups'] if g['name'] in group_names]
-        req.session['signin'] = dict(uid=find_user['uid'], name=find_user['name'], password=find_user['password'],
-                                     gids=gids, groups=group_names)
-        if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"find user: name={find_user['name']}, group_names={group_names}")
-        # パスルールチェック
-        user_groups = find_user['groups']
-        jadge = self.signin_file_data['pathrule']['policy']
-        for rule in self.signin_file_data['pathrule']['rules']:
-            if len([g for g in rule['groups'] if g in user_groups]) <= 0:
-                continue
-            if len([p for p in rule['paths'] if req.url.path.startswith(p)]) <= 0:
-                continue
-            jadge = rule['rule']
-        if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"rule: {req.url.path}: {jadge}")
-        if jadge == 'allow':
-            res.headers['signin'] = 'success'
-            return None
-        self.logger.warning(f"Unauthorized site. user={find_user['name']}, path={req.url.path}")
-        return RedirectResponse(url=f'/signin{req.url.path}?error=unauthorizedsite')
-
-    def check_signin(self, req:Request, res:Response):
-        """
-        サインインをチェックする
-
-        Args:
-            req (Request): リクエスト
-            res (Response): レスポンス
-
-        Returns:
-            Response: サインインエラーの場合はリダイレクトレスポンス
-        """
-        self.enable_cors(req, res)
-        if self.signin_file is None:
-            return None
-        if self.signin_file_data is None:
-            raise ValueError(f'signin_file_data is None. ({self.signin_file})')
-        if 'signin' in req.session:
-            self.load_signin_file() # サインインファイルの更新をチェック
-            path_jadge = self.check_path(req, req.url.path)
-            if path_jadge is not None:
-                return path_jadge
-            return None
-        self.logger.info(f"Not found siginin session. Try check_apikey. path={req.url.path}")
-        ret = self.check_apikey(req, res)
-        if ret is not None and self.logger.level == logging.DEBUG:
-            self.logger.debug(f"Not signed in.")
-        return ret
-
-    def check_path(self, req:Request, path:str):
-        if 'signin' not in req.session:
-            return None
-        path = path if path.startswith('/') else f'/{path}'
-        # パスルールチェック
-        user_groups = req.session['signin']['groups']
-        jadge = self.signin_file_data['pathrule']['policy']
-        for rule in self.signin_file_data['pathrule']['rules']:
-            if len([g for g in rule['groups'] if g in user_groups]) <= 0:
-                continue
-            if len([p for p in rule['paths'] if path.startswith(p)]) <= 0:
-                continue
-            jadge = rule['rule']
-        if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"rule: {path}: {jadge}")
-        if jadge == 'allow':
-            return None
-        else:
-            self.logger.warning(f"Unauthorized site. user={req.session['signin']['name']}, path={path}")
-            return RedirectResponse(url=f'/signin{path}?error=unauthorizedsite')
-
-    def check_cmd(self, req:Request, res:Response, mode:str, cmd:str):
-        if self.signin_file is None:
-            return True
-        if self.signin_file_data is None:
-            raise ValueError(f'signin_file_data is None. ({self.signin_file})')
-        if 'signin' not in req.session or 'groups' not in req.session['signin']:
-            return False
-        # コマンドチェック
-        user_groups = req.session['signin']['groups']
-        jadge = self.signin_file_data['cmdrule']['policy']
-        for rule in self.signin_file_data['cmdrule']['rules']:
-            if len([g for g in rule['groups'] if g in user_groups]) <= 0:
-                continue
-            if rule['mode'] is not None:
-                if rule['mode'] != mode:
-                    continue
-                if len([c for c in rule['cmds'] if cmd == c]) <= 0:
-                    continue
-            jadge = rule['rule']
-        if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"rule: mode={mode}, cmd={cmd}: {jadge}")
-        return jadge == 'allow'
-    
-    def get_enable_modes(self, req:Request, res:Response):
-        if self.signin_file is None:
-            return self.options.get_modes().copy()
-        if self.signin_file_data is None:
-            raise ValueError(f'signin_file_data is None. ({self.signin_file})')
-        if 'signin' not in req.session or 'groups' not in req.session['signin']:
-            return []
-        modes = self.options.get_modes().copy()
-        user_groups = req.session['signin']['groups']
-        jadge = self.signin_file_data['cmdrule']['policy']
-        jadge_modes = []
-        if jadge == 'allow':
-            for m in modes:
-                jadge_modes += list(m.keys()) if type(m) is dict else [m]
-        for rule in self.signin_file_data['cmdrule']['rules']:
-            if len([g for g in rule['groups'] if g in user_groups]) <= 0:
-                continue
-            if 'mode' not in rule:
-                continue
-            if rule['mode'] is not None:
-                if rule['rule'] == 'allow':
-                    jadge_modes.append(rule['mode'])
-                elif rule['rule'] == 'deny':
-                    jadge_modes.remove(rule['mode'])
-            elif rule['mode'] is None and len(rule['cmds']) <= 0:
-                if rule['rule'] == 'allow':
-                    for m in modes:
-                        jadge_modes += list(m.keys()) if type(m) is dict else [m]
-                elif rule['rule'] == 'deny':
-                    jadge_modes = []
-        return sorted(list(set(['']+jadge_modes)), key=lambda m: m)
-
-    def get_enable_cmds(self, mode:str, req:Request, res:Response):
-        if self.signin_file is None:
-            cmds = self.options.get_cmds(mode).copy()
-            return cmds
-        if self.signin_file_data is None:
-            raise ValueError(f'signin_file_data is None. ({self.signin_file})')
-        if 'signin' not in req.session or 'groups' not in req.session['signin']:
-            return []
-        cmds = self.options.get_cmds(mode).copy()
-        if mode == '':
-            return cmds
-        user_groups = req.session['signin']['groups']
-        jadge = self.signin_file_data['cmdrule']['policy']
-        jadge_cmds = []
-        if jadge == 'allow':
-            for c in cmds:
-                jadge_cmds += list(c.keys()) if type(c) is dict else [c]
-        for rule in self.signin_file_data['cmdrule']['rules']:
-            if len([g for g in rule['groups'] if g in user_groups]) <= 0:
-                continue
-            if 'mode' not in rule:
-                continue
-            if 'cmds' not in rule:
-                continue
-            if rule['mode'] is not None and rule['mode'] != mode:
-                continue
-            if len(rule['cmds']) > 0:
-                if rule['rule'] == 'allow':
-                    jadge_cmds += rule['cmds']
-                elif rule['rule'] == 'deny':
-                    for c in rule['cmds']:
-                        jadge_cmds.remove[c]
-            elif rule['mode'] is None and len(rule['cmds']) <= 0:
-                if rule['rule'] == 'allow':
-                    for c in cmds:
-                        jadge_cmds += list(c.keys()) if type(c) is dict else [c]
-                elif rule['rule'] == 'deny':
-                    jadge_cmds = []
-        return sorted(list(set(['']+jadge_cmds)), key=lambda c: c)
-
-    def correct_group(self, group_names, master_groups=None):
-        master_groups = self.signin_file_data['groups'] if master_groups is None else master_groups
-        gns = []
-        for gn in group_names.copy():
-            gns = [gr['name'] for gr in master_groups if 'parent' in gr and gr['parent']==gn]
-            gns += self.correct_group(gns, master_groups)
-        return group_names + gns
 
     def init_webfeatures(self, app:FastAPI):
         self.filemenu = dict()
@@ -393,270 +166,6 @@ class Web:
             for route in app.routes:
                 self.logger.debug(f"loaded webfeature: {route}")
 
-    def load_signin_file(self):
-        """
-        サインインファイルを読み込む
-
-        Raises:
-            HTTPException: サインインファイルのフォーマットエラー
-        """
-        if self.signin_file is not None:
-            if not self.signin_file.is_file():
-                raise HTTPException(status_code=500, detail=f'signin_file is not found. ({self.signin_file})')
-            # サインインファイル読込み済みなら返すが、別プロセスがサインインファイルを更新していたら読込みを実施する。
-            if not hasattr(self, 'signin_file_last'):
-                self.signin_file_last = self.signin_file.stat().st_mtime
-            if self.signin_file_last >= self.signin_file.stat().st_mtime and self.signin_file_data is not None:
-                return
-            self.signin_file_last = self.signin_file.stat().st_mtime
-            yml = common.load_yml(self.signin_file)
-            # usersのフォーマットチェック
-            if 'users' not in yml:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "users" not found. ({self.signin_file})')
-            uids = set()
-            unames = set()
-            groups = [g['name'] for g in yml['groups']]
-            for user in yml['users']:
-                if 'uid' not in user or user['uid'] is None:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "uid" not found or empty. ({self.signin_file})')
-                if user['uid'] in uids:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate uid found. ({self.signin_file}). uid={user["uid"]}')
-                if 'name' not in user or user['name'] is None:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "name" not found or empty. ({self.signin_file})')
-                if user['name'] in unames:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate name found. ({self.signin_file}). name={user["name"]}')
-                if 'password' not in user:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "password" not found or empty. ({self.signin_file})')
-                if 'hash' not in user or user['hash'] is None:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "hash" not found or empty. ({self.signin_file})')
-                if user['hash'] not in ['oauth2', 'plain', 'md5', 'sha1', 'sha256']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. Algorithms not supported. ({self.signin_file}). hash={user["hash"]} "oauth2", "plain", "md5", "sha1", "sha256" only.')
-                if 'groups' not in user or type(user['groups']) is not list:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found or not list type. ({self.signin_file})')
-                if len([ug for ug in user['groups'] if ug not in groups]) > 0:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. Group not found. ({self.signin_file}). {user["groups"]}')
-                uids.add(user['uid'])
-                unames.add(user['name'])
-            # groupsのフォーマットチェック
-            if 'groups' not in yml:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found. ({self.signin_file})')
-            gids = set()
-            gnames = set()
-            for group in yml['groups']:
-                if 'gid' not in group or group['gid'] is None:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "gid" not found or empty. ({self.signin_file})')
-                if group['gid'] in gids:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate gid found. ({self.signin_file}). gid={group["gid"]}')
-                if 'name' not in group or group['name'] is None:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "name" not found or empty. ({self.signin_file})')
-                if group['name'] in gnames:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate name found. ({self.signin_file}). name={group["name"]}')
-                if 'parent' in group:
-                    if group['parent'] not in groups:
-                        raise HTTPException(status_code=500, detail=f'signin_file format error. Parent group not found. ({self.signin_file}). parent={group["parent"]}')
-                gids.add(group['gid'])
-                gnames.add(group['name'])
-            # cmdruleのフォーマットチェック
-            if 'cmdrule' not in yml:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "cmdrule" not found. ({self.signin_file})')
-            if 'policy' not in yml['cmdrule']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "policy" not found in "cmdrule". ({self.signin_file})')
-            if yml['cmdrule']['policy'] not in ['allow', 'deny']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "policy" not supported in "cmdrule". ({self.signin_file}). "allow" or "deny" only.')
-            if 'rules' not in yml['cmdrule']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "rules" not found in "cmdrule". ({self.signin_file})')
-            if type(yml['cmdrule']['rules']) is not list:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "rules" not list type in "cmdrule". ({self.signin_file})')
-            for rule in yml['cmdrule']['rules']:
-                if 'groups' not in rule:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found in "cmdrule.rules" ({self.signin_file})')
-                if type(rule['groups']) is not list:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not list type in "cmdrule.rules". ({self.signin_file})')
-                rule['groups'] = list(set(copy.deepcopy(self.correct_group(rule['groups'], yml['groups']))))
-                if 'rule' not in rule:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "rule" not found in "cmdrule.rules" ({self.signin_file})')
-                if rule['rule'] not in ['allow', 'deny']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "rule" not supported in "cmdrule.rules". ({self.signin_file}). "allow" or "deny" only.')
-                if 'mode' not in rule:
-                    rule['mode'] = None
-                if 'cmds' not in rule:
-                    rule['cmds'] = []
-                if rule['mode'] is not None and len(rule['cmds']) <= 0:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. When “cmds” is specified, “mode” must be specified. ({self.signin_file})')
-                if type(rule['cmds']) is not list:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "cmds" not list type in "cmdrule.rules". ({self.signin_file})')
-            # pathruleのフォーマットチェック
-            if 'pathrule' not in yml:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "pathrule" not found. ({self.signin_file})')
-            if 'policy' not in yml['pathrule']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "policy" not found in "pathrule". ({self.signin_file})')
-            if yml['pathrule']['policy'] not in ['allow', 'deny']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "policy" not supported in "pathrule". ({self.signin_file}). "allow" or "deny" only.')
-            if 'rules' not in yml['pathrule']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "rules" not found in "pathrule". ({self.signin_file})')
-            if type(yml['pathrule']['rules']) is not list:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "rules" not list type in "pathrule". ({self.signin_file})')
-            for rule in yml['pathrule']['rules']:
-                if 'groups' not in rule:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found in "pathrule.rules" ({self.signin_file})')
-                if type(rule['groups']) is not list:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not list type in "pathrule.rules". ({self.signin_file})')
-                rule['groups'] = list(set(copy.deepcopy(self.correct_group(rule['groups'], yml['groups']))))
-                if 'rule' not in rule:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "rule" not found in "pathrule.rules" ({self.signin_file})')
-                if rule['rule'] not in ['allow', 'deny']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "rule" not supported in "pathrule.rules". ({self.signin_file}). "allow" or "deny" only.')
-                if 'paths' not in rule:
-                    rule['paths'] = []
-                if type(rule['paths']) is not list:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "paths" not list type in "pathrule.rules". ({self.signin_file})')
-            # passwordのフォーマットチェック
-            if 'password' in yml:
-                if 'policy' not in yml['password']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "policy" not found in "password". ({self.signin_file})')
-                if 'enabled' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "password.policy". ({self.signin_file})')
-                if type(yml['password']['policy']['enabled']) is not bool:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "password.policy". ({self.signin_file})')
-                if type(yml['password']['policy']['not_same_before']) is not bool:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "not_same_before" not bool type in "password.policy". ({self.signin_file})')
-                if 'min_length' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_length" not found in "password.policy". ({self.signin_file})')
-                if type(yml['password']['policy']['min_length']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_length" not int type in "password.policy". ({self.signin_file})')
-                if 'max_length' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "max_length" not found in "password.policy". ({self.signin_file})')
-                if type(yml['password']['policy']['max_length']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "max_length" not int type in "password.policy". ({self.signin_file})')
-                if 'min_lowercase' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_lowercase" not found in "password.policy". ({self.signin_file})')
-                if type(yml['password']['policy']['min_lowercase']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_lowercase" not int type in "password.policy". ({self.signin_file})')
-                if 'min_uppercase' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_uppercase" not found in "password.policy". ({self.signin_file})')
-                if type(yml['password']['policy']['min_uppercase']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_uppercase" not int type in "password.policy". ({self.signin_file})')
-                if 'min_digit' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_digit" not found in "password.policy". ({self.signin_file})')
-                if type(yml['password']['policy']['min_digit']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_digit" not int type in "password.policy". ({self.signin_file})')
-                if 'min_symbol' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_symbol" not found in "password.policy". ({self.signin_file})')
-                if type(yml['password']['policy']['min_symbol']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_symbol" not int type in "password.policy". ({self.signin_file})')
-                if 'not_contain_username' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "not_contain_username" not found in "password.policy". ({self.signin_file})')
-                if type(yml['password']['policy']['not_contain_username']) is not bool:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "not_contain_username" not bool type in "password.policy". ({self.signin_file})')
-                if 'expiration' not in yml['password']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "expiration" not found in "password". ({self.signin_file})')
-                if 'enabled' not in yml['password']['expiration']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "password.expiration". ({self.signin_file})')
-                if type(yml['password']['expiration']['enabled']) is not bool:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "password.expiration". ({self.signin_file})')
-                if 'period' not in yml['password']['expiration']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "period" not found in "password.expiration". ({self.signin_file})')
-                if type(yml['password']['expiration']['period']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "period" not int type in "password.expiration". ({self.signin_file})')
-                if 'notify' not in yml['password']['expiration']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "notify" not found in "password.expiration". ({self.signin_file})')
-                if type(yml['password']['expiration']['notify']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "notify" not int type in "password.expiration". ({self.signin_file})')
-                if 'lockout' not in yml['password']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "lockout" not found in "password". ({self.signin_file})')
-                if 'enabled' not in yml['password']['lockout']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "password.lockout". ({self.signin_file})')
-                if type(yml['password']['lockout']['enabled']) is not bool:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "password.lockout". ({self.signin_file})')
-                if 'threshold' not in yml['password']['lockout']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "threshold" not found in "password.lockout". ({self.signin_file})')
-                if type(yml['password']['lockout']['threshold']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "threshold" not int type in "password.lockout". ({self.signin_file})')
-                if 'reset' not in yml['password']['lockout']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "reset" not found in "password.lockout". ({self.signin_file})')
-                if type(yml['password']['lockout']['reset']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "reset" not int type in "password.lockout". ({self.signin_file})')
-            # oauth2のフォーマットチェック
-            if 'oauth2' not in yml:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "oauth2" not found. ({self.signin_file})')
-            if 'providers' not in yml['oauth2']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "providers" not found in "oauth2". ({self.signin_file})')
-            if 'google' not in yml['oauth2']['providers']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "google" not found in "providers". ({self.signin_file})')
-            if 'enabled' not in yml['oauth2']['providers']['google']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "google". ({self.signin_file})')
-            if type(yml['oauth2']['providers']['google']['enabled']) is not bool:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "google". ({self.signin_file})')
-            if 'client_id' not in yml['oauth2']['providers']['google']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "client_id" not found in "google". ({self.signin_file})')
-            if 'client_secret' not in yml['oauth2']['providers']['google']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "client_secret" not found in "google". ({self.signin_file})')
-            if 'redirect_uri' not in yml['oauth2']['providers']['google']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "redirect_uri" not found in "google". ({self.signin_file})')
-            if 'scope' not in yml['oauth2']['providers']['google']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not found in "google". ({self.signin_file})')
-            if type(yml['oauth2']['providers']['google']['scope']) is not list:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not list type in "google". ({self.signin_file})')
-            if 'github' not in yml['oauth2']['providers']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "github" not found in "providers". ({self.signin_file})')
-            if 'enabled' not in yml['oauth2']['providers']['github']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "github". ({self.signin_file})')
-            if type(yml['oauth2']['providers']['github']['enabled']) is not bool:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "github". ({self.signin_file})')
-            if 'client_id' not in yml['oauth2']['providers']['github']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "client_id" not found in "github". ({self.signin_file})')
-            if 'client_secret' not in yml['oauth2']['providers']['github']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "client_secret" not found in "github". ({self.signin_file})')
-            if 'redirect_uri' not in yml['oauth2']['providers']['github']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "redirect_uri" not found in "github". ({self.signin_file})')
-            if 'scope' not in yml['oauth2']['providers']['github']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not found in "github". ({self.signin_file})')
-            if type(yml['oauth2']['providers']['github']['scope']) is not list:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not list type in "github". ({self.signin_file})')
-            # フォーマットチェックOK
-            self.signin_file_data = yml
-
-    def check_password_policy(self, user_name:str, password:str, new_password:str) -> Tuple[bool, str]:
-        """
-        パスワードポリシーをチェックする
-
-        Args:
-            user_name (str): ユーザー名
-            password (str): 元パスワード
-            new_password (str): 新しいパスワード
-        Returns:
-            bool: True:ポリシーOK, False:ポリシーNG
-            str: メッセージ
-        """
-        if self.signin_file_data is None or 'password' not in self.signin_file_data:
-            return True, "There is no password policy set."
-        policy = self.signin_file_data['password']['policy']
-        if not policy['enabled']:
-            return True, "Password policy is disabled."
-        if policy['not_same_before'] and password == new_password:
-            self.logger.warning(f"Password policy error. The same password cannot be changed.")
-            return False, f"Password policy error. The same password cannot be changed."
-        if len(new_password) < policy['min_length'] or len(new_password) > policy['max_length']:
-            self.logger.warning(f"Password policy error. min_length={policy['min_length']}, max_length={policy['max_length']}")
-            return False, f"Password policy error. min_length={policy['min_length']}, max_length={policy['max_length']}"
-        if len([c for c in new_password if c.islower()]) < policy['min_lowercase']:
-            self.logger.warning(f"Password policy error. min_lowercase={policy['min_lowercase']}")
-            return False, f"Password policy error. min_lowercase={policy['min_lowercase']}"
-        if len([c for c in new_password if c.isupper()]) < policy['min_uppercase']:
-            self.logger.warning(f"Password policy error. min_uppercase={policy['min_uppercase']}")
-            return False, f"Password policy error. min_uppercase={policy['min_uppercase']}"
-        if len([c for c in new_password if c.isdigit()]) < policy['min_digit']:
-            self.logger.warning(f"Password policy error. min_digit={policy['min_digit']}")
-            return False, f"Password policy error. min_digit={policy['min_digit']}"
-        if len([c for c in new_password if c in string.punctuation]) < policy['min_symbol']:
-            self.logger.warning(f"Password policy error. min_symbol={policy['min_symbol']}")
-            return False, f"Password policy error. min_symbol={policy['min_symbol']}"
-        if policy['not_contain_username'] and (user_name is None or user_name in new_password):
-            self.logger.warning(f"Password policy error. not_contain_username=True")
-            return False, f"Password policy error. not_contain_username=True"
-        self.logger.info(f"Password policy OK.")
-        return True, "Password policy OK."
-    
     def change_password(self, user_name:str, password:str, new_password:str, confirm_password:str):
         """
         パスワードを変更する
@@ -670,7 +179,7 @@ class Web:
             HTTPException: パスワードが一致しない場合
             HTTPException: ユーザーが存在しない場合
         """
-        if self.signin_file_data is None:
+        if self.signin.get_data() is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -684,19 +193,19 @@ class Web:
             return dict(warn="Confirm password is empty.")
         if new_password != confirm_password:
             return dict(warn="Password does not match.")
-        for u in self.signin_file_data['users']:
+        for u in self.signin.get_data()['users']:
             if u['name'] == user_name:
                 p = password if u['hash'] == 'plain' else common.hash_password(password, u['hash'])
                 if u['password'] != p:
                     return dict(warn="Password does not match.")
-                jadge, msg = self.check_password_policy(user_name, password, new_password)
+                jadge, msg = self.signin.check_password_policy(user_name, password, new_password)
                 if not jadge:
                     return dict(warn=msg)
                 u['password'] = new_password if u['hash'] == 'plain' else common.hash_password(new_password, u['hash'])
                 # パスワード更新日時の保存
                 self.user_data(None, u['uid'], user_name, 'password', 'last_update', datetime.datetime.now())
                 # サインインファイルの保存
-                common.save_yml(self.signin_file, self.signin_file_data)
+                common.save_yml(self.signin_file, self.signin.get_data())
                 return dict(success="Password changed.")
         return dict(warn="User not found.")
 
@@ -710,12 +219,12 @@ class Web:
         Returns:
             List[Dict[str, Any]]: ユーザー一覧
         """
-        if self.signin_file_data is None:
+        if self.signin.get_data() is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
         ret = []
-        for u in copy.deepcopy(self.signin_file_data['users']):
+        for u in copy.deepcopy(self.signin.get_data()['users']):
             u['password'] = '********'
             if 'apikeys' in u:
                 u['apikeys'] = dict([(ak, '********') for ak in u['apikeys']])
@@ -741,7 +250,7 @@ class Web:
         Returns:
             str: ApiKey
         """
-        if self.signin_file_data is None:
+        if self.signin.get_data() is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -749,10 +258,10 @@ class Web:
             raise ValueError(f"User name is not found. ({user})")
         if 'apikey_name' not in user:
             raise ValueError(f"ApiKey name is not found. ({user})")
-        if len([u for u in self.signin_file_data['users'] if u['name'] == user['name']]) <= 0:
+        if len([u for u in self.signin.get_data()['users'] if u['name'] == user['name']]) <= 0:
             raise ValueError(f"User name is not exists. ({user})")
         apikey:str = None
-        for u in self.signin_file_data['users']:
+        for u in self.signin.get_data()['users']:
             if u['name'] == user['name']:
                 if 'apikeys' not in u:
                     u['apikeys'] = dict()
@@ -765,7 +274,7 @@ class Web:
             raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"apikey_add: {user} -> {self.signin_file}")
-        common.save_yml(self.signin_file, self.signin_file_data)
+        common.save_yml(self.signin_file, self.signin.get_data())
         return apikey
 
     def apikey_del(self, user:Dict[str, Any]):
@@ -775,7 +284,7 @@ class Web:
         Args:
             user (Dict[str, Any]): ユーザー情報
         """
-        if self.signin_file_data is None:
+        if self.signin.get_data() is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -783,10 +292,10 @@ class Web:
             raise ValueError(f"User name is not found. ({user})")
         if 'apikey_name' not in user:
             raise ValueError(f"ApiKey name is not found. ({user})")
-        if len([u for u in self.signin_file_data['users'] if u['name'] == user['name']]) <= 0:
+        if len([u for u in self.signin.get_data()['users'] if u['name'] == user['name']]) <= 0:
             raise ValueError(f"User name is not exists. ({user})")
         apikey:str = None
-        for u in self.signin_file_data['users']:
+        for u in self.signin.get_data()['users']:
             if u['name'] == user['name']:
                 if 'apikeys' not in u:
                     continue
@@ -803,7 +312,7 @@ class Web:
             raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"apikey_del: {user} -> {self.signin_file}")
-        common.save_yml(self.signin_file, self.signin_file_data)
+        common.save_yml(self.signin_file, self.signin.get_data())
 
     def user_add(self, user:Dict[str, Any]):
         """
@@ -812,7 +321,7 @@ class Web:
         Args:
             user (Dict[str, Any]): ユーザー情報
         """
-        if self.signin_file_data is None:
+        if self.signin.get_data() is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -838,26 +347,26 @@ class Web:
         for gn in user['groups']:
             if len(self.group_list(gn)) <= 0:
                 raise ValueError(f"Group is not found. ({gn})")
-        if len([u for u in self.signin_file_data['users'] if u['uid'] == user['uid']]) > 0:
+        if len([u for u in self.signin.get_data()['users'] if u['uid'] == user['uid']]) > 0:
             raise ValueError(f"User uid is already exists. ({user})")
-        if len([u for u in self.signin_file_data['users'] if u['name'] == user['name']]) > 0:
+        if len([u for u in self.signin.get_data()['users'] if u['name'] == user['name']]) > 0:
             raise ValueError(f"User name is already exists. ({user})")
         if hash not in ['oauth2', 'plain', 'md5', 'sha1', 'sha256']:
             raise ValueError(f"User hash is not supported. ({user})")
-        jadge, msg = self.check_password_policy(user['name'], '', user['password'])
+        jadge, msg = self.signin.check_password_policy(user['name'], '', user['password'])
         if not jadge:
             raise ValueError(msg)
         if hash != 'plain':
             user['password'] = common.hash_password(user['password'], hash if hash != 'oauth2' else 'sha1')
         else:
             user['password'] = user['password']
-        self.signin_file_data['users'].append(user)
+        self.signin.get_data()['users'].append(user)
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"user_add: {user} -> {self.signin_file}")
         # パスワード更新日時の保存
         self.user_data(None, user['uid'], user['name'], 'password', 'last_update', datetime.datetime.now())
         # サインインファイルの保存
-        common.save_yml(self.signin_file, self.signin_file_data)
+        common.save_yml(self.signin_file, self.signin.get_data())
 
     def user_edit(self, user:Dict[str, Any]):
         """
@@ -866,7 +375,7 @@ class Web:
         Args:
             user (Dict[str, Any]): ユーザー情報
         """
-        if self.signin_file_data is None:
+        if self.signin.get_data() is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -890,17 +399,17 @@ class Web:
         for gn in user['groups']:
             if len(self.group_list(gn)) <= 0:
                 raise ValueError(f"Group is not found. ({gn})")
-        if len([u for u in self.signin_file_data['users'] if u['uid'] == user['uid']]) <= 0:
+        if len([u for u in self.signin.get_data()['users'] if u['uid'] == user['uid']]) <= 0:
             raise ValueError(f"User uid is not found. ({user})")
-        if len([u for u in self.signin_file_data['users'] if u['name'] == user['name']]) <= 0:
+        if len([u for u in self.signin.get_data()['users'] if u['name'] == user['name']]) <= 0:
             raise ValueError(f"User name is not found. ({user})")
         if hash not in ['oauth2', 'plain', 'md5', 'sha1', 'sha256']:
             raise ValueError(f"User hash is not supported. ({user})")
-        for u in self.signin_file_data['users']:
+        for u in self.signin.get_data()['users']:
             if u['uid'] == user['uid']:
                 u['name'] = user['name']
                 if 'password' in user and user['password'] != '':
-                    jadge, msg = self.check_password_policy(user['name'], u['password'], user['password'])
+                    jadge, msg = self.signin.check_password_policy(user['name'], u['password'], user['password'])
                     if not jadge:
                         raise ValueError(msg)
                     if hash != 'plain':
@@ -915,7 +424,7 @@ class Web:
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"user_edit: {user} -> {self.signin_file}")
         # サインインファイルの保存
-        common.save_yml(self.signin_file, self.signin_file_data)
+        common.save_yml(self.signin_file, self.signin.get_data())
 
     def user_del(self, uid:int):
         """
@@ -924,7 +433,7 @@ class Web:
         Args:
             uid (int): ユーザーID
         """
-        if self.signin_file_data is None:
+        if self.signin.get_data() is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -932,13 +441,13 @@ class Web:
             uid = int(uid)
         except:
             raise ValueError(f"User uid is not number. ({uid})")
-        users = [u for u in self.signin_file_data['users'] if u['uid'] != uid]
-        if len(users) == len(self.signin_file_data['users']):
+        users = [u for u in self.signin.get_data()['users'] if u['uid'] != uid]
+        if len(users) == len(self.signin.get_data()['users']):
             raise ValueError(f"User uid is not found. ({uid})")
-        self.signin_file_data['users'] = users
+        self.signin.get_data()['users'] = users
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"user_del: {uid} -> {self.signin_file}")
-        common.save_yml(self.signin_file, self.signin_file_data)
+        common.save_yml(self.signin_file, self.signin.get_data())
 
     def group_list(self, name:str=None) -> List[Dict[str, Any]]:
         """
@@ -950,11 +459,11 @@ class Web:
         Returns:
             List[Dict[str, Any]]: グループ一覧
         """
-        if self.signin_file_data is None:
+        if self.signin.get_data() is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if name is None:
-            return copy.deepcopy(self.signin_file_data['groups'])
-        for g in copy.deepcopy(self.signin_file_data['groups']):
+            return copy.deepcopy(self.signin.get_data()['groups'])
+        for g in copy.deepcopy(self.signin.get_data()['groups']):
             if g['name'] == name:
                 return [g]
         return []
@@ -966,7 +475,7 @@ class Web:
         Args:
             group (Dict[str, Any]): グループ情報
         """
-        if self.signin_file_data is None:
+        if self.signin.get_data() is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -980,20 +489,20 @@ class Web:
             raise ValueError(f"Group name is not found. ({group})")
         if 'parent' in group and (group['parent'] is None or group['parent'] == ''):
             del group['parent']
-        elif 'parent' in group and group['parent'] not in [g['name'] for g in self.signin_file_data['groups']]:
+        elif 'parent' in group and group['parent'] not in [g['name'] for g in self.signin.get_data()['groups']]:
             raise ValueError(f"Group parent is not found. ({group})")
         if 'parent' in group and group['parent'] == group['name']:
             raise ValueError(f"Group parent is same as group name. ({group})")
-        if len([g for g in self.signin_file_data['groups'] if g['gid'] == group['gid']]) > 0:
+        if len([g for g in self.signin.get_data()['groups'] if g['gid'] == group['gid']]) > 0:
             raise ValueError(f"Group gid is already exists. ({group})")
-        if len([g for g in self.signin_file_data['groups'] if g['name'] == group['name']]) > 0:
+        if len([g for g in self.signin.get_data()['groups'] if g['name'] == group['name']]) > 0:
             raise ValueError(f"Group name is already exists. ({group})")
-        self.signin_file_data['groups'].append(group)
+        self.signin.get_data()['groups'].append(group)
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"group_add: {group} -> {self.signin_file}")
-        common.save_yml(self.signin_file, self.signin_file_data)
+        common.save_yml(self.signin_file, self.signin.get_data())
 
     def group_edit(self, group:Dict[str, Any]):
         """
@@ -1002,7 +511,7 @@ class Web:
         Args:
             group (Dict[str, Any]): グループ情報
         """
-        if self.signin_file_data is None:
+        if self.signin.get_data() is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -1016,15 +525,15 @@ class Web:
             raise ValueError(f"Group name is not found. ({group})")
         if 'parent' in group and (group['parent'] is None or group['parent'] == ''):
             del group['parent']
-        elif 'parent' in group and group['parent'] not in [g['name'] for g in self.signin_file_data['groups']]:
+        elif 'parent' in group and group['parent'] not in [g['name'] for g in self.signin.get_data()['groups']]:
             raise ValueError(f"Group parent is not found. ({group})")
         if 'parent' in group and group['parent'] == group['name']:
             raise ValueError(f"Group parent is same as group name. ({group})")
-        if len([g for g in self.signin_file_data['groups'] if g['gid'] == group['gid']]) <= 0:
+        if len([g for g in self.signin.get_data()['groups'] if g['gid'] == group['gid']]) <= 0:
             raise ValueError(f"Group gid is not found. ({group})")
-        if len([g for g in self.signin_file_data['groups'] if g['name'] == group['name']]) <= 0:
+        if len([g for g in self.signin.get_data()['groups'] if g['name'] == group['name']]) <= 0:
             raise ValueError(f"Group name is not found. ({group})")
-        for g in self.signin_file_data['groups']:
+        for g in self.signin.get_data()['groups']:
             if g['gid'] == group['gid']:
                 g['name'] = group['name']
                 g['parent'] = group['parent']
@@ -1032,7 +541,7 @@ class Web:
             raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"group_edit: {group} -> {self.signin_file}")
-        common.save_yml(self.signin_file, self.signin_file_data)
+        common.save_yml(self.signin_file, self.signin.get_data())
 
     def group_del(self, gid:int):
         """
@@ -1041,7 +550,7 @@ class Web:
         Args:
             gid (int): グループID
         """
-        if self.signin_file_data is None:
+        if self.signin.get_data() is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -1051,41 +560,41 @@ class Web:
             raise ValueError(f"Group gid is not number. ({gid})")
         # グループがユーザーに使用されているかチェック
         user_group_ids = []
-        for user in self.signin_file_data['users']:
+        for user in self.signin.get_data()['users']:
             for group in user['groups']:
-                user_group_ids += [g['gid'] for g in self.signin_file_data['groups'] if g['name'] == group]
+                user_group_ids += [g['gid'] for g in self.signin.get_data()['groups'] if g['name'] == group]
         if gid in user_group_ids:
             raise ValueError(f"Group gid is used by user. ({gid})")
         # グループが親グループに使用されているかチェック
         parent_group_ids = []
-        for group in self.signin_file_data['groups']:
+        for group in self.signin.get_data()['groups']:
             if 'parent' in group:
-                parent_group_ids += [g['gid'] for g in self.signin_file_data['groups'] if g['name'] == group['parent']]
+                parent_group_ids += [g['gid'] for g in self.signin.get_data()['groups'] if g['name'] == group['parent']]
         if gid in parent_group_ids:
             raise ValueError(f"Group gid is used by parent group. ({gid})")
         # グループがcmdruleグループに使用されているかチェック
         cmdrule_group_ids = []
-        for rule in self.signin_file_data['cmdrule']['rules']:
+        for rule in self.signin.get_data()['cmdrule']['rules']:
             for group in rule['groups']:
-                cmdrule_group_ids += [g['gid'] for g in self.signin_file_data['groups'] if g['name'] == group]
+                cmdrule_group_ids += [g['gid'] for g in self.signin.get_data()['groups'] if g['name'] == group]
         if gid in cmdrule_group_ids:
             raise ValueError(f"Group gid is used by cmdrule group. ({gid})")
         # グループがpathruleグループに使用されているかチェック
         pathrule_group_ids = []
-        for rule in self.signin_file_data['pathrule']['rules']:
+        for rule in self.signin.get_data()['pathrule']['rules']:
             for group in rule['groups']:
-                pathrule_group_ids += [g['gid'] for g in self.signin_file_data['groups'] if g['name'] == group]
+                pathrule_group_ids += [g['gid'] for g in self.signin.get_data()['groups'] if g['name'] == group]
         if gid in pathrule_group_ids:
             raise ValueError(f"Group gid is used by pathrule group. ({gid})")
 
         # グループ削除
-        groups = [g for g in self.signin_file_data['groups'] if g['gid'] != gid]
-        if len(groups) == len(self.signin_file_data['groups']):
+        groups = [g for g in self.signin.get_data()['groups'] if g['gid'] != gid]
+        if len(groups) == len(self.signin.get_data()['groups']):
             raise ValueError(f"Group gid is not found. ({gid})")
-        self.signin_file_data['groups'] = groups
+        self.signin.get_data()['groups'] = groups
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"group_del: {gid} -> {self.signin_file}")
-        common.save_yml(self.signin_file, self.signin_file_data)
+        common.save_yml(self.signin_file, self.signin.get_data())
 
     def user_data(self, req:Request, uid:str, user_name:str, categoly:str, key:str=None, val:Any=None, delkey:bool=False) -> Any:
         """

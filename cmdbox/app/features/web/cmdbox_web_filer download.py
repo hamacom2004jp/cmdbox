@@ -3,9 +3,8 @@ from cmdbox.app.commons import convert
 from cmdbox.app.features.web import cmdbox_web_exec_cmd
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.responses import StreamingResponse
 from pathlib import Path
-from typing import Dict, Any
 import io
 import urllib.parse
 
@@ -21,7 +20,7 @@ class FilerDownload(cmdbox_web_exec_cmd.ExecCmd):
         """
         @app.get('/filer/download/{constr:str}', response_class=StreamingResponse)
         async def filer_download(constr:str, req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             try:

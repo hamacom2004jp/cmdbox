@@ -15,7 +15,7 @@ class SavePin(feature.WebFeature):
         """
         @app.post('/gui/save_cmd_pin')
         async def save_cmd_pin(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             if 'signin' not in req.session or req.session['signin'] is None:
@@ -29,7 +29,7 @@ class SavePin(feature.WebFeature):
 
         @app.post('/gui/save_pipe_pin')
         async def save_pipe_pin(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             if 'signin' not in req.session or req.session['signin'] is None:

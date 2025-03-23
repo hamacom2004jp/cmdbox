@@ -15,7 +15,7 @@ class GetServerOpt(feature.WebFeature):
         """
         @app.get('/get_server_opt')
         async def get_server_opt(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             opt = dict(host=web.redis_host, port=web.redis_port, password=web.redis_password, svname=web.svname,

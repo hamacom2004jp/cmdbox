@@ -17,13 +17,13 @@ class ListCmd(feature.WebFeature):
         """
         @app.post('/gui/list_cmd')
         async def list_cmd(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             form = await req.form()
             kwd = form.get('kwd')
             ret = self.list_cmd(web, kwd)
-            ret = [r for r in ret if web.check_cmd(req, res, r['mode'], r['cmd'])]
+            ret = [r for r in ret if web.signin.check_cmd(req, res, r['mode'], r['cmd'])]
             return ret
 
     def list_cmd(self, web:Web, kwd:str) -> List[Dict[str, Any]]:

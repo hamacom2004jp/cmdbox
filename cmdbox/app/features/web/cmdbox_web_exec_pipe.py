@@ -29,7 +29,7 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
         async def exec_pipe(req:Request, res:Response, title:str=None):
             upfiles = dict()
             try:
-                signin = web.check_signin(req, res)
+                signin = web.signin.check_signin(req, res)
                 if signin is not None:
                     raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
                 opt = None
@@ -71,7 +71,7 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                             msg = f'Command "{cmd_title}" failed. This command is not available in web mode.'
                             self.callback_return_pipe_exec_func(web, title, dict(warn=msg))
                             raise HTTPException(401, detail=msg)
-                        if not web.check_cmd(req, res, cmd_opt['mode'], cmd_opt['cmd']):
+                        if not web.signin.check_cmd(req, res, cmd_opt['mode'], cmd_opt['cmd']):
                             msg = f'Command "{cmd_title}" failed. Execute command denyed. mode={cmd_opt["mode"]}, cmd={cmd_opt["cmd"]}'
                             self.callback_return_pipe_exec_func(web, title, dict(warn=msg))
                             raise HTTPException(401, detail=msg)

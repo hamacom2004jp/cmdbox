@@ -24,6 +24,7 @@ Set the edge mode. : `cmdbox -m edge -c config <Option>`
     "--apikey <apikey>","","Specify the APIKEY to connect to the endpoint."
     "--oauth2 <provider>","","Connect to the endpoint using OAuth2 authentication."
     "--oauth2_port <port>","","Specifies the callback port when OAuth2 authentication is used. If omitted, `8091` is used."
+    "--oauth2_tenant_id <tenant_id>","","Specifies the tenant ID when OAuth2 authentication is used."
     "--oauth2_client_id <client_id>","","Specifies the client ID when OAuth2 authentication is used."
     "--oauth2_client_secret <client_secret>","","Specifies the client secret when OAuth2 authentication is used."
     "--oauth2_timeout <sec>","","Specify the timeout period before OAuth2 authentication completes."

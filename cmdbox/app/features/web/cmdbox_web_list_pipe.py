@@ -17,7 +17,7 @@ class ListPipe(feature.WebFeature):
         """
         @app.post('/gui/list_pipe')
         async def list_pipe(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             form = await req.form()
@@ -57,4 +57,4 @@ class ListPipe(feature.WebFeature):
         opt = common.loadopt(web.cmds_path / f'cmd-{title}.json', True)
         if 'mode' not in opt or 'cmd' not in opt:
             return False
-        return web.check_cmd(req, res, opt['mode'], opt['cmd'])
+        return web.signin.check_cmd(req, res, opt['mode'], opt['cmd'])

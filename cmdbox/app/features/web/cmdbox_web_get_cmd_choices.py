@@ -14,7 +14,7 @@ class GetCmdChoices(feature.WebFeature):
         """
         @app.post('/gui/get_cmd_choices')
         async def get_cmd_choices(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             form = await req.form()

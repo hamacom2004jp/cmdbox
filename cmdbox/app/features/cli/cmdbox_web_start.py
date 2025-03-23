@@ -171,6 +171,7 @@ class WebStart(feature.UnsupportEdgeFeature):
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 0, msg, w
         except Exception as e:
+            logger.error(f"Web server start error. {e}", exc_info=True)
             msg = dict(warn=f"Web server start error. {e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, w
