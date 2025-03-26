@@ -20,6 +20,7 @@ Common Options
     "-s,--saveopt","","Save the specified options to the file specified by `-u`."
     "-d,--debug","","Starts in debug mode."
     "-f,--format","","Output the processing result in an easy-to-read format. If not specified, output in json format."
+    "-t,--tag","","Specify the tag for this command."
     "-o, --output_json <Destination file for processing result json>","","Specify the destination file for saving the processing result json."
     "-a, --output_json_append","","Save the processing result json file by appending."
     "--stdout_log","","Available only in GUI mode. Outputs standard output to Console log when executing commands."

@@ -1,4 +1,5 @@
-from cmdbox.app import common, signin
+from cmdbox.app import common
+from cmdbox.app.auth.signin import Signin
 from cmdbox.app.commons import convert
 from cmdbox.app.features.web import cmdbox_web_signin
 from cmdbox.app.web import Web
@@ -33,6 +34,7 @@ class DoSignin(cmdbox_web_signin.Signin):
             name = form.get('name')
             passwd = form.get('password')
             # edgeからtokenによる認証の場合
+            signin_data = web.signin.get_data()
             token_ok = False
             if token is not None:
                 if web.logger.level == logging.DEBUG:
@@ -40,7 +42,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 token = convert.b64str2str(token)
                 token = json.loads(token)
                 name = token['user']
-                user = [u for u in web.signin.get_data()['users'] if u['name'] == name]
+                user = [u for u in signin_data['users'] if u['name'] == name]
                 if len(user) <= 0:
                     raise HTTPException(status_code=401, detail='Unauthorized')
                 user = user[0]
@@ -57,7 +59,7 @@ class DoSignin(cmdbox_web_signin.Signin):
             if not token_ok:
                 if name == '' or passwd == '':
                     return RedirectResponse(url=f'/signin/{next}?error=1')
-                user = [u for u in web.signin.get_data()['users'] if u['name'] == name and u['hash'] != 'oauth2']
+                user = [u for u in signin_data['users'] if u['name'] == name and u['hash'] != 'oauth2']
                 if len(user) <= 0:
                     return RedirectResponse(url=f'/signin/{next}?error=1')
                 user = user[0]
@@ -67,9 +69,9 @@ class DoSignin(cmdbox_web_signin.Signin):
             # ロックアウトチェック
             pass_miss_count = web.user_data(None, uid, name, 'password', 'pass_miss_count')
             pass_miss_count = 0 if pass_miss_count is None else int(pass_miss_count)
-            if 'password' in web.signin.get_data() and web.signin.get_data()['password']['lockout']['enabled']:
-                threshold = web.signin.get_data()['password']['lockout']['threshold']
-                reset = web.signin.get_data()['password']['lockout']['reset']
+            if 'password' in signin_data and signin_data['password']['lockout']['enabled']:
+                threshold = signin_data['password']['lockout']['threshold']
+                reset = signin_data['password']['lockout']['reset']
                 pass_miss_last = web.user_data(None, uid, name, 'password', 'pass_miss_last')
                 if pass_miss_last is None:
                     pass_miss_last = web.user_data(None, uid, name, 'password', 'pass_miss_last', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
@@ -95,17 +97,17 @@ class DoSignin(cmdbox_web_signin.Signin):
                     web.user_data(None, uid, name, 'password', 'pass_miss_count', pass_miss_count+1)
                     web.logger.warning(f'Failed to signin. name={name}, pass_miss_count={pass_miss_count+1}')
                     return RedirectResponse(url=f'/signin/{next}?error=1')
-            group_names = list(set(web.signin.__class__.correct_group(web.signin.get_data(), user['groups'], None)))
-            gids = [g['gid'] for g in web.signin.get_data()['groups'] if g['name'] in group_names]
+            group_names = list(set(web.signin.__class__.correct_group(signin_data, user['groups'], None)))
+            gids = [g['gid'] for g in signin_data['groups'] if g['name'] in group_names]
             email = user.get('email', '')
             # パスワード最終更新日時取得
             last_update = web.user_data(None, uid, name, 'password', 'last_update')
             notify_passchange = True if last_update is None else False
             # パスワード認証の場合はパスワード有効期限チェック
-            if user['hash']!='oauth2' and 'password' in web.signin.get_data() and not notify_passchange:
+            if user['hash']!='oauth2' and 'password' in signin_data and not notify_passchange:
                 last_update = datetime.datetime.strptime(last_update, '%Y-%m-%dT%H:%M:%S')
                 # パスワード有効期限
-                expiration = web.signin.get_data()['password']['expiration']
+                expiration = signin_data['password']['expiration']
                 if expiration['enabled']:
                     period = expiration['period']
                     notify = expiration['notify']
@@ -122,7 +124,7 @@ class DoSignin(cmdbox_web_signin.Signin):
             next = f"../{next}" if token_ok else next
             return RedirectResponse(url=f'../{next}{"?warn=passchange" if notify_passchange else ""}', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス
 
-        def _load_signin(signin_module:str, appcls, ver):
+        def _load_signin(web:Web, signin_module:str, appcls, ver):
             """
             サインインオブジェクトを読込む
             
@@ -138,29 +140,30 @@ class DoSignin(cmdbox_web_signin.Signin):
             try:
                 mod = importlib.import_module(signin_module)
                 members = inspect.getmembers(mod, inspect.isclass)
+                signin_data = web.signin.get_data()
                 for name, cls in members:
-                    if cls is not signin.Signin or not issubclass(cls, signin.Signin):
-                        continue
-                    sobj = cls(appcls, ver)
-                    return sobj
+                    if cls is Signin or issubclass(cls, Signin):
+                        sobj = cls(web.logger, web.signin_file, signin_data, appcls, ver)
+                        return sobj
                 return None
             except Exception as e:
                 web.logger.error(f'Failed to load signin. {e}', exc_info=True)
                 raise e
 
-        self.google_signin = signin.Signin(web.logger, web.signin_file, web.signin.get_data(), self.appcls, self.ver)
-        self.github_signin = signin.Signin(web.logger, web.signin_file, web.signin.get_data(), self.appcls, self.ver)
-        self.azure_signin = signin.Signin(web.logger, web.signin_file, web.signin.get_data(), self.appcls, self.ver)
-        if web.signin.get_data() is not None:
+        signin_data = web.signin.get_data()
+        self.google_signin = Signin(web.logger, web.signin_file, signin_data, self.appcls, self.ver)
+        self.github_signin = Signin(web.logger, web.signin_file, signin_data, self.appcls, self.ver)
+        self.azure_signin = Signin(web.logger, web.signin_file, signin_data, self.appcls, self.ver)
+        if signin_data is not None:
             # signinオブジェクトの指定があった場合読込む
-            if 'signin_module' in web.signin.get_data()['oauth2']['providers']['google']:
-                sobj = _load_signin(web.signin.get_data()['oauth2']['providers']['google']['signin_module'], self.appcls, self.ver)
+            if 'signin_module' in signin_data['oauth2']['providers']['google']:
+                sobj = _load_signin(web, signin_data['oauth2']['providers']['google']['signin_module'], self.appcls, self.ver)
                 self.google_signin = sobj if sobj is not None else self.google_signin
-            if 'signin_module' in web.signin.get_data()['oauth2']['providers']['github']:
-                sobj = _load_signin(web.signin.get_data()['oauth2']['providers']['github']['signin_module'], self.appcls, self.ver)
+            if 'signin_module' in signin_data['oauth2']['providers']['github']:
+                sobj = _load_signin(web, signin_data['oauth2']['providers']['github']['signin_module'], self.appcls, self.ver)
                 self.github_signin = sobj if sobj is not None else self.github_signin
-            if 'signin_module' in web.signin.get_data()['oauth2']['providers']['azure']:
-                sobj = _load_signin(web.signin.get_data()['oauth2']['providers']['azure']['signin_module'], self.appcls, self.ver)
+            if 'signin_module' in signin_data['oauth2']['providers']['azure']:
+                sobj = _load_signin(web, signin_data['oauth2']['providers']['azure']['signin_module'], self.appcls, self.ver)
                 self.azure_signin = sobj if sobj is not None else self.azure_signin
 
         def _set_session(req:Request, user:dict, email:str, hashed_password:str, access_token:str, group_names:list, gids:list):

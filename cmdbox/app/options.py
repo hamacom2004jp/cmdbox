@@ -274,18 +274,16 @@ class Options:
             discription_ja="コマンドを指定します。",
             discription_en="Specify the command.",
             choice=[])
-        self._options["output_json"] = dict(
-            short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
-            discription_ja="処理結果jsonの保存先ファイルを指定。",
-            discription_en="Specify the destination file for saving the processing result json.")
-        self._options["output_json_append"] = dict(
-            short="a", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
-            discription_ja="処理結果jsonファイルを追記保存します。",
-            discription_en="Save the processing result json file by appending.")
+        self._options["tag"] = dict(
+            short="t", type=Options.T_STR, default=None, required=False, multi=True, hide=True,
+            discription_ja="このコマンドのタグを指定します。",
+            discription_en="Specify the tag for this command.",
+            choice=None)
 
     def init_debugoption(self):
         # デバックオプションを追加
         self._options["debug"]["opt"] = "debug"
+        self._options["tag"]["opt"] = "tag"
         for key, mode in self._options["cmd"].items():
             if type(mode) is not dict:
                 continue
@@ -296,6 +294,8 @@ class Options:
                 c["opt"] = k
                 if "debug" not in [_o['opt'] for _o in c["choice"]]:
                     c["choice"].append(self._options["debug"])
+                if "tag" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["tag"])
                 if c["opt"] not in [_o['opt'] for _o in self._options["cmd"]["choice"]]:
                     self._options["cmd"]["choice"] += [c]
             self._options["mode"][key] = mode

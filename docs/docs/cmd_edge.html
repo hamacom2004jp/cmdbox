@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( edge mode ) &mdash; cmdbox 2025/03/09 documentation</title>
+  <title>Command Reference ( edge mode ) &mdash; cmdbox 2025/03/26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=31affa16"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=102af95c"></script>
       <script src="../_static/doctools.js?v=888ff710"></script>
       <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -145,27 +145,31 @@
 <td></td>
 <td><p>Specifies the callback port when OAuth2 authentication is used. If omitted, <cite>8091</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--oauth2_client_id &lt;client_id&gt;</p></td>
+<tr class="row-even"><td><p>--oauth2_tenant_id &lt;tenant_id&gt;</p></td>
+<td></td>
+<td><p>Specifies the tenant ID when OAuth2 authentication is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--oauth2_client_id &lt;client_id&gt;</p></td>
 <td></td>
 <td><p>Specifies the client ID when OAuth2 authentication is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--oauth2_client_secret &lt;client_secret&gt;</p></td>
+<tr class="row-even"><td><p>--oauth2_client_secret &lt;client_secret&gt;</p></td>
 <td></td>
 <td><p>Specifies the client secret when OAuth2 authentication is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--oauth2_timeout &lt;sec&gt;</p></td>
+<tr class="row-odd"><td><p>--oauth2_timeout &lt;sec&gt;</p></td>
 <td></td>
 <td><p>Specify the timeout period before OAuth2 authentication completes.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--data &lt;path&gt;</p></td>
+<tr class="row-even"><td><p>--data &lt;path&gt;</p></td>
 <td></td>
 <td><p>When omitted, <cite>$HONE/.{self.ver.__appid__}</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--svcert_no_verify</p></td>
+<tr class="row-odd"><td><p>--svcert_no_verify</p></td>
 <td></td>
 <td><p>Do not verify server certificates during HTTPS requests.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;sec&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;sec&gt;</p></td>
 <td></td>
 <td><p>Specifies the timeout period before the request completes.</p></td>
 </tr>

@@ -141,7 +141,10 @@ Web Service Launch : `cmdbox -m web -c start <Option>`
     "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required."
     "--session_domain <domain>","","Specify the domain for which the signed-in user's session is valid."
     "--session_path <path>","","Specify the session timeout in seconds for signed-in users."
+    "--session_secure","","Set the Secure flag for the signed-in user's session."
     "--session_timeout <second>","","Specify the session timeout in seconds for signed-in users."
+    "--guvicorn_workers <second>","","Specifies the number of guvicorn workers, valid only in Linux environment. If -1 or unspecified, twice the number of CPUs is used."
+    "--guvicorn_timeout <second>","","Specify the timeout duration of the guvicorn worker in seconds."
     "--client_only","","Do not make connections to the server."
     "--outputs_key <output key>","","Specify items to be displayed on the showimg and webcap screens. If omitted, all items are displayed."
     "--doc_root <document root path>","","Document root for custom files. URL mapping from the path of a folder-specified custom file with the path of doc_root removed."
@@ -151,6 +154,7 @@ Web Service Launch : `cmdbox -m web -c start <Option>`
     "--users_html <users.html file path>","","Specify `users.html`. If omitted, the cmdbox built-in HTML file is used."
     "--assets <Path to js and css files>","","Specify the asset file required when using html files."
     "--signin_html <signin.html file path>","","Specify `signin.html`. If omitted, the cmdbox built-in HTML file is used."
+
 
 Web Service Stops : `cmdbox -m web -c stop <Option>`
 ==============================================================================

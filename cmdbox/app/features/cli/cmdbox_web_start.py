@@ -86,7 +86,7 @@ class WebStart(feature.UnsupportEdgeFeature):
                 dict(opt="session_secure", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
                      discription_ja="サインインしたユーザーのセッションにSecureフラグを設定します。",
                      discription_en="Set the Secure flag for the signed-in user's session."),
-                dict(opt="session_timeout", type=Options.T_INT, default="600", required=False, multi=False, hide=True, choice=None,
+                dict(opt="session_timeout", type=Options.T_INT, default="900", required=False, multi=False, hide=True, choice=None,
                      discription_ja="サインインしたユーザーのセッションタイムアウトの時間を秒で指定します。",
                      discription_en="Specify the session timeout in seconds for signed-in users."),
                 dict(opt="guvicorn_workers", type=Options.T_INT, default=multiprocessing.cpu_count()*2, required=False, multi=False, hide=True, choice=None,

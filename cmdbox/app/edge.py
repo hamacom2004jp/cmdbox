@@ -248,7 +248,7 @@ class Edge(object):
             resq:queue.Queue = pipe_cmd['resq']
             del pipe_cmd['resq']
             tool = Tool(self.logger, self.appcls, self.ver)
-            tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info)
+            tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2)
             feat:feature.Feature = self.options.get_cmd_attr(pipe_cmd['mode'], pipe_cmd['cmd'], 'feature')
             while not thevent.is_set():
                 prevres = None if prevq is None else prevq.get(pipe_cmd['timeout'])
@@ -305,7 +305,7 @@ class Edge(object):
                 def mkcmd(opt):
                     def _ex():
                         tool = Tool(self.logger, self.appcls, self.ver)
-                        tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info)
+                        tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2)
                         feat:feature.Feature = self.options.get_cmd_attr(opt['mode'], opt['cmd'], 'feature')
                         for status, ret in feat.edgerun(opt, tool, self.logger, self.timeout):
                             pass
@@ -374,13 +374,14 @@ class Edge(object):
         """
         self.session = requests.Session()
         self.signed_in = False
+        self.oauth2 = oauth2
         if auth_type == "noauth":
             status, res, _ = self.site_request(self.session.get, "/gui")
             if status != 0: return status, res
             status, self.user_info = self.load_user_info()
             self.user_info['auth_type'] = auth_type
             if status != 0: return status, res
-            self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info)
+            self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2)
             return 0, dict(success="No auth.")
 
         # ID/PW認証を使用する場合
@@ -397,7 +398,7 @@ class Edge(object):
             self.user_info['auth_type'] = auth_type
             self.user_info['password'] = password
             if status != 0: return status, res
-            self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info)
+            self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2)
             return 0, dict(success="Signin Success.")
 
         # APIKEY認証を使用する場合
@@ -412,7 +413,7 @@ class Edge(object):
             self.user_info['auth_type'] = auth_type
             self.user_info['apikey'] = apikey
             if status != 0: return status, res
-            self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info)
+            self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2)
             return 0, dict(success="Signin Success.")
 
         # OAuth2認証を使用する場合
@@ -454,7 +455,7 @@ class Edge(object):
                         self.user_info['access_token'] = access_token
                         if status != 0: return status, res
                         self.signed_in = True
-                        self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info)
+                        self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2)
                         return dict(success="Signin success. Please close your browser.")
                     except Exception as e:
                         raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
@@ -520,7 +521,7 @@ class Edge(object):
                         self.user_info['access_token'] = access_token
                         if status != 0: return status, res
                         self.signed_in = True
-                        self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info)
+                        self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2)
                         return dict(success="Signin success. Please close your browser.")
                     except Exception as e:
                         raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
@@ -572,9 +573,9 @@ class Edge(object):
                                'Accept': 'application/json'}
                     data = {'tenant': oauth2_tenant_id,
                             'code': req.query_params['code'],
-                            'scope': " ".join(conf['scope']),
+                            'scope': " ".join(['openid', 'profile', 'email']),
                             'client_id': oauth2_client_id,
-                            'client_secret': oauth2_client_secret,
+                            #'client_secret': oauth2_client_secret,
                             'redirect_uri': redirect_uri,
                             'grant_type': 'authorization_code'}
                     query = '&'.join([f'{k}={urllib.parse.quote(v)}' for k, v in data.items()])
@@ -592,18 +593,18 @@ class Edge(object):
                         self.user_info['access_token'] = access_token
                         if status != 0: return status, res
                         self.signed_in = True
-                        self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info)
+                        self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2)
                         return dict(success="Signin success. Please close your browser.")
                     except Exception as e:
                         raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
 
                 if not hasattr(self, 'thUvicorn') or not self.thUvicorn.is_alive():
-                    self.thUvicorn = web.ThreadedUvicorn(config=Config(app=fastapi, host='localhost', port=oauth2_port))
+                    self.thUvicorn = web.ThreadedUvicorn(self.logger, Config(app=fastapi, host='localhost', port=oauth2_port), {})
                     self.thUvicorn.start()
                     time.sleep(1)
 
                 # OAuth2認証のリクエストを送信
-                data = {'scope': 'profile、openid、email',
+                data = {'scope': " ".join(['openid', 'profile', 'email']),
                         'access_type': 'offline',
                         'response_type': 'code',
                         'redirect_uri': redirect_uri,
@@ -656,7 +657,7 @@ class Tool(object):
         except Exception as e:
             self.logger.error(f"notify error. {e}", exc_info=True)
 
-    def set_session(self, session:requests.Session, svcert_no_verify:bool, endpoint:str, icon_path:Path, user_info:Dict[str, Any]):
+    def set_session(self, session:requests.Session, svcert_no_verify:bool, endpoint:str, icon_path:Path, user_info:Dict[str, Any], oauth2:str):
         """
         セッションを設定します
 
@@ -666,12 +667,14 @@ class Tool(object):
             endpoint (str): エンドポイント
             icon_path (Path): アイコン画像のパス
             user_info (Dict[str, Any]): ユーザー情報
+            oauth2 (str): OAuth2
         """
         self.session = session
         self.svcert_no_verify = svcert_no_verify
         self.endpoint = endpoint
         self.icon_path = icon_path
         self.user = user_info
+        self.oauth2 = oauth2
 
     def exec_cmd(self, opt:Dict[str, Any], logger:logging.Logger, timeout:int, prevres:Any=None) -> Tuple[int, Dict[str, Any]]:
         """
@@ -772,12 +775,12 @@ class Tool(object):
             webbrowser.open(f"{self.endpoint}/dosignin_token/{token}{path}")
             return 0, dict(success="Open browser.")
         elif self.user['auth_type'] == "oauth2" and self.oauth2 == 'google':
-            webbrowser.open(f"{self.endpoint}/oauth2/google/session/{self.user['access_token']}/{path}")
+            webbrowser.open(f"{self.endpoint}/oauth2/google/session/{self.user['access_token']}{path}")
             return 0, dict(success="Open browser.")
         elif self.user['auth_type'] == "oauth2" and self.oauth2 == 'github':
-            webbrowser.open(f"{self.endpoint}/oauth2/github/session/{self.user['access_token']}/{path}")
+            webbrowser.open(f"{self.endpoint}/oauth2/github/session/{self.user['access_token']}{path}")
             return 0, dict(success="Open browser.")
         elif self.user['auth_type'] == "oauth2" and self.oauth2 == 'azure':
-            webbrowser.open(f"{self.endpoint}/oauth2/azure/session/{self.user['access_token']}/{path}")
+            webbrowser.open(f"{self.endpoint}/oauth2/azure/session/{self.user['access_token']}{path}")
             return 0, dict(success="Open browser.")
         return 1, dict(warn="unsupported auth_type.")

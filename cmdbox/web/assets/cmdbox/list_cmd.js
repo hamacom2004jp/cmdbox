@@ -15,11 +15,58 @@ const list_cmd_func = async () => {
         }
         elem.find('.cmd_title').text(row.title);
         elem.find('.cmd_mode').text(row.mode);
-        elem.find('.cmd_cmd').text(row.cmd);
+        elem.find('.cmd_cmd').text(row.cmd)
+        if (row.tag && Array.isArray(row.tag)) {
+            const tags = new Set([...row.tag]);
+            elem.find('.cmd_card').attr('data-tags', Array.from(tags).join(','));
+        }
         $('#cmd_items').append(elem);
     };
     py_list_cmd.forEach(row => {card_func(row, true)});
     py_list_cmd.forEach(row => {card_func(row, false)});
+    $('#cmd_item_tags').html('');
+    py_list_cmd.forEach(row => {
+        if (!row.tag || !Array.isArray(row.tag)) return;
+        const cmd_item_tags = $('#cmd_item_tags');
+        row.tag.forEach(tag => {
+            if (tag=='') return;
+            if (cmd_item_tags.find(`[data-tag="${tag}"]`).length > 0) return;
+            const elem = $(`<button type="button" class="btn btn-outline-secondary btn-sm btn-tag me-2">${tag}</button>`);
+            elem.attr('data-tag', tag);
+            elem.text(tag);
+            elem.click((e) => {
+                const ct = $(e.currentTarget);
+                const cmd_items = $('#cmd_items').find('.cmd_card:not(.cmd_add)');
+                if (ct.hasClass('btn-secondary')) {
+                    ct.removeClass('btn-secondary');
+                    ct.addClass('btn-outline-secondary');
+                }
+                else if (ct.hasClass('btn-outline-secondary')) {
+                    ct.removeClass('btn-outline-secondary');
+                    ct.addClass('btn-secondary');
+                }
+                const tags = new Set();
+                cmd_item_tags.find('.btn-tag').each((i, elem) => {
+                    if ($(elem).hasClass('btn-secondary')) tags.add($(elem).attr('data-tag'));
+                });
+                if (tags.size == 0) {
+                    cmd_items.parent().show();
+                    return;
+                }
+                cmd_items.parent().hide();
+                tags.forEach(tag => {
+                    cmd_items.each((i, elem) => {
+                        const el = $(elem);
+                        const itags = el.attr('data-tags');
+                        if (!itags) return;
+                        else if (itags.split(',').includes(tag)) el.parent().show();
+                    });
+                });
+            });
+            cmd_item_tags.append(elem);
+        });
+        
+    });
 }
 // コマンドファイルの取得が出来た時の処理
 const list_cmd_func_then = () => {
@@ -211,7 +258,8 @@ const list_cmd_func_then = () => {
                 }
                 title.append(`<span>${row.opt}</span>`);
                 if (row.hide) {
-                    elem.addClass('row_content_hide').hide();
+                    if (row_content.find('.row_content_hide').is(':hidden')) elem.hide();
+                    elem.addClass('row_content_hide');
                 } else {
                     title.addClass('text-decoration-underline');
                 }

@@ -1,4 +1,5 @@
-from cmdbox.app import common, options, signin
+from cmdbox.app import common, options
+from cmdbox.app.auth.signin import Signin
 from cmdbox.app.commons import module
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import RedirectResponse
@@ -110,9 +111,9 @@ class Web:
         self.cb_queue = queue.Queue(1000)
         self.options = options.Options.getInstance()
         self.webcap_client = requests.Session()
-        signin_file_data = signin.Signin.load_signin_file(self.signin_file)
-        self.signin = signin.Signin(self.logger, self.signin_file, signin_file_data, self.appcls, self.ver)
-        
+        signin_file_data = Signin.load_signin_file(self.signin_file)
+        self.signin = Signin(self.logger, self.signin_file, signin_file_data, self.appcls, self.ver)
+
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web init parameter: data={self.data} -> {self.data.absolute() if self.data is not None else None}")
             self.logger.debug(f"web init parameter: redis_host={self.redis_host}")
@@ -179,7 +180,8 @@ class Web:
             HTTPException: パスワードが一致しない場合
             HTTPException: ユーザーが存在しない場合
         """
-        if self.signin.get_data() is None:
+        signin_data = self.signin.get_data()
+        if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -193,7 +195,7 @@ class Web:
             return dict(warn="Confirm password is empty.")
         if new_password != confirm_password:
             return dict(warn="Password does not match.")
-        for u in self.signin.get_data()['users']:
+        for u in signin_data['users']:
             if u['name'] == user_name:
                 p = password if u['hash'] == 'plain' else common.hash_password(password, u['hash'])
                 if u['password'] != p:
@@ -205,7 +207,7 @@ class Web:
                 # パスワード更新日時の保存
                 self.user_data(None, u['uid'], user_name, 'password', 'last_update', datetime.datetime.now())
                 # サインインファイルの保存
-                common.save_yml(self.signin_file, self.signin.get_data())
+                common.save_yml(self.signin_file, signin_data)
                 return dict(success="Password changed.")
         return dict(warn="User not found.")
 
@@ -219,12 +221,13 @@ class Web:
         Returns:
             List[Dict[str, Any]]: ユーザー一覧
         """
-        if self.signin.get_data() is None:
+        signin_data = self.signin.get_data()
+        if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
         ret = []
-        for u in copy.deepcopy(self.signin.get_data()['users']):
+        for u in copy.deepcopy(signin_data['users']):
             u['password'] = '********'
             if 'apikeys' in u:
                 u['apikeys'] = dict([(ak, '********') for ak in u['apikeys']])
@@ -250,7 +253,8 @@ class Web:
         Returns:
             str: ApiKey
         """
-        if self.signin.get_data() is None:
+        signin_data = self.signin.get_data()
+        if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -258,10 +262,10 @@ class Web:
             raise ValueError(f"User name is not found. ({user})")
         if 'apikey_name' not in user:
             raise ValueError(f"ApiKey name is not found. ({user})")
-        if len([u for u in self.signin.get_data()['users'] if u['name'] == user['name']]) <= 0:
+        if len([u for u in signin_data['users'] if u['name'] == user['name']]) <= 0:
             raise ValueError(f"User name is not exists. ({user})")
         apikey:str = None
-        for u in self.signin.get_data()['users']:
+        for u in signin_data['users']:
             if u['name'] == user['name']:
                 if 'apikeys' not in u:
                     u['apikeys'] = dict()
@@ -274,7 +278,7 @@ class Web:
             raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"apikey_add: {user} -> {self.signin_file}")
-        common.save_yml(self.signin_file, self.signin.get_data())
+        common.save_yml(self.signin_file, signin_data)
         return apikey
 
     def apikey_del(self, user:Dict[str, Any]):
@@ -284,7 +288,8 @@ class Web:
         Args:
             user (Dict[str, Any]): ユーザー情報
         """
-        if self.signin.get_data() is None:
+        signin_data = self.signin.get_data()
+        if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -292,10 +297,10 @@ class Web:
             raise ValueError(f"User name is not found. ({user})")
         if 'apikey_name' not in user:
             raise ValueError(f"ApiKey name is not found. ({user})")
-        if len([u for u in self.signin.get_data()['users'] if u['name'] == user['name']]) <= 0:
+        if len([u for u in signin_data['users'] if u['name'] == user['name']]) <= 0:
             raise ValueError(f"User name is not exists. ({user})")
         apikey:str = None
-        for u in self.signin.get_data()['users']:
+        for u in signin_data['users']:
             if u['name'] == user['name']:
                 if 'apikeys' not in u:
                     continue
@@ -312,7 +317,7 @@ class Web:
             raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"apikey_del: {user} -> {self.signin_file}")
-        common.save_yml(self.signin_file, self.signin.get_data())
+        common.save_yml(self.signin_file, signin_data)
 
     def user_add(self, user:Dict[str, Any]):
         """
@@ -321,7 +326,8 @@ class Web:
         Args:
             user (Dict[str, Any]): ユーザー情報
         """
-        if self.signin.get_data() is None:
+        signin_data = self.signin.get_data()
+        if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -347,9 +353,9 @@ class Web:
         for gn in user['groups']:
             if len(self.group_list(gn)) <= 0:
                 raise ValueError(f"Group is not found. ({gn})")
-        if len([u for u in self.signin.get_data()['users'] if u['uid'] == user['uid']]) > 0:
+        if len([u for u in signin_data['users'] if u['uid'] == user['uid']]) > 0:
             raise ValueError(f"User uid is already exists. ({user})")
-        if len([u for u in self.signin.get_data()['users'] if u['name'] == user['name']]) > 0:
+        if len([u for u in signin_data['users'] if u['name'] == user['name']]) > 0:
             raise ValueError(f"User name is already exists. ({user})")
         if hash not in ['oauth2', 'plain', 'md5', 'sha1', 'sha256']:
             raise ValueError(f"User hash is not supported. ({user})")
@@ -360,13 +366,13 @@ class Web:
             user['password'] = common.hash_password(user['password'], hash if hash != 'oauth2' else 'sha1')
         else:
             user['password'] = user['password']
-        self.signin.get_data()['users'].append(user)
+        signin_data['users'].append(user)
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"user_add: {user} -> {self.signin_file}")
         # パスワード更新日時の保存
         self.user_data(None, user['uid'], user['name'], 'password', 'last_update', datetime.datetime.now())
         # サインインファイルの保存
-        common.save_yml(self.signin_file, self.signin.get_data())
+        common.save_yml(self.signin_file, signin_data)
 
     def user_edit(self, user:Dict[str, Any]):
         """
@@ -375,7 +381,8 @@ class Web:
         Args:
             user (Dict[str, Any]): ユーザー情報
         """
-        if self.signin.get_data() is None:
+        signin_data = self.signin.get_data()
+        if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -399,13 +406,13 @@ class Web:
         for gn in user['groups']:
             if len(self.group_list(gn)) <= 0:
                 raise ValueError(f"Group is not found. ({gn})")
-        if len([u for u in self.signin.get_data()['users'] if u['uid'] == user['uid']]) <= 0:
+        if len([u for u in signin_data['users'] if u['uid'] == user['uid']]) <= 0:
             raise ValueError(f"User uid is not found. ({user})")
-        if len([u for u in self.signin.get_data()['users'] if u['name'] == user['name']]) <= 0:
+        if len([u for u in signin_data['users'] if u['name'] == user['name']]) <= 0:
             raise ValueError(f"User name is not found. ({user})")
         if hash not in ['oauth2', 'plain', 'md5', 'sha1', 'sha256']:
             raise ValueError(f"User hash is not supported. ({user})")
-        for u in self.signin.get_data()['users']:
+        for u in signin_data['users']:
             if u['uid'] == user['uid']:
                 u['name'] = user['name']
                 if 'password' in user and user['password'] != '':
@@ -424,7 +431,7 @@ class Web:
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"user_edit: {user} -> {self.signin_file}")
         # サインインファイルの保存
-        common.save_yml(self.signin_file, self.signin.get_data())
+        common.save_yml(self.signin_file, signin_data)
 
     def user_del(self, uid:int):
         """
@@ -433,7 +440,8 @@ class Web:
         Args:
             uid (int): ユーザーID
         """
-        if self.signin.get_data() is None:
+        signin_data = self.signin.get_data()
+        if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -441,13 +449,13 @@ class Web:
             uid = int(uid)
         except:
             raise ValueError(f"User uid is not number. ({uid})")
-        users = [u for u in self.signin.get_data()['users'] if u['uid'] != uid]
-        if len(users) == len(self.signin.get_data()['users']):
+        users = [u for u in signin_data['users'] if u['uid'] != uid]
+        if len(users) == len(signin_data['users']):
             raise ValueError(f"User uid is not found. ({uid})")
-        self.signin.get_data()['users'] = users
+        signin_data['users'] = users
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"user_del: {uid} -> {self.signin_file}")
-        common.save_yml(self.signin_file, self.signin.get_data())
+        common.save_yml(self.signin_file, signin_data)
 
     def group_list(self, name:str=None) -> List[Dict[str, Any]]:
         """
@@ -459,11 +467,12 @@ class Web:
         Returns:
             List[Dict[str, Any]]: グループ一覧
         """
-        if self.signin.get_data() is None:
+        signin_data = self.signin.get_data()
+        if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if name is None:
-            return copy.deepcopy(self.signin.get_data()['groups'])
-        for g in copy.deepcopy(self.signin.get_data()['groups']):
+            return copy.deepcopy(signin_data['groups'])
+        for g in copy.deepcopy(signin_data['groups']):
             if g['name'] == name:
                 return [g]
         return []
@@ -475,7 +484,8 @@ class Web:
         Args:
             group (Dict[str, Any]): グループ情報
         """
-        if self.signin.get_data() is None:
+        signin_data = self.signin.get_data()
+        if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -489,20 +499,20 @@ class Web:
             raise ValueError(f"Group name is not found. ({group})")
         if 'parent' in group and (group['parent'] is None or group['parent'] == ''):
             del group['parent']
-        elif 'parent' in group and group['parent'] not in [g['name'] for g in self.signin.get_data()['groups']]:
+        elif 'parent' in group and group['parent'] not in [g['name'] for g in signin_data['groups']]:
             raise ValueError(f"Group parent is not found. ({group})")
         if 'parent' in group and group['parent'] == group['name']:
             raise ValueError(f"Group parent is same as group name. ({group})")
-        if len([g for g in self.signin.get_data()['groups'] if g['gid'] == group['gid']]) > 0:
+        if len([g for g in signin_data['groups'] if g['gid'] == group['gid']]) > 0:
             raise ValueError(f"Group gid is already exists. ({group})")
-        if len([g for g in self.signin.get_data()['groups'] if g['name'] == group['name']]) > 0:
+        if len([g for g in signin_data['groups'] if g['name'] == group['name']]) > 0:
             raise ValueError(f"Group name is already exists. ({group})")
-        self.signin.get_data()['groups'].append(group)
+        signin_data['groups'].append(group)
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"group_add: {group} -> {self.signin_file}")
-        common.save_yml(self.signin_file, self.signin.get_data())
+        common.save_yml(self.signin_file, signin_data)
 
     def group_edit(self, group:Dict[str, Any]):
         """
@@ -511,7 +521,8 @@ class Web:
         Args:
             group (Dict[str, Any]): グループ情報
         """
-        if self.signin.get_data() is None:
+        signin_data = self.signin.get_data()
+        if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -525,15 +536,15 @@ class Web:
             raise ValueError(f"Group name is not found. ({group})")
         if 'parent' in group and (group['parent'] is None or group['parent'] == ''):
             del group['parent']
-        elif 'parent' in group and group['parent'] not in [g['name'] for g in self.signin.get_data()['groups']]:
+        elif 'parent' in group and group['parent'] not in [g['name'] for g in signin_data['groups']]:
             raise ValueError(f"Group parent is not found. ({group})")
         if 'parent' in group and group['parent'] == group['name']:
             raise ValueError(f"Group parent is same as group name. ({group})")
-        if len([g for g in self.signin.get_data()['groups'] if g['gid'] == group['gid']]) <= 0:
+        if len([g for g in signin_data['groups'] if g['gid'] == group['gid']]) <= 0:
             raise ValueError(f"Group gid is not found. ({group})")
-        if len([g for g in self.signin.get_data()['groups'] if g['name'] == group['name']]) <= 0:
+        if len([g for g in signin_data['groups'] if g['name'] == group['name']]) <= 0:
             raise ValueError(f"Group name is not found. ({group})")
-        for g in self.signin.get_data()['groups']:
+        for g in signin_data['groups']:
             if g['gid'] == group['gid']:
                 g['name'] = group['name']
                 g['parent'] = group['parent']
@@ -541,7 +552,7 @@ class Web:
             raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"group_edit: {group} -> {self.signin_file}")
-        common.save_yml(self.signin_file, self.signin.get_data())
+        common.save_yml(self.signin_file, signin_data)
 
     def group_del(self, gid:int):
         """
@@ -550,7 +561,8 @@ class Web:
         Args:
             gid (int): グループID
         """
-        if self.signin.get_data() is None:
+        signin_data = self.signin.get_data()
+        if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
@@ -560,41 +572,41 @@ class Web:
             raise ValueError(f"Group gid is not number. ({gid})")
         # グループがユーザーに使用されているかチェック
         user_group_ids = []
-        for user in self.signin.get_data()['users']:
+        for user in signin_data['users']:
             for group in user['groups']:
-                user_group_ids += [g['gid'] for g in self.signin.get_data()['groups'] if g['name'] == group]
+                user_group_ids += [g['gid'] for g in signin_data['groups'] if g['name'] == group]
         if gid in user_group_ids:
             raise ValueError(f"Group gid is used by user. ({gid})")
         # グループが親グループに使用されているかチェック
         parent_group_ids = []
-        for group in self.signin.get_data()['groups']:
+        for group in signin_data['groups']:
             if 'parent' in group:
-                parent_group_ids += [g['gid'] for g in self.signin.get_data()['groups'] if g['name'] == group['parent']]
+                parent_group_ids += [g['gid'] for g in signin_data['groups'] if g['name'] == group['parent']]
         if gid in parent_group_ids:
             raise ValueError(f"Group gid is used by parent group. ({gid})")
         # グループがcmdruleグループに使用されているかチェック
         cmdrule_group_ids = []
-        for rule in self.signin.get_data()['cmdrule']['rules']:
+        for rule in signin_data['cmdrule']['rules']:
             for group in rule['groups']:
-                cmdrule_group_ids += [g['gid'] for g in self.signin.get_data()['groups'] if g['name'] == group]
+                cmdrule_group_ids += [g['gid'] for g in signin_data['groups'] if g['name'] == group]
         if gid in cmdrule_group_ids:
             raise ValueError(f"Group gid is used by cmdrule group. ({gid})")
         # グループがpathruleグループに使用されているかチェック
         pathrule_group_ids = []
-        for rule in self.signin.get_data()['pathrule']['rules']:
+        for rule in signin_data['pathrule']['rules']:
             for group in rule['groups']:
-                pathrule_group_ids += [g['gid'] for g in self.signin.get_data()['groups'] if g['name'] == group]
+                pathrule_group_ids += [g['gid'] for g in signin_data['groups'] if g['name'] == group]
         if gid in pathrule_group_ids:
             raise ValueError(f"Group gid is used by pathrule group. ({gid})")
 
         # グループ削除
-        groups = [g for g in self.signin.get_data()['groups'] if g['gid'] != gid]
-        if len(groups) == len(self.signin.get_data()['groups']):
+        groups = [g for g in signin_data['groups'] if g['gid'] != gid]
+        if len(groups) == len(signin_data['groups']):
             raise ValueError(f"Group gid is not found. ({gid})")
-        self.signin.get_data()['groups'] = groups
+        signin_data['groups'] = groups
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"group_del: {gid} -> {self.signin_file}")
-        common.save_yml(self.signin_file, self.signin.get_data())
+        common.save_yml(self.signin_file, signin_data)
 
     def user_data(self, req:Request, uid:str, user_name:str, categoly:str, key:str=None, val:Any=None, delkey:bool=False) -> Any:
         """
@@ -646,7 +658,7 @@ class Web:
 
     def start(self, allow_host:str="0.0.0.0", listen_port:int=8081, ssl_listen_port:int=8443,
               ssl_cert:Path=None, ssl_key:Path=None, ssl_keypass:str=None, ssl_ca_certs:Path=None,
-              session_domain:str=None, session_path:str='/', session_secure:bool=False, session_timeout:int=600, outputs_key:List[str]=[],
+              session_domain:str=None, session_path:str='/', session_secure:bool=False, session_timeout:int=900, outputs_key:List[str]=[],
               guvicorn_workers:int=-1, guvicorn_timeout:int=30):
         """
         Webサーバを起動する
@@ -662,7 +674,7 @@ class Web:
             session_domain (str, optional): セッションドメイン. Defaults to None.
             session_path (str, optional): セッションパス. Defaults to '/'.
             session_secure (bool, optional): セッションセキュア. Defaults to False.
-            session_timeout (int, optional): セッションタイムアウト. Defaults to 600.
+            session_timeout (int, optional): セッションタイムアウト. Defaults to 900.
             outputs_key (list, optional): 出力キー. Defaults to [].
             guvicorn_workers (int, optional): Gunicornワーカー数. Defaults to -1.
             guvicorn_timeout (int, optional): Gunicornタイムアウト. Defaults to 30.

@@ -1,5 +1,5 @@
 import urllib.parse
-from cmdbox.app import feature, signin
+from cmdbox.app import feature
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -79,6 +79,7 @@ class Signin(feature.WebFeature):
         async def oauth2_enabled(req:Request, res:Response):
             if web.signin_html_data is None:
                 return dict(google=False, github=False, azure=False)
-            return dict(google=web.signin.get_data()['oauth2']['providers']['google']['enabled'],
-                        github=web.signin.get_data()['oauth2']['providers']['github']['enabled'],
-                        azure=web.signin.get_data()['oauth2']['providers']['azure']['enabled'],)
+            signin_data = web.signin.get_data()
+            return dict(google=signin_data['oauth2']['providers']['google']['enabled'],
+                        github=signin_data['oauth2']['providers']['github']['enabled'],
+                        azure=signin_data['oauth2']['providers']['azure']['enabled'],)
