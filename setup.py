@@ -38,6 +38,7 @@ INSTALL_REQUIRES = [
 PACKAGES = [
     'cmdbox',
     'cmdbox.app',
+    'cmdbox.app.auth',
     'cmdbox.app.commons',
     'cmdbox.app.features.cli',
     'cmdbox.app.features.web',
