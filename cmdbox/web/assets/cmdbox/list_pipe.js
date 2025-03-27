@@ -45,7 +45,8 @@ list_pipe_func_then = () => {
                 const option = $('<option></option>');
                 pipe_cmd_select.append(option);
                 option.attr('value', cmd['title']);
-                option.text(`${cmd['title']}(mode=${cmd['mode']}, cmd=${cmd['cmd']})`);
+                const tag = cmd['tag'] ? `, tag=${cmd['tag']}` : '';
+                option.text(`${cmd['title']}(mode=${cmd['mode']}, cmd=${cmd['cmd']}${tag})`);
             });
             cmd_select_template.find('.add_buton').click((e) => {
                 cmd_select_template_func($(e.currentTarget), py_list_cmd);

@@ -15,7 +15,14 @@ const list_cmd_func = async () => {
         }
         elem.find('.cmd_title').text(row.title);
         elem.find('.cmd_mode').text(row.mode);
-        elem.find('.cmd_cmd').text(row.cmd)
+        elem.find('.cmd_cmd').text(row.cmd);
+        const tags_elem = elem.find('.cmd_tags');
+        if (row.tag && Array.isArray(row.tag)) {
+            row.tag.forEach(tag => {
+                if (tag=='') return;
+                tags_elem.append(`<span class="badge text-bg-secondary me-1"><svg class="bi bi-svg_tag" width="16" height="16" fill="currentColor"><use href="#svg_tag"></use></svg>${tag}</span>`);
+            });
+        }
         if (row.tag && Array.isArray(row.tag)) {
             const tags = new Set([...row.tag]);
             elem.find('.cmd_card').attr('data-tags', Array.from(tags).join(','));
@@ -24,49 +31,89 @@ const list_cmd_func = async () => {
     };
     py_list_cmd.forEach(row => {card_func(row, true)});
     py_list_cmd.forEach(row => {card_func(row, false)});
-    $('#cmd_item_tags').html('');
+    const cmd_item_tags = $('#cmd_item_tags').html('');
+    const tag_bot_click = (e) => {
+        const ct = $(e.currentTarget);
+        const cmd_items = $('#cmd_items').find('.cmd_card:not(.cmd_add)');
+        const andor_sw = ct.hasClass('andor_switch');
+        const and_val = $('#andor_switch').prop('checked');
+        // 選択中のボタンの場合は解除中にする
+        if (!andor_sw && ct.hasClass('btn-secondary')) {
+            ct.removeClass('btn-secondary');
+            ct.addClass('btn-outline-secondary');
+        }
+        // 解除中のボタンの場合は選択中にする
+        else if (!andor_sw && ct.hasClass('btn-outline-secondary')) {
+            ct.removeClass('btn-outline-secondary');
+            ct.addClass('btn-secondary');
+        }
+        // 選択中のタグを取得
+        const tags = new Set();
+        cmd_item_tags.find('.btn-tag').each((i, elem) => {
+            if ($(elem).hasClass('btn-secondary')) tags.add($(elem).attr('data-tag'));
+        });
+        // タグ無しボタンが選択された場合
+        if (ct.hasClass('btn_notag') && ct.hasClass('btn-secondary')) {
+            cmd_item_tags.find('.btn-tag').removeClass('btn-secondary').addClass('btn-outline-secondary');
+            cmd_items.parent().hide();
+            cmd_items.each((i, elem) => {
+                const el = $(elem);
+                const itags = el.attr('data-tags');
+                if (itags) return;
+                el.parent().show();
+            });
+            return;
+        }
+        // notagボタンの選択を解除
+        if (!andor_sw) $('#btn_notag').removeClass('btn-secondary').addClass('btn-outline-secondary');
+        // タグがない場合は全て表示
+        if (tags.size == 0) {
+            cmd_items.parent().show();
+            return;
+        }
+        // タグがある場合はタグに一致するものだけ表示
+        cmd_items.parent().hide();
+        cmd_items.each((i, elem) => {
+            const el = $(elem);
+            // andorチェックされている場合はすべてのタグを含むものを表示
+            if (and_val) {
+                const itags = el.attr('data-tags');
+                if (!itags) return;
+                const etags = itags.split(',');
+                if (etags.filter(tag => tags.has(tag)).length == tags.size) el.parent().show();
+                return;
+            }
+            // andorチェックされていない場合はいずれかのタグを含むものを表示
+            tags.forEach(tag => {
+                const itags = el.attr('data-tags');
+                if (!itags) return;
+                else if (itags.split(',').includes(tag)) el.parent().show();
+            });
+        });
+    };
+    // タグボタンを追加
     py_list_cmd.forEach(row => {
         if (!row.tag || !Array.isArray(row.tag)) return;
-        const cmd_item_tags = $('#cmd_item_tags');
         row.tag.forEach(tag => {
             if (tag=='') return;
             if (cmd_item_tags.find(`[data-tag="${tag}"]`).length > 0) return;
             const elem = $(`<button type="button" class="btn btn-outline-secondary btn-sm btn-tag me-2">${tag}</button>`);
             elem.attr('data-tag', tag);
             elem.text(tag);
-            elem.click((e) => {
-                const ct = $(e.currentTarget);
-                const cmd_items = $('#cmd_items').find('.cmd_card:not(.cmd_add)');
-                if (ct.hasClass('btn-secondary')) {
-                    ct.removeClass('btn-secondary');
-                    ct.addClass('btn-outline-secondary');
-                }
-                else if (ct.hasClass('btn-outline-secondary')) {
-                    ct.removeClass('btn-outline-secondary');
-                    ct.addClass('btn-secondary');
-                }
-                const tags = new Set();
-                cmd_item_tags.find('.btn-tag').each((i, elem) => {
-                    if ($(elem).hasClass('btn-secondary')) tags.add($(elem).attr('data-tag'));
-                });
-                if (tags.size == 0) {
-                    cmd_items.parent().show();
-                    return;
-                }
-                cmd_items.parent().hide();
-                tags.forEach(tag => {
-                    cmd_items.each((i, elem) => {
-                        const el = $(elem);
-                        const itags = el.attr('data-tags');
-                        if (!itags) return;
-                        else if (itags.split(',').includes(tag)) el.parent().show();
-                    });
-                });
-            });
+            elem.click(tag_bot_click);
             cmd_item_tags.append(elem);
         });
-        
     });
+    // タグ未選択ボタンを追加
+    const noselect_bot = $(`<button type="button" class="btn btn-outline-secondary btn-sm btn_notag me-2" id="btn_notag">no tag</button>`);
+    noselect_bot.click(tag_bot_click);
+    cmd_item_tags.append(noselect_bot);
+    // and/orスイッチを追加
+    const andor_bot = $(`<div class="form-check form-switch text-secondary d-inline-block"/>`);
+    andor_bot.append('<input class="form-check-input andor_switch" type="checkbox" id="andor_switch">');
+    andor_bot.append('<label class="form-check-label" for="andor_switch">or / and</label>');
+    andor_bot.find('#andor_switch').click(tag_bot_click);
+    cmd_item_tags.append(andor_bot);
 }
 // コマンドファイルの取得が出来た時の処理
 const list_cmd_func_then = () => {
