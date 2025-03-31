@@ -1,0 +1,198 @@
+from cmdbox.app import common, client
+from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.features.cli import audit_base
+from cmdbox.app.options import Options
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, Any, Tuple, List, Union
+import argparse
+import logging
+import json
+import uuid
+
+
+class AuditWrite(audit_base.AuditBase):
+    def get_mode(self) -> Union[str, List[str]]:
+        """
+        この機能のモードを返します
+
+        Returns:
+            Union[str, List[str]]: モード
+        """
+        return 'audit'
+
+    def get_cmd(self):
+        """
+        この機能のコマンドを返します
+
+        Returns:
+            str: コマンド
+        """
+        return 'write'
+    
+    def get_option(self):
+        """
+        この機能のオプションを返します
+
+        Returns:
+            Dict[str, Any]: オプション
+        """
+        opt = super().get_option()
+        opt['discription_ja'] = "監査を記録します。"
+        opt['discription_en'] = "GRecord the audit."
+        opt['choice'] += [
+            dict(opt="audit_type", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=Options.AUDITS,
+                 discription_ja="監査の種類を指定します。",
+                 discription_en="Specifies the audit type."),
+            dict(opt="clmsg_id", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                 discription_ja="クライアントのメッセージIDを指定します。省略した場合はuuid4で生成されます。",
+                 discription_en="Specifies the message ID of the client. If omitted, uuid4 will be generated."),
+            dict(opt="clmsg_date", type=Options.T_DATETIME, default=None, required=False, multi=False, hide=False, choice=None,
+                 discription_ja="クライアントのメッセージ発生日時を指定します。省略した場合はサーバーの現在日時が使用されます。",
+                 discription_en="Specifies the date and time the client message occurred. If omitted, the server's current date/time is used."),
+            dict(opt="clmsg_src", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                 discription_ja="クライアントのメッセージの発生源を指定します。通常 `cmdbox.app.feature.Feature` を継承したクラス名を指定します。",
+                 discription_en="Specifies the source of client messages. Usually specifies the name of a class that extends `cmdbox.app.feature.Feature` ."),
+            dict(opt="clmsg_user", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                 discription_ja="クライアントのメッセージの発生源を指定します。通常 `cmdbox.app.feature.Feature` を継承したクラス名を指定します。",
+                 discription_en="Specifies the source of client messages. Usually specifies the name of a class that extends `cmdbox.app.feature.Feature` ."),
+            dict(opt="clmsg_body", type=Options.T_DICT, default=None, required=False, multi=True, hide=False, choice=None,
+                 discription_ja="クライアントのメッセージの本文を辞書形式で指定します。",
+                 discription_en="Specifies the body of the client's message in dictionary format."),
+            dict(opt="clmsg_tag", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
+                 discription_ja="クライアントのメッセージのタグを指定します。後で検索しやすくするために指定します。",
+                 discription_en="Specifies the tag for the client's message. Specify to make it easier to search later."),
+        ]
+        return opt
+    
+    def get_svcmd(self):
+        """
+        この機能のサーバー側のコマンドを返します
+
+        Returns:
+            str: サーバー側のコマンド
+        """
+        return 'audit_write'
+
+    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+        """
+        この機能の実行を行います
+
+        Args:
+            logger (logging.Logger): ロガー
+            args (argparse.Namespace): 引数
+            tm (float): 実行開始時間
+            pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報
+
+        Returns:
+            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
+        """
+        if args.svname is None:
+            msg = dict(warn=f"Please specify the --svname option.")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return 1, msg, None
+        if args.audit_type is None:
+            msg = dict(warn=f"Please specify the --audit_type option.")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return 1, msg, None
+        if args.clmsg_id is None:
+            args.clmsg_id = str(uuid.uuid4())
+        if args.clmsg_date is None:
+            args.clmsg_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        audit_type_b64 = convert.str2b64str(args.audit_type)
+        clmsg_id_b64 = convert.str2b64str(args.clmsg_id)
+        clmsg_date_b64 = convert.str2b64str(args.clmsg_date)
+        clmsg_src_b64 = convert.str2b64str(args.clmsg_src) if args.clmsg_src is not None else ''
+        clmsg_user_b64 = convert.str2b64str(args.clmsg_user) if args.clmsg_user is not None else ''
+        clmsg_body_str = json.dumps(args.clmsg_body, default=common.default_json_enc, ensure_ascii=False) if args.clmsg_body is not None else '{}'
+        clmsg_body_b64 = convert.str2b64str(clmsg_body_str)
+        clmsg_tag_str = json.dumps(args.clmsg_tag, default=common.default_json_enc, ensure_ascii=False) if args.clmsg_tag is not None else '[]'
+        clmsg_tag_b64 = convert.str2b64str(clmsg_tag_str)
+
+        cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
+        cl.redis_cli.send_cmd('audit_write', [audit_type_b64, clmsg_id_b64, clmsg_date_b64, clmsg_src_b64, clmsg_user_b64, clmsg_body_b64, clmsg_tag_b64],
+                                              retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=True)
+        ret = dict(success=True)
+        #common.print_format(ret, False, tm, None, False, pf=pf)
+        return 0, ret, cl
+
+    def is_cluster_redirect(self):
+        """
+        クラスター宛のメッセージの場合、メッセージを転送するかどうかを返します
+
+        Returns:
+            bool: メッセージを転送する場合はTrue
+        """
+        return False
+
+    def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
+              sessions:Dict[str, Dict[str, Any]]) -> int:
+        """
+        この機能のサーバー側の実行を行います
+
+        Args:
+            data_dir (Path): データディレクトリ
+            logger (logging.Logger): ロガー
+            redis_cli (redis_client.RedisClient): Redisクライアント
+            msg (List[str]): 受信メッセージ
+            sessions (Dict[str, Dict[str, Any]]): セッション情報
+        
+        Returns:
+            int: 終了コード
+        """
+        audit_type = convert.b64str2str(msg[2])
+        clmsg_id = convert.b64str2str(msg[3])
+        clmsg_date = convert.b64str2str(msg[4])
+        clmsg_src = convert.b64str2str(msg[5])
+        clmsg_user = convert.b64str2str(msg[6])
+        clmsg_body = convert.b64str2str(msg[7])
+        clmsg_tags = convert.b64str2str(msg[8])
+        svmsg_id = str(uuid.uuid4())
+        st = self.write(msg[1], audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_user, clmsg_body, clmsg_tags, svmsg_id,
+                        data_dir, logger, redis_cli)
+        return st
+
+    def write(self, reskey:str, audit_type:str, clmsg_id:str, clmsg_date:str, clmsg_src:str, clmsg_user:str, clmsg_body:str, clmsg_tags:str, svmsg_id:str,
+              data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient) -> int:
+        """
+        監査ログを書き込む
+
+        Args:
+            reskey (str): レスポンスキー
+            audit_type (str): 監査の種類
+            clmsg_id (str): クライアントメッセージID
+            clmsg_date (str): クライアントメッセージ発生日時
+            clmsg_src (str): クライアントメッセージの発生源
+            clmsg_user (str): クライアントメッセージの発生させたユーザー
+            clmsg_body (str): クライアントメッセージの本文
+            clmsg_tags (str): クライアントメッセージのタグ
+            svmsg_id (str): サーバーメッセージID
+            data_dir (Path): データディレクトリ
+            logger (logging.Logger): ロガー
+            redis_cli (redis_client.RedisClient): Redisクライアント
+
+        Returns:
+            int: レスポンスコード
+        """
+        try:
+            with self.initdb(data_dir, logger) as conn:
+                cursor = conn.cursor()
+                try:
+                    clmsg_tags = json.dumps(clmsg_tags)
+                    #clmsg_body = json.loads(clmsg_body) if clmsg_body else {}
+                    cursor.execute('''
+                        INSERT INTO audit (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_user, clmsg_body, clmsg_tag, 
+                                           svmsg_id, svmsg_date)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                    ''', (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_user, clmsg_body, clmsg_tags, svmsg_id))
+                    conn.commit()
+                    rescode, msg = (self.RESP_SCCESS, dict(success=True))
+                    redis_cli.rpush(reskey, msg)
+                    return rescode
+                finally:
+                    cursor.close()
+        except Exception as e:
+            logger.warning(f"Failed to write: {e}", exc_info=True)
+            redis_cli.rpush(reskey, dict(warn=f"Failed to write: {e}"))
+            return self.RESP_WARN

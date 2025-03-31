@@ -17,6 +17,7 @@ class DelCmd(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
+        
             form = await req.form()
             title = form.get('title')
 
@@ -26,4 +27,5 @@ class DelCmd(feature.WebFeature):
             if 'signin' in req.session and req.session['signin'] is not None:
                 sess = req.session['signin']
                 web.user_data(req, sess['uid'], sess['name'], 'cmdpins', title, delkey=True)
+            web.options.audit_exec(req, res)
             return {}

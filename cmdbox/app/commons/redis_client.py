@@ -7,6 +7,7 @@ import logging
 import json
 import redis
 import time
+import threading
 
 
 class RedisClient(object):
@@ -111,9 +112,11 @@ class RedisClient(object):
             except KeyboardInterrupt as e:
                 return False
 
-    def send_cmd(self, cmd:str, params:List[str], retry_count:int=20, retry_interval:int=5, outstatus:bool=False, timeout:int = 60):
+    def send_cmd(self, cmd:str, params:List[str], retry_count:int=20, retry_interval:int=5, outstatus:bool=False, timeout:int=60, nowait:bool=False):
         """
-        コマンドをRedisサーバーに送信し、応答を取得する
+        コマンドをRedisサーバーに送信し、応答を取得します。
+        nowait=Trueの場合は、応答を待たずにスレッドで実行します。
+        その場合、応答は受信できません。
 
         Args:
             cmd (str): コマンド
@@ -122,37 +125,45 @@ class RedisClient(object):
             retry_interval (int, optional): リトライ間隔. Defaults to 5.
             outstatus (bool, optional): ステータスを出力する. Defaults to False.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
+            nowait (bool, optional): 応答を待たない. Defaults to False.
 
         Returns:
             dict: Redisサーバーからの応答
         """
-        try:
-            if timeout <= 0:
-                raise ValueError(f"timeout must be greater than 0. timeout={timeout}")
-            sreqtime = time.perf_counter()
-            if not self.check_server(find_svname=True, retry_count=retry_count, retry_interval=retry_interval, outstatus=outstatus):
-                return dict(error=f"Connected server failed or server not found. svname={self.svname.split('-')[1]}")
-            reskey = common.random_string()
-            reskey = f"cl-{reskey}-{int(time.time())}"
-            self.redis_cli.rpush(self.svname, f"{cmd} {reskey} {' '.join([str(p) for p in params])}")
-            self.is_running = True
-            stime = time.time()
-            while self.is_running:
-                ctime = time.time()
-                if ctime - stime > timeout:
-                    raise Exception(f"Response timed out.")
-                res = self.redis_cli.lpop(reskey)
-                if res is None or len(res) <= 0:
-                    time.sleep(0.001)
-                    continue
-                return self._res_cmd(reskey, res, sreqtime)
-            raise KeyboardInterrupt(f"Stop command.")
-        except KeyboardInterrupt as e:
-            self.logger.warning(f"Stop command. cmd={cmd}", exc_info=True)
-            return dict(error=f"Stop command. cmd={cmd}")
-        except Exception as e:
-            self.logger.warning(f"fail to execute command. cmd={cmd}, msg={e}", exc_info=True)
-            return dict(error=f"fail to execute command. cmd={cmd}, msg={e}")
+        def send(nowait:bool=False):
+            try:
+                if timeout <= 0:
+                    raise ValueError(f"timeout must be greater than 0. timeout={timeout}")
+                sreqtime = time.perf_counter()
+                if not self.check_server(find_svname=True, retry_count=retry_count, retry_interval=retry_interval, outstatus=outstatus):
+                    return dict(error=f"Connected server failed or server not found. svname={self.svname.split('-')[1]}")
+                reskey = common.random_string()
+                reskey = f"cl-{reskey}-{int(time.time())}"
+                self.redis_cli.rpush(self.svname, f"{cmd} {reskey} {' '.join([str(p) for p in params])}")
+                if nowait: return
+                self.is_running = True
+                stime = time.time()
+                while self.is_running:
+                    ctime = time.time()
+                    if ctime - stime > timeout:
+                        raise Exception(f"Response timed out.")
+                    res = self.redis_cli.lpop(reskey)
+                    if res is None or len(res) <= 0:
+                        time.sleep(0.001)
+                        continue
+                    return self._res_cmd(reskey, res, sreqtime)
+                raise KeyboardInterrupt(f"Stop command.")
+            except KeyboardInterrupt as e:
+                self.logger.warning(f"Stop command. cmd={cmd}", exc_info=True)
+                return dict(error=f"Stop command. cmd={cmd}")
+            except Exception as e:
+                self.logger.warning(f"fail to execute command. cmd={cmd}, msg={e}", exc_info=True)
+                return dict(error=f"fail to execute command. cmd={cmd}, msg={e}")
+        if not nowait:
+            return send(nowait)
+        else:
+            thread = threading.Thread(target=send, args=(nowait,))
+            thread.start()
 
     def _res_cmd(self, reskey:str, res_msg:bytes, sreqtime:float):
         """

@@ -28,7 +28,7 @@ class Client(object):
     def __exit__(self, a, b, c):
         pass
 
-    def stop_server(self, retry_count:int=3, retry_interval:int=5, timeout:int = 60):
+    def stop_server(self, retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         Redisサーバーを停止する
 
@@ -44,7 +44,7 @@ class Client(object):
         return res_json
     
     def file_list(self, svpath:str, recursive:bool, scope:str="client", client_data:Path = None,
-                  retry_count:int=3, retry_interval:int=5, timeout:int = 60):
+                  retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバー上のファイルリストを取得する
 
@@ -81,7 +81,7 @@ class Client(object):
             return dict(warn=f"scope is invalid. {scope}")
 
     def file_mkdir(self, svpath:str, scope:str="client", client_data:Path = None,
-                   retry_count:int=3, retry_interval:int=5, timeout:int = 60):
+                   retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバー上にディレクトリを作成する
 
@@ -117,7 +117,7 @@ class Client(object):
             return dict(warn=f"scope is invalid. {scope}")
     
     def file_rmdir(self, svpath:str, scope:str="client", client_data:Path = None,
-                   retry_count:int=3, retry_interval:int=5, timeout:int = 60):
+                   retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバー上のディレクトリを削除する
 
@@ -153,7 +153,7 @@ class Client(object):
             return dict(warn=f"scope is invalid. {scope}")
     
     def file_download(self, svpath:str, download_file:Path, scope:str="client", client_data:Path = None, rpath:str="", img_thumbnail:float=0.0,
-                      retry_count:int=3, retry_interval:int=5, timeout:int = 60):
+                      retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバー上のファイルをダウンロードする
 
@@ -203,7 +203,7 @@ class Client(object):
         return res_json
     
     def file_upload(self, svpath:str, upload_file:Path, scope:str="client", client_data:Path=None, mkdir:bool=False, orverwrite:bool=False,
-                    retry_count:int=3, retry_interval:int=5, timeout:int = 60):
+                    retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバー上にファイルをアップロードする
 
@@ -257,7 +257,7 @@ class Client(object):
                 return dict(warn=f"scope is invalid. {scope}")
 
     def file_remove(self, svpath:str, scope:str="client", client_data:Path = None,
-                    retry_count:int=3, retry_interval:int=5, timeout:int = 60):
+                    retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバー上のファイルを削除する
 
@@ -293,7 +293,7 @@ class Client(object):
             return dict(warn=f"scope is invalid. {scope}")
 
     def file_copy(self, from_path:str, to_path:str, orverwrite:bool=False, scope:str="client", client_data:Path = None,
-                    retry_count:int=3, retry_interval:int=5, timeout:int = 60):
+                    retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバー上のファイルをコピーする
 
@@ -331,7 +331,7 @@ class Client(object):
             return dict(warn=f"scope is invalid. {scope}")
 
     def file_move(self, from_path:str, to_path:str, scope:str="client", client_data:Path = None,
-                    retry_count:int=3, retry_interval:int=5, timeout:int = 60):
+                    retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバー上のファイルを移動する
 
@@ -367,7 +367,7 @@ class Client(object):
             self.logger.warning(f"scope is invalid. {scope}")
             return dict(warn=f"scope is invalid. {scope}")
 
-    def server_info(self, retry_count:int=3, retry_interval:int=5, timeout:int = 60):
+    def server_info(self, retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバーの情報を取得する
 

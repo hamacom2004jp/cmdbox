@@ -227,6 +227,7 @@ def img2byte(image:Image.Image, format:str='jpeg') -> bytes:
 def str2b64str(s:str) -> str:
     """
     文字列をBase64エンコードします。
+    sにNoneを指定した場合はNoneを返します。
 
     Args:
         s (str): 文字列
@@ -234,11 +235,15 @@ def str2b64str(s:str) -> str:
     Returns:
         str: Base64エンコードされた文字列
     """
+    if s is None:
+        return None
     return base64.b64encode(s.encode()).decode('utf-8')
 
 def b64str2str(b64str:str) -> str:
     """
     Base64エンコードされた文字列をデコードします。
+    b64strにNoneを指定した場合はNoneを返します。
+    b64strに'None'を指定した場合はNoneを返します。
 
     Args:
         b64str (str): Base64エンコードされた文字列
@@ -246,4 +251,8 @@ def b64str2str(b64str:str) -> str:
     Returns:
         str: デコードされた文字列
     """
+    if b64str is None:
+        return None
+    if b64str == 'None':
+        return None
     return base64.b64decode(b64str).decode('utf-8')

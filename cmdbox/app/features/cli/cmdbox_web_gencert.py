@@ -72,6 +72,7 @@ class WebGencert(feature.UnsupportEdgeFeature):
             ]
         )
 
+    @Options.audit(audit_type=Options.AT_EVENT)
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います

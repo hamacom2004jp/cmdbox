@@ -389,11 +389,11 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
     Returns:
         str: 生成された文字列
     """
-    if type(data) is dict and "success" in data and "performance" in data["success"] and type(data["success"]["performance"]) is list and pf is not None:
+    if type(data) is dict and "success" in data and type(data["success"]) is dict and "performance" in data["success"] and type(data["success"]["performance"]) is list and pf is not None:
         data["success"]["performance"] += pf
     txt = ''
     if format:
-        if 'success' in data:
+        if 'success' in data and type(data["success"]) is dict:
             data = data['success']['data'] if 'data' in data['success'] else data['success']
             if type(data) == list:
                 txt = tabulate(data, headers='keys', tablefmt=tablefmt)
@@ -412,7 +412,7 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
             except BrokenPipeError:
                 pass
     else:
-        if 'success' in data and type(data['success']) == dict:
+        if 'success' in data and type(data['success']) is dict:
             if "performance" not in data["success"]:
                 data["success"]["performance"] = []
             performance = data["success"]["performance"]
@@ -558,6 +558,23 @@ def decrypt(enc_message:str, password:str) -> str:
         return message.decode(encoding='utf-8')
     except:
         return None
+
+def chopdq(target:str):
+    """"
+    "で囲まれた文字列を取り除きます。
+    targetにNoneが指定された場合はNoneを返します。
+
+    Args:
+        target (str): 対象文字列
+    
+    Returns:
+        str: 取り除かれた文字列
+    """
+    if target is None:
+        return None
+    if not isinstance(target, str):
+        return target
+    return target[1:-1] if target.startswith('"') and target.endswith('"') else target
 
 def is_event_loop_running() -> bool:
     """

@@ -10,6 +10,7 @@ import io
 import json
 import traceback
 import sys
+import uuid
 
 
 class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
@@ -94,6 +95,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 return True, output
         return False, None
 
+    @options.Options.audit()
     def exec_cmd(self, req:Request, res:Response, web:Web,
                  title:str, opt:Dict[str, Any], nothread:bool=False, appcls=None) -> List[Dict[str, Any]]:
         """
@@ -120,6 +122,9 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         if 'port' in opt: opt['port'] = web.redis_port
         if 'password' in opt: opt['password'] = web.redis_password
         if 'svname' in opt: opt['svname'] = web.svname
+        if req.session is not None and 'signin' in req.session and req.session['signin'] is not None:
+            if 'clmsg_id' in req.session['signin'] and req.session['signin']['clmsg_id'] is not None:
+                opt['clmsg_id'] = req.session['signin']['clmsg_id']
         ap.sv = None
         ap.cl = None
         ap.web = None

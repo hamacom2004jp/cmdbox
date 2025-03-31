@@ -93,13 +93,14 @@ const list_cmd_func = async () => {
     };
     // タグボタンを追加
     py_list_cmd.forEach(row => {
+        // タグボタンを追加
         if (!row.tag || !Array.isArray(row.tag)) return;
         row.tag.forEach(tag => {
             if (tag=='') return;
             if (cmd_item_tags.find(`[data-tag="${tag}"]`).length > 0) return;
-            const elem = $(`<button type="button" class="btn btn-outline-secondary btn-sm btn-tag me-2">${tag}</button>`);
+            const elem = $(`<button type="button" class="btn btn-outline-secondary btn-sm btn-tag me-2">` +
+                            `<svg class="bi svg-tag" width="16" height="16" fill="currentColor"><use href="#svg_tag"></use></svg>${tag}</button>`);
             elem.attr('data-tag', tag);
-            elem.text(tag);
             elem.click(tag_bot_click);
             cmd_item_tags.append(elem);
         });
@@ -176,6 +177,8 @@ const list_cmd_func_then = () => {
                     if (next_elem) next_elem.after(elem);
                     else row_content.append(elem);
                     input_elem = elem.find('.row_content_template_input');
+                    if(row.type=='date') input_elem.attr('type', 'date');
+                    else if(row.type=='datetime') input_elem.attr('type', 'datetime-local');
                     input_elem.removeClass('row_content_template_input');
                     input_elem.val(row.default);
                 }
@@ -265,9 +268,7 @@ const list_cmd_func_then = () => {
                 // マルチの場合は追加ボタンを追加
                 if(row.multi){
                     const btn_a = $('<button class="btn btn-secondary add_buton" type="button"></button>');
-                    btn_a.append('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">'
-                                +'<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>'
-                                +'</svg>');
+                    btn_a.append('<svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>');
                     input_elem.parent().append(btn_a);
                     let mk_func = (row, next_elem) => {
                         // row, next_elemの値を残すためにクロージャーにする
@@ -286,10 +287,8 @@ const list_cmd_func_then = () => {
                             return () => del_elem.remove();
                         }
                         const btn_t = $('<button class="btn btn-secondary" type="button"></button>');
-                        btn_t.append('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">'
-                                +'<path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>'
-                                +'<path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>'
-                                +'</svg>');
+                        btn_trash
+                        btn_t.append('<svg class="bi bi-trash" width="16" height="16" fill="currentColor"><use href="#btn_trash"></use></svg>');
                         input_elem.parent().append(btn_t);
                         btn_t.click(mk_func(input_elem.parent().parent(), row));
                     }

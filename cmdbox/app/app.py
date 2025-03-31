@@ -67,6 +67,7 @@ class CmdBoxApp:
                 self.options.load_svcmd(pn, prefix=self.cli_features_prefix[i], excludes=[], appcls=self.appcls, ver=self.ver, logger=self.default_logger)
         self.options.load_features_file('cli', self.options.load_svcmd, self.appcls, self.ver, self.default_logger)
         self.options.load_features_aliases_cli(self.default_logger)
+        self.options.load_features_audit(self.default_logger)
         efeatureloadtime = time.perf_counter()
 
         # コマンド引数の生成
@@ -109,7 +110,7 @@ class CmdBoxApp:
                     args_dict[key] = d
         # featuresの初期値を適用する
         self.options.load_features_args(args_dict)
-        args = argparse.Namespace(**args_dict)
+        args = argparse.Namespace(**{k:common.chopdq(v) for k,v in args_dict.items()})
         eargsparsetime = time.perf_counter()
 
         ret = dict(success=f"Start command. {args}")

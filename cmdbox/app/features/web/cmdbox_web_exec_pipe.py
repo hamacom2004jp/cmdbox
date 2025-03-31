@@ -84,6 +84,7 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                 for tfname in upfiles.values():
                     os.unlink(tfname)
 
+    @options.Options.audit()
     def exec_pipe(self, req:Request, res:Response, web:Web,
                   title:str, opt:Dict[str, Any], nothread:bool=False, capture_stdin:bool=False) -> List[Dict[str, Any]]:
         """

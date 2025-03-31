@@ -1,12 +1,18 @@
 from cmdbox.app import common, feature
 from cmdbox.app.commons import module
+from fastapi import Request
 from fastapi.routing import APIRoute
+from datetime import datetime
 from pathlib import Path
 from starlette.routing import Route
 from typing import List, Dict, Any 
+import argparse
+import functools
 import locale
 import logging
 import re
+import time
+import uuid
 
 
 class Options:
@@ -14,6 +20,8 @@ class Options:
     T_FLOAT = 'float'
     T_BOOL = 'bool'
     T_STR = 'str'
+    T_DATE = 'date'
+    T_DATETIME = 'datetime'
     T_DICT = 'dict'
     T_TEXT = 'text'
     T_FILE = 'file'
@@ -35,10 +43,12 @@ class Options:
     def __init__(self, appcls=None, ver=None):
         self.appcls = appcls
         self.ver = ver
+        self.default_logger = common.default_logger(False, ver=self.ver, webcall=True)
         self.features_yml_data = None
         self.features_loaded = dict()
         self.aliases_loaded_cli = False
         self.aliases_loaded_web = False
+        self.audit_loaded = False
         self.init_options()
 
     def get_mode_keys(self) -> List[str]:
@@ -279,11 +289,17 @@ class Options:
             discription_ja="このコマンドのタグを指定します。",
             discription_en="Specify the tag for this command.",
             choice=None)
+        self._options["clmsg_id"] = dict(
+            type=Options.T_STR, default=None, required=False, multi=False, hide=True,
+            discription_ja="クライアントのメッセージIDを指定します。省略した場合はuuid4で生成されます。",
+            discription_en="Specifies the message ID of the client. If omitted, uuid4 will be generated.",
+            choice=None)
 
     def init_debugoption(self):
         # デバックオプションを追加
         self._options["debug"]["opt"] = "debug"
         self._options["tag"]["opt"] = "tag"
+        self._options["clmsg_id"]["opt"] = "clmsg_id"
         for key, mode in self._options["cmd"].items():
             if type(mode) is not dict:
                 continue
@@ -296,6 +312,8 @@ class Options:
                     c["choice"].append(self._options["debug"])
                 if "tag" not in [_o['opt'] for _o in c["choice"]]:
                     c["choice"].append(self._options["tag"])
+                if "clmsg_id" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["clmsg_id"])
                 if c["opt"] not in [_o['opt'] for _o in self._options["cmd"]["choice"]]:
                     self._options["cmd"]["choice"] += [c]
             self._options["mode"][key] = mode
@@ -599,3 +617,129 @@ class Options:
             if not find:
                 logger.warning(f'Skip web rule in features.yml. (Command matching the rule not found. rule={rule})')
         self.aliases_loaded_web = True
+
+    def load_features_audit(self, logger:logging.Logger):
+        yml = self.features_yml_data
+        if yml is None: return
+        if self.audit_loaded: return
+        if 'audit' not in yml: return
+        if 'enabled' not in yml['audit']:
+            raise Exception('features.yml is invalid. (The audit element must have "enabled" specified.)')
+        if not yml['audit']['enabled']: return
+        if 'feature' not in yml['audit']:
+            raise Exception('features.yml is invalid. (The audit element must have "feature" specified.)')
+        if 'mode' not in yml['audit']['feature']:
+            raise Exception('features.yml is invalid. (The audit.feature element must have "mode" specified.)')
+        mode = yml['audit']['feature']['mode']
+        if 'cmd' not in yml['audit']['feature']:
+            raise Exception('features.yml is invalid. (The audit.feature element must have "cmd" specified.)')
+        cmd = yml['audit']['feature']['cmd']
+        self.audit_func:feature.Feature = self.get_cmd_attr(mode, cmd, 'feature')
+        if 'options' not in yml['audit']:
+            raise Exception('features.yml is invalid. (The audit element must have "options" specified.)')
+        self.audit_args = yml['audit']['options'].copy()
+        self.audit_args['mode'] = mode
+        self.audit_args['cmd'] = cmd
+        self.audit_loaded = True
+
+    AT_USER = 'user'
+    AT_ADMIN = 'admin'
+    AT_SYSTEM = 'system'
+    AT_AUTH = 'auth'
+    AT_EVENT = 'event'
+    AUDITS = [AT_USER, AT_ADMIN, AT_SYSTEM, AT_AUTH, AT_EVENT]
+
+    @staticmethod
+    def audit(body:Dict[str, Any]=None, audit_type:str=None, tags:List[str]=None, src:str=None) -> int:
+        """
+        監査ログを書き込む関数を返します。
+        デコレーターとして使用することができます。
+
+        Args:
+            body (Dict[str, Any]): 監査ログの内容
+            audit_type (str): 監査の種類
+            tags (List[str]): メッセージのタグ
+            src (str): メッセージの発生源
+
+        Returns:
+            int: レスポンスコード
+        """
+        self = Options.getInstance()
+        if body is None:
+            body = dict()
+        if body is not None and type(body) is not dict:
+            raise Exception('body is invalid. (The body must be a dictionary element.)')
+        if audit_type is not None and audit_type not in Options.AUDITS:
+            raise Exception(f'audit_type is invalid. (The audit_type must be one of the following: {Options.AUDITS})')
+        tags = tags if tags is not None else []
+        if tags is not None and type(tags) is not list:
+            raise Exception('clmsg_tags is invalid. (The clmsg_tags must be a list element.)')
+        def _audit_write(func):
+            @functools.wraps(func)
+            def _wrapper(*args, **kwargs):
+                self.audit_exec(*args, body=body, audit_type=audit_type, tags=tags, src=src, **kwargs)
+                ret = func(*args, **kwargs)
+                return ret
+            return _wrapper
+        return _audit_write
+
+    def audit_exec(self, *args, body:Dict[str, Any]=None, audit_type:str=None, tags:List[str]=None, src:str=None, user:str=None, **kwargs) -> None:
+        """
+        監査ログを書き込みます。
+
+        Args:
+            args (Any): 呼び出し元で使用している引数
+            body (Dict[str, Any]): 監査ログの内容
+            audit_type (str): 監査の種類
+            tags (List[str]): メッセージのタグ
+            src (str): メッセージの発生源
+            user (str): メッセージを発生させたユーザー名
+            kwargs (Any): 呼び出し元で使用しているキーワード引数
+        """
+        if self.audit_func is None:
+            raise Exception('audit write feature is not found.')
+        clmsg_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        opt = self.audit_args.copy()
+        opt['audit_type'] = audit_type
+        opt['clmsg_id'] = str(uuid.uuid4())
+        opt['clmsg_date'] = clmsg_date
+        opt['clmsg_src'] = opt['clmsg_src'] if 'clmsg_src' in opt else None
+        opt['clmsg_user'] = user
+        opt['clmsg_tag'] = tags
+        logger = self.default_logger
+        clmsg_body = body.copy() if body is not None else dict()
+        func_feature = None
+        for arg in list(args) + list(kwargs.values()):
+            if isinstance(arg, logging.Logger): logger = arg
+            elif isinstance(arg, argparse.Namespace):
+                mode = arg.mode if hasattr(arg, 'mode') else None
+                cmd = arg.cmd if hasattr(arg, 'cmd') else None
+                if mode is not None and cmd is not None:
+                    opt_schema = self.get_cmd_choices(mode, cmd, True)
+                    for key, val in arg.__dict__.items():
+                        if key in ['stdout_log', 'capture_stdout']:
+                            continue
+                        schema = [schema for schema in opt_schema if type(schema) is dict and schema['opt'] == key]
+                        if len(schema) == 0 or val == '' or val is None:
+                            continue
+                        if 'web' in schema[0] and schema[0]['web'] == 'mask':
+                            clmsg_body[key] = '********'
+                        else:
+                            clmsg_body[key] = common.to_str(val, 100)
+                if hasattr(arg, 'clmsg_id'): opt['clmsg_id'] = arg.clmsg_id
+            elif isinstance(arg, feature.Feature):
+                func_feature = arg
+                opt['clmsg_src'] = func_feature.__class__.__name__
+            elif isinstance(arg, Request):
+                if 'signin' in arg.session and arg.session['signin'] is not None and 'name' in arg.session['signin']:
+                    opt['clmsg_user'] = arg.session['signin']['name']
+                    if opt['audit_type'] is None:
+                        opt['audit_type'] = Options.AT_ADMIN if 'admin' in arg.session['signin']['groups'] else Options.AT_USER
+                    opt['clmsg_id'] = arg.session['signin']['clmsg_id'] if 'clmsg_id' in arg.session['signin'] else opt['clmsg_id']
+                    arg.session['signin']['clmsg_id'] = opt['clmsg_id']
+                opt['clmsg_src'] = arg.url.path
+        opt['clmsg_body'] = clmsg_body
+        if src is not None and src != "":
+            opt['clmsg_src'] = src
+        audit_args = argparse.Namespace(**{k:common.chopdq(v) for k,v in opt.items()})
+        self.audit_func.apprun(logger, audit_args, tm=0.0, pf=[])

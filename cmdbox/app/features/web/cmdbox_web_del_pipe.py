@@ -26,5 +26,6 @@ class DelPipe(feature.WebFeature):
             if 'signin' in req.session and req.session['signin'] is not None:
                 sess = req.session['signin']
                 web.user_data(req, sess['uid'], sess['name'], 'pipepins', title, delkey=True)
+            web.options.audit_exec(req, res)
             return {}
 

@@ -27,6 +27,7 @@ class Filer(feature.WebFeature):
             if signin is not None:
                 return signin
             res.headers['Access-Control-Allow-Origin'] = '*'
+            web.options.audit_exec(req, res)
             return web.filer_html_data
 
     def toolmenu(self, web:Web) -> Dict[str, Any]:
