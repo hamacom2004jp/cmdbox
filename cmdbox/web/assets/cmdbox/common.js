@@ -10,6 +10,25 @@ cmdbox.change_dark_mode = (dark_mode) => {
   else html.attr('data-bs-theme','dark');
   $('body').css('background-color', '');
 };
+cmdbox.change_color_mode = (color_mode) => {
+  const html = $('html');
+  color_mode = !color_mode ? localStorage.getItem('color_mode') : color_mode;
+  if(color_mode == 'light') html.attr('data-bs-theme','light');
+  else if(color_mode == 'night') html.attr('data-bs-theme','night');
+  else if(color_mode == 'midnight') html.attr('data-bs-theme','midnight');
+  else if(color_mode == 'coal') html.attr('data-bs-theme','coal');
+  else if(color_mode == 'deepsea') html.attr('data-bs-theme','deepsea');
+  else if(color_mode == 'obsidian') html.attr('data-bs-theme','obsidian');
+  else html.attr('data-bs-theme','dark');
+  localStorage.setItem('color_mode', color_mode);
+  if (color_mode) {
+    const elem = $('.change_color_mode');
+    elem.val(color_mode);
+    elem.css('background-color', 'var(--bs-body-bg)');
+    elem.css('color', 'var(--bs-body-color)');
+  }
+  $('body').css('background-color', '');
+};
 /**
  * ローディング表示
  */

@@ -1,6 +1,6 @@
 $(() => {
-    // ダークモード対応
-    cmdbox.change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+    // カラーモード対応
+    cmdbox.change_color_mode();
     // アイコンを表示
     cmdbox.set_logoicon('.navbar-brand');
     // copyright表示

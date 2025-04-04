@@ -65,7 +65,20 @@
                             View
                         </a>
                         <ul class="dropdown-menu viewmenu">
-                            <li><a class="dropdown-item" href="#" onclick="cmdbox.change_dark_mode();">Change Dark Mode</a></li>
+                            <li class="nav-item dropdown">
+                                <span class="dropdown-item">
+                                    Change Dark Mode
+                                    <select class="d-inline-block change_color_mode" onchange="cmdbox.change_color_mode($(this).val());">
+                                        <option value="dark" selected>Dark</option>
+                                        <option value="night">night</option>
+                                        <option value="midnight">midnight</option>
+                                        <option value="coal">coal</option>
+                                        <option value="deepsea">deepsea</option>
+                                        <option value="obsidian">obsidian</option>
+                                        <option value="light">light</option>
+                                    </select>
+                                </span>
+                            </li>
                             <li><a class="dropdown-item" href="#" onclick="$(`#console_modal`).modal(`show`);">Console log</a></li>
                         </ul>
                     </li>
@@ -261,6 +274,7 @@
     });
 </script>
 <link rel="stylesheet" href="assets/bootstrap/bootstrap.min.5.3.0.css">
+<link rel="stylesheet" href="assets/cmdbox/color_mode.css">
 <link rel="stylesheet" href="assets/lightbox2/css/lightbox.min.css">
 <link rel="stylesheet" href="assets/tree-menu/css/tree-menu.css">
 <script type="text/javascript" src="assets/bootstrap/bootstrap.bundle.min.5.3.0.js"></script>

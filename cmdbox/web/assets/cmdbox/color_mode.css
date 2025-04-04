@@ -1,0 +1,511 @@
+/* ライトモード (基本) - 必要に応じて調整 */
+[data-bs-theme="light"] {
+    --bs-body-bg: #fff;
+    --bs-body-color: #212529;
+    --bs-body-font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --bs-body-font-size: 1rem;
+    --bs-body-font-weight: 400;
+    --bs-body-line-height: 1.5;
+    --bs-body-text-align: left;
+    --bs-body-text-decoration: none;
+  
+    --bs-emphasis-color: #000;
+    --bs-secondary-color: #6c757d;
+    --bs-secondary-bg: #e2e3e5;
+    --bs-tertiary-color: #6c757d;
+    --bs-tertiary-bg: #f8f9fa;
+    --bs-link-color: #0d6efd;
+    --bs-link-hover-color: #0a58ca;
+    --bs-code-color: #d63384;
+    --bs-highlight-bg: #fff3cd;
+    --bs-highlight-border-color: #ffeeba;
+  
+    --bs-primary: #0d6efd;
+    --bs-primary-rgb: 13, 110, 253;
+    --bs-primary-text: #fff;
+    --bs-primary-bg-subtle: #cfe2ff;
+    --bs-primary-border-subtle: #b6d4fe;
+    --bs-secondary: #6c757d;
+    --bs-secondary-rgb: 108, 117, 125;
+    --bs-secondary-text: #fff;
+    --bs-secondary-bg-subtle: #e2e3e5;
+    --bs-secondary-border-subtle: #d3d6d8;
+    --bs-success: #198754;
+    --bs-success-rgb: 25, 135, 84;
+    --bs-success-text: #fff;
+    --bs-success-bg-subtle: #d1e7dd;
+    --bs-success-border-subtle: #badbcc;
+    --bs-info: #0dcaf0;
+    --bs-info-rgb: 13, 202, 240;
+    --bs-info-text: #000;
+    --bs-info-bg-subtle: #cff4fc;
+    --bs-info-border-subtle: #b6effb;
+    --bs-warning: #ffc107;
+    --bs-warning-rgb: 255, 193, 7;
+    --bs-warning-text: #000;
+    --bs-warning-bg-subtle: #fff3cd;
+    --bs-warning-border-subtle: #ffeeba;
+    --bs-danger: #dc3545;
+    --bs-danger-rgb: 220, 53, 69;
+    --bs-danger-text: #fff;
+    --bs-danger-bg-subtle: #f8d7da;
+    --bs-danger-border-subtle: #f5c2c7;
+    --bs-light: #f8f9fa;
+    --bs-light-rgb: 248, 249, 250;
+    --bs-light-text: #000;
+    --bs-light-bg-subtle: #fdfdfe;
+    --bs-light-border-subtle: #fcfcfd;
+    --bs-dark: #212529;
+    --bs-dark-rgb: 33, 37, 41;
+    --bs-dark-text: #fff;
+    --bs-dark-bg-subtle: #ced4da;
+    --bs-dark-border-subtle: #adb5bd;
+  
+    --bs-white: #fff;
+    --bs-black: #000;
+    --bs-blue: #0d6efd;
+    --bs-indigo: #6610f2;
+    --bs-purple: #6f42c1;
+    --bs-pink: #d63384;
+    --bs-red: #dc3545;
+    --bs-orange: #fd7e14;
+    --bs-yellow: #ffc107;
+    --bs-green: #198754;
+    --bs-teal: #20c997;
+    --bs-cyan: #0dcaf0;
+    --bs-gray: #6c757d;
+    --bs-gray-dark: #343a40;
+  
+    --bs-gradient: linear-gradient(180deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0));
+  
+    --bs-border-width: 1px;
+    --bs-border-style: solid;
+    --bs-border-color: #dee2e6;
+    --bs-border-color-translucent: rgba(0, 0, 0, 0.175);
+    --bs-border-radius: 0.375rem;
+    --bs-border-radius-sm: 0.25rem;
+    --bs-border-radius-lg: 0.5rem;
+    --bs-border-radius-pill: 50rem;
+  
+    --bs-box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+    --bs-box-shadow-sm: 0 .125rem .25rem rgba(0, 0, 0, .075);
+    --bs-box-shadow-lg: 0 1rem 3rem rgba(0, 0, 0, .175);
+    --bs-box-shadow-inset: inset 0 1px 2px rgba(0, 0, 0, .075);
+  
+    --bs-component-transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out, filter .15s ease-in-out, backdrop-filter .15s ease-in-out;
+    --bs-form-control-transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    --bs-button-transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    --bs-modal-transition: transform .3s ease-out;
+    --bs-collapse-transition: height .35s ease;
+    --bs-dropdown-transition: transform .15s ease-in-out;
+    --bs-alert-transition: opacity .15s ease-in-out, margin .15s ease-in-out;
+    --bs-tooltip-transition: opacity .15s ease-in-out;
+    --bs-popover-transition: opacity .15s ease-in-out;
+    --bs-carousel-transition: transform .6s ease-in-out;
+}
+  
+/* ダークモード - 必要に応じて調整 */
+[data-bs-theme="dark"] {
+    --bs-body-bg: #212529;
+    --bs-body-color: #fff;
+    --bs-emphasis-color: #fff;
+    --bs-secondary-color: #6c757d;
+    --bs-secondary-bg: #343a40;
+    --bs-tertiary-color: #6c757d;
+    --bs-tertiary-bg: #212529;
+    --bs-link-color: #0d6efd;
+    --bs-link-hover-color: #0a58ca;
+    --bs-code-color: #d63384;
+    --bs-highlight-bg: #fff3cd;
+    --bs-highlight-border-color: #ffeeba;
+  
+    --bs-primary: #0d6efd;
+    --bs-primary-rgb: 13, 110, 253;
+    --bs-primary-text: #fff;
+    --bs-primary-bg-subtle: #162e51;
+    --bs-primary-border-subtle: #0c1a30;
+    --bs-secondary: #6c757d;
+    --bs-secondary-rgb: 108, 117, 125;
+    --bs-secondary-text: #fff;
+    --bs-secondary-bg-subtle: #41464b;
+    --bs-secondary-border-subtle: #2b3035;
+    --bs-success: #198754;
+    --bs-success-rgb: 25, 135, 84;
+    --bs-success-text: #fff;
+    --bs-success-bg-subtle: #142b1e;
+    --bs-success-border-subtle: #0a1913;
+    --bs-info: #0dcaf0;
+    --bs-info-rgb: 13, 202, 240;
+    --bs-info-text: #000;
+    --bs-info-bg-subtle: #11303b;
+    --bs-info-border-subtle: #081c22;
+    --bs-warning: #ffc107;
+    --bs-warning-rgb: 255, 193, 7;
+    --bs-warning-text: #000;
+    --bs-warning-bg-subtle: #4d3b08;
+    --bs-warning-border-subtle: #302406;
+    --bs-danger: #dc3545;
+    --bs-danger-rgb: 220, 53, 69;
+    --bs-danger-text: #fff;
+    --bs-danger-bg-subtle: #361114;
+    --bs-danger-border-subtle: #1e0b0d;
+    --bs-light: #f8f9fa;
+    --bs-light-rgb: 248, 249, 250;
+    --bs-light-text: #000;
+    --bs-light-bg-subtle: #fdfdfe;
+    --bs-light-border-subtle: #fcfcfd;
+    --bs-dark: #212529;
+    --bs-dark-rgb: 33, 37, 41;
+    --bs-dark-text: #fff;
+    --bs-dark-bg-subtle: #ced4da;
+    --bs-dark-border-subtle: #adb5bd;
+  
+    --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+    --bs-border-color: #495057;
+    --bs-border-color-translucent: rgba(255, 255, 255, 0.15);
+}
+
+/* ナイトモード */
+[data-bs-theme="night"] {
+    --bs-body-bg: #2c3e50; /* ダークスレートグレー */
+    --bs-body-color: #ecf0f1; /* ライトグレー */
+    --bs-emphasis-color: #fff;
+    --bs-secondary-color: #34495e; /* チャコールグレー */
+    --bs-secondary-bg: #232e3a;
+    --bs-tertiary-color: #7f8c8d; /* ブルーグレー */
+    --bs-tertiary-bg: #34495e;
+    --bs-link-color: #3498db; /* ブライトブルー */
+    --bs-link-hover-color: #2980b9; /* ダルブルー */
+    --bs-code-color: #f39c12; /* オレンジ */
+    --bs-highlight-bg: #3a536b;
+    --bs-highlight-border-color: #2c3e50;
+
+    --bs-primary: #3498db; /* ブライトブルー */
+    --bs-primary-rgb: 52, 152, 219;
+    --bs-primary-text: #fff;
+    --bs-primary-bg-subtle: #1a4363;
+    --bs-primary-border-subtle: #133147;
+    --bs-secondary: #34495e; /* チャコールグレー */
+    --bs-secondary-rgb: 52, 73, 94;
+    --bs-secondary-text: #fff;
+    --bs-secondary-bg-subtle: #1a232d;
+    --bs-secondary-border-subtle: #131920;
+    --bs-success: #2ecc71; /* エメラルド */
+    --bs-success-rgb: 46, 204, 113;
+    --bs-success-text: #fff;
+    --bs-success-bg-subtle: #153d26;
+    --bs-success-border-subtle: #0e2b1b;
+    --bs-info: #95a5a6; /* ライトスレートグレー */
+    --bs-info-rgb: 149, 165, 166;
+    --bs-info-text: #fff;
+    --bs-info-bg-subtle: #2d3738;
+    --bs-info-border-subtle: #1e2324;
+    --bs-warning: #f39c12; /* オレンジ */
+    --bs-warning-rgb: 243, 156, 18;
+    --bs-warning-text: #fff;
+    --bs-warning-bg-subtle: #4a3106;
+    --bs-warning-border-subtle: #332104;
+    --bs-danger: #e74c3c; /* アラートレッド */
+    --bs-danger-rgb: 231, 76, 60;
+    --bs-danger-text: #fff;
+    --bs-danger-bg-subtle: #431c17;
+    --bs-danger-border-subtle: #2e120e;
+    --bs-light: #bdc3c7; /* シルバー */
+    --bs-light-rgb: 189, 195, 199;
+    --bs-light-text: #000;
+    --bs-light-bg-subtle: #343a40;
+    --bs-light-border-subtle: #212529;
+    --bs-dark: #34495e; /* チャコールグレー */
+    --bs-dark-rgb: 52, 73, 94;
+    --bs-dark-text: #fff;
+    --bs-dark-bg-subtle: #1a232d;
+    --bs-dark-border-subtle: #131920;
+
+    --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+    --bs-border-width: 1px;
+    --bs-border-style: solid;
+    --bs-border-color: #4a6585;
+    --bs-border-color-translucent: rgba(52, 73, 94, 1);
+
+    --bs-emphasis-color-rgb: var(--bs-card-title-color);
+    --bs-warning-text-emphasis: var(--bs-code-color);
+    --bs-body-color-rgb: var(--bs-body-color);
+    --bs-secondary-rgb: var(--bs-btn-color);
+    --bs-table-bg: var(--bs-tertiary-bg);
+}
+
+/* ミッドナイトモード */
+[data-bs-theme="midnight"] {
+    --bs-body-bg: #1a233a; /* ダークネイビー */
+    --bs-body-color: #d7dbe8; /* ライトブルーグレー */
+    --bs-emphasis-color: #fff;
+    --bs-secondary-color: #283552; /* ディープネイビー */
+    --bs-secondary-bg: #131a2c;
+    --bs-tertiary-color: #546e7a; /* ブルーグレー */
+    --bs-tertiary-bg: #283552;
+    --bs-link-color: #64b5f6; /* ライトブルー */
+    --bs-link-hover-color: #42a5f5; /* ブルー */
+    --bs-code-color: #ffb300; /* アンバー */
+    --bs-highlight-bg: #25324e;
+    --bs-highlight-border-color: #1a233a;
+  
+    --bs-primary: #64b5f6; /* ライトブルー */
+    --bs-primary-rgb: 100, 181, 246;
+    --bs-primary-text: #000;
+    --bs-primary-bg-subtle: #2d4263;
+    --bs-primary-border-subtle: #1e2b40;
+    --bs-secondary: #283552; /* ディープネイビー */
+    --bs-secondary-rgb: 40, 53, 82;
+    --bs-secondary-text: #fff;
+    --bs-secondary-bg-subtle: #141b2d;
+    --bs-secondary-border-subtle: #0d111f;
+    --bs-success: #66bb6a; /* ライトグリーン */
+    --bs-success-rgb: 102, 187, 106;
+    --bs-success-text: #000;
+    --bs-success-bg-subtle: #2a402e;
+    --bs-success-border-subtle: #1b291f;
+    --bs-info: #b0bec5; /* ブルーグレー */
+    --bs-info-rgb: 176, 190, 197;
+    --bs-info-text: #000;
+    --bs-info-bg-subtle: #32373a;
+    --bs-info-border-subtle: #212426;
+    --bs-warning: #ffca28; /* イエローアンバー */
+    --bs-warning-rgb: 255, 202, 40;
+    --bs-warning-text: #000;
+    --bs-warning-bg-subtle: #4d3e10;
+    --bs-warning-border-subtle: #332a0b;
+    --bs-danger: #ef5350; /* ライトレッド */
+    --bs-danger-rgb: 239, 83, 80;
+    --bs-danger-text: #fff;
+    --bs-danger-bg-subtle: #451e1d;
+    --bs-danger-border-subtle: #2e1312;
+    --bs-light: #e0e0e0; /* ライトグレー */
+    --bs-light-rgb: 224, 224, 224;
+    --bs-light-text: #000;
+    --bs-light-bg-subtle: #37474f;
+    --bs-light-border-subtle: #263238;
+    --bs-dark: #283552; /* ディープネイビー */
+    --bs-dark-rgb: 40, 53, 82;
+    --bs-dark-text: #fff;
+    --bs-dark-bg-subtle: #141b2d;
+    --bs-dark-border-subtle: #0d111f;
+  
+    --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+    --bs-border-width: 1px;
+    --bs-border-style: solid;
+    --bs-border-color: #37474f;
+    --bs-border-color-translucent: rgba(40, 53, 82, 1);
+
+    --bs-emphasis-color-rgb: var(--bs-card-title-color);
+    --bs-warning-text-emphasis: var(--bs-code-color);
+    --bs-body-color-rgb: var(--bs-body-color);
+    --bs-secondary-rgb: var(--bs-btn-color);
+    --bs-table-bg: var(--bs-tertiary-bg);
+}
+  
+/* コールモード */
+[data-bs-theme="coal"] {
+    --bs-body-bg: #1e1e1e; /* ほぼ黒 */
+    --bs-body-color: #d4d4d4; /* ライトグレー */
+    --bs-emphasis-color: #fff;
+    --bs-secondary-color: #282828; /* ダークグレー */
+    --bs-secondary-bg: #141414;
+    --bs-tertiary-color: #5e5e5e; /* グレー */
+    --bs-tertiary-bg: #282828;
+    --bs-link-color: #808080; /* グレー */
+    --bs-link-hover-color: #a9a9a9; /* ダークグレー */
+    --bs-code-color: #ffd700; /* ゴールド */
+    --bs-highlight-bg: #2c2c2c;
+    --bs-highlight-border-color: #1e1e1e;
+  
+    --bs-primary: #808080; /* グレー */
+    --bs-primary-rgb: 128, 128, 128;
+    --bs-primary-text: #fff;
+    --bs-primary-bg-subtle: #333;
+    --bs-primary-border-subtle: #222;
+    --bs-secondary: #282828; /* ダークグレー */
+    --bs-secondary-rgb: 40, 40, 40;
+    --bs-secondary-text: #fff;
+    --bs-secondary-bg-subtle: #141414;
+    --bs-secondary-border-subtle: #0a0a0a;
+    --bs-success: #556b2f; /* ダークオリーブグリーン */
+    --bs-success-rgb: 85, 107, 47;
+    --bs-success-text: #fff;
+    --bs-success-bg-subtle: #222813;
+    --bs-success-border-subtle: #151a0b;
+    --bs-info: #696969; /* ダークグレー */
+    --bs-info-rgb: 105, 105, 105;
+    --bs-info-text: #fff;
+    --bs-info-bg-subtle: #292929;
+    --bs-info-border-subtle: #1a1a1a;
+    --bs-warning: #b8860b; /* ダークゴールデンロッド */
+    --bs-warning-rgb: 184, 134, 11;
+    --bs-warning-text: #fff;
+    --bs-warning-bg-subtle: #3b2a04;
+    --bs-warning-border-subtle: #271b03;
+    --bs-danger: #8b0000; /* ダークレッド */
+    --bs-danger-rgb: 139, 0, 0;
+    --bs-danger-text: #fff;
+    --bs-danger-bg-subtle: #2c0000;
+    --bs-danger-border-subtle: #1a0000;
+    --bs-light: #424242; /* ダークグレー */
+    --bs-light-rgb: 66, 66, 66;
+    --bs-light-text: #fff;
+    --bs-light-bg-subtle: #1e1e1e;
+    --bs-light-border-subtle: #0a0a0a;
+    --bs-dark: #282828; /* ダークグレー */
+    --bs-dark-rgb: 40, 40, 40;
+    --bs-dark-text: #fff;
+    --bs-dark-bg-subtle: #141414;
+    --bs-dark-border-subtle: #0a0a0a;
+  
+    --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
+    --bs-border-width: 1px;
+    --bs-border-style: solid;
+    --bs-border-color: #424242;
+    --bs-border-color-translucent: rgba(40, 40, 40, 1);
+
+    --bs-emphasis-color-rgb: var(--bs-card-title-color);
+    --bs-warning-text-emphasis: var(--bs-code-color);
+    --bs-body-color-rgb: var(--bs-body-color);
+    --bs-secondary-rgb: var(--bs-btn-color);
+    --bs-table-bg: var(--bs-tertiary-bg);
+}
+
+/* ディープシーモード */
+[data-bs-theme="deepsea"] {
+    --bs-body-bg: #0a1128; /* 濃いネイビー */
+    --bs-body-color: #a7bcd4; /* ライトブルーグレー */
+    --bs-emphasis-color: #fff;
+    --bs-secondary-color: #001f54; /* ディープブルー */
+    --bs-secondary-bg: #050b17;
+    --bs-tertiary-color: #415a77; /* スティールブルー */
+    --bs-tertiary-bg: #001f54;
+    --bs-link-color: #6a994e; /* オリーブグリーン */
+    --bs-link-hover-color: #386641; /* ダークオリーブグリーン */
+    --bs-code-color: #feca57; /* イエロー */
+    --bs-highlight-bg: #141d37;
+    --bs-highlight-border-color: #0a1128;
+
+    --bs-primary: #6a994e; /* オリーブグリーン */
+    --bs-primary-rgb: 106, 153, 78;
+    --bs-primary-text: #fff;
+    --bs-primary-bg-subtle: #2a3d1f;
+    --bs-primary-border-subtle: #1b2814;
+    --bs-secondary: #001f54; /* ディープブルー */
+    --bs-secondary-rgb: 0, 31, 84;
+    --bs-secondary-text: #fff;
+    --bs-secondary-bg-subtle: #000a1a;
+    --bs-secondary-border-subtle: #00060f;
+    --bs-success: #43aa8b; /* シーグリーン */
+    --bs-success-rgb: 67, 170, 139;
+    --bs-success-text: #fff;
+    --bs-success-bg-subtle: #1a372e;
+    --bs-success-border-subtle: #10251f;
+    --bs-info: #4cc9f0; /* シアン */
+    --bs-info-rgb: 76, 201, 240;
+    --bs-info-text: #000;
+    --bs-info-bg-subtle: #1d3845;
+    --bs-info-border-subtle: #13252f;
+    --bs-warning: #ffbe0b; /* アンバー */
+    --bs-warning-rgb: 255, 190, 11;
+    --bs-warning-text: #000;
+    --bs-warning-bg-subtle: #4d3b05;
+    --bs-warning-border-subtle: #332703;
+    --bs-danger: #f94144; /* レッドオレンジ */
+    --bs-danger-rgb: 249, 65, 68;
+    --bs-danger-text: #fff;
+    --bs-danger-bg-subtle: #4a191a;
+    --bs-danger-border-subtle: #301011;
+    --bs-light: #e9ecef; /* ライトグレー */
+    --bs-light-rgb: 233, 236, 239;
+    --bs-light-text: #000;
+    --bs-light-bg-subtle: #1e2533;
+    --bs-light-border-subtle: #131822;
+    --bs-dark: #001f54; /* ディープブルー */
+    --bs-dark-rgb: 0, 31, 84;
+    --bs-dark-text: #fff;
+    --bs-dark-bg-subtle: #000a1a;
+    --bs-dark-border-subtle: #00060f;
+
+    --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
+    --bs-border-width: 1px;
+    --bs-border-style: solid;
+    --bs-border-color: #1e2533;
+    --bs-border-color-translucent: rgba(0, 31, 84, 1);
+
+    --bs-emphasis-color-rgb: var(--bs-card-title-color);
+    --bs-warning-text-emphasis: var(--bs-code-color);
+    --bs-body-color-rgb: var(--bs-body-color);
+    --bs-secondary-rgb: var(--bs-btn-color);
+    --bs-table-bg: var(--bs-tertiary-bg);
+}
+
+/* オブシディアンモード */
+[data-bs-theme="obsidian"] {
+    --bs-body-bg: #0c0c0c; /* ほぼ黒 */
+    --bs-body-color: #e0e0e0; /* ライトグレー */
+    --bs-emphasis-color: #fff;
+    --bs-secondary-color: #1a1a1a; /* ダークグレー */
+    --bs-secondary-bg: #000;
+    --bs-tertiary-color: #4d4d4d; /* グレー */
+    --bs-tertiary-bg: #1a1a1a;
+    --bs-link-color: #808080; /* グレー */
+    --bs-link-hover-color: #b3b3b3; /* ライトグレー */
+    --bs-code-color: #f0e68c; /* カーキ */
+    --bs-highlight-bg: #262626;
+    --bs-highlight-border-color: #0c0c0c;
+
+    --bs-primary: #808080; /* グレー */
+    --bs-primary-rgb: 128, 128, 128;
+    --bs-primary-text: #fff;
+    --bs-primary-bg-subtle: #333;
+    --bs-primary-border-subtle: #222;
+    --bs-secondary: #1a1a1a; /* ダークグレー */
+    --bs-secondary-rgb: 26, 26, 26;
+    --bs-secondary-text: #fff;
+    --bs-secondary-bg-subtle: #000;
+    --bs-secondary-border-subtle: #000;
+    --bs-success: #38761d; /* ダークオリーブグリーン */
+    --bs-success-rgb: 56, 118, 29;
+    --bs-success-text: #fff;
+    --bs-success-bg-subtle: #141d0b;
+    --bs-success-border-subtle: #0a1107;
+    --bs-info: #4682b4; /* スティールブルー */
+    --bs-info-rgb: 70, 130, 180;
+    --bs-info-text: #fff;
+    --bs-info-bg-subtle: #1c2a36;
+    --bs-info-border-subtle: #111b23;
+    --bs-warning: #a0522d; /* シエンナ */
+    --bs-warning-rgb: 160, 82, 45;
+    --bs-warning-text: #fff;
+    --bs-warning-bg-subtle: #331a11;
+    --bs-warning-border-subtle: #1f0e09;
+    --bs-danger: #8b0000; /* ダークレッド */
+    --bs-danger-rgb: 139, 0, 0;
+    --bs-danger-text: #fff;
+    --bs-danger-bg-subtle: #2c0000;
+    --bs-danger-border-subtle: #1a0000;
+    --bs-light: #333; /* ダークグレー */
+    --bs-light-rgb: 51, 51, 51;
+    --bs-light-text: #fff;
+    --bs-light-bg-subtle: #0c0c0c;
+    --bs-light-border-subtle: #000;
+    --bs-dark: #1a1a1a; /* ダークグレー */
+    --bs-dark-rgb: 26, 26, 26;
+    --bs-dark-text: #fff;
+    --bs-dark-bg-subtle: #000;
+    --bs-dark-border-subtle: #000;
+
+    --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
+    --bs-border-width: 1px;
+    --bs-border-style: solid;
+    --bs-border-color: #333;
+    --bs-border-color-translucent: rgba(26, 26, 26, 1);
+
+    --bs-emphasis-color-rgb: var(--bs-card-title-color);
+    --bs-body-color-rgb: var(--bs-body-color);
+    --bs-warning-text-emphasis: var(--bs-code-color);
+    --bs-secondary-rgb: var(--bs-btn-color);
+    --bs-table-bg: var(--bs-tertiary-bg);
+}

@@ -1,4 +1,4 @@
-from cmdbox.app import app, client, options, server, web as _web
+from cmdbox.app import app, client, common, options, server, web as _web
 from cmdbox.app.commons import convert, loghandler
 from cmdbox.app.features.web import cmdbox_web_load_cmd
 from cmdbox.app.web import Web
@@ -118,6 +118,21 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         if 'mode' in opt and 'cmd' in opt:
             if not web.signin.check_cmd(req, res, opt['mode'], opt['cmd']):
                 return dict(warn=f'Command "{title}" failed. Execute command denyed. mode={opt["mode"]}, cmd={opt["cmd"]}')
+            _options = options.Options.getInstance()
+            schema = _options.get_cmd_choices(opt['mode'], opt['cmd'], False)
+            try:
+                opt_path = web.cmds_path / f"cmd-{title}.json"
+                loaded = common.loadopt(opt_path, False)
+                for o in opt.keys():
+                    found = False
+                    for s in schema:
+                        if 'opt' not in s or s['opt'] != o: continue
+                        if 'web' not in s or s['web'] != 'mask': continue
+                        found = True
+                    if not found or o not in loaded: continue
+                    opt[o] = loaded[o]
+            except:
+                pass
         if 'host' in opt: opt['host'] = web.redis_host
         if 'port' in opt: opt['port'] = web.redis_port
         if 'password' in opt: opt['password'] = web.redis_password

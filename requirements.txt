@@ -10,6 +10,8 @@ Pillow
 python-multipart
 pycryptodome
 plyer             # For desktop notifications
+psycopg[binary]
+psycopg[pool]
 pystray           # For system tray icon
 #pyobjus          # Mac OS only
 questionary

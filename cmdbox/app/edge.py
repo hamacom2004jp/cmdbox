@@ -183,10 +183,10 @@ class Edge(object):
             self.svcert_no_verify = opt['svcert_no_verify']
             if self.svcert_no_verify:
                 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-            status, msg = self.signin(opt['auth_type'], opt['user'], opt['password'], opt['apikey'],
-                                      opt['oauth2'], int(opt['oauth2_port']),
-                                      opt['oauth2_tenant_id'], opt['oauth2_client_id'], opt['oauth2_client_secret'],
-                                      int(opt['oauth2_timeout']))
+            status, msg = self.signin(opt.get('auth_type'), opt.get('user'), opt.get('password'), opt.get('apikey'),
+                                      opt.get('oauth2'), int(opt.get('oauth2_port')),
+                                      opt.get('oauth2_tenant_id'), opt.get('oauth2_client_id'), opt.get('oauth2_client_secret'),
+                                      int(opt.get('oauth2_timeout')))
             if status != 0:
                 return msg
 

@@ -109,10 +109,18 @@ class AuditWrite(audit_base.AuditBase):
         clmsg_body_b64 = convert.str2b64str(clmsg_body_str)
         clmsg_tag_str = json.dumps(args.clmsg_tag, default=common.default_json_enc, ensure_ascii=False) if args.clmsg_tag is not None else '[]'
         clmsg_tag_b64 = convert.str2b64str(clmsg_tag_str)
+        pg_enabled = args.pg_enabled
+        pg_host_b64 = convert.str2b64str(args.pg_host)
+        pg_port = args.pg_port if isinstance(args.pg_port, int) else None
+        pg_user_b64 = convert.str2b64str(args.pg_user)
+        pg_password_b64 = convert.str2b64str(args.pg_password)
+        pg_dbname_b64 = convert.str2b64str(args.pg_dbname)
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-        cl.redis_cli.send_cmd('audit_write', [audit_type_b64, clmsg_id_b64, clmsg_date_b64, clmsg_src_b64, clmsg_user_b64, clmsg_body_b64, clmsg_tag_b64],
-                                              retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=True)
+        cl.redis_cli.send_cmd(self.get_svcmd(),
+                              [audit_type_b64, clmsg_id_b64, clmsg_date_b64, clmsg_src_b64, clmsg_user_b64, clmsg_body_b64, clmsg_tag_b64,
+                               pg_enabled, pg_host_b64, pg_port, pg_user_b64, pg_password_b64, pg_dbname_b64],
+                              retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=True)
         ret = dict(success=True)
         #common.print_format(ret, False, tm, None, False, pf=pf)
         return 0, ret, cl
@@ -148,12 +156,20 @@ class AuditWrite(audit_base.AuditBase):
         clmsg_user = convert.b64str2str(msg[6])
         clmsg_body = convert.b64str2str(msg[7])
         clmsg_tags = convert.b64str2str(msg[8])
+        pg_enabled = True if msg[9]=='True' else False
+        pg_host = convert.b64str2str(msg[10])
+        pg_port = int(msg[11]) if msg[11]!='None' else None
+        pg_user = convert.b64str2str(msg[12])
+        pg_password = convert.b64str2str(msg[13])
+        pg_dbname = convert.b64str2str(msg[14])
         svmsg_id = str(uuid.uuid4())
         st = self.write(msg[1], audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_user, clmsg_body, clmsg_tags, svmsg_id,
+                        pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname,
                         data_dir, logger, redis_cli)
         return st
 
     def write(self, reskey:str, audit_type:str, clmsg_id:str, clmsg_date:str, clmsg_src:str, clmsg_user:str, clmsg_body:str, clmsg_tags:str, svmsg_id:str,
+              pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str,
               data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient) -> int:
         """
         監査ログを書き込む
@@ -168,6 +184,12 @@ class AuditWrite(audit_base.AuditBase):
             clmsg_body (str): クライアントメッセージの本文
             clmsg_tags (str): クライアントメッセージのタグ
             svmsg_id (str): サーバーメッセージID
+            pg_enabled (bool): PostgreSQLを使用する場合はTrue
+            pg_host (str): PostgreSQLホスト
+            pg_port (int): PostgreSQLポート
+            pg_user (str): PostgreSQLユーザー
+            pg_password (str): PostgreSQLパスワード
+            pg_dbname (str): PostgreSQLデータベース名
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
@@ -176,7 +198,7 @@ class AuditWrite(audit_base.AuditBase):
             int: レスポンスコード
         """
         try:
-            with self.initdb(data_dir, logger) as conn:
+            with self.initdb(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname) as conn:
                 cursor = conn.cursor()
                 try:
                     clmsg_tags = json.dumps(clmsg_tags)

@@ -2,6 +2,7 @@ from cmdbox.app import feature
 from cmdbox.app.options import Options
 from pathlib import Path
 import logging
+import psycopg_pool
 import sqlite3
 
 
@@ -41,24 +42,55 @@ class AuditBase(feature.ResultEdgeFeature):
                 dict(opt="timeout", type=Options.T_INT, default="15", required=False, multi=False, hide=True, choice=None,
                      discription_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                      discription_en="Specify the maximum waiting time until the server responds."),
+
+                dict(opt="pg_enabled", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
+                     discription_ja="postgresqlデータベース・サーバを使用する場合はTrueを指定します。",
+                     discription_en="Specify True if using the postgresql database server."),
+                dict(opt="pg_host", type=Options.T_STR, default='localhost', required=False, multi=False, hide=True, choice=None, web="mask",
+                     discription_ja="postgresqlホストを指定する。",
+                     discription_en="Specify the postgresql host."),
+                dict(opt="pg_port", type=Options.T_INT, default=5432, required=False, multi=False, hide=True, choice=None, web="mask",
+                     discription_ja="postgresqlのポートを指定する。",
+                     discription_en="Specify the postgresql port."),
+                dict(opt="pg_user", type=Options.T_STR, default='postgres', required=False, multi=False, hide=True, choice=None, web="mask",
+                     discription_ja="postgresqlのユーザー名を指定する。",
+                     discription_en="Specify the postgresql user name."),
+                dict(opt="pg_password", type=Options.T_STR, default='postgres', required=False, multi=False, hide=True, choice=None, web="mask",
+                     discription_ja="postgresqlのパスワードを指定する。",
+                     discription_en="Specify the postgresql password."),
+                dict(opt="pg_dbname", type=Options.T_STR, default='audit', required=False, multi=False, hide=True, choice=None,
+                     discription_ja="postgresqlデータベース名を指定します。",
+                     discription_en="Specify the postgresql database name."),
             ]
         )
     
-    def initdb(self, data_dir:Path, logger:logging.Logger) -> sqlite3.Connection:
+    def initdb(self, data_dir:Path, logger:logging.Logger, pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str) -> sqlite3.Connection:
         """
         データベースを初期化します
 
         Args:
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
+            pg_enabled (bool): PostgreSQLを使用するかどうか
+            pg_host (str): PostgreSQLホスト
+            pg_port (int): PostgreSQLポート
+            pg_user (str): PostgreSQLユーザー名
+            pg_password (str): PostgreSQLパスワード
+            pg_dbname (str): PostgreSQLデータベース名
 
         Returns:
             sqlite3.Connection: データベース接続
         """
-        db_path = data_dir / '.audit' / 'audit.db'
-        db_path.parent.mkdir(parents=True, exist_ok=True)
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
+        if pg_enabled:
+            constr = f"host={pg_host} port={pg_port} user={pg_user} password={pg_password} dbname={pg_dbname}"
+            pg_pool = getattr(self, 'pg_pool', psycopg_pool.ConnectionPool(constr, min_size=2, max_size=5))
+            conn = pg_pool.getconn()
+            cursor = conn.cursor()
+        else:
+            db_path = data_dir / '.audit' / 'audit.db'
+            db_path.parent.mkdir(parents=True, exist_ok=True)
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
         try:
             cursor.execute('SELECT COUNT(*) FROM sqlite_master WHERE TYPE="table" AND NAME="audit"')
             if cursor.fetchone()[0] == 0:

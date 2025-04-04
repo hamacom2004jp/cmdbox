@@ -136,13 +136,21 @@ class AuditSearch(audit_base.AuditBase):
         filter_svmsg_id_b64 = convert.str2b64str(args.filter_svmsg_id)
         filter_svmsg_sdate_b64 = convert.str2b64str(args.filter_svmsg_sdate)
         filter_svmsg_edate_b64 = convert.str2b64str(args.filter_svmsg_edate)
+        pg_enabled = args.pg_enabled
+        pg_host_b64 = convert.str2b64str(args.pg_host)
+        pg_port = args.pg_port if isinstance(args.pg_port, int) else None
+        pg_user_b64 = convert.str2b64str(args.pg_user)
+        pg_password_b64 = convert.str2b64str(args.pg_password)
+        pg_dbname_b64 = convert.str2b64str(args.pg_dbname)
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-        ret = cl.redis_cli.send_cmd('audit_search', [select_b64, sort_b64, str(offset), str(limit),
-                                                     filter_audit_type_b64, filter_clmsg_id_b64, filter_clmsg_sdate_b64, filter_clmsg_edate_b64,
-                                                     filter_clmsg_src_b64, filter_clmsg_user_b64, filter_clmsg_body_b64, filter_clmsg_tag_b64, 
-                                                     filter_svmsg_id_b64, filter_svmsg_sdate_b64, filter_svmsg_edate_b64],
-                                      retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
+        ret = cl.redis_cli.send_cmd(self.get_svcmd(),
+                                    [select_b64, sort_b64, str(offset), str(limit),
+                                     filter_audit_type_b64, filter_clmsg_id_b64, filter_clmsg_sdate_b64, filter_clmsg_edate_b64,
+                                     filter_clmsg_src_b64, filter_clmsg_user_b64, filter_clmsg_body_b64, filter_clmsg_tag_b64, 
+                                     filter_svmsg_id_b64, filter_svmsg_sdate_b64, filter_svmsg_edate_b64,
+                                     pg_enabled, pg_host_b64, pg_port, pg_user_b64, pg_password_b64, pg_dbname_b64],
+                                    retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, None, False, pf=pf)
 
         if 'success' not in ret:
@@ -201,10 +209,17 @@ class AuditSearch(audit_base.AuditBase):
         filter_svmsg_id = convert.b64str2str(msg[14])
         filter_svmsg_sdate = convert.b64str2str(msg[15])
         filter_svmsg_edate = convert.b64str2str(msg[16])
+        pg_enabled = True if msg[17]=='True' else False
+        pg_host = convert.b64str2str(msg[18])
+        pg_port = int(msg[19]) if msg[19]!='None' else None
+        pg_user = convert.b64str2str(msg[20])
+        pg_password = convert.b64str2str(msg[21])
+        pg_dbname = convert.b64str2str(msg[22])
         st = self.search(msg[1], select, sort, offset, limit,
                          filter_audit_type, filter_clmsg_id, filter_clmsg_sdate, filter_clmsg_edate,
                          filter_clmsg_src, filter_clmsg_user, body, tags,
                          filter_svmsg_id, filter_svmsg_sdate, filter_svmsg_edate,
+                         pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname,
                          data_dir, logger, redis_cli)
         return st
 
@@ -212,6 +227,7 @@ class AuditSearch(audit_base.AuditBase):
                filter_audit_type:str, filter_clmsg_id:str, filter_clmsg_sdate:str, filter_clmsg_edate:str,
                filter_clmsg_src:str, filter_clmsg_user:str, filter_clmsg_body:Dict[str, Any], filter_clmsg_tags:List[str],
                filter_svmsg_id:str, filter_svmsg_sdate:str, filter_svmsg_edate:str,
+               pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str,
                data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient) -> int:
         """
         監査ログを検索する
@@ -233,6 +249,12 @@ class AuditSearch(audit_base.AuditBase):
             filter_svmsg_id (str): サーバーメッセージID
             filter_svmsg_sdate (str): サーバーメッセージ発生日時(開始)
             filter_svmsg_edate (str): サーバーメッセージ発生日時(終了)
+            pg_enabled (bool): PostgreSQLを使用する場合はTrue
+            pg_host (str): PostgreSQLホスト
+            pg_port (int): PostgreSQLポート
+            pg_user (str): PostgreSQLユーザー
+            pg_password (str): PostgreSQLパスワード
+            pg_dbname (str): PostgreSQLデータベース名
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
@@ -241,7 +263,7 @@ class AuditSearch(audit_base.AuditBase):
             int: レスポンスコード
         """
         try:
-            with self.initdb(data_dir, logger) as conn:
+            with self.initdb(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname) as conn:
                 def dict_factory(cursor, row):
                     return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
                 conn.row_factory = dict_factory
