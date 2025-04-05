@@ -1,11 +1,11 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="jp">
+<html class="writer-html5" lang="jp" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.feature &mdash; cmdbox 2025/03/26 documentation</title>
+  <title>cmdbox.app.feature &mdash; cmdbox 2025/04/06 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,9 +13,9 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=102af95c"></script>
-      <script src="../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../_static/documentation_options.js?v=308fb3f9"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -88,7 +88,9 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 
-<div class="viewcode-block" id="Feature"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Feature</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Feature">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Feature</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">USE_REDIS_FALSE</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
     <span class="n">USE_REDIS_MEIGHT</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">USE_REDIS_TRUE</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
@@ -104,7 +106,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ver</span> <span class="o">=</span> <span class="n">ver</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">appcls</span> <span class="o">=</span> <span class="n">appcls</span>
 
-<div class="viewcode-block" id="Feature.get_mode"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_mode">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<div class="viewcode-block" id="Feature.get_mode">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        この機能のモードを返します</span>
 
@@ -113,7 +117,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="Feature.get_cmd"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_cmd">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Feature.get_cmd">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_cmd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        この機能のコマンドを返します</span>
 
@@ -122,7 +129,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="Feature.get_option"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_option">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="Feature.get_option">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_option">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        この機能のオプションを返します</span>
 
@@ -131,7 +141,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="Feature.get_svcmd"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_svcmd">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_svcmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Feature.get_svcmd">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.get_svcmd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_svcmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        この機能のサーバー側のコマンドを返します</span>
 
@@ -140,7 +153,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Feature.apprun"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.apprun">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">pf</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="Feature.apprun">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.apprun">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">pf</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        この機能の実行を行います</span>
 
@@ -155,7 +171,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="Feature.is_cluster_redirect"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.is_cluster_redirect">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">is_cluster_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Feature.is_cluster_redirect">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.is_cluster_redirect">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_cluster_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        クラスター宛のメッセージの場合、メッセージを転送するかどうかを返します</span>
 
@@ -164,7 +183,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="Feature.svrun"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.svrun">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">svrun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">:</span><span class="n">redis_client</span><span class="o">.</span><span class="n">RedisClient</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+
+<div class="viewcode-block" id="Feature.svrun">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.svrun">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">svrun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">:</span><span class="n">redis_client</span><span class="o">.</span><span class="n">RedisClient</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
               <span class="n">sessions</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        この機能のサーバー側の実行を行います</span>
@@ -181,7 +203,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="Feature.edgerun"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.edgerun">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">edgerun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">tool</span><span class="p">:</span><span class="n">edge</span><span class="o">.</span><span class="n">Tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">prevres</span><span class="p">:</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Feature.edgerun">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.Feature.edgerun">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">edgerun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">tool</span><span class="p">:</span><span class="n">edge</span><span class="o">.</span><span class="n">Tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">prevres</span><span class="p">:</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        この機能のエッジ側の実行を行います</span>
 
@@ -196,55 +221,89 @@
 <span class="sd">            Tuple[int, Dict[str, Any]]: 終了コード, 結果</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">status</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">tool</span><span class="o">.</span><span class="n">exec_cmd</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">prevres</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="n">status</span><span class="p">,</span> <span class="n">res</span></div></div>
+        <span class="k">yield</span> <span class="n">status</span><span class="p">,</span> <span class="n">res</span></div>
+</div>
 
-<div class="viewcode-block" id="OneshotEdgeFeature"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.OneshotEdgeFeature">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">OneshotEdgeFeature</span><span class="p">(</span><span class="n">Feature</span><span class="p">):</span>
+
+<div class="viewcode-block" id="OneshotEdgeFeature">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.OneshotEdgeFeature">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OneshotEdgeFeature</span><span class="p">(</span><span class="n">Feature</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    一度だけ実行するエッジ機能の基底クラス</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="OneshotEdgeFeature.edgerun"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.OneshotEdgeFeature.edgerun">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">edgerun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">tool</span><span class="p">:</span><span class="n">edge</span><span class="o">.</span><span class="n">Tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">prevres</span><span class="p">:</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="OneshotEdgeFeature.edgerun">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.OneshotEdgeFeature.edgerun">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">edgerun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">tool</span><span class="p">:</span><span class="n">edge</span><span class="o">.</span><span class="n">Tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">prevres</span><span class="p">:</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">status</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">tool</span><span class="o">.</span><span class="n">exec_cmd</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">prevres</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="mi">1</span><span class="p">,</span> <span class="n">res</span></div></div>
+        <span class="k">yield</span> <span class="mi">1</span><span class="p">,</span> <span class="n">res</span></div>
+</div>
 
-<div class="viewcode-block" id="OneshotNotifyEdgeFeature"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.OneshotNotifyEdgeFeature">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">OneshotNotifyEdgeFeature</span><span class="p">(</span><span class="n">OneshotEdgeFeature</span><span class="p">):</span>
+
+<div class="viewcode-block" id="OneshotNotifyEdgeFeature">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.OneshotNotifyEdgeFeature">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OneshotNotifyEdgeFeature</span><span class="p">(</span><span class="n">OneshotEdgeFeature</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    実行結果の通知を行うエッジ機能の基底クラス</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="OneshotNotifyEdgeFeature.edgerun"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.OneshotNotifyEdgeFeature.edgerun">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">edgerun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">tool</span><span class="p">:</span><span class="n">edge</span><span class="o">.</span><span class="n">Tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">prevres</span><span class="p">:</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="OneshotNotifyEdgeFeature.edgerun">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.OneshotNotifyEdgeFeature.edgerun">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">edgerun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">tool</span><span class="p">:</span><span class="n">edge</span><span class="o">.</span><span class="n">Tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">prevres</span><span class="p">:</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">status</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">edgerun</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">prevres</span><span class="p">))</span>
         <span class="n">tool</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="n">status</span><span class="p">,</span> <span class="n">res</span></div></div>
+        <span class="k">yield</span> <span class="n">status</span><span class="p">,</span> <span class="n">res</span></div>
+</div>
 
-<div class="viewcode-block" id="ResultEdgeFeature"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.ResultEdgeFeature">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ResultEdgeFeature</span><span class="p">(</span><span class="n">Feature</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ResultEdgeFeature">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.ResultEdgeFeature">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResultEdgeFeature</span><span class="p">(</span><span class="n">Feature</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    実行結果をWebブラウザで表示するエッジ機能の基底クラス</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="ResultEdgeFeature.edgerun"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.ResultEdgeFeature.edgerun">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">edgerun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">tool</span><span class="p">:</span><span class="n">edge</span><span class="o">.</span><span class="n">Tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">prevres</span><span class="p">:</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ResultEdgeFeature.edgerun">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.ResultEdgeFeature.edgerun">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">edgerun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">tool</span><span class="p">:</span><span class="n">edge</span><span class="o">.</span><span class="n">Tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">prevres</span><span class="p">:</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">status</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">edgerun</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">prevres</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">status</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">tool</span><span class="o">.</span><span class="n">pub_result</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span> <span class="n">res</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tool</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="n">status</span><span class="p">,</span> <span class="n">res</span></div></div>
+        <span class="k">yield</span> <span class="n">status</span><span class="p">,</span> <span class="n">res</span></div>
+</div>
 
-<div class="viewcode-block" id="OneshotResultEdgeFeature"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.OneshotResultEdgeFeature">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">OneshotResultEdgeFeature</span><span class="p">(</span><span class="n">ResultEdgeFeature</span><span class="p">):</span>
+
+<div class="viewcode-block" id="OneshotResultEdgeFeature">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.OneshotResultEdgeFeature">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OneshotResultEdgeFeature</span><span class="p">(</span><span class="n">ResultEdgeFeature</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    一度だけ実行結果をWebブラウザで表示するエッジ機能の基底クラス</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="OneshotResultEdgeFeature.edgerun"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.OneshotResultEdgeFeature.edgerun">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">edgerun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">tool</span><span class="p">:</span><span class="n">edge</span><span class="o">.</span><span class="n">Tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">prevres</span><span class="p">:</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="OneshotResultEdgeFeature.edgerun">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.OneshotResultEdgeFeature.edgerun">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">edgerun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">tool</span><span class="p">:</span><span class="n">edge</span><span class="o">.</span><span class="n">Tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">prevres</span><span class="p">:</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">status</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">edgerun</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">prevres</span><span class="p">))</span>
-        <span class="k">yield</span> <span class="mi">1</span><span class="p">,</span> <span class="n">res</span></div></div>
+        <span class="k">yield</span> <span class="mi">1</span><span class="p">,</span> <span class="n">res</span></div>
+</div>
 
-<div class="viewcode-block" id="UnsupportEdgeFeature"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.UnsupportEdgeFeature">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">UnsupportEdgeFeature</span><span class="p">(</span><span class="n">Feature</span><span class="p">):</span>
+
+<div class="viewcode-block" id="UnsupportEdgeFeature">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.UnsupportEdgeFeature">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UnsupportEdgeFeature</span><span class="p">(</span><span class="n">Feature</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    サポートされていないエッジ機能の基底クラス</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="UnsupportEdgeFeature.edgerun"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.UnsupportEdgeFeature.edgerun">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">edgerun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">tool</span><span class="p">:</span><span class="n">edge</span><span class="o">.</span><span class="n">Tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">prevres</span><span class="p">:</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="UnsupportEdgeFeature.edgerun">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.UnsupportEdgeFeature.edgerun">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">edgerun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">tool</span><span class="p">:</span><span class="n">edge</span><span class="o">.</span><span class="n">Tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">prevres</span><span class="p">:</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">res</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Unsupported edgerun. mode=&quot;</span><span class="si">{</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot;, cmd=&quot;</span><span class="si">{</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
         <span class="n">tool</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="mi">1</span><span class="p">,</span> <span class="n">res</span></div></div>
+        <span class="k">yield</span> <span class="mi">1</span><span class="p">,</span> <span class="n">res</span></div>
+</div>
 
-<div class="viewcode-block" id="WebFeature"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">WebFeature</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="WebFeature">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WebFeature</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">USE_REDIS_FALSE</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">Feature</span><span class="o">.</span><span class="n">USE_REDIS_FALSE</span>
     <span class="n">USE_REDIS_MEIGHT</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">Feature</span><span class="o">.</span><span class="n">USE_REDIS_MEIGHT</span>
     <span class="n">USE_REDIS_TRUE</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">Feature</span><span class="o">.</span><span class="n">USE_REDIS_TRUE</span>
@@ -255,7 +314,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ver</span> <span class="o">=</span> <span class="n">ver</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">appcls</span> <span class="o">=</span> <span class="n">appcls</span>
 
-<div class="viewcode-block" id="WebFeature.route"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.route">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">app</span><span class="p">:</span><span class="n">FastAPI</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="WebFeature.route">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.route">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">,</span> <span class="n">app</span><span class="p">:</span><span class="n">FastAPI</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        webモードのルーティングを設定します</span>
 
@@ -265,7 +326,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="WebFeature.filemenu"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.filemenu">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">filemenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="WebFeature.filemenu">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.filemenu">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filemenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ファイルメニューの情報を返します</span>
 
@@ -290,7 +354,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="WebFeature.toolmenu"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.toolmenu">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">toolmenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="WebFeature.toolmenu">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.toolmenu">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">toolmenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ツールメニューの情報を返します</span>
 
@@ -315,7 +382,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="WebFeature.viewmenu"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.viewmenu">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">viewmenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="WebFeature.viewmenu">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.viewmenu">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">viewmenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Viewメニューの情報を返します</span>
 
@@ -340,7 +410,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="WebFeature.aboutmenu"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.aboutmenu">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">aboutmenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="WebFeature.aboutmenu">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature.aboutmenu">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">aboutmenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web</span><span class="p">:</span><span class="n">Web</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Aboutメニューの情報を返します</span>
 
@@ -363,7 +436,9 @@
 <span class="sd">                    }</span>
 <span class="sd">                }</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span></div></div>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span></div>
+</div>
+
 </pre></div>
 
            </div>

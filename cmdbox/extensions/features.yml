@@ -56,3 +56,4 @@ audit:
     pg_user: postgres                   # Specify the postgresql user name.
     pg_password: password               # Specify the postgresql password.
     pg_dbname: audit                    # Specify the postgresql database name.
+    retention_period_days: 365          # Specify the number of days to retain audit logs.

@@ -1,0 +1,590 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Command Reference ( audit mode ) &mdash; cmdbox 2025/04/06 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=308fb3f9"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Features" href="features.html" />
+    <link rel="prev" title="Command Reference ( edge mode )" href="cmd_edge.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Audit</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audit-createdb-cmdbox-m-audit-c-createdb-option">Audit createdb : <cite>cmdbox -m audit -c createdb &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#audit-delete-cmdbox-m-audit-c-delete-option">Audit delete : <cite>cmdbox -m audit -c delete &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#audit-search-cmdbox-m-audit-c-search-option">Audit search : <cite>cmdbox -m audit -c search &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#audit-write-cmdbox-m-audit-c-write-option">Audit write : <cite>cmdbox -m audit -c write &lt;Option&gt;</cite></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="command.html">Command Reference</a></li>
+      <li class="breadcrumb-item active">Command Reference ( audit mode )</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/cmd_audit.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="command-reference-audit-mode">
+<h1>Command Reference ( audit mode )<a class="headerlink" href="#command-reference-audit-mode" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p>List of audit mode commands.</p></li>
+</ul>
+<section id="audit-createdb-cmdbox-m-audit-c-createdb-option">
+<h2>Audit createdb : <cite>cmdbox -m audit -c createdb &lt;Option&gt;</cite><a class="headerlink" href="#audit-createdb-cmdbox-m-audit-c-createdb-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Create a database to record audits.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--pg_host &lt;host&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql host.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--pg_port &lt;posrt&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql port.</p></td>
+</tr>
+<tr class="row-even"><td><p>--pg_user &lt;user&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql user name.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--pg_password &lt;passwd&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql password.</p></td>
+</tr>
+<tr class="row-even"><td><p>--pg_dbname &lt;dbname&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql database name.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--new_pg_dbname &lt;dbname&gt;</p></td>
+<td></td>
+<td><p>Specify a new postgresql database name.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="audit-delete-cmdbox-m-audit-c-delete-option">
+<h2>Audit delete : <cite>cmdbox -m audit -c delete &lt;Option&gt;</cite><a class="headerlink" href="#audit-delete-cmdbox-m-audit-c-delete-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Delete the audit log.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>--delete_audit_type &lt;audit_type&gt;</p></td>
+<td></td>
+<td><p>Specifies the type of audit for the delete condition.</p></td>
+</tr>
+<tr class="row-even"><td><p>--delete_clmsg_id &lt;clmsg_id&gt;</p></td>
+<td></td>
+<td><p>Specify the message ID of the client for the delete condition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--delete_clmsg_sdate &lt;clmsg_date&gt;</p></td>
+<td></td>
+<td><p>Specify the date and time (start) when the message occurred for the client in the delete condition.</p></td>
+</tr>
+<tr class="row-even"><td><p>--delete_clmsg_edate &lt;clmsg_date&gt;</p></td>
+<td></td>
+<td><p>Specify the date and time (end) when the message occurred for the client in the delete condition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--delete_clmsg_src &lt;clmsg_src&gt;</p></td>
+<td></td>
+<td><p>Specifies the source of the message for the client in the delete condition; performs a LIKE search.</p></td>
+</tr>
+<tr class="row-even"><td><p>--delete_clmsg_user &lt;clmsg_user&gt;</p></td>
+<td></td>
+<td><p>Specifies the user who generated the message for the client in the delete condition; performs a LIKE search.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--delete_clmsg_body &lt;clmsg_body&gt;</p></td>
+<td></td>
+<td><p>Specifies the body of the client's message in the delete condition in dictionary format; performs a LIKE search.</p></td>
+</tr>
+<tr class="row-even"><td><p>--delete_clmsg_tag &lt;clmsg_tag&gt;</p></td>
+<td></td>
+<td><p>Specifies the tag of the client's message in the delete condition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--delete_svmsg_id &lt;svmsg_id&gt;</p></td>
+<td></td>
+<td><p>Specify the message ID of the server for the delete condition.</p></td>
+</tr>
+<tr class="row-even"><td><p>--delete_svmsg_sdate &lt;svmsg_date&gt;</p></td>
+<td></td>
+<td><p>Specify the date and time (start) when the message occurred for the server in the delete condition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--delete_svmsg_edate &lt;svmsg_date&gt;</p></td>
+<td></td>
+<td><p>Specify the date and time (end) when the message occurred for the server in the delete condition.</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>--pg_enabled</p></td>
+<td></td>
+<td><p>Specify True if using the postgresql database server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--pg_host &lt;host&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql host.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--pg_port &lt;posrt&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql port.</p></td>
+</tr>
+<tr class="row-even"><td><p>--pg_user &lt;user&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql user name.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--pg_password &lt;passwd&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql password.</p></td>
+</tr>
+<tr class="row-even"><td><p>--pg_dbname &lt;dbname&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql database name.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="audit-search-cmdbox-m-audit-c-search-option">
+<h2>Audit search : <cite>cmdbox -m audit -c search &lt;Option&gt;</cite><a class="headerlink" href="#audit-search-cmdbox-m-audit-c-search-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Search the audit log.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>--select</p></td>
+<td></td>
+<td><p>Specify the items to be retrieved. If not specified, all items are acquired.</p></td>
+</tr>
+<tr class="row-even"><td><p>--filter_audit_type &lt;audit_type&gt;</p></td>
+<td></td>
+<td><p>Specifies the type of audit for the filter condition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--filter_clmsg_id &lt;clmsg_id&gt;</p></td>
+<td></td>
+<td><p>Specify the message ID of the client for the filter condition.</p></td>
+</tr>
+<tr class="row-even"><td><p>--filter_clmsg_sdate &lt;clmsg_date&gt;</p></td>
+<td></td>
+<td><p>Specify the date and time (start) when the message occurred for the client in the filter condition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--filter_clmsg_edate &lt;clmsg_date&gt;</p></td>
+<td></td>
+<td><p>Specify the date and time (end) when the message occurred for the client in the filter condition.</p></td>
+</tr>
+<tr class="row-even"><td><p>--filter_clmsg_src &lt;clmsg_src&gt;</p></td>
+<td></td>
+<td><p>Specifies the source of the message for the client in the filter condition; performs a LIKE search.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--filter_clmsg_user &lt;clmsg_user&gt;</p></td>
+<td></td>
+<td><p>Specifies the user who generated the message for the client in the filter condition; performs a LIKE search.</p></td>
+</tr>
+<tr class="row-even"><td><p>--filter_clmsg_body &lt;clmsg_body&gt;</p></td>
+<td></td>
+<td><p>Specifies the body of the client's message in the filter condition in dictionary format; performs a LIKE search.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--filter_clmsg_tag &lt;clmsg_tag&gt;</p></td>
+<td></td>
+<td><p>Specifies the tag of the client's message in the filter condition.</p></td>
+</tr>
+<tr class="row-even"><td><p>--filter_svmsg_id &lt;svmsg_id&gt;</p></td>
+<td></td>
+<td><p>Specify the message ID of the server for the filter condition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--filter_svmsg_sdate &lt;svmsg_date&gt;</p></td>
+<td></td>
+<td><p>Specify the date and time (start) when the message occurred for the server in the filter condition.</p></td>
+</tr>
+<tr class="row-even"><td><p>--filter_svmsg_edate &lt;svmsg_date&gt;</p></td>
+<td></td>
+<td><p>Specify the date and time (end) when the message occurred for the server in the filter condition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--sort &lt;sort&gt;</p></td>
+<td></td>
+<td><p>Specify the sort item.</p></td>
+</tr>
+<tr class="row-even"><td><p>--offset &lt;offset&gt;</p></td>
+<td></td>
+<td><p>Specifies the starting position of the row to be retrieved.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--limit &lt;limit&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of rows to retrieve.</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>--pg_enabled</p></td>
+<td></td>
+<td><p>Specify True if using the postgresql database server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--pg_host &lt;host&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql host.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--pg_port &lt;posrt&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql port.</p></td>
+</tr>
+<tr class="row-even"><td><p>--pg_user &lt;user&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql user name.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--pg_password &lt;passwd&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql password.</p></td>
+</tr>
+<tr class="row-even"><td><p>--pg_dbname &lt;dbname&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql database name.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="audit-write-cmdbox-m-audit-c-write-option">
+<h2>Audit write : <cite>cmdbox -m audit -c write &lt;Option&gt;</cite><a class="headerlink" href="#audit-write-cmdbox-m-audit-c-write-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Record the audit.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>--audit_type &lt;audit_type&gt;</p></td>
+<td></td>
+<td><p>Specifies the audit type.</p></td>
+</tr>
+<tr class="row-even"><td><p>--clmsg_id &lt;clmsg_id&gt;</p></td>
+<td></td>
+<td><p>Specifies the message ID of the client. If omitted, uuid4 will be generated.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--clmsg_date &lt;clmsg_date&gt;</p></td>
+<td></td>
+<td><p>Specifies the date and time the client message occurred. If omitted, the server's current date/time is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--clmsg_src &lt;clmsg_src&gt;</p></td>
+<td></td>
+<td><p>Specifies the source of client messages. Usually specifies the name of a class that extends <cite>cmdbox.app.feature.Feature</cite> .</p></td>
+</tr>
+<tr class="row-odd"><td><p>--clmsg_user &lt;clmsg_user&gt;</p></td>
+<td></td>
+<td><p>Specifies the user who generated the client message.</p></td>
+</tr>
+<tr class="row-even"><td><p>--clmsg_body &lt;clmsg_body&gt;</p></td>
+<td></td>
+<td><p>Specifies the body of the client's message in dictionary format.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--clmsg_tag &lt;clmsg_tag&gt;</p></td>
+<td></td>
+<td><p>Specifies the tag for the client's message. Specify to make it easier to search later.</p></td>
+</tr>
+<tr class="row-even"><td><p>--filter_svmsg_id &lt;svmsg_id&gt;</p></td>
+<td></td>
+<td><p>Specify the message ID of the server for the filter condition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retention_period_days &lt;days&gt;</p></td>
+<td></td>
+<td><p>Specify the number of days to keep the audit. If the number is less than or equal to 0, the audit will be kept indefinitely.</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>--pg_enabled</p></td>
+<td></td>
+<td><p>Specify True if using the postgresql database server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--pg_host &lt;host&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql host.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--pg_port &lt;posrt&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql port.</p></td>
+</tr>
+<tr class="row-even"><td><p>--pg_user &lt;user&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql user name.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--pg_password &lt;passwd&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql password.</p></td>
+</tr>
+<tr class="row-even"><td><p>--pg_dbname &lt;dbname&gt;</p></td>
+<td></td>
+<td><p>Specify the postgresql database name.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cmd_edge.html" class="btn btn-neutral float-left" title="Command Reference ( edge mode )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="features.html" class="btn btn-neutral float-right" title="Features" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2025 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

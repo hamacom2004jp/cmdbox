@@ -3,6 +3,7 @@ from cmdbox.app.commons import convert, redis_client
 from cmdbox.app.features.cli import audit_base
 from cmdbox.app.options import Options
 from pathlib import Path
+from psycopg.rows import dict_row
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
@@ -98,7 +99,6 @@ class AuditSearch(audit_base.AuditBase):
         """
         return 'audit_search'
 
-    @Options.audit(audit_type=Options.AT_EVENT)
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -125,8 +125,10 @@ class AuditSearch(audit_base.AuditBase):
         limit = args.limit
         filter_audit_type_b64 = convert.str2b64str(args.filter_audit_type)
         filter_clmsg_id_b64 = convert.str2b64str(args.filter_clmsg_id)
-        filter_clmsg_sdate_b64 = convert.str2b64str(args.filter_clmsg_sdate)
-        filter_clmsg_edate_b64 = convert.str2b64str(args.filter_clmsg_edate)
+        filter_clmsg_sdate = args.filter_clmsg_sdate+common.get_tzoffset_str() if args.filter_clmsg_sdate else None
+        filter_clmsg_sdate_b64 = convert.str2b64str(filter_clmsg_sdate)
+        filter_clmsg_edate = args.filter_clmsg_edate+common.get_tzoffset_str() if args.filter_clmsg_edate else None
+        filter_clmsg_edate_b64 = convert.str2b64str(filter_clmsg_edate)
         filter_clmsg_src_b64 = convert.str2b64str(args.filter_clmsg_src)
         filter_clmsg_user_b64 = convert.str2b64str(args.filter_clmsg_user)
         filter_clmsg_body_str = json.dumps(args.filter_clmsg_body, default=common.default_json_enc, ensure_ascii=False) if args.filter_clmsg_body else '{}'
@@ -266,59 +268,71 @@ class AuditSearch(audit_base.AuditBase):
             with self.initdb(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname) as conn:
                 def dict_factory(cursor, row):
                     return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
-                conn.row_factory = dict_factory
+                conn.row_factory = dict_row if pg_enabled else dict_factory
                 cursor = conn.cursor()
                 try:
-                    sql = f'SELECT {",".join(select) if select is not None and len(select)>0 else "*"} FROM audit WHERE 1=1'
+                    select = select if select else ['audit_type', 'clmsg_id', 'clmsg_date', 'clmsg_src', 'clmsg_user', 'clmsg_body', 'clmsg_tag', 'svmsg_id', 'svmsg_date']
+                    if pg_enabled:
+                        toz = common.get_tzoffset_str()
+                        sel = []
+                        for s in select:
+                            if s in ['clmsg_date', 'svmsg_date']:
+                                sel.append(f"{s} AT TIME ZONE INTERVAL '{toz}' as {s}")
+                            else:
+                                sel.append(s)
+                        select = sel
+                    sql = f'SELECT {",".join(select)} FROM audit'
                     params = []
+                    where = []
                     if filter_audit_type and filter_audit_type != 'None':
-                        sql += ' AND audit_type=?'
+                        where.append(f'audit_type={"%s" if pg_enabled else "?"}')
                         params.append(filter_audit_type)
                     if filter_clmsg_id and filter_clmsg_id != 'None':
-                        sql += ' AND clmsg_id=?'
+                        where.append(f'clmsg_id={"%s" if pg_enabled else "?"}')
                         params.append(filter_clmsg_id)
                     if filter_clmsg_sdate and filter_clmsg_sdate != 'None':
-                        sql += ' AND clmsg_date>=?'
+                        where.append(f'clmsg_date>={"%s" if pg_enabled else "?"}')
                         params.append(filter_clmsg_sdate)
                     if filter_clmsg_edate and filter_clmsg_edate != 'None':
-                        sql += ' AND clmsg_date<=?'
+                        where.append(f'clmsg_date<={"%s" if pg_enabled else "?"}')
                         params.append(filter_clmsg_edate)
                     if filter_clmsg_src and filter_clmsg_src != 'None':
-                        sql += ' AND clmsg_src LIKE ?'
+                        where.append(f'clmsg_src LIKE {"%s" if pg_enabled else "?"}')
                         params.append(filter_clmsg_src)
                     if filter_clmsg_user and filter_clmsg_user != 'None':
-                        sql += ' AND clmsg_user LIKE ?'
+                        where.append(f'clmsg_user LIKE {"%s" if pg_enabled else "?"}')
                         params.append(filter_clmsg_user)
                     if filter_clmsg_body:
                         if sys.version_info[0] < 3 or sys.version_info[0] >= 3 and sys.version_info[1] < 10:
                             raise RuntimeError("Python 3.10 or later is required for JSON support.")
                         for key, value in filter_clmsg_body.items():
-                            sql += f" AND clmsg_body->>'{key}' LIKE ?"
+                            where.append(f"clmsg_body->>'{key}' LIKE {'%s' if pg_enabled else '?'}")
                             params.append(value)
                     if filter_clmsg_tags:
                         for tag in filter_clmsg_tags:
-                            sql += f" AND clmsg_tag like ?"
+                            where.append(f"clmsg_tag like {'%s' if pg_enabled else '?'}")
                             params.append(f'%{tag}%')
                     if filter_svmsg_id and filter_svmsg_id != 'None':
-                        sql += ' AND svmsg_id=?'
+                        where.append(f'svmsg_id={"%s" if pg_enabled else "?"}')
                         params.append(filter_svmsg_id)
                     if filter_svmsg_sdate and filter_svmsg_sdate != 'None':
-                        sql += ' AND svmsg_date>=?'
+                        where.append(f'svmsg_date>={"%s" if pg_enabled else "?"}')
                         params.append(filter_svmsg_sdate)
                     if filter_svmsg_edate and filter_svmsg_edate != 'None':
-                        sql += ' AND svmsg_date<=?'
+                        where.append(f'svmsg_date<={"%s" if pg_enabled else "?"}')
                         params.append(filter_svmsg_edate)
+                    sql += ' WHERE ' + ' AND '.join(where) if len(where)>0 else ''
                     if sort and len(sort) > 0:
                         sql += ' ORDER BY ' + ', '.join([f"{k} {v}" for k, v in sort.items()])
                     else:
                         sql += ' ORDER BY svmsg_date DESC'
                     if offset > 0:
-                        sql += ' OFFSET ?'
+                        sql += f' OFFSET {"%s" if pg_enabled else "?"}'
                         params.append(offset)
                     if limit > 0:
-                        sql += ' LIMIT ?'
+                        sql += f' LIMIT {"%s" if pg_enabled else "?"}'
                         params.append(limit)
-                    cursor.execute(sql, params)
+                    cursor.execute(sql, tuple(params))
                     rows = cursor.fetchall()
                     if not rows:
                         rescode, msg = (self.RESP_WARN, dict(warn="No data found"))

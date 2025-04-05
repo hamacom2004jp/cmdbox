@@ -1,11 +1,11 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="jp">
+<html class="writer-html5" lang="jp" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.options &mdash; cmdbox 2025/03/26 documentation</title>
+  <title>cmdbox.app.options &mdash; cmdbox 2025/04/06 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,9 +13,9 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=102af95c"></script>
-      <script src="../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../_static/documentation_options.js?v=308fb3f9"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -77,20 +77,30 @@
   <h1>Source code for cmdbox.app.options</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">feature</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">module</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.routing</span><span class="w"> </span><span class="kn">import</span> <span class="n">APIRoute</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">starlette.routing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Route</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span> 
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">locale</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
 
 
-<div class="viewcode-block" id="Options"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Options</span><span class="p">:</span>
+<div class="viewcode-block" id="Options">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Options</span><span class="p">:</span>
     <span class="n">T_INT</span> <span class="o">=</span> <span class="s1">&#39;int&#39;</span>
     <span class="n">T_FLOAT</span> <span class="o">=</span> <span class="s1">&#39;float&#39;</span>
     <span class="n">T_BOOL</span> <span class="o">=</span> <span class="s1">&#39;bool&#39;</span>
     <span class="n">T_STR</span> <span class="o">=</span> <span class="s1">&#39;str&#39;</span>
+    <span class="n">T_DATE</span> <span class="o">=</span> <span class="s1">&#39;date&#39;</span>
+    <span class="n">T_DATETIME</span> <span class="o">=</span> <span class="s1">&#39;datetime&#39;</span>
     <span class="n">T_DICT</span> <span class="o">=</span> <span class="s1">&#39;dict&#39;</span>
     <span class="n">T_TEXT</span> <span class="o">=</span> <span class="s1">&#39;text&#39;</span>
     <span class="n">T_FILE</span> <span class="o">=</span> <span class="s1">&#39;file&#39;</span>
@@ -103,25 +113,35 @@
 
     <span class="n">_instance</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="Options.getInstance"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.getInstance">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Options.getInstance">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.getInstance">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">getInstance</span><span class="p">(</span><span class="n">appcls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">Options</span><span class="o">.</span><span class="n">_instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">Options</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="n">Options</span><span class="p">(</span><span class="n">appcls</span><span class="o">=</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="n">ver</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Options</span><span class="o">.</span><span class="n">_instance</span></div>
 
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appcls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">appcls</span> <span class="o">=</span> <span class="n">appcls</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ver</span> <span class="o">=</span> <span class="n">ver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_logger</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">default_logger</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">,</span> <span class="n">webcall</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">features_yml_data</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">features_loaded</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">aliases_loaded_cli</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">aliases_loaded_web</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">audit_loaded</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_options</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Options.get_mode_keys"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_mode_keys">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_mode_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="Options.get_mode_keys">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_mode_keys">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mode_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Options.get_modes"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_modes">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_modes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+
+<div class="viewcode-block" id="Options.get_modes">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_modes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_modes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        起動モードの選択肢を取得します。</span>
 <span class="sd">        Returns:</span>
@@ -129,12 +149,18 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[{</span><span class="n">key</span><span class="p">:</span><span class="n">val</span><span class="p">}</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Options.get_cmd_keys"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_cmd_keys">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="Options.get_cmd_keys">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_cmd_keys">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">]:</span>
             <span class="k">return</span> <span class="p">[]</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">][</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Options.get_cmds"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_cmds">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+
+<div class="viewcode-block" id="Options.get_cmds">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_cmds">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        コマンドの選択肢を取得します。</span>
 <span class="sd">        Args:</span>
@@ -149,7 +175,10 @@
             <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">ret</span>
         <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;Please select mode.&#39;</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Options.get_cmd_attr"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_cmd_attr">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Options.get_cmd_attr">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_cmd_attr">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        コマンドの属性を取得します。</span>
 <span class="sd">        Args:</span>
@@ -166,8 +195,11 @@
         <span class="k">if</span> <span class="n">attr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">][</span><span class="n">mode</span><span class="p">][</span><span class="n">cmd</span><span class="p">]:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">][</span><span class="n">mode</span><span class="p">][</span><span class="n">cmd</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span></div>
+
     
-<div class="viewcode-block" id="Options.get_svcmd_feature"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_svcmd_feature">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_svcmd_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svcmd</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="viewcode-block" id="Options.get_svcmd_feature">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_svcmd_feature">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_svcmd_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svcmd</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        サーバー側のコマンドのフューチャーを取得します。</span>
 
@@ -182,7 +214,10 @@
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;svcmd&quot;</span><span class="p">][</span><span class="n">svcmd</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Options.get_cmd_choices"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_cmd_choices">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd_choices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">webmode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+
+<div class="viewcode-block" id="Options.get_cmd_choices">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_cmd_choices">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd_choices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">webmode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        コマンドのオプション一覧を取得します。</span>
 <span class="sd">        Args:</span>
@@ -204,7 +239,10 @@
             <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span></div>
 
-<div class="viewcode-block" id="Options.get_cmd_opt"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_cmd_opt">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd_opt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">webmode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="Options.get_cmd_opt">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.get_cmd_opt">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd_opt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">webmode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        コマンドのオプションを取得します。</span>
 <span class="sd">        Args:</span>
@@ -221,7 +259,10 @@
                 <span class="k">return</span> <span class="n">o</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Options.list_options"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.list_options">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">list_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Options.list_options">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.list_options">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">_list</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">dict</span> <span class="ow">or</span> <span class="s1">&#39;type&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
                 <span class="k">return</span>
@@ -277,7 +318,10 @@
                     <span class="n">_list</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">o</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">],</span> <span class="n">o</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span></div>
 
-<div class="viewcode-block" id="Options.mk_opt_list"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.mk_opt_list">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">mk_opt_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">webmode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="Options.mk_opt_list">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.mk_opt_list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mk_opt_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">webmode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="n">opt_schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmd_choices</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">],</span> <span class="n">webmode</span><span class="p">)</span>
         <span class="n">opt_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">]]</span>
         <span class="n">file_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -318,7 +362,10 @@
                 <span class="n">file_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
         <span class="k">return</span> <span class="n">opt_list</span><span class="p">,</span> <span class="n">file_dict</span></div>
 
-<div class="viewcode-block" id="Options.init_options"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.init_options">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">init_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Options.init_options">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.init_options">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_options</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="n">short</span><span class="o">=</span><span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_BOOL</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -355,12 +402,21 @@
             <span class="n">short</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">discription_ja</span><span class="o">=</span><span class="s2">&quot;このコマンドのタグを指定します。&quot;</span><span class="p">,</span>
             <span class="n">discription_en</span><span class="o">=</span><span class="s2">&quot;Specify the tag for this command.&quot;</span><span class="p">,</span>
+            <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;clmsg_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">discription_ja</span><span class="o">=</span><span class="s2">&quot;クライアントのメッセージIDを指定します。省略した場合はuuid4で生成されます。&quot;</span><span class="p">,</span>
+            <span class="n">discription_en</span><span class="o">=</span><span class="s2">&quot;Specifies the message ID of the client. If omitted, uuid4 will be generated.&quot;</span><span class="p">,</span>
             <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Options.init_debugoption"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.init_debugoption">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">init_debugoption</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Options.init_debugoption">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.init_debugoption">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_debugoption</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># デバックオプションを追加</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;debug&quot;</span><span class="p">][</span><span class="s2">&quot;opt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;debug&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;tag&quot;</span><span class="p">][</span><span class="s2">&quot;opt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;tag&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;clmsg_id&quot;</span><span class="p">][</span><span class="s2">&quot;opt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;clmsg_id&quot;</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">dict</span><span class="p">:</span>
                 <span class="k">continue</span>
@@ -373,12 +429,17 @@
                     <span class="n">c</span><span class="p">[</span><span class="s2">&quot;choice&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;debug&quot;</span><span class="p">])</span>
                 <span class="k">if</span> <span class="s2">&quot;tag&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">_o</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">_o</span> <span class="ow">in</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;choice&quot;</span><span class="p">]]:</span>
                     <span class="n">c</span><span class="p">[</span><span class="s2">&quot;choice&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;tag&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="s2">&quot;clmsg_id&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">_o</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">_o</span> <span class="ow">in</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;choice&quot;</span><span class="p">]]:</span>
+                    <span class="n">c</span><span class="p">[</span><span class="s2">&quot;choice&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;clmsg_id&quot;</span><span class="p">])</span>
                 <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;opt&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">_o</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">_o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">][</span><span class="s2">&quot;choice&quot;</span><span class="p">]]:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">][</span><span class="s2">&quot;choice&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="n">c</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">mode</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">][</span><span class="s2">&quot;choice&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="n">mode</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Options.load_svcmd"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.load_svcmd">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_svcmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">package_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;cmdbox_&quot;</span><span class="p">,</span> <span class="n">excludes</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="p">[],</span> <span class="n">appcls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">isloaded</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Options.load_svcmd">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.load_svcmd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_svcmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">package_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;cmdbox_&quot;</span><span class="p">,</span> <span class="n">excludes</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="p">[],</span> <span class="n">appcls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">isloaded</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        指定されたパッケージの指定された接頭語を持つモジュールを読み込みます。</span>
 
@@ -405,8 +466,11 @@
                 <span class="k">if</span> <span class="n">svcmd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;svcmd&quot;</span><span class="p">][</span><span class="n">svcmd</span><span class="p">]</span> <span class="o">=</span> <span class="n">fobj</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_debugoption</span><span class="p">()</span></div>
+
     
-<div class="viewcode-block" id="Options.is_features_loaded"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.is_features_loaded">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">is_features_loaded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ftype</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="Options.is_features_loaded">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.is_features_loaded">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_features_loaded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ftype</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        指定されたフィーチャータイプが読み込まれているかどうかを返します。</span>
 
@@ -417,7 +481,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">ftype</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_loaded</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_loaded</span><span class="p">[</span><span class="n">ftype</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Options.load_features_file"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.load_features_file">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_features_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ftype</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Options.load_features_file">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.load_features_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_features_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ftype</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        フィーチャーファイル（features.yml）を読み込みます。</span>
 
@@ -432,7 +499,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_features_loaded</span><span class="p">(</span><span class="n">ftype</span><span class="p">):</span>
             <span class="k">return</span>
         <span class="c1"># cmdboxを拡張したアプリをカスタマイズするときのfeatures.ymlを読み込む</span>
-        <span class="n">features_yml</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;features.yml&#39;</span><span class="p">)</span>
+        <span class="n">features_yml</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;.config/features.yml&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">features_yml</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">features_yml</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
             <span class="c1"># cmdboxを拡張したアプリの組み込みfeatures.ymlを読み込む</span>
             <span class="n">features_yml</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ver</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;extensions&#39;</span> <span class="o">/</span> <span class="s1">&#39;features.yml&#39;</span>
@@ -473,7 +540,10 @@
                 <span class="n">func</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;package&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;prefix&#39;</span><span class="p">],</span> <span class="n">exclude_modules</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_features_loaded</span><span class="p">(</span><span class="n">ftype</span><span class="p">))</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">features_loaded</span><span class="p">[</span><span class="n">ftype</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="Options.load_features_args"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.load_features_args">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_features_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args_dict</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+
+<div class="viewcode-block" id="Options.load_features_args">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.load_features_args">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_features_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args_dict</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
         <span class="n">yml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_yml_data</span>
         <span class="k">if</span> <span class="n">yml</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
@@ -519,7 +589,10 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">args_dict</span><span class="p">[</span><span class="n">ck</span><span class="p">]</span> <span class="o">=</span> <span class="n">_cast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ck</span><span class="p">,</span> <span class="n">cv</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Options.load_features_aliases_cli"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.load_features_aliases_cli">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_features_aliases_cli</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Options.load_features_aliases_cli">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.load_features_aliases_cli">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_features_aliases_cli</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
         <span class="n">yml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_yml_data</span>
         <span class="k">if</span> <span class="n">yml</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aliases_loaded_cli</span><span class="p">:</span> <span class="k">return</span>
@@ -616,7 +689,10 @@
                     <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">][</span><span class="n">src_mode</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">aliases_loaded_cli</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="Options.load_features_aliases_web"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.load_features_aliases_web">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_features_aliases_web</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">routes</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Route</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Options.load_features_aliases_web">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.load_features_aliases_web">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_features_aliases_web</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">routes</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Route</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
         <span class="n">yml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_yml_data</span>
         <span class="k">if</span> <span class="n">yml</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aliases_loaded_web</span><span class="p">:</span> <span class="k">return</span>
@@ -675,7 +751,144 @@
                         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;copy route: src=(</span><span class="si">{</span><span class="n">route_path</span><span class="si">}</span><span class="s1">) -&gt; tgt=(</span><span class="si">{</span><span class="n">tgt_Path</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">find</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Skip web rule in features.yml. (Command matching the rule not found. rule=</span><span class="si">{</span><span class="n">rule</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">aliases_loaded_web</span> <span class="o">=</span> <span class="kc">True</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aliases_loaded_web</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Options.load_features_audit">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.load_features_audit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_features_audit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
+        <span class="n">yml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_yml_data</span>
+        <span class="k">if</span> <span class="n">yml</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">audit_loaded</span><span class="p">:</span> <span class="k">return</span>
+        <span class="k">if</span> <span class="s1">&#39;audit&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">:</span> <span class="k">return</span>
+        <span class="k">if</span> <span class="s1">&#39;enabled&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The audit element must have &quot;enabled&quot; specified.)&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">][</span><span class="s1">&#39;enabled&#39;</span><span class="p">]:</span> <span class="k">return</span>
+        <span class="k">if</span> <span class="s1">&#39;feature&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The audit element must have &quot;feature&quot; specified.)&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;mode&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">][</span><span class="s1">&#39;feature&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The audit.feature element must have &quot;mode&quot; specified.)&#39;</span><span class="p">)</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">][</span><span class="s1">&#39;feature&#39;</span><span class="p">][</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;cmd&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">][</span><span class="s1">&#39;feature&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The audit.feature element must have &quot;cmd&quot; specified.)&#39;</span><span class="p">)</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">][</span><span class="s1">&#39;feature&#39;</span><span class="p">][</span><span class="s1">&#39;cmd&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">audit_func</span><span class="p">:</span><span class="n">feature</span><span class="o">.</span><span class="n">Feature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="s1">&#39;feature&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;options&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The audit element must have &quot;options&quot; specified.)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">audit_args</span> <span class="o">=</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">][</span><span class="s1">&#39;options&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">audit_args</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">audit_args</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cmd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">audit_loaded</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+    <span class="n">AT_USER</span> <span class="o">=</span> <span class="s1">&#39;user&#39;</span>
+    <span class="n">AT_ADMIN</span> <span class="o">=</span> <span class="s1">&#39;admin&#39;</span>
+    <span class="n">AT_SYSTEM</span> <span class="o">=</span> <span class="s1">&#39;system&#39;</span>
+    <span class="n">AT_AUTH</span> <span class="o">=</span> <span class="s1">&#39;auth&#39;</span>
+    <span class="n">AT_EVENT</span> <span class="o">=</span> <span class="s1">&#39;event&#39;</span>
+    <span class="n">AUDITS</span> <span class="o">=</span> <span class="p">[</span><span class="n">AT_USER</span><span class="p">,</span> <span class="n">AT_ADMIN</span><span class="p">,</span> <span class="n">AT_SYSTEM</span><span class="p">,</span> <span class="n">AT_AUTH</span><span class="p">,</span> <span class="n">AT_EVENT</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Options.audit">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.audit">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">audit</span><span class="p">(</span><span class="n">body</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">audit_type</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        監査ログを書き込む関数を返します。</span>
+<span class="sd">        デコレーターとして使用することができます。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            body (Dict[str, Any]): 監査ログの内容</span>
+<span class="sd">            audit_type (str): 監査の種類</span>
+<span class="sd">            tags (List[str]): メッセージのタグ</span>
+<span class="sd">            src (str): メッセージの発生源</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: レスポンスコード</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="n">Options</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">body</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">body</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">body</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">body</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">dict</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;body is invalid. (The body must be a dictionary element.)&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">audit_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">audit_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Options</span><span class="o">.</span><span class="n">AUDITS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;audit_type is invalid. (The audit_type must be one of the following: </span><span class="si">{</span><span class="n">Options</span><span class="o">.</span><span class="n">AUDITS</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="n">tags</span> <span class="k">if</span> <span class="n">tags</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">tags</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;clmsg_tags is invalid. (The clmsg_tags must be a list element.)&#39;</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_audit_write</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+            <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">audit_exec</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="p">,</span> <span class="n">audit_type</span><span class="o">=</span><span class="n">audit_type</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="n">tags</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="n">src</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">ret</span>
+            <span class="k">return</span> <span class="n">_wrapper</span>
+        <span class="k">return</span> <span class="n">_audit_write</span></div>
+
+
+<div class="viewcode-block" id="Options.audit_exec">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.audit_exec">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">audit_exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">audit_type</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        監査ログを書き込みます。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (Any): 呼び出し元で使用している引数</span>
+<span class="sd">            body (Dict[str, Any]): 監査ログの内容</span>
+<span class="sd">            audit_type (str): 監査の種類</span>
+<span class="sd">            tags (List[str]): メッセージのタグ</span>
+<span class="sd">            src (str): メッセージの発生源</span>
+<span class="sd">            user (str): メッセージを発生させたユーザー名</span>
+<span class="sd">            kwargs (Any): 呼び出し元で使用しているキーワード引数</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">audit_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;audit write feature is not found.&#39;</span><span class="p">)</span>
+        <span class="n">clmsg_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">common</span><span class="o">.</span><span class="n">get_tzoffset_str</span><span class="p">()</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">audit_args</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;audit_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">audit_type</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;clmsg_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;clmsg_date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clmsg_date</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;clmsg_src&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;clmsg_src&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;clmsg_src&#39;</span> <span class="ow">in</span> <span class="n">opt</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;clmsg_user&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;clmsg_tag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tags</span>
+        <span class="n">logger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_logger</span>
+        <span class="n">clmsg_body</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="n">body</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">func_feature</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">arg</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">):</span>
+                <span class="n">mode</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">mode</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s1">&#39;mode&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="n">cmd</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">cmd</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s1">&#39;cmd&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">cmd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">opt_schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmd_choices</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">arg</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;stdout_log&#39;</span><span class="p">,</span> <span class="s1">&#39;capture_stdout&#39;</span><span class="p">]:</span>
+                            <span class="k">continue</span>
+                        <span class="n">schema</span> <span class="o">=</span> <span class="p">[</span><span class="n">schema</span> <span class="k">for</span> <span class="n">schema</span> <span class="ow">in</span> <span class="n">opt_schema</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">dict</span> <span class="ow">and</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="k">if</span> <span class="s1">&#39;web&#39;</span> <span class="ow">in</span> <span class="n">schema</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">schema</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;web&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;mask&#39;</span><span class="p">:</span>
+                            <span class="n">clmsg_body</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;********&#39;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">clmsg_body</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s1">&#39;clmsg_id&#39;</span><span class="p">):</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;clmsg_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">clmsg_id</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">feature</span><span class="o">.</span><span class="n">Feature</span><span class="p">):</span>
+                <span class="n">func_feature</span> <span class="o">=</span> <span class="n">arg</span>
+                <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;clmsg_src&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">func_feature</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">Request</span><span class="p">):</span>
+                <span class="k">if</span> <span class="s1">&#39;signin&#39;</span> <span class="ow">in</span> <span class="n">arg</span><span class="o">.</span><span class="n">session</span> <span class="ow">and</span> <span class="n">arg</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">arg</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">]:</span>
+                    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;clmsg_user&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;audit_type&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;audit_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Options</span><span class="o">.</span><span class="n">AT_ADMIN</span> <span class="k">if</span> <span class="s1">&#39;admin&#39;</span> <span class="ow">in</span> <span class="n">arg</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;groups&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="n">Options</span><span class="o">.</span><span class="n">AT_USER</span>
+                    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;clmsg_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;clmsg_id&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;clmsg_id&#39;</span> <span class="ow">in</span> <span class="n">arg</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;clmsg_id&#39;</span><span class="p">]</span>
+                    <span class="n">arg</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;clmsg_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;clmsg_id&#39;</span><span class="p">]</span>
+                <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;clmsg_src&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;clmsg_body&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clmsg_body</span>
+        <span class="k">if</span> <span class="n">src</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">src</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;clmsg_src&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">src</span>
+        <span class="n">audit_args</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">common</span><span class="o">.</span><span class="n">chopdq</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">opt</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">audit_func</span><span class="o">.</span><span class="n">apprun</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">audit_args</span><span class="p">,</span> <span class="n">tm</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="p">[])</span></div>
+</div>
+
 </pre></div>
 
            </div>

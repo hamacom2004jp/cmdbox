@@ -25,7 +25,6 @@ INSTALL_REQUIRES = [
     'Pillow',
     'plyer',
     'psycopg[binary]',
-    'psycopg[pool]',
     'pystray',
     'python-multipart',
     'pycryptodome',

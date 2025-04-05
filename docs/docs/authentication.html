@@ -1,12 +1,12 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="jp">
+<html class="writer-html5" lang="jp" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Authentication &mdash; cmdbox 2025/03/26 documentation</title>
+  <title>Authentication &mdash; cmdbox 2025/04/06 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,9 +14,9 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=102af95c"></script>
-      <script src="../_static/doctools.js?v=888ff710"></script>
-      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/documentation_options.js?v=308fb3f9"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -81,13 +81,13 @@
            <div itemprop="articleBody">
              
   <section id="authentication">
-<h1>Authentication<a class="headerlink" href="#authentication" title="Permalink to this heading"></a></h1>
+<h1>Authentication<a class="headerlink" href="#authentication" title="Link to this heading"></a></h1>
 <ul class="simple">
 <li><p>There is a <cite>user_list.yml</cite> mechanism to authenticate web mode access users.</p></li>
 <li><p>This section describes how to use <cite>user_list.yml</cite>.</p></li>
 </ul>
 <section id="configuration-items-in-user-list-yml">
-<h2>Configuration items in <cite>user_list.yml</cite><a class="headerlink" href="#configuration-items-in-user-list-yml" title="Permalink to this heading"></a></h2>
+<h2>Configuration items in <cite>user_list.yml</cite><a class="headerlink" href="#configuration-items-in-user-list-yml" title="Link to this heading"></a></h2>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">users</span><span class="p">:</span><span class="w">                         </span><span class="c1"># A list of users, each of which is a map that contains the following fields.</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">                       </span><span class="c1"># An ID that identifies a user. No two users can have the same ID.</span>
 <span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span><span class="w">                  </span><span class="c1"># A name that identifies the user. No two users can have the same name.</span>

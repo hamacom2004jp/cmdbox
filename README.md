@@ -243,6 +243,27 @@ aliases:                                # Specify the alias for the specified co
                                         #   e.g. /{1}_exec
         move:                           # Specify whether to move the regular expression group of the source to the target.
                                         #   e.g. true
+  audit:
+    enabled: true                       # Specify whether to enable the audit function.
+    feature:
+      mode: audit                       # Specify the mode of the feature to be audited.
+      cmd: write                        # Specify the command to be audited.
+    options:                            # Specify the options for the audit function.
+      host: localhost                   # Specify the service host of the audit Redis server.
+      port: 6379                        # Specify the service port of the audit Redis server.
+      password: password                # Specify the access password of the audit Redis server.
+      svname: server                    # Specify the audit service name of the inference server.
+      retry_count: 3                    # Specifies the number of reconnections to the audit Redis server.If less than 0 is specified, reconnection is forever.
+      retry_interval: 1                 # Specifies the number of seconds before reconnecting to the audit Redis server.
+      timeout: 1                        # Specify the maximum waiting time until the server responds.
+      pg_enabled: False                 # Specify True if using the postgresql database server.
+      pg_host: localhost                # Specify the postgresql host.
+      pg_port: 5432                     # Specify the postgresql port.
+      pg_user: postgres                 # Specify the postgresql user name.
+      pg_password: password             # Specify the postgresql password.
+      pg_dbname: audit                  # Specify the postgresql database name.
+      retention_period_days: 365        # Specify the number of days to retain audit logs.
+
 ```
 
 - The following files should also be known when using commands on the web screen or RESTAPI.

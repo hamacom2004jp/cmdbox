@@ -165,75 +165,6 @@
     --bs-border-color-translucent: rgba(255, 255, 255, 0.15);
 }
 
-/* ナイトモード */
-[data-bs-theme="night"] {
-    --bs-body-bg: #2c3e50; /* ダークスレートグレー */
-    --bs-body-color: #ecf0f1; /* ライトグレー */
-    --bs-emphasis-color: #fff;
-    --bs-secondary-color: #34495e; /* チャコールグレー */
-    --bs-secondary-bg: #232e3a;
-    --bs-tertiary-color: #7f8c8d; /* ブルーグレー */
-    --bs-tertiary-bg: #34495e;
-    --bs-link-color: #3498db; /* ブライトブルー */
-    --bs-link-hover-color: #2980b9; /* ダルブルー */
-    --bs-code-color: #f39c12; /* オレンジ */
-    --bs-highlight-bg: #3a536b;
-    --bs-highlight-border-color: #2c3e50;
-
-    --bs-primary: #3498db; /* ブライトブルー */
-    --bs-primary-rgb: 52, 152, 219;
-    --bs-primary-text: #fff;
-    --bs-primary-bg-subtle: #1a4363;
-    --bs-primary-border-subtle: #133147;
-    --bs-secondary: #34495e; /* チャコールグレー */
-    --bs-secondary-rgb: 52, 73, 94;
-    --bs-secondary-text: #fff;
-    --bs-secondary-bg-subtle: #1a232d;
-    --bs-secondary-border-subtle: #131920;
-    --bs-success: #2ecc71; /* エメラルド */
-    --bs-success-rgb: 46, 204, 113;
-    --bs-success-text: #fff;
-    --bs-success-bg-subtle: #153d26;
-    --bs-success-border-subtle: #0e2b1b;
-    --bs-info: #95a5a6; /* ライトスレートグレー */
-    --bs-info-rgb: 149, 165, 166;
-    --bs-info-text: #fff;
-    --bs-info-bg-subtle: #2d3738;
-    --bs-info-border-subtle: #1e2324;
-    --bs-warning: #f39c12; /* オレンジ */
-    --bs-warning-rgb: 243, 156, 18;
-    --bs-warning-text: #fff;
-    --bs-warning-bg-subtle: #4a3106;
-    --bs-warning-border-subtle: #332104;
-    --bs-danger: #e74c3c; /* アラートレッド */
-    --bs-danger-rgb: 231, 76, 60;
-    --bs-danger-text: #fff;
-    --bs-danger-bg-subtle: #431c17;
-    --bs-danger-border-subtle: #2e120e;
-    --bs-light: #bdc3c7; /* シルバー */
-    --bs-light-rgb: 189, 195, 199;
-    --bs-light-text: #000;
-    --bs-light-bg-subtle: #343a40;
-    --bs-light-border-subtle: #212529;
-    --bs-dark: #34495e; /* チャコールグレー */
-    --bs-dark-rgb: 52, 73, 94;
-    --bs-dark-text: #fff;
-    --bs-dark-bg-subtle: #1a232d;
-    --bs-dark-border-subtle: #131920;
-
-    --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
-    --bs-border-width: 1px;
-    --bs-border-style: solid;
-    --bs-border-color: #4a6585;
-    --bs-border-color-translucent: rgba(52, 73, 94, 1);
-
-    --bs-emphasis-color-rgb: var(--bs-card-title-color);
-    --bs-warning-text-emphasis: var(--bs-code-color);
-    --bs-body-color-rgb: var(--bs-body-color);
-    --bs-secondary-rgb: var(--bs-btn-color);
-    --bs-table-bg: var(--bs-tertiary-bg);
-}
-
 /* ミッドナイトモード */
 [data-bs-theme="midnight"] {
     --bs-body-bg: #1a233a; /* ダークネイビー */
@@ -302,68 +233,68 @@
     --bs-secondary-rgb: var(--bs-btn-color);
     --bs-table-bg: var(--bs-tertiary-bg);
 }
+
+/* バーダントモード */
+[data-bs-theme="verdant"] {
+    --bs-body-bg: #001a00; /* 濃い緑 */
+    --bs-body-color: #90ee90; /* ライトグリーン */
+    --bs-emphasis-color: #00ff00; /* ライム */
+    --bs-secondary-color: #006400; /* ダークグリーン */
+    --bs-secondary-bg: #000d00;
+    --bs-tertiary-color: #228b22; /* フォレストグリーン */
+    --bs-tertiary-bg: #001a00;
+    --bs-link-color: #32cd32; /* ライムグリーン */
+    --bs-link-hover-color: #008000; /* 緑 */
+    --bs-code-color: #fafad2; /* ライトゴールデンロッドイエロー */
+    --bs-highlight-bg: #003300;
+    --bs-highlight-border-color: #001a00;
   
-/* コールモード */
-[data-bs-theme="coal"] {
-    --bs-body-bg: #1e1e1e; /* ほぼ黒 */
-    --bs-body-color: #d4d4d4; /* ライトグレー */
-    --bs-emphasis-color: #fff;
-    --bs-secondary-color: #282828; /* ダークグレー */
-    --bs-secondary-bg: #141414;
-    --bs-tertiary-color: #5e5e5e; /* グレー */
-    --bs-tertiary-bg: #282828;
-    --bs-link-color: #808080; /* グレー */
-    --bs-link-hover-color: #a9a9a9; /* ダークグレー */
-    --bs-code-color: #ffd700; /* ゴールド */
-    --bs-highlight-bg: #2c2c2c;
-    --bs-highlight-border-color: #1e1e1e;
-  
-    --bs-primary: #808080; /* グレー */
-    --bs-primary-rgb: 128, 128, 128;
-    --bs-primary-text: #fff;
-    --bs-primary-bg-subtle: #333;
-    --bs-primary-border-subtle: #222;
-    --bs-secondary: #282828; /* ダークグレー */
-    --bs-secondary-rgb: 40, 40, 40;
+    --bs-primary: #32cd32; /* ライムグリーン */
+    --bs-primary-rgb: 50, 205, 50;
+    --bs-primary-text: #000;
+    --bs-primary-bg-subtle: #004d00;
+    --bs-primary-border-subtle: #003300;
+    --bs-secondary: #006400; /* ダークグリーン */
+    --bs-secondary-rgb: 0, 100, 0;
     --bs-secondary-text: #fff;
-    --bs-secondary-bg-subtle: #141414;
-    --bs-secondary-border-subtle: #0a0a0a;
-    --bs-success: #556b2f; /* ダークオリーブグリーン */
-    --bs-success-rgb: 85, 107, 47;
-    --bs-success-text: #fff;
-    --bs-success-bg-subtle: #222813;
-    --bs-success-border-subtle: #151a0b;
-    --bs-info: #696969; /* ダークグレー */
-    --bs-info-rgb: 105, 105, 105;
+    --bs-secondary-bg-subtle: #001900;
+    --bs-secondary-border-subtle: #000d00;
+    --bs-success: #00ff00; /* ライム */
+    --bs-success-rgb: 0, 255, 0;
+    --bs-success-text: #000;
+    --bs-success-bg-subtle: #004d00;
+    --bs-success-border-subtle: #003300;
+    --bs-info: #4682b4; /* スティールブルー (コントラスト用) */
+    --bs-info-rgb: 70, 130, 180;
     --bs-info-text: #fff;
-    --bs-info-bg-subtle: #292929;
-    --bs-info-border-subtle: #1a1a1a;
-    --bs-warning: #b8860b; /* ダークゴールデンロッド */
-    --bs-warning-rgb: 184, 134, 11;
-    --bs-warning-text: #fff;
-    --bs-warning-bg-subtle: #3b2a04;
-    --bs-warning-border-subtle: #271b03;
-    --bs-danger: #8b0000; /* ダークレッド */
-    --bs-danger-rgb: 139, 0, 0;
+    --bs-info-bg-subtle: #0b141d;
+    --bs-info-border-subtle: #070c11;
+    --bs-warning: #ffd700; /* ゴールド (コントラスト用) */
+    --bs-warning-rgb: 255, 215, 0;
+    --bs-warning-text: #000;
+    --bs-warning-bg-subtle: #4d4300;
+    --bs-warning-border-subtle: #332b00;
+    --bs-danger: #ff4500; /* オレンジレッド (コントラスト用) */
+    --bs-danger-rgb: 255, 69, 0;
     --bs-danger-text: #fff;
-    --bs-danger-bg-subtle: #2c0000;
-    --bs-danger-border-subtle: #1a0000;
-    --bs-light: #424242; /* ダークグレー */
-    --bs-light-rgb: 66, 66, 66;
+    --bs-danger-bg-subtle: #4d1100;
+    --bs-danger-border-subtle: #330b00;
+    --bs-light: #003300; /* 濃い緑 */
+    --bs-light-rgb: 0, 51, 0;
     --bs-light-text: #fff;
-    --bs-light-bg-subtle: #1e1e1e;
-    --bs-light-border-subtle: #0a0a0a;
-    --bs-dark: #282828; /* ダークグレー */
-    --bs-dark-rgb: 40, 40, 40;
+    --bs-light-bg-subtle: #001a00;
+    --bs-light-border-subtle: #000d00;
+    --bs-dark: #006400; /* ダークグリーン */
+    --bs-dark-rgb: 0, 100, 0;
     --bs-dark-text: #fff;
-    --bs-dark-bg-subtle: #141414;
-    --bs-dark-border-subtle: #0a0a0a;
+    --bs-dark-bg-subtle: #001900;
+    --bs-dark-border-subtle: #000d00;
   
-    --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
+    --bs-gradient: linear-gradient(180deg, rgba(0, 255, 0, 0.15), rgba(0, 255, 0, 0));
     --bs-border-width: 1px;
     --bs-border-style: solid;
-    --bs-border-color: #424242;
-    --bs-border-color-translucent: rgba(40, 40, 40, 1);
+    --bs-border-color: #006400;
+    --bs-border-color-translucent: rgba(0, 100, 0, 1);
 
     --bs-emphasis-color-rgb: var(--bs-card-title-color);
     --bs-warning-text-emphasis: var(--bs-code-color);
@@ -441,71 +372,140 @@
     --bs-table-bg: var(--bs-tertiary-bg);
 }
 
-/* オブシディアンモード */
-[data-bs-theme="obsidian"] {
-    --bs-body-bg: #0c0c0c; /* ほぼ黒 */
-    --bs-body-color: #e0e0e0; /* ライトグレー */
-    --bs-emphasis-color: #fff;
-    --bs-secondary-color: #1a1a1a; /* ダークグレー */
-    --bs-secondary-bg: #000;
-    --bs-tertiary-color: #4d4d4d; /* グレー */
-    --bs-tertiary-bg: #1a1a1a;
-    --bs-link-color: #808080; /* グレー */
-    --bs-link-hover-color: #b3b3b3; /* ライトグレー */
-    --bs-code-color: #f0e68c; /* カーキ */
-    --bs-highlight-bg: #262626;
-    --bs-highlight-border-color: #0c0c0c;
-
-    --bs-primary: #808080; /* グレー */
-    --bs-primary-rgb: 128, 128, 128;
+/* クリムゾンモード */
+[data-bs-theme="crimson"] {
+    --bs-body-bg: #1a0000; /* 濃いマルーン */
+    --bs-body-color: #f08080; /* ライトコーラル */
+    --bs-emphasis-color: #ff0000; /* 赤 */
+    --bs-secondary-color: #8b0000; /* ダークレッド */
+    --bs-secondary-bg: #0d0000;
+    --bs-tertiary-color: #b22222; /* ファイアブリック */
+    --bs-tertiary-bg: #1a0000;
+    --bs-link-color: #ff4d4d; /* 明るい赤 */
+    --bs-link-hover-color: #cc0000; /* より濃い赤 */
+    --bs-code-color: #ffdab9; /* ピーチパフ */
+    --bs-highlight-bg: #330000;
+    --bs-highlight-border-color: #1a0000;
+  
+    --bs-primary: #ff4d4d; /* 明るい赤 */
+    --bs-primary-rgb: 255, 77, 77;
     --bs-primary-text: #fff;
-    --bs-primary-bg-subtle: #333;
-    --bs-primary-border-subtle: #222;
-    --bs-secondary: #1a1a1a; /* ダークグレー */
-    --bs-secondary-rgb: 26, 26, 26;
+    --bs-primary-bg-subtle: #4d0000;
+    --bs-primary-border-subtle: #330000;
+    --bs-secondary: #8b0000; /* ダークレッド */
+    --bs-secondary-rgb: 139, 0, 0;
     --bs-secondary-text: #fff;
-    --bs-secondary-bg-subtle: #000;
-    --bs-secondary-border-subtle: #000;
-    --bs-success: #38761d; /* ダークオリーブグリーン */
-    --bs-success-rgb: 56, 118, 29;
+    --bs-secondary-bg-subtle: #220000;
+    --bs-secondary-border-subtle: #140000;
+    --bs-success: #556b2f; /* ダークオリーブグリーン (コントラスト用) */
+    --bs-success-rgb: 85, 107, 47;
     --bs-success-text: #fff;
-    --bs-success-bg-subtle: #141d0b;
-    --bs-success-border-subtle: #0a1107;
-    --bs-info: #4682b4; /* スティールブルー */
+    --bs-success-bg-subtle: #11170b;
+    --bs-success-border-subtle: #0a0e07;
+    --bs-info: #4682b4; /* スティールブルー (コントラスト用) */
     --bs-info-rgb: 70, 130, 180;
     --bs-info-text: #fff;
-    --bs-info-bg-subtle: #1c2a36;
-    --bs-info-border-subtle: #111b23;
-    --bs-warning: #a0522d; /* シエンナ */
-    --bs-warning-rgb: 160, 82, 45;
-    --bs-warning-text: #fff;
-    --bs-warning-bg-subtle: #331a11;
-    --bs-warning-border-subtle: #1f0e09;
-    --bs-danger: #8b0000; /* ダークレッド */
-    --bs-danger-rgb: 139, 0, 0;
+    --bs-info-bg-subtle: #0b141d;
+    --bs-info-border-subtle: #070c11;
+    --bs-warning: #ffa07a; /* ライトサーモン (コントラスト用) */
+    --bs-warning-rgb: 255, 160, 122;
+    --bs-warning-text: #000;
+    --bs-warning-bg-subtle: #4d2012;
+    --bs-warning-border-subtle: #33140b;
+    --bs-danger: #ff0000; /* 赤 */
+    --bs-danger-rgb: 255, 0, 0;
     --bs-danger-text: #fff;
-    --bs-danger-bg-subtle: #2c0000;
-    --bs-danger-border-subtle: #1a0000;
-    --bs-light: #333; /* ダークグレー */
-    --bs-light-rgb: 51, 51, 51;
+    --bs-danger-bg-subtle: #4d0000;
+    --bs-danger-border-subtle: #330000;
+    --bs-light: #4d0000; /* 濃いマルーン */
+    --bs-light-rgb: 77, 0, 0;
     --bs-light-text: #fff;
-    --bs-light-bg-subtle: #0c0c0c;
-    --bs-light-border-subtle: #000;
-    --bs-dark: #1a1a1a; /* ダークグレー */
-    --bs-dark-rgb: 26, 26, 26;
+    --bs-light-bg-subtle: #1a0000;
+    --bs-light-border-subtle: #0d0000;
+    --bs-dark: #8b0000; /* ダークレッド */
+    --bs-dark-rgb: 139, 0, 0;
     --bs-dark-text: #fff;
-    --bs-dark-bg-subtle: #000;
-    --bs-dark-border-subtle: #000;
-
-    --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
+    --bs-dark-bg-subtle: #220000;
+    --bs-dark-border-subtle: #140000;
+  
+    --bs-gradient: linear-gradient(180deg, rgba(255, 0, 0, 0.15), rgba(255, 0, 0, 0));
     --bs-border-width: 1px;
     --bs-border-style: solid;
-    --bs-border-color: #333;
-    --bs-border-color-translucent: rgba(26, 26, 26, 1);
+    --bs-border-color: #8b0000;
+    --bs-border-color-translucent: rgba(139, 0, 0, 1);
 
     --bs-emphasis-color-rgb: var(--bs-card-title-color);
-    --bs-body-color-rgb: var(--bs-body-color);
     --bs-warning-text-emphasis: var(--bs-code-color);
+    --bs-body-color-rgb: var(--bs-body-color);
+    --bs-secondary-rgb: var(--bs-btn-color);
+    --bs-table-bg: var(--bs-tertiary-bg);
+}
+
+/* バンブルビーモード */
+[data-bs-theme="bumblebee"] {
+    --bs-body-bg: #1a1a00; /* 濃いオリーブ */
+    --bs-body-color: #ffff00; /* 黄 */
+    --bs-emphasis-color: #ffff00; /* 黄 */
+    --bs-secondary-color: #b8860b; /* ダークゴールデンロッド */
+    --bs-secondary-bg: #0d0d00;
+    --bs-tertiary-color: #ffd700; /* ゴールド */
+    --bs-tertiary-bg: #1a1a00;
+    --bs-link-color: #ffcc00; /* 明るい黄 */
+    --bs-link-hover-color: #e6b800; /* より濃い黄 */
+    --bs-code-color: #f0f8ff; /* アリスブルー */
+    --bs-highlight-bg: #333300;
+    --bs-highlight-border-color: #1a1a00;
+  
+    --bs-primary: #ffcc00; /* 明るい黄 */
+    --bs-primary-rgb: 255, 204, 0;
+    --bs-primary-text: #000;
+    --bs-primary-bg-subtle: #4d4000;
+    --bs-primary-border-subtle: #332b00;
+    --bs-secondary: #b8860b; /* ダークゴールデンロッド */
+    --bs-secondary-rgb: 184, 134, 11;
+    --bs-secondary-text: #000;
+    --bs-secondary-bg-subtle: #2e2103;
+    --bs-secondary-border-subtle: #1f1602;
+    --bs-success: #008000; /* 緑 (コントラスト用) */
+    --bs-success-rgb: 0, 128, 0;
+    --bs-success-text: #fff;
+    --bs-success-bg-subtle: #001900;
+    --bs-success-border-subtle: #000d00;
+    --bs-info: #008b8b; /* ダークシアン (コントラスト用) */
+    --bs-info-rgb: 0, 139, 139;
+    --bs-info-text: #fff;
+    --bs-info-bg-subtle: #001a1a;
+    --bs-info-border-subtle: #000d0d;
+    --bs-warning: #ffff00; /* 黄 */
+    --bs-warning-rgb: 255, 255, 0;
+    --bs-warning-text: #000;
+    --bs-warning-bg-subtle: #4d4d00;
+    --bs-warning-border-subtle: #333300;
+    --bs-danger: #ff4500; /* オレンジレッド (コントラスト用) */
+    --bs-danger-rgb: 255, 69, 0;
+    --bs-danger-text: #fff;
+    --bs-danger-bg-subtle: #4d1100;
+    --bs-danger-border-subtle: #330b00;
+    --bs-light: #333300; /* 濃いオリーブ */
+    --bs-light-rgb: 51, 51, 0;
+    --bs-light-text: #fff;
+    --bs-light-bg-subtle: #1a1a00;
+    --bs-light-border-subtle: #0d0d00;
+    --bs-dark: #b8860b; /* ダークゴールデンロッド */
+    --bs-dark-rgb: 184, 134, 11;
+    --bs-dark-text: #000;
+    --bs-dark-bg-subtle: #2e2103;
+    --bs-dark-border-subtle: #1f1602;
+  
+    --bs-gradient: linear-gradient(180deg, rgba(255, 255, 0, 0.15), rgba(255, 255, 0, 0));
+    --bs-border-width: 1px;
+    --bs-border-style: solid;
+    --bs-border-color: #b8860b;
+    --bs-border-color-translucent: rgba(184, 134, 11, 1);
+
+    --bs-emphasis-color-rgb: var(--bs-card-title-color);
+    --bs-warning-text-emphasis: var(--bs-code-color);
+    --bs-body-color-rgb: var(--bs-body-color);
     --bs-secondary-rgb: var(--bs-btn-color);
     --bs-table-bg: var(--bs-tertiary-bg);
 }

@@ -571,7 +571,7 @@ const get_param = (modal_elem) => {
                 $(elem).addClass('is-valid');
             }
         } else if (data_type=='bool') {
-            if(data_val!='true' && data_val!='false') $(elem).addClass('is-invalid');
+            if(data_val!='true' && data_val!='false' && !$(elem).prop('disabled')) $(elem).addClass('is-invalid');
             else {
                 data_val = data_val=='true';
                 $(elem).removeClass('is-invalid');

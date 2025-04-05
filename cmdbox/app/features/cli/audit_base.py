@@ -1,8 +1,9 @@
 from cmdbox.app import feature
 from cmdbox.app.options import Options
 from pathlib import Path
+from typing import Any
 import logging
-import psycopg_pool
+import psycopg
 import sqlite3
 
 
@@ -43,7 +44,7 @@ class AuditBase(feature.ResultEdgeFeature):
                      discription_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                      discription_en="Specify the maximum waiting time until the server responds."),
 
-                dict(opt="pg_enabled", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
+                dict(opt="pg_enabled", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False], web="mask",
                      discription_ja="postgresqlデータベース・サーバを使用する場合はTrueを指定します。",
                      discription_en="Specify True if using the postgresql database server."),
                 dict(opt="pg_host", type=Options.T_STR, default='localhost', required=False, multi=False, hide=True, choice=None, web="mask",
@@ -64,7 +65,7 @@ class AuditBase(feature.ResultEdgeFeature):
             ]
         )
     
-    def initdb(self, data_dir:Path, logger:logging.Logger, pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str) -> sqlite3.Connection:
+    def initdb(self, data_dir:Path, logger:logging.Logger, pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str) -> Any:
         """
         データベースを初期化します
 
@@ -79,38 +80,56 @@ class AuditBase(feature.ResultEdgeFeature):
             pg_dbname (str): PostgreSQLデータベース名
 
         Returns:
-            sqlite3.Connection: データベース接続
+            Any: データベース接続オブジェクト
         """
         if pg_enabled:
-            constr = f"host={pg_host} port={pg_port} user={pg_user} password={pg_password} dbname={pg_dbname}"
-            pg_pool = getattr(self, 'pg_pool', psycopg_pool.ConnectionPool(constr, min_size=2, max_size=5))
-            conn = pg_pool.getconn()
+            constr = f"host={pg_host} port={pg_port} user={pg_user} password={pg_password} dbname={pg_dbname} connect_timeout=60"
+            conn = psycopg.connect(constr, autocommit=False)
             cursor = conn.cursor()
+            try:
+                cursor.execute("SELECT count(*) FROM information_schema.tables WHERE table_name='audit'")
+                if cursor.fetchone()[0] == 0:
+                    # テーブルが存在しない場合は作成
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS audit (
+                            id SERIAL PRIMARY KEY,
+                            audit_type TEXT,
+                            clmsg_id TEXT,
+                            clmsg_date TIMESTAMP WITH TIME ZONE,
+                            clmsg_src TEXT,
+                            clmsg_user TEXT,
+                            clmsg_body JSON,
+                            clmsg_tag JSON,
+                            svmsg_id TEXT,
+                            svmsg_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+                        )
+                    ''')
+            finally:
+                cursor.close()
+                conn.rollback()
         else:
             db_path = data_dir / '.audit' / 'audit.db'
             db_path.parent.mkdir(parents=True, exist_ok=True)
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
-        try:
-            cursor.execute('SELECT COUNT(*) FROM sqlite_master WHERE TYPE="table" AND NAME="audit"')
-            if cursor.fetchone()[0] == 0:
-                # テーブルが存在しない場合は作成
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS audit (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        audit_type TEXT,
-                        clmsg_id TEXT,
-                        clmsg_date TEXT,
-                        clmsg_src TEXT,
-                        clmsg_user TEXT,
-                        clmsg_body JSON,
-                        clmsg_tag JSON,
-                        svmsg_id TEXT,
-                        svmsg_date TEXT DEFAULT CURRENT_TIMESTAMP
-                    )
-                ''')
-        finally:
-            cursor.close()
-        conn.commit()
+            try:
+                cursor.execute('SELECT COUNT(*) FROM sqlite_master WHERE TYPE="table" AND NAME="audit"')
+                if cursor.fetchone()[0] == 0:
+                    # テーブルが存在しない場合は作成
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS audit (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            audit_type TEXT,
+                            clmsg_id TEXT,
+                            clmsg_date TEXT,
+                            clmsg_src TEXT,
+                            clmsg_user TEXT,
+                            clmsg_body JSON,
+                            clmsg_tag JSON,
+                            svmsg_id TEXT,
+                            svmsg_date TEXT DEFAULT CURRENT_TIMESTAMP
+                        )
+                    ''')
+            finally:
+                cursor.close()
         return conn
-

@@ -5,9 +5,9 @@ The Python Imaging Library (PIL) is
 
 Pillow is the friendly PIL fork. It is
 
-    Copyright © 2010-2024 by Jeffrey A. Clark and contributors
+    Copyright © 2010 by Jeffrey A. Clark and contributors
 
-Like PIL, Pillow is licensed under the open source HPND License:
+Like PIL, Pillow is licensed under the open source MIT-CMU License:
 
 By obtaining, using, and/or copying this software and/or its associated
 documentation, you agree that you have read, understood, and will comply
@@ -609,7 +609,7 @@ consider it more useful to permit linking proprietary applications with the
 library.  If this is what you want to do, use the GNU Library General
 Public License instead of this License.
  
-===== harfbuzz-10.0.1 ===== 
+===== harfbuzz-10.1.0 ===== 
  
 HarfBuzz is licensed under the so-called "Old MIT" license.  Details follow.
 For parts of HarfBuzz that are licensed under different licenses see individual
@@ -679,7 +679,7 @@ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
-===== libjpeg-turbo-3.0.4 ===== 
+===== libjpeg-turbo-3.1.0 ===== 
  
 LEGAL ISSUES
 ============
@@ -826,7 +826,7 @@ intended solely for clarification.
 The Modified (3-clause) BSD License
 ===================================
 
-Copyright (C)2009-2023 D. R. Commander.  All Rights Reserved.<br>
+Copyright (C)2009-2024 D. R. Commander.  All Rights Reserved.<br>
 Copyright (C)2015 Viktor Szathmáry.  All Rights Reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -866,7 +866,7 @@ attribution and endorsement protections to other entities.  Thus, it was
 desirable to choose a license that granted us the same protections for new code
 that were granted to the IJG for code derived from their software.
  
-===== libwebp-1.4.0 ===== 
+===== libwebp-1.5.0 ===== 
  
 Copyright (c) 2010, Google Inc. All rights reserved.
 
@@ -1036,7 +1036,7 @@ to supporting the PNG file format in commercial products.  If you use
 this source code in a product, acknowledgment is not required but would
 be appreciated.
  
-===== openjpeg-2.5.2 ===== 
+===== openjpeg-2.5.3 ===== 
  
 /*
  * The copyright in this software is being made available under the 2-clauses 
@@ -1190,37 +1190,24 @@ XZ Utils Licensing
     The contact information is in the README file.
 
  
-===== zlib-1.3.1 ===== 
+===== zlib-ng-2.2.2 ===== 
  
- (C) 1995-2024 Jean-loup Gailly and Mark Adler
+(C) 1995-2024 Jean-loup Gailly and Mark Adler
 
-  This software is provided 'as-is', without any express or implied
-  warranty.  In no event will the authors be held liable for any damages
-  arising from the use of this software.
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
 
-  Permission is granted to anyone to use this software for any purpose,
-  including commercial applications, and to alter it and redistribute it
-  freely, subject to the following restrictions:
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
 
-  1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
-  2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
-  3. This notice may not be removed or altered from any source distribution.
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgment in the product documentation would be
+   appreciated but is not required.
 
-  Jean-loup Gailly        Mark Adler
-  jloup@gzip.org          madler@alumni.caltech.edu
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
 
-If you use the zlib library in a product, we would appreciate *not* receiving
-lengthy legal documents to sign.  The sources are provided for free but without
-warranty of any kind.  The library has been entirely written by Jean-loup
-Gailly and Mark Adler; it does not include third-party code.  We make all
-contributions to and distributions of this project solely in our personal
-capacity, and are not conveying any rights to any intellectual property of
-any third parties.
-
-If you redistribute modified sources, we would appreciate that you include in
-the file ChangeLog history information documenting your changes.  Please read
-the FAQ for more information on the distribution of modified source versions.
+3. This notice may not be removed or altered from any source distribution.

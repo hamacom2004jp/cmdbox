@@ -1,12 +1,12 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="jp">
+<html class="writer-html5" lang="jp" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox package &mdash; cmdbox 2025/03/26 documentation</title>
+  <title>cmdbox package &mdash; cmdbox 2025/04/06 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,9 +14,9 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=102af95c"></script>
-      <script src="../_static/doctools.js?v=888ff710"></script>
-      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/documentation_options.js?v=308fb3f9"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -76,9 +76,9 @@
            <div itemprop="articleBody">
              
   <section id="cmdbox-package">
-<h1>cmdbox package<a class="headerlink" href="#cmdbox-package" title="Permalink to this heading"></a></h1>
+<h1>cmdbox package<a class="headerlink" href="#cmdbox-package" title="Link to this heading"></a></h1>
 <section id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="cmdbox.app.html">cmdbox.app package</a><ul>
@@ -110,6 +110,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmdbox.app.html#module-cmdbox.app.common">cmdbox.app.common module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.check_fname"><code class="docutils literal notranslate"><span class="pre">check_fname()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.chopdq"><code class="docutils literal notranslate"><span class="pre">chopdq()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.cmd"><code class="docutils literal notranslate"><span class="pre">cmd()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.copy_sample"><code class="docutils literal notranslate"><span class="pre">copy_sample()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.decrypt"><code class="docutils literal notranslate"><span class="pre">decrypt()</span></code></a></li>
@@ -118,6 +119,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.download_file"><code class="docutils literal notranslate"><span class="pre">download_file()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.encrypt"><code class="docutils literal notranslate"><span class="pre">encrypt()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.exec_sync"><code class="docutils literal notranslate"><span class="pre">exec_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.get_tzoffset_str"><code class="docutils literal notranslate"><span class="pre">get_tzoffset_str()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.getopt"><code class="docutils literal notranslate"><span class="pre">getopt()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.hash_password"><code class="docutils literal notranslate"><span class="pre">hash_password()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.is_event_loop_running"><code class="docutils literal notranslate"><span class="pre">is_event_loop_running()</span></code></a></li>
@@ -214,7 +216,15 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmdbox.app.html#module-cmdbox.app.options">cmdbox.app.options module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options"><code class="docutils literal notranslate"><span class="pre">Options</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.AT_ADMIN"><code class="docutils literal notranslate"><span class="pre">Options.AT_ADMIN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.AT_AUTH"><code class="docutils literal notranslate"><span class="pre">Options.AT_AUTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.AT_EVENT"><code class="docutils literal notranslate"><span class="pre">Options.AT_EVENT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.AT_SYSTEM"><code class="docutils literal notranslate"><span class="pre">Options.AT_SYSTEM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.AT_USER"><code class="docutils literal notranslate"><span class="pre">Options.AT_USER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.AUDITS"><code class="docutils literal notranslate"><span class="pre">Options.AUDITS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.T_BOOL"><code class="docutils literal notranslate"><span class="pre">Options.T_BOOL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.T_DATE"><code class="docutils literal notranslate"><span class="pre">Options.T_DATE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.T_DATETIME"><code class="docutils literal notranslate"><span class="pre">Options.T_DATETIME</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.T_DICT"><code class="docutils literal notranslate"><span class="pre">Options.T_DICT</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.T_DIR"><code class="docutils literal notranslate"><span class="pre">Options.T_DIR</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.T_FILE"><code class="docutils literal notranslate"><span class="pre">Options.T_FILE</span></code></a></li>
@@ -222,6 +232,8 @@
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.T_INT"><code class="docutils literal notranslate"><span class="pre">Options.T_INT</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.T_STR"><code class="docutils literal notranslate"><span class="pre">Options.T_STR</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.T_TEXT"><code class="docutils literal notranslate"><span class="pre">Options.T_TEXT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.audit"><code class="docutils literal notranslate"><span class="pre">Options.audit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.audit_exec"><code class="docutils literal notranslate"><span class="pre">Options.audit_exec()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.getInstance"><code class="docutils literal notranslate"><span class="pre">Options.getInstance()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.get_cmd_attr"><code class="docutils literal notranslate"><span class="pre">Options.get_cmd_attr()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.get_cmd_choices"><code class="docutils literal notranslate"><span class="pre">Options.get_cmd_choices()</span></code></a></li>
@@ -238,6 +250,7 @@
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.load_features_aliases_cli"><code class="docutils literal notranslate"><span class="pre">Options.load_features_aliases_cli()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.load_features_aliases_web"><code class="docutils literal notranslate"><span class="pre">Options.load_features_aliases_web()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.load_features_args"><code class="docutils literal notranslate"><span class="pre">Options.load_features_args()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.load_features_audit"><code class="docutils literal notranslate"><span class="pre">Options.load_features_audit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.load_features_file"><code class="docutils literal notranslate"><span class="pre">Options.load_features_file()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.load_svcmd"><code class="docutils literal notranslate"><span class="pre">Options.load_svcmd()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.mk_opt_list"><code class="docutils literal notranslate"><span class="pre">Options.mk_opt_list()</span></code></a></li>
@@ -295,13 +308,13 @@
 </div>
 </section>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
 <section id="module-cmdbox.version">
-<span id="cmdbox-version-module"></span><h2>cmdbox.version module<a class="headerlink" href="#module-cmdbox.version" title="Permalink to this heading"></a></h2>
+<span id="cmdbox-version-module"></span><h2>cmdbox.version module<a class="headerlink" href="#module-cmdbox.version" title="Link to this heading"></a></h2>
 </section>
 <section id="module-cmdbox">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cmdbox" title="Permalink to this heading"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cmdbox" title="Link to this heading"></a></h2>
 </section>
 </section>
 

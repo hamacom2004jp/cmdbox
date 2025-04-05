@@ -14,11 +14,11 @@ cmdbox.change_color_mode = (color_mode) => {
   const html = $('html');
   color_mode = !color_mode ? localStorage.getItem('color_mode') : color_mode;
   if(color_mode == 'light') html.attr('data-bs-theme','light');
-  else if(color_mode == 'night') html.attr('data-bs-theme','night');
   else if(color_mode == 'midnight') html.attr('data-bs-theme','midnight');
-  else if(color_mode == 'coal') html.attr('data-bs-theme','coal');
   else if(color_mode == 'deepsea') html.attr('data-bs-theme','deepsea');
-  else if(color_mode == 'obsidian') html.attr('data-bs-theme','obsidian');
+  else if(color_mode == 'verdant') html.attr('data-bs-theme','verdant');
+  else if(color_mode == 'bumblebee') html.attr('data-bs-theme','bumblebee');
+  else if(color_mode == 'crimson') html.attr('data-bs-theme','crimson');
   else html.attr('data-bs-theme','dark');
   localStorage.setItem('color_mode', color_mode);
   if (color_mode) {

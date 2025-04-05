@@ -1,11 +1,11 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="jp">
+<html class="writer-html5" lang="jp" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.app &mdash; cmdbox 2025/03/09 documentation</title>
+  <title>cmdbox.app.app &mdash; cmdbox 2025/04/06 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,9 +13,9 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=31affa16"></script>
-      <script src="../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../_static/documentation_options.js?v=308fb3f9"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -86,17 +86,25 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.app.main">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args_list</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.app.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args_list</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">app</span> <span class="o">=</span> <span class="n">CmdBoxApp</span><span class="o">.</span><span class="n">getInstance</span><span class="p">(</span><span class="n">appcls</span><span class="o">=</span><span class="n">CmdBoxApp</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="n">version</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">app</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">args_list</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="CmdBoxApp"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.app.CmdBoxApp">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CmdBoxApp</span><span class="p">:</span>
+
+<div class="viewcode-block" id="CmdBoxApp">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.app.CmdBoxApp">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CmdBoxApp</span><span class="p">:</span>
     <span class="n">_instance</span> <span class="o">=</span> <span class="kc">None</span>
-<div class="viewcode-block" id="CmdBoxApp.getInstance"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.app.CmdBoxApp.getInstance">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="CmdBoxApp.getInstance">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.app.CmdBoxApp.getInstance">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">getInstance</span><span class="p">(</span><span class="n">appcls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="n">version</span><span class="p">,</span> <span class="n">cli_features_packages</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cli_features_prefix</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">CmdBoxApp</span><span class="o">.</span><span class="n">_instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">CmdBoxApp</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="n">CmdBoxApp</span><span class="p">(</span><span class="n">appcls</span><span class="o">=</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="n">ver</span><span class="p">,</span> <span class="n">cli_features_packages</span><span class="o">=</span><span class="n">cli_features_packages</span><span class="p">,</span> <span class="n">cli_features_prefix</span><span class="o">=</span><span class="n">cli_features_prefix</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">CmdBoxApp</span><span class="o">.</span><span class="n">_instance</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appcls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="n">version</span><span class="p">,</span> <span class="n">cli_features_packages</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cli_features_prefix</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -113,7 +121,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cli_features_packages</span> <span class="o">=</span> <span class="n">cli_features_packages</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cli_features_prefix</span> <span class="o">=</span> <span class="n">cli_features_prefix</span>
 
-<div class="viewcode-block" id="CmdBoxApp.main"><a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.app.CmdBoxApp.main">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args_list</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_dict</span><span class="p">:</span><span class="nb">dict</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span> <span class="n">webcall</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="CmdBoxApp.main">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.app.CmdBoxApp.main">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args_list</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_dict</span><span class="p">:</span><span class="nb">dict</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span> <span class="n">webcall</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        コマンドライン引数を処理し、サーバーまたはクライアントを起動し、コマンドを実行する。</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -144,6 +154,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">load_svcmd</span><span class="p">(</span><span class="n">pn</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cli_features_prefix</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">excludes</span><span class="o">=</span><span class="p">[],</span> <span class="n">appcls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_logger</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">load_features_file</span><span class="p">(</span><span class="s1">&#39;cli&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">load_svcmd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">appcls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_logger</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">load_features_aliases_cli</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_logger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">load_features_audit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_logger</span><span class="p">)</span>
         <span class="n">efeatureloadtime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
 
         <span class="c1"># コマンド引数の生成</span>
@@ -186,7 +197,7 @@
                     <span class="n">args_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
         <span class="c1"># featuresの初期値を適用する</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">load_features_args</span><span class="p">(</span><span class="n">args_dict</span><span class="p">)</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">(</span><span class="o">**</span><span class="n">args_dict</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">common</span><span class="o">.</span><span class="n">chopdq</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">args_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
         <span class="n">eargsparsetime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
 
         <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Start command. </span><span class="si">{</span><span class="n">args</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -200,7 +211,7 @@
 
         <span class="n">smakesampletime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
         <span class="n">common</span><span class="o">.</span><span class="n">mklogdir</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-        <span class="n">common</span><span class="o">.</span><span class="n">copy_sample</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
+        <span class="c1">#common.copy_sample(args.data, ver=self.ver)</span>
         <span class="n">common</span><span class="o">.</span><span class="n">copy_sample</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="n">ver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span>
         <span class="n">emakesampletime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
 
@@ -229,6 +240,7 @@
                 <span class="n">pf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;app_argsparse&quot;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">eargsparsetime</span><span class="o">-</span><span class="n">sargsparsetime</span><span class="si">:</span><span class="s2">.03f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">))</span>
                 <span class="n">pf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;app_makesample&quot;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">emakesampletime</span><span class="o">-</span><span class="n">smakesampletime</span><span class="si">:</span><span class="s2">.03f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">))</span>
                 <span class="n">pf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;app_loggerinit&quot;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">eloggerinittime</span><span class="o">-</span><span class="n">sloggerinittime</span><span class="si">:</span><span class="s2">.03f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">audit_exec</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">audit_type</span><span class="o">=</span><span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">AT_EVENT</span><span class="p">)</span>
                 <span class="n">status</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">exec_sync</span><span class="p">(</span><span class="n">feat</span><span class="o">.</span><span class="n">apprun</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">smaintime</span><span class="p">,</span> <span class="n">pf</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">status</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">obj</span>
             <span class="k">else</span><span class="p">:</span>
@@ -237,7 +249,9 @@
                 <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">None</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="c1"># ログの状態をwebcallから戻す</span>
-            <span class="n">common</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">webcall</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span></div></div>
+            <span class="n">common</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">webcall</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">)</span></div>
+</div>
+
 </pre></div>
 
            </div>

@@ -36,7 +36,7 @@ def copy_sample(data:Path, ver=version):
         data (Path): データディレクトリ
         ver (version, optional): バージョン. Defaults to version
     """
-    dst = Path(data) / '.samples' if data is not None else HOME_DIR / '.samples'
+    dst_sample = Path(data) / '.samples' if data is not None else HOME_DIR / '.samples'
     #if dst.exists():
     #    return
     src = Path(ver.__file__).parent / 'extensions'
@@ -44,7 +44,13 @@ def copy_sample(data:Path, ver=version):
         p = Path(dst)
         if not p.exists():
             shutil.copy2(src, dst)
-    shutil.copytree(src, dst, dirs_exist_ok=True, copy_function=copy)
+    shutil.copytree(src, dst_sample, dirs_exist_ok=True, copy_function=copy)
+    dst_config = Path(data) / '.config' if data is not None else HOME_DIR / '.config'
+    dst_config.mkdir(parents=True, exist_ok=True)
+    if not (dst_config / 'features.yml').exists():
+        shutil.copy2(dst_sample / 'features.yml', dst_config / 'features.yml')
+    if not (dst_config / 'user_list.yml').exists():
+        shutil.copy2(dst_sample / 'user_list.yml', dst_config / 'user_list.yml')
 
 def mklogdir(data:Path) -> Path:
     """
@@ -200,7 +206,9 @@ def default_json_enc(o) -> Any:
     if isinstance(o, tempfile._TemporaryFileWrapper):
         return str(o)
     if isinstance(o, datetime.datetime):
-        return o.strftime('%Y-%m-%dT%H:%M:%S')
+        if o.tzinfo is datetime.timezone.utc:
+            return o.strftime('%Y-%m-%dT%H:%M:%S')
+        return o.strftime('%Y-%m-%dT%H:%M:%S%z')
     if isinstance(o, feature.Feature):
         return 'object'
     raise TypeError(f"Type {type(o)} not serializable")
@@ -611,3 +619,22 @@ def exec_sync(func, *args, **kwargs) -> Any:
             return ret
         return asyncio.run(func(*args, **kwargs))
     return func(*args, **kwargs)
+
+def get_tzoffset_str() -> str:
+    """
+    タイムゾーンのオフセットを取得します
+
+    Returns:
+        str: タイムゾーンのオフセット
+    """
+    # 現在のタイムゾーンのオフセットを取得
+    now_utc = datetime.datetime.now(datetime.timezone.utc)
+    now_local = now_utc.astimezone()
+    offset = now_local.utcoffset()
+    # timedelta オブジェクトから '+/-HH:MM' 形式の文字列を生成
+    total_seconds = int(offset.total_seconds())
+    hours = abs(total_seconds) // 3600
+    minutes = (abs(total_seconds) % 3600) // 60
+    sign = "+" if total_seconds >= 0 else "-"
+
+    return f"{sign}{hours:02}:{minutes:02}"

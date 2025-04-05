@@ -124,7 +124,7 @@ class CmdBoxApp:
 
         smakesampletime = time.perf_counter()
         common.mklogdir(args.data)
-        common.copy_sample(args.data, ver=self.ver)
+        #common.copy_sample(args.data, ver=self.ver)
         common.copy_sample(Path.cwd(), ver=self.ver)
         emakesampletime = time.perf_counter()
 
@@ -153,6 +153,7 @@ class CmdBoxApp:
                 pf.append(dict(key="app_argsparse", val=f"{eargsparsetime-sargsparsetime:.03f}s"))
                 pf.append(dict(key="app_makesample", val=f"{emakesampletime-smakesampletime:.03f}s"))
                 pf.append(dict(key="app_loggerinit", val=f"{eloggerinittime-sloggerinittime:.03f}s"))
+                self.options.audit_exec(args, logger, feat, audit_type=options.Options.AT_EVENT)
                 status, ret, obj = common.exec_sync(feat.apprun, logger, args, smaintime, pf)
                 return status, ret, obj
             else:

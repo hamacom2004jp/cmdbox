@@ -373,7 +373,7 @@ class Options:
         if self.is_features_loaded(ftype):
             return
         # cmdboxを拡張したアプリをカスタマイズするときのfeatures.ymlを読み込む
-        features_yml = Path('features.yml')
+        features_yml = Path('.config/features.yml')
         if not features_yml.exists() or not features_yml.is_file():
             # cmdboxを拡張したアプリの組み込みfeatures.ymlを読み込む
             features_yml = Path(ver.__file__).parent / 'extensions' / 'features.yml'
@@ -698,7 +698,7 @@ class Options:
         """
         if self.audit_func is None:
             raise Exception('audit write feature is not found.')
-        clmsg_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        clmsg_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + common.get_tzoffset_str()
         opt = self.audit_args.copy()
         opt['audit_type'] = audit_type
         opt['clmsg_id'] = str(uuid.uuid4())

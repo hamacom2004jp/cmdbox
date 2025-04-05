@@ -1,5 +1,6 @@
 from cmdbox.app import app, client, common, options, server, web as _web
 from cmdbox.app.commons import convert, loghandler
+from cmdbox.app.features.cli import audit_base
 from cmdbox.app.features.web import cmdbox_web_load_cmd
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
@@ -122,6 +123,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
             schema = _options.get_cmd_choices(opt['mode'], opt['cmd'], False)
             try:
                 opt_path = web.cmds_path / f"cmd-{title}.json"
+                feat = _options.get_cmd_attr(opt['mode'], opt['cmd'], "feature")
                 loaded = common.loadopt(opt_path, False)
                 for o in opt.keys():
                     found = False
@@ -131,6 +133,8 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                         found = True
                     if not found or o not in loaded: continue
                     opt[o] = loaded[o]
+                    if isinstance(feat, audit_base.AuditBase) and o in _options.audit_args:
+                        opt[o] = _options.audit_args[o]
             except:
                 pass
         if 'host' in opt: opt['host'] = web.redis_host

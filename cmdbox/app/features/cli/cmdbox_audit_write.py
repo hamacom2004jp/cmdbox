@@ -39,7 +39,7 @@ class AuditWrite(audit_base.AuditBase):
         """
         opt = super().get_option()
         opt['discription_ja'] = "監査を記録します。"
-        opt['discription_en'] = "GRecord the audit."
+        opt['discription_en'] = "Record the audit."
         opt['choice'] += [
             dict(opt="audit_type", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=Options.AUDITS,
                  discription_ja="監査の種類を指定します。",
@@ -54,14 +54,17 @@ class AuditWrite(audit_base.AuditBase):
                  discription_ja="クライアントのメッセージの発生源を指定します。通常 `cmdbox.app.feature.Feature` を継承したクラス名を指定します。",
                  discription_en="Specifies the source of client messages. Usually specifies the name of a class that extends `cmdbox.app.feature.Feature` ."),
             dict(opt="clmsg_user", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                 discription_ja="クライアントのメッセージの発生源を指定します。通常 `cmdbox.app.feature.Feature` を継承したクラス名を指定します。",
-                 discription_en="Specifies the source of client messages. Usually specifies the name of a class that extends `cmdbox.app.feature.Feature` ."),
+                 discription_ja="クライアントのメッセージを発生させたユーザーを指定します。",
+                 discription_en="SpecSpecifies the user who generated the client message."),
             dict(opt="clmsg_body", type=Options.T_DICT, default=None, required=False, multi=True, hide=False, choice=None,
                  discription_ja="クライアントのメッセージの本文を辞書形式で指定します。",
                  discription_en="Specifies the body of the client's message in dictionary format."),
             dict(opt="clmsg_tag", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
                  discription_ja="クライアントのメッセージのタグを指定します。後で検索しやすくするために指定します。",
                  discription_en="Specifies the tag for the client's message. Specify to make it easier to search later."),
+            dict(opt="retention_period_days", type=Options.T_INT, default=365, required=False, multi=False, hide=True, choice=None, web="mask",
+                 discription_ja="監査を保存する日数を指定します。この日数より古い監査は削除します。0以下を指定すると無期限で保存されます。",
+                 discription_en="Specify the number of days to keep the audit. If the number is less than or equal to 0, the audit will be kept indefinitely."),
         ]
         return opt
     
@@ -98,7 +101,7 @@ class AuditWrite(audit_base.AuditBase):
         if args.clmsg_id is None:
             args.clmsg_id = str(uuid.uuid4())
         if args.clmsg_date is None:
-            args.clmsg_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            args.clmsg_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + common.get_tzoffset_str()
 
         audit_type_b64 = convert.str2b64str(args.audit_type)
         clmsg_id_b64 = convert.str2b64str(args.clmsg_id)
@@ -119,7 +122,8 @@ class AuditWrite(audit_base.AuditBase):
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         cl.redis_cli.send_cmd(self.get_svcmd(),
                               [audit_type_b64, clmsg_id_b64, clmsg_date_b64, clmsg_src_b64, clmsg_user_b64, clmsg_body_b64, clmsg_tag_b64,
-                               pg_enabled, pg_host_b64, pg_port, pg_user_b64, pg_password_b64, pg_dbname_b64],
+                               pg_enabled, pg_host_b64, pg_port, pg_user_b64, pg_password_b64, pg_dbname_b64,
+                               args.retention_period_days],
                               retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=True)
         ret = dict(success=True)
         #common.print_format(ret, False, tm, None, False, pf=pf)
@@ -162,14 +166,17 @@ class AuditWrite(audit_base.AuditBase):
         pg_user = convert.b64str2str(msg[12])
         pg_password = convert.b64str2str(msg[13])
         pg_dbname = convert.b64str2str(msg[14])
+        retention_period_days = int(msg[15]) if msg[15] != 'None' else None
         svmsg_id = str(uuid.uuid4())
         st = self.write(msg[1], audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_user, clmsg_body, clmsg_tags, svmsg_id,
                         pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname,
+                        retention_period_days,
                         data_dir, logger, redis_cli)
         return st
 
     def write(self, reskey:str, audit_type:str, clmsg_id:str, clmsg_date:str, clmsg_src:str, clmsg_user:str, clmsg_body:str, clmsg_tags:str, svmsg_id:str,
               pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str,
+              retention_period_days:int,
               data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient) -> int:
         """
         監査ログを書き込む
@@ -190,6 +197,7 @@ class AuditWrite(audit_base.AuditBase):
             pg_user (str): PostgreSQLユーザー
             pg_password (str): PostgreSQLパスワード
             pg_dbname (str): PostgreSQLデータベース名
+            retention_period_days (int): 監査を保存する日数
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
@@ -202,12 +210,24 @@ class AuditWrite(audit_base.AuditBase):
                 cursor = conn.cursor()
                 try:
                     clmsg_tags = json.dumps(clmsg_tags)
-                    #clmsg_body = json.loads(clmsg_body) if clmsg_body else {}
-                    cursor.execute('''
-                        INSERT INTO audit (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_user, clmsg_body, clmsg_tag, 
-                                           svmsg_id, svmsg_date)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-                    ''', (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_user, clmsg_body, clmsg_tags, svmsg_id))
+                    if not pg_enabled:
+                        cursor.execute('''
+                            INSERT INTO audit (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_user, clmsg_body, clmsg_tag, 
+                                            svmsg_id, svmsg_date)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                        ''', (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_user, clmsg_body, clmsg_tags, svmsg_id))
+                        if retention_period_days is not None and retention_period_days > 0:
+                            cursor.execute('DELETE FROM audit WHERE svmsg_date < datetime(CURRENT_TIMESTAMP, ?)',
+                                           (f'-{retention_period_days} days',))
+                    else:
+                        cursor.execute('''
+                            INSERT INTO audit (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_user, clmsg_body, clmsg_tag, 
+                                            svmsg_id, svmsg_date)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+                        ''', (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_user, clmsg_body, clmsg_tags, svmsg_id))
+                        if retention_period_days is not None and retention_period_days > 0:
+                            cursor.execute("DELETE FROM audit WHERE svmsg_date < CURRENT_TIMESTAMP + %s ",
+                                           (f'-{retention_period_days} day',))
                     conn.commit()
                     rescode, msg = (self.RESP_SCCESS, dict(success=True))
                     redis_cli.rpush(reskey, msg)
