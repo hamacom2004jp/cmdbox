@@ -1,4 +1,4 @@
-from cmdbox.app import common, feature
+from cmdbox.app import common, feature, web
 from cmdbox.app.commons import module
 from fastapi import Request
 from fastapi.routing import APIRoute
@@ -373,17 +373,18 @@ class Options:
         if self.is_features_loaded(ftype):
             return
         # cmdboxを拡張したアプリをカスタマイズするときのfeatures.ymlを読み込む
-        features_yml = Path('.config/features.yml')
+        features_yml = Path(f'.{ver.__appid__}/features.yml')
         if not features_yml.exists() or not features_yml.is_file():
             # cmdboxを拡張したアプリの組み込みfeatures.ymlを読み込む
             features_yml = Path(ver.__file__).parent / 'extensions' / 'features.yml'
         #if not features_yml.exists() or not features_yml.is_file():
         #    features_yml = Path('.samples/features.yml')
-        if logger is not None and logger.level == logging.DEBUG:
-            logger.debug(f"load features.yml: {features_yml}, is_file={features_yml.is_file()}")
+        logger.info(f"load features.yml: {features_yml}, is_file={features_yml.is_file()}")
         if features_yml.exists() and features_yml.is_file():
             if self.features_yml_data is None:
                 self.features_yml_data = yml = common.load_yml(features_yml)
+                if logger.level == logging.DEBUG:
+                    logger.debug(f"features.yml data: {yml}")
             else:
                 yml = self.features_yml_data
             if yml is None: return
@@ -696,16 +697,32 @@ class Options:
             user (str): メッセージを発生させたユーザー名
             kwargs (Any): 呼び出し元で使用しているキーワード引数
         """
-        if self.audit_func is None:
+        if not hasattr(self, 'audit_func') or self.audit_func is None:
             raise Exception('audit write feature is not found.')
         clmsg_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + common.get_tzoffset_str()
         opt = self.audit_args.copy()
-        opt['audit_type'] = audit_type
+        opt['audit_type'] = audit_type if audit_type is not None else Options.AT_EVENT
         opt['clmsg_id'] = str(uuid.uuid4())
         opt['clmsg_date'] = clmsg_date
         opt['clmsg_src'] = opt['clmsg_src'] if 'clmsg_src' in opt else None
         opt['clmsg_user'] = user
         opt['clmsg_tag'] = tags
+        opt['format'] = False if opt.get('format') is None else opt['format']
+        opt['output_json'] = None if opt.get('output_json') is None else opt['output_json']
+        opt['output_json_append'] = False if opt.get('output_json_append') is None else opt['output_json_append']
+        opt['host'] = 'localhost' if opt.get('host') is None else opt['host']
+        opt['port'] = 6379 if opt.get('port') is None else opt['port']
+        opt['password'] = 'password' if opt.get('password') is None else opt['password']
+        opt['svname'] = 'server' if opt.get('svname') is None else opt['svname']
+        opt['retry_count'] = 1 if opt.get('retry_count') is None else opt['retry_count']
+        opt['retry_interval'] = 1 if opt.get('retry_interval') is None else opt['retry_interval']
+        opt['timeout'] = 5 if opt.get('timeout') is None else opt['timeout']
+        opt['pg_enabled'] = False if opt.get('pg_enabled') is None else opt['pg_enabled']
+        opt['pg_host'] = 'localhost' if opt.get('pg_host') is None else opt['pg_host']
+        opt['pg_port'] = 5432 if opt.get('pg_port') is None else opt['pg_port']
+        opt['pg_user'] = 'postgres' if opt.get('pg_user') is None else opt['pg_user']
+        opt['pg_password'] = 'postgres' if opt.get('pg_password') is None else opt['pg_password']
+        opt['pg_dbname'] = 'audit' if opt.get('pg_dbname') is None else opt['pg_dbname']
         logger = self.default_logger
         clmsg_body = body.copy() if body is not None else dict()
         func_feature = None
@@ -726,15 +743,20 @@ class Options:
                             clmsg_body[key] = '********'
                         else:
                             clmsg_body[key] = common.to_str(val, 100)
+                        opt[key] = val
                 if hasattr(arg, 'clmsg_id'): opt['clmsg_id'] = arg.clmsg_id
+            elif isinstance(arg, web.Web):
+                opt['host'] = arg.redis_host
+                opt['port'] = arg.redis_port
+                opt['password'] = arg.redis_password
+                opt['svname'] = arg.svname
             elif isinstance(arg, feature.Feature):
                 func_feature = arg
                 opt['clmsg_src'] = func_feature.__class__.__name__
             elif isinstance(arg, Request):
                 if 'signin' in arg.session and arg.session['signin'] is not None and 'name' in arg.session['signin']:
                     opt['clmsg_user'] = arg.session['signin']['name']
-                    if opt['audit_type'] is None:
-                        opt['audit_type'] = Options.AT_ADMIN if 'admin' in arg.session['signin']['groups'] else Options.AT_USER
+                    opt['audit_type'] = Options.AT_ADMIN if 'admin' in arg.session['signin']['groups'] else Options.AT_USER
                     opt['clmsg_id'] = arg.session['signin']['clmsg_id'] if 'clmsg_id' in arg.session['signin'] else opt['clmsg_id']
                     arg.session['signin']['clmsg_id'] = opt['clmsg_id']
                 opt['clmsg_src'] = arg.url.path

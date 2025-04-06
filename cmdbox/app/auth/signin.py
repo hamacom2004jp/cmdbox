@@ -291,6 +291,8 @@ class Signin(object):
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "password.policy". ({signin_file})')
                 if type(yml['password']['policy']['enabled']) is not bool:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "password.policy". ({signin_file})')
+                if 'not_same_before' not in yml['password']['policy']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "not_same_before" not found in "password.policy". ({signin_file})')
                 if type(yml['password']['policy']['not_same_before']) is not bool:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "not_same_before" not bool type in "password.policy". ({signin_file})')
                 if 'min_length' not in yml['password']['policy']:

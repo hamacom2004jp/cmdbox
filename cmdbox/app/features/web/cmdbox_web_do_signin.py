@@ -58,11 +58,11 @@ class DoSignin(cmdbox_web_signin.Signin):
                             pass
             if not token_ok:
                 if name == '' or passwd == '':
-                    web.options.audit_exec(req, res, body=dict(msg='signin failed.'), audit_type='auth')
+                    web.options.audit_exec(req, res, web, body=dict(msg='signin failed.'), audit_type='auth')
                     return RedirectResponse(url=f'/signin/{next}?error=1')
                 user = [u for u in signin_data['users'] if u['name'] == name and u['hash'] != 'oauth2']
                 if len(user) <= 0:
-                    web.options.audit_exec(req, res, body=dict(msg='signin failed.'), audit_type='auth')
+                    web.options.audit_exec(req, res, web, body=dict(msg='signin failed.'), audit_type='auth')
                     return RedirectResponse(url=f'/signin/{next}?error=1')
                 user = user[0]
             if web.logger.level == logging.DEBUG:
@@ -86,7 +86,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 if pass_miss_count >= threshold:
                     # ロックアウト
                     web.user_data(None, uid, name, 'password', 'pass_miss_count', )
-                    web.options.audit_exec(req, res, body=dict(msg='Accound lockout.'), audit_type='auth', user=name)
+                    web.options.audit_exec(req, res, web, body=dict(msg='Accound lockout.'), audit_type='auth', user=name)
                     return RedirectResponse(url=f'/signin/{next}?error=lockout')
 
             if not token_ok:
@@ -99,7 +99,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                     web.user_data(None, uid, name, 'password', 'pass_miss_last', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
                     web.user_data(None, uid, name, 'password', 'pass_miss_count', pass_miss_count+1)
                     web.logger.warning(f'Failed to signin. name={name}, pass_miss_count={pass_miss_count+1}')
-                    web.options.audit_exec(req, res, body=dict(msg='Wrong password.'), audit_type='auth', user=name)
+                    web.options.audit_exec(req, res, web, body=dict(msg='Wrong password.'), audit_type='auth', user=name)
                     return RedirectResponse(url=f'/signin/{next}?error=1')
             group_names = list(set(web.signin.__class__.correct_group(signin_data, user['groups'], None)))
             gids = [g['gid'] for g in signin_data['groups'] if g['name'] in group_names]
@@ -117,21 +117,21 @@ class DoSignin(cmdbox_web_signin.Signin):
                     notify = expiration['notify']
                     # パスワード有効期限チェック
                     if datetime.datetime.now() > last_update + datetime.timedelta(days=period):
-                        web.options.audit_exec(req, res, body=dict(msg='Password is expired.'), audit_type='auth', user=name)
+                        web.options.audit_exec(req, res, web, body=dict(msg='Password is expired.'), audit_type='auth', user=name)
                         return RedirectResponse(url=f'/signin/{next}?error=expirationofpassword')
                     if datetime.datetime.now() > last_update + datetime.timedelta(days=notify):
                         # セッションに保存
                         _set_session(req, dict(uid=uid, name=name), email, passwd, None, group_names, gids)
                         next = f"../{next}" if token_ok else next
-                        web.options.audit_exec(req, res, body=dict(msg='Signin succeeded. However, you should change your password.'), audit_type='auth', user=name)
+                        web.options.audit_exec(req, res, web, body=dict(msg='Signin succeeded. However, you should change your password.'), audit_type='auth', user=name)
                         return RedirectResponse(url=f'../{next}?warn=passchange', headers=dict(signin="success"))
             # セッションに保存
             _set_session(req, dict(uid=uid, name=name), email, passwd, None, group_names, gids)
             next = f"../{next}" if token_ok else next
             if notify_passchange:
-                web.options.audit_exec(req, res, body=dict(msg='Signin succeeded. However, you should change your password.'), audit_type='auth', user=name)
+                web.options.audit_exec(req, res, web, body=dict(msg='Signin succeeded. However, you should change your password.'), audit_type='auth', user=name)
                 return RedirectResponse(url=f'../{next}?warn=passchange', headers=dict(signin="success"))
-            web.options.audit_exec(req, res, body=dict(msg='Signin succeeded.'), audit_type='auth', user=name)
+            web.options.audit_exec(req, res, web, body=dict(msg='Signin succeeded.'), audit_type='auth', user=name)
             return RedirectResponse(url=f'../{next}', headers=dict(signin="success"))
 
         def _load_signin(web:Web, signin_module:str, appcls, ver):

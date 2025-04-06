@@ -232,6 +232,7 @@
     --bs-body-color-rgb: var(--bs-body-color);
     --bs-secondary-rgb: var(--bs-btn-color);
     --bs-table-bg: var(--bs-tertiary-bg);
+    --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
 }
 
 /* バーダントモード */
@@ -242,7 +243,7 @@
     --bs-secondary-color: #006400; /* ダークグリーン */
     --bs-secondary-bg: #000d00;
     --bs-tertiary-color: #228b22; /* フォレストグリーン */
-    --bs-tertiary-bg: #001a00;
+    --bs-tertiary-bg: #285235;
     --bs-link-color: #32cd32; /* ライムグリーン */
     --bs-link-hover-color: #008000; /* 緑 */
     --bs-code-color: #fafad2; /* ライトゴールデンロッドイエロー */
@@ -301,6 +302,7 @@
     --bs-body-color-rgb: var(--bs-body-color);
     --bs-secondary-rgb: var(--bs-btn-color);
     --bs-table-bg: var(--bs-tertiary-bg);
+    --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
 }
 
 /* ディープシーモード */
@@ -370,6 +372,7 @@
     --bs-body-color-rgb: var(--bs-body-color);
     --bs-secondary-rgb: var(--bs-btn-color);
     --bs-table-bg: var(--bs-tertiary-bg);
+    --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
 }
 
 /* クリムゾンモード */
@@ -380,7 +383,7 @@
     --bs-secondary-color: #8b0000; /* ダークレッド */
     --bs-secondary-bg: #0d0000;
     --bs-tertiary-color: #b22222; /* ファイアブリック */
-    --bs-tertiary-bg: #1a0000;
+    --bs-tertiary-bg: #522835;
     --bs-link-color: #ff4d4d; /* 明るい赤 */
     --bs-link-hover-color: #cc0000; /* より濃い赤 */
     --bs-code-color: #ffdab9; /* ピーチパフ */
@@ -439,6 +442,7 @@
     --bs-body-color-rgb: var(--bs-body-color);
     --bs-secondary-rgb: var(--bs-btn-color);
     --bs-table-bg: var(--bs-tertiary-bg);
+    --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
 }
 
 /* バンブルビーモード */
@@ -449,7 +453,7 @@
     --bs-secondary-color: #b8860b; /* ダークゴールデンロッド */
     --bs-secondary-bg: #0d0d00;
     --bs-tertiary-color: #ffd700; /* ゴールド */
-    --bs-tertiary-bg: #1a1a00;
+    --bs-tertiary-bg: #525235;
     --bs-link-color: #ffcc00; /* 明るい黄 */
     --bs-link-hover-color: #e6b800; /* より濃い黄 */
     --bs-code-color: #f0f8ff; /* アリスブルー */
@@ -508,4 +512,5 @@
     --bs-body-color-rgb: var(--bs-body-color);
     --bs-secondary-rgb: var(--bs-btn-color);
     --bs-table-bg: var(--bs-tertiary-bg);
+    --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
 }

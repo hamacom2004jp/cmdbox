@@ -45,12 +45,12 @@ def copy_sample(data:Path, ver=version):
         if not p.exists():
             shutil.copy2(src, dst)
     shutil.copytree(src, dst_sample, dirs_exist_ok=True, copy_function=copy)
-    dst_config = Path(data) / '.config' if data is not None else HOME_DIR / '.config'
+    dst_config = Path(data) / f'.{ver.__appid__}' if data is not None else HOME_DIR / f'.{ver.__appid__}'
     dst_config.mkdir(parents=True, exist_ok=True)
     if not (dst_config / 'features.yml').exists():
-        shutil.copy2(dst_sample / 'features.yml', dst_config / 'features.yml')
+        shutil.copy2(src / 'features.yml', dst_config / 'features.yml')
     if not (dst_config / 'user_list.yml').exists():
-        shutil.copy2(dst_sample / 'user_list.yml', dst_config / 'user_list.yml')
+        shutil.copy2(src / 'user_list.yml', dst_config / 'user_list.yml')
 
 def mklogdir(data:Path) -> Path:
     """

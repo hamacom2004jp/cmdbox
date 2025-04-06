@@ -28,7 +28,7 @@ class Users(feature.WebFeature):
             if signin is not None:
                 return signin
             res.headers['Access-Control-Allow-Origin'] = '*'
-            web.options.audit_exec(req, res)
+            web.options.audit_exec(req, res, web)
             return web.users_html_data
 
         @app.get('/users/list')
@@ -38,7 +38,7 @@ class Users(feature.WebFeature):
                 return signin
             if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
-            web.options.audit_exec(req, res)
+            web.options.audit_exec(req, res, web)
             return web.user_list(None)
 
         @app.post('/users/add')
@@ -51,7 +51,7 @@ class Users(feature.WebFeature):
             form = await req.json()
             try:
                 web.user_add(form)
-                web.options.audit_exec(req, res)
+                web.options.audit_exec(req, res, web)
                 return dict(success='add user')
             except Exception as e:
                 return dict(error=str(e))
@@ -66,7 +66,7 @@ class Users(feature.WebFeature):
             form = await req.json()
             try:
                 web.user_edit(form)
-                web.options.audit_exec(req, res)
+                web.options.audit_exec(req, res, web)
                 return dict(success='edit user')
             except Exception as e:
                 return dict(error=str(e))
@@ -83,7 +83,7 @@ class Users(feature.WebFeature):
                 if req.session['signin']['uid'] == form.get('uid', None):
                     raise ValueError('You cannot delete yourself.')
                 web.user_del(form.get('uid', None))
-                web.options.audit_exec(req, res)
+                web.options.audit_exec(req, res, web)
                 return dict(success='delete user')
             except Exception as e:
                 return dict(error=str(e))
@@ -98,7 +98,7 @@ class Users(feature.WebFeature):
             form = await req.json()
             try:
                 apikey = web.apikey_add(form)
-                web.options.audit_exec(req, res)
+                web.options.audit_exec(req, res, web)
                 return dict(success=apikey)
             except Exception as e:
                 return dict(error=str(e))
@@ -113,7 +113,7 @@ class Users(feature.WebFeature):
             form = await req.json()
             try:
                 apikey = web.apikey_del(form)
-                web.options.audit_exec(req, res)
+                web.options.audit_exec(req, res, web)
                 return dict(success=apikey)
             except Exception as e:
                 return dict(error=str(e))
@@ -126,7 +126,7 @@ class Users(feature.WebFeature):
             if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
             try:
-                web.options.audit_exec(req, res)
+                web.options.audit_exec(req, res, web)
                 return web.group_list(None)
             except Exception as e:
                 return dict(error=str(e))
@@ -141,7 +141,7 @@ class Users(feature.WebFeature):
             form = await req.json()
             try:
                 web.group_add(form)
-                web.options.audit_exec(req, res)
+                web.options.audit_exec(req, res, web)
                 return dict(success='add group')
             except Exception as e:
                 return dict(error=str(e))
@@ -156,7 +156,7 @@ class Users(feature.WebFeature):
             form = await req.json()
             try:
                 web.group_edit(form)
-                web.options.audit_exec(req, res)
+                web.options.audit_exec(req, res, web)
                 return dict(success='edit group')
             except Exception as e:
                 return dict(error=str(e))
@@ -173,7 +173,7 @@ class Users(feature.WebFeature):
                 if form.get('gid', None) in req.session['signin']['gids']:
                     raise ValueError('You cannot delete yourself group.')
                 web.group_del(form.get('gid', None))
-                web.options.audit_exec(req, res)
+                web.options.audit_exec(req, res, web)
                 return dict(success='delete group')
             except Exception as e:
                 return dict(error=str(e))
@@ -225,7 +225,7 @@ class Users(feature.WebFeature):
             try:
                 ret = web.change_password(form.get('user_name', None), form.get('password', None),
                                     form.get('new_password', None), form.get('confirm_password', None))
-                web.options.audit_exec(req, res)
+                web.options.audit_exec(req, res, web)
                 return ret
             except Exception as e:
                 return dict(error=str(e))

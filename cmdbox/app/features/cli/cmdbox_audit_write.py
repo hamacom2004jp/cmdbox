@@ -92,11 +92,11 @@ class AuditWrite(audit_base.AuditBase):
         """
         if args.svname is None:
             msg = dict(warn=f"Please specify the --svname option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         if args.audit_type is None:
             msg = dict(warn=f"Please specify the --audit_type option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         if args.clmsg_id is None:
             args.clmsg_id = str(uuid.uuid4())

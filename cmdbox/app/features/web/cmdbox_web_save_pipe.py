@@ -23,7 +23,7 @@ class SavePipe(feature.WebFeature):
             title = form.get('title')
             opt = form.get('opt')
             ret = self.save_pipe(web, title, json.loads(opt))
-            web.options.audit_exec(req, res)
+            web.options.audit_exec(req, res, web)
             return ret
 
     def save_pipe(self, web:Web, title:str, opt:Dict[str, Any]) -> Dict[str, str]:

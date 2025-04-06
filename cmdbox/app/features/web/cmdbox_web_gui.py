@@ -39,7 +39,7 @@ class Gui(feature.WebFeature):
             if signin is not None:
                 return signin
             res.headers['Access-Control-Allow-Origin'] = '*'
-            web.options.audit_exec(req, res)
+            web.options.audit_exec(req, res, web)
             return web.gui_html_data
 
         @app.get('/signin/gui/appid', response_class=PlainTextResponse)
