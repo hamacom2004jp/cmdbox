@@ -53,6 +53,9 @@ class AuditWrite(audit_base.AuditBase):
             dict(opt="clmsg_src", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                  discription_ja="クライアントのメッセージの発生源を指定します。通常 `cmdbox.app.feature.Feature` を継承したクラス名を指定します。",
                  discription_en="Specifies the source of client messages. Usually specifies the name of a class that extends `cmdbox.app.feature.Feature` ."),
+            dict(opt="clmsg_title", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                 discription_ja="クライアントのメッセージタイトルを指定します。通常コマンドタイトルを指定します。",
+                 discription_en="Specifies the client message title. Usually specifies the command title."),
             dict(opt="clmsg_user", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                  discription_ja="クライアントのメッセージを発生させたユーザーを指定します。",
                  discription_en="SpecSpecifies the user who generated the client message."),
@@ -107,6 +110,7 @@ class AuditWrite(audit_base.AuditBase):
         clmsg_id_b64 = convert.str2b64str(args.clmsg_id)
         clmsg_date_b64 = convert.str2b64str(args.clmsg_date)
         clmsg_src_b64 = convert.str2b64str(args.clmsg_src) if args.clmsg_src is not None else ''
+        clmsg_title_b64 = convert.str2b64str(args.clmsg_title) if args.clmsg_title is not None else ''
         clmsg_user_b64 = convert.str2b64str(args.clmsg_user) if args.clmsg_user is not None else ''
         clmsg_body_str = json.dumps(args.clmsg_body, default=common.default_json_enc, ensure_ascii=False) if args.clmsg_body is not None else '{}'
         clmsg_body_b64 = convert.str2b64str(clmsg_body_str)
@@ -121,7 +125,7 @@ class AuditWrite(audit_base.AuditBase):
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         cl.redis_cli.send_cmd(self.get_svcmd(),
-                              [audit_type_b64, clmsg_id_b64, clmsg_date_b64, clmsg_src_b64, clmsg_user_b64, clmsg_body_b64, clmsg_tag_b64,
+                              [audit_type_b64, clmsg_id_b64, clmsg_date_b64, clmsg_src_b64, clmsg_title_b64, clmsg_user_b64, clmsg_body_b64, clmsg_tag_b64,
                                pg_enabled, pg_host_b64, pg_port, pg_user_b64, pg_password_b64, pg_dbname_b64,
                                args.retention_period_days],
                               retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=True)
@@ -157,24 +161,26 @@ class AuditWrite(audit_base.AuditBase):
         clmsg_id = convert.b64str2str(msg[3])
         clmsg_date = convert.b64str2str(msg[4])
         clmsg_src = convert.b64str2str(msg[5])
-        clmsg_user = convert.b64str2str(msg[6])
-        clmsg_body = convert.b64str2str(msg[7])
-        clmsg_tags = convert.b64str2str(msg[8])
-        pg_enabled = True if msg[9]=='True' else False
-        pg_host = convert.b64str2str(msg[10])
-        pg_port = int(msg[11]) if msg[11]!='None' else None
-        pg_user = convert.b64str2str(msg[12])
-        pg_password = convert.b64str2str(msg[13])
-        pg_dbname = convert.b64str2str(msg[14])
-        retention_period_days = int(msg[15]) if msg[15] != 'None' else None
+        clmsg_title = convert.b64str2str(msg[6])
+        clmsg_user = convert.b64str2str(msg[7])
+        clmsg_body = convert.b64str2str(msg[8])
+        clmsg_tags = convert.b64str2str(msg[9])
+        pg_enabled = True if msg[10]=='True' else False
+        pg_host = convert.b64str2str(msg[11])
+        pg_port = int(msg[12]) if msg[12]!='None' else None
+        pg_user = convert.b64str2str(msg[13])
+        pg_password = convert.b64str2str(msg[14])
+        pg_dbname = convert.b64str2str(msg[15])
+        retention_period_days = int(msg[16]) if msg[16] != 'None' else None
         svmsg_id = str(uuid.uuid4())
-        st = self.write(msg[1], audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_user, clmsg_body, clmsg_tags, svmsg_id,
+        st = self.write(msg[1], audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tags, svmsg_id,
                         pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname,
                         retention_period_days,
                         data_dir, logger, redis_cli)
         return st
 
-    def write(self, reskey:str, audit_type:str, clmsg_id:str, clmsg_date:str, clmsg_src:str, clmsg_user:str, clmsg_body:str, clmsg_tags:str, svmsg_id:str,
+    def write(self, reskey:str, audit_type:str, clmsg_id:str, clmsg_date:str, clmsg_src:str, clmsg_title:str,
+              clmsg_user:str, clmsg_body:str, clmsg_tags:str, svmsg_id:str,
               pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str,
               retention_period_days:int,
               data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient) -> int:
@@ -187,6 +193,7 @@ class AuditWrite(audit_base.AuditBase):
             clmsg_id (str): クライアントメッセージID
             clmsg_date (str): クライアントメッセージ発生日時
             clmsg_src (str): クライアントメッセージの発生源
+            clmsg_title (str): クライアントメッセージのタイトル
             clmsg_user (str): クライアントメッセージの発生させたユーザー
             clmsg_body (str): クライアントメッセージの本文
             clmsg_tags (str): クライアントメッセージのタグ
@@ -209,22 +216,22 @@ class AuditWrite(audit_base.AuditBase):
             with self.initdb(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname) as conn:
                 cursor = conn.cursor()
                 try:
-                    clmsg_tags = json.dumps(clmsg_tags)
+                    svmsg_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + common.get_tzoffset_str()
                     if not pg_enabled:
                         cursor.execute('''
-                            INSERT INTO audit (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_user, clmsg_body, clmsg_tag, 
+                            INSERT INTO audit (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tag, 
                                             svmsg_id, svmsg_date)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-                        ''', (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_user, clmsg_body, clmsg_tags, svmsg_id))
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ''', (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tags, svmsg_id, svmsg_date))
                         if retention_period_days is not None and retention_period_days > 0:
                             cursor.execute('DELETE FROM audit WHERE svmsg_date < datetime(CURRENT_TIMESTAMP, ?)',
                                            (f'-{retention_period_days} days',))
                     else:
                         cursor.execute('''
-                            INSERT INTO audit (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_user, clmsg_body, clmsg_tag, 
+                            INSERT INTO audit (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tag, 
                                             svmsg_id, svmsg_date)
-                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
-                        ''', (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_user, clmsg_body, clmsg_tags, svmsg_id))
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        ''', (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tags, svmsg_id, svmsg_date))
                         if retention_period_days is not None and retention_period_days > 0:
                             cursor.execute("DELETE FROM audit WHERE svmsg_date < CURRENT_TIMESTAMP + %s ",
                                            (f'-{retention_period_days} day',))

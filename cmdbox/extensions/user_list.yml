@@ -50,6 +50,10 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     cmds: [list]
     rule: allow
   - groups: [user, guest]
+    mode: audit
+    cmds: [write]
+    rule: allow
+  - groups: [user, guest]
     mode: web
     cmds: [genpass]
     rule: allow
@@ -69,6 +73,7 @@ pathrule:                      # List of RESTAPI rules, rules that determine whe
     rule: allow
   - groups: [user]
     paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout, /password/change,
+            /gui/user_data/load, /gui/user_data/save, /gui/user_data/delete,
             /exec_cmd, /exec_pipe, /filer, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
     rule: allow
   - groups: [readonly]

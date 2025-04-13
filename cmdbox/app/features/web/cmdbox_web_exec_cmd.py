@@ -1,6 +1,6 @@
 from cmdbox.app import app, client, common, options, server, web as _web
 from cmdbox.app.commons import convert, loghandler
-from cmdbox.app.features.cli import audit_base
+from cmdbox.app.features.cli import cmdbox_audit_search, cmdbox_audit_write
 from cmdbox.app.features.web import cmdbox_web_load_cmd
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
@@ -96,7 +96,6 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 return True, output
         return False, None
 
-    @options.Options.audit()
     def exec_cmd(self, req:Request, res:Response, web:Web,
                  title:str, opt:Dict[str, Any], nothread:bool=False, appcls=None) -> List[Dict[str, Any]]:
         """
@@ -113,6 +112,10 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         Returns:
             list: コマンド実行結果
         """
+        tags = []
+        if 'tag' in opt and isinstance(opt['tag'], list):
+            tags = [t for t in opt['tag'] if t is not None and t != '']
+        web.options.audit_exec(req, res, web, tags=tags, title=title)
         appcls = self.appcls if appcls is None else appcls
         appcls = app.CmdBoxApp if appcls is None else appcls
         web.container['cmdbox_app'] = ap = appcls.getInstance(appcls=appcls, ver=self.ver)
@@ -133,8 +136,10 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                         found = True
                     if not found or o not in loaded: continue
                     opt[o] = loaded[o]
-                    if isinstance(feat, audit_base.AuditBase) and o in _options.audit_args:
-                        opt[o] = _options.audit_args[o]
+                    if isinstance(feat, cmdbox_audit_write.AuditWrite) and o in _options.audit_write_args:
+                        opt[o] = _options.audit_write_args[o]
+                    elif isinstance(feat, cmdbox_audit_search.AuditSearch) and o in _options.audit_search_args:
+                        opt[o] = _options.audit_search_args[o]
             except:
                 pass
         if 'host' in opt: opt['host'] = web.redis_host

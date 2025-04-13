@@ -148,7 +148,9 @@ cmdbox.passchange = async () => {
   const form = $(`<form id="chpass_form" class="modal-content novalidate"/>`).appendTo(daialog);
   const header = $(`<div class="modal-header"/>`).appendTo(form);
   header.append('<h5 class="modal-title">Change Password</h5>');
-  header.append('<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>');
+  header.append('<button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">'
+                +'<svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>'
+                +'</button>');
   const body = $(`<div class="modal-body"/>`).appendTo(form);
   const row_content = $(`<div class="row row_content"/>`).appendTo(body);
   const crrent_pass = $(`<div class="col-12 mb-3"><div class="input-group">`+
@@ -981,17 +983,59 @@ cmdbox.progress = (_min, _max, _now, _text, _show, _cycle) => {
   }
 };
 /**
+ * ユーザーデータを保存
+ * @param {string} cat - カテゴリ
+ * @param {string} key - キー
+ * @param {string} val - 値
+ * @returns {Promise}
+ */
+cmdbox.save_user_data = async (cat, key, val) => {
+  const formData = new FormData();
+  formData.append('categoly', cat);
+  formData.append('key', key);
+  formData.append('val', val);
+  const res = await fetch('gui/user_data/save', {method:'POST', body:formData});
+  if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+  const msg = await res.json()
+  return msg;
+};
+/**
+ * ユーザーデータを取得
+ * @param {string} cat - カテゴリ
+ * @param {string} key - キー
+ * @returns {Promise}
+ */
+cmdbox.load_user_data = async (cat, key) => {
+  const formData = new FormData();
+  formData.append('categoly', cat);
+  if (key) formData.append('key', key);
+  const res = await fetch('gui/user_data/load', {method:'POST', body:formData});
+  if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+  const data = await res.json();
+  return data;
+};
+/**
+ * ユーザーデータを削除
+ * @param {string} cat - カテゴリ
+ * @param {string} key - キー
+ * @returns {Promise}
+ */
+cmdbox.delete_user_data = async (cat, key) => {
+  const formData = new FormData();
+  formData.append('categoly', cat);
+  formData.append('key', key);
+  const res = await fetch('gui/user_data/delete', {method:'POST', body:formData});
+  if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+  const data = await res.json();
+  return data;
+};
+/**
  * コマンドピンを保存
  * @param {string} title - タイトル
  * @param {bool} pin - ピン
  */
 cmdbox.save_cmd_pin = async (title, pin) => {
-  const formData = new FormData();
-  formData.append('title', title);
-  formData.append('pin', pin?'on':'off');
-  const res = await fetch('gui/save_cmd_pin', {method:'POST', body:formData});
-  if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
-  const msg = await res.json()
+  return await cmdbox.save_user_data('cmdpins', title, pin?'on':'off');
 };
 /**
  * コマンドピンをロード
@@ -999,12 +1043,7 @@ cmdbox.save_cmd_pin = async (title, pin) => {
  * @returns {Promise}
  */
 cmdbox.load_cmd_pin = async (title) => {
-  const formData = new FormData();
-  if (title) formData.append('title', title);
-  const res = await fetch('gui/load_cmd_pin', {method:'POST', body:formData});
-  if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
-  const pins = await res.json();
-  return pins;
+  return await cmdbox.load_user_data('cmdpins', title);
 };
 /**
  * パイプピンを保存
@@ -1012,12 +1051,7 @@ cmdbox.load_cmd_pin = async (title) => {
  * @param {bool} pin - ピン
  */
 cmdbox.save_pipe_pin = async (title, pin) => {
-  const formData = new FormData();
-  formData.append('title', title);
-  formData.append('pin', pin?'on':'off');
-  const res = await fetch('gui/save_pipe_pin', {method:'POST', body:formData});
-  if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
-  const msg = await res.json()
+  return await cmdbox.save_user_data('pipepins', title, pin?'on':'off');
 };
 /**
  * パイプピンをロード
@@ -1025,10 +1059,321 @@ cmdbox.save_pipe_pin = async (title, pin) => {
  * @returns {Promise}
  */
 cmdbox.load_pipe_pin = async (title) => {
+  return await cmdbox.load_user_data('pipepins', title);
+}
+/**
+ * コマンドモーダルのフォームを追加
+ * @param {number} i - インデックス
+ * @param {$} cmd_modal - コマンドモーダル
+ * @param {$} row_content - 行コンテンツ
+ * @param {object} row - 行データ(コマンドオプション)
+ * @param {$} next_elem - 次の要素
+ * @param {number} lcolsize - 横長のカラムサイズ
+ * @param {number} scolsize - 通常のカラムサイズ
+ * @returns {void}
+ */
+cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, scolsize=6) => {
+  const target_name = row.opt;
+  let input_elem, elem;
+  if(!row.choice) {
+    // 選択肢がない場合
+    if(row.type=='text') {
+      elem = $(`<div class="col-${lcolsize} mb-3">` // row_content_template_text
+                +'<div class="input-group">'
+                  +'<label class="input-group-text row_content_template_title">title</label>'
+                  +'<textarea class="form-control row_content_template_input" rows="1" style="field-sizing:content;"></textarea>'
+                  +'</div></div>');
+    } else if(row.type=='dict') {
+      elem = $(`<div class="col-${lcolsize} mb-3">` // row_content_template_dict
+                +'<div class="input-group">'
+                  +'<label class="input-group-text row_content_template_title">title</label>'
+                  +'<input type="text" class="form-control row_content_key row_content_template_input">'
+                  +'<label class="input-group-text">=</label>'
+                  +'<input type="text" class="form-control row_content_val row_content_template_input">'
+                  +'</div></div>');
+    } else {
+      elem = $(`<div class="col-${scolsize} mb-3">` // row_content_template_str
+                +'<div class="input-group">'
+                  +'<label class="input-group-text row_content_template_title">title</label>'
+                  +'<input type="text" class="form-control row_content_template_input">'
+                  +'</div></div>');
+    }
+    if (next_elem) next_elem.after(elem);
+    else row_content.append(elem);
+    input_elem = elem.find('.row_content_template_input');
+    if(row.type=='date') input_elem.attr('type', 'date');
+    else if(row.type=='datetime') input_elem.attr('type', 'datetime-local');
+    input_elem.removeClass('row_content_template_input');
+    input_elem.val(row.default);
+  }
+  else {
+    // 選択肢がある場合
+    if(row.type=='dict') {
+      elem = $(`<div class="col-${lcolsize} mb-3">` // row_content_template_dict_choice
+                +'<div class="input-group">'
+                  +'<label class="input-group-text row_content_template_title">title</label>'
+                  +'<input type="text" class="form-control row_content_key row_content_template_input">'
+                  +'<label class="input-group-text">=</label>'
+                  +'<select class="form-select row_content_template_select"></select>'
+                  +'</div></div>');
+    } else {
+      elem = $(`<div class="col-${scolsize} mb-3">` // row_content_template_choice
+                +'<div class="input-group">'
+                  +'<label class="input-group-text row_content_template_title">title</label>'
+                  +'<select class="form-select row_content_template_select"></select>'
+                  +'</div></div>');
+    }
+    if (next_elem) next_elem.after(elem);
+    else row_content.append(elem);
+    input_elem = elem.find('.row_content_template_select,.row_content_template_input');
+    input_elem.removeClass('row_content_template_select').removeClass('row_content_template_input');
+    if (row.choice_show) {
+      input_elem.addClass('choice_show');
+      input_elem.change(() => {
+        let names = []
+        for (const ns of Object.values(row.choice_show)) {
+          if (Array.isArray(ns)) {
+            ns.forEach(n => names.push(n));
+          } else {
+            names.push(ns);
+          }
+        }
+        names = [...new Set(names)];
+        names.forEach(name => row_content.find(`[name="${name}"]`).parent().parent().hide());
+        const v = input_elem.val();
+        if (!row.choice_show[v]) return;
+        row.choice_show[v].forEach(n => row_content.find(`[name="${n}"]`).parent().parent().show());
+      });
+    }
+    // 配列をoptionタグに変換
+    const mkopt = (arr) => {
+      if (!arr) return '';
+      const opt = arr.map(row => {
+        if (typeof row === 'object') {
+          key = Object.keys(row)[0];
+          d = window.navigator.language=='ja'?row[key].discription_ja:row[key].discription_en;
+          return `<option value="${key}" discription="${d}">${key}</option>`;
+        }
+        return `<option value="${row}" discription="">${row}</option>`;
+      }).join('');
+      return opt;
+    }
+    input_elem.html(mkopt(row.choice));
+    input_elem.val(`${row.default!=null?row.default:''}`);
+  }
+  let index = 0;
+  if (cmd_modal.find(`[name="${target_name}"]`).length > 0) {
+    index = 0;
+    cmd_modal.find(`[name="${target_name}"][param_data_index]`).each((i, val) => {
+      v = Number($(val).attr('param_data_index'));
+      if (index <= v) index = v + 1;
+    });
+  }
+  input_elem.attr('name', target_name);
+  if(row.type=='dict') {
+    input_elem.each((i, e) => {
+      $(e).attr('id', target_name + (index + i));
+      $(e).attr('param_data_index', (index + i));
+    });
+  } else {
+    input_elem.attr('id', target_name + index);
+    input_elem.attr('param_data_index', index);
+  }
+  input_elem.attr('required', row.required);
+  input_elem.attr('param_data_type', row.type);
+  input_elem.attr('param_data_multi', row.multi);
+  input_elem.attr('param_data_web', row.web);
+  if (row.web=='mask' || row.web=='readonly') {
+    input_elem.attr('disabled', 'disabled');
+  }
+  // ファイルタイプの場合はファイラーモーダルを開くボタンを追加
+  if(row.type=='file'){
+    const btn = $('<button class="btn btn-secondary" type="button">file</button>');
+    input_elem.parent().append(btn);
+    const mk_func = (tid, tn) => {
+      // tid, tnの値を残すためにクロージャーにする
+      return () => {
+        const current_path = $(`[id="${tid}"]`).val();
+        fmodal.filer_modal_func(tid, tn, current_path, false, true);
+      }
+    }
+    btn.click(mk_func(input_elem.attr('id'), input_elem.attr('name')));
+  }
+  // ディレクトリタイプの場合はファイラーモーダルを開くボタンを追加
+  if(row.type=='dir'){
+    const btn = $('<button class="btn btn-secondary" type="button">dir</button>');
+    input_elem.parent().append(btn);
+    const mk_func = (tid, tn) => {
+      // tid, tnの値を残すためにクロージャーにする
+      return () => {
+        const current_path = $(`[id="${tid}"]`).val();
+        fmodal.filer_modal_func(tid, tn, current_path, true, true);
+      }
+    }
+    btn.click(mk_func(input_elem.attr('id'), input_elem.attr('name')));
+  }
+  // マルチの場合は追加ボタンを追加
+  if(row.multi){
+    const btn_a = $('<button class="btn btn-secondary add_buton" type="button"></button>');
+    btn_a.append('<svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>');
+    input_elem.parent().append(btn_a);
+    let mk_func = (row, next_elem) => {
+      // row, next_elemの値を残すためにクロージャーにする
+      return () => {
+        const r = {...row};
+        //r.hide = next_elem.is(':hidden');
+        cmdbox.add_form_func(0, cmd_modal, row_content, r, next_elem, lcolsize, scolsize);
+      }
+    }
+    btn_a.click(mk_func(row, input_elem.parent().parent()));
+    // 2個目以降は削除ボタンを追加
+    const len = cmd_modal.find(`[name="${target_name}"]`).length;
+    if (row.type!='dict' && len > 1 || row.type=='dict' && len > 2) {
+      mk_func = (del_elem, row) => {
+        // del_elemの値を残すためにクロージャーにする
+        return () => del_elem.remove();
+      }
+      const btn_t = $('<button class="btn btn-secondary" type="button"></button>');
+      btn_trash
+      btn_t.append('<svg class="bi bi-trash" width="16" height="16" fill="currentColor"><use href="#btn_trash"></use></svg>');
+      input_elem.parent().append(btn_t);
+      btn_t.click(mk_func(input_elem.parent().parent(), row));
+    }
+  }
+  const title = elem.find('.row_content_template_title');
+  title.html('');
+  title.attr('title', window.navigator.language=='ja'?row.discription_ja:row.discription_en)
+  if (row.required) {
+    title.append('<span class="text-danger" title="required">*</span>');
+  }
+  if (row.choice_show) {
+    title.append('<span class="text-primary" title="choice_show">*</span>');
+  }
+  title.append(`<span>${row.opt}</span>`);
+  if (row.hide) {
+    if (row_content.find('.row_content_hide').is(':hidden')) elem.hide();
+    elem.addClass('row_content_hide');
+  } else {
+    title.addClass('text-decoration-underline');
+  }
+}
+/**
+ * コマンド選択肢取得
+ * @param {string} mode - モード
+ * @param {string} cmd - コマンド
+ * @returns {Promise} - コマンドオプション
+ */
+cmdbox.get_cmd_choices = async (mode, cmd) => {
   const formData = new FormData();
-  if (title) formData.append('title', title);
-  const res = await fetch('gui/load_pipe_pin', {method:'POST', body:formData});
-  if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
-  const pins = await res.json();
-  return pins;
+  formData.append('mode', mode);
+  formData.append('cmd', cmd);
+  const res = await fetch('gui/get_cmd_choices', {method: 'POST', body: formData});
+  if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+  return await res.json();
+}
+// コマンドフォームからパラメータを取得
+cmdbox.get_param = (modal_elem) => {
+  modal_elem.find('.is-invalid, .is-valid').removeClass('is-invalid').removeClass('is-valid');
+  const opt = {};
+  const title = modal_elem.find('[name="title"]').val();
+  opt["modal_mode"] = modal_elem.find('[name="modal_mode"]').val();
+  opt["mode"] = modal_elem.find('[name="mode"]').val();
+  opt["cmd"] = modal_elem.find('[name="cmd"]').val();
+  if(!opt["mode"]) delete opt["mode"];
+  if(!opt["cmd"]) delete opt["cmd"];
+  opt["title"] = title;
+  const isFloat = (i) => {
+      try {
+          n = Number(i);
+          return n % 1 !== 0;
+      } catch(e) {
+          return false;
+      }
+  }
+  const isInt = (i) => {
+      try {
+          n = Number(i);
+          return n % 1 === 0;
+      } catch(e) {
+          return false;
+      }
+  }
+  // フォームの入力値をチェック（不正な値があればフォームに'is-invalid'クラスを付加する）
+  const dict_buf = {};
+  modal_elem.find('.row_content, .row_content_common').find('input, select, textarea').each((i, elem) => {
+    const data_name = $(elem).attr('name');
+    let data_val = $(elem).val();
+    const data_type = $(elem).attr('param_data_type');
+    const data_web = $(elem).attr('param_data_web');
+    const data_index = parseInt($(elem).attr('param_data_index'));
+    const data_multi = $(elem).attr('param_data_multi');
+    if ($(elem).attr('required') && (!data_val || data_val=='')) {
+      $(elem).addClass('is-invalid');
+    } else if (data_type=='int' && !data_web) {
+      if(data_val && data_val!='') {
+        if(!isInt(data_val)) $(elem).addClass('is-invalid');
+        else {
+          $(elem).removeClass('is-invalid');
+          $(elem).addClass('is-valid');
+          data_val = parseInt(data_val);
+        }
+      } else {
+        $(elem).removeClass('is-invalid');
+        $(elem).addClass('is-valid');
+      }
+    } else if (data_type=='float') {
+      if(data_val && data_val!='') {
+        if(!isFloat(data_val) && !isInt(data_val)) $(elem).addClass('is-invalid');
+        else {
+          $(elem).removeClass('is-invalid');
+          $(elem).addClass('is-valid');
+          data_val = parseFloat(data_val);
+        }
+      } else {
+        $(elem).removeClass('is-invalid');
+        $(elem).addClass('is-valid');
+      }
+    } else if (data_type=='bool') {
+      if(data_val!='true' && data_val!='false' && !$(elem).prop('disabled')) $(elem).addClass('is-invalid');
+      else {
+        data_val = data_val=='true';
+        $(elem).removeClass('is-invalid');
+        $(elem).addClass('is-valid');
+      }
+    } else if (data_type=='dict') {
+      data_val = data_val ? data_val : '';
+      if(data_val.indexOf(' ')>=0) $(elem).addClass('is-invalid');
+      else {
+        $(elem).removeClass('is-invalid');
+        $(elem).addClass('is-valid');
+      }
+    } else if (data_type=='text') {
+      $(elem).removeClass('is-invalid');
+      $(elem).addClass('is-valid');
+    } else {
+      $(elem).removeClass('is-invalid');
+      $(elem).addClass('is-valid');
+    }
+    if(data_multi=='true' || data_type=='dict') {
+      if (data_type=='dict') {
+        if(!opt[data_name]) {
+          opt[data_name] = {};
+          dict_buf[data_name] = {};
+        }
+        if(data_index%2==0) dict_buf[data_name]['key'] = data_val;
+        else if (dict_buf[data_name]['key']) {
+          opt[data_name][dict_buf[data_name]['key']] = data_val;
+          delete dict_buf[data_name]['key'];
+        }
+      } else {
+        if(!opt[data_name]) opt[data_name] = [];
+        if(data_val && data_val!='') opt[data_name].push(data_val);
+        else if(data_val==false) opt[data_name].push(data_val);
+      }
+    } else {
+      if(data_val && data_val!='') opt[data_name] = data_val;
+      else if(data_val==false) opt[data_name] = data_val;
+    }
+  });
+  return [title, opt];
 }

@@ -42,10 +42,10 @@ class AuditSearch(audit_base.AuditBase):
         opt['discription_en'] = "Search the audit log."
         opt['choice'] += [
             dict(opt="select", type=Options.T_STR, default=None, required=False, multi=True, hide=False,
-                 choice=['', 'audit_type', 'clmsg_id', 'clmsg_date', 'clmsg_tag', 'clmsg_src', 'clmsg_body', 'svmsg_id', 'svmsg_date'],
+                 choice=['', 'audit_type', 'clmsg_id', 'clmsg_date', 'clmsg_src', 'clmsg_title', 'clmsg_user', 'clmsg_body', 'clmsg_tag', 'svmsg_id', 'svmsg_date'],
                  discription_ja="取得項目を指定します。指定しない場合は全ての項目を取得します。",
                  discription_en="Specify the items to be retrieved. If not specified, all items are acquired."),
-            dict(opt="filter_audit_type", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=Options.AUDITS,
+            dict(opt="filter_audit_type", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=['']+Options.AUDITS,
                  discription_ja="フィルタ条件の監査の種類を指定します。",
                  discription_en="Specifies the type of audit for the filter condition."),
             dict(opt="filter_clmsg_id", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
@@ -60,6 +60,9 @@ class AuditSearch(audit_base.AuditBase):
             dict(opt="filter_clmsg_src", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                  discription_ja="フィルタ条件のクライアントのメッセージの発生源を指定します。LIKE検索を行います。",
                  discription_en="Specifies the source of the message for the client in the filter condition; performs a LIKE search."),
+            dict(opt="filter_clmsg_title", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                 discription_ja="フィルタ条件のクライアントのメッセージタイトルを指定します。LIKE検索を行います。",
+                 discription_en="Specifies the message title of the client for the filter condition; a LIKE search is performed."),
             dict(opt="filter_clmsg_user", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                  discription_ja="フィルタ条件のクライアントのメッセージの発生させたユーザーを指定します。LIKE検索を行います。",
                  discription_en="Specifies the user who generated the message for the client in the filter condition; performs a LIKE search."),
@@ -78,7 +81,7 @@ class AuditSearch(audit_base.AuditBase):
             dict(opt="filter_svmsg_edate", type=Options.T_DATETIME, default=None, required=False, multi=False, hide=False, choice=None,
                  discription_ja="フィルタ条件のサーバーのメッセージ発生日時(終了)を指定します。",
                  discription_en="Specify the date and time (end) when the message occurred for the server in the filter condition."),
-            dict(opt="sort", type=Options.T_DICT, default=None, required=False, multi=True, hide=False, choice=['', 'ASC', 'DICT'],
+            dict(opt="sort", type=Options.T_DICT, default=None, required=False, multi=True, hide=False, choice=['', 'ASC', 'DESC'],
                  discription_ja="ソート項目を指定します。",
                  discription_en="Specify the sort item."),
             dict(opt="offset", type=Options.T_INT, default=0, required=False, multi=False, hide=False, choice=None,
@@ -117,43 +120,46 @@ class AuditSearch(audit_base.AuditBase):
             common.print_format(msg, args.format, tm, None, False, pf=pf)
             return 1, msg, None
 
-        select_str = json.dumps(args.select, default=common.default_json_enc, ensure_ascii=False) if args.select else '[]'
+        select_str = json.dumps(args.select, default=common.default_json_enc, ensure_ascii=False) if getattr(args, 'select', None) else '[]'
         select_b64 = convert.str2b64str(select_str)
-        sort_str = json.dumps(args.sort, default=common.default_json_enc, ensure_ascii=False) if args.sort else '{}'
+        args.sort = args.sort if getattr(args, 'sort', {}) else {}
+        args.sort = args.sort if isinstance(args.sort, dict) else {str(args.sort): 'DESC'}
+        sort_str = json.dumps(args.sort, default=common.default_json_enc, ensure_ascii=False)
         sort_b64 = convert.str2b64str(sort_str)
-        offset = args.offset
-        limit = args.limit
-        filter_audit_type_b64 = convert.str2b64str(args.filter_audit_type)
-        filter_clmsg_id_b64 = convert.str2b64str(args.filter_clmsg_id)
-        filter_clmsg_sdate = args.filter_clmsg_sdate+common.get_tzoffset_str() if args.filter_clmsg_sdate else None
+        offset = getattr(args, 'offset', None)
+        limit = getattr(args, 'limit', None)
+        filter_audit_type_b64 = convert.str2b64str(getattr(args, 'filter_audit_type', None))
+        filter_clmsg_id_b64 = convert.str2b64str(getattr(args, 'filter_clmsg_id', None))
+        filter_clmsg_sdate = args.filter_clmsg_sdate+common.get_tzoffset_str() if getattr(args, 'filter_clmsg_sdate', None) else None
         filter_clmsg_sdate_b64 = convert.str2b64str(filter_clmsg_sdate)
-        filter_clmsg_edate = args.filter_clmsg_edate+common.get_tzoffset_str() if args.filter_clmsg_edate else None
+        filter_clmsg_edate = args.filter_clmsg_edate+common.get_tzoffset_str() if getattr(args, 'filter_clmsg_edate', None) else None
         filter_clmsg_edate_b64 = convert.str2b64str(filter_clmsg_edate)
-        filter_clmsg_src_b64 = convert.str2b64str(args.filter_clmsg_src)
-        filter_clmsg_user_b64 = convert.str2b64str(args.filter_clmsg_user)
-        filter_clmsg_body_str = json.dumps(args.filter_clmsg_body, default=common.default_json_enc, ensure_ascii=False) if args.filter_clmsg_body else '{}'
+        filter_clmsg_src_b64 = convert.str2b64str(getattr(args, 'filter_clmsg_src', None))
+        filter_clmsg_title_b64 = convert.str2b64str(getattr(args, 'filter_clmsg_title', None))
+        filter_clmsg_user_b64 = convert.str2b64str(getattr(args, 'filter_clmsg_user', None))
+        filter_clmsg_body_str = json.dumps(args.filter_clmsg_body, default=common.default_json_enc, ensure_ascii=False) if getattr(args, 'filter_clmsg_body', None) else '{}'
         filter_clmsg_body_b64 = convert.str2b64str(filter_clmsg_body_str)
-        filter_clmsg_tag_str = json.dumps(args.filter_clmsg_tag, default=common.default_json_enc, ensure_ascii=False) if args.filter_clmsg_tag else '[]'
+        filter_clmsg_tag_str = json.dumps(args.filter_clmsg_tag, default=common.default_json_enc, ensure_ascii=False) if getattr(args, 'filter_clmsg_tag', None) else '[]'
         filter_clmsg_tag_b64 = convert.str2b64str(filter_clmsg_tag_str)
-        filter_svmsg_id_b64 = convert.str2b64str(args.filter_svmsg_id)
-        filter_svmsg_sdate_b64 = convert.str2b64str(args.filter_svmsg_sdate)
-        filter_svmsg_edate_b64 = convert.str2b64str(args.filter_svmsg_edate)
-        pg_enabled = args.pg_enabled
-        pg_host_b64 = convert.str2b64str(args.pg_host)
-        pg_port = args.pg_port if isinstance(args.pg_port, int) else None
-        pg_user_b64 = convert.str2b64str(args.pg_user)
-        pg_password_b64 = convert.str2b64str(args.pg_password)
-        pg_dbname_b64 = convert.str2b64str(args.pg_dbname)
+        filter_svmsg_id_b64 = convert.str2b64str(getattr(args, 'filter_svmsg_id', None))
+        filter_svmsg_sdate_b64 = convert.str2b64str(getattr(args, 'filter_svmsg_sdate', None))
+        filter_svmsg_edate_b64 = convert.str2b64str(getattr(args, 'filter_svmsg_edate', None))
+        pg_enabled = args.pg_enabled if getattr(args, 'pg_enabled', False) and isinstance(args.pg_enabled, bool) else False
+        pg_host_b64 = convert.str2b64str(getattr(args, 'pg_host', None))
+        pg_port = args.pg_port if getattr(args, 'pg_port', 5432) and isinstance(args.pg_port, int) else None
+        pg_user_b64 = convert.str2b64str(getattr(args, 'pg_user', None))
+        pg_password_b64 = convert.str2b64str(getattr(args, 'pg_password', None))
+        pg_dbname_b64 = convert.str2b64str(getattr(args, 'pg_dbname', None))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.redis_cli.send_cmd(self.get_svcmd(),
                                     [select_b64, sort_b64, str(offset), str(limit),
                                      filter_audit_type_b64, filter_clmsg_id_b64, filter_clmsg_sdate_b64, filter_clmsg_edate_b64,
-                                     filter_clmsg_src_b64, filter_clmsg_user_b64, filter_clmsg_body_b64, filter_clmsg_tag_b64, 
-                                     filter_svmsg_id_b64, filter_svmsg_sdate_b64, filter_svmsg_edate_b64,
+                                     filter_clmsg_src_b64, filter_clmsg_title_b64, filter_clmsg_user_b64, filter_clmsg_body_b64,
+                                     filter_clmsg_tag_b64, filter_svmsg_id_b64, filter_svmsg_sdate_b64, filter_svmsg_edate_b64,
                                      pg_enabled, pg_host_b64, pg_port, pg_user_b64, pg_password_b64, pg_dbname_b64],
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
-        common.print_format(ret, args.format, tm, None, False, pf=pf)
+        common.print_format(ret, getattr(args, 'format', False), tm, None, False, pf=pf)
 
         if 'success' not in ret:
             return 1, ret, cl
@@ -205,21 +211,22 @@ class AuditSearch(audit_base.AuditBase):
         filter_clmsg_sdate = convert.b64str2str(msg[8])
         filter_clmsg_edate = convert.b64str2str(msg[9])
         filter_clmsg_src = convert.b64str2str(msg[10])
-        filter_clmsg_user = convert.b64str2str(msg[11])
-        body = json.loads(convert.b64str2str(msg[12]))
-        tags = json.loads(convert.b64str2str(msg[13]))
-        filter_svmsg_id = convert.b64str2str(msg[14])
-        filter_svmsg_sdate = convert.b64str2str(msg[15])
-        filter_svmsg_edate = convert.b64str2str(msg[16])
-        pg_enabled = True if msg[17]=='True' else False
-        pg_host = convert.b64str2str(msg[18])
-        pg_port = int(msg[19]) if msg[19]!='None' else None
-        pg_user = convert.b64str2str(msg[20])
-        pg_password = convert.b64str2str(msg[21])
-        pg_dbname = convert.b64str2str(msg[22])
+        filter_clmsg_title = convert.b64str2str(msg[11])
+        filter_clmsg_user = convert.b64str2str(msg[12])
+        body = json.loads(convert.b64str2str(msg[13]))
+        tags = json.loads(convert.b64str2str(msg[14]))
+        filter_svmsg_id = convert.b64str2str(msg[15])
+        filter_svmsg_sdate = convert.b64str2str(msg[16])
+        filter_svmsg_edate = convert.b64str2str(msg[17])
+        pg_enabled = True if msg[18]=='True' else False
+        pg_host = convert.b64str2str(msg[19])
+        pg_port = int(msg[20]) if msg[20]!='None' else None
+        pg_user = convert.b64str2str(msg[21])
+        pg_password = convert.b64str2str(msg[22])
+        pg_dbname = convert.b64str2str(msg[23])
         st = self.search(msg[1], select, sort, offset, limit,
                          filter_audit_type, filter_clmsg_id, filter_clmsg_sdate, filter_clmsg_edate,
-                         filter_clmsg_src, filter_clmsg_user, body, tags,
+                         filter_clmsg_src, filter_clmsg_title, filter_clmsg_user, body, tags,
                          filter_svmsg_id, filter_svmsg_sdate, filter_svmsg_edate,
                          pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname,
                          data_dir, logger, redis_cli)
@@ -227,8 +234,8 @@ class AuditSearch(audit_base.AuditBase):
 
     def search(self, reskey:str, select:List[str], sort:Dict[str, str], offset:int, limit:int,
                filter_audit_type:str, filter_clmsg_id:str, filter_clmsg_sdate:str, filter_clmsg_edate:str,
-               filter_clmsg_src:str, filter_clmsg_user:str, filter_clmsg_body:Dict[str, Any], filter_clmsg_tags:List[str],
-               filter_svmsg_id:str, filter_svmsg_sdate:str, filter_svmsg_edate:str,
+               filter_clmsg_src:str, filter_clmsg_title:str, filter_clmsg_user:str, filter_clmsg_body:Dict[str, Any],
+               filter_clmsg_tags:List[str], filter_svmsg_id:str, filter_svmsg_sdate:str, filter_svmsg_edate:str,
                pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str,
                data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient) -> int:
         """
@@ -245,6 +252,7 @@ class AuditSearch(audit_base.AuditBase):
             filter_clmsg_sdate (str): クライアントメッセージ発生日時(開始)
             filter_clmsg_edate (str): クライアントメッセージ発生日時(終了)
             filter_clmsg_src (str): クライアントメッセージの発生源
+            filter_clmsg_title (str): クライアントメッセージのタイトル
             filter_clmsg_user (str): クライアントメッセージの発生させたユーザー
             filter_clmsg_body (Dict[str, Any]): クライアントメッセージの本文
             filter_clmsg_tags (List[str]): クライアントメッセージのタグ
@@ -271,7 +279,9 @@ class AuditSearch(audit_base.AuditBase):
                 conn.row_factory = dict_row if pg_enabled else dict_factory
                 cursor = conn.cursor()
                 try:
-                    select = select if select else ['audit_type', 'clmsg_id', 'clmsg_date', 'clmsg_src', 'clmsg_user', 'clmsg_body', 'clmsg_tag', 'svmsg_id', 'svmsg_date']
+                    select = [a for a in select if a != ''] if select else None
+                    select = select if select and len(select)>0 else ['audit_type', 'clmsg_id', 'clmsg_date', 'clmsg_src', 'clmsg_title',
+                                                                      'clmsg_user', 'clmsg_body', 'clmsg_tag', 'svmsg_id', 'svmsg_date']
                     if pg_enabled:
                         toz = common.get_tzoffset_str()
                         sel = []
@@ -299,6 +309,9 @@ class AuditSearch(audit_base.AuditBase):
                     if filter_clmsg_src and filter_clmsg_src != 'None':
                         where.append(f'clmsg_src LIKE {"%s" if pg_enabled else "?"}')
                         params.append(filter_clmsg_src)
+                    if filter_clmsg_title and filter_clmsg_title != 'None':
+                        where.append(f'clmsg_title LIKE {"%s" if pg_enabled else "?"}')
+                        params.append(filter_clmsg_title)
                     if filter_clmsg_user and filter_clmsg_user != 'None':
                         where.append(f'clmsg_user LIKE {"%s" if pg_enabled else "?"}')
                         params.append(filter_clmsg_user)

@@ -159,165 +159,16 @@ const list_cmd_func_then = () => {
             const cmd = cmd_modal.find('[name="cmd"]').val();
             const selected_cmd = cmd_modal.find('[name="cmd"] option:selected');
             cmd_modal.find('.cmd_label').attr('title', selected_cmd.attr('discription'));
-            const py_get_cmd_choices = await get_cmd_choices(mode, cmd);
+            const py_get_cmd_choices = await cmdbox.get_cmd_choices(mode, cmd);
             row_content.html('');
-            // オプション一覧をフォームに追加
-            const add_form_func = (i, row, next_elem) => {
-                const target_name = row.opt;
-                let input_elem, elem;
-                if(!row.choice) {
-                    // 選択肢がない場合
-                    if(row.type=='text') {
-                        elem = $(cmd_modal.find('.row_content_template_text').html());
-                    } else if(row.type=='dict') {
-                        elem = $(cmd_modal.find('.row_content_template_dict').html());
-                    } else {
-                        elem = $(cmd_modal.find('.row_content_template_str').html());
-                    }
-                    if (next_elem) next_elem.after(elem);
-                    else row_content.append(elem);
-                    input_elem = elem.find('.row_content_template_input');
-                    if(row.type=='date') input_elem.attr('type', 'date');
-                    else if(row.type=='datetime') input_elem.attr('type', 'datetime-local');
-                    input_elem.removeClass('row_content_template_input');
-                    input_elem.val(row.default);
-                }
-                else {
-                    // 選択肢がある場合
-                    if(row.type=='dict') {
-                        elem = $(cmd_modal.find('.row_content_template_dict_choice').html());
-                    } else {
-                        elem = $(cmd_modal.find('.row_content_template_choice').html());
-                    }
-                    if (next_elem) next_elem.after(elem);
-                    else row_content.append(elem);
-                    input_elem = elem.find('.row_content_template_select,.row_content_template_input');
-                    input_elem.removeClass('row_content_template_select').removeClass('row_content_template_input');
-                    if (row.choice_show) {
-                        input_elem.addClass('choice_show');
-                        input_elem.change(() => {
-                            let names = []
-                            for (const ns of Object.values(row.choice_show)) {
-                                if (Array.isArray(ns)) {
-                                    ns.forEach(n => names.push(n));
-                                } else {
-                                    names.push(ns);
-                                }
-                            }
-                            names = [...new Set(names)];
-                            names.forEach(name => row_content.find(`[name="${name}"]`).parent().parent().hide());
-                            const v = input_elem.val();
-                            if (!row.choice_show[v]) return;
-                            row.choice_show[v].forEach(n => row_content.find(`[name="${n}"]`).parent().parent().show());
-                        });
-                    }
-                    input_elem.html(mkopt(row.choice));
-                    input_elem.val(`${row.default!=null?row.default:''}`);
-                }
-                let index = 0;
-                if (cmd_modal.find(`[name="${target_name}"]`).length > 0) {
-                    index = 0;
-                    cmd_modal.find(`[name="${target_name}"][param_data_index]`).each((i, val) => {
-                        v = Number($(val).attr('param_data_index'));
-                        if (index <= v) index = v + 1;
-                    });
-                }
-                input_elem.attr('name', target_name);
-                if(row.type=='dict') {
-                    input_elem.each((i, e) => {
-                        $(e).attr('id', target_name + (index + i));
-                        $(e).attr('param_data_index', (index + i));
-                    });
-                } else {
-                    input_elem.attr('id', target_name + index);
-                    input_elem.attr('param_data_index', index);
-                }
-                input_elem.attr('required', row.required);
-                input_elem.attr('param_data_type', row.type);
-                input_elem.attr('param_data_multi', row.multi);
-                input_elem.attr('param_data_web', row.web);
-                if (row.web=='mask' || row.web=='readonly') {
-                    input_elem.attr('disabled', 'disabled');
-                }
-                // ファイルタイプの場合はファイラーモーダルを開くボタンを追加
-                if(row.type=='file'){
-                    const btn = $('<button class="btn btn-secondary" type="button">file</button>');
-                    input_elem.parent().append(btn);
-                    const mk_func = (tid, tn) => {
-                        // tid, tnの値を残すためにクロージャーにする
-                        return () => {
-                            const current_path = $(`[id="${tid}"]`).val();
-                            fmodal.filer_modal_func(tid, tn, current_path, false, true);
-                        }
-                    }
-                    btn.click(mk_func(input_elem.attr('id'), input_elem.attr('name')));
-                }
-                // ディレクトリタイプの場合はファイラーモーダルを開くボタンを追加
-                if(row.type=='dir'){
-                    const btn = $('<button class="btn btn-secondary" type="button">dir</button>');
-                    input_elem.parent().append(btn);
-                    const mk_func = (tid, tn) => {
-                        // tid, tnの値を残すためにクロージャーにする
-                        return () => {
-                            const current_path = $(`[id="${tid}"]`).val();
-                            fmodal.filer_modal_func(tid, tn, current_path, true, true);
-                        }
-                    }
-                    btn.click(mk_func(input_elem.attr('id'), input_elem.attr('name')));
-                }
-                // マルチの場合は追加ボタンを追加
-                if(row.multi){
-                    const btn_a = $('<button class="btn btn-secondary add_buton" type="button"></button>');
-                    btn_a.append('<svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>');
-                    input_elem.parent().append(btn_a);
-                    let mk_func = (row, next_elem) => {
-                        // row, next_elemの値を残すためにクロージャーにする
-                        return () => {
-                            const r = {...row};
-                            //r.hide = next_elem.is(':hidden');
-                            add_form_func(0, r, next_elem);
-                        }
-                    }
-                    btn_a.click(mk_func(row, input_elem.parent().parent()));
-                    // 2個目以降は削除ボタンを追加
-                    const len = cmd_modal.find(`[name="${target_name}"]`).length;
-                    if (row.type!='dict' && len > 1 || row.type=='dict' && len > 2) {
-                        mk_func = (del_elem, row) => {
-                            // del_elemの値を残すためにクロージャーにする
-                            return () => del_elem.remove();
-                        }
-                        const btn_t = $('<button class="btn btn-secondary" type="button"></button>');
-                        btn_trash
-                        btn_t.append('<svg class="bi bi-trash" width="16" height="16" fill="currentColor"><use href="#btn_trash"></use></svg>');
-                        input_elem.parent().append(btn_t);
-                        btn_t.click(mk_func(input_elem.parent().parent(), row));
-                    }
-                }
-                const title = elem.find('.row_content_template_title');
-                title.html('');
-                title.attr('title', window.navigator.language=='ja'?row.discription_ja:row.discription_en)
-                if (row.required) {
-                    title.append('<span class="text-danger" title="required">*</span>');
-                }
-                if (row.choice_show) {
-                    title.append('<span class="text-primary" title="choice_show">*</span>');
-                }
-                title.append(`<span>${row.opt}</span>`);
-                if (row.hide) {
-                    if (row_content.find('.row_content_hide').is(':hidden')) elem.hide();
-                    elem.addClass('row_content_hide');
-                } else {
-                    title.addClass('text-decoration-underline');
-                }
-            }
             // 表示オプションを追加
-            py_get_cmd_choices.filter(row => !row.hide).forEach((row, i) => add_form_func(i, row, null));
+            py_get_cmd_choices.filter(row => !row.hide).forEach((row, i) => cmdbox.add_form_func(i, cmd_modal, row_content, row, null));
             // 高度なオプションを表示するリンクを追加
             const show_link = $('<div class="text-center card-hover mb-3"><a href="#">[ advanced options ]</a></div>');
             show_link.click(() => row_content.find('.row_content_hide').toggle());
             row_content.append(show_link);
             // 非表示オプションを追加
-            py_get_cmd_choices.filter(row => row.hide).forEach((row, i) => add_form_func(i, row, null));
+            py_get_cmd_choices.filter(row => row.hide).forEach((row, i) => cmdbox.add_form_func(i, cmd_modal, row_content, row, null));
             cmd_modal.find('.choice_show').change();
         }
         //row_content.find('is-invalid, is-valid').removeClass('is-invalid').removeClass('is-valid');
@@ -449,7 +300,7 @@ const list_cmd_func_then = () => {
     // コマンドファイルの保存
     $('#cmd_save').off('click').on('click', async () => {
         const cmd_modal = $('#cmd_modal');
-        const [title, opt] = get_param(cmd_modal);
+        const [title, opt] = cmdbox.get_param(cmd_modal);
         if (cmd_modal.find('.row_content, .row_content_common').find('.is-invalid').length > 0) {
             return;
         }
@@ -480,7 +331,7 @@ const list_cmd_func_then = () => {
     // コマンドファイルの実行
     $('#cmd_exec').off('click').on('click', async () => {
         const cmd_modal = $('#cmd_modal');
-        const [title, opt] = get_param(cmd_modal);
+        const [title, opt] = cmdbox.get_param(cmd_modal);
         if (cmd_modal.find('.row_content, .row_content_common').find('.is-invalid').length > 0) {
             return;
         }
@@ -495,7 +346,7 @@ const list_cmd_func_then = () => {
     // RAW表示の実行
     $('#cmd_raw').off('click').on('click', async () => {
         const cmd_modal = $('#cmd_modal');
-        const [title, opt] = get_param(cmd_modal);
+        const [title, opt] = cmdbox.get_param(cmd_modal);
         if (cmd_modal.find('.row_content, .row_content_common').find('.is-invalid').length > 0) {
             return;
         }
@@ -507,113 +358,6 @@ const list_cmd_func_then = () => {
         });
     });
 };
-
-// コマンドフォームからパラメータを取得
-const get_param = (modal_elem) => {
-    modal_elem.find('.is-invalid, .is-valid').removeClass('is-invalid').removeClass('is-valid');
-    const opt = {};
-    const title = modal_elem.find('[name="title"]').val();
-    opt["modal_mode"] = modal_elem.find('[name="modal_mode"]').val();
-    opt["mode"] = modal_elem.find('[name="mode"]').val();
-    opt["cmd"] = modal_elem.find('[name="cmd"]').val();
-    if(!opt["mode"]) delete opt["mode"];
-    if(!opt["cmd"]) delete opt["cmd"];
-    opt["title"] = title;
-    const isFloat = (i) => {
-        try {
-            n = Number(i);
-            return n % 1 !== 0;
-        } catch(e) {
-            return false;
-        }
-    }
-    const isInt = (i) => {
-        try {
-            n = Number(i);
-            return n % 1 === 0;
-        } catch(e) {
-            return false;
-        }
-    }
-    // フォームの入力値をチェック（不正な値があればフォームに'is-invalid'クラスを付加する）
-    const dict_buf = {};
-    modal_elem.find('.row_content, .row_content_common').find('input, select, textarea').each((i, elem) => {
-        const data_name = $(elem).attr('name');
-        let data_val = $(elem).val();
-        const data_type = $(elem).attr('param_data_type');
-        const data_web = $(elem).attr('param_data_web');
-        const data_index = parseInt($(elem).attr('param_data_index'));
-        const data_multi = $(elem).attr('param_data_multi');
-        if ($(elem).attr('required') && (!data_val || data_val=='')) {
-            $(elem).addClass('is-invalid');
-        } else if (data_type=='int' && !data_web) {
-            if(data_val && data_val!='') {
-                if(!isInt(data_val)) $(elem).addClass('is-invalid');
-                else {
-                    $(elem).removeClass('is-invalid');
-                    $(elem).addClass('is-valid');
-                    data_val = parseInt(data_val);
-                }
-            } else {
-                $(elem).removeClass('is-invalid');
-                $(elem).addClass('is-valid');
-            }
-        } else if (data_type=='float') {
-            if(data_val && data_val!='') {
-                if(!isFloat(data_val) && !isInt(data_val)) $(elem).addClass('is-invalid');
-                else {
-                    $(elem).removeClass('is-invalid');
-                    $(elem).addClass('is-valid');
-                    data_val = parseFloat(data_val);
-                }
-            } else {
-                $(elem).removeClass('is-invalid');
-                $(elem).addClass('is-valid');
-            }
-        } else if (data_type=='bool') {
-            if(data_val!='true' && data_val!='false' && !$(elem).prop('disabled')) $(elem).addClass('is-invalid');
-            else {
-                data_val = data_val=='true';
-                $(elem).removeClass('is-invalid');
-                $(elem).addClass('is-valid');
-            }
-        } else if (data_type=='dict') {
-            data_val = data_val ? data_val : '';
-            if(data_val.indexOf(' ')>=0) $(elem).addClass('is-invalid');
-            else {
-                $(elem).removeClass('is-invalid');
-                $(elem).addClass('is-valid');
-            }
-        } else if (data_type=='text') {
-            $(elem).removeClass('is-invalid');
-            $(elem).addClass('is-valid');
-        } else {
-            $(elem).removeClass('is-invalid');
-            $(elem).addClass('is-valid');
-        }
-        if(data_multi=='true' || data_type=='dict') {
-            if (data_type=='dict') {
-                if(!opt[data_name]) {
-                    opt[data_name] = {};
-                    dict_buf[data_name] = {};
-                }
-                if(data_index%2==0) dict_buf[data_name]['key'] = data_val;
-                else if (dict_buf[data_name]['key']) {
-                    opt[data_name][dict_buf[data_name]['key']] = data_val;
-                    delete dict_buf[data_name]['key'];
-                }
-            } else {
-                if(!opt[data_name]) opt[data_name] = [];
-                if(data_val && data_val!='') opt[data_name].push(data_val);
-                else if(data_val==false) opt[data_name].push(data_val);
-            }
-        } else {
-            if(data_val && data_val!='') opt[data_name] = data_val;
-            else if(data_val==false) opt[data_name] = data_val;
-        }
-    });
-    return [title, opt];
-}
 
 const list_cmd = async (kwd) => {
     const formData = new FormData();
@@ -631,14 +375,6 @@ const get_cmds = async (mode) => {
     const formData = new FormData();
     formData.append('mode', mode);
     const res = await fetch('gui/get_cmds', {method: 'POST', body: formData});
-    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
-    return await res.json();
-}
-const get_cmd_choices = async (mode, cmd) => {
-    const formData = new FormData();
-    formData.append('mode', mode);
-    formData.append('cmd', cmd);
-    const res = await fetch('gui/get_cmd_choices', {method: 'POST', body: formData});
     if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }

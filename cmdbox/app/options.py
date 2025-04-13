@@ -627,20 +627,35 @@ class Options:
         if 'enabled' not in yml['audit']:
             raise Exception('features.yml is invalid. (The audit element must have "enabled" specified.)')
         if not yml['audit']['enabled']: return
-        if 'feature' not in yml['audit']:
-            raise Exception('features.yml is invalid. (The audit element must have "feature" specified.)')
-        if 'mode' not in yml['audit']['feature']:
-            raise Exception('features.yml is invalid. (The audit.feature element must have "mode" specified.)')
-        mode = yml['audit']['feature']['mode']
-        if 'cmd' not in yml['audit']['feature']:
-            raise Exception('features.yml is invalid. (The audit.feature element must have "cmd" specified.)')
-        cmd = yml['audit']['feature']['cmd']
-        self.audit_func:feature.Feature = self.get_cmd_attr(mode, cmd, 'feature')
+        # writeフューチャー
+        if 'write' not in yml['audit']:
+            raise Exception('features.yml is invalid. (The audit element must have "write" specified.)')
+        if 'mode' not in yml['audit']['write']:
+            raise Exception('features.yml is invalid. (The audit.write element must have "mode" specified.)')
+        mode = yml['audit']['write']['mode']
+        if 'cmd' not in yml['audit']['write']:
+            raise Exception('features.yml is invalid. (The audit.write element must have "cmd" specified.)')
+        cmd = yml['audit']['write']['cmd']
+        self.audit_write:feature.Feature = self.get_cmd_attr(mode, cmd, 'feature')
+        # searchフューチャー
+        if 'search' not in yml['audit']:
+            raise Exception('features.yml is invalid. (The audit element must have "search" specified.)')
+        if 'mode' not in yml['audit']['search']:
+            raise Exception('features.yml is invalid. (The audit.search element must have "mode" specified.)')
+        mode = yml['audit']['search']['mode']
+        if 'cmd' not in yml['audit']['search']:
+            raise Exception('features.yml is invalid. (The audit.search element must have "cmd" specified.)')
+        cmd = yml['audit']['search']['cmd']
+        self.audit_search:feature.Feature = self.get_cmd_attr(mode, cmd, 'feature')
+        # フューチャーのoptions
         if 'options' not in yml['audit']:
             raise Exception('features.yml is invalid. (The audit element must have "options" specified.)')
-        self.audit_args = yml['audit']['options'].copy()
-        self.audit_args['mode'] = mode
-        self.audit_args['cmd'] = cmd
+        self.audit_write_args = yml['audit']['options'].copy()
+        self.audit_write_args['mode'] = mode
+        self.audit_write_args['cmd'] = cmd
+        self.audit_search_args = yml['audit']['options'].copy()
+        self.audit_search_args['mode'] = mode
+        self.audit_search_args['cmd'] = cmd
         self.audit_loaded = True
 
     AT_USER = 'user'
@@ -684,7 +699,7 @@ class Options:
             return _wrapper
         return _audit_write
 
-    def audit_exec(self, *args, body:Dict[str, Any]=None, audit_type:str=None, tags:List[str]=None, src:str=None, user:str=None, **kwargs) -> None:
+    def audit_exec(self, *args, body:Dict[str, Any]=None, audit_type:str=None, tags:List[str]=None, src:str=None, title:str=None, user:str=None, **kwargs) -> None:
         """
         監査ログを書き込みます。
 
@@ -694,17 +709,19 @@ class Options:
             audit_type (str): 監査の種類
             tags (List[str]): メッセージのタグ
             src (str): メッセージの発生源
+            title (str): メッセージのタイトル
             user (str): メッセージを発生させたユーザー名
             kwargs (Any): 呼び出し元で使用しているキーワード引数
         """
-        if not hasattr(self, 'audit_func') or self.audit_func is None:
+        if not hasattr(self, 'audit_write') or self.audit_write is None:
             raise Exception('audit write feature is not found.')
         clmsg_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + common.get_tzoffset_str()
-        opt = self.audit_args.copy()
-        opt['audit_type'] = audit_type if audit_type is not None else Options.AT_EVENT
+        opt = self.audit_write_args.copy()
+        opt['audit_type'] = audit_type
         opt['clmsg_id'] = str(uuid.uuid4())
         opt['clmsg_date'] = clmsg_date
         opt['clmsg_src'] = opt['clmsg_src'] if 'clmsg_src' in opt else None
+        opt['clmsg_title'] = opt['clmsg_title'] if 'clmsg_title' in opt else None
         opt['clmsg_user'] = user
         opt['clmsg_tag'] = tags
         opt['format'] = False if opt.get('format') is None else opt['format']
@@ -756,12 +773,16 @@ class Options:
             elif isinstance(arg, Request):
                 if 'signin' in arg.session and arg.session['signin'] is not None and 'name' in arg.session['signin']:
                     opt['clmsg_user'] = arg.session['signin']['name']
-                    opt['audit_type'] = Options.AT_ADMIN if 'admin' in arg.session['signin']['groups'] else Options.AT_USER
+                    if opt['audit_type'] is None:
+                        opt['audit_type'] = Options.AT_ADMIN if 'admin' in arg.session['signin']['groups'] else Options.AT_USER
                     opt['clmsg_id'] = arg.session['signin']['clmsg_id'] if 'clmsg_id' in arg.session['signin'] else opt['clmsg_id']
                     arg.session['signin']['clmsg_id'] = opt['clmsg_id']
                 opt['clmsg_src'] = arg.url.path
         opt['clmsg_body'] = clmsg_body
+        opt['audit_type'] = opt['audit_type'] if opt['audit_type'] else Options.AT_EVENT
         if src is not None and src != "":
             opt['clmsg_src'] = src
-        audit_args = argparse.Namespace(**{k:common.chopdq(v) for k,v in opt.items()})
-        self.audit_func.apprun(logger, audit_args, tm=0.0, pf=[])
+        if title is not None and title != "":
+            opt['clmsg_title'] = title
+        audit_write_args = argparse.Namespace(**{k:common.chopdq(v) for k,v in opt.items()})
+        self.audit_write.apprun(logger, audit_write_args, tm=0.0, pf=[])

@@ -131,7 +131,7 @@ list_pipe_func_then = () => {
     // パイプラインファイルの保存
     $('#pipe_save').off('click').on('click', async () => {
         const pipe_modal = $('#pipe_modal');
-        const [title, opt] = get_param(pipe_modal);
+        const [title, opt] = cmdbox.get_param(pipe_modal);
         if (pipe_modal.find('.row_content, .row_content_common').find('.is-invalid').length > 0) {
             return;
         }
@@ -159,7 +159,7 @@ list_pipe_func_then = () => {
     // パイプラインファイルの実行
     $('#pipe_exec').off('click').on('click', async () => {
         const pipe_modal = $('#pipe_modal');
-        const [title, opt] = get_param(pipe_modal);
+        const [title, opt] = cmdbox.get_param(pipe_modal);
         if (pipe_modal.find('.row_content').find('.is-invalid').length > 0) {
             return;
         }
@@ -173,7 +173,7 @@ list_pipe_func_then = () => {
     // RAW表示の実行
     $('#pipe_raw').off('click').on('click', async () => {
         const pipe_modal = $('#pipe_modal');
-        const [title, opt] = get_param(pipe_modal);
+        const [title, opt] = cmdbox.get_param(pipe_modal);
         if (pipe_modal.find('.row_content').find('.is-invalid').length > 0) {
             return;
         }

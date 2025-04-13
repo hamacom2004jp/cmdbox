@@ -31,7 +31,7 @@ class Web:
     def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None,
                  redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server',
                  client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None, result_html:str=None, users_html:str=None,
-                 assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
+                 audit_html:str=None, assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
                  web_features_packages:List[str]=None, web_features_prefix:List[str]=None):
         """
         cmdboxクライアント側のwebapiサービス
@@ -51,6 +51,7 @@ class Web:
             filer_html (str, optional): ファイラーのHTMLファイル. Defaults to None.
             result_html (str, optional): 結果のHTMLファイル. Defaults to None.
             users_html (str, optional): ユーザーのHTMLファイル. Defaults to None.
+            audit_html (str, optional): 監査のHTMLファイル. Defaults to None.
             assets (List[str], optional): 静的ファイルのリスト. Defaults to None.
             signin_html (str, optional): ログイン画面のHTMLファイル. Defaults to None.
             signin_file (str, optional): ログイン情報のファイル. Defaults to args.signin_file.
@@ -76,6 +77,7 @@ class Web:
         self.filer_html = Path(filer_html) if filer_html is not None else Path(__file__).parent.parent / 'web' / 'filer.html'
         self.result_html = Path(result_html) if result_html is not None else Path(__file__).parent.parent / 'web' / 'result.html'
         self.users_html = Path(users_html) if users_html is not None else Path(__file__).parent.parent / 'web' / 'users.html'
+        self.audit_html = Path(audit_html) if audit_html is not None else Path(__file__).parent.parent / 'web' / 'audit.html'
         self.assets = []
         if assets is not None:
             if not isinstance(assets, list):
@@ -94,6 +96,7 @@ class Web:
         self.filer_html_data = None
         self.result_html_data = None
         self.users_html_data = None
+        self.audit_html_data = None
         self.assets_data = None
         self.signin_html_data = None
         self.gui_mode = gui_mode
@@ -102,10 +105,12 @@ class Web:
         self.cmds_path = self.data / ".cmds"
         self.pipes_path = self.data / ".pipes"
         self.users_path = self.data / ".users"
+        self.audit_path = self.data / '.audit'
         self.static_root = Path(__file__).parent.parent / 'web'
         common.mkdirs(self.cmds_path)
         common.mkdirs(self.pipes_path)
         common.mkdirs(self.users_path)
+        common.mkdirs(self.audit_path)
         self.pipe_th = None
         self.img_queue = queue.Queue(1000)
         self.cb_queue = queue.Queue(1000)
@@ -125,6 +130,7 @@ class Web:
             self.logger.debug(f"web init parameter: filer_html={self.filer_html} -> {self.filer_html.absolute() if self.filer_html is not None else None}")
             self.logger.debug(f"web init parameter: result_html={self.result_html} -> {self.result_html.absolute() if self.result_html is not None else None}")
             self.logger.debug(f"web init parameter: users_html={self.users_html} -> {self.users_html.absolute() if self.users_html is not None else None}")
+            self.logger.debug(f"web init parameter: audit_html={self.audit_html} -> {self.audit_html.absolute() if self.audit_html is not None else None}")
             self.logger.debug(f"web init parameter: assets={self.assets} -> {[a.absolute() for a in self.assets] if self.assets is not None else None}")
             self.logger.debug(f"web init parameter: signin_html={self.signin_html} -> {self.signin_html.absolute() if self.signin_html is not None else None}")
             self.logger.debug(f"web init parameter: signin_file={self.signin_file} -> {self.signin_file.absolute() if self.signin_file is not None else None}")

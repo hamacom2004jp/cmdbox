@@ -56,6 +56,9 @@ class AuditDelete(audit_base.AuditBase):
             dict(opt="delete_clmsg_src", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                  discription_ja="削除条件のクライアントのメッセージの発生源を指定します。LIKE検索を行います。",
                  discription_en="Specifies the source of the message for the client in the delete condition; performs a LIKE search."),
+            dict(opt="delete_clmsg_title", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                 discription_ja="削除条件のクライアントのメッセージタイトルを指定します。LIKE検索を行います。",
+                 discription_en="Specifies the message title of the client for the deletion condition; a LIKE search is performed."),
             dict(opt="delete_clmsg_user", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                  discription_ja="削除条件のクライアントのメッセージの発生させたユーザーを指定します。LIKE検索を行います。",
                  discription_en="Specifies the user who generated the message for the client in the delete condition; performs a LIKE search."),
@@ -111,6 +114,7 @@ class AuditDelete(audit_base.AuditBase):
         delete_clmsg_edate = args.delete_clmsg_edate+common.get_tzoffset_str() if args.delete_clmsg_edate else None
         delete_clmsg_edate_b64 = convert.str2b64str(delete_clmsg_edate)
         delete_clmsg_src_b64 = convert.str2b64str(args.delete_clmsg_src)
+        delete_clmsg_title_b64 = convert.str2b64str(args.delete_clmsg_title) if args.delete_clmsg_title else None
         delete_clmsg_user_b64 = convert.str2b64str(args.delete_clmsg_user)
         delete_clmsg_body_str = json.dumps(args.delete_clmsg_body, default=common.default_json_enc, ensure_ascii=False) if args.delete_clmsg_body else '{}'
         delete_clmsg_body_b64 = convert.str2b64str(delete_clmsg_body_str)
@@ -129,8 +133,8 @@ class AuditDelete(audit_base.AuditBase):
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.redis_cli.send_cmd(self.get_svcmd(),
                                     [delete_audit_type_b64, delete_clmsg_id_b64, delete_clmsg_sdate_b64, delete_clmsg_edate_b64,
-                                     delete_clmsg_src_b64, delete_clmsg_user_b64, delete_clmsg_body_b64, delete_clmsg_tag_b64, 
-                                     delete_svmsg_id_b64, delete_svmsg_sdate_b64, delete_svmsg_edate_b64,
+                                     delete_clmsg_src_b64, delete_clmsg_title_b64, delete_clmsg_user_b64, delete_clmsg_body_b64,
+                                     delete_clmsg_tag_b64, delete_svmsg_id_b64, delete_svmsg_sdate_b64, delete_svmsg_edate_b64,
                                      pg_enabled, pg_host_b64, pg_port, pg_user_b64, pg_password_b64, pg_dbname_b64],
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, None, False, pf=pf)
@@ -180,21 +184,22 @@ class AuditDelete(audit_base.AuditBase):
         delete_clmsg_sdate = convert.b64str2str(msg[4])
         delete_clmsg_edate = convert.b64str2str(msg[5])
         delete_clmsg_src = convert.b64str2str(msg[6])
-        delete_clmsg_user = convert.b64str2str(msg[7])
-        body = json.loads(convert.b64str2str(msg[8]))
-        tags = json.loads(convert.b64str2str(msg[9]))
-        delete_svmsg_id = convert.b64str2str(msg[10])
-        delete_svmsg_sdate = convert.b64str2str(msg[11])
-        delete_svmsg_edate = convert.b64str2str(msg[12])
-        pg_enabled = True if msg[13]=='True' else False
-        pg_host = convert.b64str2str(msg[14])
-        pg_port = int(msg[15]) if msg[15]!='None' else None
-        pg_user = convert.b64str2str(msg[16])
-        pg_password = convert.b64str2str(msg[17])
-        pg_dbname = convert.b64str2str(msg[18])
+        delete_clmsg_title = convert.b64str2str(msg[7])
+        delete_clmsg_user = convert.b64str2str(msg[8])
+        body = json.loads(convert.b64str2str(msg[9]))
+        tags = json.loads(convert.b64str2str(msg[10]))
+        delete_svmsg_id = convert.b64str2str(msg[11])
+        delete_svmsg_sdate = convert.b64str2str(msg[12])
+        delete_svmsg_edate = convert.b64str2str(msg[13])
+        pg_enabled = True if msg[14]=='True' else False
+        pg_host = convert.b64str2str(msg[15])
+        pg_port = int(msg[16]) if msg[16]!='None' else None
+        pg_user = convert.b64str2str(msg[17])
+        pg_password = convert.b64str2str(msg[18])
+        pg_dbname = convert.b64str2str(msg[19])
         st = self.delete(msg[1],
                          delete_audit_type, delete_clmsg_id, delete_clmsg_sdate, delete_clmsg_edate,
-                         delete_clmsg_src, delete_clmsg_user, body, tags,
+                         delete_clmsg_src, delete_clmsg_title, delete_clmsg_user, body, tags,
                          delete_svmsg_id, delete_svmsg_sdate, delete_svmsg_edate,
                          pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname,
                          data_dir, logger, redis_cli)
@@ -202,8 +207,8 @@ class AuditDelete(audit_base.AuditBase):
 
     def delete(self, reskey:str,
                delete_audit_type:str, delete_clmsg_id:str, delete_clmsg_sdate:str, delete_clmsg_edate:str,
-               delete_clmsg_src:str, delete_clmsg_user:str, delete_clmsg_body:Dict[str, Any], delete_clmsg_tags:List[str],
-               delete_svmsg_id:str, delete_svmsg_sdate:str, delete_svmsg_edate:str,
+               delete_clmsg_src:str, delete_clmsg_title:str, delete_clmsg_user:str, delete_clmsg_body:Dict[str, Any],
+               delete_clmsg_tags:List[str], delete_svmsg_id:str, delete_svmsg_sdate:str, delete_svmsg_edate:str,
                pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str,
                data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient) -> int:
         """
@@ -216,6 +221,7 @@ class AuditDelete(audit_base.AuditBase):
             delete_clmsg_sdate (str): クライアントメッセージ発生日時(開始)
             delete_clmsg_edate (str): クライアントメッセージ発生日時(終了)
             delete_clmsg_src (str): クライアントメッセージの発生源
+            delete_clmsg_title (str): クライアントメッセージのタイトル
             delete_clmsg_user (str): クライアントメッセージの発生させたユーザー
             delete_clmsg_body (Dict[str, Any]): クライアントメッセージの本文
             delete_clmsg_tags (List[str]): クライアントメッセージのタグ
@@ -256,6 +262,9 @@ class AuditDelete(audit_base.AuditBase):
                         params.append(delete_clmsg_edate)
                     if delete_clmsg_src and delete_clmsg_src != 'None':
                         where.append(f'clmsg_src LIKE {"%s" if pg_enabled else "?"}')
+                        params.append(delete_clmsg_src)
+                    if delete_clmsg_title and delete_clmsg_title != 'None':
+                        where.append(f'clmsg_title LIKE {"%s" if pg_enabled else "?"}')
                         params.append(delete_clmsg_src)
                     if delete_clmsg_user and delete_clmsg_user != 'None':
                         where.append(f'clmsg_user LIKE {"%s" if pg_enabled else "?"}')
