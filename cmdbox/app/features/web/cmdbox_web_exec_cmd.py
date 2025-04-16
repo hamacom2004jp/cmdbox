@@ -180,7 +180,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
             logsize = 1024
             try:
                 old_stdout.write(loghandler.colorize_msg(f'EXEC:     {opt_list}\n'[:logsize]))
-                status, ret_main, obj = cmdbox_app.main(args_list=opt_list, file_dict=file_dict, webcall=True)
+                status, ret_main, obj = cmdbox_app.main(args_list=[common.chopdq(o) for o in opt_list], file_dict=file_dict, webcall=True)
                 if isinstance(obj, server.Server):
                     cmdbox_app.sv = obj
                 elif isinstance(obj, client.Client):

@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import copy
 import logging
+import string
 
 
 class Signin(object):

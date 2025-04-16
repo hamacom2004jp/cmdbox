@@ -260,7 +260,7 @@ const list_cmd_func_then = () => {
             cmdbox.load_cmd_pin(title).then((result) => {
                 if (!result['success']) {
                     cmd_modal.find('.btn_pin_fill').hide();
-                    cmd_modal.find('.btn_pin_angle').hide();
+                    cmd_modal.find('.btn_pin_angle').show();
                 } else if (result['success']=='on') {
                     cmd_modal.find('.btn_pin_fill').show();
                     cmd_modal.find('.btn_pin_angle').hide();

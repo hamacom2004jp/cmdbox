@@ -1109,13 +1109,24 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
   else {
     // 選択肢がある場合
     if(row.type=='dict') {
-      elem = $(`<div class="col-${lcolsize} mb-3">` // row_content_template_dict_choice
-                +'<div class="input-group">'
-                  +'<label class="input-group-text row_content_template_title">title</label>'
-                  +'<input type="text" class="form-control row_content_key row_content_template_input">'
-                  +'<label class="input-group-text">=</label>'
-                  +'<select class="form-select row_content_template_select"></select>'
-                  +'</div></div>');
+      if (Array.isArray(row.choice)) {
+        elem = $(`<div class="col-${lcolsize} mb-3">` // row_content_template_dict_choice
+                  +'<div class="input-group">'
+                    +'<label class="input-group-text row_content_template_title">title</label>'
+                    +'<input type="text" class="form-control row_content_key row_content_template_input">'
+                    +'<label class="input-group-text">=</label>'
+                    +'<select class="form-select row_content_template_select"></select>'
+                    +'</div></div>');
+      }
+      else {
+        elem = $(`<div class="col-${lcolsize} mb-3">` // row_content_template_dict_choice
+                  +'<div class="input-group">'
+                    +'<label class="input-group-text row_content_template_title">title</label>'
+                    +'<select class="form-select row_content_key row_content_template_select"></select>'
+                    +'<label class="input-group-text">=</label>'
+                    +'<select class="form-select row_content_template_select"></select>'
+                    +'</div></div>');
+      }
     } else {
       elem = $(`<div class="col-${scolsize} mb-3">` // row_content_template_choice
                 +'<div class="input-group">'
@@ -1149,7 +1160,7 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
     const mkopt = (arr) => {
       if (!arr) return '';
       const opt = arr.map(row => {
-        if (typeof row === 'object') {
+        if (row && typeof row === 'object') {
           key = Object.keys(row)[0];
           d = window.navigator.language=='ja'?row[key].discription_ja:row[key].discription_en;
           return `<option value="${key}" discription="${d}">${key}</option>`;
@@ -1158,8 +1169,23 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
       }).join('');
       return opt;
     }
-    input_elem.html(mkopt(row.choice));
-    input_elem.val(`${row.default!=null?row.default:''}`);
+    if (Array.isArray(row.choice)) {
+      // 配列の場合
+      input_elem.html(mkopt(row.choice));
+      input_elem.val(`${row.default!=null?row.default:''}`);
+    } else {
+      // 辞書の場合
+      const cho = [row.choice['key'], row.choice['val']];
+      let def = row.default!=null?[row.default, row.default]:null;
+      if (row.default && typeof row.default === 'object') {
+        def[0] = Object.keys(row.default)[0];
+        def[1] = row.default[def[0]];
+      }
+      input_elem.each((i, e) => {
+        $(e).html(mkopt(cho[i]));
+        $(e).val(`${def!=null?def[i]:''}`);
+      });
+    }
   }
   let index = 0;
   if (cmd_modal.find(`[name="${target_name}"]`).length > 0) {

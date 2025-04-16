@@ -125,7 +125,7 @@ fsapi.filer = (svpath, is_local) => {
       };
       const path = file_list.pop()
       const list_downloads = [];
-      if (path[1] && path[1]['is_dir'] && !path[1]['children']) {
+      if (path[1] && path[1]['is_dir'] && path[1]['children']!=null && path[1]['children']!=undefined) {
         list_downloads.push(...get_list(path[1]));
       } else if (path[1] && !path[1]['is_dir']) {
         let rpath = path[1]['path'].replace(fsapi.right.find('.filer_address').val(), '');

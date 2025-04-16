@@ -41,10 +41,13 @@ class AuditSearch(audit_base.AuditBase):
         opt['discription_ja'] = "監査ログを検索します。"
         opt['discription_en'] = "Search the audit log."
         opt['choice'] += [
-            dict(opt="select", type=Options.T_STR, default=None, required=False, multi=True, hide=False,
-                 choice=['', 'audit_type', 'clmsg_id', 'clmsg_date', 'clmsg_src', 'clmsg_title', 'clmsg_user', 'clmsg_body', 'clmsg_tag', 'svmsg_id', 'svmsg_date'],
+            dict(opt="select", type=Options.T_DICT, default=None, required=False, multi=True, hide=False,
+                 choice=dict(key=['']+self.TBL_COLS, val=['-','count','sum','avg','min','max']),
                  discription_ja="取得項目を指定します。指定しない場合は全ての項目を取得します。",
                  discription_en="Specify the items to be retrieved. If not specified, all items are acquired."),
+            dict(opt="select_date_format", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=['']+self.DT_FMT,
+                 discription_ja="取得項目の日時のフォーマットを指定します。",
+                 discription_en="Specifies the format of the date and time of the acquisition item."),
             dict(opt="filter_audit_type", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=['']+Options.AUDITS,
                  discription_ja="フィルタ条件の監査の種類を指定します。",
                  discription_en="Specifies the type of audit for the filter condition."),
@@ -81,7 +84,13 @@ class AuditSearch(audit_base.AuditBase):
             dict(opt="filter_svmsg_edate", type=Options.T_DATETIME, default=None, required=False, multi=False, hide=False, choice=None,
                  discription_ja="フィルタ条件のサーバーのメッセージ発生日時(終了)を指定します。",
                  discription_en="Specify the date and time (end) when the message occurred for the server in the filter condition."),
-            dict(opt="sort", type=Options.T_DICT, default=None, required=False, multi=True, hide=False, choice=['', 'ASC', 'DESC'],
+            dict(opt="groupby", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=['']+self.TBL_COLS,
+                 discription_ja="グループ化項目を指定します。",
+                 discription_en="Specify grouping items."),
+            dict(opt="groupby_date_format", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=['']+self.DT_FMT,
+                 discription_ja="グループ化項目の日時のフォーマットを指定します。",
+                 discription_en="Specifies the format of the date and time of the grouping item."),
+            dict(opt="sort", type=Options.T_DICT, default=None, required=False, multi=True, hide=False, choice=dict(key=['']+self.TBL_COLS, val=['', 'ASC', 'DESC']),
                  discription_ja="ソート項目を指定します。",
                  discription_en="Specify the sort item."),
             dict(opt="offset", type=Options.T_INT, default=0, required=False, multi=False, hide=False, choice=None,
@@ -120,8 +129,12 @@ class AuditSearch(audit_base.AuditBase):
             common.print_format(msg, args.format, tm, None, False, pf=pf)
             return 1, msg, None
 
-        select_str = json.dumps(args.select, default=common.default_json_enc, ensure_ascii=False) if getattr(args, 'select', None) else '[]'
+        select_str = json.dumps(args.select, default=common.default_json_enc, ensure_ascii=False) if getattr(args, 'select', None) else '{}'
         select_b64 = convert.str2b64str(select_str)
+        select_date_format_b64 = convert.str2b64str(getattr(args, 'select_date_format', None))
+        groupby_str = json.dumps(args.groupby, default=common.default_json_enc, ensure_ascii=False) if getattr(args, 'groupby', None) else '[]'
+        groupby_b64 = convert.str2b64str(groupby_str)
+        groupby_date_format_b64 = convert.str2b64str(getattr(args, 'groupby_date_format', None))
         args.sort = args.sort if getattr(args, 'sort', {}) else {}
         args.sort = args.sort if isinstance(args.sort, dict) else {str(args.sort): 'DESC'}
         sort_str = json.dumps(args.sort, default=common.default_json_enc, ensure_ascii=False)
@@ -153,7 +166,8 @@ class AuditSearch(audit_base.AuditBase):
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.redis_cli.send_cmd(self.get_svcmd(),
-                                    [select_b64, sort_b64, str(offset), str(limit),
+                                    [select_b64, select_date_format_b64, groupby_b64, groupby_date_format_b64,
+                                     sort_b64, str(offset), str(limit),
                                      filter_audit_type_b64, filter_clmsg_id_b64, filter_clmsg_sdate_b64, filter_clmsg_edate_b64,
                                      filter_clmsg_src_b64, filter_clmsg_title_b64, filter_clmsg_user_b64, filter_clmsg_body_b64,
                                      filter_clmsg_tag_b64, filter_svmsg_id_b64, filter_svmsg_sdate_b64, filter_svmsg_edate_b64,
@@ -202,29 +216,33 @@ class AuditSearch(audit_base.AuditBase):
             int: 終了コード
         """
         select = json.loads(convert.b64str2str(msg[2]))
-        sort = json.loads(convert.b64str2str(msg[3]))
-        offset = int(msg[4]) if msg[4] else 0
-        limit = int(msg[5]) if msg[5] else 100
+        select_date_format = convert.b64str2str(msg[3])
+        groupby = json.loads(convert.b64str2str(msg[4]))
+        groupby_date_format = convert.b64str2str(msg[5])
+        sort = json.loads(convert.b64str2str(msg[6]))
+        offset = int(msg[7]) if msg[7] else 0
+        limit = int(msg[8]) if msg[8] else 100
         
-        filter_audit_type = convert.b64str2str(msg[6])
-        filter_clmsg_id = convert.b64str2str(msg[7])
-        filter_clmsg_sdate = convert.b64str2str(msg[8])
-        filter_clmsg_edate = convert.b64str2str(msg[9])
-        filter_clmsg_src = convert.b64str2str(msg[10])
-        filter_clmsg_title = convert.b64str2str(msg[11])
-        filter_clmsg_user = convert.b64str2str(msg[12])
-        body = json.loads(convert.b64str2str(msg[13]))
-        tags = json.loads(convert.b64str2str(msg[14]))
-        filter_svmsg_id = convert.b64str2str(msg[15])
-        filter_svmsg_sdate = convert.b64str2str(msg[16])
-        filter_svmsg_edate = convert.b64str2str(msg[17])
-        pg_enabled = True if msg[18]=='True' else False
-        pg_host = convert.b64str2str(msg[19])
-        pg_port = int(msg[20]) if msg[20]!='None' else None
-        pg_user = convert.b64str2str(msg[21])
-        pg_password = convert.b64str2str(msg[22])
-        pg_dbname = convert.b64str2str(msg[23])
-        st = self.search(msg[1], select, sort, offset, limit,
+        filter_audit_type = convert.b64str2str(msg[9])
+        filter_clmsg_id = convert.b64str2str(msg[10])
+        filter_clmsg_sdate = convert.b64str2str(msg[11])
+        filter_clmsg_edate = convert.b64str2str(msg[12])
+        filter_clmsg_src = convert.b64str2str(msg[13])
+        filter_clmsg_title = convert.b64str2str(msg[14])
+        filter_clmsg_user = convert.b64str2str(msg[15])
+        body = json.loads(convert.b64str2str(msg[16]))
+        tags = json.loads(convert.b64str2str(msg[17]))
+        filter_svmsg_id = convert.b64str2str(msg[18])
+        filter_svmsg_sdate = convert.b64str2str(msg[19])
+        filter_svmsg_edate = convert.b64str2str(msg[20])
+        pg_enabled = True if msg[21]=='True' else False
+        pg_host = convert.b64str2str(msg[22])
+        pg_port = int(msg[23]) if msg[23]!='None' else None
+        pg_user = convert.b64str2str(msg[24])
+        pg_password = convert.b64str2str(msg[25])
+        pg_dbname = convert.b64str2str(msg[26])
+        st = self.search(msg[1], select, select_date_format, groupby, groupby_date_format,
+                         sort, offset, limit,
                          filter_audit_type, filter_clmsg_id, filter_clmsg_sdate, filter_clmsg_edate,
                          filter_clmsg_src, filter_clmsg_title, filter_clmsg_user, body, tags,
                          filter_svmsg_id, filter_svmsg_sdate, filter_svmsg_edate,
@@ -232,7 +250,7 @@ class AuditSearch(audit_base.AuditBase):
                          data_dir, logger, redis_cli)
         return st
 
-    def search(self, reskey:str, select:List[str], sort:Dict[str, str], offset:int, limit:int,
+    def search(self, reskey:str, select:Dict[str, str], select_date_format:str, groupby:List[str], groupby_date_format:str, sort:Dict[str, str], offset:int, limit:int,
                filter_audit_type:str, filter_clmsg_id:str, filter_clmsg_sdate:str, filter_clmsg_edate:str,
                filter_clmsg_src:str, filter_clmsg_title:str, filter_clmsg_user:str, filter_clmsg_body:Dict[str, Any],
                filter_clmsg_tags:List[str], filter_svmsg_id:str, filter_svmsg_sdate:str, filter_svmsg_edate:str,
@@ -243,7 +261,10 @@ class AuditSearch(audit_base.AuditBase):
 
         Args:
             reskey (str): レスポンスキー
-            select (List[str]): 取得項目
+            select (Dict[str, str]): 取得項目
+            select_date_format (str): 取得項目の日時フォーマット
+            groupby (List[str]): グループ化項目
+            groupby_date_format (str): グループ化項目の日時フォーマット
             sort (Dict[str, str]): ソート条件
             offset (int): 取得する行の開始位置
             limit (int): 取得する行数
@@ -272,6 +293,31 @@ class AuditSearch(audit_base.AuditBase):
         Returns:
             int: レスポンスコード
         """
+        def _date_format(pg_enabled, col, date_format):
+            if col not in ['clmsg_date', 'svmsg_date']:
+                return col
+            if pg_enabled:
+                if date_format == '%u':
+                    return f"to_char({col}, 'D')"
+                elif date_format == '%m':
+                    return f"to_char({col}, 'MM')"
+                elif date_format == '%Y':
+                    return f"to_char({col}, 'YYYY')"
+                elif date_format == '%Y/%m':
+                    return f"to_char({col}, 'YYYY/MM')"
+                elif date_format == '%Y/%m/%d':
+                    return f"to_char({col}, 'YYYY/MM/DD')"
+                elif date_format == '%Y/%m/%d %H':
+                    return f"to_char({col}, 'YYYY/MM/DD HH24')"
+                elif date_format == '%Y/%m/%d %H:%M':
+                    return f"to_char({col}, 'YYYY/MM/DD HH24:MI')"
+                else:
+                    return col
+            else:
+                if date_format != '':
+                    return f"strftime('{date_format}', {col})"
+                else:
+                    return col
         try:
             with self.initdb(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname) as conn:
                 def dict_factory(cursor, row):
@@ -279,19 +325,24 @@ class AuditSearch(audit_base.AuditBase):
                 conn.row_factory = dict_row if pg_enabled else dict_factory
                 cursor = conn.cursor()
                 try:
-                    select = [a for a in select if a != ''] if select else None
-                    select = select if select and len(select)>0 else ['audit_type', 'clmsg_id', 'clmsg_date', 'clmsg_src', 'clmsg_title',
-                                                                      'clmsg_user', 'clmsg_body', 'clmsg_tag', 'svmsg_id', 'svmsg_date']
+                    select = {k:v for k,v in select.items() if k != ''} if select else None
+                    select = select if select and len(select)>0 else {k:'-' for k in self.TBL_COLS}
                     if pg_enabled:
                         toz = common.get_tzoffset_str()
-                        sel = []
-                        for s in select:
-                            if s in ['clmsg_date', 'svmsg_date']:
-                                sel.append(f"{s} AT TIME ZONE INTERVAL '{toz}' as {s}")
+                        sel = {}
+                        for k,v in select.items():
+                            if k in ['clmsg_date', 'svmsg_date']:
+                                sel[f"{k} AT TIME ZONE INTERVAL '{toz}' as {k}"] = v
                             else:
-                                sel.append(s)
+                                sel[k] = v
                         select = sel
-                    sql = f'SELECT {",".join(select)} FROM audit'
+                    sql = []
+                    for k,v in select.items():
+                        if v in ['count', 'sum', 'avg', 'min', 'max']:
+                            sql.append(f'{v}({_date_format(pg_enabled, k, select_date_format)}) AS {k}')
+                        else:
+                            sql.append(f'{_date_format(pg_enabled, k, select_date_format)} AS {k}')
+                    sql = f"SELECT {','.join(sql)} FROM audit"
                     params = []
                     where = []
                     if filter_audit_type and filter_audit_type != 'None':
@@ -335,6 +386,8 @@ class AuditSearch(audit_base.AuditBase):
                         where.append(f'svmsg_date<={"%s" if pg_enabled else "?"}')
                         params.append(filter_svmsg_edate)
                     sql += ' WHERE ' + ' AND '.join(where) if len(where)>0 else ''
+                    if groupby and len(groupby) > 0:
+                        sql += ' GROUP BY ' + ', '.join([f"{_date_format(pg_enabled, g, groupby_date_format)}" for g in groupby])
                     if sort and len(sort) > 0:
                         sql += ' ORDER BY ' + ', '.join([f"{k} {v}" for k, v in sort.items()])
                     else:

@@ -34,8 +34,7 @@ const render_result_func = (target_elem, result, res_size) => {
     target_elem.append(table);
     // list型の結果をテーブルに変換
     const list2table = (data, table_head, table_body) => {
-        Object.keys(data).forEach(i => {
-            const row = data[i];
+        data.forEach((row, i) => {
             if(row['success'] && typeof row['success'] == "object" && !Array.isArray(row['success'])){
                 dict2table(row['success'], i==0?table_head:null, table_body, row['output_image']);
                 return;

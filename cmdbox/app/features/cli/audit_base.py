@@ -8,7 +8,8 @@ import sqlite3
 
 
 class AuditBase(feature.ResultEdgeFeature):
-    
+    TBL_COLS = ['audit_type', 'clmsg_id', 'clmsg_date', 'clmsg_src', 'clmsg_title', 'clmsg_user', 'clmsg_body', 'clmsg_tag', 'svmsg_id', 'svmsg_date']
+    DT_FMT = ['%Y/%m/%d %H:%M', '%Y/%m/%d %H', '%Y/%m/%d', '%Y/%m', '%Y', '%m', '%u']
     def get_option(self):
         """
         この機能のオプションを返します

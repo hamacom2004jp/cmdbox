@@ -41,7 +41,7 @@ class AuditDelete(audit_base.AuditBase):
         opt['discription_ja'] = "監査ログを削除します。"
         opt['discription_en'] = "Delete the audit log."
         opt['choice'] += [
-            dict(opt="delete_audit_type", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=Options.AUDITS,
+            dict(opt="delete_audit_type", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=['']+Options.AUDITS,
                  discription_ja="削除条件の監査の種類を指定します。",
                  discription_en="Specifies the type of audit for the delete condition."),
             dict(opt="delete_clmsg_id", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
