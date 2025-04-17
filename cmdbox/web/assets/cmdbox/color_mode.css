@@ -1,3 +1,7 @@
+.th {
+    background-color: var(--bs-tertiary-bg) !important;
+    word-break:normal;
+}
 /* ライトモード (基本) - 必要に応じて調整 */
 [data-bs-theme="light"] {
     --bs-body-bg: #fff;

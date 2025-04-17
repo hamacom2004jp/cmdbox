@@ -609,7 +609,7 @@ consider it more useful to permit linking proprietary applications with the
 library.  If this is what you want to do, use the GNU Library General
 Public License instead of this License.
  
-===== harfbuzz-10.1.0 ===== 
+===== harfbuzz-11.0.1 ===== 
  
 HarfBuzz is licensed under the so-called "Old MIT" license.  Details follow.
 For parts of HarfBuzz that are licensed under different licenses see individual
@@ -654,7 +654,7 @@ FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
 ON AN "AS IS" BASIS, AND THE COPYRIGHT HOLDER HAS NO OBLIGATION TO
 PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  
-===== lcms2-2.16 ===== 
+===== lcms2-2.17 ===== 
  
 MIT License
 
@@ -866,40 +866,7 @@ attribution and endorsement protections to other entities.  Thus, it was
 desirable to choose a license that granted us the same protections for new code
 that were granted to the IJG for code derived from their software.
  
-===== libwebp-1.5.0 ===== 
- 
-Copyright (c) 2010, Google Inc. All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-  * Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
-
-  * Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in
-    the documentation and/or other materials provided with the
-    distribution.
-
-  * Neither the name of Google nor the names of its contributors may
-    be used to endorse or promote products derived from this software
-    without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
- 
-===== lpng1644 ===== 
+===== libpng-1.6.47 ===== 
  
 COPYRIGHT NOTICE, DISCLAIMER, and LICENSE
 =========================================
@@ -907,8 +874,8 @@ COPYRIGHT NOTICE, DISCLAIMER, and LICENSE
 PNG Reference Library License version 2
 ---------------------------------------
 
- * Copyright (c) 1995-2024 The PNG Reference Library Authors.
- * Copyright (c) 2018-2024 Cosmin Truta.
+ * Copyright (c) 1995-2025 The PNG Reference Library Authors.
+ * Copyright (c) 2018-2025 Cosmin Truta.
  * Copyright (c) 2000-2002, 2004, 2006-2018 Glenn Randers-Pehrson.
  * Copyright (c) 1996-1997 Andreas Dilger.
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -1036,6 +1003,39 @@ to supporting the PNG file format in commercial products.  If you use
 this source code in a product, acknowledgment is not required but would
 be appreciated.
  
+===== libwebp-1.5.0 ===== 
+ 
+Copyright (c) 2010, Google Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+
+  * Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the
+    distribution.
+
+  * Neither the name of Google nor the names of its contributors may
+    be used to endorse or promote products derived from this software
+    without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+ 
 ===== openjpeg-2.5.3 ===== 
  
 /*
@@ -1078,7 +1078,7 @@ be appreciated.
  * POSSIBILITY OF SUCH DAMAGE.
  */
  
-===== tiff-4.6.0 ===== 
+===== tiff-4.7.0 ===== 
  
 # LibTIFF license
 
@@ -1104,7 +1104,7 @@ WHETHER OR NOT ADVISED OF THE POSSIBILITY OF DAMAGE, AND ON ANY THEORY OF
 LIABILITY, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE 
 OF THIS SOFTWARE.
  
-===== xz-5.6.3 ===== 
+===== xz-5.8.1 ===== 
  
 
 XZ Utils Licensing
@@ -1148,6 +1148,12 @@ XZ Utils Licensing
         free software licenses. These aren't built or installed as
         part of XZ Utils.
 
+    The following command may be helpful in finding per-file license
+    information. It works on xz.git and on a clean file tree extracted
+    from a release tarball.
+
+        sh build-aux/license-check.sh -v
+
     For the files under the BSD Zero Clause License (0BSD), if
     a copyright notice is needed, the following is sufficient:
 
@@ -1167,30 +1173,11 @@ XZ Utils Licensing
       - COPYING.GPLv2: GNU General Public License version 2
       - COPYING.GPLv3: GNU General Public License version 3
 
-    A note about old XZ Utils releases:
-
-        XZ Utils releases 5.4.6 and older and 5.5.1alpha have a
-        significant amount of code put into the public domain and
-        that obviously remains so. The switch from public domain to
-        0BSD for newer releases was made in Febrary 2024 because
-        public domain has (real or perceived) legal ambiguities in
-        some jurisdictions.
-
-        There is very little *practical* difference between public
-        domain and 0BSD. The main difference likely is that one
-        shouldn't claim that 0BSD-licensed code is in the public
-        domain; 0BSD-licensed code is copyrighted but available under
-        an extremely permissive license. Neither 0BSD nor public domain
-        require retaining or reproducing author, copyright holder, or
-        license notices when distributing the software. (Compare to,
-        for example, BSD 2-Clause "Simplified" License which does have
-        such requirements.)
-
     If you have questions, don't hesitate to ask for more information.
     The contact information is in the README file.
 
  
-===== zlib-ng-2.2.2 ===== 
+===== zlib-ng-2.2.4 ===== 
  
 (C) 1995-2024 Jean-loup Gailly and Mark Adler
 

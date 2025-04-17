@@ -1,4 +1,5 @@
 const cell_chop = (val, res_size) => {
+    val = `${val || ''}`;
     res_size = res_size==-1 && res_size ? res_size : 150;
     if(val && res_size>0 && val.length > res_size){
         return `${val.substring(0, res_size)}...`;
@@ -24,10 +25,8 @@ const render_result_func = (target_elem, result, res_size) => {
     if (!result || Array.isArray(result) && result.length<=0) return;
     const mk_table_func = () => {
         const table = $('<table class="table table-bordered table-hover table-sm"></table>');
-        const table_head = $('<thead></thead>');
-        const table_body = $('<tbody></tbody>');
-        table.append(table_head);
-        table.append(table_body);
+        $('<thead><tr></tr></thead>').appendTo(table);
+        $('<tbody></tbody>').appendTo(table);
         return table;
     }
     const table = mk_table_func();
@@ -42,7 +41,7 @@ const render_result_func = (target_elem, result, res_size) => {
             if(typeof row == 'string' || row instanceof String){
                 const tr = $('<tr></tr>');
                 table_body.append(tr);
-                tr.append($(`<td>${row}</td>`));
+                tr.append($(`<td>${cell_chop(row, res_size)}</td>`));
                 return;
             }
             if(Array.isArray(row) && row.length > 0 && typeof row[0] != "object"){
@@ -57,7 +56,7 @@ const render_result_func = (target_elem, result, res_size) => {
             Object.keys(row).forEach(key => {
                 const val = row[key];
                 if(i==0) {
-                    table_head.append($(`<th scope="col" style="word-break:normal">${key}</th>`));
+                    table_head.append($(`<th class="th" scope="col">${key}</th>`));
                 }
                 if(val && val['success'] && Array.isArray(val['success'])){
                     const tbl = mk_table_func()
@@ -88,7 +87,7 @@ const render_result_func = (target_elem, result, res_size) => {
                     list2table(val, tbl.find('thead'), tbl.find('tbody'));
                 }
                 else{
-                    tr.append($(`<td>${val}</td>`));
+                    tr.append($(`<td>${cell_chop(val, res_size)}</td>`));
                 }
             });
         });
@@ -97,7 +96,7 @@ const render_result_func = (target_elem, result, res_size) => {
     const dict2table = (data, table_head, table_body, output_image) => {
         const tr = $('<tr></tr>');
         if(output_image){
-            if(table_head)table_head.append($('<th scope="col" style="word-break:normal">output_image</th>'));
+            if(table_head)table_head.append($('<th class="th" scope="col">output_image</th>'));
             const img = $('<img class="img-thumbnail">').attr('src', `data:image/png;base64,${output_image}`);
             img.css('width','100px').css('height','auto');
             const anchor = $(`<a href="data:image/jpeg;base64,${output_image}" data-lightbox="output_image"></a>`).append(img);
@@ -106,7 +105,7 @@ const render_result_func = (target_elem, result, res_size) => {
         table_body.append(tr);
         Object.keys(data).forEach(key => {
             let val = data[key];
-            if(table_head)table_head.append($(`<th scope="col" style="word-break:normal">${key}</th>`));
+            if(table_head)table_head.append($(`<th class="th" scope="col">${key}</th>`));
             if (key != 'warn' && val) {
                 if(Array.isArray(val)){
                     if(val.length > 0 && typeof val[0] == "object"){
@@ -133,7 +132,7 @@ const render_result_func = (target_elem, result, res_size) => {
             tr.append($(`<td style="overflow-wrap:break-word;word-break:break-all;">${val}</td>`));
         });
     }
-    const table_head = table.find('thead')
+    const table_head = table.find('thead tr')
     const table_body = table.find('tbody')
     // 結果をテーブルに変換
     if(result['success'] && Array.isArray(result['success'])){

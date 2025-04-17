@@ -198,21 +198,21 @@ users.users_list = async () => {
         modal.modal('show');
     };
     // ユーザー一覧を表示
-    const user_table = $('<table>').addClass('table table-bordered table-hover').appendTo(users_elem);
+    const user_table = $('<table/>').addClass('table table-bordered table-hover').appendTo(users_elem);
     // ヘッダ行を作成
-    const user_thead = $('<thead>').appendTo(user_table);
+    const user_thead = $('<thead/>').appendTo(user_table);
     const cols = new Set();
     if (users_data.length == 0) {
-        $('<tr>').append($('<th>').text('No users')).appendTo(user_thead);
+        $('<tr/>').append($('<th class="th"/>').text('No users')).appendTo(user_thead);
         return
     } else {
         const user_thead_tr = $('<tr>').appendTo(user_thead);
         for (const row of users_data) {
             for (const key in row) cols.add(key);
         }
-        $('<th>').text('-').attr('scope', 'col').attr('width', '40').appendTo(user_thead_tr);
+        $('<th class="th"/>').text('-').attr('scope', 'col').attr('width', '40').appendTo(user_thead_tr);
         for (const col of cols) {
-            $('<th>').text(col).attr('scope', 'col').appendTo(user_thead_tr);
+            $('<th class="th"/>').text(col).attr('scope', 'col').appendTo(user_thead_tr);
         }
     }
     // 明細行を作成
@@ -343,21 +343,21 @@ users.groups_list = async () => {
         modal.modal('show');
     };
     // グループ一覧を表示
-    const group_table = $('<table>').addClass('table table-bordered table-hover').appendTo(groups_elem);
+    const group_table = $('<table/>').addClass('table table-bordered table-hover').appendTo(groups_elem);
     // ヘッダ行を作成
-    const group_thead = $('<thead>').appendTo(group_table);
+    const group_thead = $('<thead/>').appendTo(group_table);
     const cols = new Set();
     if (groups_data.length == 0) {
-        $('<tr>').append($('<th>').text('No groups')).appendTo(group_thead);
+        $('<tr>').append($('<th class="th"/>').text('No groups')).appendTo(group_thead);
         return
     } else {
         const group_thead_tr = $('<tr>').appendTo(group_thead);
         for (const row of groups_data) {
             for (const key in row) cols.add(key);
         }
-        $('<th>').text('-').attr('scope', 'col').attr('width', '40').appendTo(group_thead_tr);
+        $('<th class="th"/>').text('-').attr('scope', 'col').attr('width', '40').appendTo(group_thead_tr);
         for (const col of cols) {
-            $('<th>').text(col).attr('scope', 'col').appendTo(group_thead_tr);
+            $('<th class="th"/>').text(col).attr('scope', 'col').appendTo(group_thead_tr);
         }
     }
     // 明細行を作成
@@ -418,16 +418,16 @@ users.cmdrules_list = async () => {
     const cmdrule_thead = $('<thead>').appendTo(cmdrule_table);
     const cols = new Set();
     if (cmdrules_data.length == 0) {
-        $('<tr>').append($('<th>').text('No cmdrules')).appendTo(cmdrule_thead);
+        $('<tr>').append($('<th class="th"/>').text('No cmdrules')).appendTo(cmdrule_thead);
         return
     } else {
         const cmdrule_thead_tr = $('<tr>').appendTo(cmdrule_thead);
         for (const row of cmdrules_data) {
             for (const key in row) cols.add(key);
         }
-        $('<th>').text('#').attr('scope', 'col').attr('width', '40').appendTo(cmdrule_thead_tr);
+        $('<th class="th"/>').text('#').attr('scope', 'col').attr('width', '40').appendTo(cmdrule_thead_tr);
         for (const col of cols) {
-            $('<th>').text(col).attr('scope', 'col').appendTo(cmdrule_thead_tr);
+            $('<th class="th"/>').text(col).attr('scope', 'col').appendTo(cmdrule_thead_tr);
         }
     }
     // 明細行を作成
@@ -479,16 +479,16 @@ users.pathrules_list = async () => {
     const pathrule_thead = $('<thead>').appendTo(pathrule_table);
     const cols = new Set();
     if (pathrules_data.length == 0) {
-        $('<tr>').append($('<th>').text('No cmdrules')).appendTo(pathrule_thead);
+        $('<tr>').append($('<th class="th"/>').text('No cmdrules')).appendTo(pathrule_thead);
         return
     } else {
         const pathrule_thead_tr = $('<tr>').appendTo(pathrule_thead);
         for (const row of pathrules_data) {
             for (const key in row) cols.add(key);
         }
-        $('<th>').text('#').attr('scope', 'col').attr('width', '40').appendTo(pathrule_thead_tr);
+        $('<th class="th"/>').text('#').attr('scope', 'col').attr('width', '40').appendTo(pathrule_thead_tr);
         for (const col of cols) {
-            $('<th>').text(col).attr('scope', 'col').appendTo(pathrule_thead_tr);
+            $('<th class="th"/>').text(col).attr('scope', 'col').appendTo(pathrule_thead_tr);
         }
     }
     // 明細行を作成
@@ -536,7 +536,7 @@ users.passsetting_list = async () => {
         const cardbody_elem = $('<div class="card-body"/>').appendTo(card_elem);
         cardbody_elem.append(`<h5 class="card-title">${title}</h5>`);
         const table_elem = $('<table class="table table-bordered table-hover"/>').appendTo(cardbody_elem);
-        const thead_elem = $('<thead><tr><th>#</th><th>setting</th><th>value</th></tr></thead>').appendTo(table_elem);
+        const thead_elem = $('<thead><tr><th class="th">#</th><th class="th">setting</th><th class="th">value</th></tr></thead>').appendTo(table_elem);
         const tbody_elem = $('<tbody/>').appendTo(table_elem);
         let i_row=0;
         for (const key in data) {

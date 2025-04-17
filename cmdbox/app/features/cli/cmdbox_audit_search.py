@@ -314,7 +314,7 @@ class AuditSearch(audit_base.AuditBase):
                 else:
                     return col
             else:
-                if date_format != '':
+                if date_format is not None and date_format != '':
                     return f"strftime('{date_format}', {col})"
                 else:
                     return col

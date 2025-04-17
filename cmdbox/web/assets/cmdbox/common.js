@@ -1074,6 +1074,8 @@ cmdbox.load_pipe_pin = async (title) => {
  */
 cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, scolsize=6) => {
   const target_name = row.opt;
+  // clmsg_idのオプションは隠しオプション扱い。restapiで指定はできる。
+  if (target_name=='clmsg_id') return;
   let input_elem, elem;
   if(!row.choice) {
     // 選択肢がない場合

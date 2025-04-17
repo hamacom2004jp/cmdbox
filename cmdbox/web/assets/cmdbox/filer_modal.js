@@ -62,7 +62,7 @@ fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_di
             filer_modal.find('.file-list').html('');
             filer_modal.find('.file-list').append(table);
             const table_head = $('<thead></thead>');
-            table_head.append($('<tr><th scope="col">-</th><th scope="col">name</th><th scope="col">size</th><th scope="col">last</th></tr>'));
+            table_head.append($('<tr><th class="th" scope="col">-</th><th class="th" scope="col">name</th><th class="th" scope="col">size</th><th class="th" scope="col">last</th></tr>'));
             table.append(table_head);
             const table_body = $('<tbody></tbody>');
             table.append(table_body);

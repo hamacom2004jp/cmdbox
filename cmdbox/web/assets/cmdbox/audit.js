@@ -11,8 +11,43 @@ audit.rawlog = async () => {
         return;
     }
     render_result_func(rawlog_area, data, 100);
+    audit.tracelog(data);
     await audit.metrics();
     cmdbox.hide_loading();
+};
+// 監査ログのトレース
+audit.tracelog = async (data) => {
+    const rawlog_area = $('#trace_area').html('');
+    const table = $('<table class="table table-bordered table-hover table-sm"></table>').appendTo(rawlog_area);
+    const table_head = $('<thead><tr></tr></thead>').appendTo(table).find('tr');
+    const table_body = $('<tbody></tbody>').appendTo(table);
+    table_head.append($('<th class="th" scope="col">clmsg_user</th>'));
+    table_head.append($('<th class="th" scope="col">trace log</th>'));
+    const row_dict = {};
+    for (const row of data) {
+        const clmsg_id = row['clmsg_id'];
+        if (clmsg_id == null || clmsg_id == '') continue;
+        if (!row_dict[clmsg_id]) {
+            row_dict[clmsg_id] = {clmsg_id:clmsg_id, clmsg_user:row['clmsg_user'], clmsg_date:row['clmsg_date'], row:[]};
+        }
+        if (!row_dict[clmsg_id]['clmsg_date']) {
+            row_dict[clmsg_id]['clmsg_date'] = row['clmsg_date'];
+        }
+        if (!row_dict[clmsg_id]['clmsg_user']) {
+            row_dict[clmsg_id]['clmsg_user'] = row['clmsg_user'];
+        }
+        delete row['clmsg_id'];
+        delete row['clmsg_user'];
+        row_dict[clmsg_id]['row'].push(row);
+    }
+    Object.values(row_dict).sort((a,b) => {
+        a['clmsg_date'] > b['clmsg_date'] ? 1 : -1;
+    }).forEach((attr, i) => {
+        const tr = $('<tr></tr>').appendTo(table_body);
+        $(`<td>${attr['clmsg_user']}</td>`).appendTo(tr);
+        const div = $(`<td><span>clmsg_id : ${attr['clmsg_id']}</span><div/></td>`).appendTo(tr).find('div');
+        render_result_func(div, attr['row'], 100);
+    });
 };
 // 検索
 audit.query = async (opt) => {
@@ -48,9 +83,10 @@ audit.metrics = async () => {
             opt['select_date_format'] = row['horizontal_date_format'];
             opt['groupby'] = [row['horizontal']];
             opt['groupby_date_format'] = row['horizontal_date_format'];
-            opt['sort'][row['horizontal']] = 'ASC';
-            const data = await audit.query(opt);
+            opt['sort'][row['horizontal']] = 'DESC';
+            let data = await audit.query(opt);
             if (!data) return;
+            data = data.reverse();
             // 時系列グラフの追加
             const card = $(`<div class="col-${row['col_size']} p-1"><div class="card card-hover"><div class="card-body"></div></div></div>`).appendTo(metrics_area);
             const card_body = card.find('.card-body');

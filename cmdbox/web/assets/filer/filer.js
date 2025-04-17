@@ -315,7 +315,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
       if(!node['path']) return;
       target.find('.filer_address').val(node['path']);
       const table = $('<table class="table table-bordered table-hover table-sm">'
-                    + '<thead><tr><th scope="col">-</th><th scope="col">name</th><th scope="col">mime</th><th scope="col">size</th><th scope="col">last</th></tr></thead>'
+                    + '<thead><tr><th class="th" scope="col">-</th><th class="th" scope="col">name</th><th class="th" scope="col">mime</th><th class="th" scope="col">size</th><th class="th" scope="col">last</th></tr></thead>'
                     + '</table>');
       const table_body = $('<tbody></tbody>');
       target.find('.file-list').html('');

@@ -20,7 +20,7 @@ const view_raw_func = (title, result) => {
                 let found = false;
                 for (const [key, val] of Object.entries(row)) {
                     if(i==0) {
-                        table_head.append($(`<th scope="col">${key}</th>`));
+                        table_head.append($(`<th class="th" scope="col">${key}</th>`));
                     }
                     try {
                         if (found) {

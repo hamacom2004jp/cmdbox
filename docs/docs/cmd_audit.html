@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( audit mode ) &mdash; cmdbox 2025/04/06 documentation</title>
+  <title>Command Reference ( audit mode ) &mdash; cmdbox 2025/04/18 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=308fb3f9"></script>
+      <script src="../_static/documentation_options.js?v=18224466"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -229,67 +229,71 @@
 <td></td>
 <td><p>Specifies the source of the message for the client in the delete condition; performs a LIKE search.</p></td>
 </tr>
-<tr class="row-even"><td><p>--delete_clmsg_user &lt;clmsg_user&gt;</p></td>
+<tr class="row-even"><td><p>--delete_clmsg_title &lt;clmsg_title&gt;</p></td>
+<td></td>
+<td><p>Specifies the message title of the client for the deletion condition; a LIKE search is performed.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--delete_clmsg_user &lt;clmsg_user&gt;</p></td>
 <td></td>
 <td><p>Specifies the user who generated the message for the client in the delete condition; performs a LIKE search.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--delete_clmsg_body &lt;clmsg_body&gt;</p></td>
+<tr class="row-even"><td><p>--delete_clmsg_body &lt;clmsg_body&gt;</p></td>
 <td></td>
 <td><p>Specifies the body of the client's message in the delete condition in dictionary format; performs a LIKE search.</p></td>
 </tr>
-<tr class="row-even"><td><p>--delete_clmsg_tag &lt;clmsg_tag&gt;</p></td>
+<tr class="row-odd"><td><p>--delete_clmsg_tag &lt;clmsg_tag&gt;</p></td>
 <td></td>
 <td><p>Specifies the tag of the client's message in the delete condition.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--delete_svmsg_id &lt;svmsg_id&gt;</p></td>
+<tr class="row-even"><td><p>--delete_svmsg_id &lt;svmsg_id&gt;</p></td>
 <td></td>
 <td><p>Specify the message ID of the server for the delete condition.</p></td>
 </tr>
-<tr class="row-even"><td><p>--delete_svmsg_sdate &lt;svmsg_date&gt;</p></td>
+<tr class="row-odd"><td><p>--delete_svmsg_sdate &lt;svmsg_date&gt;</p></td>
 <td></td>
 <td><p>Specify the date and time (start) when the message occurred for the server in the delete condition.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--delete_svmsg_edate &lt;svmsg_date&gt;</p></td>
+<tr class="row-even"><td><p>--delete_svmsg_edate &lt;svmsg_date&gt;</p></td>
 <td></td>
 <td><p>Specify the date and time (end) when the message occurred for the server in the delete condition.</p></td>
 </tr>
-<tr class="row-even"><td></td>
+<tr class="row-odd"><td></td>
 <td></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>--pg_enabled</p></td>
+<tr class="row-even"><td><p>--pg_enabled</p></td>
 <td></td>
 <td><p>Specify True if using the postgresql database server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--pg_host &lt;host&gt;</p></td>
+<tr class="row-odd"><td><p>--pg_host &lt;host&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql host.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--pg_port &lt;posrt&gt;</p></td>
+<tr class="row-even"><td><p>--pg_port &lt;posrt&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql port.</p></td>
 </tr>
-<tr class="row-even"><td><p>--pg_user &lt;user&gt;</p></td>
+<tr class="row-odd"><td><p>--pg_user &lt;user&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql user name.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--pg_password &lt;passwd&gt;</p></td>
+<tr class="row-even"><td><p>--pg_password &lt;passwd&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql password.</p></td>
 </tr>
-<tr class="row-even"><td><p>--pg_dbname &lt;dbname&gt;</p></td>
+<tr class="row-odd"><td><p>--pg_dbname &lt;dbname&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql database name.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
@@ -334,29 +338,37 @@
 <td></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>--select</p></td>
+<tr class="row-odd"><td><p>--select &lt;select&gt;</p></td>
 <td></td>
 <td><p>Specify the items to be retrieved. If not specified, all items are acquired.</p></td>
 </tr>
-<tr class="row-even"><td><p>--filter_audit_type &lt;audit_type&gt;</p></td>
+<tr class="row-even"><td><p>--select_date_format &lt;format&gt;</p></td>
+<td></td>
+<td><p>Specifies the format of the date and time of the acquisition item.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--filter_audit_type &lt;audit_type&gt;</p></td>
 <td></td>
 <td><p>Specifies the type of audit for the filter condition.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--filter_clmsg_id &lt;clmsg_id&gt;</p></td>
+<tr class="row-even"><td><p>--filter_clmsg_id &lt;clmsg_id&gt;</p></td>
 <td></td>
 <td><p>Specify the message ID of the client for the filter condition.</p></td>
 </tr>
-<tr class="row-even"><td><p>--filter_clmsg_sdate &lt;clmsg_date&gt;</p></td>
+<tr class="row-odd"><td><p>--filter_clmsg_sdate &lt;clmsg_date&gt;</p></td>
 <td></td>
 <td><p>Specify the date and time (start) when the message occurred for the client in the filter condition.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--filter_clmsg_edate &lt;clmsg_date&gt;</p></td>
+<tr class="row-even"><td><p>--filter_clmsg_edate &lt;clmsg_date&gt;</p></td>
 <td></td>
 <td><p>Specify the date and time (end) when the message occurred for the client in the filter condition.</p></td>
 </tr>
-<tr class="row-even"><td><p>--filter_clmsg_src &lt;clmsg_src&gt;</p></td>
+<tr class="row-odd"><td><p>--filter_clmsg_src &lt;clmsg_src&gt;</p></td>
 <td></td>
 <td><p>Specifies the source of the message for the client in the filter condition; performs a LIKE search.</p></td>
+</tr>
+<tr class="row-even"><td><p>--filter_clmsg_title &lt;clmsg_title&gt;</p></td>
+<td></td>
+<td><p>Specifies the message title of the client for the filter condition; a LIKE search is performed.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--filter_clmsg_user &lt;clmsg_user&gt;</p></td>
 <td></td>
@@ -381,6 +393,14 @@
 <tr class="row-even"><td><p>--filter_svmsg_edate &lt;svmsg_date&gt;</p></td>
 <td></td>
 <td><p>Specify the date and time (end) when the message occurred for the server in the filter condition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--groupby &lt;group&gt;</p></td>
+<td></td>
+<td><p>Specify grouping items.</p></td>
+</tr>
+<tr class="row-even"><td><p>--groupby_date_format &lt;format&gt;</p></td>
+<td></td>
+<td><p>Specifies the format of the date and time of the grouping item.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--sort &lt;sort&gt;</p></td>
 <td></td>
@@ -491,63 +511,67 @@
 <td></td>
 <td><p>Specifies the source of client messages. Usually specifies the name of a class that extends <cite>cmdbox.app.feature.Feature</cite> .</p></td>
 </tr>
-<tr class="row-odd"><td><p>--clmsg_user &lt;clmsg_user&gt;</p></td>
+<tr class="row-odd"><td><p>--clmsg_title &lt;clmsg_title&gt;</p></td>
+<td></td>
+<td><p>Specifies the client message title. Usually specifies the command title.</p></td>
+</tr>
+<tr class="row-even"><td><p>--clmsg_user &lt;clmsg_user&gt;</p></td>
 <td></td>
 <td><p>Specifies the user who generated the client message.</p></td>
 </tr>
-<tr class="row-even"><td><p>--clmsg_body &lt;clmsg_body&gt;</p></td>
+<tr class="row-odd"><td><p>--clmsg_body &lt;clmsg_body&gt;</p></td>
 <td></td>
 <td><p>Specifies the body of the client's message in dictionary format.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--clmsg_tag &lt;clmsg_tag&gt;</p></td>
+<tr class="row-even"><td><p>--clmsg_tag &lt;clmsg_tag&gt;</p></td>
 <td></td>
 <td><p>Specifies the tag for the client's message. Specify to make it easier to search later.</p></td>
 </tr>
-<tr class="row-even"><td><p>--filter_svmsg_id &lt;svmsg_id&gt;</p></td>
+<tr class="row-odd"><td><p>--filter_svmsg_id &lt;svmsg_id&gt;</p></td>
 <td></td>
 <td><p>Specify the message ID of the server for the filter condition.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retention_period_days &lt;days&gt;</p></td>
+<tr class="row-even"><td><p>--retention_period_days &lt;days&gt;</p></td>
 <td></td>
 <td><p>Specify the number of days to keep the audit. If the number is less than or equal to 0, the audit will be kept indefinitely.</p></td>
 </tr>
-<tr class="row-even"><td></td>
+<tr class="row-odd"><td></td>
 <td></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>--pg_enabled</p></td>
+<tr class="row-even"><td><p>--pg_enabled</p></td>
 <td></td>
 <td><p>Specify True if using the postgresql database server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--pg_host &lt;host&gt;</p></td>
+<tr class="row-odd"><td><p>--pg_host &lt;host&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql host.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--pg_port &lt;posrt&gt;</p></td>
+<tr class="row-even"><td><p>--pg_port &lt;posrt&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql port.</p></td>
 </tr>
-<tr class="row-even"><td><p>--pg_user &lt;user&gt;</p></td>
+<tr class="row-odd"><td><p>--pg_user &lt;user&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql user name.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--pg_password &lt;passwd&gt;</p></td>
+<tr class="row-even"><td><p>--pg_password &lt;passwd&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql password.</p></td>
 </tr>
-<tr class="row-even"><td><p>--pg_dbname &lt;dbname&gt;</p></td>
+<tr class="row-odd"><td><p>--pg_dbname &lt;dbname&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql database name.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
