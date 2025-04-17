@@ -1,6 +1,6 @@
 const cell_chop = (val, res_size) => {
     val = `${val || ''}`;
-    res_size = res_size==-1 && res_size ? res_size : 150;
+    res_size = res_size ? res_size : 150;
     if(val && res_size>0 && val.length > res_size){
         return `${val.substring(0, res_size)}...`;
     }
