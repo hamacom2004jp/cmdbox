@@ -41,7 +41,7 @@ class Audit(feature.WebFeature):
             if web.signin.get_data() is None:
                 return dict(error='signin_file_data is None.')
             if not hasattr(web.options, 'audit_search') or web.options.audit_search is None:
-                raise dict(error='audit search feature is not found.')
+                return dict(warn='audit feature is disabled.')
             opt = await req.json()
             opt = {**opt, **web.options.audit_search_args.copy()}
             args = argparse.Namespace(**{k:common.chopdq(v) for k,v in opt.items()})
@@ -55,6 +55,8 @@ class Audit(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
+            if not hasattr(web.options, 'audit_search_args'):
+                return dict(warn='audit feature is disabled.')
             return dict(success=web.options.audit_search_args)
 
     def toolmenu(self, web:Web) -> Dict[str, Any]:

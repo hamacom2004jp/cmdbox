@@ -713,6 +713,10 @@ class Options:
             user (str): メッセージを発生させたユーザー名
             kwargs (Any): 呼び出し元で使用しているキーワード引数
         """
+        if not hasattr(self, 'audit_write_args') or self.audit_write_args is None:
+            return
+        if 'audit' not in self.audit_write_args or 'enabled' not in self.audit_write_args['audit'] or not self.audit_write_args['audit']['enabled']:
+            return
         if not hasattr(self, 'audit_write') or self.audit_write is None:
             raise Exception('audit write feature is not found.')
         clmsg_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + common.get_tzoffset_str()

@@ -54,13 +54,13 @@ audit.query = async (opt) => {
     const res = await fetch(`audit/rawlog`,
         {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(opt)});
     if (res.status != 200) {
-        cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+        cmdbox.message(`${res.status}: ${res.statusText}`);
         return;
     }
     try {
         const content = JSON.parse(await res.text());
         if (!content['success']) {
-            cmdbox.message({'error': content});
+            cmdbox.message(content);
             return;
         }
         return content['success']['data'];
@@ -220,10 +220,10 @@ audit.init_form = async () => {
     const form = $('#filter_form');
     const row_content = form.find('.row_content');
     const res = await fetch('audit/mode_cmd', {method: 'GET'});
-    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+    if (res.status != 200) cmdbox.message(`${res.status}: ${res.statusText}`);
     const msg = await res.json();
     if (!msg['success']) {
-        cmdbox.message({'error': msg['message']});
+        cmdbox.message(msg);
         return;
     }
     const args = msg['success'];

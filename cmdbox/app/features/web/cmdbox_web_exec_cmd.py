@@ -136,9 +136,9 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                         found = True
                     if not found or o not in loaded: continue
                     opt[o] = loaded[o]
-                    if isinstance(feat, cmdbox_audit_write.AuditWrite) and o in _options.audit_write_args:
+                    if isinstance(feat, cmdbox_audit_write.AuditWrite) and hasattr(_options, 'audit_write_args') and o in _options.audit_write_args:
                         opt[o] = _options.audit_write_args[o]
-                    elif isinstance(feat, cmdbox_audit_search.AuditSearch) and o in _options.audit_search_args:
+                    elif isinstance(feat, cmdbox_audit_search.AuditSearch) and hasattr(_options, 'audit_search_args') and o in _options.audit_search_args:
                         opt[o] = _options.audit_search_args[o]
             except:
                 pass
