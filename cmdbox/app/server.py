@@ -133,6 +133,7 @@ class Server(filer.Filer):
 
         while self.is_running:
             try:
+                msg = None
                 # ブロッキングリストから要素を取り出す
                 ctime = time.time()
                 self.redis_cli.hset(self.redis_cli.hbname, 'ctime', ctime)
@@ -186,18 +187,29 @@ class Server(filer.Filer):
             except exceptions.TimeoutError:
                 pass
             except exceptions.ConnectionError as e:
-                self.logger.warning(f"Connection to the server was lost. {e}", exec_info=True)
+                self.logger.warning(f"Connection to the server was lost. {e}", exc_info=True)
                 if not self.redis_cli.check_server(find_svname=False, retry_count=self.retry_count, retry_interval=self.retry_interval, outstatus=True):
                     self.is_running = False
                     break
             except OSError as e:
-                self.logger.warning(f"OSError. {e}", exec_info=True)
+                self.logger.warning(f"OSError. {e}. This message is not executable in the server environment. ({msg})", exc_info=True)
+                if msg is not None and len(msg) > 1:
+                    self.redis_cli.rpush(msg[1], dict(warn=f"OSError. {e}. This message is not executable in the server environment. ({msg[0]})"))
+                error_cnt += 1
+                self.redis_cli.hset(self.redis_cli.hbname, 'error_cnt', error_cnt)
+                pass
+            except IndexError as e:
+                self.logger.warning(f"IndexError. {e}. The message received by the server is invalid. ({msg})", exc_info=True)
+                if msg is not None and len(msg) > 1:
+                    self.redis_cli.rpush(msg[1], dict(warn=f"IndexError. {e}. The message received by the server is invalid. ({msg[0]})"))
+                error_cnt += 1
+                self.redis_cli.hset(self.redis_cli.hbname, 'error_cnt', error_cnt)
                 pass
             except KeyboardInterrupt as e:
                 self.is_running = False
                 break
             except Exception as e:
-                self.logger.warning(f"Unknown error occurred. {e}", exc_info=True)
+                self.logger.warning(f"Unknown error occurred. {e}. Service will be stopped due to unknown cause.({msg})", exc_info=True)
                 self.is_running = False
                 break
         self.redis_cli.delete(self.redis_cli.svname)

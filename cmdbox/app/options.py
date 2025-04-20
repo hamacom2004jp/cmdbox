@@ -715,7 +715,8 @@ class Options:
         """
         if not hasattr(self, 'audit_write_args') or self.audit_write_args is None:
             return
-        if 'audit' not in self.audit_write_args or 'enabled' not in self.audit_write_args['audit'] or not self.audit_write_args['audit']['enabled']:
+        yml = self.features_yml_data
+        if yml is None or 'audit' not in yml or 'enabled' not in yml['audit'] or not yml['audit']['enabled']:
             return
         if not hasattr(self, 'audit_write') or self.audit_write is None:
             raise Exception('audit write feature is not found.')
@@ -765,6 +766,10 @@ class Options:
                         else:
                             clmsg_body[key] = common.to_str(val, 100)
                         opt[key] = val
+                if hasattr(arg, 'redis_host'): opt['host'] = arg.redis_host
+                if hasattr(arg, 'redis_port'): opt['port'] = arg.redis_port
+                if hasattr(arg, 'redis_password'): opt['password'] = arg.redis_password
+                if hasattr(arg, 'svname'): opt['svname'] = arg.svname
                 if hasattr(arg, 'clmsg_id'): opt['clmsg_id'] = arg.clmsg_id
             elif isinstance(arg, web.Web):
                 opt['host'] = arg.redis_host

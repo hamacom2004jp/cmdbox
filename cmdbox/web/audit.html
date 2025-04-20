@@ -6,10 +6,6 @@
     .card-hover:hover {
         box-shadow: 0 0 8px gray;
     }
-    .pane-divider {
-        border: 1px solid #C8C8C8 !important;
-        border-radius: 1px;
-    }
     </style>
 </head>
 <body lang="ja" class="overflow-hidden p-2" style="background-color:rgb(33, 37, 41)">
@@ -43,6 +39,9 @@
         <symbol id="svg_edit_btn" viewBox="0 0 16 16">
             <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
             <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+        </symbol>
+        <symbol id="svg_search_btn" viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
         </symbol>
     </svg>
     <!-- ナビゲーションバー -->
@@ -100,48 +99,76 @@
         </div>
     </nav>
     <div id="main_container" class="container-fluid overflow-auto split-pane fixed-left" style="margin-top:66px;height:calc(100vh - 120px);">
-        <!-- 検索結果側ペイン -->
-        <div id="left_container" class="split-pane-component" style="width:80%;">
-            <ul class="nav nav-tabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <a class="nav-link active" id="metrics-tab" data-bs-toggle="tab" href="#metrics" role="tab" aria-controls="metrics" aria-selected="true">Metrics</a>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <a class="nav-link" id="trace-tab" data-bs-toggle="tab" href="#trace" role="tab" aria-controls="trace" aria-selected="false">Trace</a>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <a class="nav-link" id="rawlog-tab" data-bs-toggle="tab" href="#rawlog" role="tab" aria-controls="rawlog" aria-selected="false">Raw Log</a>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div class="tab-pane fade show active" id="metrics" role="tabpanel" aria-labelledby="metrics-tab">
-                    <button id="add_metrics" type="button" class="btn">
-                        <svg width="32" height="32" fill="currentColor" class="bi bi-plus-lg"><use href="#svg_add_btn"></use></svg>
-                    </button>
-                    <div class="row g-2 m-0" id="metrics_area"></div>
-                </div>
-                <div class="tab-pane fade" id="trace" role="tabpanel" aria-labelledby="trace-tab">
-                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-2 mt-2" id="trace_area"></div>
-                </div>
-                <div class="tab-pane fade" id="rawlog" role="tabpanel" aria-labelledby="rawlog-tab">
-                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-2 mt-2 modal-body" id="rawlog_area"></div>
-                </div>
+        <ul id="main_tabs" class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="metrics-tab" data-bs-toggle="tab" href="#metrics" role="tab" aria-controls="metrics" aria-selected="true">Metrics</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="trace-tab" data-bs-toggle="tab" href="#trace" role="tab" aria-controls="trace" aria-selected="false">Trace</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="rawlog-tab" data-bs-toggle="tab" href="#rawlog" role="tab" aria-controls="rawlog" aria-selected="false">Raw Log</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="metrics" role="tabpanel" aria-labelledby="metrics-tab">
+                <button id="add_metrics" type="button" class="btn">
+                    <svg width="32" height="32" fill="currentColor" class="bi bi-plus-lg"><use href="#svg_add_btn"></use></svg>
+                </button>
+                <!-- メトリクスグラフ -->
+                <div class="row g-2 m-0 overflow-auto" id="metrics_area" style="height:calc(100vh - 220px);"></div>
+            </div>
+            <div class="tab-pane fade" id="trace" role="tabpanel" aria-labelledby="trace-tab">
+                <button id="search_trace" type="button" class="btn">
+                    <svg width="32" height="32" fill="currentColor" class="bi bi-plus-lg"><use href="#svg_search_btn"></use></svg>
+                </button>
+                <!-- トレース一覧 -->
+                <div class="row g-2 mt-1 overflow-auto" id="trace_area" style="height:calc(100vh - 220px);"></div>
+            </div>
+            <div class="tab-pane fade" id="rawlog" role="tabpanel" aria-labelledby="rawlog-tab">
+                <button id="search_rawlog" type="button" class="btn">
+                    <svg width="32" height="32" fill="currentColor" class="bi bi-plus-lg"><use href="#svg_search_btn"></use></svg>
+                </button>
+                <!-- 監査ログ一覧 -->
+                <div class="row g-2 mt-1 overflow-auto" id="rawlog_area" style="height:calc(100vh - 220px);"></div>
             </div>
         </div>
-        <!-- 左右のスプリッター -->
-        <div class="split-pane-divider pane-divider" style="left:80%;"></div>
-        <!-- フィルター側ペイン -->
-        <div id="right_container" class="split-pane-component" style="left:80%;">
-            <form class="d-none filer_form">
-                <input name="filer_host" type="hidden" class="filer_host">
-                <input name="filer_port" type="hidden" class="filer_port">
-                <input name="filer_password" type="hidden" class="filer_password">
-                <input name="filer_svname" type="hidden" class="filer_svname">
-                <input name="filer_scope" type="hidden" class="filer_scope">
-                <input name="filer_client_data" type="hidden" class="filer_client_data">
-            </form>
-            <div id="filter_form">
-                <div class="row row_content m-1"></div>
+    </div>
+    <!-- searchモーダル -->
+    <div id="search_modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div id="search_form" class="modal-content novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title">Search Condition</h5>
+                    <button type="button" class="btn btn_window_stack">
+                        <svg width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
+                            <use href="#svg_window_stack"></use>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn_window">
+                        <svg width="16" height="16" fill="currentColor" class="bi bi-window" viewBox="0 0 16 16">
+                            <use href="#svg_window"></use>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">
+                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row row_content"></div>
+                    <form id="filter_form" class="d-none filer_form">
+                        <input name="filer_host" type="hidden" class="filer_host">
+                        <input name="filer_port" type="hidden" class="filer_port">
+                        <input name="filer_password" type="hidden" class="filer_password">
+                        <input name="filer_svname" type="hidden" class="filer_svname">
+                        <input name="filer_scope" type="hidden" class="filer_scope">
+                        <input name="filer_client_data" type="hidden" class="filer_client_data">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="do_search" type="button" class="btn btn-success">Search</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
@@ -238,7 +265,6 @@
 <link rel="stylesheet" href="assets/bootstrap/bootstrap.min.5.3.0.css">
 <link rel="stylesheet" href="assets/cmdbox/color_mode.css">
 <link rel="stylesheet" href="assets/tree-menu/css/tree-menu.css">
-<link rel="stylesheet" href="assets/split-pane/split-pane.css">
 <link rel="stylesheet" href="assets/apexcharts/apexcharts.css">
 <style type="text/css">
 .apexcharts-tooltip {
@@ -260,7 +286,6 @@
 <script type="text/javascript" src="assets/jquery/jquery.min.3.2.0.js"></script>
 <script type="text/javascript" src="assets/jquery-ui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="assets/jquery-resizable/jquery-resizable.min.js"></script>
-<script type="text/javascript" src="assets/split-pane/split-pane.js"></script>
 <script type="text/javascript" src="assets/apexcharts/apexcharts.min.js"></script>
 <script type="text/javascript" src="assets/cmdbox/common.js"></script>
 <script type="text/javascript" src="assets/cmdbox/view_result.js"></script>

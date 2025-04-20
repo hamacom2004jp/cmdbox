@@ -44,6 +44,10 @@ class Audit(feature.WebFeature):
                 return dict(warn='audit feature is disabled.')
             opt = await req.json()
             opt = {**opt, **web.options.audit_search_args.copy()}
+            opt['host'] = web.redis_host
+            opt['port'] = web.redis_port
+            opt['password'] = web.redis_password
+            opt['svname'] = web.svname
             args = argparse.Namespace(**{k:common.chopdq(v) for k,v in opt.items()})
             status, ret_main, _ = web.options.audit_search.apprun(web.logger, args, time.perf_counter(), [])
             if status != 0:

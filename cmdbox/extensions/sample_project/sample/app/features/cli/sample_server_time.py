@@ -48,7 +48,7 @@ class ServerTime(feature.Feature):
                 dict(opt="password", type=Options.T_STR, default=self.default_pass, required=True, multi=False, hide=True, choice=None,
                         discription_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
                         discription_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
-                dict(opt="svname", type=Options.T_STR, default="server", required=True, multi=False, hide=True, choice=None,
+                dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None,
                         discription_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
                         discription_en="Specify the service name of the inference server. If omitted, `server` is used."),
                 dict(opt="timedelta", type=Options.T_INT, default=9, required=False, multi=False, hide=False, choice=None,

@@ -149,7 +149,7 @@ class ServerTime(feature.Feature):
                 dict(opt="password", type=Options.T_STR, default=self.default_pass, required=True, multi=False, hide=True, choice=None,
                         discription_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
                         discription_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
-                dict(opt="svname", type=Options.T_STR, default="server", required=True, multi=False, hide=True, choice=None,
+                dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None,
                         discription_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
                         discription_en="Specify the service name of the inference server. If omitted, `server` is used."),
                 dict(opt="timedelta", type=Options.T_INT, default=9, required=False, multi=False, hide=False, choice=None,
@@ -252,10 +252,10 @@ aliases:                                # Specify the alias for the specified co
       mode: audit                       # Specify the mode of the feature to be searched.
       cmd: search                       # Specify the command to be searched.
     options:                            # Specify the options for the audit function.
-      host: localhost                   # Specify the service host of the audit Redis server.
-      port: 6379                        # Specify the service port of the audit Redis server.
-      password: password                # Specify the access password of the audit Redis server.
-      svname: server                    # Specify the audit service name of the inference server.
+      host: localhost                   # Specify the service host of the audit Redis server.However, if it is specified as a command line argument, it is ignored.
+      port: 6379                        # Specify the service port of the audit Redis server.However, if it is specified as a command line argument, it is ignored.
+      password: password                # Specify the access password of the audit Redis server.However, if it is specified as a command line argument, it is ignored.
+      svname: server                    # Specify the audit service name of the inference server.However, if it is specified as a command line argument, it is ignored.
       retry_count: 3                    # Specifies the number of reconnections to the audit Redis server.If less than 0 is specified, reconnection is forever.
       retry_interval: 1                 # Specifies the number of seconds before reconnecting to the audit Redis server.
       timeout: 15                       # Specify the maximum waiting time until the server responds.

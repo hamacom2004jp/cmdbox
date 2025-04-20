@@ -22,10 +22,12 @@ class Feature(object):
     default_host:str = os.environ.get('REDIS_HOST', 'localhost')
     default_port:int = int(os.environ.get('REDIS_PORT', '6379'))
     default_pass:str = os.environ.get('REDIS_PASSWORD', 'password')
+    default_svname:str = os.environ.get('SVNAME', 'server')
 
     def __init__(self, appcls, ver):
         self.ver = ver
         self.appcls = appcls
+        self.default_svname:str = ver.__appid__
 
     def get_mode(self) -> Union[str, List[str]]:
         """
