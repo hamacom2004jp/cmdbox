@@ -27,6 +27,7 @@ INSTALL_REQUIRES = [
     'psycopg[binary]',
     'pystray',
     'python-multipart',
+    'python3-saml',
     'pycryptodome',
     'questionary',
     'redis',

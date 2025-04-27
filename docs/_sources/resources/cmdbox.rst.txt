@@ -17,13 +17,13 @@ cmdbox.version module
 
 .. automodule:: cmdbox.version
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Module contents
 ---------------
 
 .. automodule:: cmdbox
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

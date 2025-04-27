@@ -31,7 +31,6 @@ Set the edge mode. : `cmdbox -m edge -c config <Option>`
     "--saml <provider>","","Connect to the endpoint using SAML authentication."
     "--saml_port <port>","","Specifies the callback port when SAML authentication is used. If omitted, `8091` is used."
     "--saml_tenant_id <tenant_id>","","Specifies the tenant ID when SAML authentication is used."
-    "--saml_idp_cert <file>","","Specifies the server certificate when using SAML authentication; must be a PEM format file."
     "--saml_timeout <sec>","","Specify the timeout period before SAML authentication completes."
     "--data <path>","","When omitted, `$HONE/.{self.ver.__appid__}` is used."
     "--svcert_no_verify","","Do not verify server certificates during HTTPS requests."

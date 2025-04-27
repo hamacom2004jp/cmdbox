@@ -207,12 +207,6 @@ class Edge(object):
                     if 'saml_tenant_id' not in opt or opt['saml_tenant_id'] is None:
                         msg = dict(warn=f"Please run the `edge config` command. And please set the saml_tenant_id.")
                         return msg
-                    if 'saml_idp_cert' not in opt or opt['saml_idp_cert'] is None:
-                        msg = dict(warn=f"Please run the `edge config` command. And please set the saml_idp_cert.")
-                        return msg
-                    if not Path(opt['saml_idp_cert']).is_file():
-                        msg = dict(warn=f"Please run the `edge config` command. And please set the saml_idp_cert. file not found. saml_idp_cert={opt['saml_idp_cert']}")
-                        return msg
                 if 'saml_timeout' not in opt or opt['saml_timeout'] is None:
                     msg = dict(warn=f"Please run the `edge config` command. And please set the saml_timeout.")
                     return msg
@@ -243,8 +237,7 @@ class Edge(object):
                                       opt.get('oauth2_tenant_id'), opt.get('oauth2_client_id'), opt.get('oauth2_client_secret'),
                                       int(opt.get('oauth2_timeout', 60)),
                                       opt.get('saml'), int(opt.get('saml_port', 8091)),
-                                      opt.get('saml_tenant_id'), opt.get('saml_idp_cert'),
-                                      int(opt.get('saml_timeout', 60)))
+                                      opt.get('saml_tenant_id'), int(opt.get('saml_timeout', 60)))
 
             if status != 0:
                 return msg
@@ -413,7 +406,7 @@ class Edge(object):
     def signin(self, auth_type:str, user:str, password:str, apikey:str,
                oauth2:str, oauth2_port:int, oauth2_tenant_id:str, oauth2_client_id:str, oauth2_client_secret:str,
                oauth2_timeout:int,
-               saml:str, saml_port:int, saml_tenant_id:str, saml_idp_cert:str,
+               saml:str, saml_port:int, saml_tenant_id:str,
                saml_timeout:int) -> Tuple[int, Dict[str, Any]]:
         """
         サインインを行います
@@ -432,7 +425,6 @@ class Edge(object):
             saml (str): SAML
             saml_port (int): SAMLポート
             saml_tenant_id (str): SAMLテナントID
-            saml_idp_cert (str): SAML IDP証明書
             saml_timeout (int): SAMLタイムアウト
 
         Returns:
@@ -694,10 +686,6 @@ class Edge(object):
             if saml == "azure":
                 if saml_tenant_id is None:
                     return 1, dict(warn="Please specify the --saml_tenant_id option.")
-                with open(saml_idp_cert, 'r', encoding='utf-8') as f:
-                    saml_idp_cert = f.read()
-                    saml_idp_cert = saml_idp_cert
-
                 saml_settings = dict(
                     strict=False,
                     debug=self.logger.level==logging.DEBUG,
@@ -706,7 +694,6 @@ class Edge(object):
                         singleSignOnService=dict(
                             url=f'https://login.microsoftonline.com/{saml_tenant_id}/saml2',
                             binding=f'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),
-                        #x509cert=saml_idp_cert,
                         certFingerprint='',
                         certFingerprintAlgorithm='sha1',
                         singleLogoutService=dict()),
@@ -930,7 +917,7 @@ class Tool(object):
                 webbrowser.open(f"{self.endpoint}/oauth2/azure/session/{self.user['access_token']}{path}")
                 return 0, dict(success="Open browser.")
         elif self.user['auth_type'] == "saml":
-            if self.oauth2 == 'azure':
+            if self.saml == 'azure':
                 webbrowser.open(f"{self.endpoint}/saml/azure/session/{self.user['saml_token']}{path}")
                 return 0, dict(success="Open browser.")
         return 1, dict(warn="unsupported auth_type.")

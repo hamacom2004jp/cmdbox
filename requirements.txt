@@ -8,6 +8,7 @@ itsdangerous
 numpy
 Pillow
 python-multipart
+python3-saml
 pycryptodome
 plyer             # For desktop notifications
 psycopg[binary]

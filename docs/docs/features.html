@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Features &mdash; cmdbox 2025/04/18 documentation</title>
+  <title>Features &mdash; cmdbox 2025/04/27 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=18224466"></script>
+      <script src="../_static/documentation_options.js?v=5d689768"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -141,17 +141,20 @@
 <span class="w">                                            </span><span class="c1">#   e.g. true</span>
 <span class="w">    </span><span class="nt">audit</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">                       </span><span class="c1"># Specify whether to enable the audit function.</span>
-<span class="w">        </span><span class="nt">feature</span><span class="p">:</span>
-<span class="w">            </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">audit</span><span class="w">                     </span><span class="c1"># Specify the mode of the feature to be audited.</span>
-<span class="w">            </span><span class="nt">cmd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">write</span><span class="w">                      </span><span class="c1"># Specify the command to be audited.</span>
+<span class="w">        </span><span class="nt">write</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">audit</span><span class="w">                     </span><span class="c1"># Specify the mode of the feature to be writed.</span>
+<span class="w">            </span><span class="nt">cmd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">write</span><span class="w">                      </span><span class="c1"># Specify the command to be writed.</span>
+<span class="w">        </span><span class="nt">search</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">audit</span><span class="w">                     </span><span class="c1"># Specify the mode of the feature to be searched.</span>
+<span class="w">            </span><span class="nt">cmd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">search</span><span class="w">                     </span><span class="c1"># Specify the command to be searched.</span>
 <span class="w">        </span><span class="nt">options</span><span class="p">:</span><span class="w">                            </span><span class="c1"># Specify the options for the audit function.</span>
-<span class="w">            </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span><span class="w">                 </span><span class="c1"># Specify the service host of the audit Redis server.</span>
-<span class="w">            </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6379</span><span class="w">                      </span><span class="c1"># Specify the service port of the audit Redis server.</span>
-<span class="w">            </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">password</span><span class="w">              </span><span class="c1"># Specify the access password of the audit Redis server.</span>
-<span class="w">            </span><span class="nt">svname</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">                  </span><span class="c1"># Specify the audit service name of the inference server.</span>
+<span class="w">            </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span><span class="w">                 </span><span class="c1"># Specify the service host of the audit Redis server.However, if it is specified as a command line argument, it is ignored.</span>
+<span class="w">            </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6379</span><span class="w">                      </span><span class="c1"># Specify the service port of the audit Redis server.However, if it is specified as a command line argument, it is ignored.</span>
+<span class="w">            </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">password</span><span class="w">              </span><span class="c1"># Specify the access password of the audit Redis server.However, if it is specified as a command line argument, it is ignored.</span>
+<span class="w">            </span><span class="nt">svname</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">                  </span><span class="c1"># Specify the audit service name of the inference server.However, if it is specified as a command line argument, it is ignored.</span>
 <span class="w">            </span><span class="nt">retry_count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">                  </span><span class="c1"># Specifies the number of reconnections to the audit Redis server.If less than 0 is specified, reconnection is forever.</span>
 <span class="w">            </span><span class="nt">retry_interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">               </span><span class="c1"># Specifies the number of seconds before reconnecting to the audit Redis server.</span>
-<span class="w">            </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">                      </span><span class="c1"># Specify the maximum waiting time until the server responds.</span>
+<span class="w">            </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">15</span><span class="w">                     </span><span class="c1"># Specify the maximum waiting time until the server responds.</span>
 <span class="w">            </span><span class="nt">pg_enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w">               </span><span class="c1"># Specify True if using the postgresql database server.</span>
 <span class="w">            </span><span class="nt">pg_host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span><span class="w">              </span><span class="c1"># Specify the postgresql host.</span>
 <span class="w">            </span><span class="nt">pg_port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5432</span><span class="w">                   </span><span class="c1"># Specify the postgresql port.</span>
