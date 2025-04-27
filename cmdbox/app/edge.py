@@ -1,7 +1,9 @@
 from cmdbox.app import common, feature, options, web
+from cmdbox.app.auth import signin, signin_saml, azure_signin, azure_signin_saml, github_signin, google_signin
 from cmdbox.app.commons import convert
 from cmdbox.app.options import Options
 from fastapi import FastAPI, Request, HTTPException
+from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from pathlib import Path
 from PIL import Image
 from typing import Dict, List, Tuple, Any, Union
@@ -63,12 +65,30 @@ class Edge(object):
             conf = common.loadopt(conf_file)
         else:
             conf = dict()
+        skip_opts = []
+        input_opts = []
+        def _show_opts(choice_show:Dict[str, List[str]], value:str, ref_opts:List[Dict[str, Any]]) -> None:
+            for k, v in choice_show.items():
+                if k == value:
+                    input_opts.extend(v)
+                else:
+                    skip_opts.extend(v)
+                for r in ref_opts:
+                    for opt in v:
+                        if 'opt' not in r or r['opt'] is None:
+                            continue
+                        if 'choice_show' not in r or r['choice_show'] is None:
+                            continue
+                        _show_opts(r['choice_show'], '', [o for o in ref_opts if o['opt'] == opt])
         for r in ref_opts:
             if 'opt' not in r or r['opt'] is None:
                 continue
             opt = r['opt']
-            if opt in ['output_json', 'output_json_append', 'stdout_log', 'capture_stdout', 'capture_maxsize']:
+            if opt in ['tag', 'clmsg_id', 'output_json', 'output_json_append', 'stdout_log', 'capture_stdout', 'capture_maxsize']:
                 continue
+            if opt in skip_opts and opt not in input_opts:
+                continue
+            choice_show = r['choice_show'] if 'choice_show' in r else dict()
             default = conf[opt] if opt in conf else None
             default = r['default'] if default is None and 'default' in r else default
             default = default if default is not None else ''
@@ -86,6 +106,7 @@ class Edge(object):
                 value = questionary.select(f"{opt}:({help}):", choice, default=default).ask()
             else:
                 value = questionary.text(f"{opt}:({help}):", default=default, validate=lambda v:not required or len(v)>0).ask()
+            _show_opts(choice_show, value, ref_opts)
             if r['type'] == Options.T_BOOL: value = value=='True'
             if r['type'] == Options.T_INT: value = int(value)
             if r['type'] == Options.T_FLOAT: value = float(value)
@@ -129,43 +150,77 @@ class Edge(object):
             if 'auth_type' not in opt or opt['auth_type'] is None:
                 msg = dict(warn=f"Please run the `edge config` command. And please set the auth_type.")
                 return msg
-            if opt['auth_type'] == 'idpw' and ('user' not in opt or opt['user'] is None):
-                msg = dict(warn=f"Please run the `edge config` command. And please set the user.")
-                return msg
-            if opt['auth_type'] == 'idpw' and ('password' not in opt or opt['password'] is None):
-                msg = dict(warn=f"Please run the `edge config` command. And please set the password.")
-                return msg
-            if opt['auth_type'] == 'apikey' and ('apikey' not in opt or opt['apikey'] is None):
-                msg = dict(warn=f"Please run the `edge config` command. And please set the apikey.")
-                return msg
-            if opt['auth_type'] == 'oauth2' and ('oauth2' not in opt or opt['oauth2'] is None):
-                msg = dict(warn=f"Please run the `edge config` command. And please set the oauth2.")
-                return msg
-            if opt['auth_type'] == 'oauth2' and ('oauth2_port' not in opt or opt['oauth2_port'] is None):
-                msg = dict(warn=f"Please run the `edge config` command. And please set the oauth2_port.")
-                return msg
-            if isinstance(opt['oauth2_port'], str):
-                if not opt['oauth2_port'].isdigit():
-                    msg = dict(warn=f"Please set the numeric value in the oauth2_port. oauth2_port={opt['oauth2_port']}")
+            if opt['auth_type'] == 'idpw':
+                if 'user' not in opt or opt['user'] is None:
+                    msg = dict(warn=f"Please run the `edge config` command. And please set the user.")
                     return msg
-                opt['oauth2_port'] = int(opt['oauth2_port'])
-            if opt['oauth2'] == 'azure' and ('oauth2_tenant_id' not in opt or opt['oauth2_tenant_id'] is None):
-                msg = dict(warn=f"Please run the `edge config` command. And please set the oauth2_tenant_id.")
-                return msg
-            if opt['auth_type'] == 'oauth2' and ('oauth2_client_id' not in opt or opt['oauth2_client_id'] is None):
-                msg = dict(warn=f"Please run the `edge config` command. And please set the oauth2_client_id.")
-                return msg
-            if opt['auth_type'] == 'oauth2' and ('oauth2_client_secret' not in opt or opt['oauth2_client_secret'] is None):
-                msg = dict(warn=f"Please run the `edge config` command. And please set the oauth2_client_secret.")
-                return msg
-            if opt['auth_type'] == 'oauth2' and ('oauth2_timeout' not in opt or opt['oauth2_timeout'] is None):
-                msg = dict(warn=f"Please run the `edge config` command. And please set the oauth2_timeout.")
-                return msg
-            if isinstance(opt['oauth2_timeout'], str):
-                if not opt['oauth2_timeout'].isdigit():
-                    msg = dict(warn=f"Please set the numeric value in the oauth2_timeout. oauth2_timeout={opt['oauth2_timeout']}")
+                if 'password' not in opt or opt['password'] is None:
+                    msg = dict(warn=f"Please run the `edge config` command. And please set the password.")
                     return msg
-                opt['oauth2_timeout'] = int(opt['oauth2_timeout'])
+            if opt['auth_type'] == 'apikey':
+                if 'apikey' not in opt or opt['apikey'] is None:
+                    msg = dict(warn=f"Please run the `edge config` command. And please set the apikey.")
+                    return msg
+            if opt['auth_type'] == 'oauth2':
+                if 'oauth2' not in opt or opt['oauth2'] is None:
+                    msg = dict(warn=f"Please run the `edge config` command. And please set the oauth2.")
+                    return msg
+                if 'oauth2_port' not in opt or opt['oauth2_port'] is None:
+                    msg = dict(warn=f"Please run the `edge config` command. And please set the oauth2_port.")
+                    return msg
+                if isinstance(opt['oauth2_port'], str):
+                    if not opt['oauth2_port'].isdigit():
+                        msg = dict(warn=f"Please set the numeric value in the oauth2_port. oauth2_port={opt['oauth2_port']}")
+                        return msg
+                    opt['oauth2_port'] = int(opt['oauth2_port'])
+                if opt['oauth2'] == 'azure':
+                    if 'oauth2_tenant_id' not in opt or opt['oauth2_tenant_id'] is None:
+                        msg = dict(warn=f"Please run the `edge config` command. And please set the oauth2_tenant_id.")
+                        return msg
+                if 'oauth2_client_id' not in opt or opt['oauth2_client_id'] is None:
+                    msg = dict(warn=f"Please run the `edge config` command. And please set the oauth2_client_id.")
+                    return msg
+                if 'oauth2_client_secret' not in opt or opt['oauth2_client_secret'] is None:
+                    msg = dict(warn=f"Please run the `edge config` command. And please set the oauth2_client_secret.")
+                    return msg
+                if 'oauth2_timeout' not in opt or opt['oauth2_timeout'] is None:
+                    msg = dict(warn=f"Please run the `edge config` command. And please set the oauth2_timeout.")
+                    return msg
+                if isinstance(opt['oauth2_timeout'], str):
+                    if not opt['oauth2_timeout'].isdigit():
+                        msg = dict(warn=f"Please set the numeric value in the oauth2_timeout. oauth2_timeout={opt['oauth2_timeout']}")
+                        return msg
+                    opt['oauth2_timeout'] = int(opt['oauth2_timeout'])
+            if opt['auth_type'] == 'saml':
+                if 'saml' not in opt or opt['saml'] is None:
+                    msg = dict(warn=f"Please run the `edge config` command. And please set the saml.")
+                    return msg
+                if 'saml_port' not in opt or opt['saml_port'] is None:
+                    msg = dict(warn=f"Please run the `edge config` command. And please set the saml.")
+                    return msg
+                if isinstance(opt['saml_port'], str):
+                    if not opt['saml_port'].isdigit():
+                        msg = dict(warn=f"Please set the numeric value in the saml_port. saml_port={opt['saml_port']}")
+                        return msg
+                    opt['saml_port'] = int(opt['saml_port'])
+                if opt['saml'] == 'azure':
+                    if 'saml_tenant_id' not in opt or opt['saml_tenant_id'] is None:
+                        msg = dict(warn=f"Please run the `edge config` command. And please set the saml_tenant_id.")
+                        return msg
+                    if 'saml_idp_cert' not in opt or opt['saml_idp_cert'] is None:
+                        msg = dict(warn=f"Please run the `edge config` command. And please set the saml_idp_cert.")
+                        return msg
+                    if not Path(opt['saml_idp_cert']).is_file():
+                        msg = dict(warn=f"Please run the `edge config` command. And please set the saml_idp_cert. file not found. saml_idp_cert={opt['saml_idp_cert']}")
+                        return msg
+                if 'saml_timeout' not in opt or opt['saml_timeout'] is None:
+                    msg = dict(warn=f"Please run the `edge config` command. And please set the saml_timeout.")
+                    return msg
+                if isinstance(opt['saml_timeout'], str):
+                    if not opt['saml_timeout'].isdigit():
+                        msg = dict(warn=f"Please set the numeric value in the saml_timeout. saml_timeout={opt['saml_timeout']}")
+                        return msg
+                    opt['saml_timeout'] = int(opt['saml_timeout'])
             if 'svcert_no_verify' not in opt or opt['svcert_no_verify'] is not True:
                 opt['svcert_no_verify'] = False
             if 'timeout' not in opt or opt['timeout'] is None:
@@ -184,9 +239,13 @@ class Edge(object):
             if self.svcert_no_verify:
                 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
             status, msg = self.signin(opt.get('auth_type'), opt.get('user'), opt.get('password'), opt.get('apikey'),
-                                      opt.get('oauth2'), int(opt.get('oauth2_port')),
+                                      opt.get('oauth2'), int(opt.get('oauth2_port', 8091)),
                                       opt.get('oauth2_tenant_id'), opt.get('oauth2_client_id'), opt.get('oauth2_client_secret'),
-                                      int(opt.get('oauth2_timeout')))
+                                      int(opt.get('oauth2_timeout', 60)),
+                                      opt.get('saml'), int(opt.get('saml_port', 8091)),
+                                      opt.get('saml_tenant_id'), opt.get('saml_idp_cert'),
+                                      int(opt.get('saml_timeout', 60)))
+
             if status != 0:
                 return msg
 
@@ -248,7 +307,7 @@ class Edge(object):
             resq:queue.Queue = pipe_cmd['resq']
             del pipe_cmd['resq']
             tool = Tool(self.logger, self.appcls, self.ver)
-            tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2)
+            tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2, self.saml)
             feat:feature.Feature = self.options.get_cmd_attr(pipe_cmd['mode'], pipe_cmd['cmd'], 'feature')
             while not thevent.is_set():
                 prevres = None if prevq is None else prevq.get(pipe_cmd['timeout'])
@@ -305,7 +364,7 @@ class Edge(object):
                 def mkcmd(opt):
                     def _ex():
                         tool = Tool(self.logger, self.appcls, self.ver)
-                        tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2)
+                        tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2, self.saml)
                         feat:feature.Feature = self.options.get_cmd_attr(opt['mode'], opt['cmd'], 'feature')
                         for status, ret in feat.edgerun(opt, tool, self.logger, self.timeout):
                             pass
@@ -353,7 +412,9 @@ class Edge(object):
 
     def signin(self, auth_type:str, user:str, password:str, apikey:str,
                oauth2:str, oauth2_port:int, oauth2_tenant_id:str, oauth2_client_id:str, oauth2_client_secret:str,
-               oauth2_timeout:int) -> Tuple[int, Dict[str, Any]]:
+               oauth2_timeout:int,
+               saml:str, saml_port:int, saml_tenant_id:str, saml_idp_cert:str,
+               saml_timeout:int) -> Tuple[int, Dict[str, Any]]:
         """
         サインインを行います
 
@@ -368,6 +429,11 @@ class Edge(object):
             oauth2_client_id (str): OAuth2クライアントID
             oauth2_client_secret (str): OAuth2クライアントシークレット
             oauth2_timeout (int): OAuth2タイムアウト
+            saml (str): SAML
+            saml_port (int): SAMLポート
+            saml_tenant_id (str): SAMLテナントID
+            saml_idp_cert (str): SAML IDP証明書
+            saml_timeout (int): SAMLタイムアウト
 
         Returns:
             Tuple[int, Dict[str, Any]]: 終了コード, メッセージ
@@ -375,13 +441,14 @@ class Edge(object):
         self.session = requests.Session()
         self.signed_in = False
         self.oauth2 = oauth2
+        self.saml = saml
         if auth_type == "noauth":
             status, res, _ = self.site_request(self.session.get, "/gui")
             if status != 0: return status, res
             status, self.user_info = self.load_user_info()
             self.user_info['auth_type'] = auth_type
             if status != 0: return status, res
-            self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2)
+            self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2, self.saml)
             return 0, dict(success="No auth.")
 
         # ID/PW認証を使用する場合
@@ -398,7 +465,7 @@ class Edge(object):
             self.user_info['auth_type'] = auth_type
             self.user_info['password'] = password
             if status != 0: return status, res
-            self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2)
+            self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2, self.saml)
             return 0, dict(success="Signin Success.")
 
         # APIKEY認証を使用する場合
@@ -413,7 +480,7 @@ class Edge(object):
             self.user_info['auth_type'] = auth_type
             self.user_info['apikey'] = apikey
             if status != 0: return status, res
-            self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2)
+            self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2, self.saml)
             return 0, dict(success="Signin Success.")
 
         # OAuth2認証を使用する場合
@@ -453,9 +520,9 @@ class Edge(object):
                         status, self.user_info = self.load_user_info()
                         self.user_info['auth_type'] = auth_type
                         self.user_info['access_token'] = access_token
-                        if status != 0: return status, res
+                        if status != 0: return res
                         self.signed_in = True
-                        self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2)
+                        self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2, self.saml)
                         return dict(success="Signin success. Please close your browser.")
                     except Exception as e:
                         raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
@@ -519,9 +586,9 @@ class Edge(object):
                         status, self.user_info = self.load_user_info()
                         self.user_info['auth_type'] = auth_type
                         self.user_info['access_token'] = access_token
-                        if status != 0: return status, res
+                        if status != 0: return res
                         self.signed_in = True
-                        self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2)
+                        self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2, self.saml)
                         return dict(success="Signin success. Please close your browser.")
                     except Exception as e:
                         raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
@@ -548,7 +615,6 @@ class Edge(object):
                         return 1, dict(warn="Signin Timeout.")
                     time.sleep(1)
                 return 0, dict(success="Signin success.")
-
 
             # Azure OAuth2を使用する場合
             elif oauth2 == "azure":
@@ -591,9 +657,9 @@ class Edge(object):
                         status, self.user_info = self.load_user_info()
                         self.user_info['auth_type'] = auth_type
                         self.user_info['access_token'] = access_token
-                        if status != 0: return status, res
+                        if status != 0: return res
                         self.signed_in = True
-                        self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2)
+                        self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2, self.saml)
                         return dict(success="Signin success. Please close your browser.")
                     except Exception as e:
                         raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
@@ -618,6 +684,84 @@ class Edge(object):
                 tm = time.time()
                 while not self.signed_in:
                     if time.time() - tm > oauth2_timeout:
+                        return 1, dict(warn="Signin Timeout.")
+                    time.sleep(1)
+                return 0, dict(success="Signin success.")
+
+        # saml認証を使用する場合
+        elif auth_type == "saml":
+            # Azure samlを使用する場合
+            if saml == "azure":
+                if saml_tenant_id is None:
+                    return 1, dict(warn="Please specify the --saml_tenant_id option.")
+                with open(saml_idp_cert, 'r', encoding='utf-8') as f:
+                    saml_idp_cert = f.read()
+                    saml_idp_cert = saml_idp_cert
+
+                saml_settings = dict(
+                    strict=False,
+                    debug=self.logger.level==logging.DEBUG,
+                    idp=dict(
+                        entityId=f'https://sts.windows.net/{saml_tenant_id}/',
+                        singleSignOnService=dict(
+                            url=f'https://login.microsoftonline.com/{saml_tenant_id}/saml2',
+                            binding=f'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),
+                        #x509cert=saml_idp_cert,
+                        certFingerprint='',
+                        certFingerprintAlgorithm='sha1',
+                        singleLogoutService=dict()),
+                    sp=dict(
+                        entityId=self.endpoint,
+                        assertionConsumerService=dict(
+                            url=f'http://localhost:{saml_port}/saml/azure/callback',
+                            binding=f'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'),
+                        attributeConsumingService=dict(),
+                        singleLogoutService=dict(
+                            binding=f'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),
+                        NameIDFormat=f'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
+                        x509cert='',
+                        privateKey=''))
+                request_data = dict(
+                    https='off',
+                    http_host='localhost',
+                    server_port=saml_port,
+                    script_name=f'/saml/azure/gui?next=gui',
+                    post_data=dict(),
+                    get_data=dict(n=common.random_string(8)),
+                )
+                auth = OneLogin_Saml2_Auth(request_data=request_data, old_settings=saml_settings)
+
+                # SAML認証のコールバックを受けるFastAPIサーバーを起動
+                fastapi = FastAPI()
+                @fastapi.post('/saml/azure/callback')
+                async def saml_azure_callback(req:Request):
+                    form_data = await req.form()
+                    try:
+                        status, res, headers = self.site_request(self.session.post, f"/saml/azure/callback", data=form_data, ok_status=[200, 307])
+                        if status != 0 or headers.get('signin') is None:
+                            return dict(warn=f"Signin failed.")
+                        status, self.user_info = self.load_user_info()
+                        self.user_info['auth_type'] = auth_type
+                        if status != 0: return res
+                        self.signed_in = True
+                        self.user_info['saml_token'] = convert.str2b64str(common.to_str(form_data._dict))
+                        self.tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2, self.saml)
+                        return dict(success="Signin success. Please close your browser.")
+                    except Exception as e:
+                        raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
+
+                if not hasattr(self, 'thUvicorn') or not self.thUvicorn.is_alive():
+                    self.thUvicorn = web.ThreadedUvicorn(self.logger, Config(app=fastapi, host='localhost', port=saml_port), {})
+                    self.thUvicorn.start()
+                    time.sleep(1)
+
+                # SAML認証のリクエストを送信
+                webbrowser.open(auth.login())
+
+                # 認証完了まで指定秒数待つ
+                tm = time.time()
+                while not self.signed_in:
+                    if time.time() - tm > saml_timeout:
                         return 1, dict(warn="Signin Timeout.")
                     time.sleep(1)
                 return 0, dict(success="Signin success.")
@@ -657,7 +801,7 @@ class Tool(object):
         except Exception as e:
             self.logger.error(f"notify error. {e}", exc_info=True)
 
-    def set_session(self, session:requests.Session, svcert_no_verify:bool, endpoint:str, icon_path:Path, user_info:Dict[str, Any], oauth2:str):
+    def set_session(self, session:requests.Session, svcert_no_verify:bool, endpoint:str, icon_path:Path, user_info:Dict[str, Any], oauth2:str, saml:str):
         """
         セッションを設定します
 
@@ -675,6 +819,7 @@ class Tool(object):
         self.icon_path = icon_path
         self.user = user_info
         self.oauth2 = oauth2
+        self.saml = saml
 
     def exec_cmd(self, opt:Dict[str, Any], logger:logging.Logger, timeout:int, prevres:Any=None) -> Tuple[int, Dict[str, Any]]:
         """
@@ -774,13 +919,18 @@ class Tool(object):
             token = convert.str2b64str(common.to_str(token))
             webbrowser.open(f"{self.endpoint}/dosignin_token/{token}{path}")
             return 0, dict(success="Open browser.")
-        elif self.user['auth_type'] == "oauth2" and self.oauth2 == 'google':
-            webbrowser.open(f"{self.endpoint}/oauth2/google/session/{self.user['access_token']}{path}")
-            return 0, dict(success="Open browser.")
-        elif self.user['auth_type'] == "oauth2" and self.oauth2 == 'github':
-            webbrowser.open(f"{self.endpoint}/oauth2/github/session/{self.user['access_token']}{path}")
-            return 0, dict(success="Open browser.")
-        elif self.user['auth_type'] == "oauth2" and self.oauth2 == 'azure':
-            webbrowser.open(f"{self.endpoint}/oauth2/azure/session/{self.user['access_token']}{path}")
-            return 0, dict(success="Open browser.")
+        elif self.user['auth_type'] == "oauth2":
+            if self.oauth2 == 'google':
+                webbrowser.open(f"{self.endpoint}/oauth2/google/session/{self.user['access_token']}{path}")
+                return 0, dict(success="Open browser.")
+            if self.oauth2 == 'github':
+                webbrowser.open(f"{self.endpoint}/oauth2/github/session/{self.user['access_token']}{path}")
+                return 0, dict(success="Open browser.")
+            if self.oauth2 == 'azure':
+                webbrowser.open(f"{self.endpoint}/oauth2/azure/session/{self.user['access_token']}{path}")
+                return 0, dict(success="Open browser.")
+        elif self.user['auth_type'] == "saml":
+            if self.oauth2 == 'azure':
+                webbrowser.open(f"{self.endpoint}/saml/azure/session/{self.user['saml_token']}{path}")
+                return 0, dict(success="Open browser.")
         return 1, dict(warn="unsupported auth_type.")

@@ -348,12 +348,12 @@ class Web:
         if 'hash' not in user or user['hash'] == '':
             raise ValueError(f"User hash is not found or empty. ({user})")
         hash = user['hash']
-        if hash!='oauth2' and ('password' not in user or user['password'] == ''):
+        if hash!='oauth2' and hash!='saml' and ('password' not in user or user['password'] == ''):
             raise ValueError(f"User password is not found or empty. ({user})")
         if 'email' not in user:
             raise ValueError(f"User email is not found. ({user})")
-        if hash=='oauth2' and (user['email'] is None or user['email']==''):
-            raise ValueError(f"Required when `email` is `oauth2`. ({user})")
+        if (hash=='oauth2' or hash=='saml') and (user['email'] is None or user['email']==''):
+            raise ValueError(f"Required when `email` is `oauth2` or `saml`. ({user})")
         if 'groups' not in user or type(user['groups']) is not list:
             raise ValueError(f"User groups is not found or empty. ({user})")
         for gn in user['groups']:
@@ -363,13 +363,13 @@ class Web:
             raise ValueError(f"User uid is already exists. ({user})")
         if len([u for u in signin_data['users'] if u['name'] == user['name']]) > 0:
             raise ValueError(f"User name is already exists. ({user})")
-        if hash not in ['oauth2', 'plain', 'md5', 'sha1', 'sha256']:
+        if hash not in ['oauth2', 'saml', 'plain', 'md5', 'sha1', 'sha256']:
             raise ValueError(f"User hash is not supported. ({user})")
         jadge, msg = self.signin.check_password_policy(user['name'], '', user['password'])
         if not jadge:
             raise ValueError(msg)
         if hash != 'plain':
-            user['password'] = common.hash_password(user['password'], hash if hash != 'oauth2' else 'sha1')
+            user['password'] = common.hash_password(user['password'], hash if hash != 'oauth2' and hash != 'saml' else 'sha1')
         else:
             user['password'] = user['password']
         signin_data['users'].append(user)
@@ -405,8 +405,8 @@ class Web:
         if 'email' not in user:
             raise ValueError(f"User email is not found. ({user})")
         hash = user['hash']
-        if hash=='oauth2' and (user['email'] is None or user['email']==''):
-            raise ValueError(f"Required when `email` is `oauth2`. ({user})")
+        if (hash=='oauth2' or hash=='saml') and (user['email'] is None or user['email']==''):
+            raise ValueError(f"Required when `email` is `oauth2` or `saml`. ({user})")
         if 'groups' not in user or type(user['groups']) is not list:
             raise ValueError(f"User groups is not found or empty. ({user})")
         for gn in user['groups']:
@@ -416,7 +416,7 @@ class Web:
             raise ValueError(f"User uid is not found. ({user})")
         if len([u for u in signin_data['users'] if u['name'] == user['name']]) <= 0:
             raise ValueError(f"User name is not found. ({user})")
-        if hash not in ['oauth2', 'plain', 'md5', 'sha1', 'sha256']:
+        if hash not in ['oauth2', 'saml', 'plain', 'md5', 'sha1', 'sha256']:
             raise ValueError(f"User hash is not supported. ({user})")
         for u in signin_data['users']:
             if u['uid'] == user['uid']:
@@ -426,7 +426,7 @@ class Web:
                     if not jadge:
                         raise ValueError(msg)
                     if hash != 'plain':
-                        u['password'] = common.hash_password(user['password'], hash if hash != 'oauth2' else 'sha1')
+                        u['password'] = common.hash_password(user['password'], hash if hash != 'oauth2' and hash != 'saml' else 'sha1')
                     else:
                         u['password'] = user['password']
                     # パスワード更新日時の保存

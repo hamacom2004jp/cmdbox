@@ -1,6 +1,7 @@
 from cmdbox.app import common, options
 from fastapi import Request, Response, HTTPException
 from fastapi.responses import RedirectResponse
+from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import copy
@@ -27,13 +28,12 @@ class Signin(object):
         """
         return self.signin_file_data
 
-    def jadge(self, access_token:str, email:str) -> Tuple[bool, Dict[str, Any]]:
+    def jadge(self, email:str) -> Tuple[bool, Dict[str, Any]]:
         """
         サインインを成功させるかどうかを判定します。
         返すユーザーデータには、uid, name, email, groups, hash が必要です。
 
         Args:
-            access_token (str): アクセストークン
             email (str): メールアドレス
 
         Returns:
@@ -159,6 +159,43 @@ class Signin(object):
         self.logger.warning(f"Unauthorized site. user={find_user['name']}, path={req.url.path}")
         return RedirectResponse(url=f'/signin{req.url.path}?error=unauthorizedsite')
 
+    async def make_saml(self, prov:str, next:str, form_data:Dict[str, Any], req:Request, res:Response) -> OneLogin_Saml2_Auth:
+        """
+        SAML認証のリダイレクトURLを取得する
+        Args:
+            prov (str): プロバイダ名
+            next (str): リダイレクト先のURL
+            req (Request): リクエスト
+            res (Response): レスポンス
+        Returns:
+            OneLogin_Saml2_Auth: SAML認証オブジェクト
+        """
+        sd = self.get_data()
+        saml_settings = dict(
+            strict=False,
+            debug=self.logger.level==logging.DEBUG,
+            idp=sd['saml']['providers'][prov]['idp'],
+            sp=sd['saml']['providers'][prov]['sp'])
+        # SAML認証のリダイレクトURLを取得
+        request_data = dict(
+            https='on' if req.url.scheme=='https' else 'off',
+            http_host=req.client.host,
+            server_port=req.url.port,
+            script_name=f'{req.url.path}?next={next}',
+            post_data=dict(),
+            get_data=dict(),
+        )
+        if (req.query_params):
+            request_data["get_data"] = req.query_params,
+        if "SAMLResponse" in form_data:
+            SAMLResponse = form_data["SAMLResponse"]
+            request_data["post_data"]["SAMLResponse"] = SAMLResponse
+        if "RelayState" in form_data:
+            RelayState = form_data["RelayState"]
+            request_data["post_data"]["RelayState"] = RelayState
+        auth = OneLogin_Saml2_Auth(request_data=request_data, old_settings=saml_settings)
+        return auth
+
     @classmethod
     def load_signin_file(cls, signin_file:Path, signin_file_data:Dict[str, Any]=None) -> Dict[str, Any]:
         """
@@ -203,8 +240,8 @@ class Signin(object):
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "password" not found or empty. ({signin_file})')
                 if 'hash' not in user or user['hash'] is None:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "hash" not found or empty. ({signin_file})')
-                if user['hash'] not in ['oauth2', 'plain', 'md5', 'sha1', 'sha256']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. Algorithms not supported. ({signin_file}). hash={user["hash"]} "oauth2", "plain", "md5", "sha1", "sha256" only.')
+                if user['hash'] not in ['oauth2', 'saml', 'plain', 'md5', 'sha1', 'sha256']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. Algorithms not supported. ({signin_file}). hash={user["hash"]} "oauth2", "saml", "plain", "md5", "sha1", "sha256" only.')
                 if 'groups' not in user or type(user['groups']) is not list:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found or not list type. ({signin_file})')
                 if len([ug for ug in user['groups'] if ug not in groups]) > 0:
@@ -416,6 +453,24 @@ class Signin(object):
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not list type in "azure". ({signin_file})')
             if 'signin_module' not in yml['oauth2']['providers']['azure']:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "signin_module" not found in "azure". ({signin_file})')
+            # samlのフォーマットチェック
+            if 'saml' not in yml:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "saml" not found. ({signin_file})')
+            if 'providers' not in yml['saml']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "providers" not found in "saml". ({signin_file})')
+            # azure
+            if 'azure' not in yml['saml']['providers']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "azure" not found in "providers". ({signin_file})')
+            if 'enabled' not in yml['saml']['providers']['azure']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "azure". ({signin_file})')
+            if type(yml['saml']['providers']['azure']['enabled']) is not bool:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "azure". ({signin_file})')
+            if 'signin_module' not in yml['saml']['providers']['azure']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "signin_module" not found in "azure". ({signin_file})')
+            if 'sp' not in yml['saml']['providers']['azure']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "sp" not found in "azure". ({signin_file})')
+            if 'idp' not in yml['saml']['providers']['azure']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "idp" not found in "azure". ({signin_file})')
             # フォーマットチェックOK
             return yml
 
@@ -632,3 +687,29 @@ class Signin(object):
             return False, f"Password policy error. not_contain_username=True"
         self.logger.info(f"Password policy OK.")
         return True, "Password policy OK."
+
+    def request_access_token(self, conf:Dict, req:Request, res:Response) -> str:
+        """
+        アクセストークンを取得します
+
+        Args:
+            conf (Dict): サインインモジュールの設定
+            req (Request): リクエスト
+            res (Response): レスポンス
+
+        Returns:
+            str: アクセストークン
+        """
+        raise NotImplementedError("request_access_token() is not implemented.")
+
+    def get_email(self, data:Any) -> str:
+        """
+        アクセストークンからメールアドレスを取得します
+
+        Args:
+            data (str): アクセストークン又は属性データ
+
+        Returns:
+            str: メールアドレス
+        """
+        return self.__class__.get_email(data)

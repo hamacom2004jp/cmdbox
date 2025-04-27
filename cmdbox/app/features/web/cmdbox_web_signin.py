@@ -1,9 +1,9 @@
-import urllib.parse
 from cmdbox.app import feature
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 import urllib
+import urllib.parse
 
 
 class Signin(feature.WebFeature):
@@ -83,3 +83,25 @@ class Signin(feature.WebFeature):
             return dict(google=signin_data['oauth2']['providers']['google']['enabled'],
                         github=signin_data['oauth2']['providers']['github']['enabled'],
                         azure=signin_data['oauth2']['providers']['azure']['enabled'],)
+
+        @app.get('/saml/{prov}/{next}')
+        async def saml_login(prov:str, next:str, req:Request, res:Response):
+            """
+            SAML認証のログイン処理を行います
+
+            Args:
+                prov (str): SAMLプロバイダ名
+                next (str): リダイレクト先のURL
+                req (Request): Requestオブジェクト
+                res (Response): Responseオブジェクト
+            """
+            form = await req.form()
+            auth = await web.signin.make_saml(prov, next, form, req, res)
+            return RedirectResponse(url=auth.login())
+
+        @app.get('/saml/enabled')
+        async def saml_enabled(req:Request, res:Response):
+            if web.signin_html_data is None:
+                return dict(azure=False)
+            signin_data = web.signin.get_data()
+            return dict(azure=signin_data['saml']['providers']['azure']['enabled'],)

@@ -59,6 +59,7 @@ $(() => {
     const btn_google = $('.btn-google');
     const btn_github = $('.btn-github');
     const btn_azure = $('.btn-azure');
+    const btn_saml_azure = $('.btn-saml-azure');
     btn_google.off('click').on('click', async (event) => {
         const path = window.location.pathname.replace('/signin', '');
         window.location.href = `../oauth2/google${path}?n=${cmdbox.randam_string(8)}`;
@@ -71,6 +72,10 @@ $(() => {
         const path = window.location.pathname.replace('/signin', '');
         window.location.href = `../oauth2/azure${path}?n=${cmdbox.randam_string(8)}`;
     });
+    btn_saml_azure.off('click').on('click', async (event) => {
+        const path = window.location.pathname.replace('/signin', '');
+        window.location.href = `../saml/azure${path}?n=${cmdbox.randam_string(8)}`;
+    });
     oauth2_enabled().then((res) => {
         if (res.google) btn_google.show();
         else btn_google.hide();
@@ -78,6 +83,10 @@ $(() => {
         else btn_github.hide();
         if (res.azure) btn_azure.show();
         else btn_azure.hide();
+    });
+    saml_enabled().then((res) => {
+        if (res.azure) btn_saml_azure.show();
+        else btn_saml_azure.hide();
     });
 });
 const get_client_data = async () => {
@@ -90,5 +99,9 @@ const bbforce_cmd = async () => {
 }
 const oauth2_enabled = async () => {
     const res = await fetch('../oauth2/enabled', {method: 'GET'});
+    return await res.json();
+}
+const saml_enabled = async () => {
+    const res = await fetch('../saml/enabled', {method: 'GET'});
     return await res.json();
 }

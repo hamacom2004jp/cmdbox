@@ -63,7 +63,7 @@ users.users_list = async () => {
                 const row = $(modal.find('.row_content_template_choice').html()).appendTo(row_content);
                 row_content.find('.row_content_template_title').removeClass('row_content_template_title').text(col);
                 const select = row_content.find('.row_content_template_select').removeClass('row_content_template_select');
-                for (const h of ['', 'oauth2', 'plain', 'md5', 'sha1', 'sha256']) {
+                for (const h of ['', 'oauth2', 'saml', 'plain', 'md5', 'sha1', 'sha256']) {
                     $('<option>').text(h).val(h).appendTo(select);
                 }
                 select.attr('name', col).val(user && user[col] ? user[col] : '');
