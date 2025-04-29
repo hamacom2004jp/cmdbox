@@ -96,12 +96,12 @@ class Signin(feature.WebFeature):
                 res (Response): Responseオブジェクト
             """
             form = await req.form()
-            auth = await web.signin.make_saml(prov, next, form, req, res)
+            auth = await web.signin_saml.make_saml(prov, next, form, req, res)
             return RedirectResponse(url=auth.login())
 
         @app.get('/saml/enabled')
         async def saml_enabled(req:Request, res:Response):
             if web.signin_html_data is None:
                 return dict(azure=False)
-            signin_data = web.signin.get_data()
+            signin_data = web.signin_saml.get_data()
             return dict(azure=signin_data['saml']['providers']['azure']['enabled'],)

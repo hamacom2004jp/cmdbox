@@ -8,7 +8,6 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import os
-import time
 
 
 class Feature(object):

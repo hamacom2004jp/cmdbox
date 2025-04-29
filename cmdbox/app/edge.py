@@ -3,7 +3,6 @@ from cmdbox.app.auth import signin, signin_saml, azure_signin, azure_signin_saml
 from cmdbox.app.commons import convert
 from cmdbox.app.options import Options
 from fastapi import FastAPI, Request, HTTPException
-from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from pathlib import Path
 from PIL import Image
 from typing import Dict, List, Tuple, Any, Union
@@ -716,6 +715,7 @@ class Edge(object):
                     post_data=dict(),
                     get_data=dict(n=common.random_string(8)),
                 )
+                from onelogin.saml2.auth import OneLogin_Saml2_Auth
                 auth = OneLogin_Saml2_Auth(request_data=request_data, old_settings=saml_settings)
 
                 # SAML認証のコールバックを受けるFastAPIサーバーを起動

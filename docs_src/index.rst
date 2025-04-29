@@ -21,6 +21,7 @@ cmdbox
    Features <docs/features.rst>
    Authentication <docs/authentication.rst>
    Developer Information <docs/developer.rst>
+   Common Errors <docs/errors.rst>
    License <docs/license.rst>
 
 Indices and tables

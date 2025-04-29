@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MIT License &mdash; cmdbox 2025/04/29 documentation</title>
+  <title>Common Errors &mdash; cmdbox 2025/04/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -20,7 +20,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Common Errors" href="errors.html" /> 
+    <link rel="next" title="MIT License" href="license.html" />
+    <link rel="prev" title="Developer Information" href="developer.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -49,8 +50,8 @@
 <li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Information</a></li>
-<li class="toctree-l1"><a class="reference internal" href="errors.html">Common Errors</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">License</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 </ul>
 
         </div>
@@ -67,9 +68,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">MIT License</li>
+      <li class="breadcrumb-item active">Common Errors</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/docs/license.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/docs/errors.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -77,31 +78,36 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="mit-license">
-<h1>MIT License<a class="headerlink" href="#mit-license" title="Link to this heading"></a></h1>
-<p>Copyright (c) 2023-2024 hamacom2004jp All Rights Reserved.</p>
-<p>Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the &quot;Software&quot;), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:</p>
-<p>The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.</p>
-<p>THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.</p>
+  <section id="common-errors">
+<h1>Common Errors<a class="headerlink" href="#common-errors" title="Link to this heading"></a></h1>
+<p>The causes of the errors and how to deal with them are described.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><dl class="field-list simple">
+<dt class="field-odd">header<span class="colon">:</span></dt>
+<dd class="field-odd"><p>&quot;Operation&quot;</p>
+</dd>
+</dl>
+</td>
+<td><p>Message</p></td>
+<td><p>Cause</p></td>
+<td><p>How to</p></td>
+</tr>
+<tr class="row-even"><td><p><cite>pip install cmdbox</cite></p></td>
+<td><p>error: xmlsec1 is not installed or not in path.</p></td>
+<td><p><cite>xmlsec</cite> is not installed.</p></td>
+<td><p>Install development libraries with <cite>sudo apt install libxmlsec1-dev</cite></p></td>
+</tr>
+</tbody>
+</table>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="errors.html" class="btn btn-neutral float-left" title="Common Errors" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="developer.html" class="btn btn-neutral float-left" title="Developer Information" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="license.html" class="btn btn-neutral float-right" title="MIT License" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

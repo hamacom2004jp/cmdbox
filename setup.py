@@ -16,6 +16,7 @@ VERSION = version.__version__
 PYTHON_REQUIRES = '>=3.8'
 INSTALL_REQUIRES = [
     'argcomplete',
+    'async-timeout',
     'cryptography',
     'fastapi',
     'gevent',
@@ -27,7 +28,7 @@ INSTALL_REQUIRES = [
     'psycopg[binary]',
     'pystray',
     'python-multipart',
-    'python3-saml',
+    #'python3-saml',
     'pycryptodome',
     'questionary',
     'redis',
@@ -36,6 +37,7 @@ INSTALL_REQUIRES = [
     'tabulate',
     'uvicorn[standard]',
     'wheel',
+    #'xmlsec==1.3.13',
 ]
 PACKAGES = [
     'cmdbox',

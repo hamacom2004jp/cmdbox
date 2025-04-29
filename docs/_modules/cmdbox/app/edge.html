@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.edge &mdash; cmdbox 2025/04/27 documentation</title>
+  <title>cmdbox.app.edge &mdash; cmdbox 2025/04/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=5d689768"></script>
+      <script src="../../../_static/documentation_options.js?v=110ab0b3"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/authentication.html">Authentication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/errors.html">Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/license.html">License</a></li>
 </ul>
 
@@ -80,7 +81,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Options</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">HTTPException</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">onelogin.saml2.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">OneLogin_Saml2_Auth</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
@@ -818,6 +818,7 @@
                     <span class="n">post_data</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
                     <span class="n">get_data</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">random_string</span><span class="p">(</span><span class="mi">8</span><span class="p">)),</span>
                 <span class="p">)</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">onelogin.saml2.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">OneLogin_Saml2_Auth</span>
                 <span class="n">auth</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Auth</span><span class="p">(</span><span class="n">request_data</span><span class="o">=</span><span class="n">request_data</span><span class="p">,</span> <span class="n">old_settings</span><span class="o">=</span><span class="n">saml_settings</span><span class="p">)</span>
 
                 <span class="c1"># SAML認証のコールバックを受けるFastAPIサーバーを起動</span>
@@ -1037,7 +1038,7 @@
                 <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">/oauth2/azure/session/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;access_token&#39;</span><span class="p">]</span><span class="si">}{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="s2">&quot;Open browser.&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;auth_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;saml&quot;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">oauth2</span> <span class="o">==</span> <span class="s1">&#39;azure&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">saml</span> <span class="o">==</span> <span class="s1">&#39;azure&#39;</span><span class="p">:</span>
                 <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">/saml/azure/session/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;saml_token&#39;</span><span class="p">]</span><span class="si">}{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="s2">&quot;Open browser.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s2">&quot;unsupported auth_type.&quot;</span><span class="p">)</span></div>

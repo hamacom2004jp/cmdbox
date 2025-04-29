@@ -1,7 +1,6 @@
 from cmdbox.app import common, options
 from fastapi import Request, Response, HTTPException
 from fastapi.responses import RedirectResponse
-from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import copy
@@ -158,43 +157,6 @@ class Signin(object):
             return None
         self.logger.warning(f"Unauthorized site. user={find_user['name']}, path={req.url.path}")
         return RedirectResponse(url=f'/signin{req.url.path}?error=unauthorizedsite')
-
-    async def make_saml(self, prov:str, next:str, form_data:Dict[str, Any], req:Request, res:Response) -> OneLogin_Saml2_Auth:
-        """
-        SAML認証のリダイレクトURLを取得する
-        Args:
-            prov (str): プロバイダ名
-            next (str): リダイレクト先のURL
-            req (Request): リクエスト
-            res (Response): レスポンス
-        Returns:
-            OneLogin_Saml2_Auth: SAML認証オブジェクト
-        """
-        sd = self.get_data()
-        saml_settings = dict(
-            strict=False,
-            debug=self.logger.level==logging.DEBUG,
-            idp=sd['saml']['providers'][prov]['idp'],
-            sp=sd['saml']['providers'][prov]['sp'])
-        # SAML認証のリダイレクトURLを取得
-        request_data = dict(
-            https='on' if req.url.scheme=='https' else 'off',
-            http_host=req.client.host,
-            server_port=req.url.port,
-            script_name=f'{req.url.path}?next={next}',
-            post_data=dict(),
-            get_data=dict(),
-        )
-        if (req.query_params):
-            request_data["get_data"] = req.query_params,
-        if "SAMLResponse" in form_data:
-            SAMLResponse = form_data["SAMLResponse"]
-            request_data["post_data"]["SAMLResponse"] = SAMLResponse
-        if "RelayState" in form_data:
-            RelayState = form_data["RelayState"]
-            request_data["post_data"]["RelayState"] = RelayState
-        auth = OneLogin_Saml2_Auth(request_data=request_data, old_settings=saml_settings)
-        return auth
 
     @classmethod
     def load_signin_file(cls, signin_file:Path, signin_file_data:Dict[str, Any]=None) -> Dict[str, Any]:

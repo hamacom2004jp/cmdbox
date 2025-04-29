@@ -1,4 +1,5 @@
 argcomplete
+async-timeout
 collectlicense
 cryptography
 fastapi
@@ -8,7 +9,7 @@ itsdangerous
 numpy
 Pillow
 python-multipart
-python3-saml
+#python3-saml
 pycryptodome
 plyer             # For desktop notifications
 psycopg[binary]
@@ -27,3 +28,4 @@ tabulate
 twine
 uvicorn[standard]
 wheel
+#xmlsec==1.3.13

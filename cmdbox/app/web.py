@@ -1,5 +1,5 @@
 from cmdbox.app import common, options
-from cmdbox.app.auth.signin import Signin
+from cmdbox.app.auth import signin, signin_saml
 from cmdbox.app.commons import module
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import RedirectResponse
@@ -116,8 +116,9 @@ class Web:
         self.cb_queue = queue.Queue(1000)
         self.options = options.Options.getInstance()
         self.webcap_client = requests.Session()
-        signin_file_data = Signin.load_signin_file(self.signin_file)
-        self.signin = Signin(self.logger, self.signin_file, signin_file_data, self.appcls, self.ver)
+        signin_file_data = signin.Signin.load_signin_file(self.signin_file)
+        self.signin = signin.Signin(self.logger, self.signin_file, signin_file_data, self.appcls, self.ver)
+        self.signin_saml = signin_saml.SigninSAML(self.logger, self.signin_file, signin_file_data, self.appcls, self.ver)
 
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web init parameter: data={self.data} -> {self.data.absolute() if self.data is not None else None}")

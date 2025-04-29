@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.auth.signin_saml &mdash; cmdbox 2025/04/27 documentation</title>
+  <title>cmdbox.app.auth.signin_saml &mdash; cmdbox 2025/04/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=5d689768"></script>
+      <script src="../../../../_static/documentation_options.js?v=110ab0b3"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/authentication.html">Authentication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/errors.html">Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/license.html">License</a></li>
 </ul>
 
@@ -76,8 +77,10 @@
              
   <h1>Source code for cmdbox.app.auth.signin_saml</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.auth.signin</span><span class="w"> </span><span class="kn">import</span> <span class="n">Signin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
 
 <div class="viewcode-block" id="SigninSAML">
@@ -100,6 +103,47 @@
         <span class="n">copy_signin_data</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file_data</span><span class="p">)</span>
         <span class="n">users</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">copy_signin_data</span><span class="p">[</span><span class="s1">&#39;users&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">email</span> <span class="ow">and</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;hash&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;saml&#39;</span><span class="p">]</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">users</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SigninSAML.make_saml">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.auth.html#cmdbox.app.auth.signin_saml.SigninSAML.make_saml">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">make_saml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prov</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="nb">next</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">form_data</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        SAML認証のリダイレクトURLを取得する</span>
+<span class="sd">        Args:</span>
+<span class="sd">            prov (str): プロバイダ名</span>
+<span class="sd">            next (str): リダイレクト先のURL</span>
+<span class="sd">            req (Request): リクエスト</span>
+<span class="sd">            res (Response): レスポンス</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            OneLogin_Saml2_Auth: SAML認証オブジェクト</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+        <span class="n">saml_settings</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span><span class="o">==</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+            <span class="n">idp</span><span class="o">=</span><span class="n">sd</span><span class="p">[</span><span class="s1">&#39;saml&#39;</span><span class="p">][</span><span class="s1">&#39;providers&#39;</span><span class="p">][</span><span class="n">prov</span><span class="p">][</span><span class="s1">&#39;idp&#39;</span><span class="p">],</span>
+            <span class="n">sp</span><span class="o">=</span><span class="n">sd</span><span class="p">[</span><span class="s1">&#39;saml&#39;</span><span class="p">][</span><span class="s1">&#39;providers&#39;</span><span class="p">][</span><span class="n">prov</span><span class="p">][</span><span class="s1">&#39;sp&#39;</span><span class="p">])</span>
+        <span class="c1"># SAML認証のリダイレクトURLを取得</span>
+        <span class="n">request_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">https</span><span class="o">=</span><span class="s1">&#39;on&#39;</span> <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">scheme</span><span class="o">==</span><span class="s1">&#39;https&#39;</span> <span class="k">else</span> <span class="s1">&#39;off&#39;</span><span class="p">,</span>
+            <span class="n">http_host</span><span class="o">=</span><span class="n">req</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
+            <span class="n">server_port</span><span class="o">=</span><span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+            <span class="n">script_name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">?next=</span><span class="si">{</span><span class="nb">next</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="n">post_data</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+            <span class="n">get_data</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">query_params</span><span class="p">):</span>
+            <span class="n">request_data</span><span class="p">[</span><span class="s2">&quot;get_data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">query_params</span><span class="p">,</span>
+        <span class="k">if</span> <span class="s2">&quot;SAMLResponse&quot;</span> <span class="ow">in</span> <span class="n">form_data</span><span class="p">:</span>
+            <span class="n">SAMLResponse</span> <span class="o">=</span> <span class="n">form_data</span><span class="p">[</span><span class="s2">&quot;SAMLResponse&quot;</span><span class="p">]</span>
+            <span class="n">request_data</span><span class="p">[</span><span class="s2">&quot;post_data&quot;</span><span class="p">][</span><span class="s2">&quot;SAMLResponse&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SAMLResponse</span>
+        <span class="k">if</span> <span class="s2">&quot;RelayState&quot;</span> <span class="ow">in</span> <span class="n">form_data</span><span class="p">:</span>
+            <span class="n">RelayState</span> <span class="o">=</span> <span class="n">form_data</span><span class="p">[</span><span class="s2">&quot;RelayState&quot;</span><span class="p">]</span>
+            <span class="n">request_data</span><span class="p">[</span><span class="s2">&quot;post_data&quot;</span><span class="p">][</span><span class="s2">&quot;RelayState&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">RelayState</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">onelogin.saml2.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">OneLogin_Saml2_Auth</span>
+        <span class="n">auth</span> <span class="o">=</span> <span class="n">OneLogin_Saml2_Auth</span><span class="p">(</span><span class="n">request_data</span><span class="o">=</span><span class="n">request_data</span><span class="p">,</span> <span class="n">old_settings</span><span class="o">=</span><span class="n">saml_settings</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">auth</span></div>
 </div>
 
 </pre></div>
