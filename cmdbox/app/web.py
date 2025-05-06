@@ -31,7 +31,7 @@ class Web:
     def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None,
                  redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server',
                  client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None, result_html:str=None, users_html:str=None,
-                 audit_html:str=None, assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
+                 audit_html:str=None, agent_html:str=None, assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
                  web_features_packages:List[str]=None, web_features_prefix:List[str]=None):
         """
         cmdboxクライアント側のwebapiサービス
@@ -52,6 +52,7 @@ class Web:
             result_html (str, optional): 結果のHTMLファイル. Defaults to None.
             users_html (str, optional): ユーザーのHTMLファイル. Defaults to None.
             audit_html (str, optional): 監査のHTMLファイル. Defaults to None.
+            agent_html (str, optional): エージェントのHTMLファイル. Defaults to None.
             assets (List[str], optional): 静的ファイルのリスト. Defaults to None.
             signin_html (str, optional): ログイン画面のHTMLファイル. Defaults to None.
             signin_file (str, optional): ログイン情報のファイル. Defaults to args.signin_file.
@@ -78,6 +79,7 @@ class Web:
         self.result_html = Path(result_html) if result_html is not None else Path(__file__).parent.parent / 'web' / 'result.html'
         self.users_html = Path(users_html) if users_html is not None else Path(__file__).parent.parent / 'web' / 'users.html'
         self.audit_html = Path(audit_html) if audit_html is not None else Path(__file__).parent.parent / 'web' / 'audit.html'
+        self.agent_html = Path(agent_html) if agent_html is not None else Path(__file__).parent.parent / 'web' / 'agent.html'
         self.assets = []
         if assets is not None:
             if not isinstance(assets, list):
@@ -97,6 +99,7 @@ class Web:
         self.result_html_data = None
         self.users_html_data = None
         self.audit_html_data = None
+        self.agent_html_data = None
         self.assets_data = None
         self.signin_html_data = None
         self.gui_mode = gui_mode
@@ -106,11 +109,13 @@ class Web:
         self.pipes_path = self.data / ".pipes"
         self.users_path = self.data / ".users"
         self.audit_path = self.data / '.audit'
+        self.agent_path = self.data / '.agent'
         self.static_root = Path(__file__).parent.parent / 'web'
         common.mkdirs(self.cmds_path)
         common.mkdirs(self.pipes_path)
         common.mkdirs(self.users_path)
         common.mkdirs(self.audit_path)
+        common.mkdirs(self.agent_path)
         self.pipe_th = None
         self.img_queue = queue.Queue(1000)
         self.cb_queue = queue.Queue(1000)
@@ -132,6 +137,7 @@ class Web:
             self.logger.debug(f"web init parameter: result_html={self.result_html} -> {self.result_html.absolute() if self.result_html is not None else None}")
             self.logger.debug(f"web init parameter: users_html={self.users_html} -> {self.users_html.absolute() if self.users_html is not None else None}")
             self.logger.debug(f"web init parameter: audit_html={self.audit_html} -> {self.audit_html.absolute() if self.audit_html is not None else None}")
+            self.logger.debug(f"web init parameter: agent_html={self.agent_html} -> {self.agent_html.absolute() if self.agent_html is not None else None}")
             self.logger.debug(f"web init parameter: assets={self.assets} -> {[a.absolute() for a in self.assets] if self.assets is not None else None}")
             self.logger.debug(f"web init parameter: signin_html={self.signin_html} -> {self.signin_html.absolute() if self.signin_html is not None else None}")
             self.logger.debug(f"web init parameter: signin_file={self.signin_file} -> {self.signin_file.absolute() if self.signin_file is not None else None}")
@@ -141,6 +147,8 @@ class Web:
             self.logger.debug(f"web init parameter: cmds_path={self.cmds_path} -> {self.cmds_path.absolute() if self.cmds_path is not None else None}")
             self.logger.debug(f"web init parameter: pipes_path={self.pipes_path} -> {self.pipes_path.absolute() if self.pipes_path is not None else None}")
             self.logger.debug(f"web init parameter: users_path={self.users_path} -> {self.users_path.absolute() if self.users_path is not None else None}")
+            self.logger.debug(f"web init parameter: audit_path={self.audit_path} -> {self.audit_path.absolute() if self.audit_path is not None else None}")
+            self.logger.debug(f"web init parameter: agent_path={self.agent_path} -> {self.agent_path.absolute() if self.agent_path is not None else None}")
 
     def init_webfeatures(self, app:FastAPI):
         self.filemenu = dict()
@@ -666,7 +674,8 @@ class Web:
     def start(self, allow_host:str="0.0.0.0", listen_port:int=8081, ssl_listen_port:int=8443,
               ssl_cert:Path=None, ssl_key:Path=None, ssl_keypass:str=None, ssl_ca_certs:Path=None,
               session_domain:str=None, session_path:str='/', session_secure:bool=False, session_timeout:int=900, outputs_key:List[str]=[],
-              guvicorn_workers:int=-1, guvicorn_timeout:int=30):
+              guvicorn_workers:int=-1, guvicorn_timeout:int=30,
+              agent_runner=None):
         """
         Webサーバを起動する
 
@@ -685,6 +694,7 @@ class Web:
             outputs_key (list, optional): 出力キー. Defaults to [].
             guvicorn_workers (int, optional): Gunicornワーカー数. Defaults to -1.
             guvicorn_timeout (int, optional): Gunicornタイムアウト. Defaults to 30.
+            agent_runner (Runner, optional): エージェントランナー. Defaults to None.
         """
         self.allow_host = allow_host
         self.listen_port = listen_port
@@ -700,6 +710,7 @@ class Web:
         self.session_timeout = session_timeout
         self.guvicorn_workers = guvicorn_workers
         self.guvicorn_timeout = guvicorn_timeout
+        self.agent_runner = agent_runner
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web start parameter: allow_host={self.allow_host}")
             self.logger.debug(f"web start parameter: listen_port={self.listen_port}")
@@ -715,6 +726,71 @@ class Web:
             self.logger.debug(f"web start parameter: session_timeout={self.session_timeout}")
             self.logger.debug(f"web start parameter: guvicorn_worker={self.guvicorn_workers}")
             self.logger.debug(f"web start parameter: guvicorn_timeout={self.guvicorn_timeout}")
+            self.logger.debug(f"web start parameter: agent_runner={self.agent_runner}")
+
+        if self.agent_runner is not None:
+            # google.adkが大きいので必要な時にだけ読込む
+            from google.adk.sessions import BaseSessionService, Session
+            def create_agent_session(session_service:BaseSessionService, user_id:str, session_id:str=None) -> Session:
+                """
+                セッションを作成します
+
+                Args:
+                    session_service (BaseSessionService): セッションサービス
+                    user_id (str): ユーザーID
+                    session_id (str): セッションID
+
+                Returns:
+                    Any: セッション
+                """
+                if session_id is None:
+                    session_id = common.random_string(32)
+                    session = session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
+                if session is None:
+                    session = session_service.create_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
+                return session
+            self.create_agent_session = create_agent_session
+            def list_agent_sessions(session_service:BaseSessionService, user_id:str) -> List[Session]:
+                """
+                セッションをリストします
+
+                Args:
+                    session_service (BaseSessionService): セッションサービス
+                    user_id (str): ユーザーID
+
+                Returns:
+                    List[Session]: セッションリスト
+                """
+                return session_service.list_sessions(app_name=self.ver.__appid__, user_id=user_id).sessions
+            self.list_agent_sessions = list_agent_sessions
+            def delete_agent_session(session_service:BaseSessionService, user_id:str, session_id:str) -> bool:
+                """
+                セッションを削除します
+
+                Args:
+                    session_service (BaseSessionService): セッションサービス
+                    user_id (str): ユーザーID
+                    session_id (str): セッションID
+
+                Returns:
+                    bool: 成功した場合はTrue, 失敗した場合はFalse
+                """
+                return session_service.delete_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
+            self.delete_agent_session = delete_agent_session
+            def list_agent_events(session_service:BaseSessionService, user_id:str, session_id:str) -> List[Dict[str, Any]]:
+                """
+                セッションのイベントをリストします
+
+                Args:
+                    session_service (BaseSessionService): セッションサービス
+                    user_id (str): ユーザーID
+                    session_id (str): セッションID
+
+                Returns:
+                    List[Dict[str, Any]]: イベントリスト
+                """
+                return session_service.list_events(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
+            self.list_agent_events = list_agent_events
 
         app = FastAPI()
         @app.middleware("http")
@@ -778,6 +854,7 @@ class Web:
             traceback.print_exc()
         finally:
             self.logger.info(f"Exit web.")
+
 
 class ThreadedUvicorn:
     def __init__(self, logger:logging.Logger, config:Config, guvicorn_config:Dict[str, Any]):

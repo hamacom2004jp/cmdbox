@@ -62,19 +62,19 @@ $(() => {
     const btn_saml_azure = $('.btn-saml-azure');
     btn_google.off('click').on('click', async (event) => {
         const path = window.location.pathname.replace('/signin', '');
-        window.location.href = `../oauth2/google${path}?n=${cmdbox.randam_string(8)}`;
+        window.location.href = `../oauth2/google${path}?n=${cmdbox.random_string(8)}`;
     });
     btn_github.off('click').on('click', async (event) => {
         const path = window.location.pathname.replace('/signin', '');
-        window.location.href = `../oauth2/github${path}?n=${cmdbox.randam_string(8)}`;
+        window.location.href = `../oauth2/github${path}?n=${cmdbox.random_string(8)}`;
     });
     btn_azure.off('click').on('click', async (event) => {
         const path = window.location.pathname.replace('/signin', '');
-        window.location.href = `../oauth2/azure${path}?n=${cmdbox.randam_string(8)}`;
+        window.location.href = `../oauth2/azure${path}?n=${cmdbox.random_string(8)}`;
     });
     btn_saml_azure.off('click').on('click', async (event) => {
         const path = window.location.pathname.replace('/signin', '');
-        window.location.href = `../saml/azure${path}?n=${cmdbox.randam_string(8)}`;
+        window.location.href = `../saml/azure${path}?n=${cmdbox.random_string(8)}`;
     });
     oauth2_enabled().then((res) => {
         if (res.google) btn_google.show();

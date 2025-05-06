@@ -4,6 +4,7 @@ from cmdbox.app.features.cli import cmdbox_audit_search, cmdbox_audit_write
 from cmdbox.app.features.web import cmdbox_web_load_cmd
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
+from fastapi.responses import PlainTextResponse
 from starlette.datastructures import UploadFile
 from typing import Dict, Any, List
 import html
@@ -234,6 +235,8 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     except:
                         ret = ret_main
                 if nothread:
+                    if isinstance(ret, str):
+                        return PlainTextResponse(ret, media_type='text/plain')
                     return ret
                 self.callback_return_cmd_exec_func(web, title, ret)
             except:

@@ -76,7 +76,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature):
                      test_true={"server":None,
                                 "client":common.HOME_DIR / f".{self.ver.__appid__}",
                                 "current":None}),
-                dict(opt="img_thumbnail", type=Options.T_FLOAT, default=None, required=False, multi=False, hide=True, choice=None,
+                dict(opt="img_thumbnail", type=Options.T_FLOAT, default=0.0, required=False, multi=False, hide=True, choice=None,
                      discription_ja="対象が画像だった場合のサムネイルのピクセル単位のサイズを指定します。",
                      discription_en="Specifies the size in pixels of the thumbnail if the subject is an image."),
                 dict(opt="retry_count", type=Options.T_INT, default=3, required=False, multi=False, hide=True, choice=None,

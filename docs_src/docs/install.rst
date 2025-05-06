@@ -18,6 +18,12 @@ Install
     pip install xmlsec==1.3.13 python3-saml
     apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl build-essential libopencv-dev
 
+- When using `--agent use` in web mode, install the modules with dependencies.
+
+.. code-block:: bash
+
+    pip install google-adk litellm
+
 - Also install the docker version of the redis server.
 
 .. code-block:: bash

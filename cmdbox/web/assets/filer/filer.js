@@ -420,7 +420,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
               const opt = cmdbox.get_server_opt(false, fsapi.right);
               const thum_size = "0";
               const constr = btoa(`${opt['host']}\t${opt['port']}\t${opt['svname']}\t${opt['password']}\t${encodeURIComponent(_p)}\t${opt['scope']}\t${thum_size}`);
-              fsapi.viewer(_p, res['data'], `filer/download/${constr}?r=${cmdbox.randam_string(8)}`, _mime);
+              fsapi.viewer(_p, res['data'], `filer/download/${constr}?r=${cmdbox.random_string(8)}`, _mime);
             }
           }).finally(() => {
             cmdbox.hide_loading();

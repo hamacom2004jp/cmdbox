@@ -6,7 +6,9 @@ from pathlib import Path
 from psycopg.rows import dict_row
 from typing import Dict, Any, Tuple, List, Union
 import argparse
+import csv
 import logging
+import io
 import json
 import sys
 
@@ -99,6 +101,9 @@ class AuditSearch(audit_base.AuditBase):
             dict(opt="limit", type=Options.T_INT, default=100, required=False, multi=False, hide=False, choice=None,
                  discription_ja="取得する行数を指定します。",
                  discription_en="Specifies the number of rows to retrieve."),
+            dict(opt="csv", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[False, True],
+                 discription_ja="検索結果をcsvで出力します。",
+                 discription_en="Output search results in csv.")
         ]
         return opt
 
@@ -173,21 +178,39 @@ class AuditSearch(audit_base.AuditBase):
                                      filter_clmsg_tag_b64, filter_svmsg_id_b64, filter_svmsg_sdate_b64, filter_svmsg_edate_b64,
                                      pg_enabled, pg_host_b64, pg_port, pg_user_b64, pg_password_b64, pg_dbname_b64],
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
-        common.print_format(ret, getattr(args, 'format', False), tm, None, False, pf=pf)
 
         if 'success' not in ret:
+            common.print_format(ret, getattr(args, 'format', False), tm, None, False, pf=pf)
             return 1, ret, cl
 
         if 'data' in ret['success']:
+            cols = list()
             for row in ret['success']['data']:
+                cols += row.keys()
                 try:
                     row['clmsg_tag'] = json.loads(row['clmsg_tag'])
                 except:
                     pass
                 try:
                     row['clmsg_body'] = json.loads(row['clmsg_body'])
+                    cols += row['clmsg_body'].keys() if isinstance(row['clmsg_body'], dict) else {}
                 except:
                     pass
+                cols = sorted(set(cols), key=cols.index)
+            if hasattr(args, "csv") and args.csv:
+                if hasattr(cols, 'clmsg_body'):
+                    del cols['clmsg_body']
+                buf = io.StringIO()
+                w = csv.DictWriter(buf, fieldnames=cols, quoting=csv.QUOTE_MINIMAL)
+                w.writeheader()
+                for row in ret['success']['data']:
+                    body = row.pop('clmsg_body', {})
+                    row.update(body)
+                    w.writerow(row)
+                ret = buf.getvalue()
+                ret = ret.replace('\r\n', '\n') if ret is not None else ''
+
+        common.print_format(ret, getattr(args, 'format', False), tm, None, False, pf=pf)
 
         return 0, ret, cl
 

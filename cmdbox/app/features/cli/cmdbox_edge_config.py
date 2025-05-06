@@ -40,7 +40,7 @@ class EdgeConfig(feature.UnsupportEdgeFeature):
                 dict(opt="endpoint", type=Options.T_STR, default="http://localhost:8081", required=False, multi=False, hide=False, choice=None,
                      discription_ja="エンドポイントのURLを指定します。",
                      discription_en="Specify the URL of the endpoint."),
-                dict(opt="icon_path", type=Options.T_STR, default=Path(self.ver.__file__).parent / 'web' / 'assets' / self.ver.__appid__ / 'favicon.ico',
+                dict(opt="icon_path", type=Options.T_FILE, default=Path(self.ver.__file__).parent / 'web' / 'assets' / self.ver.__appid__ / 'favicon.ico',
                      required=False, multi=False, hide=False, choice=None,
                      discription_ja="アイコン画像のパスを指定します。",
                      discription_en="Specify the path to the icon image."),

@@ -4,8 +4,10 @@ collectlicense
 cryptography
 fastapi
 gevent
+#google-adk
 gunicorn
 itsdangerous
+#litellm
 numpy
 Pillow
 python-multipart

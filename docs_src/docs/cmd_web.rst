@@ -154,6 +154,20 @@ Web Service Launch : `cmdbox -m web -c start <Option>`
     "--users_html <users.html file path>","","Specify `users.html`. If omitted, the cmdbox built-in HTML file is used."
     "--assets <Path to js and css files>","","Specify the asset file required when using html files."
     "--signin_html <signin.html file path>","","Specify `signin.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--agent <use>","","Specifies whether the agent is used. `no` or `use` can be specified."
+    "--agent_name <name>","","Specifies the agent name."
+    "--agent_description <description>","","Specify agent description."
+    "--agent_instruction <instruction>","","Specifies the agent's system instructions."
+    "--llmprov <provider>","","Specify llm provider."
+    "--llmprojectid <projectid>","","Specify the project ID for llm's provider connection."
+    "--llmsvaccountfile <file>","","Specifies the service account file for llm's provider connection."
+    "--llmlocation <location>","","Specifies the location for llm provider connections."
+    "--llmapikey <apikey>","","Specify API key for llm provider connection."
+    "--llmapiversion <apiver>","","Specifies the API version for llm provider connections."
+    "--llmendpoint <endpoint>","","Specifies the endpoint for llm provider connections."
+    "--llmmodel <model>","","Specifies the llm model."
+    "--llmseed <seed>","","Specifies the seed value when using llm model."
+    "--llmtemperature <temperature>","","Specifies the temperature when using llm model."
 
 
 Web Service Stops : `cmdbox -m web -c stop <Option>`
