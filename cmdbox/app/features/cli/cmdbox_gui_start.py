@@ -22,6 +22,7 @@ class GuiStart(cmdbox_web_start.WebStart):
             Dict[str, Any]: オプション
         """
         opt = super().get_option()
+        opt['use_agent'] = False
         opt['discription_ja'] = "GUIモードを起動します。"
         opt['discription_en'] = "Start GUI mode."
         return opt

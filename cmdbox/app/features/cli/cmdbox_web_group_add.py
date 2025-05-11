@@ -33,7 +33,7 @@ class WebGroupAdd(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False, use_agent=False,
             discription_ja="Webモードのグループを追加します。",
             discription_en="Add a group in Web mode.",
             choice=[
@@ -49,7 +49,7 @@ class WebGroupAdd(feature.UnsupportEdgeFeature):
                 dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",
                      discription_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
                      discription_en="Specify the service name of the inference server. If omitted, `server` is used."),
-                dict(opt="data", type=Options.T_FILE, default=common.HOME_DIR / f".{self.ver.__appid__}", required=False, multi=False, hide=False, choice=None,
+                dict(opt="data", type=Options.T_FILE, default=self.default_data, required=False, multi=False, hide=False, choice=None,
                      discription_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
                      discription_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
                 dict(opt="group_id", type=Options.T_INT, default=None, required=True, multi=False, hide=False, choice=None,

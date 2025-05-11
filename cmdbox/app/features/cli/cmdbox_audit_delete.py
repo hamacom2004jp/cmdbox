@@ -38,6 +38,7 @@ class AuditDelete(audit_base.AuditBase):
             Dict[str, Any]: オプション
         """
         opt = super().get_option()
+        opt['use_agent'] = False
         opt['discription_ja'] = "監査ログを削除します。"
         opt['discription_en'] = "Delete the audit log."
         opt['choice'] += [

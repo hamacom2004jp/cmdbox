@@ -52,9 +52,18 @@ class Agent(feature.WebFeature):
             if 'signin' in req.session:
                 user_id = req.session['signin']['name']
             sessions = web.list_agent_sessions(web.agent_runner.session_service, user_id)
-            sessions = [dict(id=s.id, app_name=s.app_name, user_id=s.user_id, last_update_time=s.last_update_time,
-                             events=[dict(author=ev.author,text=ev.content.parts[0].text) for ev in s.events if ev.content and ev.content.parts]) for s in sessions]
-            return dict(success=sessions)
+            #data = []
+            #for s in sessions:
+            #    d = dict(id=s.id, app_name=s.app_name, user_id=s.user_id, last_update_time=s.last_update_time)
+            #    data.append(d)
+            #    elist = web.list_agent_events(web.agent_runner.session_service, user_id, s.id)
+            #    d['events'] = []
+            #    for e in elist:
+            #        if e.content and e.content.parts:
+            #            d['events'].append(dict(author=e.author, text=e.content.parts[0].text))
+            data = [dict(id=s.id, app_name=s.app_name, user_id=s.user_id, last_update_time=s.last_update_time,
+                         events=[dict(author=ev.author,text=ev.content.parts[0].text) for ev in s.events if ev.content and ev.content.parts]) for s in sessions]
+            return dict(success=data)
 
         @app.websocket('/agent/chat')
         @app.websocket('/agent/chat/{session_id}')
@@ -67,8 +76,10 @@ class Agent(feature.WebFeature):
             web.logger.info(f"agent_chat: connected")
             # ユーザー名を取得する
             user_id = common.random_string(16)
+            groups = []
             if 'signin' in websocket.session:
                 user_id = websocket.session['signin']['name']
+                groups = websocket.session['signin']['groups']
             # これを行わねば非同期処理にならない。。
             await websocket.accept()
             # 言語認識
@@ -86,9 +97,24 @@ class Agent(feature.WebFeature):
                     if query is None or query == '' or query == 'ping':
                         time.sleep(0.5)
                         continue
+                    if is_japan:
+                        query += f"なお現在のユーザーは'{user_id}'でgroupsは'{groups}'ですので引数に必要な時は指定してください。"
+                            #f"またコマンド実行に必要なパラメータを確認し、以下の引数が必要な場合はこの値を使用してください。\n" + \
+                            #f"  host = {web.redis_host if web.redis_host else self.default_host}\n" + \
+                            #f", port = {web.redis_port if web.redis_port else self.default_port}\n" + \
+                            #f", password = {web.redis_password if web.redis_password else self.default_pass}\n" + \
+                            #f", svname = {web.svname if web.svname else self.default_svname}\n"
+                    else:
+                        query += f"The current user is '{user_id}' and the groups is '{groups}', so please specify it when necessary."
+                            #f"Also check the parameters required to execute the command and use these values if the following arguments are required.\n" + \
+                            #f"  host = {web.redis_host if web.redis_host else self.default_host}\n" + \
+                            #f", port = {web.redis_port if web.redis_port else self.default_port}\n" + \
+                            #f", password = {web.redis_password if web.redis_password else self.default_pass}\n" + \
+                            #f", svname = {web.svname if web.svname else self.default_svname}\n"
                     content = types.Content(role='user', parts=[types.Part(text=query)])
 
                     async for event in web.agent_runner.run_async(user_id=user_id, session_id=agent_session.id, new_message=content):
+                        #web.agent_runner.session_service.append_event(agent_session, event)
                         outputs = dict()
                         if event.turn_complete:
                             outputs['turn_complete'] = True
@@ -96,13 +122,17 @@ class Agent(feature.WebFeature):
                         if event.interrupted:
                             outputs['interrupted'] = True
                             await websocket.send_text(json.dumps(outputs, default=common.default_json_enc))
-                        if event.is_final_response():
-                            if event.content and event.content.parts:
-                                outputs['message'] = event.content.parts[0].text
-                            elif event.actions and event.actions.escalate:
-                                outputs['message'] = f"Agent escalated: {event.error_message or 'No specific message.'}"
+                        #if event.is_final_response():
+                        msg = None
+                        if event.content and event.content.parts:
+                            msg = event.content.parts[0].text
+                        elif event.actions and event.actions.escalate:
+                            msg = f"Agent escalated: {event.error_message or 'No specific message.'}"
+                        if msg:
+                            outputs['message'] = msg
                             await websocket.send_text(json.dumps(outputs, default=common.default_json_enc))
-                            break
+                            if event.is_final_response():
+                                break
                 except WebSocketDisconnect:
                     web.logger.warning('chat: websocket disconnected.')
                     break

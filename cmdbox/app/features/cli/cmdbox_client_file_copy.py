@@ -34,7 +34,7 @@ class ClientFileCopy(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False, use_agent=False,
             discription_ja="サーバー側のデータフォルダ配下のファイルをコピーします。",
             discription_en="Copy the files under the data folder on the server side.",
             choice=[

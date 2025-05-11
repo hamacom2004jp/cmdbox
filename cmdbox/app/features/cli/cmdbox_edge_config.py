@@ -33,7 +33,7 @@ class EdgeConfig(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True, use_agent=False,
             discription_ja="端末モードの設定を行います。",
             discription_en="Set the edge mode.",
             choice=[
@@ -94,7 +94,7 @@ class EdgeConfig(feature.UnsupportEdgeFeature):
                 dict(opt="saml_timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=False, choice=None,
                      discription_ja="SAML認証が完了するまでのタイムアウト時間を指定します。",
                      discription_en="Specify the timeout period before SAML authentication completes."),
-                dict(opt="data", type=Options.T_FILE, default=common.HOME_DIR / f".{self.ver.__appid__}", required=False, multi=False, hide=True, choice=None,
+                dict(opt="data", type=Options.T_FILE, default=self.default_data, required=False, multi=False, hide=True, choice=None,
                      discription_ja=f"省略した時は f`$HONE/.{self.ver.__appid__}` を使用します。",
                      discription_en=f"When omitted, f`$HONE/.{self.ver.__appid__}` is used."),
                 dict(opt="svcert_no_verify", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[False, True],

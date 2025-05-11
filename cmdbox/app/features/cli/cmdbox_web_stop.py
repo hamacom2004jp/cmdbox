@@ -33,11 +33,11 @@ class WebStop(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=True,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=True, use_agent=False,
             discription_ja="Webモードを停止します。",
             discription_en="Stop Web mode.",
             choice=[
-                dict(opt="data", type=Options.T_FILE, default=common.HOME_DIR / f'.{self.ver.__appid__}', required=False, multi=False, hide=False, choice=None,
+                dict(opt="data", type=Options.T_FILE, default=self.default_data, required=False, multi=False, hide=False, choice=None,
                      discription_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
                      discription_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
                 dict(opt="stdout_log", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],

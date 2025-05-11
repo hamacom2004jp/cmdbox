@@ -34,7 +34,7 @@ class ClientFileRmdir(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False, use_agent=False,
             discription_ja="データフォルダ配下のフォルダを削除します。",
             discription_en="Delete a folder under the data folder.",
             choice=[

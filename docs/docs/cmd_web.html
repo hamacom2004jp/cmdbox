@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( web mode ) &mdash; cmdbox 2025/04/29 documentation</title>
+  <title>Command Reference ( web mode ) &mdash; cmdbox 2025/05/11 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=110ab0b3"></script>
+      <script src="../_static/documentation_options.js?v=8d0fcf6a"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -50,6 +50,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Web</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#self-signed-server-certificate-generation-cmdbox-m-web-c-gencert-option">Self-signed server certificate generation : <cite>cmdbox -m web -c gencert &lt;Option&gt;</cite></a></li>
@@ -538,6 +539,62 @@
 <tr class="row-odd"><td><p>--signin_html &lt;signin.html file path&gt;</p></td>
 <td></td>
 <td><p>Specify <cite>signin.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--agent &lt;use&gt;</p></td>
+<td></td>
+<td><p>Specifies whether the agent is used. <cite>no</cite> or <cite>use</cite> can be specified.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--agent_name &lt;name&gt;</p></td>
+<td></td>
+<td><p>Specifies the agent name.</p></td>
+</tr>
+<tr class="row-even"><td><p>--agent_description &lt;description&gt;</p></td>
+<td></td>
+<td><p>Specify agent description.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--agent_instruction &lt;instruction&gt;</p></td>
+<td></td>
+<td><p>Specifies the agent's system instructions.</p></td>
+</tr>
+<tr class="row-even"><td><p>--llmprov &lt;provider&gt;</p></td>
+<td></td>
+<td><p>Specify llm provider.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--llmprojectid &lt;projectid&gt;</p></td>
+<td></td>
+<td><p>Specify the project ID for llm's provider connection.</p></td>
+</tr>
+<tr class="row-even"><td><p>--llmsvaccountfile &lt;file&gt;</p></td>
+<td></td>
+<td><p>Specifies the service account file for llm's provider connection.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--llmlocation &lt;location&gt;</p></td>
+<td></td>
+<td><p>Specifies the location for llm provider connections.</p></td>
+</tr>
+<tr class="row-even"><td><p>--llmapikey &lt;apikey&gt;</p></td>
+<td></td>
+<td><p>Specify API key for llm provider connection.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--llmapiversion &lt;apiver&gt;</p></td>
+<td></td>
+<td><p>Specifies the API version for llm provider connections.</p></td>
+</tr>
+<tr class="row-even"><td><p>--llmendpoint &lt;endpoint&gt;</p></td>
+<td></td>
+<td><p>Specifies the endpoint for llm provider connections.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--llmmodel &lt;model&gt;</p></td>
+<td></td>
+<td><p>Specifies the llm model.</p></td>
+</tr>
+<tr class="row-even"><td><p>--llmseed &lt;seed&gt;</p></td>
+<td></td>
+<td><p>Specifies the seed value when using llm model.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--llmtemperature &lt;temperature&gt;</p></td>
+<td></td>
+<td><p>Specifies the temperature when using llm model.</p></td>
 </tr>
 </tbody>
 </table>

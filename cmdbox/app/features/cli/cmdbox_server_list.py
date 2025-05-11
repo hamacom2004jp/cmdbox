@@ -33,7 +33,7 @@ class ServerList(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=True,
             discription_ja="起動中のサーバーの一覧を表示します。クライアント環境からの利用も可能です。",
             discription_en="Displays a list of running inference servers. Can also be used from the client environment.",
             choice=[

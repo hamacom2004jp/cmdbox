@@ -3,6 +3,7 @@ agent.chat_reconnectInterval_handler = null;
 agent.chat_callback_ping_handler = null;
 agent.init_form = async () => {
     const container = $('#message_container');
+    const histories = $('#histories');
     const messages = $('#messages');
     const agent_chat = (session_id) => {
         // ws再接続のためのインターバル初期化
@@ -28,6 +29,7 @@ agent.init_form = async () => {
             $(`<div class="d-inline-block"></div>`).appendTo(user_message).text(msg);
             $(`<a class="d-inline-block align-top" style="fill:gray;"><svg class="align-top ms-3" width="32" height="32" viewBox="0 0 16 16">`
                 +`<use href="#svg_signin_ico"></use></svg></a>`).appendTo(user_msg_row);
+            agent.create_history(histories, '', msg);
             // エージェント側のメッセージ読込中を表示
             if (!message_id) {
                 message_id = cmdbox.random_string(16);
@@ -70,17 +72,26 @@ agent.init_form = async () => {
             message_id = null;
             try {
                 // エージェントからのメッセージをresult表示できるかやってみる
-                let msg = packet.message.replace(/^```json/g, '').replace(/```$/g, '');
-                msg = JSON.parse(msg);
-                for (const funcName in msg) {
-                    for (const ckey in msg[funcName]) {
+                let rand = cmdbox.random_string(16);
+                let j = packet.message.match(/```json([^(```)]+)```/);
+                j = JSON.parse(j[1]);
+                for (const funcName in j) {
+                    for (const ckey in j[funcName]) {
                         if (ckey == 'content') {
-                            msg[funcName] = JSON.parse(msg[funcName][ckey]);
+                            j[funcName] = JSON.parse(j[funcName][ckey]);
                             break;
                         }
                     }
                 }
-                render_result_func(txt, msg, 100);
+                let msg = packet.message.replace(/^([^(```json)*]+)```json([^(```)]+)```(.+)$/, `$1<span id="${rand}"/>$3`);
+                txt.html(msg);
+                if (txt.find("#rand").length > 0) {
+                    render_result_func(txt.find("#rand"), j, 100);
+                } else {
+                    // 置換に失敗していた場合
+                    txt.html('');
+                    render_result_func(txt, j, 100);
+                }
             } catch (e) {
                 // JSONパースできなかったらそのまま表示
                 let msg = packet.message.replace(/\n/g, '<br>');
@@ -145,20 +156,26 @@ agent.list_sessions = async () => {
     const res = await fetch('agent/session/list', {method: 'GET'});
     if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     res.json().then((res) => {
+        return;
         if (!res['success']) return;
         histories.html('');
         res['success'].forEach(async (row) => {
             if (!row['events'] || row['events'].length <= 0) return;
             const msg = row['events'][0]['text'];
-            const history = $(`<a href="#" class="history pt-2 pb-2 btn_hover"></a>`).appendTo(histories);
-            $(`<span class="d-inline-block align-top ms-2 me-2" style="fill:gray;"><svg class="align-top" width="24" height="24" viewBox="0 0 16 16">`
-                +`<use href="#svg_justify_left"></use></svg></span>`).appendTo(history);
-            $(`<div class="d-inline-block mb-2" style="width:calc(100% - 88px);"></div>`).appendTo(history).text(cell_chop(msg, 40));
-            $(`<button class="btn d-inline-block align-top pt-1 btn_hover" style="fill:gray;"><svg class="align-top" width="16" height="16" viewBox="0 0 16 16">`
-                +`<use href="#btn_three_dots_vertical"></use></svg></button>`).appendTo(history);
+            const history = agent.create_history(histories, row['id'], msg);
         });
     });
 }
+agent.create_history = (histories, session_id, msg) => {
+    msg = cell_chop(msg, 300);
+    const history = $(`<a id="${session_id}" href="#" class="history pt-2 pb-1 d-block btn_hover"></a>`).appendTo(histories);
+    $(`<span class="d-inline-block align-top ms-2 me-2" style="fill:gray;"><svg class="align-top" width="24" height="24" viewBox="0 0 16 16">`
+        +`<use href="#svg_justify_left"></use></svg></span>`).appendTo(history);
+    $(`<div class="d-inline-block mb-2" style="width:calc(100% - 88px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>`).appendTo(history).text(msg);
+    $(`<button class="btn d-inline-block align-top pt-1 btn_hover" style="fill:gray;"><svg class="align-top" width="16" height="16" viewBox="0 0 16 16">`
+        +`<use href="#btn_three_dots_vertical"></use></svg></button>`).off('click').on('click',(e)=>{}).appendTo(history);
+    return history;
+};
 agent.delete_session = async () => {
     const formData = new FormData();
     const res = await fetch('agent/session/list', {method: 'POST', body: formData});

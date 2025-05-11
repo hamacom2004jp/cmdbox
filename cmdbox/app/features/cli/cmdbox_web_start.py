@@ -37,6 +37,7 @@ class WebStart(feature.UnsupportEdgeFeature, agent_base.AgentBase):
         """
         opt = super().get_option()
         opt['use_redis'] = self.USE_REDIS_MEIGHT
+        opt['use_agent'] = False
         opt['nouse_webmode'] = True
         opt['discription_ja'] = "Webモードを起動します。"
         opt['discription_en'] = "Start Web mode."
@@ -53,7 +54,7 @@ class WebStart(feature.UnsupportEdgeFeature, agent_base.AgentBase):
             dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",
                     discription_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
                     discription_en="Specify the service name of the inference server. If omitted, `server` is used."),
-            dict(opt="data", type=Options.T_FILE, default=common.HOME_DIR / f".{self.ver.__appid__}", required=False, multi=False, hide=False, choice=None,
+            dict(opt="data", type=Options.T_FILE, default=self.default_data, required=False, multi=False, hide=False, choice=None,
                     discription_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
                     discription_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
             dict(opt="allow_host", type=Options.T_STR, default="0.0.0.0", required=False, multi=False, hide=False, choice=None,

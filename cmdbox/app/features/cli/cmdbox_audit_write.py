@@ -38,6 +38,7 @@ class AuditWrite(audit_base.AuditBase):
             Dict[str, Any]: オプション
         """
         opt = super().get_option()
+        opt['use_agent'] = False
         opt['discription_ja'] = "監査を記録します。"
         opt['discription_en'] = "Record the audit."
         opt['choice'] += [

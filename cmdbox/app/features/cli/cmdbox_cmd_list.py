@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature
+from cmdbox.app.auth import signin
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -7,7 +8,7 @@ import glob
 import logging
 
 
-class ClientCmdList(feature.OneshotResultEdgeFeature):
+class CmdList(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -15,7 +16,7 @@ class ClientCmdList(feature.OneshotResultEdgeFeature):
         Returns:
             Union[str, List[str]]: モード
         """
-        return 'client'
+        return 'cmd'
 
     def get_cmd(self):
         """
@@ -24,7 +25,7 @@ class ClientCmdList(feature.OneshotResultEdgeFeature):
         Returns:
             str: コマンド
         """
-        return 'cmd_list'
+        return 'list'
     
     def get_option(self):
         """
@@ -34,16 +35,22 @@ class ClientCmdList(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
             discription_ja="データフォルダ配下のコマンドリストを取得します。",
             discription_en="Obtains a list of commands under the data folder.",
             choice=[
-                dict(opt="data", type=Options.T_FILE, default=common.HOME_DIR / f".{self.ver.__appid__}", required=True, multi=False, hide=False, choice=None,
-                    discription_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
-                    discription_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
-                dict(opt="kwd", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
-                    discription_ja=f"検索したいコマンド名を指定します。中間マッチで検索します。",
-                    discription_en=f"Specify the name of the command you want to search. Search with intermediate matches."),
+                dict(opt="data", type=Options.T_FILE, default=self.default_data, required=True, multi=False, hide=False, choice=None,
+                     discription_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
+                     discription_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
+                dict(opt="kwd", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                     discription_ja=f"検索したいコマンド名を指定します。中間マッチで検索します。",
+                     discription_en=f"Specify the name of the command you want to search. Search with intermediate matches."),
+                dict(opt="signin_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None,
+                     discription_ja="サインイン可能なユーザーとパスワードを記載したファイルを指定します。",
+                     discription_en="Specify a file containing users and passwords with which they can signin."),
+                dict(opt="groups", type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=None,
+                     discription_ja="`signin_file` を指定した場合に、このユーザーグループに許可されているコマンドリストを返すように指定します。",
+                     discription_en="Specifies that `signin_file`, if specified, should return the list of commands allowed for this user group."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                      discription_ja="処理結果jsonの保存先ファイルを指定。",
                      discription_en="Specify the destination file for saving the processing result json."),
@@ -61,7 +68,7 @@ class ClientCmdList(feature.OneshotResultEdgeFeature):
                      discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
             ]
         )
-    
+
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -82,9 +89,12 @@ class ClientCmdList(feature.OneshotResultEdgeFeature):
         kwd = args.kwd
         if kwd is None or kwd == '':
             kwd = '*'
+        if not hasattr(self, 'signin_file_data') or self.signin_file_data is None:
+            self.signin_file_data = signin.Signin.load_signin_file(args.signin_file, None)
         paths = glob.glob(str(Path(args.data) / ".cmds" / f"cmd-{kwd}.json"))
         ret = [common.loadopt(path, True) for path in paths]
         ret = sorted(ret, key=lambda cmd: cmd["title"])
+        ret = [r for r in ret if signin.Signin._check_cmd(self.signin_file_data, args.groups, r['mode'], r['cmd'], logger)]
         ret = dict(success=ret)
 
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)

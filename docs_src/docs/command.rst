@@ -12,6 +12,7 @@ See below for available options for the various commands.
    Common Options <cmd_common.rst>
    Server <cmd_server.rst>
    Client <cmd_client.rst>
+   Cmd <cmd_cmd.rst>
    GUI <cmd_gui.rst>
    Web <cmd_web.rst>
    Edge <cmd_edge.rst>

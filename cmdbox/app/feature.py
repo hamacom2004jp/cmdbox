@@ -1,5 +1,5 @@
 from cmdbox import version
-from cmdbox.app import edge
+from cmdbox.app import common, edge
 from cmdbox.app.commons import redis_client
 from cmdbox.app.web import Web
 from fastapi import FastAPI
@@ -27,6 +27,7 @@ class Feature(object):
         self.ver = ver
         self.appcls = appcls
         self.default_svname:str = ver.__appid__
+        self.default_data:Path = os.environ.get('DATA_DIR', common.HOME_DIR / f".{self.ver.__appid__}")
 
     def get_mode(self) -> Union[str, List[str]]:
         """

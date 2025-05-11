@@ -38,7 +38,7 @@ class AuditCreatedb(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=True,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=True, use_agent=False,
             discription_ja="監査を記録するデータベースを作成します。",
             discription_en="Create a database to record audits.",
             choice=[

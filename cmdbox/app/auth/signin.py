@@ -173,268 +173,270 @@ class Signin(object):
         Returns:
             Dict[str, Any]: サインインファイルデータ
         """
-        if signin_file is not None:
-            if not signin_file.is_file():
-                raise HTTPException(status_code=500, detail=f'signin_file is not found. ({signin_file})')
-            # サインインファイル読込み済みなら返すが、別プロセスがサインインファイルを更新していたら読込みを実施する。
-            if not hasattr(cls, 'signin_file_last'):
-                cls.signin_file_last = signin_file.stat().st_mtime
-            if cls.signin_file_last >= signin_file.stat().st_mtime and signin_file_data is not None:
-                return signin_file_data
+        if signin_file is None:
+            return None
+        signin_file = Path(signin_file) if isinstance(signin_file, str) else signin_file
+        if not signin_file.is_file():
+            raise HTTPException(status_code=500, detail=f'signin_file is not found. ({signin_file})')
+        # サインインファイル読込み済みなら返すが、別プロセスがサインインファイルを更新していたら読込みを実施する。
+        if not hasattr(cls, 'signin_file_last'):
             cls.signin_file_last = signin_file.stat().st_mtime
-            yml = common.load_yml(signin_file)
-            # usersのフォーマットチェック
-            if 'users' not in yml:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "users" not found. ({signin_file})')
-            uids = set()
-            unames = set()
-            groups = [g['name'] for g in yml['groups']]
-            for user in yml['users']:
-                if 'uid' not in user or user['uid'] is None:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "uid" not found or empty. ({signin_file})')
-                if user['uid'] in uids:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate uid found. ({signin_file}). uid={user["uid"]}')
-                if 'name' not in user or user['name'] is None:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "name" not found or empty. ({signin_file})')
-                if user['name'] in unames:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate name found. ({signin_file}). name={user["name"]}')
-                if 'password' not in user:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "password" not found or empty. ({signin_file})')
-                if 'hash' not in user or user['hash'] is None:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "hash" not found or empty. ({signin_file})')
-                if user['hash'] not in ['oauth2', 'saml', 'plain', 'md5', 'sha1', 'sha256']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. Algorithms not supported. ({signin_file}). hash={user["hash"]} "oauth2", "saml", "plain", "md5", "sha1", "sha256" only.')
-                if 'groups' not in user or type(user['groups']) is not list:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found or not list type. ({signin_file})')
-                if len([ug for ug in user['groups'] if ug not in groups]) > 0:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. Group not found. ({signin_file}). {user["groups"]}')
-                uids.add(user['uid'])
-                unames.add(user['name'])
-            # groupsのフォーマットチェック
-            if 'groups' not in yml:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found. ({signin_file})')
-            gids = set()
-            gnames = set()
-            for group in yml['groups']:
-                if 'gid' not in group or group['gid'] is None:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "gid" not found or empty. ({signin_file})')
-                if group['gid'] in gids:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate gid found. ({signin_file}). gid={group["gid"]}')
-                if 'name' not in group or group['name'] is None:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "name" not found or empty. ({signin_file})')
-                if group['name'] in gnames:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate name found. ({signin_file}). name={group["name"]}')
-                if 'parent' in group:
-                    if group['parent'] not in groups:
-                        raise HTTPException(status_code=500, detail=f'signin_file format error. Parent group not found. ({signin_file}). parent={group["parent"]}')
-                gids.add(group['gid'])
-                gnames.add(group['name'])
-            # cmdruleのフォーマットチェック
-            if 'cmdrule' not in yml:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "cmdrule" not found. ({signin_file})')
-            if 'policy' not in yml['cmdrule']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "policy" not found in "cmdrule". ({signin_file})')
-            if yml['cmdrule']['policy'] not in ['allow', 'deny']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "policy" not supported in "cmdrule". ({signin_file}). "allow" or "deny" only.')
-            if 'rules' not in yml['cmdrule']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "rules" not found in "cmdrule". ({signin_file})')
-            if type(yml['cmdrule']['rules']) is not list:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "rules" not list type in "cmdrule". ({signin_file})')
-            for rule in yml['cmdrule']['rules']:
-                if 'groups' not in rule:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found in "cmdrule.rules" ({signin_file})')
-                if type(rule['groups']) is not list:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not list type in "cmdrule.rules". ({signin_file})')
-                rule['groups'] = list(set(copy.deepcopy(cls.correct_group(yml, rule['groups'], yml['groups']))))
-                if 'rule' not in rule:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "rule" not found in "cmdrule.rules" ({signin_file})')
-                if rule['rule'] not in ['allow', 'deny']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "rule" not supported in "cmdrule.rules". ({signin_file}). "allow" or "deny" only.')
-                if 'mode' not in rule:
-                    rule['mode'] = None
-                if 'cmds' not in rule:
-                    rule['cmds'] = []
-                if rule['mode'] is not None and len(rule['cmds']) <= 0:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. When “cmds” is specified, “mode” must be specified. ({signin_file})')
-                if type(rule['cmds']) is not list:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "cmds" not list type in "cmdrule.rules". ({signin_file})')
-            # pathruleのフォーマットチェック
-            if 'pathrule' not in yml:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "pathrule" not found. ({signin_file})')
-            if 'policy' not in yml['pathrule']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "policy" not found in "pathrule". ({signin_file})')
-            if yml['pathrule']['policy'] not in ['allow', 'deny']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "policy" not supported in "pathrule". ({signin_file}). "allow" or "deny" only.')
-            if 'rules' not in yml['pathrule']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "rules" not found in "pathrule". ({signin_file})')
-            if type(yml['pathrule']['rules']) is not list:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "rules" not list type in "pathrule". ({signin_file})')
-            for rule in yml['pathrule']['rules']:
-                if 'groups' not in rule:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found in "pathrule.rules" ({signin_file})')
-                if type(rule['groups']) is not list:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not list type in "pathrule.rules". ({signin_file})')
-                rule['groups'] = list(set(copy.deepcopy(cls.correct_group(yml, rule['groups'], yml['groups']))))
-                if 'rule' not in rule:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "rule" not found in "pathrule.rules" ({signin_file})')
-                if rule['rule'] not in ['allow', 'deny']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "rule" not supported in "pathrule.rules". ({signin_file}). "allow" or "deny" only.')
-                if 'paths' not in rule:
-                    rule['paths'] = []
-                if type(rule['paths']) is not list:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "paths" not list type in "pathrule.rules". ({signin_file})')
-            # passwordのフォーマットチェック
-            if 'password' in yml:
-                if 'policy' not in yml['password']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "policy" not found in "password". ({signin_file})')
-                if 'enabled' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "password.policy". ({signin_file})')
-                if type(yml['password']['policy']['enabled']) is not bool:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "password.policy". ({signin_file})')
-                if 'not_same_before' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "not_same_before" not found in "password.policy". ({signin_file})')
-                if type(yml['password']['policy']['not_same_before']) is not bool:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "not_same_before" not bool type in "password.policy". ({signin_file})')
-                if 'min_length' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_length" not found in "password.policy". ({signin_file})')
-                if type(yml['password']['policy']['min_length']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_length" not int type in "password.policy". ({signin_file})')
-                if 'max_length' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "max_length" not found in "password.policy". ({signin_file})')
-                if type(yml['password']['policy']['max_length']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "max_length" not int type in "password.policy". ({signin_file})')
-                if 'min_lowercase' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_lowercase" not found in "password.policy". ({signin_file})')
-                if type(yml['password']['policy']['min_lowercase']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_lowercase" not int type in "password.policy". ({signin_file})')
-                if 'min_uppercase' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_uppercase" not found in "password.policy". ({signin_file})')
-                if type(yml['password']['policy']['min_uppercase']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_uppercase" not int type in "password.policy". ({signin_file})')
-                if 'min_digit' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_digit" not found in "password.policy". ({signin_file})')
-                if type(yml['password']['policy']['min_digit']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_digit" not int type in "password.policy". ({signin_file})')
-                if 'min_symbol' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_symbol" not found in "password.policy". ({signin_file})')
-                if type(yml['password']['policy']['min_symbol']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "min_symbol" not int type in "password.policy". ({signin_file})')
-                if 'not_contain_username' not in yml['password']['policy']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "not_contain_username" not found in "password.policy". ({signin_file})')
-                if type(yml['password']['policy']['not_contain_username']) is not bool:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "not_contain_username" not bool type in "password.policy". ({signin_file})')
-                if 'expiration' not in yml['password']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "expiration" not found in "password". ({signin_file})')
-                if 'enabled' not in yml['password']['expiration']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "password.expiration". ({signin_file})')
-                if type(yml['password']['expiration']['enabled']) is not bool:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "password.expiration". ({signin_file})')
-                if 'period' not in yml['password']['expiration']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "period" not found in "password.expiration". ({signin_file})')
-                if type(yml['password']['expiration']['period']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "period" not int type in "password.expiration". ({signin_file})')
-                if 'notify' not in yml['password']['expiration']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "notify" not found in "password.expiration". ({signin_file})')
-                if type(yml['password']['expiration']['notify']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "notify" not int type in "password.expiration". ({signin_file})')
-                if 'lockout' not in yml['password']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "lockout" not found in "password". ({signin_file})')
-                if 'enabled' not in yml['password']['lockout']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "password.lockout". ({signin_file})')
-                if type(yml['password']['lockout']['enabled']) is not bool:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "password.lockout". ({signin_file})')
-                if 'threshold' not in yml['password']['lockout']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "threshold" not found in "password.lockout". ({signin_file})')
-                if type(yml['password']['lockout']['threshold']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "threshold" not int type in "password.lockout". ({signin_file})')
-                if 'reset' not in yml['password']['lockout']:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "reset" not found in "password.lockout". ({signin_file})')
-                if type(yml['password']['lockout']['reset']) is not int:
-                    raise HTTPException(status_code=500, detail=f'signin_file format error. "reset" not int type in "password.lockout". ({signin_file})')
-            # oauth2のフォーマットチェック
-            if 'oauth2' not in yml:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "oauth2" not found. ({signin_file})')
-            if 'providers' not in yml['oauth2']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "providers" not found in "oauth2". ({signin_file})')
-            # google
-            if 'google' not in yml['oauth2']['providers']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "google" not found in "providers". ({signin_file})')
-            if 'enabled' not in yml['oauth2']['providers']['google']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "google". ({signin_file})')
-            if type(yml['oauth2']['providers']['google']['enabled']) is not bool:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "google". ({signin_file})')
-            if 'client_id' not in yml['oauth2']['providers']['google']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "client_id" not found in "google". ({signin_file})')
-            if 'client_secret' not in yml['oauth2']['providers']['google']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "client_secret" not found in "google". ({signin_file})')
-            if 'redirect_uri' not in yml['oauth2']['providers']['google']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "redirect_uri" not found in "google". ({signin_file})')
-            if 'scope' not in yml['oauth2']['providers']['google']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not found in "google". ({signin_file})')
-            if type(yml['oauth2']['providers']['google']['scope']) is not list:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not list type in "google". ({signin_file})')
-            if 'signin_module' not in yml['oauth2']['providers']['google']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "signin_module" not found in "google". ({signin_file})')
-            # github
-            if 'github' not in yml['oauth2']['providers']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "github" not found in "providers". ({signin_file})')
-            if 'enabled' not in yml['oauth2']['providers']['github']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "github". ({signin_file})')
-            if type(yml['oauth2']['providers']['github']['enabled']) is not bool:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "github". ({signin_file})')
-            if 'client_id' not in yml['oauth2']['providers']['github']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "client_id" not found in "github". ({signin_file})')
-            if 'client_secret' not in yml['oauth2']['providers']['github']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "client_secret" not found in "github". ({signin_file})')
-            if 'redirect_uri' not in yml['oauth2']['providers']['github']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "redirect_uri" not found in "github". ({signin_file})')
-            if 'scope' not in yml['oauth2']['providers']['github']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not found in "github". ({signin_file})')
-            if type(yml['oauth2']['providers']['github']['scope']) is not list:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not list type in "github". ({signin_file})')
-            if 'signin_module' not in yml['oauth2']['providers']['github']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "signin_module" not found in "github". ({signin_file})')
-            # azure
-            if 'azure' not in yml['oauth2']['providers']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "azure" not found in "providers". ({signin_file})')
-            if 'enabled' not in yml['oauth2']['providers']['azure']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "azure". ({signin_file})')
-            if type(yml['oauth2']['providers']['azure']['enabled']) is not bool:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "azure". ({signin_file})')
-            if 'tenant_id' not in yml['oauth2']['providers']['azure']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "tenant_id" not found in "azure". ({signin_file})')
-            if 'client_id' not in yml['oauth2']['providers']['azure']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "client_id" not found in "azure". ({signin_file})')
-            if 'client_secret' not in yml['oauth2']['providers']['azure']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "client_secret" not found in "azure". ({signin_file})')
-            if 'redirect_uri' not in yml['oauth2']['providers']['azure']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "redirect_uri" not found in "azure". ({signin_file})')
-            if 'scope' not in yml['oauth2']['providers']['azure']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not found in "azure". ({signin_file})')
-            if type(yml['oauth2']['providers']['azure']['scope']) is not list:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not list type in "azure". ({signin_file})')
-            if 'signin_module' not in yml['oauth2']['providers']['azure']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "signin_module" not found in "azure". ({signin_file})')
-            # samlのフォーマットチェック
-            if 'saml' not in yml:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "saml" not found. ({signin_file})')
-            if 'providers' not in yml['saml']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "providers" not found in "saml". ({signin_file})')
-            # azure
-            if 'azure' not in yml['saml']['providers']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "azure" not found in "providers". ({signin_file})')
-            if 'enabled' not in yml['saml']['providers']['azure']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "azure". ({signin_file})')
-            if type(yml['saml']['providers']['azure']['enabled']) is not bool:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "azure". ({signin_file})')
-            if 'signin_module' not in yml['saml']['providers']['azure']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "signin_module" not found in "azure". ({signin_file})')
-            if 'sp' not in yml['saml']['providers']['azure']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "sp" not found in "azure". ({signin_file})')
-            if 'idp' not in yml['saml']['providers']['azure']:
-                raise HTTPException(status_code=500, detail=f'signin_file format error. "idp" not found in "azure". ({signin_file})')
-            # フォーマットチェックOK
-            return yml
+        if cls.signin_file_last >= signin_file.stat().st_mtime and signin_file_data is not None:
+            return signin_file_data
+        cls.signin_file_last = signin_file.stat().st_mtime
+        yml = common.load_yml(signin_file)
+        # usersのフォーマットチェック
+        if 'users' not in yml:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "users" not found. ({signin_file})')
+        uids = set()
+        unames = set()
+        groups = [g['name'] for g in yml['groups']]
+        for user in yml['users']:
+            if 'uid' not in user or user['uid'] is None:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "uid" not found or empty. ({signin_file})')
+            if user['uid'] in uids:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate uid found. ({signin_file}). uid={user["uid"]}')
+            if 'name' not in user or user['name'] is None:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "name" not found or empty. ({signin_file})')
+            if user['name'] in unames:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate name found. ({signin_file}). name={user["name"]}')
+            if 'password' not in user:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "password" not found or empty. ({signin_file})')
+            if 'hash' not in user or user['hash'] is None:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "hash" not found or empty. ({signin_file})')
+            if user['hash'] not in ['oauth2', 'saml', 'plain', 'md5', 'sha1', 'sha256']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. Algorithms not supported. ({signin_file}). hash={user["hash"]} "oauth2", "saml", "plain", "md5", "sha1", "sha256" only.')
+            if 'groups' not in user or type(user['groups']) is not list:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found or not list type. ({signin_file})')
+            if len([ug for ug in user['groups'] if ug not in groups]) > 0:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. Group not found. ({signin_file}). {user["groups"]}')
+            uids.add(user['uid'])
+            unames.add(user['name'])
+        # groupsのフォーマットチェック
+        if 'groups' not in yml:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found. ({signin_file})')
+        gids = set()
+        gnames = set()
+        for group in yml['groups']:
+            if 'gid' not in group or group['gid'] is None:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "gid" not found or empty. ({signin_file})')
+            if group['gid'] in gids:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate gid found. ({signin_file}). gid={group["gid"]}')
+            if 'name' not in group or group['name'] is None:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "name" not found or empty. ({signin_file})')
+            if group['name'] in gnames:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate name found. ({signin_file}). name={group["name"]}')
+            if 'parent' in group:
+                if group['parent'] not in groups:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. Parent group not found. ({signin_file}). parent={group["parent"]}')
+            gids.add(group['gid'])
+            gnames.add(group['name'])
+        # cmdruleのフォーマットチェック
+        if 'cmdrule' not in yml:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "cmdrule" not found. ({signin_file})')
+        if 'policy' not in yml['cmdrule']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "policy" not found in "cmdrule". ({signin_file})')
+        if yml['cmdrule']['policy'] not in ['allow', 'deny']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "policy" not supported in "cmdrule". ({signin_file}). "allow" or "deny" only.')
+        if 'rules' not in yml['cmdrule']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "rules" not found in "cmdrule". ({signin_file})')
+        if type(yml['cmdrule']['rules']) is not list:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "rules" not list type in "cmdrule". ({signin_file})')
+        for rule in yml['cmdrule']['rules']:
+            if 'groups' not in rule:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found in "cmdrule.rules" ({signin_file})')
+            if type(rule['groups']) is not list:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not list type in "cmdrule.rules". ({signin_file})')
+            rule['groups'] = list(set(copy.deepcopy(cls.correct_group(yml, rule['groups'], yml['groups']))))
+            if 'rule' not in rule:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "rule" not found in "cmdrule.rules" ({signin_file})')
+            if rule['rule'] not in ['allow', 'deny']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "rule" not supported in "cmdrule.rules". ({signin_file}). "allow" or "deny" only.')
+            if 'mode' not in rule:
+                rule['mode'] = None
+            if 'cmds' not in rule:
+                rule['cmds'] = []
+            if rule['mode'] is not None and len(rule['cmds']) <= 0:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. When “cmds” is specified, “mode” must be specified. ({signin_file})')
+            if type(rule['cmds']) is not list:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "cmds" not list type in "cmdrule.rules". ({signin_file})')
+        # pathruleのフォーマットチェック
+        if 'pathrule' not in yml:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "pathrule" not found. ({signin_file})')
+        if 'policy' not in yml['pathrule']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "policy" not found in "pathrule". ({signin_file})')
+        if yml['pathrule']['policy'] not in ['allow', 'deny']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "policy" not supported in "pathrule". ({signin_file}). "allow" or "deny" only.')
+        if 'rules' not in yml['pathrule']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "rules" not found in "pathrule". ({signin_file})')
+        if type(yml['pathrule']['rules']) is not list:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "rules" not list type in "pathrule". ({signin_file})')
+        for rule in yml['pathrule']['rules']:
+            if 'groups' not in rule:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found in "pathrule.rules" ({signin_file})')
+            if type(rule['groups']) is not list:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not list type in "pathrule.rules". ({signin_file})')
+            rule['groups'] = list(set(copy.deepcopy(cls.correct_group(yml, rule['groups'], yml['groups']))))
+            if 'rule' not in rule:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "rule" not found in "pathrule.rules" ({signin_file})')
+            if rule['rule'] not in ['allow', 'deny']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "rule" not supported in "pathrule.rules". ({signin_file}). "allow" or "deny" only.')
+            if 'paths' not in rule:
+                rule['paths'] = []
+            if type(rule['paths']) is not list:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "paths" not list type in "pathrule.rules". ({signin_file})')
+        # passwordのフォーマットチェック
+        if 'password' in yml:
+            if 'policy' not in yml['password']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "policy" not found in "password". ({signin_file})')
+            if 'enabled' not in yml['password']['policy']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "password.policy". ({signin_file})')
+            if type(yml['password']['policy']['enabled']) is not bool:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "password.policy". ({signin_file})')
+            if 'not_same_before' not in yml['password']['policy']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "not_same_before" not found in "password.policy". ({signin_file})')
+            if type(yml['password']['policy']['not_same_before']) is not bool:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "not_same_before" not bool type in "password.policy". ({signin_file})')
+            if 'min_length' not in yml['password']['policy']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "min_length" not found in "password.policy". ({signin_file})')
+            if type(yml['password']['policy']['min_length']) is not int:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "min_length" not int type in "password.policy". ({signin_file})')
+            if 'max_length' not in yml['password']['policy']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "max_length" not found in "password.policy". ({signin_file})')
+            if type(yml['password']['policy']['max_length']) is not int:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "max_length" not int type in "password.policy". ({signin_file})')
+            if 'min_lowercase' not in yml['password']['policy']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "min_lowercase" not found in "password.policy". ({signin_file})')
+            if type(yml['password']['policy']['min_lowercase']) is not int:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "min_lowercase" not int type in "password.policy". ({signin_file})')
+            if 'min_uppercase' not in yml['password']['policy']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "min_uppercase" not found in "password.policy". ({signin_file})')
+            if type(yml['password']['policy']['min_uppercase']) is not int:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "min_uppercase" not int type in "password.policy". ({signin_file})')
+            if 'min_digit' not in yml['password']['policy']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "min_digit" not found in "password.policy". ({signin_file})')
+            if type(yml['password']['policy']['min_digit']) is not int:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "min_digit" not int type in "password.policy". ({signin_file})')
+            if 'min_symbol' not in yml['password']['policy']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "min_symbol" not found in "password.policy". ({signin_file})')
+            if type(yml['password']['policy']['min_symbol']) is not int:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "min_symbol" not int type in "password.policy". ({signin_file})')
+            if 'not_contain_username' not in yml['password']['policy']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "not_contain_username" not found in "password.policy". ({signin_file})')
+            if type(yml['password']['policy']['not_contain_username']) is not bool:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "not_contain_username" not bool type in "password.policy". ({signin_file})')
+            if 'expiration' not in yml['password']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "expiration" not found in "password". ({signin_file})')
+            if 'enabled' not in yml['password']['expiration']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "password.expiration". ({signin_file})')
+            if type(yml['password']['expiration']['enabled']) is not bool:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "password.expiration". ({signin_file})')
+            if 'period' not in yml['password']['expiration']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "period" not found in "password.expiration". ({signin_file})')
+            if type(yml['password']['expiration']['period']) is not int:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "period" not int type in "password.expiration". ({signin_file})')
+            if 'notify' not in yml['password']['expiration']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "notify" not found in "password.expiration". ({signin_file})')
+            if type(yml['password']['expiration']['notify']) is not int:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "notify" not int type in "password.expiration". ({signin_file})')
+            if 'lockout' not in yml['password']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "lockout" not found in "password". ({signin_file})')
+            if 'enabled' not in yml['password']['lockout']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "password.lockout". ({signin_file})')
+            if type(yml['password']['lockout']['enabled']) is not bool:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "password.lockout". ({signin_file})')
+            if 'threshold' not in yml['password']['lockout']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "threshold" not found in "password.lockout". ({signin_file})')
+            if type(yml['password']['lockout']['threshold']) is not int:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "threshold" not int type in "password.lockout". ({signin_file})')
+            if 'reset' not in yml['password']['lockout']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "reset" not found in "password.lockout". ({signin_file})')
+            if type(yml['password']['lockout']['reset']) is not int:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "reset" not int type in "password.lockout". ({signin_file})')
+        # oauth2のフォーマットチェック
+        if 'oauth2' not in yml:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "oauth2" not found. ({signin_file})')
+        if 'providers' not in yml['oauth2']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "providers" not found in "oauth2". ({signin_file})')
+        # google
+        if 'google' not in yml['oauth2']['providers']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "google" not found in "providers". ({signin_file})')
+        if 'enabled' not in yml['oauth2']['providers']['google']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "google". ({signin_file})')
+        if type(yml['oauth2']['providers']['google']['enabled']) is not bool:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "google". ({signin_file})')
+        if 'client_id' not in yml['oauth2']['providers']['google']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "client_id" not found in "google". ({signin_file})')
+        if 'client_secret' not in yml['oauth2']['providers']['google']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "client_secret" not found in "google". ({signin_file})')
+        if 'redirect_uri' not in yml['oauth2']['providers']['google']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "redirect_uri" not found in "google". ({signin_file})')
+        if 'scope' not in yml['oauth2']['providers']['google']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not found in "google". ({signin_file})')
+        if type(yml['oauth2']['providers']['google']['scope']) is not list:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not list type in "google". ({signin_file})')
+        if 'signin_module' not in yml['oauth2']['providers']['google']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "signin_module" not found in "google". ({signin_file})')
+        # github
+        if 'github' not in yml['oauth2']['providers']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "github" not found in "providers". ({signin_file})')
+        if 'enabled' not in yml['oauth2']['providers']['github']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "github". ({signin_file})')
+        if type(yml['oauth2']['providers']['github']['enabled']) is not bool:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "github". ({signin_file})')
+        if 'client_id' not in yml['oauth2']['providers']['github']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "client_id" not found in "github". ({signin_file})')
+        if 'client_secret' not in yml['oauth2']['providers']['github']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "client_secret" not found in "github". ({signin_file})')
+        if 'redirect_uri' not in yml['oauth2']['providers']['github']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "redirect_uri" not found in "github". ({signin_file})')
+        if 'scope' not in yml['oauth2']['providers']['github']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not found in "github". ({signin_file})')
+        if type(yml['oauth2']['providers']['github']['scope']) is not list:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not list type in "github". ({signin_file})')
+        if 'signin_module' not in yml['oauth2']['providers']['github']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "signin_module" not found in "github". ({signin_file})')
+        # azure
+        if 'azure' not in yml['oauth2']['providers']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "azure" not found in "providers". ({signin_file})')
+        if 'enabled' not in yml['oauth2']['providers']['azure']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "azure". ({signin_file})')
+        if type(yml['oauth2']['providers']['azure']['enabled']) is not bool:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "azure". ({signin_file})')
+        if 'tenant_id' not in yml['oauth2']['providers']['azure']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "tenant_id" not found in "azure". ({signin_file})')
+        if 'client_id' not in yml['oauth2']['providers']['azure']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "client_id" not found in "azure". ({signin_file})')
+        if 'client_secret' not in yml['oauth2']['providers']['azure']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "client_secret" not found in "azure". ({signin_file})')
+        if 'redirect_uri' not in yml['oauth2']['providers']['azure']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "redirect_uri" not found in "azure". ({signin_file})')
+        if 'scope' not in yml['oauth2']['providers']['azure']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not found in "azure". ({signin_file})')
+        if type(yml['oauth2']['providers']['azure']['scope']) is not list:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "scope" not list type in "azure". ({signin_file})')
+        if 'signin_module' not in yml['oauth2']['providers']['azure']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "signin_module" not found in "azure". ({signin_file})')
+        # samlのフォーマットチェック
+        if 'saml' not in yml:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "saml" not found. ({signin_file})')
+        if 'providers' not in yml['saml']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "providers" not found in "saml". ({signin_file})')
+        # azure
+        if 'azure' not in yml['saml']['providers']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "azure" not found in "providers". ({signin_file})')
+        if 'enabled' not in yml['saml']['providers']['azure']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "azure". ({signin_file})')
+        if type(yml['saml']['providers']['azure']['enabled']) is not bool:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "azure". ({signin_file})')
+        if 'signin_module' not in yml['saml']['providers']['azure']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "signin_module" not found in "azure". ({signin_file})')
+        if 'sp' not in yml['saml']['providers']['azure']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "sp" not found in "azure". ({signin_file})')
+        if 'idp' not in yml['saml']['providers']['azure']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "idp" not found in "azure". ({signin_file})')
+        # フォーマットチェックOK
+        return yml
 
     @classmethod
     def correct_group(cls, signin_file_data:Dict[str, Any], group_names:List[str], master_groups:List[Dict[str, Any]]) -> List[str]:
@@ -504,10 +506,29 @@ class Signin(object):
             return True
         if 'signin' not in req.session or 'groups' not in req.session['signin']:
             return False
+        return Signin._check_cmd(self.signin_file_data, req.session['signin']['groups'], mode, cmd, self.logger)
+
+    @classmethod
+    def _check_cmd(cls, signin_file_data:Dict[str, Any], user_groups:List[str], mode:str, cmd:str, logger:logging.Logger) -> bool:
+        """
+        コマンドの認可をチェックします
+
+        Args:
+            signin_file_data (Dict[str, Any]): サインインファイルデータ
+            user_groups (List[str]): ユーザグループ
+            mode (str): モード
+            cmd (str): コマンド
+
+        Returns:
+            bool: 認可されたかどうか
+        """
+        if signin_file_data is None:
+            return True
+        if user_groups is None or len(user_groups) <= 0:
+            return False
         # コマンドチェック
-        user_groups = req.session['signin']['groups']
-        jadge = self.signin_file_data['cmdrule']['policy']
-        for rule in self.signin_file_data['cmdrule']['rules']:
+        jadge = signin_file_data['cmdrule']['policy']
+        for rule in signin_file_data['cmdrule']['rules']:
             if len([g for g in rule['groups'] if g in user_groups]) <= 0:
                 continue
             if rule['mode'] is not None:
@@ -516,8 +537,8 @@ class Signin(object):
                 if len([c for c in rule['cmds'] if cmd == c]) <= 0:
                     continue
             jadge = rule['rule']
-        if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"rule: mode={mode}, cmd={cmd}: {jadge}")
+        if logger.level == logging.DEBUG:
+            logger.debug(f"rule: mode={mode}, cmd={cmd}: {jadge}")
         return jadge == 'allow'
 
     def get_enable_modes(self, req:Request, res:Response) -> List[str]:

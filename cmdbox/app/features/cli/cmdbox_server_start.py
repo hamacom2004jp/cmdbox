@@ -33,7 +33,7 @@ class ServerStart(feature.OneshotNotifyEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_TRUE, nouse_webmode=True,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=True, use_agent=False,
             discription_ja="サーバーを起動します。installモードで `cmdbox -m install -c server` を実行している場合は、 `docker-compose up -d` を使用してください。",
             discription_en="Start the inference server. If you are running `cmdbox -m install -c server` in install mode, use `docker-compose up -d`.",
             choice=[
@@ -49,7 +49,7 @@ class ServerStart(feature.OneshotNotifyEdgeFeature):
                 dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",
                      discription_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
                      discription_en="Specify the service name of the inference server. If omitted, `server` is used."),
-                dict(opt="data", type=Options.T_FILE, default=common.HOME_DIR / f".{self.ver.__appid__}", required=False, multi=False, hide=False, choice=None,
+                dict(opt="data", type=Options.T_FILE, default=self.default_data, required=False, multi=False, hide=False, choice=None,
                      discription_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
                      discription_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
                 dict(opt="retry_count", type=Options.T_INT, default=20, required=False, multi=False, hide=True, choice=None,

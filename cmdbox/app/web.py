@@ -730,6 +730,7 @@ class Web:
 
         if self.agent_runner is not None:
             # google.adkが大きいので必要な時にだけ読込む
+            from google.adk.events import Event
             from google.adk.sessions import BaseSessionService, Session
             def create_agent_session(session_service:BaseSessionService, user_id:str, session_id:str=None) -> Session:
                 """
@@ -777,7 +778,7 @@ class Web:
                 """
                 return session_service.delete_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
             self.delete_agent_session = delete_agent_session
-            def list_agent_events(session_service:BaseSessionService, user_id:str, session_id:str) -> List[Dict[str, Any]]:
+            def list_agent_events(session_service:BaseSessionService, user_id:str, session_id:str) -> List[Event]:
                 """
                 セッションのイベントをリストします
 
@@ -787,9 +788,9 @@ class Web:
                     session_id (str): セッションID
 
                 Returns:
-                    List[Dict[str, Any]]: イベントリスト
+                    List[Event]: イベントリスト
                 """
-                return session_service.list_events(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
+                return session_service.list_events(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id).events
             self.list_agent_events = list_agent_events
 
         app = FastAPI()

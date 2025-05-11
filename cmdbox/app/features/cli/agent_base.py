@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature
+from cmdbox.app.features.cli import cmdbox_cmd_list
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Any, Callable, Dict, Tuple, List
@@ -20,7 +21,7 @@ class AgentBase(feature.ResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
             discription_ja="-",
             discription_en="-",
             choice=[
@@ -110,50 +111,63 @@ class AgentBase(feature.ResultEdgeFeature):
         is_japan = language.find('Japan') >= 0 or language.find('ja_JP') >= 0
         description = f"{self.ver.__appid__}に登録されているコマンド提供"
         instruction = f"あなたはコマンドの意味を熟知しているエキスパートです。" + \
-                      f"ユーザーがコマンドを実行したいとき、あなたはそのコマンドを実行してください。" + \
-                      f"コマンドがエラーを返した場合は、ユーザーに丁寧に知らせてください。" + \
-                      f"コマンドが成功したら、コマンドの結果をそのままJSONにしてユーザーに提示してください。" + \
-                      f"コマンドの結果に含まれる情報以外のことは伝えないでください。" + \
-                      f"どのコマンドを使用すべきかは、各ツールの関数名とドキュメント文字列を参考に判断してください。" + \
-                      f"なおコマンド実行に必要な引数のうち、以下のものをユーザーが指定しなかった場合、以下の値を使用してください。\n" + \
-                      f"  host = {args.host if hasattr(args, 'host') and args.host else self.default_host}\n" + \
-                      f", port = {args.port if hasattr(args, 'port') and args.port else self.default_port}\n" + \
-                      f", password = {args.password if hasattr(args, 'password') and args.password else self.default_pass}\n" + \
-                      f", svname = {args.svname if hasattr(args, 'svname') and args.svname else self.default_svname}\n" + \
-                      f", retry_count = {args.retry_count if hasattr(args, 'retry_count') and args.retry_count else 3}\n" + \
-                      f", retry_interval = {args.retry_interval if hasattr(args, 'retry_interval') and args.retry_interval else 3}\n" + \
-                      f", timeout = {args.timeout if hasattr(args, 'timeout') and args.timeout else 15}\n" + \
-                      f", output_json = {args.output_json if hasattr(args, 'output_json') and args.output_json else None}\n" + \
-                      f", output_json_append = {args.output_json_append if hasattr(args, 'output_json_append') and args.output_json_append else False}\n" + \
-                      f", stdout_log = {args.stdout_log if hasattr(args, 'stdout_log') and args.stdout_log else False}\n" + \
-                      f", capture_stdout = {args.capture_stdout if hasattr(args, 'capture_stdout') and args.capture_stdout else False}\n" + \
-                      f", capture_maxsize = {args.capture_maxsize if hasattr(args, 'capture_maxsize') and args.capture_maxsize else 100}\n" + \
-                      f", tag = {args.tag if hasattr(args, 'tag') and args.tag else None}\n" + \
-                      f", clmsg_id = {args.clmsg_id if hasattr(args, 'clmsg_id') and args.clmsg_id else None}\n"
+                      f"ユーザーがコマンドを実行したいとき、あなたは以下の手順に従ってコマンドを実行してください。\n" + \
+                      f"1. ユーザーのクエリからが実行したいコマンドを特定します。\n" + \
+                      f"2. コマンド実行に必要なパラメータを特定します。\n" + \
+                      f"3. ユーザーのクエリから指定しているパラメータを取得します。\n" + \
+                      f"4. コマンド実行に必要なパラメータの中で、ユーザーが指定しているパラメータが不足しているものを特定します。\n" + \
+                      f"5. 以下に「パラメータ = デフォルト値」を示しているので、不足しているパラメータはデフォルト値を使用します。\n" + \
+                      f"   但しコマンドが実行に必要のないパラメータは指定しないようにします。\n" + \
+                      f" host = {args.host if hasattr(args, 'host') and args.host else self.default_host}\n" + \
+                      f" port = {args.port if hasattr(args, 'port') and args.port else self.default_port}\n" + \
+                      f" password = {args.password if hasattr(args, 'password') and args.password else self.default_pass}\n" + \
+                      f" svname = {args.svname if hasattr(args, 'svname') and args.svname else self.default_svname}\n" + \
+                      f" data = {args.data if hasattr(args, 'data') and args.data else self.default_data}\n" + \
+                      f" retry_count = {args.retry_count if hasattr(args, 'retry_count') and args.retry_count else 3}\n" + \
+                      f" retry_interval = {args.retry_interval if hasattr(args, 'retry_interval') and args.retry_interval else 3}\n" + \
+                      f" timeout = {args.timeout if hasattr(args, 'timeout') and args.timeout else 15}\n" + \
+                      f" output_json = {args.output_json if hasattr(args, 'output_json') and args.output_json else None}\n" + \
+                      f" output_json_append = {args.output_json_append if hasattr(args, 'output_json_append') and args.output_json_append else False}\n" + \
+                      f" stdout_log = {args.stdout_log if hasattr(args, 'stdout_log') and args.stdout_log else False}\n" + \
+                      f" capture_stdout = {args.capture_stdout if hasattr(args, 'capture_stdout') and args.capture_stdout else False}\n" + \
+                      f" capture_maxsize = {args.capture_maxsize if hasattr(args, 'capture_maxsize') and args.capture_maxsize else 100}\n" + \
+                      f" tag = {args.tag if hasattr(args, 'tag') and args.tag else None}\n" + \
+                      f" clmsg_id = {args.clmsg_id if hasattr(args, 'clmsg_id') and args.clmsg_id else None}\n" + \
+                      f" signin_file = {args.signin_file if hasattr(args, 'signin_file') and args.signin_file else f'.{self.ver.__appid__}/user_list.yml'}\n" + \
+                      f"6. 以上のパラメータを使用しても不足するパラメータは、Noneを使用します。\n" + \
+                      f"7. 以上のパラメータを使用してコマンドを実行して、コマンドの結果はJSONでユーザーに提示してください。\n" + \
+                      f"8. もしエラーが発生した場合は、ユーザーにコマンド名とパラメータとエラー内容を提示してください。\n"
+
         description = description if is_japan else \
                       f"Command offer registered in {self.ver.__appid__}."
         instruction = instruction if is_japan else \
                       f"You are the expert who knows what the commands mean." + \
-                      f"When a user wants to execute a command, you execute that command." + \
-                      f"If the command returns an error, politely inform the user." + \
-                      f"If the command is successful, the results of the command should be presented to the user in JSON as is." + \
-                      f"Do not tell them anything other than the information contained in the results of the command." + \
-                      f"Please refer to the function name and document string of each tool to determine which command should be used." + \
-                      f"Note that if the user does not specify any of the following arguments required to execute the command, the following values should be used.\n" + \
-                      f"  host = {args.host if hasattr(args, 'host') and args.host else self.default_host}\n" + \
-                      f", port = {args.port if hasattr(args, 'port') and args.port else self.default_port}\n" + \
-                      f", password = {args.password if hasattr(args, 'password') and args.password else self.default_pass}\n" + \
-                      f", svname = {args.svname if hasattr(args, 'svname') and args.svname else self.default_svname}\n" + \
-                      f", retry_count = {args.retry_count if hasattr(args, 'retry_count') and args.retry_count else 3}\n" + \
-                      f", retry_interval = {args.retry_interval if hasattr(args, 'retry_interval') and args.retry_interval else 3}\n" + \
-                      f", timeout = {args.timeout if hasattr(args, 'timeout') and args.timeout else 15}\n" + \
-                      f", output_json = {args.output_json if hasattr(args, 'output_json') and args.output_json else None}\n" + \
-                      f", output_json_append = {args.output_json_append if hasattr(args, 'output_json_append') and args.output_json_append else False}\n" + \
-                      f", stdout_log = {args.stdout_log if hasattr(args, 'stdout_log') and args.stdout_log else False}\n" + \
-                      f", capture_stdout = {args.capture_stdout if hasattr(args, 'capture_stdout') and args.capture_stdout else False}\n" + \
-                      f", capture_maxsize = {args.capture_maxsize if hasattr(args, 'capture_maxsize') and args.capture_maxsize else 100}\n" + \
-                      f", tag = {args.tag if hasattr(args, 'tag') and args.tag else None}\n" + \
-                      f", clmsg_id = {args.clmsg_id if hasattr(args, 'clmsg_id') and args.clmsg_id else None}\n"
+                      f"When a user wants to execute a command, you follow these steps to execute the command.\n" + \
+                      f"1. Identify the command you want to execute from the user's query.\n" + \
+                      f"2. Identify the parameters required to execute the command.\n" + \
+                      f"3. Retrieve the specified parameters from the user's query.\n" + \
+                      f"4. Identifies missing user-specified parameters required to execute the command.\n" + \
+                      f"5. The “Parameter = Default Value” is shown below, so use default values for missing parameters.\n" + \
+                      f"   However, do not specify parameters that the command does not require for execution.\n" + \
+                      f" host = {args.host if hasattr(args, 'host') and args.host else self.default_host}\n" + \
+                      f" port = {args.port if hasattr(args, 'port') and args.port else self.default_port}\n" + \
+                      f" password = {args.password if hasattr(args, 'password') and args.password else self.default_pass}\n" + \
+                      f" svname = {args.svname if hasattr(args, 'svname') and args.svname else self.default_svname}\n" + \
+                      f" data = {args.data if hasattr(args, 'data') and args.data else self.default_data}\n" + \
+                      f" retry_count = {args.retry_count if hasattr(args, 'retry_count') and args.retry_count else 3}\n" + \
+                      f" retry_interval = {args.retry_interval if hasattr(args, 'retry_interval') and args.retry_interval else 3}\n" + \
+                      f" timeout = {args.timeout if hasattr(args, 'timeout') and args.timeout else 15}\n" + \
+                      f" output_json = {args.output_json if hasattr(args, 'output_json') and args.output_json else None}\n" + \
+                      f" output_json_append = {args.output_json_append if hasattr(args, 'output_json_append') and args.output_json_append else False}\n" + \
+                      f" stdout_log = {args.stdout_log if hasattr(args, 'stdout_log') and args.stdout_log else False}\n" + \
+                      f" capture_stdout = {args.capture_stdout if hasattr(args, 'capture_stdout') and args.capture_stdout else False}\n" + \
+                      f" capture_maxsize = {args.capture_maxsize if hasattr(args, 'capture_maxsize') and args.capture_maxsize else 100}\n" + \
+                      f" tag = {args.tag if hasattr(args, 'tag') and args.tag else None}\n" + \
+                      f" clmsg_id = {args.clmsg_id if hasattr(args, 'clmsg_id') and args.clmsg_id else None}\n" + \
+                      f"6. Use None for parameters that are missing even with the above parameters.\n" + \
+                      f"7. Execute the command using the above parameters and present the results of the command to the user in JSON.\n" + \
+                      f"8. If an error occurs, provide the user with the command name, parameters, and error description.\n"
+
         description = args.agent_description if args.agent_description else description
         instruction = args.agent_instruction if args.agent_instruction else instruction
         from google.adk.agents import Agent
@@ -260,6 +274,18 @@ class AgentBase(feature.ResultEdgeFeature):
         options = Options.getInstance()
         tools:Callable[[logging.Logger, argparse.Namespace, float, Dict], Tuple[int, Dict[str, Any], Any]] = []
         def _t2s(t:str, m:bool, d) -> str:
+            if t == Options.T_BOOL: return (":List[bool]" if m else f":bool")
+            if t == Options.T_DATE: return (":List[str]" if m else f":str")
+            if t == Options.T_DATETIME: return (":List[str]" if m else f":str")
+            if t == Options.T_DICT: return (":List[dict]" if m else ":dict")
+            if t == Options.T_DIR: return (":List[str]" if m else f":str")
+            if t == Options.T_FILE: return (":List[str]" if m else f":str")
+            if t == Options.T_FLOAT: return (":List[float]" if m else ":float")
+            if t == Options.T_INT: return (":List[int]" if m else f":int")
+            if t == Options.T_STR: return (":List[str]" if m else f":str")
+            if t == Options.T_TEXT: return (":List[str]" if m else f":str")
+            return ""
+            """
             s = f'="{d}"' if d is not None else '=""'
             if t == Options.T_BOOL: return (":List[bool]=[]" if m else f":bool={d}")
             if t == Options.T_DATE: return (":List[str]=[]" if m else f":str{s}")
@@ -272,6 +298,7 @@ class AgentBase(feature.ResultEdgeFeature):
             if t == Options.T_STR: return (":List[str]=[]" if m else f":str{s}")
             if t == Options.T_TEXT: return (":List[str]=[]" if m else f":str{s}")
             return "=None"
+            """
         def _t2d(t:str, m:bool, d) -> str:
             s = None
             if t == Options.T_BOOL: s = "List[bool]" if m else "bool"
@@ -286,19 +313,36 @@ class AgentBase(feature.ResultEdgeFeature):
             if t == Options.T_TEXT: s = "List[str]" if m else "str"
             if s is None: return " "
             return f" Optional[{s}]" if d is not None else f" {s}"
+        def _arg(o:Dict[str, Any], is_japan) -> str:
+            #f'        {o["opt"]}{_t2d(o["type"], o["multi"], o["default"])}: {o["discription_ja"] if is_japan else o["discription_en"]}\n'
+            s = f'        {o["opt"]}{_t2d(o["type"], o["multi"], o["default"])}: '
+            if o["required"] == True:
+                s += f'{"必須パラメータ: " if is_japan else "Required Parameter: "}'
+            else:
+                s += f'{"オプションパラメータ: " if is_japan else "Optional Parameter: "}'
+            s += f'{o["discription_ja"] if is_japan else o["discription_en"]}'
+            return s
+        def _coercion(a:argparse.Namespace, key:str, dval) -> str:
+            dval = f'opt["{key}"] if "{key}" in opt else ' + f'"{dval}"' if isinstance(dval, str) else dval
+            aval = args.__dict__[key] if hasattr(args, key) and args.__dict__[key] else None
+            aval = f'"{aval}"' if isinstance(aval, str) else aval
+            ret = f'opt["{key}"] = {aval}' if aval is not None else f'opt["{key}"] = {dval}'
+            return ret
         language, _ = locale.getlocale()
         is_japan = language.find('Japan') >= 0 or language.find('ja_JP') >= 0
         for mode in options.get_mode_keys():
             for cmd in options.get_cmd_keys(mode):
+                if not options.get_cmd_attr(mode, cmd, 'use_agent'):
+                    continue
                 discription = options.get_cmd_attr(mode, cmd, 'discription_ja' if is_japan else 'discription_en')
                 choices = options.get_cmd_choices(mode, cmd, False)
                 feat:feature.Feature = options.get_cmd_attr(mode, cmd, 'feature')
-                fn = f"{feat.__class__.__name__}_{mode}_{cmd}"
+                fn = f"{mode}_{cmd}"
                 func_txt = f'def {fn}('+", ".join([f'{o["opt"]}{_t2s(o["type"], o["multi"], o["default"])}' for o in choices])+'):\n'
                 func_txt += f'    """\n'
                 func_txt += f'    {discription}\n'
                 func_txt += f'    Args:\n'
-                func_txt += "".join([f'        {o["opt"]}{_t2d(o["type"], o["multi"], o["default"])}: {o["discription_ja"] if is_japan else o["discription_en"]}\n' for o in choices])
+                func_txt += "".join([_arg(o, is_japan) for o in choices])
                 func_txt += f'    Returns:\n'
                 func_txt += f'        Dict[str, Any]:{"処理結果" if is_japan else "Processing Result"}\n'
                 func_txt += f'    """\n'
@@ -312,6 +356,21 @@ class AgentBase(feature.ResultEdgeFeature):
                 func_txt += f'    opt["output_json_append"] = False\n'
                 func_txt += f'    opt["debug"] = logger.level == logging.DEBUG\n'
                 func_txt += '\n'.join([f'    opt["{o["opt"]}"] = {o["opt"]}' for o in choices])+'\n'
+                func_txt += f'    {_coercion(args, "host", self.default_host)}\n'
+                func_txt += f'    {_coercion(args, "port", self.default_port)}\n'
+                func_txt += f'    {_coercion(args, "password", self.default_pass)}\n'
+                func_txt += f'    {_coercion(args, "svname", self.default_svname)}\n'
+                func_txt += f'    {_coercion(args, "retry_count", 3)}\n'
+                func_txt += f'    {_coercion(args, "retry_interval", 3)}\n'
+                func_txt += f'    {_coercion(args, "timeout", 15)}\n'
+                func_txt += f'    {_coercion(args, "output_json", None)}\n'
+                func_txt += f'    {_coercion(args, "output_json_append", False)}\n'
+                func_txt += f'    {_coercion(args, "stdout_log", False)}\n'
+                func_txt += f'    {_coercion(args, "capture_stdout", False)}\n'
+                func_txt += f'    {_coercion(args, "capture_maxsize", 1024*1024)}\n'
+                func_txt += f'    {_coercion(args, "tag", None)}\n'
+                func_txt += f'    {_coercion(args, "clmsg_id", None)}\n'
+                func_txt += f'    {_coercion(args, "signin_file", Path(f".{self.ver.__appid__}")/"user_list.yml")}\n'
                 func_txt += f'    args = argparse.Namespace(**opt)\n'
                 func_txt += f'    feat = Options.getInstance().get_cmd_attr("{mode}", "{cmd}", "feature")\n'
                 func_txt += f'    st, ret, _ = feat.apprun(logger, args, time.perf_counter(), [])\n'
