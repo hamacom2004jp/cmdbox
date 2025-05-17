@@ -35,6 +35,7 @@ INSTALL_REQUIRES = [
     'questionary',
     'redis',
     'requests',
+    'rich',
     'six',
     'tabulate',
     'uvicorn[standard]',

@@ -167,15 +167,16 @@ class WebStart(feature.UnsupportEdgeFeature, agent_base.AgentBase):
                          result_html=args.result_html, users_html=args.users_html,
                         assets=args.assets, signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=args.gui_mode)
             agent_runner = None
+            mcp = None
             if args.agent=='use':
                 args.agent_session_dburl = "sqlite:" + pathname2url(str(w.agent_path / 'session.db'))
-                agent_runner = self.init_agent_runner(logger, args)
+                agent_runner, mcp = self.init_agent_runner(logger, args)
             w.start(args.allow_host, args.listen_port, ssl_listen_port=args.ssl_listen_port,
                     ssl_cert=ssl_cert, ssl_key=ssl_key, ssl_keypass=args.ssl_keypass, ssl_ca_certs=ssl_ca_certs,
                     session_domain=args.session_domain, session_path=args.session_path,
                     session_secure=args.session_secure, session_timeout=args.session_timeout,
                     outputs_key=args.outputs_key, guvicorn_workers=args.guvicorn_workers, guvicorn_timeout=args.guvicorn_timeout,
-                    agent_runner=agent_runner)
+                    agent_runner=agent_runner, mcp=mcp)
 
             msg = dict(success="web complate.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

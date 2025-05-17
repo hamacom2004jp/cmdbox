@@ -8,7 +8,7 @@ import glob
 import logging
 
 
-class CmdList(feature.OneshotResultEdgeFeature):
+class CmdLoad(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -25,7 +25,7 @@ class CmdList(feature.OneshotResultEdgeFeature):
         Returns:
             str: コマンド
         """
-        return 'list'
+        return 'load'
     
     def get_option(self):
         """
@@ -36,15 +36,15 @@ class CmdList(feature.OneshotResultEdgeFeature):
         """
         return dict(
             use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
-            discription_ja="データフォルダ配下のコマンドリストを取得します。",
-            discription_en="Obtains a list of commands under the data folder.",
+            discription_ja="データフォルダ配下のコマンドの内容を取得します。",
+            discription_en="Obtains the contents of commands under the data folder.",
             choice=[
                 dict(opt="data", type=Options.T_FILE, default=self.default_data, required=True, multi=False, hide=False, choice=None,
                      discription_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
                      discription_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
-                dict(opt="kwd", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                     discription_ja=f"検索したいコマンド名を指定します。中間マッチで検索します。",
-                     discription_en=f"Specify the name of the command you want to search. Search with intermediate matches."),
+                dict(opt="title", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                     discription_ja=f"読込みたいコマンド名を指定します。",
+                     discription_en=f"Specify the name of the command to be read."),
                 dict(opt="signin_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None,
                      discription_ja="サインイン可能なユーザーとパスワードを記載したファイルを指定します。",
                      discription_en="Specify a file containing users and passwords with which they can signin."),
@@ -86,16 +86,15 @@ class CmdList(feature.OneshotResultEdgeFeature):
             msg = dict(warn=f"Please specify the --data option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
-        kwd = args.kwd
-        if kwd is None or kwd == '':
-            kwd = '*'
+        if args.title is None:
+            msg = dict(warn=f"Please specify the --title option.")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return 1, msg, None
         if not hasattr(self, 'signin_file_data') or self.signin_file_data is None:
             self.signin_file_data = signin.Signin.load_signin_file(args.signin_file, None)
-        paths = glob.glob(str(Path(args.data) / ".cmds" / f"cmd-{kwd}.json"))
-        ret = [common.loadopt(path, True) for path in paths]
-        ret = sorted(ret, key=lambda cmd: cmd["title"])
-        ret = [dict(title=r.get('title',''), mode=r.get('mode',''), cmd=r.get('cmd',''), tag=r.get('tag','')) for r in ret if signin.Signin._check_cmd(self.signin_file_data, args.groups, r['mode'], r['cmd'], logger)]
-        ret = dict(success=ret)
+        opt_path = Path(args.data) / ".cmds" / f"cmd-{args.title}.json"
+        opt = common.loadopt(opt_path, True)
+        ret = dict(success=opt)
 
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 

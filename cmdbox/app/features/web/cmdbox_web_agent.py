@@ -125,7 +125,7 @@ class Agent(feature.WebFeature):
                         #if event.is_final_response():
                         msg = None
                         if event.content and event.content.parts:
-                            msg = event.content.parts[0].text
+                            msg = "\n".join([p.text for p in event.content.parts if p and p.text])
                         elif event.actions and event.actions.escalate:
                             msg = f"Agent escalated: {event.error_message or 'No specific message.'}"
                         if msg:

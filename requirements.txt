@@ -20,6 +20,7 @@ pystray           # For system tray icon
 questionary
 redis
 requests
+rich
 six
 sphinx
 sphinx-rtd-theme

@@ -29,7 +29,7 @@ agent.init_form = async () => {
             $(`<div class="d-inline-block"></div>`).appendTo(user_message).text(msg);
             $(`<a class="d-inline-block align-top" style="fill:gray;"><svg class="align-top ms-3" width="32" height="32" viewBox="0 0 16 16">`
                 +`<use href="#svg_signin_ico"></use></svg></a>`).appendTo(user_msg_row);
-            agent.create_history(histories, '', msg);
+            agent.create_history(histories, session_id, msg);
             // エージェント側のメッセージ読込中を表示
             if (!message_id) {
                 message_id = cmdbox.random_string(16);
@@ -152,11 +152,11 @@ agent.init_form = async () => {
     agent_chat(session_id);
 };
 agent.list_sessions = async () => {
+    return;
     const histories = $('#histories');
     const res = await fetch('agent/session/list', {method: 'GET'});
     if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     res.json().then((res) => {
-        return;
         if (!res['success']) return;
         histories.html('');
         res['success'].forEach(async (row) => {
@@ -167,6 +167,7 @@ agent.list_sessions = async () => {
     });
 }
 agent.create_history = (histories, session_id, msg) => {
+    if (histories.find(`#${session_id}`).length > 0) return;
     msg = cell_chop(msg, 300);
     const history = $(`<a id="${session_id}" href="#" class="history pt-2 pb-1 d-block btn_hover"></a>`).appendTo(histories);
     $(`<span class="d-inline-block align-top ms-2 me-2" style="fill:gray;"><svg class="align-top" width="24" height="24" viewBox="0 0 16 16">`

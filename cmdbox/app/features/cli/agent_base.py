@@ -79,6 +79,20 @@ class AgentBase(feature.ResultEdgeFeature):
                      discription_en="Specifies the temperature when using llm model."),
             ])
 
+    def create_mcpserver(self, args:argparse.Namespace) -> Any:
+        """
+        mcpserverを作成します
+
+        Args:
+            args (argparse.Namespace): 引数
+
+        Returns:
+            Any: FastMCP
+        """
+        from mcp.server.fastmcp import FastMCP
+        mcp = FastMCP(name=self.ver.__appid__)
+        return mcp
+
     def create_session_service(self, args:argparse.Namespace) -> Any:
         """
         セッションサービスを作成します
@@ -107,6 +121,8 @@ class AgentBase(feature.ResultEdgeFeature):
         Returns:
             Agent: エージェント
         """
+        if logger.level == logging.DEBUG:
+            logger.debug(f"create_agent processing..")
         language, _ = locale.getlocale()
         is_japan = language.find('Japan') >= 0 or language.find('ja_JP') >= 0
         description = f"{self.ver.__appid__}に登録されているコマンド提供"
@@ -170,8 +186,16 @@ class AgentBase(feature.ResultEdgeFeature):
 
         description = args.agent_description if args.agent_description else description
         instruction = args.agent_instruction if args.agent_instruction else instruction
+        if logger.level == logging.DEBUG:
+            logger.debug(f"google-adk loading..")
         from google.adk.agents import Agent
+        if logger.level == logging.DEBUG:
+            logger.debug(f"litellm loading..")
         from google.adk.models.lite_llm import LiteLlm
+        # loggerの初期化
+        common.reset_logger("LiteLLM Proxy")
+        common.reset_logger("LiteLLM Router")
+        common.reset_logger("LiteLLM")
         if args.llmprov == 'openai':
             if args.llmmodel is None: raise ValueError("llmmodel is required.")
             if args.llmapikey is None: raise ValueError("llmapikey is required.")
@@ -240,6 +264,8 @@ class AgentBase(feature.ResultEdgeFeature):
             )
         else:
             raise ValueError("llmprov is required.")
+        if logger.level == logging.DEBUG:
+            logger.debug(f"create_agent complate.")
         return agent
 
     def create_runner(self, logger:logging.Logger, args:argparse.Namespace, session_service, agent) -> Any:
@@ -262,17 +288,30 @@ class AgentBase(feature.ResultEdgeFeature):
             session_service=session_service,
         )
 
-    def init_agent_runner(self, logger:logging.Logger, args:argparse.Namespace) -> Any:
+    def init_agent_runner(self, logger:logging.Logger, args:argparse.Namespace) -> Tuple[Any, Any]:
         """
         エージェントの初期化を行います
 
         Args:
             logger (logging.Logger): ロガー
             args (argparse.Namespace): 引数
+
+        Returns:
+            Tuple[Any, Any]: ランナーとFastMCP
         """
-        session_service = self.create_session_service(args)
+        if logger.level == logging.DEBUG:
+            logger.debug(f"init_agent_runner processing..")
+        # loggerの初期化
+        common.reset_logger("httpx")
+        common.reset_logger("google.adk.sessions.database_session_service")
+        # モジュールインポート
+        from mcp.server.fastmcp import FastMCP
+        from google.adk.sessions import BaseSessionService
+        mcp:FastMCP = self.create_mcpserver(args)
+        session_service:BaseSessionService = self.create_session_service(args)
         options = Options.getInstance()
         tools:Callable[[logging.Logger, argparse.Namespace, float, Dict], Tuple[int, Dict[str, Any], Any]] = []
+
         def _t2s(t:str, m:bool, d) -> str:
             if t == Options.T_BOOL: return (":List[bool]" if m else f":bool")
             if t == Options.T_DATE: return (":List[str]" if m else f":str")
@@ -338,7 +377,8 @@ class AgentBase(feature.ResultEdgeFeature):
                 choices = options.get_cmd_choices(mode, cmd, False)
                 feat:feature.Feature = options.get_cmd_attr(mode, cmd, 'feature')
                 fn = f"{mode}_{cmd}"
-                func_txt = f'def {fn}('+", ".join([f'{o["opt"]}{_t2s(o["type"], o["multi"], o["default"])}' for o in choices])+'):\n'
+                func_txt =  f'@mcp.tool()\n'
+                func_txt += f'def {fn}('+", ".join([f'{o["opt"]}{_t2s(o["type"], o["multi"], o["default"])}' for o in choices])+'):\n'
                 func_txt += f'    """\n'
                 func_txt += f'    {discription}\n'
                 func_txt += f'    Args:\n'
@@ -376,7 +416,13 @@ class AgentBase(feature.ResultEdgeFeature):
                 func_txt += f'    st, ret, _ = feat.apprun(logger, args, time.perf_counter(), [])\n'
                 func_txt += f'    return ret\n'
                 func_txt += f'tools.append({fn})\n'
-                exec(func_txt, dict(time=time,List=List, argparse=argparse, common=common, Options=Options, logging=logging), dict(tools=tools))
+                if logger.level == logging.DEBUG:
+                    logger.debug(f"generating agent tool: {fn}")
+                exec(func_txt,
+                     dict(time=time,List=List, argparse=argparse, common=common, Options=Options, logging=logging),
+                     dict(tools=tools, mcp=mcp))
         root_agent = self.create_agent(logger, args, tools)
         runner = self.create_runner(logger, args, session_service, root_agent)
-        return runner
+        if logger.level == logging.DEBUG:
+            logger.debug(f"init_agent_runner complate.")
+        return runner, mcp

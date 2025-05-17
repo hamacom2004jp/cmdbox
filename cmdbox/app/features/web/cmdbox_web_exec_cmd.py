@@ -179,8 +179,10 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 sys.stdout = captured_output = io.StringIO()
             ret_main = {}
             logsize = 1024
+            console = common.create_console(file=old_stdout)
+
             try:
-                old_stdout.write(loghandler.colorize_msg(f'EXEC:     {opt_list}\n'[:logsize]))
+                console.log(f'EXEC:     {opt_list}\n'[:logsize])
                 status, ret_main, obj = cmdbox_app.main(args_list=[common.chopdq(o) for o in opt_list], file_dict=file_dict, webcall=True)
                 if isinstance(obj, server.Server):
                     cmdbox_app.sv = obj
@@ -207,11 +209,11 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                             output = [dict(warn=f'The captured stdout was discarded because its size was larger than {capture_maxsize} bytes.')]
                 else:
                     output = [dict(warn='capture_stdout is off.')]
-                old_stdout.write(loghandler.colorize_msg(f'EXEC:     {output}'[:logsize])+'\n')
+                console.log(f'EXEC:     {output}'[:logsize])
             except Exception as e:
                 web.logger.disabled = False # ログ出力を有効にする
                 msg = f'exec_cmd error. {traceback.format_exc()}'
-                old_stdout.write(loghandler.colorize_msg(f'EXEC:     {msg}'[:logsize])+'\n')
+                console.log(f'EXEC:     {msg}'[:logsize])
                 web.logger.warning(msg)
                 output = [dict(warn=f'<pre>{html.escape(traceback.format_exc())}</pre>')]
             sys.stdout = old_stdout

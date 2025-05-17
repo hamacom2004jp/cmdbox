@@ -4,6 +4,8 @@ from cmdbox.app.commons import convert, module, loghandler
 from cryptography.fernet import Fernet
 from pathlib import Path
 from pkg_resources import resource_string
+from rich.logging import RichHandler
+from rich.console import Console
 from tabulate import tabulate
 from typing import List, Tuple, Dict, Any
 import asyncio
@@ -91,6 +93,48 @@ def save_yml(yml_path:Path, data:dict) -> None:
     with open(yml_path, 'w') as f:
         yaml.dump(data, f, default_flow_style=False, sort_keys=False)
 
+def reset_logger(name:str, stderr:bool=False, fmt:str='%(message)s') -> None:
+    """
+    指定されたロガーのハンドラをクリアし、新しいハンドラを追加します。
+    Args:
+        name (str): ロガーの名前
+        stderr (bool, optional): 標準エラー出力を使用するかどうか. Defaults to False.
+        fmt (str, optional): ログフォーマット. Defaults to '%(message)s'.
+    """
+    logger = logging.getLogger(name)
+    logger.handlers.clear()
+    logger.propagate = False
+    logger.addHandler(create_log_handler(stderr, fmt))
+
+def create_log_handler(stderr:bool=False, fmt:str='%(message)s') -> logging.Handler:
+    """
+    ログハンドラを生成します。
+
+    Args:
+        stderr (bool, optional): 標準エラー出力を使用するかどうか. Defaults to False.
+        fmt (str, optional): ログフォーマット. Defaults to '%(message)s'.
+    Returns:
+        logging.Handler: ログハンドラ
+    """
+    formatter = logging.Formatter(fmt)
+    handler = RichHandler(console=Console(stderr=stderr), show_path=False, omit_repeated_times=False,
+                          tracebacks_word_wrap=False, log_time_format='[%Y-%m-%d %H:%M]')
+    handler.setFormatter(formatter)
+    return handler
+
+def create_console(stderr:bool=False, file=None) -> Console:
+    """
+    コンソールを生成します。
+
+    Args:
+        stderr (bool, optional): 標準エラー出力を使用するかどうか. Defaults to False.
+        file (file, optional): 出力先のファイル. Defaults to None.
+    Returns:
+        Console: コンソール
+    """
+    console = Console(stderr=stderr, file=file, log_time=True, log_path=False, log_time_format='[%Y-%m-%d %H:%M]')
+    return console
+
 def default_logger(debug:bool=False, ver=version, webcall:bool=False) -> logging.Logger:
     """
     デフォルトのロガーを生成します。
@@ -105,12 +149,13 @@ def default_logger(debug:bool=False, ver=version, webcall:bool=False) -> logging
     """
     logger = logging.getLogger(ver.__appid__)
     if not webcall:
-        formatter = logging.Formatter('%(levelname)s[%(asctime)s] - %(message)s')
-        handler = loghandler.ColorfulStreamHandler(sys.stdout)
+        #formatter = logging.Formatter('%(levelname)s[%(asctime)s] - %(message)s')
+        #handler = loghandler.ColorfulStreamHandler(sys.stdout)
+        handler = create_log_handler()
         handler.setLevel(logging.DEBUG if debug else logging.INFO)
-        handler.setFormatter(formatter)
         logger.addHandler(handler)
     logger.setLevel(logging.DEBUG if debug else logging.INFO)
+    logger.propagate = False
     return logger
 
 def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, ver=version) -> Tuple[logging.Logger, dict]:

@@ -1,0 +1,14 @@
+{
+    "servers": [
+        {
+            "name": "cmdbox_mcp",
+            "uri": "http://localhost:8081",
+            "authentication": {
+                "type": "header",
+                "key": "Authorization",
+                "value": "Bearer 818GTXC2MPDK8IGXDLLF5IZ30RYAVZK12MKXXUEEA4ZYNYGONNY492LV6DO4VVID"
+            },
+            "tools": ["*"]
+        }
+    ]
+}

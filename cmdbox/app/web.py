@@ -1,11 +1,11 @@
 from cmdbox.app import common, options
 from cmdbox.app.auth import signin, signin_saml
 from cmdbox.app.commons import module
-from fastapi import FastAPI, Request, Response, HTTPException
-from fastapi.responses import RedirectResponse
+from fastapi import FastAPI, Request, Response
 from pathlib import Path
 from starlette.middleware.sessions import SessionMiddleware
-from typing import Any, Dict, List, Tuple
+from starlette.routing import Mount
+from typing import Any, Dict, List
 from uvicorn.config import Config
 import asyncio
 import copy
@@ -158,7 +158,10 @@ class Web:
         if self.options.is_features_loaded('web'):
             return
         # webfeatureの読込み
+        self.wf_dep = []
         def wf_route(pk, prefix, excludes, w, app, appcls, ver, logger):
+            if pk in w.wf_dep: return
+            w.wf_dep.append(pk)
             for wf in module.load_webfeatures(pk, prefix, excludes, appcls=appcls, ver=ver, logger=logger):
                 wf.route(self, app)
                 self.filemenu = {**self.filemenu, **wf.filemenu(w)}
@@ -675,7 +678,7 @@ class Web:
               ssl_cert:Path=None, ssl_key:Path=None, ssl_keypass:str=None, ssl_ca_certs:Path=None,
               session_domain:str=None, session_path:str='/', session_secure:bool=False, session_timeout:int=900, outputs_key:List[str]=[],
               guvicorn_workers:int=-1, guvicorn_timeout:int=30,
-              agent_runner=None):
+              agent_runner=None, mcp=None):
         """
         Webサーバを起動する
 
@@ -695,6 +698,7 @@ class Web:
             guvicorn_workers (int, optional): Gunicornワーカー数. Defaults to -1.
             guvicorn_timeout (int, optional): Gunicornタイムアウト. Defaults to 30.
             agent_runner (Runner, optional): エージェントランナー. Defaults to None.
+            mcp (MCP, optional): MCP. Defaults to None.
         """
         self.allow_host = allow_host
         self.listen_port = listen_port
@@ -711,6 +715,7 @@ class Web:
         self.guvicorn_workers = guvicorn_workers
         self.guvicorn_timeout = guvicorn_timeout
         self.agent_runner = agent_runner
+        self.mcp = mcp
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web start parameter: allow_host={self.allow_host}")
             self.logger.debug(f"web start parameter: listen_port={self.listen_port}")
@@ -727,6 +732,7 @@ class Web:
             self.logger.debug(f"web start parameter: guvicorn_worker={self.guvicorn_workers}")
             self.logger.debug(f"web start parameter: guvicorn_timeout={self.guvicorn_timeout}")
             self.logger.debug(f"web start parameter: agent_runner={self.agent_runner}")
+            self.logger.debug(f"web start parameter: mcp={self.mcp}")
 
         if self.agent_runner is not None:
             # google.adkが大きいので必要な時にだけ読込む
@@ -793,7 +799,14 @@ class Web:
                 return session_service.list_events(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id).events
             self.list_agent_events = list_agent_events
 
-        app = FastAPI()
+        if self.mcp is not None:
+            # MCPをFastAPIにマウント
+            mcp_app = self.mcp.sse_app(mount_path="/mcp")
+            app = FastAPI(lifespan=self.mcp.settings.lifespan)
+            app.mount("/mcp-server", mcp_app)
+        else:
+            app = FastAPI()
+        #app = FastAPI()
         @app.middleware("http")
         async def set_context_cookie(req:Request, call_next):
             res:Response = await call_next(req)
@@ -861,10 +874,20 @@ class ThreadedUvicorn:
     def __init__(self, logger:logging.Logger, config:Config, guvicorn_config:Dict[str, Any]):
         self.logger = logger
         self.guvicorn_config = guvicorn_config
+        stderr_handler = common.create_log_handler(stderr=True)
+        stdout_handler = common.create_log_handler(stderr=False)
         if platform.system() == "Windows":
+            # loggerの設定
+            common.reset_logger("uvicorn")
+            common.reset_logger("uvicorn.error")
+            common.reset_logger("uvicorn.access")
             self.server = uvicorn.Server(config)
             self.thread = RaiseThread(daemon=True, target=self.server.run)
         else:
+            # loggerの設定
+            common.reset_logger("gunicorn.error")
+            common.reset_logger("gunicorn.access")
+
             from gunicorn.app.wsgiapp import WSGIApplication
             class App(WSGIApplication):
                 def __init__(self, app, options):
