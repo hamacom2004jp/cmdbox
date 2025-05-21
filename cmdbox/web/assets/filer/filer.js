@@ -145,7 +145,8 @@ fsapi.filer = (svpath, is_local) => {
         opt['capture_maxsize'] = 1024**3*10;
         //opt['svpath'] = event.originalEvent.dataTransfer.getData('path');
         jobs.push(cmdbox.sv_exec_cmd(opt).then(async res => {
-          if(!res[0] || !res[0]['success']) {
+          if (res && res['success']) res = [res];
+          if (!res[0] || !res[0]['success']) {
             fsapi.download_now ++;
             cmdbox.progress(0, list_downloads.length, fsapi.download_now, '', true, false)
             cmdbox.message(res);
@@ -276,6 +277,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
         res[0]['success']['_'] = fsapi.treemem;
       }
     }
+    if (res && res['success']) res = [res];
     if(!res[0] || !res[0]['success']) {
       cmdbox.message(res);
       target.find('.file-list').html('');

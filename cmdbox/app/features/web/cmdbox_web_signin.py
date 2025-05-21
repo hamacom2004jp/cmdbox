@@ -22,8 +22,7 @@ class Signin(feature.WebFeature):
             with open(web.signin_html, 'r', encoding='utf-8') as f:
                 web.signin_html_data = f.read()
 
-        @app.get('/signin/{next}', response_class=HTMLResponse)
-        @app.post('/signin/{next}', response_class=HTMLResponse)
+        @app.api_route('/signin/{next}', methods=['GET', 'POST'], response_class=HTMLResponse)
         async def _signin(next:str, req:Request, res:Response):
             web.signin.enable_cors(req, res)
             res.headers['Access-Control-Allow-Origin'] = '*'

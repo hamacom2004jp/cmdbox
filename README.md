@@ -250,29 +250,47 @@ aliases:                                # Specify the alias for the specified co
                                         #   e.g. /{1}_exec
         move:                           # Specify whether to move the regular expression group of the source to the target.
                                         #   e.g. true
-  audit:
-    enabled: true                       # Specify whether to enable the audit function.
-    write:
-      mode: audit                       # Specify the mode of the feature to be writed.
-      cmd: write                        # Specify the command to be writed.
-    search:
-      mode: audit                       # Specify the mode of the feature to be searched.
-      cmd: search                       # Specify the command to be searched.
-    options:                            # Specify the options for the audit function.
-      host: localhost                   # Specify the service host of the audit Redis server.However, if it is specified as a command line argument, it is ignored.
-      port: 6379                        # Specify the service port of the audit Redis server.However, if it is specified as a command line argument, it is ignored.
-      password: password                # Specify the access password of the audit Redis server.However, if it is specified as a command line argument, it is ignored.
-      svname: server                    # Specify the audit service name of the inference server.However, if it is specified as a command line argument, it is ignored.
-      retry_count: 3                    # Specifies the number of reconnections to the audit Redis server.If less than 0 is specified, reconnection is forever.
-      retry_interval: 1                 # Specifies the number of seconds before reconnecting to the audit Redis server.
-      timeout: 15                       # Specify the maximum waiting time until the server responds.
-      pg_enabled: False                 # Specify True if using the postgresql database server.
-      pg_host: localhost                # Specify the postgresql host.
-      pg_port: 5432                     # Specify the postgresql port.
-      pg_user: postgres                 # Specify the postgresql user name.
-      pg_password: password             # Specify the postgresql password.
-      pg_dbname: audit                  # Specify the postgresql database name.
-      retention_period_days: 365        # Specify the number of days to retain audit logs.
+agentrule:                              # Specifies a list of rules that determine which commands the agent can execute.
+  policy: deny                          # Specify the default policy for the rule. The value can be allow or deny.
+  rules:                                # Specify the rules for the commands that the agent can execute according to the group to which the user belongs.
+  - mode: audit                         # Specify the "mode" as the condition for applying the rule.
+    cmds: [search, write]               # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
+    rule: allow                         # Specifies whether the specified command is allowed or not. Values are allow or deny.
+  - mode: client
+    cmds: [file_copy, file_download, file_list, file_mkdir, file_move, file_remove, file_rmdir, file_upload, server_info]
+    rule: allow
+  - mode: cmd
+    cmds: [list, load]
+    rule: allow
+  - mode: server
+    cmds: [list]
+    rule: allow
+  - mode: web
+    cmds: [gencert, genpass, group_list, user_list]
+    rule: allow
+audit:
+  enabled: true                         # Specify whether to enable the audit function.
+  write:
+    mode: audit                         # Specify the mode of the feature to be writed.
+    cmd: write                          # Specify the command to be writed.
+  search:
+    mode: audit                         # Specify the mode of the feature to be searched.
+    cmd: search                         # Specify the command to be searched.
+  options:                              # Specify the options for the audit function.
+    host: localhost                     # Specify the service host of the audit Redis server.However, if it is specified as a command line argument, it is ignored.
+    port: 6379                          # Specify the service port of the audit Redis server.However, if it is specified as a command line argument, it is ignored.
+    password: password                  # Specify the access password of the audit Redis server.However, if it is specified as a command line argument, it is ignored.
+    svname: cmdbox                      # Specify the audit service name of the inference server.However, if it is specified as a command line argument, it is ignored.
+    retry_count: 3                      # Specifies the number of reconnections to the audit Redis server.If less than 0 is specified, reconnection is forever.
+    retry_interval: 1                   # Specifies the number of seconds before reconnecting to the audit Redis server.
+    timeout: 15                         # Specify the maximum waiting time until the server responds.
+    pg_enabled: False                   # Specify True if using the postgresql database server.
+    pg_host: localhost                  # Specify the postgresql host.
+    pg_port: 5432                       # Specify the postgresql port.
+    pg_user: postgres                   # Specify the postgresql user name.
+    pg_password: password               # Specify the postgresql password.
+    pg_dbname: audit                    # Specify the postgresql database name.
+    retention_period_days: 365          # Specify the number of days to retain audit logs.
 
 ```
 

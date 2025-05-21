@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature
+from cmdbox.app.auth import signin
 from cmdbox.app.features.cli import cmdbox_cmd_list
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -152,7 +153,8 @@ class AgentBase(feature.ResultEdgeFeature):
                       f" signin_file = {args.signin_file if hasattr(args, 'signin_file') and args.signin_file else f'.{self.ver.__appid__}/user_list.yml'}\n" + \
                       f"6. 以上のパラメータを使用しても不足するパラメータは、Noneを使用します。\n" + \
                       f"7. 以上のパラメータを使用してコマンドを実行して、コマンドの結果はJSONでユーザーに提示してください。\n" + \
-                      f"8. もしエラーが発生した場合は、ユーザーにコマンド名とパラメータとエラー内容を提示してください。\n"
+                      f"8. もし予期しないパラメータを受け取ったという旨のエラーが発生した場合は、そのパラメータを指定せずに再実行してください。\n" + \
+                      f"9. もしエラーが発生した場合は、ユーザーにコマンド名とパラメータとエラー内容を提示してください。\n"
 
         description = description if is_japan else \
                       f"Command offer registered in {self.ver.__appid__}."
@@ -182,7 +184,8 @@ class AgentBase(feature.ResultEdgeFeature):
                       f" clmsg_id = {args.clmsg_id if hasattr(args, 'clmsg_id') and args.clmsg_id else None}\n" + \
                       f"6. Use None for parameters that are missing even with the above parameters.\n" + \
                       f"7. Execute the command using the above parameters and present the results of the command to the user in JSON.\n" + \
-                      f"8. If an error occurs, provide the user with the command name, parameters, and error description.\n"
+                      f"8. If you receive an error stating that an unexpected parameter was received, rerun the program without that parameter.\n" + \
+                      f"9. If an error occurs, provide the user with the command name, parameters, and error description.\n"
 
         description = args.agent_description if args.agent_description else description
         instruction = args.agent_instruction if args.agent_instruction else instruction
@@ -375,7 +378,14 @@ class AgentBase(feature.ResultEdgeFeature):
                     continue
                 discription = options.get_cmd_attr(mode, cmd, 'discription_ja' if is_japan else 'discription_en')
                 choices = options.get_cmd_choices(mode, cmd, False)
-                feat:feature.Feature = options.get_cmd_attr(mode, cmd, 'feature')
+                if len([opt for opt in choices if 'opt' in opt and opt['opt'] == 'signin_file']) <= 0:
+                    choices.append(dict(opt="signin_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None,
+                        discription_ja="サインイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。",
+                        discription_en="Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required."),)
+                if len([opt for opt in choices if 'opt' in opt and opt['opt'] == 'groups']) <= 0:
+                    choices.append(dict(opt="groups", type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=None,
+                        discription_ja="`signin_file` を指定した場合に、このユーザーグループに許可されているコマンドかどうかをチェックします。",
+                        discription_en="If `signin_file` is specified, checks if the command is allowed for this user group."),)
                 fn = f"{mode}_{cmd}"
                 func_txt =  f'@mcp.tool()\n'
                 func_txt += f'def {fn}('+", ".join([f'{o["opt"]}{_t2s(o["type"], o["multi"], o["default"])}' for o in choices])+'):\n'
@@ -410,16 +420,21 @@ class AgentBase(feature.ResultEdgeFeature):
                 func_txt += f'    {_coercion(args, "capture_maxsize", 1024*1024)}\n'
                 func_txt += f'    {_coercion(args, "tag", None)}\n'
                 func_txt += f'    {_coercion(args, "clmsg_id", None)}\n'
-                func_txt += f'    {_coercion(args, "signin_file", Path(f".{self.ver.__appid__}")/"user_list.yml")}\n'
+                func_txt += f'    opt["signin_file"] = signin_file if signin_file else ".{self.ver.__appid__}/user_list.yml"\n'
+                func_txt += f'    groups = groups if groups else []\n'
                 func_txt += f'    args = argparse.Namespace(**opt)\n'
+                func_txt += f'    signin_data = signin.Signin.load_signin_file(args.signin_file)\n'
+                func_txt += f'    if not signin.Signin._check_cmd(signin_data, groups, "{mode}", "{cmd}", logger):\n'
+                func_txt += f'        return dict(warn="You do not have permission to execute this command.")\n'
                 func_txt += f'    feat = Options.getInstance().get_cmd_attr("{mode}", "{cmd}", "feature")\n'
                 func_txt += f'    st, ret, _ = feat.apprun(logger, args, time.perf_counter(), [])\n'
                 func_txt += f'    return ret\n'
                 func_txt += f'tools.append({fn})\n'
                 if logger.level == logging.DEBUG:
                     logger.debug(f"generating agent tool: {fn}")
+                    
                 exec(func_txt,
-                     dict(time=time,List=List, argparse=argparse, common=common, Options=Options, logging=logging),
+                     dict(time=time,List=List, argparse=argparse, common=common, Options=Options, logging=logging, signin=signin,),
                      dict(tools=tools, mcp=mcp))
         root_agent = self.create_agent(logger, args, tools)
         runner = self.create_runner(logger, args, session_service, root_agent)

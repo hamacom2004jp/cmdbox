@@ -3,6 +3,7 @@ from cmdbox.app.auth import signin, signin_saml
 from cmdbox.app.commons import module
 from fastapi import FastAPI, Request, Response
 from pathlib import Path
+from starlette.applications import Starlette
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.routing import Mount
 from typing import Any, Dict, List
@@ -801,9 +802,10 @@ class Web:
 
         if self.mcp is not None:
             # MCPをFastAPIにマウント
-            mcp_app = self.mcp.sse_app(mount_path="/mcp")
+            mcp_app:Starlette = self.mcp.sse_app(mount_path="/mcp")
             app = FastAPI(lifespan=self.mcp.settings.lifespan)
-            app.mount("/mcp-server", mcp_app)
+            app.mount("/mcp", mcp_app)
+            #app.include_router(mcp_app.router)
         else:
             app = FastAPI()
         #app = FastAPI()

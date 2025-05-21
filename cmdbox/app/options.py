@@ -1,6 +1,6 @@
 from cmdbox.app import common, feature, web
 from cmdbox.app.commons import module
-from fastapi import Request
+from fastapi import Request, WebSocket
 from fastapi.routing import APIRoute
 from datetime import datetime
 from pathlib import Path
@@ -49,6 +49,7 @@ class Options:
         self.aliases_loaded_cli = False
         self.aliases_loaded_web = False
         self.audit_loaded = False
+        self.agentrule_loaded = False
         self.init_options()
 
     def get_mode_keys(self) -> List[str]:
@@ -345,6 +346,7 @@ class Options:
                 svcmd = fobj.get_svcmd()
                 if svcmd is not None:
                     self._options["svcmd"][svcmd] = fobj
+                opt['use_agent'] = self.check_agentrule(mode, cmd, logger)
         self.init_debugoption()
     
     def is_features_loaded(self, ftype:str) -> bool:
@@ -396,6 +398,8 @@ class Options:
                 return
             if type(yml['features'][ftype]) is not list:
                 raise Exception(f'features.yml is invalid. (The “features.{ftype} element must be a list. {ftype}={yml["features"][ftype]})')
+            # featureモジュール読込みの前にagentruleの読み込み
+            self.load_features_agentrule(logger)
             for data in yml['features'][ftype]:
                 if type(data) is not dict:
                     raise Exception(f'features.yml is invalid. (The “features.{ftype}” element must be a list element must be a dictionary. data={data})')
@@ -414,6 +418,7 @@ class Options:
                     exclude_modules = data['exclude_modules']
                 func(data['package'], data['prefix'], exclude_modules, appcls, ver, logger, self.is_features_loaded(ftype))
                 self.features_loaded[ftype] = True
+
 
     def load_features_args(self, args_dict:Dict[str, Any]):
         yml = self.features_yml_data
@@ -658,6 +663,54 @@ class Options:
         self.audit_search_args['cmd'] = cmd
         self.audit_loaded = True
 
+    def load_features_agentrule(self, logger:logging.Logger):
+        yml = self.features_yml_data
+        if yml is None: return
+        if self.agentrule_loaded: return
+        if 'agentrule' not in yml: return
+        if 'policy' not in yml['agentrule']:
+            raise Exception('features.yml is invalid. (The agentrule element must have "policy" specified.)')
+        if yml['agentrule']['policy'] not in ['allow', 'deny']:
+            raise Exception('features.yml is invalid. (The policy element must specify allow or deny.)')
+        if 'rules' not in yml['agentrule']:
+            raise Exception('features.yml is invalid. (The agentrule element must have "rules" specified.)')
+        for rule in yml['agentrule']['rules']:
+            if 'mode' not in rule:
+                rule['mode'] = None
+            if 'cmds' not in rule:
+                rule['cmds'] = []
+            if rule['mode'] is None and len(rule['cmds']) > 0:
+                raise Exception('features.yml is invalid. (When “cmds” is specified, “mode” must be specified.)')
+            if 'rule' not in rule:
+                raise Exception('features.yml is invalid. (The agentrule.rules element must have "rule" specified.)')
+        self.agentrule_loaded = True
+
+    def check_agentrule(self, mode:str, cmd:str, logger:logging.Logger) -> bool:
+        """
+        エージェントが使用してよいコマンドかどうかをチェックします
+
+        Args:
+            mode (str): モード
+            cmd (str): コマンド
+
+        Returns:
+            bool: 認可されたかどうか
+        """
+        if not self.agentrule_loaded:
+            return False
+        # コマンドチェック
+        jadge = self.features_yml_data['agentrule']['policy']
+        for rule in self.features_yml_data['agentrule']['rules']:
+            if rule['mode'] is not None:
+                if rule['mode'] != mode:
+                    continue
+                if len([c for c in rule['cmds'] if cmd == c]) <= 0:
+                    continue
+            jadge = rule['rule']
+        if logger.level == logging.DEBUG:
+            logger.debug(f"agent rule: mode={mode}, cmd={cmd}: {jadge}")
+        return jadge == 'allow'
+
     AT_USER = 'user'
     AT_ADMIN = 'admin'
     AT_SYSTEM = 'system'
@@ -779,7 +832,7 @@ class Options:
             elif isinstance(arg, feature.Feature):
                 func_feature = arg
                 opt['clmsg_src'] = func_feature.__class__.__name__
-            elif isinstance(arg, Request):
+            elif isinstance(arg, Request) or isinstance(arg, WebSocket):
                 if 'signin' in arg.session and arg.session['signin'] is not None and 'name' in arg.session['signin']:
                     opt['clmsg_user'] = arg.session['signin']['name']
                     if opt['audit_type'] is None:

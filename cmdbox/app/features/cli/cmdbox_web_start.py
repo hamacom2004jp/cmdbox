@@ -37,7 +37,6 @@ class WebStart(feature.UnsupportEdgeFeature, agent_base.AgentBase):
         """
         opt = super().get_option()
         opt['use_redis'] = self.USE_REDIS_MEIGHT
-        opt['use_agent'] = False
         opt['nouse_webmode'] = True
         opt['discription_ja'] = "Webモードを起動します。"
         opt['discription_en'] = "Start Web mode."

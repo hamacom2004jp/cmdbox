@@ -559,30 +559,31 @@ cmdbox.load_server_list = (parent_elem, call_back_func, server_only, current_onl
         opt["capture_stdout"] = true;
         delete opt['svname'];
         cmdbox.sv_exec_cmd(opt).then(res => {
-        if(!res[0] || !res[0]['success']) {
-            cmdbox.message(res);
-            return;
-        }
-        if(res.length<=0 || !res[0]['success']) {
-            cmdbox.hide_loading();
-            return;
-        }
-        const svnames = {};
-        res[0]['success'].forEach(elem => {
-            const svname = elem['svname'].split('-')[0];
-            if (svnames[svname]) return;
-            svnames[svname] = true;
-            const a_elem = $(`<a class="dropdown-item" href="#" data-client_data="">${svname} ( ${opt['host']}:${opt['port']} )</a>`);
-            a_elem.attr('data-host', opt['host']);
-            a_elem.attr('data-port', opt['port']);
-            a_elem.attr('data-password', opt['password']);
-            a_elem.attr('data-svname', svname);
-            a_elem.attr('data-scope', "server");
-            a_elem.off("click").on("click", mk_func(a_elem));
-            const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
-            parent_elem.find('.filer_server').append(li_elem);
-        });
-        parent_elem.find('.filer_server').find('.dropdown-item:first').click();
+            if(res && res['success']) res = [res];
+            if(!res[0] || !res[0]['success']) {
+                cmdbox.message(res);
+                return;
+            }
+            if(res.length<=0 || !res[0]['success']) {
+                cmdbox.hide_loading();
+                return;
+            }
+            const svnames = {};
+            res[0]['success'].forEach(elem => {
+                const svname = elem['svname'].split('-')[0];
+                if (svnames[svname]) return;
+                svnames[svname] = true;
+                const a_elem = $(`<a class="dropdown-item" href="#" data-client_data="">${svname} ( ${opt['host']}:${opt['port']} )</a>`);
+                a_elem.attr('data-host', opt['host']);
+                a_elem.attr('data-port', opt['port']);
+                a_elem.attr('data-password', opt['password']);
+                a_elem.attr('data-svname', svname);
+                a_elem.attr('data-scope', "server");
+                a_elem.off("click").on("click", mk_func(a_elem));
+                const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
+                parent_elem.find('.filer_server').append(li_elem);
+            });
+            parent_elem.find('.filer_server').find('.dropdown-item:first').click();
         }).catch((e) => {
             console.log(e);
         }).finally(() => {
@@ -707,7 +708,8 @@ cmdbox.file_list = (target, svpath, recursive=false, error_func=undefined, exec_
     cmdbox.show_loading();
     const exec = exec_cmd ? exec_cmd : cmdbox.sv_exec_cmd;
     return exec(opt).then(res => {
-        if(!res[0] || !res[0]['success']) {
+        if (res && res['success']) res = [res];
+        if (!res[0] || !res[0]['success']) {
             if (error_func) {
                 error_func(res);
                 return;
@@ -737,7 +739,8 @@ cmdbox.file_download = (target, svpath, error_func=undefined, exec_cmd=undefined
     cmdbox.show_loading();
     const exec = exec_cmd ? exec_cmd : cmdbox.sv_exec_cmd;
     return exec(opt).then(res => {
-        if(!res[0] || !res[0]['success'] || !res[0]['success']['data']) {
+        if (res && res['success']) res = [res];
+        if (!res[0] || !res[0]['success'] || !res[0]['success']['data']) {
             if (error_func) {
                 error_func(res);
                 return;
@@ -824,7 +827,8 @@ cmdbox.file_copy = (target, from_path, to_path, orverwrite=false, error_func=und
     cmdbox.show_loading();
     const exec = exec_cmd ? exec_cmd : cmdbox.sv_exec_cmd;
     return exec(opt).then(res => {
-        if(!res[0] || !res[0]['success']) {
+        if (res && res['success']) res = [res];
+        if (!res[0] || !res[0]['success']) {
             if (error_func) {
                 error_func(res);
                 return;
@@ -855,7 +859,8 @@ cmdbox.file_move = (target, from_path, to_path, error_func=undefined, exec_cmd=u
     cmdbox.show_loading();
     const exec = exec_cmd ? exec_cmd : cmdbox.sv_exec_cmd;
     return exec(opt).then(res => {
-        if(!res[0] || !res[0]['success']) {
+        if (res && res['success']) res = [res];
+        if (!res[0] || !res[0]['success']) {
             if (error_func) {
                 error_func(res);
                 return;
@@ -884,7 +889,8 @@ cmdbox.file_remove = (target, svpath, error_func=undefined, exec_cmd=undefined) 
     cmdbox.show_loading();
     const exec = exec_cmd ? exec_cmd : cmdbox.sv_exec_cmd;
     return exec(opt).then(res => {
-        if(!res[0] || !res[0]['success']) {
+        if (res && res['success']) res = [res];
+        if (!res[0] || !res[0]['success']) {
             if (error_func) {
                 error_func(res);
                 return;
@@ -913,7 +919,8 @@ cmdbox.file_rmdir = (target, svpath, error_func=undefined, exec_cmd=undefined) =
     cmdbox.show_loading();
     const exec = exec_cmd ? exec_cmd : cmdbox.sv_exec_cmd;
     return exec(opt).then(res => {
-        if(!res[0] || !res[0]['success']) {
+        if (res && res['success']) res = [res];
+        if (!res[0] || !res[0]['success']) {
             if (error_func) {
                 error_func(res);
                 return;
@@ -942,7 +949,8 @@ cmdbox.file_mkdir = (target, svpath, error_func=undefined, exec_cmd=undefined) =
     cmdbox.show_loading();
     const exec = exec_cmd ? exec_cmd : cmdbox.sv_exec_cmd;
     return exec(opt).then(res => {
-        if(!res[0] || !res[0]['success']) {
+        if (res && res['success']) res = [res];
+        if (!res[0] || !res[0]['success']) {
             if (error_func) {
                 error_func(res);
                 return;

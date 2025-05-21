@@ -256,7 +256,7 @@ class Signin(object):
                 rule['mode'] = None
             if 'cmds' not in rule:
                 rule['cmds'] = []
-            if rule['mode'] is not None and len(rule['cmds']) <= 0:
+            if rule['mode'] is None and len(rule['cmds']) > 0:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. When “cmds” is specified, “mode” must be specified. ({signin_file})')
             if type(rule['cmds']) is not list:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "cmds" not list type in "cmdrule.rules". ({signin_file})')

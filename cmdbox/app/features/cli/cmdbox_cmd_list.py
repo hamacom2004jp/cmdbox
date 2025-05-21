@@ -35,7 +35,7 @@ class CmdList(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
             discription_ja="データフォルダ配下のコマンドリストを取得します。",
             discription_en="Obtains a list of commands under the data folder.",
             choice=[

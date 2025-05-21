@@ -32,7 +32,7 @@ class EdgeStart(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True, use_agent=False,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
             discription_ja="端末モードを起動します。",
             discription_en="Start Edge mode.",
             choice=[

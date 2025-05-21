@@ -33,7 +33,7 @@ class WebGroupList(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False, use_agent=True,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
             discription_ja="Webモードのグループー一覧を取得します。",
             discription_en="Get a list of users in Web mode.",
             choice=[

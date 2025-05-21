@@ -21,68 +21,85 @@ Configuration items in `features.yml`
 .. code-block:: yaml
 
     features:
-        cli:                                    # Specify a list of package names in which the module implementing the command is located.
-            - package: cmdbox.app.features.cli  # Package Name. Classes inheriting from cmdbox.app.feature.Feature.
-              prefix: cmdbox_                   # Module name prefix. Modules that begin with this letter are eligible.
-              exclude_modules: []               # Specify the module name to exclude from the list of modules to be loaded.
-        web:                                    # Specify a list of package names with modules that implement web screens and RESTAPIs.
-            - package: cmdbox.app.features.web  # Package Name. Classes inheriting from cmdbox.app.feature.WebFeature .
-              prefix: cmdbox_web_               # Module name prefix. Modules that begin with this letter are eligible.
-        args:                                   # Specifies default or forced arguments for the specified command.
-            cli:                                # Specify rules to apply default values or force arguments.
-                - rule:                         # Specify the rules for applying default values and forced arguments for each command line option.
-                                                #   e.g. mode: web
-                  default:                      # Specify a default value for each item to be set when a rule is matched.
-                                                #   e.g. doc_root: f"{Path(self.ver.__file__).parent / 'web'}"
-                  coercion:                     # Specify a coercion value for each item to be set when a rule is matched.
-                                                #   e.g. doc_root: f"{Path(self.ver.__file__).parent / 'web'}"
-    aliases:                                    # Specify the alias for the specified command.
-        cli:                                    # Specify the alias for the command line.
-            - source:                           # Specifies the command from which the alias originates.
-                mode:                           # Specify the mode of the source command. The exact match "mode" is selected.
-                                                #   e.g. client
-                cmd:                            # Specify the source command to be aliased. The regex match "cmd" is selected.
-                                                #   e.g. (.+)_(.+)
-              target:                           # Specifies the command to be aliased to.
-                mode:                           # Specify the mode of the target command. Create an alias for this “mode”.
-                                                #   e.g. CLIENT
-                cmd:                            # Specify the target command to be aliased. Create an alias for this “cmd”, referring to the regular expression group of source by "{n}".
-                                                #   e.g. {2}_{1}
-                move:                           # Specify whether to move the regular expression group of the source to the target.
-                                                #   e.g. true
-        web:                                    # Specify the alias for the RESTAPI.
-            - source:                           # Specifies the RESTAPI from which the alias originates.
-                path:                           # Specify the path of the source RESTAPI. The regex match "path" is selected.
-                                                #   e.g. /exec_(.+)
-              target:                           # Specifies the RESTAPI to be aliased to.
-                path:                           # Specify the path of the target RESTAPI. Create an alias for this “path”, referring to the regular expression group of source by "{n}".
-                                                #   e.g. /{1}_exec
-                move:                           # Specify whether to move the regular expression group of the source to the target.
-                                                #   e.g. true
-        audit:
-            enabled: true                       # Specify whether to enable the audit function.
-            write:
-                mode: audit                     # Specify the mode of the feature to be writed.
-                cmd: write                      # Specify the command to be writed.
-            search:
-                mode: audit                     # Specify the mode of the feature to be searched.
-                cmd: search                     # Specify the command to be searched.
-            options:                            # Specify the options for the audit function.
-                host: localhost                 # Specify the service host of the audit Redis server.However, if it is specified as a command line argument, it is ignored.
-                port: 6379                      # Specify the service port of the audit Redis server.However, if it is specified as a command line argument, it is ignored.
-                password: password              # Specify the access password of the audit Redis server.However, if it is specified as a command line argument, it is ignored.
-                svname: server                  # Specify the audit service name of the inference server.However, if it is specified as a command line argument, it is ignored.
-                retry_count: 3                  # Specifies the number of reconnections to the audit Redis server.If less than 0 is specified, reconnection is forever.
-                retry_interval: 1               # Specifies the number of seconds before reconnecting to the audit Redis server.
-                timeout: 15                     # Specify the maximum waiting time until the server responds.
-                pg_enabled: False               # Specify True if using the postgresql database server.
-                pg_host: localhost              # Specify the postgresql host.
-                pg_port: 5432                   # Specify the postgresql port.
-                pg_user: postgres               # Specify the postgresql user name.
-                pg_password: password           # Specify the postgresql password.
-                pg_dbname: audit                # Specify the postgresql database name.
-                retention_period_days: 365      # Specify the number of days to retain audit logs.
-
+      cli:                                  # Specify a list of package names in which the module implementing the command is located.
+        - package: cmdbox.app.features.cli  # Package Name. Classes inheriting from cmdbox.app.feature.Feature.
+          prefix: cmdbox_                   # Module name prefix. Modules that begin with this letter are eligible.
+          exclude_modules: []               # Specify the module name to exclude from the list of modules to be loaded.
+      web:                                  # Specify a list of package names with modules that implement web screens and RESTAPIs.
+        - package: cmdbox.app.features.web  # Package Name. Classes inheriting from cmdbox.app.feature.WebFeature .
+          prefix: cmdbox_web_               # Module name prefix. Modules that begin with this letter are eligible.
+    args:                                   # Specifies default or forced arguments for the specified command.
+      cli:                                  # Specify rules to apply default values or force arguments.
+        - rule:                             # Specify the rules for applying default values and forced arguments for each command line option.
+                                            #   e.g. mode: web
+          default:                          # Specify a default value for each item to be set when a rule is matched.
+                                            #   e.g. doc_root: f"{Path(self.ver.__file__).parent / 'web'}"
+          coercion:                         # Specify a coercion value for each item to be set when a rule is matched.
+                                            #   e.g. doc_root: f"{Path(self.ver.__file__).parent / 'web'}"
+    aliases:                                # Specify the alias for the specified command.
+      cli:                                  # Specify the alias for the command line.
+        - source:                           # Specifies the command from which the alias originates.
+            mode:                           # Specify the mode of the source command. The exact match "mode" is selected.
+                                            #   e.g. client
+            cmd:                            # Specify the source command to be aliased. The regex match "cmd" is selected.
+                                            #   e.g. (.+)_(.+)
+          target:                           # Specifies the command to be aliased to.
+            mode:                           # Specify the mode of the target command. Create an alias for this “mode”.
+                                            #   e.g. CLIENT
+            cmd:                            # Specify the target command to be aliased. Create an alias for this “cmd”, referring to the regular expression group of source by "{n}".
+                                            #   e.g. {2}_{1}
+            move:                           # Specify whether to move the regular expression group of the source to the target.
+                                            #   e.g. true
+      web:                                  # Specify the alias for the RESTAPI.
+        - source:                           # Specifies the RESTAPI from which the alias originates.
+            path:                           # Specify the path of the source RESTAPI. The regex match "path" is selected.
+                                            #   e.g. /exec_(.+)
+          target:                           # Specifies the RESTAPI to be aliased to.
+            path:                           # Specify the path of the target RESTAPI. Create an alias for this “path”, referring to the regular expression group of source by "{n}".
+                                            #   e.g. /{1}_exec
+            move:                           # Specify whether to move the regular expression group of the source to the target.
+                                            #   e.g. true
+    agentrule:                              # Specifies a list of rules that determine which commands the agent can execute.
+      policy: deny                          # Specify the default policy for the rule. The value can be allow or deny.
+      rules:                                # Specify the rules for the commands that the agent can execute according to the group to which the user belongs.
+      - mode: audit                         # Specify the "mode" as the condition for applying the rule.
+        cmds: [search, write]               # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
+        rule: allow                         # Specifies whether the specified command is allowed or not. Values are allow or deny.
+      - mode: client
+        cmds: [file_copy, file_download, file_list, file_mkdir, file_move, file_remove, file_rmdir, file_upload, server_info]
+        rule: allow
+      - mode: cmd
+        cmds: [list, load]
+        rule: allow
+      - mode: server
+        cmds: [list]
+        rule: allow
+      - mode: web
+        cmds: [gencert, genpass, group_list, user_list]
+        rule: allow
+    audit:
+      enabled: true                         # Specify whether to enable the audit function.
+      write:
+        mode: audit                         # Specify the mode of the feature to be writed.
+        cmd: write                          # Specify the command to be writed.
+      search:
+        mode: audit                         # Specify the mode of the feature to be searched.
+        cmd: search                         # Specify the command to be searched.
+      options:                              # Specify the options for the audit function.
+        host: localhost                     # Specify the service host of the audit Redis server.However, if it is specified as a command line argument, it is ignored.
+        port: 6379                          # Specify the service port of the audit Redis server.However, if it is specified as a command line argument, it is ignored.
+        password: password                  # Specify the access password of the audit Redis server.However, if it is specified as a command line argument, it is ignored.
+        svname: cmdbox                      # Specify the audit service name of the inference server.However, if it is specified as a command line argument, it is ignored.
+        retry_count: 3                      # Specifies the number of reconnections to the audit Redis server.If less than 0 is specified, reconnection is forever.
+        retry_interval: 1                   # Specifies the number of seconds before reconnecting to the audit Redis server.
+        timeout: 15                         # Specify the maximum waiting time until the server responds.
+        pg_enabled: False                   # Specify True if using the postgresql database server.
+        pg_host: localhost                  # Specify the postgresql host.
+        pg_port: 5432                       # Specify the postgresql port.
+        pg_user: postgres                   # Specify the postgresql user name.
+        pg_password: password               # Specify the postgresql password.
+        pg_dbname: audit                    # Specify the postgresql database name.
+        retention_period_days: 365          # Specify the number of days to retain audit logs.
 
 - See also the contents of `.sample/sample_project/sample/extensions/features.yml`.
 

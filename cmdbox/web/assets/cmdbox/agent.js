@@ -50,7 +50,7 @@ agent.init_form = async () => {
         const host = window.location.hostname;
         const port = window.location.port;
         const path = window.location.pathname;
-        const ws = new WebSocket(`${protocol}://${host}:${port}${path}/chat`);
+        const ws = new WebSocket(`${protocol}://${host}:${port}${path}/chat/ws`);
         // エージェントからのメッセージ受信時の処理
         ws.onmessage = (event) => {
             const packet = JSON.parse(event.data);

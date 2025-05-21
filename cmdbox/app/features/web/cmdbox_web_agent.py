@@ -1,10 +1,12 @@
 from cmdbox.app import common, feature
+from cmdbox.app.commons import convert
 from cmdbox.app.web import Web
 from fastapi import FastAPI, HTTPException, Request, Response, WebSocket
 from fastapi.responses import HTMLResponse, StreamingResponse
 from starlette.websockets import WebSocketDisconnect
 from pathlib import Path
 from starlette.applications import Starlette
+from starlette.datastructures import UploadFile
 from starlette.routing import Mount
 from typing import Dict, Any, Tuple, List, Union
 import locale
@@ -52,53 +54,98 @@ class Agent(feature.WebFeature):
             if 'signin' in req.session:
                 user_id = req.session['signin']['name']
             sessions = web.list_agent_sessions(web.agent_runner.session_service, user_id)
-            #data = []
-            #for s in sessions:
-            #    d = dict(id=s.id, app_name=s.app_name, user_id=s.user_id, last_update_time=s.last_update_time)
-            #    data.append(d)
-            #    elist = web.list_agent_events(web.agent_runner.session_service, user_id, s.id)
-            #    d['events'] = []
-            #    for e in elist:
-            #        if e.content and e.content.parts:
-            #            d['events'].append(dict(author=e.author, text=e.content.parts[0].text))
             data = [dict(id=s.id, app_name=s.app_name, user_id=s.user_id, last_update_time=s.last_update_time,
                          events=[dict(author=ev.author,text=ev.content.parts[0].text) for ev in s.events if ev.content and ev.content.parts]) for s in sessions]
             return dict(success=data)
 
-        @app.websocket('/agent/chat')
-        @app.websocket('/agent/chat/{session_id}')
-        async def chat(session_id:str=None, websocket:WebSocket=None, res:Response=None):
+        @app.websocket('/agent/chat/ws')
+        @app.websocket('/agent/chat/ws/{session_id}')
+        async def ws_chat(session_id:str=None, websocket:WebSocket=None, res:Response=None):
             if not websocket:
                 raise HTTPException(status_code=400, detail='Expected WebSocket request.')
+            signin = web.signin.check_signin(websocket, res)
+            if signin is not None:
+                return signin
             if web.agent_runner is None:
                 web.logger.error(f"agent_runner is null. Start web mode with `--agent use`.")
                 raise HTTPException(status_code=500, detail='agent_runner is null. Start web mode with `--agent use`.')
+
+            # これを行わねば非同期処理にならない。。
+            await websocket.accept()
+            # チャット処理
+            async for res in _chat(websocket.session, session_id, websocket, websocket.receive_text):
+                await websocket.send_text(res)
+            return dict(success="connected")
+
+        @app.api_route('/agent/chat/sse', methods=['GET', 'POST'])
+        @app.api_route('/agent/chat/sse/{session_id}', methods=['GET', 'POST'])
+        async def sse_chat(session_id:str=None, req:Request=None, res:Response=None):
+            signin = web.signin.check_signin(req, res)
+            if signin is not None:
+                return signin
+            def _marge_opt(opt, param):
+                for k in opt.keys():
+                    if k in param: opt[k] = param[k]
+                return opt
+            content_type = req.headers.get('content-type')
+            opt = None
+            if content_type is None:
+                opt = req.query_params._dict
+            elif content_type.startswith('multipart/form-data'):
+                form = await req.form()
+                opt = dict()
+                for key, fv in form.multi_items():
+                    if not isinstance(fv, UploadFile): continue
+                    opt[key] = fv.file
+            elif content_type.startswith('application/json'):
+                opt = await req.json()
+            elif content_type.startswith('application/octet-stream'):
+                opt = json.loads(await req.body())
+            if opt is None:
+                raise HTTPException(status_code=400, detail='Expected JSON or form data.')
+            if opt['query'] is None or opt['query'] == '':
+                raise HTTPException(status_code=400, detail='Expected query.')
+            if web.agent_runner is None:
+                web.logger.error(f"agent_runner is null. Start web mode with `--agent use`.")
+                raise HTTPException(status_code=500, detail='agent_runner is null. Start web mode with `--agent use`.')
+            async def receive_text():
+                # 受信したデータを返す
+                if 'query' in opt:
+                    query = opt['query']
+                    del opt['query']
+                    return query
+                raise self.SSEDisconnect('SSE disconnect')
+            # チャット処理
+            return StreamingResponse(
+                _chat(req.session, session_id, req, receive_text=receive_text)
+            )
+
+        async def _chat(session:Dict[str, Any], session_id:str, sock, receive_text=None):
             web.logger.info(f"agent_chat: connected")
             # ユーザー名を取得する
             user_id = common.random_string(16)
             groups = []
-            if 'signin' in websocket.session:
-                user_id = websocket.session['signin']['name']
-                groups = websocket.session['signin']['groups']
-            # これを行わねば非同期処理にならない。。
-            await websocket.accept()
+            if 'signin' in session:
+                user_id = session['signin']['name']
+                groups = session['signin']['groups']
             # 言語認識
             language, _ = locale.getlocale()
             is_japan = language.find('Japan') >= 0 or language.find('ja_JP') >= 0
             # セッションを作成する
             agent_session = web.create_agent_session(web.agent_runner.session_service, user_id, session_id=session_id)
             startmsg = "こんにちは！何かお手伝いできることはありますか？" if is_japan else "Hello! Is there anything I can help you with?"
-            await websocket.send_text(json.dumps(dict(message=startmsg), default=common.default_json_enc))
+            yield json.dumps(dict(message=startmsg), default=common.default_json_enc)
             from google.genai import types
             while True:
                 outputs = None
                 try:
-                    query = await websocket.receive_text()
+                    query = await receive_text()
                     if query is None or query == '' or query == 'ping':
                         time.sleep(0.5)
                         continue
                     if is_japan:
-                        query += f"なお現在のユーザーは'{user_id}'でgroupsは'{groups}'ですので引数に必要な時は指定してください。"
+                        query += f"なお現在のユーザーは'{user_id}'でgroupsは'{groups}'ですので引数に必要な時は指定してください。" + \
+                            f"またsignin_fileの引数が必要な時は'{web.signin.signin_file}'を指定してください。"
                             #f"またコマンド実行に必要なパラメータを確認し、以下の引数が必要な場合はこの値を使用してください。\n" + \
                             #f"  host = {web.redis_host if web.redis_host else self.default_host}\n" + \
                             #f", port = {web.redis_port if web.redis_port else self.default_port}\n" + \
@@ -111,6 +158,7 @@ class Agent(feature.WebFeature):
                             #f", port = {web.redis_port if web.redis_port else self.default_port}\n" + \
                             #f", password = {web.redis_password if web.redis_password else self.default_pass}\n" + \
                             #f", svname = {web.svname if web.svname else self.default_svname}\n"
+                    web.options.audit_exec(sock, web, body=dict(agent_session=agent_session.id, user_id=user_id, groups=groups, query=query))
                     content = types.Content(role='user', parts=[types.Part(text=query)])
 
                     async for event in web.agent_runner.run_async(user_id=user_id, session_id=agent_session.id, new_message=content):
@@ -118,10 +166,10 @@ class Agent(feature.WebFeature):
                         outputs = dict()
                         if event.turn_complete:
                             outputs['turn_complete'] = True
-                            await websocket.send_text(json.dumps(outputs, default=common.default_json_enc))
+                            yield json.dumps(outputs, default=common.default_json_enc)
                         if event.interrupted:
                             outputs['interrupted'] = True
-                            await websocket.send_text(json.dumps(outputs, default=common.default_json_enc))
+                            yield json.dumps(outputs, default=common.default_json_enc)
                         #if event.is_final_response():
                         msg = None
                         if event.content and event.content.parts:
@@ -130,16 +178,19 @@ class Agent(feature.WebFeature):
                             msg = f"Agent escalated: {event.error_message or 'No specific message.'}"
                         if msg:
                             outputs['message'] = msg
-                            await websocket.send_text(json.dumps(outputs, default=common.default_json_enc))
+                            web.options.audit_exec(sock, web, body=dict(agent_session=agent_session.id, result=msg))
+                            yield json.dumps(outputs, default=common.default_json_enc)
                             if event.is_final_response():
                                 break
                 except WebSocketDisconnect:
                     web.logger.warning('chat: websocket disconnected.')
                     break
+                except self.SSEDisconnect as e:
+                    break
                 except Exception as e:
                     web.logger.warning(f'chat error.', exc_info=True)
-                    await websocket.send_text(json.dumps(dict(message=f'<pre>{traceback.format_exc()}</pre>'), default=common.default_json_enc))
-
+                    yield json.dumps(dict(message=f'<pre>{traceback.format_exc()}</pre>'), default=common.default_json_enc)
+                    break
             
     def toolmenu(self, web:Web) -> Dict[str, Any]:
         """
@@ -164,3 +215,8 @@ class Agent(feature.WebFeature):
         """
         return dict(agent=dict(html='Agent', href='agent', target='_blank', css_class='dropdown-item'))
 
+    class SSEDisconnect(Exception):
+        """
+        SSEの切断を示す例外クラス
+        """
+        pass

@@ -40,7 +40,6 @@ class AuditSearch(audit_base.AuditBase):
             Dict[str, Any]: オプション
         """
         opt = super().get_option()
-        opt['use_agent'] = True
         opt['discription_ja'] = "監査ログを検索します。"
         opt['discription_en'] = "Search the audit log."
         opt['choice'] += [
