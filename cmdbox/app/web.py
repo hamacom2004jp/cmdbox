@@ -737,9 +737,8 @@ class Web:
 
         if self.agent_runner is not None:
             # google.adkが大きいので必要な時にだけ読込む
-            from google.adk.events import Event
             from google.adk.sessions import BaseSessionService, Session
-            def create_agent_session(session_service:BaseSessionService, user_id:str, session_id:str=None) -> Session:
+            async def create_agent_session(session_service:BaseSessionService, user_id:str, session_id:str=None) -> Session:
                 """
                 セッションを作成します
 
@@ -753,12 +752,12 @@ class Web:
                 """
                 if session_id is None:
                     session_id = common.random_string(32)
-                    session = session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
+                session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
                 if session is None:
-                    session = session_service.create_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
+                    session = await session_service.create_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
                 return session
             self.create_agent_session = create_agent_session
-            def list_agent_sessions(session_service:BaseSessionService, user_id:str) -> List[Session]:
+            async def list_agent_sessions(session_service:BaseSessionService, user_id:str, session_id:str=None) -> List[Session]:
                 """
                 セッションをリストします
 
@@ -769,9 +768,19 @@ class Web:
                 Returns:
                     List[Session]: セッションリスト
                 """
-                return session_service.list_sessions(app_name=self.ver.__appid__, user_id=user_id).sessions
+                if session_id is None:
+                    sessions = await session_service.list_sessions(app_name=self.ver.__appid__, user_id=user_id)
+                    ret = []
+                    for s in sessions.sessions:
+                        ret.append(await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=s.id))
+                    return ret
+                else:
+                    session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
+                    if session is None:
+                        return []
+                    return [session]
             self.list_agent_sessions = list_agent_sessions
-            def delete_agent_session(session_service:BaseSessionService, user_id:str, session_id:str) -> bool:
+            async def delete_agent_session(session_service:BaseSessionService, user_id:str, session_id:str) -> bool:
                 """
                 セッションを削除します
 
@@ -783,26 +792,12 @@ class Web:
                 Returns:
                     bool: 成功した場合はTrue, 失敗した場合はFalse
                 """
-                return session_service.delete_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
+                return await session_service.delete_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
             self.delete_agent_session = delete_agent_session
-            def list_agent_events(session_service:BaseSessionService, user_id:str, session_id:str) -> List[Event]:
-                """
-                セッションのイベントをリストします
-
-                Args:
-                    session_service (BaseSessionService): セッションサービス
-                    user_id (str): ユーザーID
-                    session_id (str): セッションID
-
-                Returns:
-                    List[Event]: イベントリスト
-                """
-                return session_service.list_events(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id).events
-            self.list_agent_events = list_agent_events
 
         if self.mcp is not None:
             # MCPをFastAPIにマウント
-            mcp_app:Starlette = self.mcp.sse_app(mount_path="/mcp")
+            mcp_app:Starlette = self.mcp.streamable_http_app()
             app = FastAPI(lifespan=self.mcp.settings.lifespan)
             app.mount("/mcp", mcp_app)
             #app.include_router(mcp_app.router)
@@ -870,7 +865,6 @@ class Web:
             traceback.print_exc()
         finally:
             self.logger.info(f"Exit web.")
-
 
 class ThreadedUvicorn:
     def __init__(self, logger:logging.Logger, config:Config, guvicorn_config:Dict[str, Any]):

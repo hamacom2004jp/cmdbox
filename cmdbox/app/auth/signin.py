@@ -91,7 +91,8 @@ class Signin(object):
             if path_jadge is not None:
                 return path_jadge
             return None
-        self.logger.info(f"Not found siginin session. Try check_apikey. path={req.url.path}")
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"Not found siginin session. Try check_apikey. path={req.url.path}")
         ret = self.check_apikey(req, res)
         if ret is not None and self.logger.level == logging.DEBUG:
             self.logger.debug(f"Not signed in.")
@@ -113,11 +114,11 @@ class Signin(object):
             res.headers['signin'] = 'success'
             return None
         if 'Authorization' not in req.headers:
-            self.logger.warning(f"Authorization not found. headers={req.headers}")
+            #self.logger.warning(f"Authorization not found. headers={req.headers}")
             return RedirectResponse(url=f'/signin{req.url.path}?error=noauth')
         auth = req.headers['Authorization']
         if not auth.startswith('Bearer '):
-            self.logger.warning(f"Bearer not found. headers={req.headers}")
+            #self.logger.warning(f"Bearer not found. headers={req.headers}")
             return RedirectResponse(url=f'/signin{req.url.path}?error=apikeyfail')
         bearer, apikey = auth.split(' ')
         apikey = common.hash_password(apikey.strip(), 'sha1')

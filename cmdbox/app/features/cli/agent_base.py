@@ -9,6 +9,7 @@ import asyncio
 import locale
 import logging
 import json
+import re
 import time
 
 
@@ -29,7 +30,7 @@ class AgentBase(feature.ResultEdgeFeature):
                 dict(opt="agent", type=Options.T_STR, default="no", required=False, multi=False, hide=False, choice=["no", "use"],
                      discription_ja="エージェントを使用するかどうかを指定します。",
                      discription_en="Specifies whether the agent is used.",
-                     choice_show=dict(use=["agent_name", "agent_description", "agent_instruction", "llmprov"],)),
+                     choice_show=dict(use=["agent_name", "agent_description", "agent_instruction", "agent_session_store", "llmprov"],)),
                 dict(opt="agent_name", type=Options.T_STR, default=self.ver.__appid__, required=False, multi=False, hide=False, choice=None,
                      discription_ja="エージェント名を指定します。",
                      discription_en="Specifies the agent name."),
@@ -39,9 +40,25 @@ class AgentBase(feature.ResultEdgeFeature):
                 dict(opt="agent_instruction", type=Options.T_TEXT, default=None, required=False, multi=False, hide=False, choice=None,
                      discription_ja="エージェントのシステム指示を指定します。",
                      discription_en="Specifies the agent's system instructions."),
-                dict(opt="agent_session_dburl", type=Options.T_TEXT, default=None, required=False, multi=False, hide=False, choice=None,
-                     discription_ja="エージェントのセッションを保存するDBのURLを指定します。",
-                     discription_en="Specify the URL of the DB where the agent's sessions are stored."),
+                dict(opt="agent_session_store", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=['memory', 'sqlite', 'postgresql'],
+                     discription_ja="エージェントのセッションを保存する方法を指定します。",
+                     discription_en="Specify how the agent's session is to be saved.",
+                     choice_show=dict(postgresql=["pg_host", "pg_port", "pg_user", "pg_password", "pg_dbname"]),),
+                dict(opt="pg_host", type=Options.T_STR, default='localhost', required=False, multi=False, hide=True, choice=None, web="mask",
+                     discription_ja="postgresqlホストを指定する。",
+                     discription_en="Specify the postgresql host."),
+                dict(opt="pg_port", type=Options.T_INT, default=5432, required=False, multi=False, hide=True, choice=None, web="mask",
+                     discription_ja="postgresqlのポートを指定する。",
+                     discription_en="Specify the postgresql port."),
+                dict(opt="pg_user", type=Options.T_STR, default='postgres', required=False, multi=False, hide=True, choice=None, web="mask",
+                     discription_ja="postgresqlのユーザー名を指定する。",
+                     discription_en="Specify the postgresql user name."),
+                dict(opt="pg_password", type=Options.T_STR, default='postgres', required=False, multi=False, hide=True, choice=None, web="mask",
+                     discription_ja="postgresqlのパスワードを指定する。",
+                     discription_en="Specify the postgresql password."),
+                dict(opt="pg_dbname", type=Options.T_STR, default='agent', required=False, multi=False, hide=True, choice=None,
+                     discription_ja="postgresqlデータベース名を指定します。",
+                     discription_en="Specify the postgresql database name."),
                 dict(opt="llmprov", type=Options.T_STR, default=None, required=False, multi=False, hide=False,
                      choice=["", "azureopenai", "openai", "vertexai", "ollama"],
                      discription_ja="llmのプロバイダを指定します。",
@@ -104,9 +121,27 @@ class AgentBase(feature.ResultEdgeFeature):
         Returns:
             BaseSessionService: セッションサービス
         """
-        from google.adk.sessions import DatabaseSessionService, InMemorySessionService
+        from google.adk.events import Event
+        from google.adk.sessions import DatabaseSessionService, InMemorySessionService, session
+        from typing_extensions import override
         if hasattr(args, 'agent_session_dburl') and args.agent_session_dburl is not None:
-            return DatabaseSessionService(db_url=args.agent_session_dburl)
+            class _DatabaseSessionService(DatabaseSessionService):
+                @override
+                async def append_event(self, session: session.Session, event: Event) -> Event:
+                    # 永続化されるセッションには <important> タグを含めない
+                    bk_parts = event.content.parts.copy()
+                    for part in event.content.parts:
+                        if not part.text: continue
+                        part.text = re.sub(r"<important>.*</important>", "", part.text)
+                    for part in bk_parts:
+                        if not part.text: continue
+                        part.text = part.text.replace("<important>", "").replace("</important>", "")
+                    ret = await super().append_event(session, event)
+                    ret.content.parts = bk_parts
+                    return ret
+            dss = _DatabaseSessionService(db_url=args.agent_session_dburl)
+            #dss.db_engine.echo = True
+            return dss
         else:
             return InMemorySessionService()
 
@@ -315,53 +350,28 @@ class AgentBase(feature.ResultEdgeFeature):
         options = Options.getInstance()
         tools:Callable[[logging.Logger, argparse.Namespace, float, Dict], Tuple[int, Dict[str, Any], Any]] = []
 
-        def _t2s(t:str, m:bool, d) -> str:
-            if t == Options.T_BOOL: return (":List[bool]" if m else f":bool")
-            if t == Options.T_DATE: return (":List[str]" if m else f":str")
-            if t == Options.T_DATETIME: return (":List[str]" if m else f":str")
-            if t == Options.T_DICT: return (":List[dict]" if m else ":dict")
-            if t == Options.T_DIR: return (":List[str]" if m else f":str")
-            if t == Options.T_FILE: return (":List[str]" if m else f":str")
-            if t == Options.T_FLOAT: return (":List[float]" if m else ":float")
-            if t == Options.T_INT: return (":List[int]" if m else f":int")
-            if t == Options.T_STR: return (":List[str]" if m else f":str")
-            if t == Options.T_TEXT: return (":List[str]" if m else f":str")
-            return ""
-            """
-            s = f'="{d}"' if d is not None else '=""'
-            if t == Options.T_BOOL: return (":List[bool]=[]" if m else f":bool={d}")
-            if t == Options.T_DATE: return (":List[str]=[]" if m else f":str{s}")
-            if t == Options.T_DATETIME: return (":List[str]=[]" if m else f":str{s}")
-            if t == Options.T_DICT: return (":List[dict]=[]" if m else ":dict={}")
-            if t == Options.T_DIR: return (":List[str]=[]" if m else f":str"+s.replace("\\", "/"))
-            if t == Options.T_FILE: return (":List[str]=[]" if m else f":str"+s.replace("\\", "/"))
-            if t == Options.T_FLOAT: return (":List[float]=[]" if m else ":float"+(f'={d}' if d is not None else '=0.0'))
-            if t == Options.T_INT: return (":List[int]=[]" if m else f":int"+(f'={d}' if d is not None else '=0'))
-            if t == Options.T_STR: return (":List[str]=[]" if m else f":str{s}")
-            if t == Options.T_TEXT: return (":List[str]=[]" if m else f":str{s}")
-            return "=None"
-            """
-        def _t2d(t:str, m:bool, d) -> str:
-            s = None
-            if t == Options.T_BOOL: s = "List[bool]" if m else "bool"
-            if t == Options.T_DATE: s = "List[str]" if m else "str"
-            if t == Options.T_DATETIME: s = "List[str]" if m else "str"
-            if t == Options.T_DICT: s = "List[dict]" if m else "dict"
-            if t == Options.T_DIR: s = "List[str]" if m else "str"
-            if t == Options.T_FILE: s = "List[str]" if m else "str"
-            if t == Options.T_FLOAT: s = "List[float]" if m else "float"
-            if t == Options.T_INT:  s = "List[int]" if m else "int"
-            if t == Options.T_STR: s = "List[str]" if m else "str"
-            if t == Options.T_TEXT: s = "List[str]" if m else "str"
-            if s is None: return " "
-            return f" Optional[{s}]" if d is not None else f" {s}"
+        def _ds(d:str) -> str:
+            return f'"{d}"' if d is not None else 'None'
+        def _t2s(o:Dict[str, Any], req=True) -> str:
+            t, m, d, r = o["type"], o["multi"], o["default"], o["required"]
+            if t == Options.T_BOOL: return ("List[bool]=[]" if m else f"bool={d}") if req else ("List[bool]" if m else f"bool")
+            if t == Options.T_DATE: return ("List[str]=[]" if m else f"str={_ds(d)}") if req else ("List[str]" if m else f"str")
+            if t == Options.T_DATETIME: return ("List[str]=[]" if m else f"str={_ds(d)}") if req else ("List[str]" if m else f"str")
+            if t == Options.T_DICT: return ("List[dict]=[]" if m else f"dict={d}") if req else ("List[dict]" if m else f"dict")
+            if t == Options.T_DIR or t == Options.T_FILE:
+                if d is not None: d = str(d).replace('\\', '/')
+                return ("List[str]=[]" if m else f"str={_ds(d)}") if req else ("List[str]" if m else f"str")
+            if t == Options.T_FLOAT: return ("List[float]=[]" if m else f"float={d}") if req else ("List[float]" if m else f"float")
+            if t == Options.T_INT: return ("List[int]=[]" if m else f"int={d}") if req else ("List[int]" if m else f"int")
+            if t == Options.T_STR: return ("List[str]=[]" if m else f"str={_ds(d)}") if req else ("List[str]" if m else f"str")
+            if t == Options.T_TEXT: return ("List[str]=[]" if m else f"str={_ds(d)}") if req else ("List[str]" if m else f"str")
+            raise ValueError(f"Unknown type: {t} for option {o['opt']}")
         def _arg(o:Dict[str, Any], is_japan) -> str:
-            #f'        {o["opt"]}{_t2d(o["type"], o["multi"], o["default"])}: {o["discription_ja"] if is_japan else o["discription_en"]}\n'
-            s = f'        {o["opt"]}{_t2d(o["type"], o["multi"], o["default"])}: '
-            if o["required"] == True:
-                s += f'{"必須パラメータ: " if is_japan else "Required Parameter: "}'
-            else:
-                s += f'{"オプションパラメータ: " if is_japan else "Optional Parameter: "}'
+            t, d = o["type"], o["default"]
+            s = f'        {o["opt"]}:'
+            if t == Options.T_DIR or t == Options.T_FILE:
+                d = str(d).replace("\\", "/")
+            s += f'Optional[{_t2s(o, False)}]={d}:'
             s += f'{o["discription_ja"] if is_japan else o["discription_en"]}'
             return s
         def _coercion(a:argparse.Namespace, key:str, dval) -> str:
@@ -388,11 +398,13 @@ class AgentBase(feature.ResultEdgeFeature):
                         discription_en="If `signin_file` is specified, checks if the command is allowed for this user group."),)
                 fn = f"{mode}_{cmd}"
                 func_txt =  f'@mcp.tool()\n'
-                func_txt += f'def {fn}('+", ".join([f'{o["opt"]}{_t2s(o["type"], o["multi"], o["default"])}' for o in choices])+'):\n'
+                func_txt += f'def {fn}(' + \
+                    ", ".join([f'{o["opt"]}:{_t2s(o, False)}' for o in choices]) + '):\n'
                 func_txt += f'    """\n'
                 func_txt += f'    {discription}\n'
                 func_txt += f'    Args:\n'
-                func_txt += "".join([_arg(o, is_japan) for o in choices])
+                func_txt += "\n".join([_arg(o, is_japan) for o in choices])
+                func_txt += f'\n'
                 func_txt += f'    Returns:\n'
                 func_txt += f'        Dict[str, Any]:{"処理結果" if is_japan else "Processing Result"}\n'
                 func_txt += f'    """\n'

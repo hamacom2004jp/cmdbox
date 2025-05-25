@@ -168,7 +168,12 @@ class WebStart(feature.UnsupportEdgeFeature, agent_base.AgentBase):
             agent_runner = None
             mcp = None
             if args.agent=='use':
-                args.agent_session_dburl = "sqlite:" + pathname2url(str(w.agent_path / 'session.db'))
+                if args.agent_session_store == 'sqlite':
+                    args.agent_session_dburl = "sqlite:" + pathname2url(str(w.agent_path / 'session.db'))
+                elif args.agent_session_store == 'postgresql':
+                    args.agent_session_dburl = f"postgresql+psycopg://{args.pg_user}:{args.pg_password}@{args.pg_host}:{args.pg_port}/{args.pg_dbname}"
+                else:
+                    args.agent_session_dburl = None
                 agent_runner, mcp = self.init_agent_runner(logger, args)
             w.start(args.allow_host, args.listen_port, ssl_listen_port=args.ssl_listen_port,
                     ssl_cert=ssl_cert, ssl_key=ssl_key, ssl_keypass=args.ssl_keypass, ssl_ca_certs=ssl_ca_certs,

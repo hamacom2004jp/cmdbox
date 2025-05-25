@@ -10,6 +10,7 @@ from starlette.datastructures import UploadFile
 from starlette.routing import Mount
 from typing import Dict, Any, Tuple, List, Union
 import locale
+import logging
 import json
 import time
 import traceback
@@ -39,7 +40,7 @@ class Agent(feature.WebFeature):
             web.options.audit_exec(req, res, web)
             return web.agent_html_data
 
-        @app.get('/agent/session/list')
+        @app.post('/agent/session/list')
         async def agent_session_list(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
@@ -53,10 +54,31 @@ class Agent(feature.WebFeature):
             user_id = common.random_string(16)
             if 'signin' in req.session:
                 user_id = req.session['signin']['name']
-            sessions = web.list_agent_sessions(web.agent_runner.session_service, user_id)
+            form = await req.form()
+            session_id = form.get('session_id', None)
+            sessions = await web.list_agent_sessions(web.agent_runner.session_service, user_id, session_id=session_id)
             data = [dict(id=s.id, app_name=s.app_name, user_id=s.user_id, last_update_time=s.last_update_time,
                          events=[dict(author=ev.author,text=ev.content.parts[0].text) for ev in s.events if ev.content and ev.content.parts]) for s in sessions]
             return dict(success=data)
+
+        @app.post('/agent/session/delete')
+        async def agent_session_delete(req:Request, res:Response):
+            signin = web.signin.check_signin(req, res)
+            if signin is not None:
+                return signin
+            if web.agent_runner is None:
+                web.logger.error(f"agent_runner is null. Start web mode with `--agent use`.")
+                raise HTTPException(status_code=500, detail='agent_runner is null. Start web mode with `--agent use`.')
+            res.headers['Access-Control-Allow-Origin'] = '*'
+            web.options.audit_exec(req, res, web)
+            # ユーザー名を取得する
+            user_id = common.random_string(16)
+            if 'signin' in req.session:
+                user_id = req.session['signin']['name']
+            form = await req.form()
+            session_id = form.get('session_id', None)
+            await web.delete_agent_session(web.agent_runner.session_service, user_id, session_id=session_id)
+            return dict(success=True)
 
         @app.websocket('/agent/chat/ws')
         @app.websocket('/agent/chat/ws/{session_id}')
@@ -77,8 +99,8 @@ class Agent(feature.WebFeature):
                 await websocket.send_text(res)
             return dict(success="connected")
 
-        @app.api_route('/agent/chat/sse', methods=['GET', 'POST'])
-        @app.api_route('/agent/chat/sse/{session_id}', methods=['GET', 'POST'])
+        @app.api_route('/agent/chat/stream', methods=['GET', 'POST'])
+        @app.api_route('/agent/chat/stream/{session_id}', methods=['GET', 'POST'])
         async def sse_chat(session_id:str=None, req:Request=None, res:Response=None):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
@@ -121,7 +143,8 @@ class Agent(feature.WebFeature):
             )
 
         async def _chat(session:Dict[str, Any], session_id:str, sock, receive_text=None):
-            web.logger.info(f"agent_chat: connected")
+            if web.logger.level == logging.DEBUG:
+                web.logger.debug(f"agent_chat: connected")
             # ユーザー名を取得する
             user_id = common.random_string(16)
             groups = []
@@ -132,7 +155,7 @@ class Agent(feature.WebFeature):
             language, _ = locale.getlocale()
             is_japan = language.find('Japan') >= 0 or language.find('ja_JP') >= 0
             # セッションを作成する
-            agent_session = web.create_agent_session(web.agent_runner.session_service, user_id, session_id=session_id)
+            agent_session = await web.create_agent_session(web.agent_runner.session_service, user_id, session_id=session_id)
             startmsg = "こんにちは！何かお手伝いできることはありますか？" if is_japan else "Hello! Is there anything I can help you with?"
             yield json.dumps(dict(message=startmsg), default=common.default_json_enc)
             from google.genai import types
@@ -144,15 +167,16 @@ class Agent(feature.WebFeature):
                         time.sleep(0.5)
                         continue
                     if is_japan:
-                        query += f"なお現在のユーザーは'{user_id}'でgroupsは'{groups}'ですので引数に必要な時は指定してください。" + \
-                            f"またsignin_fileの引数が必要な時は'{web.signin.signin_file}'を指定してください。"
+                        query += f"<important>なお現在のユーザーは'{user_id}'でgroupsは'{groups}'ですので引数に必要な時は指定してください。" + \
+                            f"またsignin_fileの引数が必要な時は'{web.signin.signin_file}'を指定してください。</important>"
                             #f"またコマンド実行に必要なパラメータを確認し、以下の引数が必要な場合はこの値を使用してください。\n" + \
                             #f"  host = {web.redis_host if web.redis_host else self.default_host}\n" + \
                             #f", port = {web.redis_port if web.redis_port else self.default_port}\n" + \
                             #f", password = {web.redis_password if web.redis_password else self.default_pass}\n" + \
                             #f", svname = {web.svname if web.svname else self.default_svname}\n"
                     else:
-                        query += f"The current user is '{user_id}' and the groups is '{groups}', so please specify it when necessary."
+                        query += f"<important>The current user is '{user_id}' and the groups is '{groups}', so please specify it when necessary." + \
+                            f"Also, if the signin_file argument is required for command execution, please specify '{web.signin.signin_file}'.</important>"
                             #f"Also check the parameters required to execute the command and use these values if the following arguments are required.\n" + \
                             #f"  host = {web.redis_host if web.redis_host else self.default_host}\n" + \
                             #f", port = {web.redis_port if web.redis_port else self.default_port}\n" + \
