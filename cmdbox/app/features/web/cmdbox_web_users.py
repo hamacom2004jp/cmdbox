@@ -88,6 +88,7 @@ class Users(feature.WebFeature):
             except Exception as e:
                 return dict(error=str(e))
 
+        @app.post('/gui/apikey/add')
         @app.post('/users/apikey/add')
         async def users_apikey_add(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
@@ -103,6 +104,7 @@ class Users(feature.WebFeature):
             except Exception as e:
                 return dict(error=str(e))
 
+        @app.post('/gui/apikey/del')
         @app.post('/users/apikey/del')
         async def users_apikey_del(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)

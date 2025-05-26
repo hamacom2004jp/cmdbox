@@ -139,6 +139,70 @@ cmdbox.singout = (sitepath) => {
         location.href = `dosignout/${sitepath}?r=${rand}`;
     }
 };
+cmdbox.editapikey = async () => {
+    const user = await cmdbox.user_info();
+    if (!user) {
+        cmdbox.message('user not found');
+        return;
+    }
+    const editapikey_modal = $('#editapikey_modal').length?$('#editapikey_modal'):$(`<div id="editapikey_modal" class="modal" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
+    editapikey_modal.html('');
+    const daialog = $(`<div class="modal-dialog ui-draggable ui-draggable-handle"/>`).appendTo(editapikey_modal);
+    const form = $(`<form id="editapikey_form" class="modal-content novalidate"/>`).appendTo(daialog);
+    const header = $(`<div class="modal-header"/>`).appendTo(form);
+    header.append('<h5 class="modal-title">Edit ApiKey</h5>');
+    header.append('<button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">'
+                 +'<svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>'
+                 +'</button>');
+    const body = $(`<div class="modal-body"/>`).appendTo(form);
+    const row_content = $(`<div class="row row_content"/>`).appendTo(body);
+    const table = $(`<table class="table table-bordered table-hover"/>`).appendTo(row_content);
+    const thead = $(`<thead><tr><th class="th" scope="col" width="40">-</th><th class="th" scope="col">apikey name</th></tr></thead>`).appendTo(table);
+    const tbody = $(`<tbody/>`).appendTo(table);
+    const apikey_names = user['apikeys'] ? Object.keys(user['apikeys']) : [];
+    apikey_names.forEach((name, i) => {
+        const tr = $(`<tr/>`).appendTo(tbody);
+        const td_no = $(`<td>${i+1}</td>`).appendTo(tr);
+        const td_name = $(`<td>${name}</td>`).appendTo(tr);
+    });
+    const footer = $(`<div class="modal-footer"/>`).appendTo(form);
+    const addapikey_btn = $(`<button type="button" class="btn btn-info">Add apikey</button>`).appendTo(footer);
+    addapikey_btn.off('click').on('click', async (event) => {
+        const apikey_name = window.prompt('Please enter the apikey name.');
+        if (!apikey_name) return;
+        const res = await fetch('gui/apikey/add', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({'name': user['name'], 'apikey_name': apikey_name})
+        });
+        if (res.status != 200) {
+            cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+            return;
+        }
+        cmdbox.message(await res.json());
+        editapikey_modal.modal('hide');
+    });
+    const delapikey_btn = $(`<button type="button" class="btn btn-warning">Del apikey</button>`).appendTo(footer);
+    delapikey_btn.off('click').on('click', async (event) => {
+        const apikey_name = window.prompt('Please enter the apikey name.');
+        if (!apikey_name) return;
+        const res = await fetch('gui/apikey/del', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({'name': user['name'], 'apikey_name': apikey_name})
+        });
+        if (res.status != 200) {
+            cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+            return;
+        }
+        cmdbox.message(await res.json());
+        editapikey_modal.modal('hide');
+    });
+    const close_btn = $('<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>').appendTo(footer);
+    editapikey_modal.appendTo('body');
+    daialog.draggable({cursor:'move',cancel:'.modal-body'});
+    editapikey_modal.modal('show');
+};
 /**
  * 現在のユーザーのパスワード変更
  */
@@ -150,6 +214,10 @@ cmdbox.passchange = async () => {
     }
     if (user['hash']=='oauth2') {
         cmdbox.message('This account is an OAuth2 account and cannot be changed.');
+        return;
+    }
+    if (user['hash']=='saml') {
+        cmdbox.message('This account is an SAML account and cannot be changed.');
         return;
     }
     const chpass_modal = $('#chpass_modal').length?$('#chpass_modal'):$(`<div id="chpass_modal" class="modal" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
@@ -255,6 +323,11 @@ $(()=>{
             if (!user) return;
             const user_info_menu = $('.user_info');
             user_info_menu.removeClass('d-none').addClass('d-flex');
+
+            if (!user_info_menu.find('.dropdown-menu .editapikey-menu-item').length) {
+                const editapikey_item = $(`<li><a class="dropdown-item editapikey-menu-item" href="#" onclick="cmdbox.editapikey();">Edit ApiKey</a></li>`);
+                user_info_menu.find('.dropdown-menu').append(editapikey_item);
+            }
             if (!user_info_menu.find('.dropdown-menu .changepass-menu-item').length) {
                 const changepass_item = $(`<li><a class="dropdown-item changepass-menu-item" href="#" onclick="cmdbox.passchange();">Change Password</a></li>`);
                 user_info_menu.find('.dropdown-menu').append(changepass_item);
@@ -263,7 +336,7 @@ $(()=>{
                 const parts = location.pathname.split('/');
                 const sitepath = parts[parts.length-1];
                 const signout_item = $(`<li><a class="dropdown-item signout-menu-item" href="#" onclick="cmdbox.singout('${sitepath}');">Sign out</a></li>`);
-                user_info_menu.find('.dropdown-menu').append(signout_item);
+                user_info_menu.find('.dropdown-menu').append(`<li><hr class="dropdown-divider"></li>`).append(signout_item);
             }
             user_info_menu.find('.user_info_note').html(`Groups: ${user['groups'].join(', ')}`);
             user_info_menu.find('.username').text(user['name']);

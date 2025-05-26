@@ -510,6 +510,34 @@ class Signin(object):
         return Signin._check_cmd(self.signin_file_data, req.session['signin']['groups'], mode, cmd, self.logger)
 
     @classmethod
+    def load_groups(cls, signin_file_data:Dict[str, Any], apikey:str, logger:logging.Logger):
+        """
+        APIキーからユーザグループを取得します
+        Args:
+            signin_file_data (Dict[str, Any]): サインインファイルデータ
+            apikey (str): APIキー
+            logger (logging.Logger): ロガー
+        Returns:
+            Dict[str, Any]: ユーザグループの情報
+        """
+        apikey = common.hash_password(apikey.strip(), 'sha1')
+        if logger.level == logging.DEBUG:
+            logger.debug(f"hashed apikey: {apikey}")
+        find_user = None
+        for user in signin_file_data['users']:
+            if 'apikeys' not in user:
+                continue
+            for ak, key in user['apikeys'].items():
+                if apikey == key:
+                    find_user = user
+        if find_user is None:
+            logger.warning(f"No matching user found for apikey.")
+            return dict(warn='No matching user found for apikey.')
+
+        group_names = list(set(Signin.correct_group(signin_file_data, find_user['groups'], None)))
+        return dict(success=group_names)
+
+    @classmethod
     def _check_cmd(cls, signin_file_data:Dict[str, Any], user_groups:List[str], mode:str, cmd:str, logger:logging.Logger) -> bool:
         """
         コマンドの認可をチェックします

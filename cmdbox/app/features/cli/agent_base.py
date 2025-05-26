@@ -44,6 +44,12 @@ class AgentBase(feature.ResultEdgeFeature):
                      discription_ja="エージェントのセッションを保存する方法を指定します。",
                      discription_en="Specify how the agent's session is to be saved.",
                      choice_show=dict(postgresql=["pg_host", "pg_port", "pg_user", "pg_password", "pg_dbname"]),),
+                dict(opt="mcp_listen_port", type=Options.T_INT, default="9081", required=False, multi=False, hide=False, choice=None,
+                     discription_ja="省略した時は `9081` を使用します。",
+                     discription_en="If omitted, `9081` is used."),
+                dict(opt="mcp_ssl_listen_port", type=Options.T_INT, default="9443", required=False, multi=False, hide=False, choice=None,
+                     discription_ja="省略した時は `9443` を使用します。",
+                     discription_en="If omitted, `9443` is used."),
                 dict(opt="pg_host", type=Options.T_STR, default='localhost', required=False, multi=False, hide=True, choice=None, web="mask",
                      discription_ja="postgresqlホストを指定する。",
                      discription_en="Specify the postgresql host."),
@@ -341,7 +347,8 @@ class AgentBase(feature.ResultEdgeFeature):
             logger.debug(f"init_agent_runner processing..")
         # loggerの初期化
         common.reset_logger("httpx")
-        common.reset_logger("google.adk.sessions.database_session_service")
+        common.reset_logger("google_adk.google.adk.sessions.database_session_service")
+        common.reset_logger("mcp.server.streamable_http_manager")
         # モジュールインポート
         from mcp.server.fastmcp import FastMCP
         from google.adk.sessions import BaseSessionService
@@ -392,10 +399,10 @@ class AgentBase(feature.ResultEdgeFeature):
                     choices.append(dict(opt="signin_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None,
                         discription_ja="サインイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。",
                         discription_en="Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required."),)
-                if len([opt for opt in choices if 'opt' in opt and opt['opt'] == 'groups']) <= 0:
-                    choices.append(dict(opt="groups", type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=None,
-                        discription_ja="`signin_file` を指定した場合に、このユーザーグループに許可されているコマンドかどうかをチェックします。",
-                        discription_en="If `signin_file` is specified, checks if the command is allowed for this user group."),)
+                if len([opt for opt in choices if 'opt' in opt and opt['opt'] == 'apikey']) <= 0:
+                    choices.append(dict(opt="apikey", type=Options.T_STR, default=None, required=True, multi=True, hide=True, choice=None,
+                        discription_ja="このコマンドを実行しようとしているユーザーのAPIキーを指定します。省略すると権限が無いと判断します。",
+                        discription_en="Specify the API key of the user who is about to execute this command. If omitted, it is assumed that you are not authorized."),)
                 fn = f"{mode}_{cmd}"
                 func_txt =  f'@mcp.tool()\n'
                 func_txt += f'def {fn}(' + \
@@ -417,6 +424,8 @@ class AgentBase(feature.ResultEdgeFeature):
                 func_txt += f'    opt["output_json"] = None\n'
                 func_txt += f'    opt["output_json_append"] = False\n'
                 func_txt += f'    opt["debug"] = logger.level == logging.DEBUG\n'
+                func_txt += f'    if apikey is None:\n'
+                func_txt += f'        return dict(warn="You must specify apikey to check authorization.")\n'
                 func_txt += '\n'.join([f'    opt["{o["opt"]}"] = {o["opt"]}' for o in choices])+'\n'
                 func_txt += f'    {_coercion(args, "host", self.default_host)}\n'
                 func_txt += f'    {_coercion(args, "port", self.default_port)}\n'
@@ -433,9 +442,12 @@ class AgentBase(feature.ResultEdgeFeature):
                 func_txt += f'    {_coercion(args, "tag", None)}\n'
                 func_txt += f'    {_coercion(args, "clmsg_id", None)}\n'
                 func_txt += f'    opt["signin_file"] = signin_file if signin_file else ".{self.ver.__appid__}/user_list.yml"\n'
-                func_txt += f'    groups = groups if groups else []\n'
                 func_txt += f'    args = argparse.Namespace(**opt)\n'
                 func_txt += f'    signin_data = signin.Signin.load_signin_file(args.signin_file)\n'
+                func_txt += f'    res_groups = signin.Signin.load_groups(signin_data, apikey, logger)\n'
+                func_txt += f'    if res_groups.get("success", None) is None:\n'
+                func_txt += f'        return res_groups\n'
+                func_txt += f'    groups = res_groups.get("success")\n'
                 func_txt += f'    if not signin.Signin._check_cmd(signin_data, groups, "{mode}", "{cmd}", logger):\n'
                 func_txt += f'        return dict(warn="You do not have permission to execute this command.")\n'
                 func_txt += f'    feat = Options.getInstance().get_cmd_attr("{mode}", "{cmd}", "feature")\n'
