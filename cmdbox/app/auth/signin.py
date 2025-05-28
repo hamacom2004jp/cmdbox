@@ -1,12 +1,12 @@
 from cmdbox.app import common, options
-from fastapi import Request, Response, HTTPException
+from fastapi import Request, Response, HTTPException, WebSocket
 from fastapi.responses import RedirectResponse
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import copy
+import contextvars
 import logging
 import string
-
 
 class Signin(object):
 
@@ -59,7 +59,8 @@ class Signin(object):
         gids = [g['gid'] for g in copy_signin_data['groups'] if g['name'] in group_names]
         return group_names, gids
 
-    def enable_cors(self, req:Request, res:Response) -> None:
+    @classmethod
+    def _enable_cors(cls, req:Request, res:Response) -> None:
         """
         CORSを有効にする
 
@@ -71,7 +72,7 @@ class Signin(object):
             return
         res.headers['Access-Control-Allow-Origin'] = res.headers['Origin']
 
-    def check_signin(self, req:Request, res:Response):
+    def check_signin(self, req:Request, res:Response) -> Union[None, RedirectResponse]:
         """
         サインインをチェックする
 
@@ -80,25 +81,44 @@ class Signin(object):
             res (Response): レスポンス
 
         Returns:
-            Response: サインインエラーの場合はリダイレクトレスポンス
+            Union[None, RedirectResponse]: サインインエラーの場合はリダイレクトレスポンス
         """
-        self.enable_cors(req, res)
         if self.signin_file_data is None:
             return None
         if 'signin' in req.session:
-            self.signin_file_data = self.load_signin_file(self.signin_file, self.signin_file_data) # サインインファイルの更新をチェック
-            path_jadge = self.check_path(req, req.url.path)
+            self.signin_file_data = Signin.load_signin_file(self.signin_file, self.signin_file_data) # サインインファイルの更新をチェック
+        return Signin._check_signin(req, res, self.signin_file_data, self.logger)
+    
+    @classmethod
+    def _check_signin(cls, req:Request, res:Response, signin_file_data:Dict[str, Any], logger:logging.Logger) -> Union[None, RedirectResponse]:
+        """
+        サインインをチェックする
+
+        Args:
+            req (Request): リクエスト
+            res (Response): レスポンス
+            signin_file_data (Dict[str, Any]): サインインファイルデータ（変更不可）
+            logger (logging.Logger): ロガー
+
+        Returns:
+            Union[None, RedirectResponse]: サインインエラーの場合はリダイレクトレスポンス
+        """
+        Signin._enable_cors(req, res)
+        if signin_file_data is None:
+            return None
+        if 'signin' in req.session:
+            path_jadge = Signin._check_path(req, req.url.path, signin_file_data, logger)
             if path_jadge is not None:
                 return path_jadge
             return None
-        if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"Not found siginin session. Try check_apikey. path={req.url.path}")
-        ret = self.check_apikey(req, res)
-        if ret is not None and self.logger.level == logging.DEBUG:
-            self.logger.debug(f"Not signed in.")
+        if logger.level == logging.DEBUG:
+            logger.debug(f"Not found siginin session. Try check_apikey. path={req.url.path}")
+        ret = Signin._check_apikey(req, res, signin_file_data, logger)
+        if ret is not None and logger.level == logging.DEBUG:
+            logger.debug(f"Not signed in.")
         return ret
 
-    def check_apikey(self, req:Request, res:Response):
+    def check_apikey(self, req:Request, res:Response) -> Union[None, RedirectResponse]:
         """
         ApiKeyをチェックする
 
@@ -107,10 +127,26 @@ class Signin(object):
             res (Response): レスポンス
 
         Returns:
-            Response: サインインエラーの場合はリダイレクトレスポンス
+             Union[None, RedirectResponse]: サインインエラーの場合はリダイレクトレスポンス
         """
-        self.enable_cors(req, res)
-        if self.signin_file_data is None:
+        return Signin._check_apikey(req, res, self.signin_file_data)
+
+    @classmethod
+    def _check_apikey(cls, req:Request, res:Response, signin_file_data:Dict[str, Any], logger:logging.Logger) -> Union[None, RedirectResponse]:
+        """
+        ApiKeyをチェックする
+
+        Args:
+            req (Request): リクエスト
+            res (Response): レスポンス
+            signin_file_data (Dict[str, Any]): サインインファイルデータ（変更不可）
+            logger (logging.Logger): ロガー
+
+        Returns:
+            Union[None, RedirectResponse]: サインインエラーの場合はリダイレクトレスポンス
+        """
+        Signin._enable_cors(req, res)
+        if signin_file_data is None:
             res.headers['signin'] = 'success'
             return None
         if 'Authorization' not in req.headers:
@@ -122,41 +158,40 @@ class Signin(object):
             return RedirectResponse(url=f'/signin{req.url.path}?error=apikeyfail')
         bearer, apikey = auth.split(' ')
         apikey = common.hash_password(apikey.strip(), 'sha1')
-        if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"hashed apikey: {apikey}")
+        if logger.level == logging.DEBUG:
+            logger.debug(f"hashed apikey: {apikey}")
         find_user = None
-        self.signin_file_data = self.load_signin_file(self.signin_file, self.signin_file_data) # サインインファイルの更新をチェック
-        for user in self.signin_file_data['users']:
+        for user in signin_file_data['users']:
             if 'apikeys' not in user:
                 continue
             for ak, key in user['apikeys'].items():
                 if apikey == key:
                     find_user = user
         if find_user is None:
-            self.logger.warning(f"No matching user found for apikey.")
+            logger.warning(f"No matching user found for apikey.")
             return RedirectResponse(url=f'/signin{req.url.path}?error=apikeyfail')
 
-        group_names = list(set(self.__class__.correct_group(self.get_data(), find_user['groups'], None)))
-        gids = [g['gid'] for g in self.signin_file_data['groups'] if g['name'] in group_names]
+        group_names = list(set(Signin.correct_group(signin_file_data, find_user['groups'], None)))
+        gids = [g['gid'] for g in signin_file_data['groups'] if g['name'] in group_names]
         req.session['signin'] = dict(uid=find_user['uid'], name=find_user['name'], password=find_user['password'],
                                      gids=gids, groups=group_names)
-        if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"find user: name={find_user['name']}, group_names={group_names}")
+        if logger.level == logging.DEBUG:
+            logger.debug(f"find user: name={find_user['name']}, group_names={group_names}")
         # パスルールチェック
         user_groups = find_user['groups']
-        jadge = self.signin_file_data['pathrule']['policy']
-        for rule in self.signin_file_data['pathrule']['rules']:
+        jadge = signin_file_data['pathrule']['policy']
+        for rule in signin_file_data['pathrule']['rules']:
             if len([g for g in rule['groups'] if g in user_groups]) <= 0:
                 continue
             if len([p for p in rule['paths'] if req.url.path.startswith(p)]) <= 0:
                 continue
             jadge = rule['rule']
-        if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"rule: {req.url.path}: {jadge}")
+        if logger.level == logging.DEBUG:
+            logger.debug(f"rule: {req.url.path}: {jadge}")
         if jadge == 'allow':
             res.headers['signin'] = 'success'
             return None
-        self.logger.warning(f"Unauthorized site. user={find_user['name']}, path={req.url.path}")
+        logger.warning(f"Unauthorized site. user={find_user['name']}, path={req.url.path}")
         return RedirectResponse(url=f'/signin{req.url.path}?error=unauthorizedsite')
 
     @classmethod
@@ -468,26 +503,42 @@ class Signin(object):
         Returns:
             Union[None, RedirectResponse]: 認可された場合はNone、認可されなかった場合はリダイレクトレスポンス
         """
-        if self.signin_file_data is None:
+        return Signin._check_path(req, path, self.signin_file_data, self.logger)
+
+    @classmethod
+    def _check_path(cls, req:Request, path:str, signin_file_data:Dict[str, Any], logger:logging.Logger) -> Union[None, RedirectResponse]:
+        """
+        パスの認可をチェックします
+
+        Args:
+            req (Request): リクエスト
+            path (str): パス
+            signin_file_data (Dict[str, Any]): サインインファイルデータ
+            logger (logging.Logger): ロガー
+
+        Returns:
+            Union[None, RedirectResponse]: 認可された場合はNone、認可されなかった場合はリダイレクトレスポンス
+        """
+        if signin_file_data is None:
             return None
         if 'signin' not in req.session:
             return None
         path = path if path.startswith('/') else f'/{path}'
         # パスルールチェック
         user_groups = req.session['signin']['groups']
-        jadge = self.signin_file_data['pathrule']['policy']
-        for rule in self.signin_file_data['pathrule']['rules']:
+        jadge = signin_file_data['pathrule']['policy']
+        for rule in signin_file_data['pathrule']['rules']:
             if len([g for g in rule['groups'] if g in user_groups]) <= 0:
                 continue
             if len([p for p in rule['paths'] if path.startswith(p)]) <= 0:
                 continue
             jadge = rule['rule']
-        if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"rule: {path}: {jadge}")
+        if logger.level == logging.DEBUG:
+            logger.debug(f"rule: {path}: {jadge}")
         if jadge == 'allow':
             return None
         else:
-            self.logger.warning(f"Unauthorized site. user={req.session['signin']['name']}, path={path}")
+            logger.warning(f"Unauthorized site. user={req.session['signin']['name']}, path={path}")
             return RedirectResponse(url=f'/signin{path}?error=unauthorizedsite')
 
     def check_cmd(self, req:Request, res:Response, mode:str, cmd:str):
@@ -725,3 +776,53 @@ class Signin(object):
             str: メールアドレス
         """
         return self.__class__.get_email(data)
+
+
+request_scope = contextvars.ContextVar('request_scope', default=None)
+
+async def create_request_scope(req:Request=None, res:Response=None, websocket:WebSocket=None):
+    """
+    FastAPIのDepends用に、ContextVarを使用してリクエストスコープを提供します。
+    これにより、リクエストごとに異なるRequestオブジェクトを取得できます。
+    これは、FastAPIのDependsで使用されることを意図しています。
+    次のように使用します。
+
+    ```python
+    from cmdbox.app.auth import signin
+    from fastapi import Depends, Request, Response
+
+    @app.get("/some-endpoint")
+    async def some_endpoint(req: Request, res: Response, scope=Depends(signin.create_request_scope)):
+        # 何らかの処理
+    ```
+    Args:
+        req (Request): リクエスト
+        res (Response): レスポンス
+        websocket (WebSocket): WebSocket接続
+    """
+    sess = None
+    if req is not None:
+        sess = req.session if hasattr(req, 'session') else None
+    request_scope.set(dict(req=req, res=res, websocket=websocket))
+    try:
+        yield # リクエストの処理
+    finally:
+        # リクエストの処理が終わったら、ContextVarをクリアします
+        request_scope.set(None)
+
+def get_request_scope() -> Dict[str, Any]:
+    """
+    FastAPIのDepends用に、ContextVarからリクエストスコープを取得します。
+    ```python
+    from cmdbox.app.auth import signin
+    from fastapi import Request, Response
+    scope = signin.get_request_scope()
+    scope['req']  # Requestオブジェクト
+    scope['res']  # Responseオブジェクト
+    scope['session']  # sessionを表す辞書
+    scope['websocket']  # WebSocket接続
+    ```
+    Returns:
+        Dict[str, Any]: リクエストとレスポンスとWebSocket接続
+    """
+    return request_scope.get() if request_scope.get() is not None else dict(req=None, res=None, session=None, websocket=None)

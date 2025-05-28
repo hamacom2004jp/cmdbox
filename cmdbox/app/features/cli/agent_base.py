@@ -173,9 +173,9 @@ class AgentBase(feature.ResultEdgeFeature):
                       f"1. ユーザーのクエリからが実行したいコマンドを特定します。\n" + \
                       f"2. コマンド実行に必要なパラメータを特定します。\n" + \
                       f"3. ユーザーのクエリから指定しているパラメータを取得します。\n" + \
-                      f"4. コマンド実行に必要なパラメータの中で、ユーザーが指定しているパラメータが不足しているものを特定します。\n" + \
+                      f"4. ユーザーが指定しているパラメータと、コマンド実行に必要なパラメータを比較し、不足しているパラメータを取得します。\n" + \
                       f"5. 以下に「パラメータ = デフォルト値」を示しているので、不足しているパラメータはデフォルト値を使用します。\n" + \
-                      f"   但しコマンドが実行に必要のないパラメータは指定しないようにします。\n" + \
+                      f"   但しコマンドが実行に必要のないパラメータは指定しないようにしてください。\n" + \
                       f" host = {args.host if hasattr(args, 'host') and args.host else self.default_host}\n" + \
                       f" port = {args.port if hasattr(args, 'port') and args.port else self.default_port}\n" + \
                       f" password = {args.password if hasattr(args, 'password') and args.password else self.default_pass}\n" + \
@@ -205,7 +205,7 @@ class AgentBase(feature.ResultEdgeFeature):
                       f"1. Identify the command you want to execute from the user's query.\n" + \
                       f"2. Identify the parameters required to execute the command.\n" + \
                       f"3. Retrieve the specified parameters from the user's query.\n" + \
-                      f"4. Identifies missing user-specified parameters required to execute the command.\n" + \
+                      f"4. It compares the parameters specified by the user with those required to execute the command and obtains the missing parameters.\n" + \
                       f"5. The “Parameter = Default Value” is shown below, so use default values for missing parameters.\n" + \
                       f"   However, do not specify parameters that the command does not require for execution.\n" + \
                       f" host = {args.host if hasattr(args, 'host') and args.host else self.default_host}\n" + \
@@ -399,14 +399,9 @@ class AgentBase(feature.ResultEdgeFeature):
                     choices.append(dict(opt="signin_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None,
                         discription_ja="サインイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。",
                         discription_en="Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required."),)
-                if len([opt for opt in choices if 'opt' in opt and opt['opt'] == 'apikey']) <= 0:
-                    choices.append(dict(opt="apikey", type=Options.T_STR, default=None, required=True, multi=True, hide=True, choice=None,
-                        discription_ja="このコマンドを実行しようとしているユーザーのAPIキーを指定します。省略すると権限が無いと判断します。",
-                        discription_en="Specify the API key of the user who is about to execute this command. If omitted, it is assumed that you are not authorized."),)
                 fn = f"{mode}_{cmd}"
                 func_txt =  f'@mcp.tool()\n'
-                func_txt += f'def {fn}(' + \
-                    ", ".join([f'{o["opt"]}:{_t2s(o, False)}' for o in choices]) + '):\n'
+                func_txt += f'def {fn}(' + ", ".join([f'{o["opt"]}:{_t2s(o, False)}' for o in choices]) + '):\n'
                 func_txt += f'    """\n'
                 func_txt += f'    {discription}\n'
                 func_txt += f'    Args:\n'
@@ -416,6 +411,8 @@ class AgentBase(feature.ResultEdgeFeature):
                 func_txt += f'        Dict[str, Any]:{"処理結果" if is_japan else "Processing Result"}\n'
                 func_txt += f'    """\n'
                 func_txt += f'    logger = logging.getLogger("agent")\n'
+                func_txt += f'    scope = signin.get_request_scope()\n'
+                func_txt += f'    logger.info("scope="+str(scope))\n'
                 func_txt += f'    opt = dict()\n'
                 func_txt += f'    opt["mode"] = "{mode}"\n'
                 func_txt += f'    opt["cmd"] = "{cmd}"\n'
@@ -424,8 +421,6 @@ class AgentBase(feature.ResultEdgeFeature):
                 func_txt += f'    opt["output_json"] = None\n'
                 func_txt += f'    opt["output_json_append"] = False\n'
                 func_txt += f'    opt["debug"] = logger.level == logging.DEBUG\n'
-                func_txt += f'    if apikey is None:\n'
-                func_txt += f'        return dict(warn="You must specify apikey to check authorization.")\n'
                 func_txt += '\n'.join([f'    opt["{o["opt"]}"] = {o["opt"]}' for o in choices])+'\n'
                 func_txt += f'    {_coercion(args, "host", self.default_host)}\n'
                 func_txt += f'    {_coercion(args, "port", self.default_port)}\n'
@@ -444,19 +439,24 @@ class AgentBase(feature.ResultEdgeFeature):
                 func_txt += f'    opt["signin_file"] = signin_file if signin_file else ".{self.ver.__appid__}/user_list.yml"\n'
                 func_txt += f'    args = argparse.Namespace(**opt)\n'
                 func_txt += f'    signin_data = signin.Signin.load_signin_file(args.signin_file)\n'
-                func_txt += f'    res_groups = signin.Signin.load_groups(signin_data, apikey, logger)\n'
-                func_txt += f'    if res_groups.get("success", None) is None:\n'
-                func_txt += f'        return res_groups\n'
-                func_txt += f'    groups = res_groups.get("success")\n'
+                func_txt += f'    req = scope["req"] if scope["req"] is not None else scope["websocket"]\n'
+                func_txt += f'    sign = signin.Signin._check_signin(req, scope["res"], signin_data, logger)\n'
+                func_txt += f'    if signin is not None:\n'
+                func_txt += f'        return dict(warn="Unable to execute command because authentication information cannot be obtained")\n'
+                func_txt += f'    groups = req.session["signin"]["groups"]\n'
                 func_txt += f'    if not signin.Signin._check_cmd(signin_data, groups, "{mode}", "{cmd}", logger):\n'
                 func_txt += f'        return dict(warn="You do not have permission to execute this command.")\n'
                 func_txt += f'    feat = Options.getInstance().get_cmd_attr("{mode}", "{cmd}", "feature")\n'
-                func_txt += f'    st, ret, _ = feat.apprun(logger, args, time.perf_counter(), [])\n'
-                func_txt += f'    return ret\n'
+                func_txt += f'    try:\n'
+                func_txt += f'        st, ret, _ = feat.apprun(logger, args, time.perf_counter(), [])\n'
+                func_txt += f'        return ret\n'
+                func_txt += f'    except Exception as e:\n'
+                func_txt += f'        logger.error("Error occurs when tool is executed:", exc_info=True)\n'
+                func_txt += f'        raise e\n'
                 func_txt += f'tools.append({fn})\n'
                 if logger.level == logging.DEBUG:
                     logger.debug(f"generating agent tool: {fn}")
-                    
+
                 exec(func_txt,
                      dict(time=time,List=List, argparse=argparse, common=common, Options=Options, logging=logging, signin=signin,),
                      dict(tools=tools, mcp=mcp))

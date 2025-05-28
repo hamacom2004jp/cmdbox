@@ -1,7 +1,8 @@
 from cmdbox.app import common, feature
+from cmdbox.app.auth import signin
 from cmdbox.app.commons import convert
 from cmdbox.app.web import Web
-from fastapi import FastAPI, HTTPException, Request, Response, WebSocket
+from fastapi import FastAPI, Depends, HTTPException, Request, Response, WebSocket
 from fastapi.responses import HTMLResponse, StreamingResponse
 from starlette.websockets import WebSocketDisconnect
 from pathlib import Path
@@ -59,6 +60,7 @@ class Agent(feature.WebFeature):
             sessions = await web.list_agent_sessions(web.agent_runner.session_service, user_id, session_id=session_id)
             data = [dict(id=s.id, app_name=s.app_name, user_id=s.user_id, last_update_time=s.last_update_time,
                          events=[dict(author=ev.author,text=ev.content.parts[0].text) for ev in s.events if ev.content and ev.content.parts]) for s in sessions]
+            data.reverse()  # 最新のセッションを先頭にする
             return dict(success=data)
 
         @app.post('/agent/session/delete')
@@ -82,7 +84,7 @@ class Agent(feature.WebFeature):
 
         @app.websocket('/agent/chat/ws')
         @app.websocket('/agent/chat/ws/{session_id}')
-        async def ws_chat(session_id:str=None, websocket:WebSocket=None, res:Response=None):
+        async def ws_chat(session_id:str=None, websocket:WebSocket=None, res:Response=None, scope=Depends(signin.create_request_scope)):
             if not websocket:
                 raise HTTPException(status_code=400, detail='Expected WebSocket request.')
             signin = web.signin.check_signin(websocket, res)
@@ -166,6 +168,7 @@ class Agent(feature.WebFeature):
                     if query is None or query == '' or query == 'ping':
                         time.sleep(0.5)
                         continue
+                    """
                     if is_japan:
                         query += f"<important>なお現在のユーザーは'{user_id}'でgroupsは'{groups}'ですので引数に必要な時は指定してください。" + \
                             f"またsignin_fileの引数が必要な時は'{web.signin.signin_file}'を指定してください。</important>"
@@ -182,6 +185,7 @@ class Agent(feature.WebFeature):
                             #f", port = {web.redis_port if web.redis_port else self.default_port}\n" + \
                             #f", password = {web.redis_password if web.redis_password else self.default_pass}\n" + \
                             #f", svname = {web.svname if web.svname else self.default_svname}\n"
+                    """
                     web.options.audit_exec(sock, web, body=dict(agent_session=agent_session.id, user_id=user_id, groups=groups, query=query))
                     content = types.Content(role='user', parts=[types.Part(text=query)])
 

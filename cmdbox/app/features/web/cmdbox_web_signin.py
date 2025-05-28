@@ -1,4 +1,5 @@
 from cmdbox.app import feature
+from cmdbox.app.auth import signin
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -24,7 +25,7 @@ class Signin(feature.WebFeature):
 
         @app.api_route('/signin/{next}', methods=['GET', 'POST'], response_class=HTMLResponse)
         async def _signin(next:str, req:Request, res:Response):
-            web.signin.enable_cors(req, res)
+            signin.Signin._enable_cors(req, res)
             res.headers['Access-Control-Allow-Origin'] = '*'
             return web.signin_html_data
 
