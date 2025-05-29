@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.auth package &mdash; cmdbox 2025/05/11 documentation</title>
+  <title>cmdbox.app.auth package &mdash; cmdbox 2025/05/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=8d0fcf6a"></script>
+      <script src="../_static/documentation_options.js?v=03cc8ca9"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -256,7 +256,7 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.auth.signin.Signin.check_apikey">
-<span class="sig-name descname"><span class="pre">check_apikey</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Response</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/auth/signin.html#Signin.check_apikey"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.auth.signin.Signin.check_apikey" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">check_apikey</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Response</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">RedirectResponse</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/auth/signin.html#Signin.check_apikey"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.auth.signin.Signin.check_apikey" title="Link to this definition"></a></dt>
 <dd><p>ApiKeyをチェックする</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -269,7 +269,7 @@
 <dd class="field-even"><p>サインインエラーの場合はリダイレクトレスポンス</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Response</p>
+<dd class="field-odd"><p>Union[None, RedirectResponse]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -340,7 +340,7 @@ str: メッセージ</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.auth.signin.Signin.check_signin">
-<span class="sig-name descname"><span class="pre">check_signin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Response</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/auth/signin.html#Signin.check_signin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.auth.signin.Signin.check_signin" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">check_signin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Response</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">RedirectResponse</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/auth/signin.html#Signin.check_signin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.auth.signin.Signin.check_signin" title="Link to this definition"></a></dt>
 <dd><p>サインインをチェックする</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -353,7 +353,7 @@ str: メッセージ</p>
 <dd class="field-even"><p>サインインエラーの場合はリダイレクトレスポンス</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Response</p>
+<dd class="field-odd"><p>Union[None, RedirectResponse]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -368,20 +368,6 @@ str: メッセージ</p>
 <li><p><strong>signin_file_data</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- サインインファイルデータ</p></li>
 <li><p><strong>group_names</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) -- グループ名リスト</p></li>
 <li><p><strong>master_groups</strong> (<em>List</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- 親グループ名. Defaults to None.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cmdbox.app.auth.signin.Signin.enable_cors">
-<span class="sig-name descname"><span class="pre">enable_cors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Response</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/auth/signin.html#Signin.enable_cors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.auth.signin.Signin.enable_cors" title="Link to this definition"></a></dt>
-<dd><p>CORSを有効にする</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>req</strong> (<em>Request</em>) -- リクエスト</p></li>
-<li><p><strong>res</strong> (<em>Response</em>) -- レスポンス</p></li>
 </ul>
 </dd>
 </dl>
@@ -499,6 +485,26 @@ str: メッセージ</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cmdbox.app.auth.signin.Signin.load_groups">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_groups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signin_file_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apikey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/auth/signin.html#Signin.load_groups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.auth.signin.Signin.load_groups" title="Link to this definition"></a></dt>
+<dd><p>APIキーからユーザグループを取得します
+:param signin_file_data: サインインファイルデータ
+:type signin_file_data: Dict[str, Any]
+:param apikey: APIキー
+:type apikey: str
+:param logger: ロガー
+:type logger: logging.Logger</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ユーザグループの情報</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cmdbox.app.auth.signin.Signin.load_signin_file">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_signin_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signin_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signin_file_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/auth/signin.html#Signin.load_signin_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.auth.signin.Signin.load_signin_file" title="Link to this definition"></a></dt>
 <dd><p>サインインファイルを読み込む</p>
@@ -542,6 +548,55 @@ str: メッセージ</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.auth.signin.create_request_scope">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cmdbox.app.auth.signin.</span></span><span class="sig-name descname"><span class="pre">create_request_scope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Response</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">websocket</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">WebSocket</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cmdbox/app/auth/signin.html#create_request_scope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.auth.signin.create_request_scope" title="Link to this definition"></a></dt>
+<dd><p>FastAPIのDepends用に、ContextVarを使用してリクエストスコープを提供します。
+これにより、リクエストごとに異なるRequestオブジェクトを取得できます。
+これは、FastAPIのDependsで使用されることを意図しています。
+次のように使用します。</p>
+<p class="rubric">Example</p>
+<p>from cmdbox.app.auth import signin
+from fastapi import Depends, Request, Response</p>
+<p>&#64;app.get(&quot;/some-endpoint&quot;)
+async def some_endpoint(req: Request, res: Response, scope=Depends(signin.create_request_scope)):</p>
+<blockquote>
+<div><p># 何らかの処理</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>req</strong> (<em>Request</em>) -- リクエスト</p></li>
+<li><p><strong>res</strong> (<em>Response</em>) -- レスポンス</p></li>
+<li><p><strong>websocket</strong> (<em>WebSocket</em>) -- WebSocket接続</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cmdbox.app.auth.signin.get_request_scope">
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.auth.signin.</span></span><span class="sig-name descname"><span class="pre">get_request_scope</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/cmdbox/app/auth/signin.html#get_request_scope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.auth.signin.get_request_scope" title="Link to this definition"></a></dt>
+<dd><p>FastAPIのDepends用に、ContextVarからリクエストスコープを取得します。</p>
+<p class="rubric">Example</p>
+<p>from cmdbox.app.auth import signin
+from fastapi import Request, Response
+scope = signin.get_request_scope()
+scope['req']  # Requestオブジェクト
+scope['res']  # Responseオブジェクト
+scope['session']  # sessionを表す辞書
+scope['websocket']  # WebSocket接続
+scope['logger']  # loggerオブジェクト</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>リクエストとレスポンスとWebSocket接続</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, Any]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

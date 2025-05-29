@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.common &mdash; cmdbox 2025/04/18 documentation</title>
+  <title>cmdbox.app.common &mdash; cmdbox 2025/05/28 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=18224466"></script>
+      <script src="../../../_static/documentation_options.js?v=a7b408b0"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/authentication.html">Authentication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/errors.html">Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/license.html">License</a></li>
 </ul>
 
@@ -81,6 +82,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">cryptography.fernet</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fernet</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pkg_resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">resource_string</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">RichHandler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.console</span><span class="w"> </span><span class="kn">import</span> <span class="n">Console</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">tabulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">tabulate</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
@@ -180,6 +183,57 @@
         <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="reset_logger">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.reset_logger">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">reset_logger</span><span class="p">(</span><span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">stderr</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    指定されたロガーのハンドラをクリアし、新しいハンドラを追加します。</span>
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): ロガーの名前</span>
+<span class="sd">        stderr (bool, optional): 標準エラー出力を使用するかどうか. Defaults to False.</span>
+<span class="sd">        fmt (str, optional): ログフォーマット. Defaults to &#39;%(message)s&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">create_log_handler</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="n">fmt</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="create_log_handler">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.create_log_handler">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_log_handler</span><span class="p">(</span><span class="n">stderr</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">Handler</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ログハンドラを生成します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        stderr (bool, optional): 標準エラー出力を使用するかどうか. Defaults to False.</span>
+<span class="sd">        fmt (str, optional): ログフォーマット. Defaults to &#39;%(message)s&#39;.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        logging.Handler: ログハンドラ</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+    <span class="n">handler</span> <span class="o">=</span> <span class="n">RichHandler</span><span class="p">(</span><span class="n">console</span><span class="o">=</span><span class="n">Console</span><span class="p">(</span><span class="n">stderr</span><span class="o">=</span><span class="n">stderr</span><span class="p">),</span> <span class="n">show_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">omit_repeated_times</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                          <span class="n">tracebacks_word_wrap</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_time_format</span><span class="o">=</span><span class="s1">&#39;[%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M]&#39;</span><span class="p">)</span>
+    <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">handler</span></div>
+
+
+<div class="viewcode-block" id="create_console">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.create_console">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_console</span><span class="p">(</span><span class="n">stderr</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Console</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    コンソールを生成します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        stderr (bool, optional): 標準エラー出力を使用するかどうか. Defaults to False.</span>
+<span class="sd">        file (file, optional): 出力先のファイル. Defaults to None.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Console: コンソール</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">console</span> <span class="o">=</span> <span class="n">Console</span><span class="p">(</span><span class="n">stderr</span><span class="o">=</span><span class="n">stderr</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">file</span><span class="p">,</span> <span class="n">log_time</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_time_format</span><span class="o">=</span><span class="s1">&#39;[%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M]&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">console</span></div>
+
+
 <div class="viewcode-block" id="default_logger">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.default_logger">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">default_logger</span><span class="p">(</span><span class="n">debug</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="n">version</span><span class="p">,</span> <span class="n">webcall</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">:</span>
@@ -196,12 +250,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">webcall</span><span class="p">:</span>
-        <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(levelname)s</span><span class="s1">[</span><span class="si">%(asctime)s</span><span class="s1">] - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">handler</span> <span class="o">=</span> <span class="n">loghandler</span><span class="o">.</span><span class="n">ColorfulStreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+        <span class="c1">#formatter = logging.Formatter(&#39;%(levelname)s[%(asctime)s] - %(message)s&#39;)</span>
+        <span class="c1">#handler = loghandler.ColorfulStreamHandler(sys.stdout)</span>
+        <span class="n">handler</span> <span class="o">=</span> <span class="n">create_log_handler</span><span class="p">()</span>
         <span class="n">handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span> <span class="k">if</span> <span class="n">debug</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-        <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span> <span class="k">if</span> <span class="n">debug</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="n">logger</span></div>
 
 

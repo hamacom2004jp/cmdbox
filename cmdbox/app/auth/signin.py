@@ -8,6 +8,7 @@ import contextvars
 import logging
 import string
 
+
 class Signin(object):
 
     def __init__(self, logger:logging.Logger, signin_file:Path, signin_file_data:Dict[str, Any], appcls, ver):
@@ -787,14 +788,17 @@ async def create_request_scope(req:Request=None, res:Response=None, websocket:We
     これは、FastAPIのDependsで使用されることを意図しています。
     次のように使用します。
 
-    ```python
-    from cmdbox.app.auth import signin
-    from fastapi import Depends, Request, Response
+    Example:
 
-    @app.get("/some-endpoint")
-    async def some_endpoint(req: Request, res: Response, scope=Depends(signin.create_request_scope)):
-        # 何らかの処理
-    ```
+        ::
+
+        from cmdbox.app.auth import signin
+        from fastapi import Depends, Request, Response
+
+        @app.get("/some-endpoint")
+        async def some_endpoint(req: Request, res: Response, scope=Depends(signin.create_request_scope)):
+            # 何らかの処理
+
     Args:
         req (Request): リクエスト
         res (Response): レスポンス
@@ -813,15 +817,20 @@ async def create_request_scope(req:Request=None, res:Response=None, websocket:We
 def get_request_scope() -> Dict[str, Any]:
     """
     FastAPIのDepends用に、ContextVarからリクエストスコープを取得します。
-    ```python
-    from cmdbox.app.auth import signin
-    from fastapi import Request, Response
-    scope = signin.get_request_scope()
-    scope['req']  # Requestオブジェクト
-    scope['res']  # Responseオブジェクト
-    scope['session']  # sessionを表す辞書
-    scope['websocket']  # WebSocket接続
-    ```
+
+    Example:
+
+        ::
+
+        from cmdbox.app.auth import signin
+        from fastapi import Request, Response
+        scope = signin.get_request_scope()
+        scope['req']  # Requestオブジェクト
+        scope['res']  # Responseオブジェクト
+        scope['session']  # sessionを表す辞書
+        scope['websocket']  # WebSocket接続
+        scope['logger']  # loggerオブジェクト
+
     Returns:
         Dict[str, Any]: リクエストとレスポンスとWebSocket接続
     """

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox package &mdash; cmdbox 2025/05/11 documentation</title>
+  <title>cmdbox package &mdash; cmdbox 2025/05/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=8d0fcf6a"></script>
+      <script src="../_static/documentation_options.js?v=03cc8ca9"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -128,6 +128,8 @@
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.chopdq"><code class="docutils literal notranslate"><span class="pre">chopdq()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.cmd"><code class="docutils literal notranslate"><span class="pre">cmd()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.copy_sample"><code class="docutils literal notranslate"><span class="pre">copy_sample()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.create_console"><code class="docutils literal notranslate"><span class="pre">create_console()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.create_log_handler"><code class="docutils literal notranslate"><span class="pre">create_log_handler()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.decrypt"><code class="docutils literal notranslate"><span class="pre">decrypt()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.default_json_enc"><code class="docutils literal notranslate"><span class="pre">default_json_enc()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.default_logger"><code class="docutils literal notranslate"><span class="pre">default_logger()</span></code></a></li>
@@ -146,6 +148,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.mklogdir"><code class="docutils literal notranslate"><span class="pre">mklogdir()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.print_format"><code class="docutils literal notranslate"><span class="pre">print_format()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.random_string"><code class="docutils literal notranslate"><span class="pre">random_string()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.reset_logger"><code class="docutils literal notranslate"><span class="pre">reset_logger()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.rmdirs"><code class="docutils literal notranslate"><span class="pre">rmdirs()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.safe_fname"><code class="docutils literal notranslate"><span class="pre">safe_fname()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.save_yml"><code class="docutils literal notranslate"><span class="pre">save_yml()</span></code></a></li>
@@ -165,14 +168,6 @@
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.edge.Edge.start"><code class="docutils literal notranslate"><span class="pre">Edge.start()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.edge.Edge.start_tray"><code class="docutils literal notranslate"><span class="pre">Edge.start_tray()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.edge.Edge.stop_jobs"><code class="docutils literal notranslate"><span class="pre">Edge.stop_jobs()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.edge.Tool"><code class="docutils literal notranslate"><span class="pre">Tool</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.edge.Tool.exec_cmd"><code class="docutils literal notranslate"><span class="pre">Tool.exec_cmd()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.edge.Tool.notify"><code class="docutils literal notranslate"><span class="pre">Tool.notify()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.edge.Tool.open_browser"><code class="docutils literal notranslate"><span class="pre">Tool.open_browser()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.edge.Tool.pub_result"><code class="docutils literal notranslate"><span class="pre">Tool.pub_result()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.edge.Tool.set_session"><code class="docutils literal notranslate"><span class="pre">Tool.set_session()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -272,6 +267,7 @@
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.T_TEXT"><code class="docutils literal notranslate"><span class="pre">Options.T_TEXT</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.audit"><code class="docutils literal notranslate"><span class="pre">Options.audit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.audit_exec"><code class="docutils literal notranslate"><span class="pre">Options.audit_exec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.check_agentrule"><code class="docutils literal notranslate"><span class="pre">Options.check_agentrule()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.getInstance"><code class="docutils literal notranslate"><span class="pre">Options.getInstance()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.get_cmd_attr"><code class="docutils literal notranslate"><span class="pre">Options.get_cmd_attr()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.get_cmd_choices"><code class="docutils literal notranslate"><span class="pre">Options.get_cmd_choices()</span></code></a></li>
@@ -285,6 +281,7 @@
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.init_options"><code class="docutils literal notranslate"><span class="pre">Options.init_options()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.is_features_loaded"><code class="docutils literal notranslate"><span class="pre">Options.is_features_loaded()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.list_options"><code class="docutils literal notranslate"><span class="pre">Options.list_options()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.load_features_agentrule"><code class="docutils literal notranslate"><span class="pre">Options.load_features_agentrule()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.load_features_aliases_cli"><code class="docutils literal notranslate"><span class="pre">Options.load_features_aliases_cli()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.load_features_aliases_web"><code class="docutils literal notranslate"><span class="pre">Options.load_features_aliases_web()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.options.Options.load_features_args"><code class="docutils literal notranslate"><span class="pre">Options.load_features_args()</span></code></a></li>

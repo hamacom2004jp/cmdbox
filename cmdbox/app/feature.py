@@ -1,6 +1,6 @@
 from cmdbox import version
-from cmdbox.app import common, edge
-from cmdbox.app.commons import redis_client
+from cmdbox.app import common, edge_tool
+from cmdbox.app.commons import convert, redis_client
 from cmdbox.app.web import Web
 from fastapi import FastAPI
 from pathlib import Path
@@ -106,13 +106,13 @@ class Feature(object):
         """
         raise NotImplementedError
 
-    def edgerun(self, opt:Dict[str, Any], tool:edge.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
+    def edgerun(self, opt:Dict[str, Any], tool:edge_tool.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
         """
         この機能のエッジ側の実行を行います
 
         Args:
             opt (Dict[str, Any]): オプション
-            tool (edge.Tool): 通知関数などedge側のUI操作を行うためのクラス
+            tool (edge_tool.Tool): 通知関数などedge側のUI操作を行うためのクラス
             logger (logging.Logger): ロガー
             timeout (int): タイムアウト時間
             prevres (Any): 前コマンドの結果。pipeline実行の実行結果を参照する時に使用します。
@@ -127,7 +127,7 @@ class OneshotEdgeFeature(Feature):
     """
     一度だけ実行するエッジ機能の基底クラス
     """
-    def edgerun(self, opt:Dict[str, Any], tool:edge.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
+    def edgerun(self, opt:Dict[str, Any], tool:edge_tool.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
         status, res = tool.exec_cmd(opt, logger, timeout, prevres)
         yield 1, res
 
@@ -135,7 +135,7 @@ class OneshotNotifyEdgeFeature(OneshotEdgeFeature):
     """
     実行結果の通知を行うエッジ機能の基底クラス
     """
-    def edgerun(self, opt:Dict[str, Any], tool:edge.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
+    def edgerun(self, opt:Dict[str, Any], tool:edge_tool.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
         status, res = next(super().edgerun(opt, tool, logger, timeout, prevres))
         tool.notify(res)
         yield status, res
@@ -144,7 +144,7 @@ class ResultEdgeFeature(Feature):
     """
     実行結果をWebブラウザで表示するエッジ機能の基底クラス
     """
-    def edgerun(self, opt:Dict[str, Any], tool:edge.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
+    def edgerun(self, opt:Dict[str, Any], tool:edge_tool.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
         status, res = next(super().edgerun(opt, tool, logger, timeout, prevres))
         if status == 0:
             status, res = tool.pub_result(opt['title'], res, timeout)
@@ -156,7 +156,7 @@ class OneshotResultEdgeFeature(ResultEdgeFeature):
     """
     一度だけ実行結果をWebブラウザで表示するエッジ機能の基底クラス
     """
-    def edgerun(self, opt:Dict[str, Any], tool:edge.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
+    def edgerun(self, opt:Dict[str, Any], tool:edge_tool.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
         status, res = next(super().edgerun(opt, tool, logger, timeout, prevres))
         yield 1, res
 
@@ -164,7 +164,7 @@ class UnsupportEdgeFeature(Feature):
     """
     サポートされていないエッジ機能の基底クラス
     """
-    def edgerun(self, opt:Dict[str, Any], tool:edge.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
+    def edgerun(self, opt:Dict[str, Any], tool:edge_tool.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
         res = dict(warn=f'Unsupported edgerun. mode="{opt["mode"]}", cmd="{opt["cmd"]}"')
         tool.notify(res)
         yield 1, res

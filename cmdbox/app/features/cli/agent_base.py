@@ -98,7 +98,7 @@ class AgentBase(feature.ResultEdgeFeature):
                 dict(opt="llmseed", type=Options.T_INT, default=13, required=False, multi=False, hide=False, choice=None,
                      discription_ja="llmモデルを使用するときのシード値を指定します。",
                      discription_en="Specifies the seed value when using llm model."),
-                dict(opt="llmtemperature", type=Options.T_FLOAT, default=None, required=False, multi=False, hide=False, choice=None,
+                dict(opt="llmtemperature", type=Options.T_FLOAT, default=0.1, required=False, multi=False, hide=False, choice=None,
                      discription_ja="llmのモデルを使用するときのtemperatureを指定します。",
                      discription_en="Specifies the temperature when using llm model."),
             ])
@@ -169,40 +169,47 @@ class AgentBase(feature.ResultEdgeFeature):
         is_japan = language.find('Japan') >= 0 or language.find('ja_JP') >= 0
         description = f"{self.ver.__appid__}に登録されているコマンド提供"
         instruction = f"あなたはコマンドの意味を熟知しているエキスパートです。" + \
-                      f"ユーザーがコマンドを実行したいとき、あなたは以下の手順に従ってコマンドを実行してください。\n" + \
+                      f"ユーザーがコマンドを実行したいとき、あなたは以下の手順に従ってコマンドを確実に実行してください。\n" + \
                       f"1. ユーザーのクエリからが実行したいコマンドを特定します。\n" + \
-                      f"2. コマンド実行に必要なパラメータを特定します。\n" + \
-                      f"3. ユーザーのクエリから指定しているパラメータを取得します。\n" + \
-                      f"4. ユーザーが指定しているパラメータと、コマンド実行に必要なパラメータを比較し、不足しているパラメータを取得します。\n" + \
-                      f"5. 以下に「パラメータ = デフォルト値」を示しているので、不足しているパラメータはデフォルト値を使用します。\n" + \
-                      f"   但しコマンドが実行に必要のないパラメータは指定しないようにしてください。\n" + \
-                      f" host = {args.host if hasattr(args, 'host') and args.host else self.default_host}\n" + \
-                      f" port = {args.port if hasattr(args, 'port') and args.port else self.default_port}\n" + \
-                      f" password = {args.password if hasattr(args, 'password') and args.password else self.default_pass}\n" + \
-                      f" svname = {args.svname if hasattr(args, 'svname') and args.svname else self.default_svname}\n" + \
-                      f" data = {args.data if hasattr(args, 'data') and args.data else self.default_data}\n" + \
-                      f" retry_count = {args.retry_count if hasattr(args, 'retry_count') and args.retry_count else 3}\n" + \
-                      f" retry_interval = {args.retry_interval if hasattr(args, 'retry_interval') and args.retry_interval else 3}\n" + \
-                      f" timeout = {args.timeout if hasattr(args, 'timeout') and args.timeout else 15}\n" + \
-                      f" output_json = {args.output_json if hasattr(args, 'output_json') and args.output_json else None}\n" + \
-                      f" output_json_append = {args.output_json_append if hasattr(args, 'output_json_append') and args.output_json_append else False}\n" + \
-                      f" stdout_log = {args.stdout_log if hasattr(args, 'stdout_log') and args.stdout_log else False}\n" + \
-                      f" capture_stdout = {args.capture_stdout if hasattr(args, 'capture_stdout') and args.capture_stdout else False}\n" + \
-                      f" capture_maxsize = {args.capture_maxsize if hasattr(args, 'capture_maxsize') and args.capture_maxsize else 100}\n" + \
-                      f" tag = {args.tag if hasattr(args, 'tag') and args.tag else None}\n" + \
-                      f" clmsg_id = {args.clmsg_id if hasattr(args, 'clmsg_id') and args.clmsg_id else None}\n" + \
-                      f" signin_file = {args.signin_file if hasattr(args, 'signin_file') and args.signin_file else f'.{self.ver.__appid__}/user_list.yml'}\n" + \
-                      f"6. 以上のパラメータを使用しても不足するパラメータは、Noneを使用します。\n" + \
-                      f"7. 以上のパラメータを使用してコマンドを実行して、コマンドの結果はJSONでユーザーに提示してください。\n" + \
-                      f"8. もし予期しないパラメータを受け取ったという旨のエラーが発生した場合は、そのパラメータを指定せずに再実行してください。\n" + \
-                      f"9. もしエラーが発生した場合は、ユーザーにコマンド名とパラメータとエラー内容を提示してください。\n"
+                      f"2. コマンド実行に必要なパラメータのなかで、ユーザーのクエリから取得できないものは、コマンド定義にあるデフォルト値を指定して実行してください。\n" + \
+                      f"3. もしエラーが発生した場合は、ユーザーにコマンド名とパラメータとエラー内容を提示してください。\n"
+        """
+                    f"2. コマンド実行に必要なパラメータを特定します。\n" + \
+                    f"3. ユーザーのクエリから指定しているパラメータを取得します。\n" + \
+                    f"4. ユーザーが指定しているパラメータと、コマンド実行に必要なパラメータを比較し、不足しているパラメータを取得します。\n" + \
+                    f"5. 以下に「パラメータ = デフォルト値」を示しているので、不足しているパラメータはデフォルト値を使用します。\n" + \
+                    f"   但しコマンドが実行に必要のないパラメータは指定しないようにしてください。\n" + \
+                    f" host = {args.host if hasattr(args, 'host') and args.host else self.default_host}\n" + \
+                    f" port = {args.port if hasattr(args, 'port') and args.port else self.default_port}\n" + \
+                    f" password = {args.password if hasattr(args, 'password') and args.password else self.default_pass}\n" + \
+                    f" svname = {args.svname if hasattr(args, 'svname') and args.svname else self.default_svname}\n" + \
+                    f" data = {args.data if hasattr(args, 'data') and args.data else self.default_data}\n" + \
+                    f" retry_count = {args.retry_count if hasattr(args, 'retry_count') and args.retry_count else 3}\n" + \
+                    f" retry_interval = {args.retry_interval if hasattr(args, 'retry_interval') and args.retry_interval else 3}\n" + \
+                    f" timeout = {args.timeout if hasattr(args, 'timeout') and args.timeout else 15}\n" + \
+                    f" output_json = {args.output_json if hasattr(args, 'output_json') and args.output_json else None}\n" + \
+                    f" output_json_append = {args.output_json_append if hasattr(args, 'output_json_append') and args.output_json_append else False}\n" + \
+                    f" stdout_log = {args.stdout_log if hasattr(args, 'stdout_log') and args.stdout_log else False}\n" + \
+                    f" capture_stdout = {args.capture_stdout if hasattr(args, 'capture_stdout') and args.capture_stdout else False}\n" + \
+                    f" capture_maxsize = {args.capture_maxsize if hasattr(args, 'capture_maxsize') and args.capture_maxsize else 100}\n" + \
+                    f" tag = {args.tag if hasattr(args, 'tag') and args.tag else None}\n" + \
+                    f" clmsg_id = {args.clmsg_id if hasattr(args, 'clmsg_id') and args.clmsg_id else None}\n" + \
+                    f" signin_file = {args.signin_file if hasattr(args, 'signin_file') and args.signin_file else f'.{self.ver.__appid__}/user_list.yml'}\n" + \
+                    f"6. 以上のパラメータを使用しても不足するパラメータは、Noneを使用します。\n" + \
+                    f"7. 以上のパラメータを使用してコマンドを実行して、コマンドの結果はJSONでユーザーに提示してください。\n" + \
+                    f"8. もし予期しないパラメータを受け取ったという旨のエラーが発生した場合は、そのパラメータを指定せずに再実行してください。\n" + \
+                    f"9. もしエラーが発生した場合は、ユーザーにコマンド名とパラメータとエラー内容を提示してください。\n"
+        """
 
         description = description if is_japan else \
                       f"Command offer registered in {self.ver.__appid__}."
         instruction = instruction if is_japan else \
                       f"You are the expert who knows what the commands mean." + \
-                      f"When a user wants to execute a command, you follow these steps to execute the command.\n" + \
+                      f"When a user wants to execute a command, you follow these steps to ensure that the command is executed.\n" + \
                       f"1. Identify the command you want to execute from the user's query.\n" + \
+                      f"2. Any parameters required to execute the command that cannot be obtained from the user's query should be executed with the default values provided in the command definition.\n" + \
+                      f"3. If an error occurs, provide the user with the command name, parameters, and error description.\n"
+        """
                       f"2. Identify the parameters required to execute the command.\n" + \
                       f"3. Retrieve the specified parameters from the user's query.\n" + \
                       f"4. It compares the parameters specified by the user with those required to execute the command and obtains the missing parameters.\n" + \
@@ -227,6 +234,7 @@ class AgentBase(feature.ResultEdgeFeature):
                       f"7. Execute the command using the above parameters and present the results of the command to the user in JSON.\n" + \
                       f"8. If you receive an error stating that an unexpected parameter was received, rerun the program without that parameter.\n" + \
                       f"9. If an error occurs, provide the user with the command name, parameters, and error description.\n"
+        """
 
         description = args.agent_description if args.agent_description else description
         instruction = args.agent_instruction if args.agent_instruction else instruction
@@ -396,7 +404,7 @@ class AgentBase(feature.ResultEdgeFeature):
                 discription = options.get_cmd_attr(mode, cmd, 'discription_ja' if is_japan else 'discription_en')
                 choices = options.get_cmd_choices(mode, cmd, False)
                 if len([opt for opt in choices if 'opt' in opt and opt['opt'] == 'signin_file']) <= 0:
-                    choices.append(dict(opt="signin_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None,
+                    choices.append(dict(opt="signin_file", type=Options.T_FILE, default=f'.{self.ver.__appid__}/user_list.yml', required=True, multi=False, hide=True, choice=None,
                         discription_ja="サインイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。",
                         discription_en="Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required."),)
                 fn = f"{mode}_{cmd}"
@@ -410,9 +418,8 @@ class AgentBase(feature.ResultEdgeFeature):
                 func_txt += f'    Returns:\n'
                 func_txt += f'        Dict[str, Any]:{"処理結果" if is_japan else "Processing Result"}\n'
                 func_txt += f'    """\n'
-                func_txt += f'    logger = logging.getLogger("agent")\n'
                 func_txt += f'    scope = signin.get_request_scope()\n'
-                func_txt += f'    logger.info("scope="+str(scope))\n'
+                func_txt += f'    logger = common.default_logger()\n'
                 func_txt += f'    opt = dict()\n'
                 func_txt += f'    opt["mode"] = "{mode}"\n'
                 func_txt += f'    opt["cmd"] = "{cmd}"\n'
@@ -441,10 +448,13 @@ class AgentBase(feature.ResultEdgeFeature):
                 func_txt += f'    signin_data = signin.Signin.load_signin_file(args.signin_file)\n'
                 func_txt += f'    req = scope["req"] if scope["req"] is not None else scope["websocket"]\n'
                 func_txt += f'    sign = signin.Signin._check_signin(req, scope["res"], signin_data, logger)\n'
-                func_txt += f'    if signin is not None:\n'
+                func_txt += f'    if sign is not None:\n'
+                func_txt += f'        logger.warning("Unable to execute command because authentication information cannot be obtained")\n'
                 func_txt += f'        return dict(warn="Unable to execute command because authentication information cannot be obtained")\n'
                 func_txt += f'    groups = req.session["signin"]["groups"]\n'
+                func_txt += f'    logger.info("Call agent tool `{mode}_{cmd}`:user="+str(req.session["signin"]["name"])+" groups="+str(groups)+" args="+str(args))\n'
                 func_txt += f'    if not signin.Signin._check_cmd(signin_data, groups, "{mode}", "{cmd}", logger):\n'
+                func_txt += f'        logger.warning("You do not have permission to execute this command.")\n'
                 func_txt += f'        return dict(warn="You do not have permission to execute this command.")\n'
                 func_txt += f'    feat = Options.getInstance().get_cmd_attr("{mode}", "{cmd}", "feature")\n'
                 func_txt += f'    try:\n'

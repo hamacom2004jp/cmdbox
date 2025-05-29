@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( gui mode ) &mdash; cmdbox 2025/05/11 documentation</title>
+  <title>Command Reference ( gui mode ) &mdash; cmdbox 2025/05/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=8d0fcf6a"></script>
+      <script src="../_static/documentation_options.js?v=03cc8ca9"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -99,129 +99,10 @@
 </ul>
 <section id="management-screen-startup-cmdbox-m-gui-c-start-option">
 <h2>Management screen startup : <cite>cmdbox -m gui -c start &lt;Option&gt;</cite><a class="headerlink" href="#management-screen-startup-cmdbox-m-gui-c-start-option" title="Link to this heading"></a></h2>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>--host &lt;IP address or host name&gt;</p></th>
-<th class="head"></th>
-<th class="head"><p>Specify the service host of the Redis server.</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--data &lt;data folder&gt;</p></td>
-<td></td>
-<td><p>When omitted, f`$HONE/.{version.__appid__}` is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--allow_host &lt;IP to allow connection&gt;</p></td>
-<td></td>
-<td><p>If omitted, <cite>0.0.0.0</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--listen_port &lt;service port&gt;</p></td>
-<td></td>
-<td><p>If omitted, <cite>8081</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--ssl_listen_port &lt;service port&gt;</p></td>
-<td></td>
-<td><p>If omitted, <cite>8443</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--ssl_cert &lt;SSL server certificate file&gt;</p></td>
-<td></td>
-<td><p>Specify the SSL server certificate file.</p></td>
-</tr>
-<tr class="row-even"><td><p>--ssl_key &lt;SSL Server Private Key File&gt;</p></td>
-<td></td>
-<td><p>Specify the SSL server private key file.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--ssl_keypass &lt;SSL Server Private Key Password&gt;</p></td>
-<td></td>
-<td><p>Specify the composite password for the SSL server private key file.</p></td>
-</tr>
-<tr class="row-even"><td><p>--ssl_ca_certs &lt;SSL Server CA Certificate File&gt;</p></td>
-<td></td>
-<td><p>Specify the SSL server CA certificate file.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--signin_file &lt;user list file&gt;</p></td>
-<td></td>
-<td><p>Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required.</p></td>
-</tr>
-<tr class="row-even"><td><p>--session_domain &lt;domain&gt;</p></td>
-<td></td>
-<td><p>Specify the domain for which the signed-in user's session is valid.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--session_path &lt;path&gt;</p></td>
-<td></td>
-<td><p>Specify the session timeout in seconds for signed-in users.</p></td>
-</tr>
-<tr class="row-even"><td><p>--session_secure</p></td>
-<td></td>
-<td><p>Set the Secure flag for the signed-in user's session.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--session_timeout &lt;second&gt;</p></td>
-<td></td>
-<td><p>Specify the session timeout in seconds for signed-in users.</p></td>
-</tr>
-<tr class="row-even"><td><p>--guvicorn_workers &lt;second&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of guvicorn workers, valid only in Linux environment. If -1 or unspecified, twice the number of CPUs is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--guvicorn_timeout &lt;second&gt;</p></td>
-<td></td>
-<td><p>Specify the timeout duration of the guvicorn worker in seconds.</p></td>
-</tr>
-<tr class="row-even"><td><p>--client_only</p></td>
-<td></td>
-<td><p>Do not make connections to the server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--outputs_key &lt;output key&gt;</p></td>
-<td></td>
-<td><p>Specify items to be displayed on the showimg and webcap screens. If omitted, all items are displayed.</p></td>
-</tr>
-<tr class="row-even"><td><p>--doc_root &lt;document root path&gt;</p></td>
-<td></td>
-<td><p>Document root for custom files. URL mapping from the path of a folder-specified custom file with the path of doc_root removed.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--gui_html &lt;gui.html file path&gt;</p></td>
-<td></td>
-<td><p>Specify <cite>gui.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--filer_html &lt;filer.html file path&gt;</p></td>
-<td></td>
-<td><p>Specify <cite>filer.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--result_html &lt;result.html file path&gt;</p></td>
-<td></td>
-<td><p>Specify <cite>result.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--users_html &lt;users.html file path&gt;</p></td>
-<td></td>
-<td><p>Specify <cite>users.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--assets &lt;Path to js and css files&gt;</p></td>
-<td></td>
-<td><p>Specify the asset file required when using html files.</p></td>
-</tr>
-<tr class="row-even"><td><p>--signin_html &lt;signin.html file path&gt;</p></td>
-<td></td>
-<td><p>Specify <cite>signin.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
-</tr>
-</tbody>
-</table>
+<ul class="simple">
+<li><p>The same options are available as for the web mode start command.</p></li>
+<li><p>The only difference is whether the browser is activated or not.</p></li>
+</ul>
 </section>
 </section>
 

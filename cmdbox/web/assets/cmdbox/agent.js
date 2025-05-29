@@ -66,13 +66,27 @@ agent.format_agent_message = (container, messages, txt, message) => {
 };
 agent.recursive_json_parse = (jobj) => {
     Object.keys(jobj).forEach((key) => {
-        if (jobj[key] && typeof jobj[key] === 'string') {
-            try {
-                jobj[key] = eval(`(${jobj[key]})`);
-                agent.recursive_json_parse(jobj[key]);
-            } catch (e) {}
+        if (!jobj[key]) return; // nullやundefinedは無視
+        if (typeof jobj[key] === 'function') {
+            delete jobj[key]; // 関数は削除
+            return;
         }
-        if (jobj[key] && typeof jobj[key] === 'object' && !Array.isArray(jobj[key])) {
+        if (typeof jobj[key] === 'string') {
+            try {
+                const val = eval(`(${jobj[key]})`);
+                if (val && typeof val === 'object' && !Array.isArray(val))
+                    for (const v of Object.values(val))
+                        if (v && typeof v === 'function') return; // 関数は無視
+                else if (val && Array.isArray(val))
+                    for (const v of val)
+                        if (v && typeof v === 'function') return; // 関数は無視
+                jobj[key] = val;
+                agent.recursive_json_parse(jobj[key]);
+            } catch (e) {
+                console.debug(`Fail parsing JSON string: ${jobj[key]}`, e);
+            }
+        }
+        if (typeof jobj[key] === 'object' && !Array.isArray(jobj[key])) {
             // オブジェクトの場合は再帰的に処理
             agent.recursive_json_parse(jobj[key]);
         }

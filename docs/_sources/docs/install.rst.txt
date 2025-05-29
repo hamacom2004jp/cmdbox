@@ -5,9 +5,11 @@ Install
 **************
 
 - Install cmdbox with the following command.
+- Also install the docker version of the redis server.
 
 .. code-block:: bash
 
+    docker run -p 6379:6379 --name redis -e REDIS_PASSWORD=password -it ubuntu/redis:latest
     pip install cmdbox
     cmdbox -v
 
@@ -24,8 +26,3 @@ Install
 
     pip install google-adk litellm
 
-- Also install the docker version of the redis server.
-
-.. code-block:: bash
-
-    docker run -p 6379:6379 --name redis -it ubuntu/redis:latest
