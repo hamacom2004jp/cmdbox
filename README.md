@@ -30,6 +30,29 @@ apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl buil
 pip install google-adk litellm
 ```
 
+# Run
+
+- Run the cmdbox server.
+
+```bash
+cmdbox -m server -c start &
+```
+
+- Run the cmdbox web.
+
+```bash
+cmdbox -m web -c start --signin_file .cmdbox/user_list.yml &
+```
+
+- Run the cmdbox web with agent.
+- Below is an example of using Google vertexai.
+- Other available options include Azure OpenAI and Ollama.
+
+```bash
+cmdbox -m web -c start --signin_file .cmdbox/user_list.yml --agent use --llmprov vertexai --llmmodel gemini-2.0-flash --llmlocation us-central1 --llmsvaccountfile <account json file>
+```
+
+
 # Tutorial
 
 - Open the ```.sample/sample_project``` folder in the current directory with VSCode.
