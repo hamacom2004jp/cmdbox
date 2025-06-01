@@ -74,7 +74,8 @@ pathrule:                      # List of RESTAPI rules, rules that determine whe
   - groups: [user]
     paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout, /password/change,
             /gui/user_data/load, /gui/user_data/save, /gui/user_data/delete,
-            /exec_cmd, /exec_pipe, /filer, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
+            /agent, /mcp,
+            /exec_cmd, /exec_pipe, /filer, /result, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
     rule: allow
   - groups: [readonly]
     paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]

@@ -1,9 +1,9 @@
 import datetime
 
-dt_now = datetime.datetime(2025, 5, 30)
+dt_now = datetime.datetime(2025, 6, 1)
 __appid__ = 'cmdbox'
 __title__ = 'cmdbox (Command Development Application)'
-__version__ = '0.6.0'
+__version__ = '0.6.0.1'
 __copyright__ = f'Copyright © 2023-{dt_now.strftime("%Y")} hamacom2004jp'
 __pypiurl__ = 'https://pypi.org/project/cmdbox/'
 __srcurl__ = 'https://github.com/hamacom2004jp/cmdbox'
@@ -18,7 +18,7 @@ __logo__ = '''
  ╚═════╝╚═╝     ╚═╝╚═════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝'''
 __description__ = f'{__title__} {__version__}\n\n' + \
                   f'{__copyright__}\n' + \
-                  f'build: {dt_now.strftime("%Y-%m-%d")}\n' + \
+                  f'Build Date: {dt_now.strftime("%Y-%m-%d")}\n' + \
                   f'Web Site: PyPi <{__pypiurl__}>\n' + \
                   f'Web Site: SorceCode <{__srcurl__}>\n' + \
                   f'Web Site: Document <{__docurl__}>\n' + \

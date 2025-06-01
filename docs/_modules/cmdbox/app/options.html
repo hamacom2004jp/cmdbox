@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.options &mdash; cmdbox 2025/05/28 documentation</title>
+  <title>cmdbox.app.options &mdash; cmdbox 2025/06/01 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=a7b408b0"></script>
+      <script src="../../../_static/documentation_options.js?v=de8a5b00"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -771,6 +771,11 @@
         <span class="k">if</span> <span class="s1">&#39;enabled&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The audit element must have &quot;enabled&quot; specified.)&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">][</span><span class="s1">&#39;enabled&#39;</span><span class="p">]:</span> <span class="k">return</span>
+        <span class="c1"># フューチャーのoptions</span>
+        <span class="k">if</span> <span class="s1">&#39;options&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The audit element must have &quot;options&quot; specified.)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">audit_write_args</span> <span class="o">=</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">][</span><span class="s1">&#39;options&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">audit_search_args</span> <span class="o">=</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">][</span><span class="s1">&#39;options&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="c1"># writeフューチャー</span>
         <span class="k">if</span> <span class="s1">&#39;write&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The audit element must have &quot;write&quot; specified.)&#39;</span><span class="p">)</span>
@@ -781,6 +786,8 @@
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The audit.write element must have &quot;cmd&quot; specified.)&#39;</span><span class="p">)</span>
         <span class="n">cmd</span> <span class="o">=</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">][</span><span class="s1">&#39;write&#39;</span><span class="p">][</span><span class="s1">&#39;cmd&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">audit_write</span><span class="p">:</span><span class="n">feature</span><span class="o">.</span><span class="n">Feature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="s1">&#39;feature&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">audit_write_args</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">audit_write_args</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cmd</span>
         <span class="c1"># searchフューチャー</span>
         <span class="k">if</span> <span class="s1">&#39;search&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The audit element must have &quot;search&quot; specified.)&#39;</span><span class="p">)</span>
@@ -791,13 +798,6 @@
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The audit.search element must have &quot;cmd&quot; specified.)&#39;</span><span class="p">)</span>
         <span class="n">cmd</span> <span class="o">=</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">][</span><span class="s1">&#39;search&#39;</span><span class="p">][</span><span class="s1">&#39;cmd&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">audit_search</span><span class="p">:</span><span class="n">feature</span><span class="o">.</span><span class="n">Feature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="s1">&#39;feature&#39;</span><span class="p">)</span>
-        <span class="c1"># フューチャーのoptions</span>
-        <span class="k">if</span> <span class="s1">&#39;options&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The audit element must have &quot;options&quot; specified.)&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">audit_write_args</span> <span class="o">=</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">][</span><span class="s1">&#39;options&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">audit_write_args</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mode</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">audit_write_args</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cmd</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">audit_search_args</span> <span class="o">=</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;audit&#39;</span><span class="p">][</span><span class="s1">&#39;options&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">audit_search_args</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">audit_search_args</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cmd</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">audit_loaded</span> <span class="o">=</span> <span class="kc">True</span></div>

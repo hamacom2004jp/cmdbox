@@ -13,9 +13,9 @@ class DoSignout(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.get('/dosignout/{next}', response_class=HTMLResponse)
-        @app.post('/dosignout/{next}', response_class=HTMLResponse)
-        async def do_signout(next, req:Request, res:Response):
+        @app.api_route('/dosignout/{next}', methods=['GET', 'POST'], response_class=HTMLResponse)
+        @app.api_route('/{full_path:path}/dosignout/{next}/', methods=['GET', 'POST'], response_class=HTMLResponse)
+        async def do_signout(next, req:Request, res:Response, full_path:str=None):
             if 'signin' in req.session:
                 web.options.audit_exec(req, res, web, body=dict(msg='Signout.'), audit_type='auth')
                 for key in list(req.session.keys()).copy():

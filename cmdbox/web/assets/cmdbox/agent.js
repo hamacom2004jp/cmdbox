@@ -160,7 +160,10 @@ agent.init_form = async () => {
             agent.format_agent_message(container, messages, txt, packet.message);
         };
         ws.onopen = () => {
-            const ping = () => {ws.send('ping');};
+            const ping = () => {
+                ws.send('ping');
+                agent.chat_reconnect_count = 0; // pingが成功したら再接続回数をリセット
+            };
             btn_user_msg.prop('disabled', false);
             agent.chat_callback_ping_handler = setInterval(() => {ping();}, ping_interval);
         };
@@ -174,7 +177,7 @@ agent.init_form = async () => {
                 clearInterval(agent.chat_reconnectInterval_handler);
                 cmdbox.message({'error':'Connection to the agent has failed for several minutes. Please reload to resume reconnection.'});
                 const rand = cmdbox.random_string(8);
-                location.href = `signin/agent?r=${rand}`;
+                location.href = `../signin/agent?r=${rand}`;
                 return;
             }
             agent.chat_reconnect_count++;

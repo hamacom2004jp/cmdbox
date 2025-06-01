@@ -900,19 +900,16 @@ class ThreadedUvicorn:
         self.logger = logger
         self.guvicorn_config = guvicorn_config
         self.force_uvicorn = True if platform.system() == "Windows" else force_uvicorn
-        stderr_handler = common.create_log_handler(stderr=True)
-        stdout_handler = common.create_log_handler(stderr=False)
+        # loggerの設定
+        common.reset_logger("uvicorn")
+        common.reset_logger("uvicorn.error")
+        common.reset_logger("uvicorn.access")
+        #common.reset_logger("gunicorn.error")
+        #common.reset_logger("gunicorn.access")
         if self.force_uvicorn:
-            # loggerの設定
-            common.reset_logger("uvicorn")
-            common.reset_logger("uvicorn.error")
-            common.reset_logger("uvicorn.access")
             self.server = uvicorn.Server(config)
             self.thread = RaiseThread(daemon=True, target=self.server.run)
         else:
-            # loggerの設定
-            common.reset_logger("gunicorn.error")
-            common.reset_logger("gunicorn.access")
 
             from gunicorn.app.wsgiapp import WSGIApplication
             class App(WSGIApplication):

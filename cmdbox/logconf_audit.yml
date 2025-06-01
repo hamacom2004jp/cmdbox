@@ -2,13 +2,19 @@ version: 1
 
 formatters:
     fmt:
-        format: '%(levelname)s[%(asctime)s] - %(message)s'
+        format: '[%(asctime)s] %(levelname)s - %(message)s'
+        datefmt: '%Y-%m-%d %H:%M:%S'
         class: logging.Formatter
     fmt_rich:
         format: '%(message)s'
         class: logging.Formatter
 handlers:
     std:
+        class: cmdbox.app.commons.loghandler.ColorfulStreamHandler
+        level: INFO
+        formatter: fmt
+        stream: ext://sys.stdout
+    rich:
         class: rich.logging.RichHandler
         level: INFO
         formatter: fmt_rich
@@ -16,9 +22,8 @@ handlers:
         omit_repeated_times: false
         tracebacks_word_wrap: false
         log_time_format: '[%Y-%m-%d %H:%M]'
-        #stream: ext://sys.stdout
     audit:
-        class: logging.handlers.TimedRotatingFileHandler
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
         level: INFO
         formatter: fmt
         backupCount: 5
@@ -28,7 +33,7 @@ handlers:
 
 loggers:
     audit:
-        handlers: [audit]
+        handlers: [audit, std]
         level: INFO
         qualname: audit
         propagate: false

@@ -1,3 +1,6 @@
+from rich.console import Console
+from rich import highlighter
+from rich.theme import Theme
 import re
 import logging
 import logging.handlers
@@ -77,25 +80,71 @@ def colorize_msg(msg) -> str:
     return msg
 
 level_mapping = {
-    logging.DEBUG:   f"{colorize('DEBUG', Colors.Bold, Colors.Cyan)}:    ",
-    logging.INFO:    f"{colorize('INFO', Colors.Bold, Colors.Green)}:     ",
-    logging.WARNING: f"{colorize('WARNING', Colors.Bold, Colors.Yellow)}:  ",
-    logging.ERROR:   f"{colorize('ERROR', Colors.Bold, Colors.Red)}:    ",
-    logging.CRITICAL:f"{colorize('CRITICAL', Colors.Bold, Colors.LightGray, Colors.BackgroundRed)}: "}
+    logging.DEBUG:   f"{colorize('DEBUG', Colors.Bold, Colors.Cyan)}",
+    logging.INFO:    f"{colorize('INFO', Colors.Bold, Colors.Green)} ",
+    logging.WARNING: f"{colorize('WARN', Colors.Bold, Colors.Yellow)} ",
+    logging.ERROR:   f"{colorize('ERROR', Colors.Bold, Colors.Red)}",
+    logging.CRITICAL:f"{colorize('FATAL', Colors.Bold, Colors.LightGray, Colors.BackgroundRed)}"}
 
 level_mapping_nc = {
-    logging.DEBUG:   f"DEBUG:    ",
-    logging.INFO:    f"INFO:     ",
-    logging.WARNING: f"WARNING:  ",
-    logging.ERROR:   f"ERROR:    ",
-    logging.CRITICAL:f"CRITICAL: "}
+    logging.DEBUG:   f"DEBUG",
+    logging.INFO:    f"INFO ",
+    logging.WARNING: f"WARN ",
+    logging.ERROR:   f"ERROR",
+    logging.CRITICAL:f"FATAL"}
+
+theme=Theme({
+    "repr.log_debug": "bold cyan",
+    "repr.log_info": "bold green",
+    "repr.log_warn": "bold Yellow",
+    "repr.log_error": "bold red",
+    "repr.log_fatal": "bold red reverse",
+    "repr.log_product": "dodger_blue2 reverse",
+    "repr.log_success": "green",})
+
+class LogLevelHighlighter(highlighter.ReprHighlighter):
+    def __init__(self):
+        #self.highlights = []
+        self.highlights.append(r"(?P<log_debug>DEBUG)")
+        self.highlights.append(r"(?P<log_info>INFO)")
+        self.highlights.append(r"(?P<log_warn>WARN|WARNING|WARN|CAUTION|NOTICE|STOP|DISCONNECTED|DENY)")
+        self.highlights.append(r"(?P<log_error>ERROR|ALERT|ABORT|FAILED)")
+        self.highlights.append(r"(?P<log_fatal>FATAL|CRITICAL)")
+        self.highlights.append(r"(?P<log_product>CMDBOX|IINFER|USOUND|GAIAN|GAIC|WITSHAPE)")
+        self.highlights.append(r"(?P<log_success>SUCCESS|OK|PASSED|DONE|COMPLETE|START|FINISH|OPEN|CONNECTED|ALLOW|EXEC)")
+        """
+        self.highlights.append(r"(?P<tag_start><)(?P<tag_name>[-\w.:|]*)(?P<tag_contents>[\w\W]*)(?P<tag_end>>)")
+        self.highlights.append(r'(?P<attrib_name>[\w_]{1,50})=(?P<attrib_value>"?[\w_]+"?)?')
+        self.highlights.append(r"(?P<brace>[][{}()])")
+        self.highlights.append(highlighter._combine_regex(
+            r"(?P<ipv4>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})",
+            r"(?P<ipv6>([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4})",
+            r"(?P<eui64>(?:[0-9A-Fa-f]{1,2}-){7}[0-9A-Fa-f]{1,2}|(?:[0-9A-Fa-f]{1,2}:){7}[0-9A-Fa-f]{1,2}|(?:[0-9A-Fa-f]{4}\.){3}[0-9A-Fa-f]{4})",
+            r"(?P<eui48>(?:[0-9A-Fa-f]{1,2}-){5}[0-9A-Fa-f]{1,2}|(?:[0-9A-Fa-f]{1,2}:){5}[0-9A-Fa-f]{1,2}|(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4})",
+            r"(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})",
+            r"(?P<call>[\w.]*?)\(",
+            r"\b(?P<bool_true>True)\b|\b(?P<bool_false>False)\b|\b(?P<none>None)\b",
+            r"(?P<ellipsis>\.\.\.)",
+            r"(?P<number_complex>(?<!\w)(?:\-?[0-9]+\.?[0-9]*(?:e[-+]?\d+?)?)(?:[-+](?:[0-9]+\.?[0-9]*(?:e[-+]?\d+)?))?j)",
+            r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*(e[-+]?\d+?)?\b|0x[0-9a-fA-F]*)",
+            r"(?P<path>\B(/[-\w._+]+)*\/)(?P<filename>[-\w._+]*)?",
+            r"(?<![\\\w])(?P<str>b?'''.*?(?<!\\)'''|b?'.*?(?<!\\)'|b?\"\"\".*?(?<!\\)\"\"\"|b?\".*?(?<!\\)\")",
+            r"(?P<url>(file|https|http|ws|wss)://[-0-9a-zA-Z$_+!`(),.?/;:&=%#~@]*)",
+        ))
+        """
+        self.highlights = [re.compile(h, re.IGNORECASE) for h in self.highlights]
 
 class ColorfulStreamHandler(logging.StreamHandler):
+    console = Console(soft_wrap=True, height=True, highlighter=LogLevelHighlighter(), theme=theme)
+
     def emit(self, record: logging.LogRecord) -> None:
-        record.levelname = level_mapping[record.levelno]
+        #record.levelname = level_mapping[record.levelno]
         #record.asctime = colorize(record.asctime, Colors.Bold)
-        record.msg = colorize_msg(record.msg)
-        super().emit(record)
+        #record.msg = colorize_msg(record.msg)
+        #super().emit(record)
+        record.levelname = level_mapping_nc[record.levelno]
+        record.msg = self.format(record)
+        self.console.print(record.msg)
 
 class TimedRotatingFileHandler(logging.handlers.TimedRotatingFileHandler):
     def emit(self, record: logging.LogRecord) -> None:

@@ -93,32 +93,35 @@ def save_yml(yml_path:Path, data:dict) -> None:
     with open(yml_path, 'w') as f:
         yaml.dump(data, f, default_flow_style=False, sort_keys=False)
 
-def reset_logger(name:str, stderr:bool=False, fmt:str='%(message)s') -> None:
+def reset_logger(name:str, stderr:bool=False, fmt:str='[%(asctime)s] %(levelname)s - %(message)s', datefmt:str='%Y-%m-%d %H:%M:%S') -> None:
     """
     指定されたロガーのハンドラをクリアし、新しいハンドラを追加します。
     Args:
         name (str): ロガーの名前
         stderr (bool, optional): 標準エラー出力を使用するかどうか. Defaults to False.
-        fmt (str, optional): ログフォーマット. Defaults to '%(message)s'.
+        fmt (str, optional): ログフォーマット. Defaults to '[%(asctime)s] %(levelname)s - %(message)s'.
+        datefmt (str, optional): 日時フォーマット. Defaults to '%Y-%m-%d %H:%M:%S'.
     """
     logger = logging.getLogger(name)
     logger.handlers.clear()
     logger.propagate = False
-    logger.addHandler(create_log_handler(stderr, fmt))
+    logger.addHandler(create_log_handler(stderr, fmt, datefmt))
 
-def create_log_handler(stderr:bool=False, fmt:str='%(message)s') -> logging.Handler:
+def create_log_handler(stderr:bool=False, fmt:str='[%(asctime)s] %(levelname)s - %(message)s', datefmt:str='%Y-%m-%d %H:%M:%S') -> logging.Handler:
     """
     ログハンドラを生成します。
 
     Args:
         stderr (bool, optional): 標準エラー出力を使用するかどうか. Defaults to False.
-        fmt (str, optional): ログフォーマット. Defaults to '%(message)s'.
+        fmt (str, optional): ログフォーマット. Defaults to '[%(asctime)s] %(levelname)s - %(message)s'.
+        datefmt (str, optional): 日時フォーマット. Defaults to '%Y-%m-%d %H:%M:%S'.
     Returns:
         logging.Handler: ログハンドラ
     """
-    formatter = logging.Formatter(fmt)
-    handler = RichHandler(console=Console(stderr=stderr), show_path=False, omit_repeated_times=False,
-                          tracebacks_word_wrap=False, log_time_format='[%Y-%m-%d %H:%M]')
+    formatter = logging.Formatter(fmt, datefmt)
+    #handler = RichHandler(console=Console(stderr=stderr), show_path=False, omit_repeated_times=False,
+    #                      tracebacks_word_wrap=False, log_time_format='[%Y-%m-%d %H:%M]')
+    handler = loghandler.ColorfulStreamHandler(sys.stdout if not stderr else sys.stderr)
     handler.setFormatter(formatter)
     return handler
 
@@ -132,7 +135,9 @@ def create_console(stderr:bool=False, file=None) -> Console:
     Returns:
         Console: コンソール
     """
-    console = Console(stderr=stderr, file=file, log_time=True, log_path=False, log_time_format='[%Y-%m-%d %H:%M]')
+    console = Console(height=False,
+                      soft_wrap=False, stderr=stderr, file=file, log_time=True, log_path=False, log_time_format='[%Y-%m-%d %H:%M:%S]')
+    #console = Console(soft_wrap=True, stderr=stderr, file=file, log_time=True, log_path=False, log_time_format='[%Y-%m-%d %H:%M:%S]')
     return console
 
 def default_logger(debug:bool=False, ver=version, webcall:bool=False) -> logging.Logger:
@@ -149,8 +154,6 @@ def default_logger(debug:bool=False, ver=version, webcall:bool=False) -> logging
     """
     logger = logging.getLogger(ver.__appid__)
     if not webcall:
-        #formatter = logging.Formatter('%(levelname)s[%(asctime)s] - %(message)s')
-        #handler = loghandler.ColorfulStreamHandler(sys.stdout)
         handler = create_log_handler()
         handler.setLevel(logging.DEBUG if debug else logging.INFO)
         logger.addHandler(handler)

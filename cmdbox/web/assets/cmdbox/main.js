@@ -19,6 +19,9 @@ $(() => {
     cmdbox.init_modal_button();
     cmdbox.gui_callback_reconnectInterval_handler = null;
     cmdbox.gui_callback_ping_handler = null;
+    const ping_interval = 5000; // pingの間隔
+    const max_reconnect_count = 60000/ping_interval*1; // 最大再接続回数
+    cmdbox.callback_reconnect_count = 0; // 再接続回数
     const gui_callback = () => {
         if (cmdbox.gui_callback_reconnectInterval_handler) {
             clearInterval(cmdbox.gui_callback_reconnectInterval_handler);
@@ -68,8 +71,11 @@ $(() => {
             }
         };
         ws.onopen = () => {
-            const ping = () => {ws.send('ping');};
-            cmdbox.gui_callback_ping_handler = setInterval(() => {ping();}, 1000);
+            const ping = () => {
+                ws.send('ping');
+                cmdbox.callback_reconnect_count = 0;
+            };
+            cmdbox.gui_callback_ping_handler = setInterval(() => {ping();}, ping_interval);
         };
         ws.onerror = (e) => {
             console.error(`Websocket error: ${e}`);
@@ -77,9 +83,17 @@ $(() => {
         };
         ws.onclose = () => {
             clearInterval(cmdbox.gui_callback_ping_handler);
+            if (cmdbox.callback_reconnect_count >= max_reconnect_count) {
+                clearInterval(cmdbox.gui_callback_reconnectInterval_handler);
+                cmdbox.message({'error':'Connection to the agent has failed for several minutes. Please reload to resume reconnection.'});
+                const rand = cmdbox.random_string(8);
+                location.href = `../signin${path}?r=${rand}`;
+                return;
+            }
+            cmdbox.callback_reconnect_count++;
             cmdbox.gui_callback_reconnectInterval_handler = setInterval(() => {
                 gui_callback();
-            }, 3000);
+            }, ping_interval);
         };
     };
     gui_callback();

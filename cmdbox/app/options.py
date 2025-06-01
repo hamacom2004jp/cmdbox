@@ -632,6 +632,11 @@ class Options:
         if 'enabled' not in yml['audit']:
             raise Exception('features.yml is invalid. (The audit element must have "enabled" specified.)')
         if not yml['audit']['enabled']: return
+        # フューチャーのoptions
+        if 'options' not in yml['audit']:
+            raise Exception('features.yml is invalid. (The audit element must have "options" specified.)')
+        self.audit_write_args = yml['audit']['options'].copy()
+        self.audit_search_args = yml['audit']['options'].copy()
         # writeフューチャー
         if 'write' not in yml['audit']:
             raise Exception('features.yml is invalid. (The audit element must have "write" specified.)')
@@ -642,6 +647,8 @@ class Options:
             raise Exception('features.yml is invalid. (The audit.write element must have "cmd" specified.)')
         cmd = yml['audit']['write']['cmd']
         self.audit_write:feature.Feature = self.get_cmd_attr(mode, cmd, 'feature')
+        self.audit_write_args['mode'] = mode
+        self.audit_write_args['cmd'] = cmd
         # searchフューチャー
         if 'search' not in yml['audit']:
             raise Exception('features.yml is invalid. (The audit element must have "search" specified.)')
@@ -652,13 +659,6 @@ class Options:
             raise Exception('features.yml is invalid. (The audit.search element must have "cmd" specified.)')
         cmd = yml['audit']['search']['cmd']
         self.audit_search:feature.Feature = self.get_cmd_attr(mode, cmd, 'feature')
-        # フューチャーのoptions
-        if 'options' not in yml['audit']:
-            raise Exception('features.yml is invalid. (The audit element must have "options" specified.)')
-        self.audit_write_args = yml['audit']['options'].copy()
-        self.audit_write_args['mode'] = mode
-        self.audit_write_args['cmd'] = cmd
-        self.audit_search_args = yml['audit']['options'].copy()
         self.audit_search_args['mode'] = mode
         self.audit_search_args['cmd'] = cmd
         self.audit_loaded = True

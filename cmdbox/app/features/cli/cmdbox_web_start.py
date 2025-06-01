@@ -167,11 +167,12 @@ class WebStart(feature.UnsupportEdgeFeature, agent_base.AgentBase):
                         assets=args.assets, signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=args.gui_mode)
             agent_runner = None
             mcp = None
+            logger.info(f"Agent={args.agent}")
             if args.agent=='use':
                 if args.agent_session_store == 'sqlite':
                     args.agent_session_dburl = "sqlite:" + pathname2url(str(w.agent_path / 'session.db'))
                 elif args.agent_session_store == 'postgresql':
-                    args.agent_session_dburl = f"postgresql+psycopg://{args.pg_user}:{args.pg_password}@{args.pg_host}:{args.pg_port}/{args.pg_dbname}"
+                    args.agent_session_dburl = f"postgresql+psycopg://{args.agent_pg_user}:{args.agent_pg_password}@{args.agent_pg_host}:{args.agent_pg_port}/{args.agent_pg_dbname}"
                 else:
                     args.agent_session_dburl = None
                 agent_runner, mcp = self.init_agent_runner(logger, args)

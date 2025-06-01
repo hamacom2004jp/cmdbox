@@ -84,12 +84,18 @@ class AuditBase(feature.ResultEdgeFeature):
             Any: データベース接続オブジェクト
         """
         if pg_enabled:
+            if logger.level == logging.DEBUG:
+                logger.debug(f"Initializing database with pg_enabled={pg_enabled}, pg_host={pg_host}, pg_port={pg_port}, pg_user={pg_user}, pg_dbname={pg_dbname}")
             constr = f"host={pg_host} port={pg_port} user={pg_user} password={pg_password} dbname={pg_dbname} connect_timeout=60"
             conn = psycopg.connect(constr, autocommit=False)
             cursor = conn.cursor()
             try:
                 cursor.execute("SELECT count(*) FROM information_schema.tables WHERE table_name='audit'")
-                if cursor.fetchone()[0] == 0:
+                row = cursor.fetchone()
+                if logger.level == logging.DEBUG:
+                    logger.debug(f"SQL query: SELECT count(*) FROM information_schema.tables WHERE table_name='audit'")
+                    logger.debug(f"SQL row  : {row}")
+                if row[0] == 0:
                     # テーブルが存在しない場合は作成
                     cursor.execute('''
                         CREATE TABLE IF NOT EXISTS audit (
@@ -107,16 +113,22 @@ class AuditBase(feature.ResultEdgeFeature):
                         )
                     ''')
             finally:
+                conn.commit()
                 cursor.close()
-                conn.rollback()
         else:
             db_path = data_dir / '.audit' / 'audit.db'
+            if logger.level == logging.DEBUG:
+                logger.debug(f"Initializing database with db_path={db_path}")
             db_path.parent.mkdir(parents=True, exist_ok=True)
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
             try:
-                cursor.execute('SELECT COUNT(*) FROM sqlite_master WHERE TYPE="table" AND NAME="audit"')
-                if cursor.fetchone()[0] == 0:
+                cursor.execute("SELECT COUNT(*) FROM sqlite_master WHERE TYPE='table' AND NAME='audit'")
+                row = cursor.fetchone()
+                if logger.level == logging.DEBUG:
+                    logger.debug(f"SQL query: SELECT COUNT(*) FROM sqlite_master WHERE TYPE='table' AND NAME='audit'")
+                    logger.debug(f"SQL row  : {row}")
+                if row[0] == 0:
                     # テーブルが存在しない場合は作成
                     cursor.execute('''
                         CREATE TABLE IF NOT EXISTS audit (

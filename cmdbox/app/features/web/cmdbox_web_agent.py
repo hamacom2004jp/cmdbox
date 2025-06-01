@@ -13,6 +13,7 @@ from typing import Dict, Any, Tuple, List, Union
 import locale
 import logging
 import json
+import re
 import time
 import traceback
 
@@ -160,6 +161,15 @@ class Agent(feature.WebFeature):
             agent_session = await web.create_agent_session(web.agent_runner.session_service, user_id, session_id=session_id)
             startmsg = "こんにちは！何かお手伝いできることはありますか？" if is_japan else "Hello! Is there anything I can help you with?"
             yield json.dumps(dict(message=startmsg), default=common.default_json_enc)
+            def _replace_match(match_obj):
+                json_str = match_obj.group(0)
+                try:
+                    data = json.loads(json_str) # ユニコード文字列をエンコード
+                    return json.dumps(data, ensure_ascii=False, default=common.default_json_enc)
+                except json.JSONDecodeError:
+                    return json_str
+            json_pattern = re.compile(r'\{.*?\}')
+
             from google.genai import types
             while True:
                 outputs = None
@@ -205,6 +215,8 @@ class Agent(feature.WebFeature):
                         elif event.actions and event.actions.escalate:
                             msg = f"Agent escalated: {event.error_message or 'No specific message.'}"
                         if msg:
+                            msg = json_pattern.sub(_replace_match, msg)
+
                             outputs['message'] = msg
                             web.options.audit_exec(sock, web, body=dict(agent_session=agent_session.id, result=msg))
                             yield json.dumps(outputs, default=common.default_json_enc)

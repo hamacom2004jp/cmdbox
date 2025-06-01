@@ -136,7 +136,7 @@ cmdbox.set_logoicon = async (sel) => {
 cmdbox.singout = (sitepath) => {
     if (confirm('Sign out ok ?')) {
         const rand = cmdbox.random_string(8);
-        location.href = `dosignout/${sitepath}?r=${rand}`;
+        location.href = `../dosignout/${sitepath}?r=${rand}`;
     }
 };
 cmdbox.editapikey = async () => {

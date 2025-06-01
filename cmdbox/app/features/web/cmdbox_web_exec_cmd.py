@@ -182,7 +182,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
             console = common.create_console(file=old_stdout)
 
             try:
-                console.log(f'EXEC:     {opt_list}\n'[:logsize])
+                console.log(f'EXEC  - {opt_list}\n'[:logsize])
                 status, ret_main, obj = cmdbox_app.main(args_list=[common.chopdq(o) for o in opt_list], file_dict=file_dict, webcall=True)
                 if isinstance(obj, server.Server):
                     cmdbox_app.sv = obj
@@ -209,11 +209,11 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                             output = [dict(warn=f'The captured stdout was discarded because its size was larger than {capture_maxsize} bytes.')]
                 else:
                     output = [dict(warn='capture_stdout is off.')]
-                console.log(f'EXEC:     {output}'[:logsize])
+                old_stdout.write(f'EXEC OUTPUT => {output}'[:logsize]) # コマンド実行時のアウトプットはカラーリングしない
             except Exception as e:
                 web.logger.disabled = False # ログ出力を有効にする
                 msg = f'exec_cmd error. {traceback.format_exc()}'
-                console.log(f'EXEC:     {msg}'[:logsize])
+                console.log(f'EXEC  - {msg}'[:logsize])
                 web.logger.warning(msg)
                 output = [dict(warn=f'<pre>{html.escape(traceback.format_exc())}</pre>')]
             sys.stdout = old_stdout
