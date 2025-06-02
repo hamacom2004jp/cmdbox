@@ -316,26 +316,26 @@ class AuditSearch(audit_base.AuditBase):
         Returns:
             int: レスポンスコード
         """
-        def _date_format(pg_enabled, col, date_format):
+        def _date_format(pg_enabled, cal, col, date_format):
             if col not in ['clmsg_date', 'svmsg_date']:
                 return col
             if pg_enabled:
                 if date_format == '%u':
-                    return f"to_char({col}, 'D')"
+                    return f"to_char({cal}, 'D')"
                 elif date_format == '%m':
-                    return f"to_char({col}, 'MM')"
+                    return f"to_char({cal}, 'MM')"
                 elif date_format == '%Y':
-                    return f"to_char({col}, 'YYYY')"
+                    return f"to_char({cal}, 'YYYY')"
                 elif date_format == '%Y/%m':
-                    return f"to_char({col}, 'YYYY/MM')"
+                    return f"to_char({cal}, 'YYYY/MM')"
                 elif date_format == '%Y/%m/%d':
-                    return f"to_char({col}, 'YYYY/MM/DD')"
+                    return f"to_char({cal}, 'YYYY/MM/DD')"
                 elif date_format == '%Y/%m/%d %H':
-                    return f"to_char({col}, 'YYYY/MM/DD HH24')"
+                    return f"to_char({cal}, 'YYYY/MM/DD HH24')"
                 elif date_format == '%Y/%m/%d %H:%M':
-                    return f"to_char({col}, 'YYYY/MM/DD HH24:MI')"
+                    return f"to_char({cal}, 'YYYY/MM/DD HH24:MI')"
                 else:
-                    return col
+                    return cal
             else:
                 if date_format is not None and date_format != '':
                     return f"strftime('{date_format}', {col})"
@@ -349,22 +349,22 @@ class AuditSearch(audit_base.AuditBase):
                 cursor = conn.cursor()
                 try:
                     select = {k:v for k,v in select.items() if k != ''} if select else None
-                    select = select if select and len(select)>0 else {k:'-' for k in self.TBL_COLS}
+                    select = select if select and len(select)>0 else {k:k for k in self.TBL_COLS}
                     if pg_enabled:
                         toz = common.get_tzoffset_str()
                         sel = {}
                         for k,v in select.items():
                             if k in ['clmsg_date', 'svmsg_date']:
-                                sel[f"{k} AT TIME ZONE INTERVAL '{toz}' as {k}"] = v
+                                sel[f"{k} AT TIME ZONE INTERVAL '{toz}'"] = (k if v is '-' else v)
                             else:
-                                sel[k] = v
+                                sel[k] = (k if v is '-' else v)
                         select = sel
                     sql = []
                     for k,v in select.items():
                         if v in ['count', 'sum', 'avg', 'min', 'max']:
-                            sql.append(f'{v}({_date_format(pg_enabled, k, select_date_format)}) AS {k}')
+                            sql.append(f'{v}({_date_format(pg_enabled, k, k, select_date_format)}) AS {k}')
                         else:
-                            sql.append(f'{_date_format(pg_enabled, k, select_date_format)} AS {k}')
+                            sql.append(f'{_date_format(pg_enabled, k, v, select_date_format)} AS {v}')
                     sql = f"SELECT {','.join(sql)} FROM audit"
                     params = []
                     where = []
@@ -397,8 +397,13 @@ class AuditSearch(audit_base.AuditBase):
                             params.append(value)
                     if filter_clmsg_tags:
                         for tag in filter_clmsg_tags:
-                            where.append(f"clmsg_tag like {'%s' if pg_enabled else '?'}")
-                            params.append(f'%{tag}%')
+                            if not tag: continue
+                            if pg_enabled:
+                                where.append(f"clmsg_tag ?| %s")
+                                params.append(f'{tag}')
+                            else:
+                                where.append(f"clmsg_tag like '?'")
+                                params.append(f'%{tag}%')
                     if filter_svmsg_id and filter_svmsg_id != 'None':
                         where.append(f'svmsg_id={"%s" if pg_enabled else "?"}')
                         params.append(filter_svmsg_id)
@@ -410,7 +415,18 @@ class AuditSearch(audit_base.AuditBase):
                         params.append(filter_svmsg_edate)
                     sql += ' WHERE ' + ' AND '.join(where) if len(where)>0 else ''
                     if groupby and len(groupby) > 0:
-                        sql += ' GROUP BY ' + ', '.join([f"{_date_format(pg_enabled, g, groupby_date_format)}" for g in groupby])
+                        _gb = {}
+                        if pg_enabled:
+                            toz = common.get_tzoffset_str()
+                            for g in groupby:
+                                if g in ['clmsg_date', 'svmsg_date']:
+                                    _gb[f"{g} AT TIME ZONE INTERVAL '{toz}'"] = g
+                                else:
+                                    _gb[g] = g
+                            groupby = _gb
+                        else:
+                            groupby = {g:g for g in groupby}
+                        sql += ' GROUP BY ' + ', '.join([f"{_date_format(pg_enabled, k, v, groupby_date_format)}" for k,v in groupby.items()])
                     if sort and len(sort) > 0:
                         sql += ' ORDER BY ' + ', '.join([f"{k} {v}" for k, v in sort.items()])
                     else:
