@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.options &mdash; cmdbox 2025/06/01 documentation</title>
+  <title>cmdbox.app.options &mdash; cmdbox 2025/06/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=de8a5b00"></script>
+      <script src="../../../_static/documentation_options.js?v=463491e3"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -409,6 +409,11 @@
             <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">discription_ja</span><span class="o">=</span><span class="s2">&quot;クライアントのメッセージIDを指定します。省略した場合はuuid4で生成されます。&quot;</span><span class="p">,</span>
             <span class="n">discription_en</span><span class="o">=</span><span class="s2">&quot;Specifies the message ID of the client. If omitted, uuid4 will be generated.&quot;</span><span class="p">,</span>
+            <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_TEXT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">discription_ja</span><span class="o">=</span><span class="s2">&quot;このコマンド登録の説明文を指定します。Agentがこのコマンドの用途を理解するのに使用します。&quot;</span><span class="p">,</span>
+            <span class="n">discription_en</span><span class="o">=</span><span class="s2">&quot;Specifies a description of this command registration, used to help the Agent understand the use of this command.&quot;</span><span class="p">,</span>
             <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
 
 
@@ -419,6 +424,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;debug&quot;</span><span class="p">][</span><span class="s2">&quot;opt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;debug&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;tag&quot;</span><span class="p">][</span><span class="s2">&quot;opt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;tag&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;clmsg_id&quot;</span><span class="p">][</span><span class="s2">&quot;opt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;clmsg_id&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">][</span><span class="s2">&quot;opt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;description&quot;</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">dict</span><span class="p">:</span>
                 <span class="k">continue</span>
@@ -433,6 +439,8 @@
                     <span class="n">c</span><span class="p">[</span><span class="s2">&quot;choice&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;tag&quot;</span><span class="p">])</span>
                 <span class="k">if</span> <span class="s2">&quot;clmsg_id&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">_o</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">_o</span> <span class="ow">in</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;choice&quot;</span><span class="p">]]:</span>
                     <span class="n">c</span><span class="p">[</span><span class="s2">&quot;choice&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;clmsg_id&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="s2">&quot;description&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">_o</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">_o</span> <span class="ow">in</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;choice&quot;</span><span class="p">]]:</span>
+                    <span class="n">c</span><span class="p">[</span><span class="s2">&quot;choice&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">])</span>
                 <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;opt&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">_o</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">_o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">][</span><span class="s2">&quot;choice&quot;</span><span class="p">]]:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">][</span><span class="s2">&quot;choice&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="n">c</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">mode</span>

@@ -24,5 +24,5 @@ Install
 
 .. code-block:: bash
 
-    pip install google-adk litellm
+    pip install google-adk litellm fastmcp
 

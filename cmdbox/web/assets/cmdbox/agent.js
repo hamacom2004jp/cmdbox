@@ -49,7 +49,7 @@ agent.format_agent_message = (container, messages, txt, message) => {
             const rand = cmdbox.random_string(16);
             txt.append(`<span id="${rand}"/>`);
             agent.recursive_json_parse(jobj);
-            render_result_func(txt.find(`#${rand}`), jobj, 100);
+            render_result_func(txt.find(`#${rand}`), jobj, 256);
         } catch (e) {
             const msg = message.replace(/\n/g, '<br/>');
             txt.append(msg);
@@ -176,8 +176,7 @@ agent.init_form = async () => {
             if (agent.chat_reconnect_count >= max_reconnect_count) {
                 clearInterval(agent.chat_reconnectInterval_handler);
                 cmdbox.message({'error':'Connection to the agent has failed for several minutes. Please reload to resume reconnection.'});
-                const rand = cmdbox.random_string(8);
-                location.href = `../signin/agent?r=${rand}`;
+                location.reload(true);
                 return;
             }
             agent.chat_reconnect_count++;

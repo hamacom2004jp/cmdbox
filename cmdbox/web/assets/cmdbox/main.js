@@ -86,8 +86,7 @@ $(() => {
             if (cmdbox.callback_reconnect_count >= max_reconnect_count) {
                 clearInterval(cmdbox.gui_callback_reconnectInterval_handler);
                 cmdbox.message({'error':'Connection to the agent has failed for several minutes. Please reload to resume reconnection.'});
-                const rand = cmdbox.random_string(8);
-                location.href = `../signin${path}?r=${rand}`;
+                location.reload(true);
                 return;
             }
             cmdbox.callback_reconnect_count++;

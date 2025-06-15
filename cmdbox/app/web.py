@@ -5,7 +5,6 @@ from fastapi import FastAPI, Request, Response
 from pathlib import Path
 from starlette.applications import Starlette
 from starlette.middleware.sessions import SessionMiddleware
-from starlette.routing import Mount
 from typing import Any, Dict, List
 from uvicorn.config import Config
 import asyncio
@@ -20,7 +19,6 @@ import platform
 import requests
 import queue
 import signal
-import string
 import time
 import threading
 import traceback
@@ -30,10 +28,10 @@ import webbrowser
 
 class Web:
     def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None,
-                 redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server',
+                 redis_host:str="localhost", redis_port:int=6379, redis_password:str=None, svname:str='server',
                  client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None, result_html:str=None, users_html:str=None,
                  audit_html:str=None, agent_html:str=None, assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
-                 web_features_packages:List[str]=None, web_features_prefix:List[str]=None):
+                 web_features_packages:List[str]=None, web_features_prefix:List[str]=[]):
         """
         cmdboxクライアント側のwebapiサービス
 
@@ -679,7 +677,7 @@ class Web:
               ssl_cert:Path=None, ssl_key:Path=None, ssl_keypass:str=None, ssl_ca_certs:Path=None,
               session_domain:str=None, session_path:str='/', session_secure:bool=False, session_timeout:int=900, outputs_key:List[str]=[],
               guvicorn_workers:int=-1, guvicorn_timeout:int=30,
-              agent_runner=None, mcp=None, mcp_listen_port=9081, mcp_ssl_listen_port=9443):
+              agent_runner=None, mcp=None,):
         """
         Webサーバを起動する
 
@@ -700,8 +698,6 @@ class Web:
             guvicorn_timeout (int, optional): Gunicornタイムアウト. Defaults to 30.
             agent_runner (Runner, optional): エージェントランナー. Defaults to None.
             mcp (MCP, optional): MCP. Defaults to None.
-            mcp_listen_port (int, optional): MCPリスンポート. Defaults to 9081.
-            mcp_ssl_listen_port (int, optional): MCP SSLリスンポート. Defaults to 9443.
         """
         self.allow_host = allow_host
         self.listen_port = listen_port
@@ -719,8 +715,6 @@ class Web:
         self.guvicorn_timeout = guvicorn_timeout
         self.agent_runner = agent_runner
         self.mcp = mcp
-        self.mcp_listen_port = mcp_listen_port
-        self.mcp_ssl_listen_port = mcp_ssl_listen_port
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web start parameter: allow_host={self.allow_host}")
             self.logger.debug(f"web start parameter: listen_port={self.listen_port}")
@@ -738,8 +732,6 @@ class Web:
             self.logger.debug(f"web start parameter: guvicorn_timeout={self.guvicorn_timeout}")
             self.logger.debug(f"web start parameter: agent_runner={self.agent_runner}")
             self.logger.debug(f"web start parameter: mcp={self.mcp}")
-            self.logger.debug(f"web start parameter: mcp_listen_port={self.mcp_listen_port}")
-            self.logger.debug(f"web start parameter: mcp_ssl_listen_port={self.mcp_ssl_listen_port}")
 
         if self.agent_runner is not None:
             # google.adkが大きいので必要な時にだけ読込む
@@ -778,7 +770,10 @@ class Web:
                     sessions = await session_service.list_sessions(app_name=self.ver.__appid__, user_id=user_id)
                     ret = []
                     for s in sessions.sessions:
-                        ret.append(await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=s.id))
+                        session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=s.id)
+                        if session is None:
+                            continue
+                        ret.append(session)
                     return ret
                 else:
                     session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
@@ -801,17 +796,15 @@ class Web:
                 return await session_service.delete_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
             self.delete_agent_session = delete_agent_session
 
-        """
+        mcp_app:Starlette = None
         if self.mcp is not None:
-            # MCPをFastAPIにマウント
             mcp_app:Starlette = self.mcp.streamable_http_app()
-            app = FastAPI(lifespan=self.mcp.settings.lifespan)
-            app.mount("/mcp", mcp_app)
-            #app.include_router(mcp_app.router)
+            #mcp_app:Starlette = self.mcp.http_app()
+        if mcp_app is not None:
+            app = FastAPI(lifespan=mcp_app.lifespan)
         else:
             app = FastAPI()
-        """
-        app = FastAPI()
+
         @app.middleware("http")
         async def set_context_cookie(req:Request, call_next):
             res:Response = await call_next(req)
@@ -824,20 +817,13 @@ class Web:
         if self.session_secure:
             mwparam['https_only'] = True # セッションハイジャック対策
         app.add_middleware(SessionMiddleware, **mwparam)
+        if mcp_app is not None:
+            app.mount("/mcpsv", mcp_app, name="mcp")
+            self.logger.info(f"mcp server mount: mount_path=/mcpsv app={mcp_app} routes={mcp_app.routes}")
         self.init_webfeatures(app)
 
         self.is_running = True
-        #uvicorn.run(app, host=self.allow_host, port=self.listen_port, workers=2)
-        http_config = Config(app=app, host=self.allow_host, port=self.listen_port)
-        th = ThreadedUvicorn(self.logger, config=http_config,
-                             guvicorn_config=dict(workers=self.guvicorn_workers, timeout=self.guvicorn_timeout))
-        th.start()
-        if self.mcp is not None and self.ssl_cert is None and self.ssl_key is None:
-            mcp_app:Starlette = self.mcp.streamable_http_app()
-            http_config = Config(app=mcp_app, host=self.allow_host, port=self.mcp_listen_port)
-            mcp_th = ThreadedUvicorn(self.logger, config=http_config, force_uvicorn=True)
-            mcp_th.start()
-        browser_port = self.listen_port
+        th = None
         th_ssl = None
         if self.ssl_cert is not None and self.ssl_key is not None:
             https_config = Config(app=app, host=self.allow_host, port=self.ssl_listen_port,
@@ -847,13 +833,12 @@ class Web:
                                      guvicorn_config=dict(workers=self.guvicorn_workers, timeout=self.guvicorn_timeout))
             th_ssl.start()
             browser_port = self.ssl_listen_port
-            if self.mcp is not None:
-                mcp_app:Starlette = self.mcp.streamable_http_app()
-                https_config = Config(app=mcp_app, host=self.allow_host, port=self.mcp_ssl_listen_port,
-                                      ssl_certfile=self.ssl_cert, ssl_keyfile=self.ssl_key,
-                                      ssl_keyfile_password=self.ssl_keypass, ssl_ca_certs=self.ssl_ca_certs)
-                mcp_th_ssl = ThreadedUvicorn(self.logger, config=https_config, force_uvicorn=True)
-                mcp_th_ssl.start()
+        else:
+            http_config = Config(app=app, host=self.allow_host, port=self.listen_port)
+            th = ThreadedUvicorn(self.logger, config=http_config,
+                                guvicorn_config=dict(workers=self.guvicorn_workers, timeout=self.guvicorn_timeout))
+            th.start()
+            browser_port = self.listen_port
         try:
             if self.gui_mode:
                 webbrowser.open(f'http://localhost:{browser_port}/gui')
@@ -861,21 +846,15 @@ class Web:
                 f.write(str(os.getpid()))
             while self.is_running:
                 gevent.sleep(1)
-            th.stop()
-            if self.mcp is not None:
-                mcp_th.stop()
+            if th is not None:
+                th.stop()
             if th_ssl is not None:
                 th_ssl.stop()
-                if self.mcp is not None:
-                    mcp_th_ssl.stop()
         except KeyboardInterrupt:
-            th.stop()
-            if self.mcp is not None:
-                mcp_th.stop()
+            if th is not None:
+                th.stop()
             if th_ssl is not None:
                 th_ssl.stop()
-                if self.mcp is not None:
-                    mcp_th_ssl.stop()
 
     def stop(self):
         """

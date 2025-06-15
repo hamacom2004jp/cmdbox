@@ -60,7 +60,7 @@ class Agent(feature.WebFeature):
             session_id = form.get('session_id', None)
             sessions = await web.list_agent_sessions(web.agent_runner.session_service, user_id, session_id=session_id)
             data = [dict(id=s.id, app_name=s.app_name, user_id=s.user_id, last_update_time=s.last_update_time,
-                         events=[dict(author=ev.author,text=ev.content.parts[0].text) for ev in s.events if ev.content and ev.content.parts]) for s in sessions]
+                         events=[dict(author=ev.author,text=ev.content.parts[0].text) for ev in s.events if ev.content and ev.content.parts]) for s in sessions if s]
             data.reverse()  # 最新のセッションを先頭にする
             return dict(success=data)
 
@@ -204,14 +204,20 @@ class Agent(feature.WebFeature):
                         outputs = dict()
                         if event.turn_complete:
                             outputs['turn_complete'] = True
-                            yield json.dumps(outputs, default=common.default_json_enc)
+                            yield common.to_str(outputs)
                         if event.interrupted:
                             outputs['interrupted'] = True
-                            yield json.dumps(outputs, default=common.default_json_enc)
+                            yield common.to_str(outputs)
                         #if event.is_final_response():
                         msg = None
                         if event.content and event.content.parts:
                             msg = "\n".join([p.text for p in event.content.parts if p and p.text])
+                            calls = event.get_function_calls()
+                            if calls:
+                                msg += '\n```json{"function_calls":'+common.to_str([dict(fn=c.name,args=c.args) for c in calls])+'}```'
+                            responses = event.get_function_responses()
+                            if responses:
+                                msg += '\n```json{"function_responses":'+common.to_str([dict(fn=r.name, res=r.response) for r in responses])+'}```'
                         elif event.actions and event.actions.escalate:
                             msg = f"Agent escalated: {event.error_message or 'No specific message.'}"
                         if msg:
@@ -219,7 +225,7 @@ class Agent(feature.WebFeature):
 
                             outputs['message'] = msg
                             web.options.audit_exec(sock, web, body=dict(agent_session=agent_session.id, result=msg))
-                            yield json.dumps(outputs, default=common.default_json_enc)
+                            yield common.to_str(outputs)
                             if event.is_final_response():
                                 break
                 except WebSocketDisconnect:

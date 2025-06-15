@@ -45,7 +45,7 @@ class CmdList(feature.OneshotResultEdgeFeature):
                 dict(opt="kwd", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                      discription_ja=f"検索したいコマンド名を指定します。中間マッチで検索します。",
                      discription_en=f"Specify the name of the command you want to search. Search with intermediate matches."),
-                dict(opt="signin_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None,
+                dict(opt="signin_file", type=Options.T_FILE, default=f".{self.ver.__appid__}/user_list.yml", required=False, multi=False, hide=True, choice=None,
                      discription_ja="サインイン可能なユーザーとパスワードを記載したファイルを指定します。",
                      discription_en="Specify a file containing users and passwords with which they can signin."),
                 dict(opt="groups", type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=None,

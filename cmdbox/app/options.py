@@ -295,12 +295,18 @@ class Options:
             discription_ja="クライアントのメッセージIDを指定します。省略した場合はuuid4で生成されます。",
             discription_en="Specifies the message ID of the client. If omitted, uuid4 will be generated.",
             choice=None)
+        self._options["description"] = dict(
+            type=Options.T_TEXT, default=None, required=False, multi=False, hide=True,
+            discription_ja="このコマンド登録の説明文を指定します。Agentがこのコマンドの用途を理解するのに使用します。",
+            discription_en="Specifies a description of this command registration, used to help the Agent understand the use of this command.",
+            choice=None)
 
     def init_debugoption(self):
         # デバックオプションを追加
         self._options["debug"]["opt"] = "debug"
         self._options["tag"]["opt"] = "tag"
         self._options["clmsg_id"]["opt"] = "clmsg_id"
+        self._options["description"]["opt"] = "description"
         for key, mode in self._options["cmd"].items():
             if type(mode) is not dict:
                 continue
@@ -315,6 +321,8 @@ class Options:
                     c["choice"].append(self._options["tag"])
                 if "clmsg_id" not in [_o['opt'] for _o in c["choice"]]:
                     c["choice"].append(self._options["clmsg_id"])
+                if "description" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["description"])
                 if c["opt"] not in [_o['opt'] for _o in self._options["cmd"]["choice"]]:
                     self._options["cmd"]["choice"] += [c]
             self._options["mode"][key] = mode

@@ -159,8 +159,6 @@ Web Service Launch : `cmdbox -m web -c start <Option>`
     "--agent_description <description>","","Specify agent description."
     "--agent_instruction <instruction>","","Specifies the agent's system instructions."
     "--agent_session_store <session_store>","","Specify how the agent's session is to be saved."
-    "--mcp_listen_port <service port>","","If omitted, `9081` is used."
-    "--mcp_ssl_listen_port <service port>","","If omitted, `9443` is used."
     "--agent_pg_host <host>","","Specify the postgresql host."
     "--agent_pg_port <posrt>","","Specify the postgresql port."
     "--agent_pg_user <user>","","Specify the postgresql user name."

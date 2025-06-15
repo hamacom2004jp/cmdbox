@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.common &mdash; cmdbox 2025/06/01 documentation</title>
+  <title>cmdbox.app.common &mdash; cmdbox 2025/06/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=de8a5b00"></script>
+      <script src="../../../_static/documentation_options.js?v=463491e3"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -233,8 +233,10 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Console: コンソール</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">console</span> <span class="o">=</span> <span class="n">Console</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                      <span class="n">soft_wrap</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">stderr</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">file</span><span class="p">,</span> <span class="n">log_time</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_time_format</span><span class="o">=</span><span class="s1">&#39;[%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S]&#39;</span><span class="p">)</span>
+    <span class="c1">#console = Console(soft_wrap=True, height=True, highlighter=loghandler.LogLevelHighlighter(), theme=loghandler.theme,</span>
+    <span class="c1">#                  stderr=stderr, file=file)</span>
+    <span class="n">console</span> <span class="o">=</span> <span class="n">Console</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">highlighter</span><span class="o">=</span><span class="n">loghandler</span><span class="o">.</span><span class="n">LogLevelHighlighter</span><span class="p">(),</span> <span class="n">theme</span><span class="o">=</span><span class="n">loghandler</span><span class="o">.</span><span class="n">theme</span><span class="p">,</span>
+                      <span class="n">soft_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">stderr</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">file</span><span class="p">,</span> <span class="n">log_time</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_time_format</span><span class="o">=</span><span class="s1">&#39;[%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S]&#39;</span><span class="p">)</span>
     <span class="c1">#console = Console(soft_wrap=True, stderr=stderr, file=file, log_time=True, log_path=False, log_time_format=&#39;[%Y-%m-%d %H:%M:%S]&#39;)</span>
     <span class="k">return</span> <span class="n">console</span></div>
 

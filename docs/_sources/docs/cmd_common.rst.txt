@@ -27,3 +27,5 @@ Common Options
     "--capture_stdout","","Available in GUI mode only. Captures standard output during command execution and displays it on the execution result screen."
     "--capture_maxsize","","Available in GUI mode only. Specifies the maximum capture size of standard output when executing commands."
     "-v, --version","","Display version"
+    "--clmsg_id","","Specifies the message ID of the client. If omitted, uuid4 will be generated."
+    "--description","","Specifies a description of this command registration, used to help the Agent understand the use of this command."

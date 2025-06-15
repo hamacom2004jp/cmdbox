@@ -203,6 +203,24 @@ cmdbox.editapikey = async () => {
     daialog.draggable({cursor:'move',cancel:'.modal-body'});
     editapikey_modal.modal('show');
 };
+cmdbox.agentsetting = async () => {
+    const user = await cmdbox.user_info();
+    if (!user) {
+        cmdbox.message('user not found');
+        return;
+    }
+    const agentsetting_modal = $('#agentsetting_modal').length?$('#agentsetting_modal'):$(`<div id="agentsetting_modal" class="modal" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
+    agentsetting_modal.html('');
+    const daialog = $(`<div class="modal-dialog ui-draggable ui-draggable-handle"/>`).appendTo(agentsetting_modal);
+    const form = $(`<form id="agentsetting_form" class="modal-content novalidate"/>`).appendTo(daialog);
+    const header = $(`<div class="modal-header"/>`).appendTo(form);
+    header.append('<h5 class="modal-title">Agent Setting</h5>');
+    header.append('<button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">'
+                 +'<svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>'
+                 +'</button>');
+    const body = $(`<div class="modal-body"/>`).appendTo(form);
+    const row_content = $(`<div class="row row_content"/>`).appendTo(body);
+};
 /**
  * 現在のユーザーのパスワード変更
  */
@@ -324,14 +342,18 @@ $(()=>{
             const user_info_menu = $('.user_info');
             user_info_menu.removeClass('d-none').addClass('d-flex');
 
-            if (!user_info_menu.find('.dropdown-menu .editapikey-menu-item').length) {
-                const editapikey_item = $(`<li><a class="dropdown-item editapikey-menu-item" href="#" onclick="cmdbox.editapikey();">Edit ApiKey</a></li>`);
-                user_info_menu.find('.dropdown-menu').append(editapikey_item);
-            }
             if (!user_info_menu.find('.dropdown-menu .changepass-menu-item').length) {
                 const changepass_item = $(`<li><a class="dropdown-item changepass-menu-item" href="#" onclick="cmdbox.passchange();">Change Password</a></li>`);
                 user_info_menu.find('.dropdown-menu').append(changepass_item);
             }
+            if (!user_info_menu.find('.dropdown-menu .editapikey-menu-item').length) {
+                const editapikey_item = $(`<li><a class="dropdown-item editapikey-menu-item" href="#" onclick="cmdbox.editapikey();">Edit ApiKey</a></li>`);
+                user_info_menu.find('.dropdown-menu').append(editapikey_item);
+            }
+            /*if (!user_info_menu.find('.dropdown-menu .agentsetting-menu-item').length) {
+                const agentsetting_item = $(`<li><a class="dropdown-item agentsetting-menu-item" href="#" onclick="cmdbox.agentsetting();">Agent Setting</a></li>`);
+                user_info_menu.find('.dropdown-menu').append(agentsetting_item);
+            }*/
             if (!user_info_menu.find('.dropdown-menu .signout-menu-item').length) {
                 const parts = location.pathname.split('/');
                 const sitepath = parts[parts.length-1];

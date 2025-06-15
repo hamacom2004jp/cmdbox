@@ -27,7 +27,7 @@ apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl buil
 
 - When using `--agent use` in web mode, install the modules with dependencies.
 ```bash
-pip install google-adk litellm
+pip install google-adk litellm fastmcp
 ```
 
 # Run

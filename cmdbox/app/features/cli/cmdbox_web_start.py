@@ -157,32 +157,12 @@ class WebStart(feature.UnsupportEdgeFeature, agent_base.AgentBase):
         w = None
         try:
             args.gui_mode = False if not hasattr(args, 'gui_mode') or not args.gui_mode else args.gui_mode
-            ssl_cert = None if args.ssl_cert is None else Path(args.ssl_cert)
-            ssl_key = None if args.ssl_key is None else Path(args.ssl_key)
-            ssl_ca_certs = None if args.ssl_ca_certs is None else Path(args.ssl_ca_certs)
-            w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
-                        redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
-                        client_only=args.client_only, doc_root=args.doc_root, gui_html=args.gui_html, filer_html=args.filer_html,
-                         result_html=args.result_html, users_html=args.users_html,
-                        assets=args.assets, signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=args.gui_mode)
-            agent_runner = None
-            mcp = None
-            logger.info(f"Agent={args.agent}")
-            if args.agent=='use':
-                if args.agent_session_store == 'sqlite':
-                    args.agent_session_dburl = "sqlite://" + pathname2url(str(w.agent_path / 'session.db'))
-                elif args.agent_session_store == 'postgresql':
-                    args.agent_session_dburl = f"postgresql+psycopg://{args.agent_pg_user}:{args.agent_pg_password}@{args.agent_pg_host}:{args.agent_pg_port}/{args.agent_pg_dbname}"
-                else:
-                    args.agent_session_dburl = None
-                agent_runner, mcp = self.init_agent_runner(logger, args)
-            w.start(allow_host=args.allow_host, listen_port=args.listen_port, ssl_listen_port=args.ssl_listen_port,
-                    ssl_cert=ssl_cert, ssl_key=ssl_key, ssl_keypass=args.ssl_keypass, ssl_ca_certs=ssl_ca_certs,
-                    session_domain=args.session_domain, session_path=args.session_path,
-                    session_secure=args.session_secure, session_timeout=args.session_timeout,
-                    outputs_key=args.outputs_key, guvicorn_workers=args.guvicorn_workers, guvicorn_timeout=args.guvicorn_timeout,
-                    agent_runner=agent_runner, mcp=mcp, mcp_listen_port=args.mcp_listen_port, mcp_ssl_listen_port=args.mcp_ssl_listen_port)
-
+            w = self.createWeb(logger, args)
+            agent_runner, mcp = self._init_agent_runner(w, logger, args)
+            args.ssl_cert = None if args.ssl_cert is None else Path(args.ssl_cert)
+            args.ssl_key = None if args.ssl_key is None else Path(args.ssl_key)
+            args.ssl_ca_certs = None if args.ssl_ca_certs is None else Path(args.ssl_ca_certs)
+            self.start(w, agent_runner, mcp, logger, args)
             msg = dict(success="web complate.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 0, msg, w
@@ -191,3 +171,62 @@ class WebStart(feature.UnsupportEdgeFeature, agent_base.AgentBase):
             msg = dict(warn=f"Web server start error. {e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, w
+
+    def createWeb(self, logger:logging.Logger, args:argparse.Namespace) -> web.Web:
+        """
+        Webオブジェクトを作成します
+
+        Args:
+            logger (logging.Logger): ロガー
+            args (argparse.Namespace): 引数
+
+        Returns:
+            web.Web: Webオブジェクト
+        """
+        w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
+                    redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
+                    client_only=args.client_only, doc_root=args.doc_root, gui_html=args.gui_html, filer_html=args.filer_html,
+                    result_html=args.result_html, users_html=args.users_html,
+                    assets=args.assets, signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=args.gui_mode)
+        return w
+
+    def _init_agent_runner(self, w:web.Web, logger:logging.Logger, args:argparse.Namespace) -> Tuple[Any, Any]:
+        """
+        エージェントをセットアップします
+
+        Args:
+            w (web.Web): Webオブジェクト
+            logger (logging.Logger): ロガー
+            args (argparse.Namespace): 引数
+
+        Returns:
+            Tuple[agent_base.AgentBase, Any]: エージェントオブジェクト, MCPオブジェクト
+        """
+        logger.info(f"Agent={args.agent}")
+        if args.agent=='use':
+            if args.agent_session_store == 'sqlite':
+                args.agent_session_dburl = "sqlite://" + pathname2url(str(w.agent_path / 'session.db'))
+            elif args.agent_session_store == 'postgresql':
+                args.agent_session_dburl = f"postgresql+psycopg://{args.agent_pg_user}:{args.agent_pg_password}@{args.agent_pg_host}:{args.agent_pg_port}/{args.agent_pg_dbname}"
+            else:
+                args.agent_session_dburl = None
+            return self.init_agent_runner(logger, args)
+        return None, None
+
+    def start(self, w:web.Web, agent_runner, mcp, logger:logging.Logger, args:argparse.Namespace) -> None:
+        """
+        Webモードを起動します
+
+        Args:
+            w (web.Web): Webオブジェクト
+            agent_runner: エージェントランナー
+            mcp: MCPオブジェクト
+            logger (logging.Logger): ロガー
+            args (argparse.Namespace): 引数
+        """
+        w.start(allow_host=args.allow_host, listen_port=args.listen_port, ssl_listen_port=args.ssl_listen_port,
+                ssl_cert=args.ssl_cert, ssl_key=args.ssl_key, ssl_keypass=args.ssl_keypass, ssl_ca_certs=args.ssl_ca_certs,
+                session_domain=args.session_domain, session_path=args.session_path,
+                session_secure=args.session_secure, session_timeout=args.session_timeout,
+                outputs_key=args.outputs_key, guvicorn_workers=args.guvicorn_workers, guvicorn_timeout=args.guvicorn_timeout,
+                agent_runner=agent_runner, mcp=mcp,)

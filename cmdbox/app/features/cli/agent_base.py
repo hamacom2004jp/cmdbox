@@ -30,8 +30,7 @@ class AgentBase(feature.ResultEdgeFeature):
                 dict(opt="agent", type=Options.T_STR, default="no", required=False, multi=False, hide=False, choice=["no", "use"],
                      discription_ja="エージェントを使用するかどうかを指定します。",
                      discription_en="Specifies whether the agent is used.",
-                     choice_show=dict(use=["agent_name", "agent_description", "agent_instruction", "agent_session_store", "llmprov",
-                                           "mcp_listen_port", "mcp_ssl_listen_port"],)),
+                     choice_show=dict(use=["agent_name", "agent_description", "agent_instruction", "agent_session_store", "llmprov",],)),
                 dict(opt="agent_name", type=Options.T_STR, default=self.ver.__appid__, required=False, multi=False, hide=False, choice=None,
                      discription_ja="エージェント名を指定します。",
                      discription_en="Specifies the agent name."),
@@ -45,12 +44,6 @@ class AgentBase(feature.ResultEdgeFeature):
                      discription_ja="エージェントのセッションを保存する方法を指定します。",
                      discription_en="Specify how the agent's session is to be saved.",
                      choice_show=dict(postgresql=["agent_pg_host", "agent_pg_port", "agent_pg_user", "agent_pg_password", "agent_pg_dbname"]),),
-                dict(opt="mcp_listen_port", type=Options.T_INT, default="9081", required=False, multi=False, hide=False, choice=None,
-                     discription_ja="省略した時は `9081` を使用します。",
-                     discription_en="If omitted, `9081` is used."),
-                dict(opt="mcp_ssl_listen_port", type=Options.T_INT, default="9443", required=False, multi=False, hide=False, choice=None,
-                     discription_ja="省略した時は `9443` を使用します。",
-                     discription_en="If omitted, `9443` is used."),
                 dict(opt="agent_pg_host", type=Options.T_STR, default='localhost', required=False, multi=False, hide=False, choice=None, web="mask",
                      discription_ja="postgresqlホストを指定する。",
                      discription_en="Specify the postgresql host."),
@@ -114,7 +107,7 @@ class AgentBase(feature.ResultEdgeFeature):
         Returns:
             Any: FastMCP
         """
-        from mcp.server.fastmcp import FastMCP
+        from fastmcp import FastMCP
         mcp = FastMCP(name=self.ver.__appid__)
         return mcp
 
@@ -174,33 +167,6 @@ class AgentBase(feature.ResultEdgeFeature):
                       f"1. ユーザーのクエリからが実行したいコマンドを特定します。\n" + \
                       f"2. コマンド実行に必要なパラメータのなかで、ユーザーのクエリから取得できないものは、コマンド定義にあるデフォルト値を指定して実行してください。\n" + \
                       f"3. もしエラーが発生した場合は、ユーザーにコマンド名とパラメータとエラー内容を提示してください。\n"
-        """
-                    f"2. コマンド実行に必要なパラメータを特定します。\n" + \
-                    f"3. ユーザーのクエリから指定しているパラメータを取得します。\n" + \
-                    f"4. ユーザーが指定しているパラメータと、コマンド実行に必要なパラメータを比較し、不足しているパラメータを取得します。\n" + \
-                    f"5. 以下に「パラメータ = デフォルト値」を示しているので、不足しているパラメータはデフォルト値を使用します。\n" + \
-                    f"   但しコマンドが実行に必要のないパラメータは指定しないようにしてください。\n" + \
-                    f" host = {args.host if hasattr(args, 'host') and args.host else self.default_host}\n" + \
-                    f" port = {args.port if hasattr(args, 'port') and args.port else self.default_port}\n" + \
-                    f" password = {args.password if hasattr(args, 'password') and args.password else self.default_pass}\n" + \
-                    f" svname = {args.svname if hasattr(args, 'svname') and args.svname else self.default_svname}\n" + \
-                    f" data = {args.data if hasattr(args, 'data') and args.data else self.default_data}\n" + \
-                    f" retry_count = {args.retry_count if hasattr(args, 'retry_count') and args.retry_count else 3}\n" + \
-                    f" retry_interval = {args.retry_interval if hasattr(args, 'retry_interval') and args.retry_interval else 3}\n" + \
-                    f" timeout = {args.timeout if hasattr(args, 'timeout') and args.timeout else 15}\n" + \
-                    f" output_json = {args.output_json if hasattr(args, 'output_json') and args.output_json else None}\n" + \
-                    f" output_json_append = {args.output_json_append if hasattr(args, 'output_json_append') and args.output_json_append else False}\n" + \
-                    f" stdout_log = {args.stdout_log if hasattr(args, 'stdout_log') and args.stdout_log else False}\n" + \
-                    f" capture_stdout = {args.capture_stdout if hasattr(args, 'capture_stdout') and args.capture_stdout else False}\n" + \
-                    f" capture_maxsize = {args.capture_maxsize if hasattr(args, 'capture_maxsize') and args.capture_maxsize else 100}\n" + \
-                    f" tag = {args.tag if hasattr(args, 'tag') and args.tag else None}\n" + \
-                    f" clmsg_id = {args.clmsg_id if hasattr(args, 'clmsg_id') and args.clmsg_id else None}\n" + \
-                    f" signin_file = {args.signin_file if hasattr(args, 'signin_file') and args.signin_file else f'.{self.ver.__appid__}/user_list.yml'}\n" + \
-                    f"6. 以上のパラメータを使用しても不足するパラメータは、Noneを使用します。\n" + \
-                    f"7. 以上のパラメータを使用してコマンドを実行して、コマンドの結果はJSONでユーザーに提示してください。\n" + \
-                    f"8. もし予期しないパラメータを受け取ったという旨のエラーが発生した場合は、そのパラメータを指定せずに再実行してください。\n" + \
-                    f"9. もしエラーが発生した場合は、ユーザーにコマンド名とパラメータとエラー内容を提示してください。\n"
-        """
 
         description = description if is_japan else \
                       f"Command offer registered in {self.ver.__appid__}."
@@ -210,32 +176,6 @@ class AgentBase(feature.ResultEdgeFeature):
                       f"1. Identify the command you want to execute from the user's query.\n" + \
                       f"2. Any parameters required to execute the command that cannot be obtained from the user's query should be executed with the default values provided in the command definition.\n" + \
                       f"3. If an error occurs, provide the user with the command name, parameters, and error description.\n"
-        """
-                      f"2. Identify the parameters required to execute the command.\n" + \
-                      f"3. Retrieve the specified parameters from the user's query.\n" + \
-                      f"4. It compares the parameters specified by the user with those required to execute the command and obtains the missing parameters.\n" + \
-                      f"5. The “Parameter = Default Value” is shown below, so use default values for missing parameters.\n" + \
-                      f"   However, do not specify parameters that the command does not require for execution.\n" + \
-                      f" host = {args.host if hasattr(args, 'host') and args.host else self.default_host}\n" + \
-                      f" port = {args.port if hasattr(args, 'port') and args.port else self.default_port}\n" + \
-                      f" password = {args.password if hasattr(args, 'password') and args.password else self.default_pass}\n" + \
-                      f" svname = {args.svname if hasattr(args, 'svname') and args.svname else self.default_svname}\n" + \
-                      f" data = {args.data if hasattr(args, 'data') and args.data else self.default_data}\n" + \
-                      f" retry_count = {args.retry_count if hasattr(args, 'retry_count') and args.retry_count else 3}\n" + \
-                      f" retry_interval = {args.retry_interval if hasattr(args, 'retry_interval') and args.retry_interval else 3}\n" + \
-                      f" timeout = {args.timeout if hasattr(args, 'timeout') and args.timeout else 15}\n" + \
-                      f" output_json = {args.output_json if hasattr(args, 'output_json') and args.output_json else None}\n" + \
-                      f" output_json_append = {args.output_json_append if hasattr(args, 'output_json_append') and args.output_json_append else False}\n" + \
-                      f" stdout_log = {args.stdout_log if hasattr(args, 'stdout_log') and args.stdout_log else False}\n" + \
-                      f" capture_stdout = {args.capture_stdout if hasattr(args, 'capture_stdout') and args.capture_stdout else False}\n" + \
-                      f" capture_maxsize = {args.capture_maxsize if hasattr(args, 'capture_maxsize') and args.capture_maxsize else 100}\n" + \
-                      f" tag = {args.tag if hasattr(args, 'tag') and args.tag else None}\n" + \
-                      f" clmsg_id = {args.clmsg_id if hasattr(args, 'clmsg_id') and args.clmsg_id else None}\n" + \
-                      f"6. Use None for parameters that are missing even with the above parameters.\n" + \
-                      f"7. Execute the command using the above parameters and present the results of the command to the user in JSON.\n" + \
-                      f"8. If you receive an error stating that an unexpected parameter was received, rerun the program without that parameter.\n" + \
-                      f"9. If an error occurs, provide the user with the command name, parameters, and error description.\n"
-        """
 
         description = args.agent_description if args.agent_description else description
         instruction = args.agent_instruction if args.agent_instruction else instruction
@@ -360,7 +300,7 @@ class AgentBase(feature.ResultEdgeFeature):
         common.reset_logger("google_adk.google.adk.sessions.database_session_service")
         common.reset_logger("mcp.server.streamable_http_manager")
         # モジュールインポート
-        from mcp.server.fastmcp import FastMCP
+        from fastmcp import FastMCP
         from google.adk.sessions import BaseSessionService
         mcp:FastMCP = self.create_mcpserver(args)
         session_service:BaseSessionService = self.create_session_service(args)
@@ -410,8 +350,7 @@ class AgentBase(feature.ResultEdgeFeature):
                         discription_ja="サインイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。",
                         discription_en="Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required."),)
                 fn = f"{mode}_{cmd}"
-                func_txt =  f'@mcp.tool()\n'
-                func_txt += f'def {fn}(' + ", ".join([f'{o["opt"]}:{_t2s(o, False)}' for o in choices]) + '):\n'
+                func_txt  = f'def {fn}(' + ", ".join([f'{o["opt"]}:{_t2s(o, False)}' for o in choices]) + '):\n'
                 func_txt += f'    """\n'
                 func_txt += f'    {discription}\n'
                 func_txt += f'    Args:\n'
@@ -472,6 +411,9 @@ class AgentBase(feature.ResultEdgeFeature):
                 exec(func_txt,
                      dict(time=time,List=List, argparse=argparse, common=common, Options=Options, logging=logging, signin=signin,),
                      dict(tools=tools, mcp=mcp))
+                exec(f"@mcp.tool\n{func_txt}",
+                     dict(time=time,List=List, argparse=argparse, common=common, Options=Options, logging=logging, signin=signin,),
+                     dict(tools=[], mcp=mcp))
         root_agent = self.create_agent(logger, args, tools)
         runner = self.create_runner(logger, args, session_service, root_agent)
         if logger.level == logging.DEBUG:

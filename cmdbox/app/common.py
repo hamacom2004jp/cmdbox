@@ -135,8 +135,10 @@ def create_console(stderr:bool=False, file=None) -> Console:
     Returns:
         Console: コンソール
     """
-    console = Console(height=False,
-                      soft_wrap=False, stderr=stderr, file=file, log_time=True, log_path=False, log_time_format='[%Y-%m-%d %H:%M:%S]')
+    #console = Console(soft_wrap=True, height=True, highlighter=loghandler.LogLevelHighlighter(), theme=loghandler.theme,
+    #                  stderr=stderr, file=file)
+    console = Console(height=True, highlighter=loghandler.LogLevelHighlighter(), theme=loghandler.theme,
+                      soft_wrap=True, stderr=stderr, file=file, log_time=True, log_path=False, log_time_format='[%Y-%m-%d %H:%M:%S]')
     #console = Console(soft_wrap=True, stderr=stderr, file=file, log_time=True, log_path=False, log_time_format='[%Y-%m-%d %H:%M:%S]')
     return console
 

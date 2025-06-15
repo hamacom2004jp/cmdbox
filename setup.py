@@ -19,6 +19,7 @@ INSTALL_REQUIRES = [
     'async-timeout',
     'cryptography',
     'fastapi',
+    #'fastmcp',
     'gevent',
     #'google-adk',
     'gunicorn',
