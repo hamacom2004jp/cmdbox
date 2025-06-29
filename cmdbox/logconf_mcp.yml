@@ -1,0 +1,43 @@
+version: 1
+
+formatters:
+    fmt:
+        format: '[%(asctime)s] %(levelname)s - %(message)s'
+        datefmt: '%Y-%m-%d %H:%M:%S'
+        class: logging.Formatter
+    fmt_rich:
+        format: '%(message)s'
+        class: logging.Formatter
+handlers:
+    std:
+        class: cmdbox.app.commons.loghandler.ColorfulStreamHandler
+        level: INFO
+        formatter: fmt
+        stream: ext://sys.stdout
+    rich:
+        class: rich.logging.RichHandler
+        level: INFO
+        formatter: fmt_rich
+        show_path: false
+        omit_repeated_times: false
+        tracebacks_word_wrap: false
+        log_time_format: '[%Y-%m-%d %H:%M]'
+    mcp:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/mcp.log
+
+loggers:
+    mcp:
+        handlers: [mcp, std]
+        level: INFO
+        qualname: mcp
+        propagate: false
+
+#root:
+#    handlers: [std]
+#    level: NOTSET

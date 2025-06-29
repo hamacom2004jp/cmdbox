@@ -16,7 +16,7 @@ class Signin(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        web.signin.signin_file_data = web.signin.load_signin_file(web.signin_file, web.signin.get_data())
+        web.signin.signin_file_data = web.signin.load_signin_file(web.signin_file, web.signin.get_data(), self=self)
         if web.signin_html is not None:
             if not web.signin_html.is_file():
                 raise HTTPException(status_code=500, detail=f'signin_html is not found. ({web.signin_html})')

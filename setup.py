@@ -29,6 +29,7 @@ INSTALL_REQUIRES = [
     'Pillow',
     'plyer',
     'psycopg[binary]',
+    'pyjwt',
     'pystray',
     'python-multipart',
     #'python3-saml',

@@ -9,9 +9,9 @@ import time
 import sys
 
 
-def main(args_list:list=None):
+def main(args_list:list=None, webcall:bool=False):
     app = CmdBoxApp.getInstance(appcls=CmdBoxApp, ver=version)
-    return app.main(args_list)[0]
+    return app.main(args_list, webcall=webcall)[0]
 
 class CmdBoxApp:
     _instance = None

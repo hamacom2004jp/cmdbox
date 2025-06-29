@@ -51,6 +51,12 @@ class WebGencert(feature.UnsupportEdgeFeature):
                 dict(opt="output_cert_format", type=Options.T_STR, default="PEM", required=False, multi=False, hide=False, choice=["DER", "PEM"],
                      discription_ja="出力する自己署名証明書のファイルフォーマットを指定します。",
                      discription_en="Specifies the file format of the self-signed certificate to be output."),
+                dict(opt="output_pkey", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None,
+                     discription_ja="出力する自己署名証明書の公開鍵のファイルを指定します。省略した場合は `webhostオプションに指定したホスト名` .pkey に出力されます。",
+                     discription_en="Specifies the public key file of the self-signed certificate to output. If omitted, the output will be in the `hostname specified in the `webhost option` .pkey."),
+                dict(opt="output_pkey_format", type=Options.T_STR, default="PEM", required=False, multi=False, hide=False, choice=["DER", "PEM"],
+                     discription_ja="出力する自己署名証明書の公開鍵のファイルフォーマットを指定します。",
+                     discription_en="Specifies the file format of the public key of the self-signed certificate to be output."),
                 dict(opt="output_key", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None,
                      discription_ja="出力する自己署名証明書の秘密鍵ファイルを指定します。省略した場合は `webhostオプションに指定したホスト名` .key に出力されます。",
                      discription_en="Specifies the private key file of the self-signed certificate to be output.If omitted, the hostname specified in the `webhost option` .key will be output."),
@@ -91,12 +97,19 @@ class WebGencert(feature.UnsupportEdgeFeature):
             return 1, msg, None
         if args.output_cert is None:
             args.output_cert = f"{args.webhost}.crt"
+        if args.output_pkey is None:
+            args.output_pkey = f"{args.webhost}.pkey"
         if args.output_key is None:
             args.output_key = f"{args.webhost}.key"
         output_cert = Path(args.output_cert)
+        output_pkey = Path(args.output_pkey)
         output_key = Path(args.output_key)
         if not args.overwrite and output_cert.exists():
             msg = dict(warn=f"File already exists. {output_cert}")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return 1, msg, None
+        if not args.overwrite and output_pkey.exists():
+            msg = dict(warn=f"File already exists. {output_pkey}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         if not args.overwrite and output_key.exists():
@@ -105,8 +118,11 @@ class WebGencert(feature.UnsupportEdgeFeature):
             return 1, msg, None
 
         try:
-            self.gen_cert(logger, args.webhost, output_cert, output_key)
-            ret = dict(success=f"Generate certificate. {output_cert}, {output_key}")
+            self.gen_cert(logger, args.webhost,
+                          output_cert, args.output_cert_format,
+                          output_pkey, args.output_pkey_format,
+                          output_key, args.output_key_format)
+            ret = dict(success=f"Generate certificate. {output_cert}, {output_pkey}, {output_key}")
         except Exception as e:
             msg = dict(error=f"Failed to generate certificate. {e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -115,6 +131,7 @@ class WebGencert(feature.UnsupportEdgeFeature):
 
     def gen_cert(self, logger:logging.Logger, webhost:str,
                  output_cert:Path, output_cert_format:str,
+                 output_pkey:Path, output_pkey_format:str,
                  output_key:Path, output_key_format:str) -> None:
         # 秘密鍵の作成
         private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
@@ -150,6 +167,12 @@ class WebGencert(feature.UnsupportEdgeFeature):
             x509.SubjectAlternativeName([x509.DNSName(webhost)]),
             critical=False,
         ).sign(private_key, hashes.SHA256())
+
+        # 自己署名証明書の公開鍵の保存
+        with open(output_pkey, "wb") as f:
+            f.write(self_cert.public_key().public_bytes(serialization.Encoding.DER if output_pkey_format == "DER" else serialization.Encoding.PEM,
+                                                        format=serialization.PublicFormat.SubjectPublicKeyInfo))
+            logger.info(f"Save self-signed public key. {output_pkey}")
 
         # 自己署名証明書の保存
         with open(output_cert, "wb") as f:

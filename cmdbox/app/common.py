@@ -93,7 +93,33 @@ def save_yml(yml_path:Path, data:dict) -> None:
     with open(yml_path, 'w') as f:
         yaml.dump(data, f, default_flow_style=False, sort_keys=False)
 
-def reset_logger(name:str, stderr:bool=False, fmt:str='[%(asctime)s] %(levelname)s - %(message)s', datefmt:str='%Y-%m-%d %H:%M:%S') -> None:
+class CommonValue:
+    _map = dict()
+
+def set_common_value(key:str, value:Any) -> None:
+    """
+    共通の値を設定します。
+
+    Args:
+        key (str): キー
+        value (Any): 値
+    """
+    CommonValue._map[key] = value
+
+def get_common_value(key:str, default:Any=None) -> Any:
+    """
+    共通の値を取得します。
+
+    Args:
+        key (str): キー
+        default (Any, optional): デフォルト値. Defaults to None.
+
+    Returns:
+        Any: 取得した値。存在しない場合はdefault値を返します。
+    """
+    return CommonValue._map.get(key, default)
+
+def reset_logger(name:str, stderr:bool=False, fmt:str='[%(asctime)s] %(levelname)s - %(message)s', datefmt:str='%Y-%m-%d %H:%M:%S', level:int=logging.INFO) -> None:
     """
     指定されたロガーのハンドラをクリアし、新しいハンドラを追加します。
     Args:
@@ -101,13 +127,21 @@ def reset_logger(name:str, stderr:bool=False, fmt:str='[%(asctime)s] %(levelname
         stderr (bool, optional): 標準エラー出力を使用するかどうか. Defaults to False.
         fmt (str, optional): ログフォーマット. Defaults to '[%(asctime)s] %(levelname)s - %(message)s'.
         datefmt (str, optional): 日時フォーマット. Defaults to '%Y-%m-%d %H:%M:%S'.
+        level (int, optional): ログレベル. Defaults to logging.INFO.
     """
     logger = logging.getLogger(name)
     logger.handlers.clear()
     logger.propagate = False
-    logger.addHandler(create_log_handler(stderr, fmt, datefmt))
+    logger.setLevel(level)
+    logger.addHandler(create_log_handler(stderr, fmt, datefmt, level))
+    if get_common_value('webcall', False):
+        # webcallの場合はStreamHandlerを削除
+        for handler in logger.handlers:
+            hc = handler.__class__
+            if issubclass(hc, logging.StreamHandler) and not issubclass(hc, logging.FileHandler):
+                logger.removeHandler(handler)
 
-def create_log_handler(stderr:bool=False, fmt:str='[%(asctime)s] %(levelname)s - %(message)s', datefmt:str='%Y-%m-%d %H:%M:%S') -> logging.Handler:
+def create_log_handler(stderr:bool=False, fmt:str='[%(asctime)s] %(levelname)s - %(message)s', datefmt:str='%Y-%m-%d %H:%M:%S', level:int=logging.INFO) -> logging.Handler:
     """
     ログハンドラを生成します。
 
@@ -123,6 +157,7 @@ def create_log_handler(stderr:bool=False, fmt:str='[%(asctime)s] %(levelname)s -
     #                      tracebacks_word_wrap=False, log_time_format='[%Y-%m-%d %H:%M]')
     handler = loghandler.ColorfulStreamHandler(sys.stdout if not stderr else sys.stderr)
     handler.setFormatter(formatter)
+    handler.setLevel(level)
     return handler
 
 def create_console(stderr:bool=False, file=None) -> Console:
@@ -155,6 +190,7 @@ def default_logger(debug:bool=False, ver=version, webcall:bool=False) -> logging
         logging.Logger: ロガー
     """
     logger = logging.getLogger(ver.__appid__)
+    set_common_value('webcall', webcall)
     if not webcall:
         handler = create_log_handler()
         handler.setLevel(logging.DEBUG if debug else logging.INFO)
@@ -199,6 +235,7 @@ def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, v
     with open(log_conf_path) as f:
         log_config = yaml.safe_load(f)
     std_key = None
+    set_common_value('webcall', webcall)
     for k, h in log_config['handlers'].items():
         if 'filename' in h:
             h['filename'] = data / h['filename']

@@ -91,7 +91,7 @@ class CmdLoad(feature.OneshotResultEdgeFeature):
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg, None
         if not hasattr(self, 'signin_file_data') or self.signin_file_data is None:
-            self.signin_file_data = signin.Signin.load_signin_file(args.signin_file, None)
+            self.signin_file_data = signin.Signin.load_signin_file(args.signin_file, None, self=self)
         opt_path = Path(args.data) / ".cmds" / f"cmd-{args.title}.json"
         opt = common.loadopt(opt_path, True)
         ret = dict(success=opt)

@@ -832,11 +832,13 @@ class Options:
                 if hasattr(arg, 'redis_password'): opt['password'] = arg.redis_password
                 if hasattr(arg, 'svname'): opt['svname'] = arg.svname
                 if hasattr(arg, 'clmsg_id'): opt['clmsg_id'] = arg.clmsg_id
+                if hasattr(arg, 'client_only'): opt['client_only'] = arg.client_only
             elif isinstance(arg, web.Web):
                 opt['host'] = arg.redis_host
                 opt['port'] = arg.redis_port
                 opt['password'] = arg.redis_password
                 opt['svname'] = arg.svname
+                opt['client_only'] = arg.client_only
             elif isinstance(arg, feature.Feature):
                 func_feature = arg
                 opt['clmsg_src'] = func_feature.__class__.__name__

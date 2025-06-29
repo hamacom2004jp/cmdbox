@@ -19,6 +19,8 @@ Self-signed server certificate generation : `cmdbox -m web -c gencert <Option>`
     "--webhost <Server Name>","","Specify the host name to be specified as the CN (Common Name) of the self-signed certificate."
     "--output_cert <destination file>","","Specify the self-signed certificate file to be output.If omitted, the hostname specified in the `webhost option` .crt will be output."
     "--output_cert_format <format>","","Specifies the file format of the self-signed certificate to be output.'PEM' and 'DER' can be specified."
+    "--output_pkey <destination file>","","Specifies the public key file of the self-signed certificate to output. If omitted, the output will be in the `hostname specified in the `webhost option` .pkey."
+    "--output_pkey_format <format>","","Specifies the file format of the public key of the self-signed certificate to be output."
     "--output_key <destination file>","","Specifies the private key file of the self-signed certificate to be output.If omitted, the hostname specified in the `webhost option` .key will be output."
     "--output_key_format <format>","","Specifies the private key file format of the output self-signed certificate.'PEM' and 'DER' can be specified."
     "--overwrite","","Overwrites the self-signed certificate file to be output if it exists."

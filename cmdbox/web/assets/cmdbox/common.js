@@ -147,7 +147,7 @@ cmdbox.editapikey = async () => {
     }
     const editapikey_modal = $('#editapikey_modal').length?$('#editapikey_modal'):$(`<div id="editapikey_modal" class="modal" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
     editapikey_modal.html('');
-    const daialog = $(`<div class="modal-dialog ui-draggable ui-draggable-handle"/>`).appendTo(editapikey_modal);
+    const daialog = $(`<div class="modal-dialog modal-lg ui-draggable ui-draggable-handle"/>`).appendTo(editapikey_modal);
     const form = $(`<form id="editapikey_form" class="modal-content novalidate"/>`).appendTo(daialog);
     const header = $(`<div class="modal-header"/>`).appendTo(form);
     header.append('<h5 class="modal-title">Edit ApiKey</h5>');
@@ -157,14 +157,57 @@ cmdbox.editapikey = async () => {
     const body = $(`<div class="modal-body"/>`).appendTo(form);
     const row_content = $(`<div class="row row_content"/>`).appendTo(body);
     const table = $(`<table class="table table-bordered table-hover"/>`).appendTo(row_content);
-    const thead = $(`<thead><tr><th class="th" scope="col" width="40">-</th><th class="th" scope="col">apikey name</th></tr></thead>`).appendTo(table);
+    const thead = $(`<thead><tr/></thead>`).appendTo(table);
+    thead.find('tr').append(`<th class="th" scope="col" width="40">-</th>`);
+    thead.find('tr').append(`<th class="th" scope="col">apikey name</th>`);
+    thead.find('tr').append(`<th class="th" scope="col" width="112">key</th>`);
+    thead.find('tr').append(`<th class="th" scope="col">expiration</th>`);
+    thead.find('tr').append(`<th class="th" scope="col">note</th>`);
     const tbody = $(`<tbody/>`).appendTo(table);
-    const apikey_names = user['apikeys'] ? Object.keys(user['apikeys']) : [];
+    if (user['apikeys']) {
+        Object.keys(user['apikeys']).forEach((name, i) => {
+            const tr = $(`<tr/>`).appendTo(tbody);
+            $(`<td>${i+1}</td>`).appendTo(tr);
+            $(`<td>${name}</td>`).appendTo(tr);
+            const td_key = $(`<td><span>********</span></td>`).appendTo(tr);
+            // コピー用のボタン
+            const td_btn_copy = $(`<button type="button" class="btn btn_copy p-0 ms-1">`
+                +`<svg class="bi bi-copy" width="16" height="16" fill="currentColor"><use href="#btn_copy"></use></svg>`
+                +`</button>`).appendTo(td_key);
+            td_btn_copy.off('click').on('click', (event) => {
+                const key = user['apikeys'][name][0];
+                if (!key) {
+                    cmdbox.message({'error': 'No key available for this apikey.'});
+                    return;
+                }
+                navigator.clipboard.writeText(key).then(() => {
+                    cmdbox.message({'success': 'Key copied to clipboard.'});
+                }).catch((err) => {
+                    cmdbox.message({'error': `Failed to copy key: ${err}`});
+                });
+            });
+            // ダウンロードボタン
+            const td_btn_download = $(`<a type="button" class="btn btn_download p-0 m-0">`
+                +`<svg class="bi bi-download" width="16" height="16" fill="currentColor"><use href="#btn_download"></use></svg>`
+                +`</a>`).appendTo(td_key);
+            const blob = new Blob([user['apikeys'][name][0]], {"type":"text/plain"});
+            const download_url = (window.URL || window.webkitURL).createObjectURL(blob);
+            td_btn_download.attr('href', download_url).attr('download', `${name}.txt`);
+            // 有効期限とメモ
+            const exp = user['apikeys'][name][1];
+            if (exp) $(`<td>${exp}</td>`).appendTo(tr);
+            else $(`<td>-</td>`).appendTo(tr);
+            const note = user['apikeys'][name][2];
+            $(`<td>${note}</td>`).appendTo(tr);
+        });
+    }
+    /*const apikey_names = user['apikeys'] ? Object.keys(user['apikeys']) : [];
     apikey_names.forEach((name, i) => {
         const tr = $(`<tr/>`).appendTo(tbody);
         const td_no = $(`<td>${i+1}</td>`).appendTo(tr);
         const td_name = $(`<td>${name}</td>`).appendTo(tr);
-    });
+        const exp = user['apikeys'][name];
+    });*/
     const footer = $(`<div class="modal-footer"/>`).appendTo(form);
     const addapikey_btn = $(`<button type="button" class="btn btn-info">Add apikey</button>`).appendTo(footer);
     addapikey_btn.off('click').on('click', async (event) => {

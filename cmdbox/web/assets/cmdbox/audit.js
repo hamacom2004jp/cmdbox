@@ -94,7 +94,7 @@ audit.metrics = async () => {
             const modal = $('#search_modal');
             const [_, opt] = cmdbox.get_param(modal);
             opt['select'] = row['vertical'];
-            opt['select'][row['horizontal']] = '-';
+            opt['select'][row['horizontal']] = row['horizontal'];
             opt['select_date_format'] = row['horizontal_date_format'];
             opt['groupby'] = [row['horizontal']];
             opt['groupby_date_format'] = row['horizontal_date_format'];

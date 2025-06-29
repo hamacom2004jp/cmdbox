@@ -75,11 +75,11 @@ users.users_list = async () => {
                     const row = $(modal.find('.row_content_template_choice').html()).appendTo(row_content);
                     if (prev) row.insertAfter(prev);
                     const btn_p = $('<button class="btn btn-secondary puls_buton" type="button"></button>');
-                    btn_p.append('<svg width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16"><use href="#svg_puls_btn"></use></svg>');
+                    btn_p.append('<svg width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16"><use href="#btn_plus"></use></svg>');
                     btn_p.appendTo(row.find('.input-group')).click(() => {groups_add_func('', row);});
                     if (row_content.find('[name="groups"]').length > 0) {
                         const btn_t = $('<button class="btn btn-secondary trash_buton" type="button"></button>');
-                        btn_t.append('<svg width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16"><use href="#svg_trash_btn"></use></svg>');
+                        btn_t.append('<svg width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16"><use href="#btn_trash"></use></svg>');
                         btn_t.appendTo(row.find('.input-group')).click(() => {row.remove();});
                     }
                     row_content.find('.row_content_template_title').removeClass('row_content_template_title').text(col);
@@ -239,7 +239,8 @@ users.users_list = async () => {
                 for (const key in data) {
                     const tr = $('<tr>').appendTo(table);
                     $('<td>').text(key).appendTo(tr);
-                    $('<td>').text(data[key]).appendTo(tr);
+                    if (col == 'apikeys') $('<td>').text(data[key].slice(1)).appendTo(tr);
+                    else $('<td>').text(data[key]).appendTo(tr);
                 }
                 $('<td>').append(table).appendTo(user_tbody_tr);
             } else {

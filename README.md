@@ -327,25 +327,25 @@ audit:
 users:                         # A list of users, each of which is a map that contains the following fields.
 - uid: 1                       # An ID that identifies a user. No two users can have the same ID.
   name: admin                  # A name that identifies the user. No two users can have the same name.
-  password: XXXXXXXXXXXXXXXX   # The user's password. The value is hashed with the hash function specified in the next hash field.
+  password: XXXXX              # The user's password. The value is hashed with the hash function specified in the next hash field.
   hash: plain                  # The hash function used to hash the password, which can be plain, md5, sha1, or sha256, or oauth2, or saml.
   groups: [admin]              # A list of groups to which the user belongs, as specified in the groups field.
   email: admin@aaa.bbb.jp      # The email address of the user, used when authenticating using the provider specified in the oauth2 or saml field.
 - uid: 101
   name: user01
-  password: XXXXXXXXXXXXXXXX
+  password: XXXXX
   hash: md5
   groups: [user]
   email: user01@aaa.bbb.jp
 - uid: 102
   name: user02
-  password: XXXXXXXXXXXXXXXX
+  password: XXXXX
   hash: sha1
   groups: [readonly]
   email: user02@aaa.bbb.jp
 - uid: 103
   name: user03
-  password: XXXXXXXXXXXXXXXX
+  password: XXXXX
   hash: sha256
   groups: [editor]
   email: user03@aaa.bbb.jp
@@ -400,6 +400,7 @@ pathrule:                      # List of RESTAPI rules, rules that determine whe
   - groups: [user]
     paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout, /password/change,
             /gui/user_data/load, /gui/user_data/save, /gui/user_data/delete,
+            /agent, /mcpsv,
             /exec_cmd, /exec_pipe, /filer, /result, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
     rule: allow
   - groups: [readonly]
@@ -427,6 +428,30 @@ password:                       # Password settings.
     enabled: true               # Specify whether or not to enable account lockout.
     threshold: 5                # Specify the number of failed login attempts before the account is locked.
     reset: 30                   # Specify the number of minutes after which the failed login count will be reset.
+apikey:
+  gen_cert:                         # Specify whether to generate a certificate for API key.
+    enabled: true                   # Specify whether to enable certificate generation for API key.
+    privatekey: idp_private.pem     # Specify the destination file for the generated private key.
+    certificate: idp_cert.pem       # Specify the destination file for the generated certificate.
+    publickey: idp_public.pem       # Specify the destination file for the generated public key.
+  gen_jwt:                          # Specify whether to generate JWT for API key.
+    enabled: true                   # Specify whether to enable JWT generation for API key.
+    privatekey: idp_private.pem     # Specify the private key file for JWT generation.
+    privatekey_passphrase:          # Specify the passphrase for the private key file.
+                                    # If the private key is encrypted, specify the passphrase here.
+    algorithm: RS256                # Specify the algorithm used to generate the JWT. The value can be RS256, PS256, or ES256.
+    claims:                         # Specify the claims to be included in the JWT.
+      iss: identity_provider        # Specify the issuer of the JWT. This is usually the name of the identity provider.
+      sub: app_user                 # Specify the subject of the JWT. This is usually the name of the application.
+      aud: app_organization         # Specify the audience of the JWT. This is usually the name of the organization that will use the application.
+      exp: 31536000                 # Specify the expiration time of the JWT in seconds. The default is 31536000 seconds (1 year).
+  verify_jwt:                       # Specify whether to verify JWT for API key.
+    enabled: true                   # Specify whether to enable JWT verification for API key.
+    certificate: idp_cert.pem       # Specify the certificate file for JWT verification.
+    publickey: idp_public.pem       # Specify the public key file for JWT verification. Not required if certificate exists.
+    issuer: identity_provider       # Specify the issuer of the JWT. This is usually the name of the identity provider. (If not specified, no verification)
+    audience: app_organization      # Specify the audience of the JWT. This is usually the name of the organization that will use the application. (If not specified, no verification)
+    algorithm: RS256                # Specify the algorithm used to verify the JWT. The value can be RS256, PS256, or ES256.
 oauth2:                             # OAuth2 settings.
   providers:                        # This is a per-provider setting for OAuth2.
     google:                         # Google's OAuth2 configuration.
@@ -487,7 +512,6 @@ saml:                               # SAML settings.
         singleLogoutService: {}
         certFingerprint: ''
         certFingerprintAlgorithm: sha1
-
 
 ```
 

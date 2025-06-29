@@ -15,25 +15,25 @@ Configuration items in `user_list.yml`
     users:                         # A list of users, each of which is a map that contains the following fields.
     - uid: 1                       # An ID that identifies a user. No two users can have the same ID.
       name: admin                  # A name that identifies the user. No two users can have the same name.
-      password: XXXXXXXXXXX        # The user's password. The value is hashed with the hash function specified in the next hash field.
-      hash: plain                  # The hash function used to hash the password, which can be plain, md5, sha1, or sha256, or oauth2.
+      password: admin              # The user's password. The value is hashed with the hash function specified in the next hash field.
+      hash: plain                  # The hash function used to hash the password, which can be plain, md5, sha1, or sha256, or oauth2, or saml.
       groups: [admin]              # A list of groups to which the user belongs, as specified in the groups field.
-      email: admin@aaa.bbb.jp      # The email address of the user, used when authenticating using the provider specified in the oauth2 field.
+      email: admin@aaa.bbb.jp      # The email address of the user, used when authenticating using the provider specified in the oauth2 or saml field.
     - uid: 101
       name: user01
-      password: XXXXXXXXXXX
+      password: b75705d7e35e7014521a46b532236ec3
       hash: md5
       groups: [user]
       email: user01@aaa.bbb.jp
     - uid: 102
       name: user02
-      password: XXXXXXXXXXX
+      password: a7659675668c2b34f0a456dbaa508200340dc36c
       hash: sha1
       groups: [readonly]
       email: user02@aaa.bbb.jp
     - uid: 103
       name: user03
-      password: XXXXXXXXXXX
+      password: d64243e8519cce2304fffb92d31acaca622585011b40439c97e9274fae146189
       hash: sha256
       groups: [editor]
       email: user03@aaa.bbb.jp
@@ -64,6 +64,10 @@ Configuration items in `user_list.yml`
         cmds: [list]
         rule: allow
       - groups: [user, guest]
+        mode: audit
+        cmds: [write]
+        rule: allow
+      - groups: [user, guest]
         mode: web
         cmds: [genpass]
         rule: allow
@@ -83,7 +87,9 @@ Configuration items in `user_list.yml`
         rule: allow
       - groups: [user]
         paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout, /password/change,
-                /exec_cmd, /exec_pipe, /filer, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
+                /gui/user_data/load, /gui/user_data/save, /gui/user_data/delete,
+                /agent, /mcpsv,
+                /exec_cmd, /exec_pipe, /filer, /result, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
         rule: allow
       - groups: [readonly]
         paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
@@ -110,6 +116,30 @@ Configuration items in `user_list.yml`
         enabled: true               # Specify whether or not to enable account lockout.
         threshold: 5                # Specify the number of failed login attempts before the account is locked.
         reset: 30                   # Specify the number of minutes after which the failed login count will be reset.
+    apikey:
+      gen_cert:                         # Specify whether to generate a certificate for API key.
+        enabled: true                   # Specify whether to enable certificate generation for API key.
+        privatekey: idp_private.pem     # Specify the destination file for the generated private key.
+        certificate: idp_cert.pem       # Specify the destination file for the generated certificate.
+        publickey: idp_public.pem       # Specify the destination file for the generated public key.
+      gen_jwt:                          # Specify whether to generate JWT for API key.
+        enabled: true                   # Specify whether to enable JWT generation for API key.
+        privatekey: idp_private.pem     # Specify the private key file for JWT generation.
+        privatekey_passphrase:          # Specify the passphrase for the private key file.
+                                        # If the private key is encrypted, specify the passphrase here.
+        algorithm: RS256                # Specify the algorithm used to generate the JWT. The value can be RS256, PS256, or ES256.
+        claims:                         # Specify the claims to be included in the JWT.
+          iss: identity_provider        # Specify the issuer of the JWT. This is usually the name of the identity provider.
+          sub: app_user                 # Specify the subject of the JWT. This is usually the name of the application.
+          aud: app_organization         # Specify the audience of the JWT. This is usually the name of the organization that will use the application.
+          exp: 31536000                 # Specify the expiration time of the JWT in seconds. The default is 31536000 seconds (1 year).
+      verify_jwt:                       # Specify whether to verify JWT for API key.
+        enabled: true                   # Specify whether to enable JWT verification for API key.
+        certificate: idp_cert.pem       # Specify the certificate file for JWT verification.
+        publickey: idp_public.pem       # Specify the public key file for JWT verification. Not required if certificate exists.
+        issuer: identity_provider       # Specify the issuer of the JWT. This is usually the name of the identity provider. (If not specified, no verification)
+        audience: app_organization      # Specify the audience of the JWT. This is usually the name of the organization that will use the application. (If not specified, no verification)
+        algorithm: RS256                # Specify the algorithm used to verify the JWT. The value can be RS256, PS256, or ES256.
     oauth2:                             # OAuth2 settings.
       providers:                        # This is a per-provider setting for OAuth2.
         google:                         # Google's OAuth2 configuration.
@@ -118,7 +148,8 @@ Configuration items in `user_list.yml`
           client_secret: XXXXXXXXXXX    # Specify Google's OAuth2 client secret.
           redirect_uri: https://localhost:8443/oauth2/google/callback # Specify Google's OAuth2 redirect URI.
           scope: ['email']              # Specify the scope you want to retrieve with Google's OAuth2. Usually, just reading the email is sufficient.
-          signin_module:                # Specify the module name that implements the sign-in. see, cmdbox.app.signin.SignIn
+          signin_module:                # Specify the module name that implements the sign-in.
+            cmdbox.app.auth.google_signin
           note:                         # Specify a description such as Google's OAuth2 reference site.
           - https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest
         github:                         # OAuth2 settings for GitHub.
@@ -127,7 +158,8 @@ Configuration items in `user_list.yml`
           client_secret: XXXXXXXXXXX    # Specify the GitHub OAuth2 client secret.
           redirect_uri: https://localhost:8443/oauth2/github/callback # Specify the OAuth2 redirect URI for GitHub.
           scope: ['user:email']         # Specify the scope you want to get from GitHub's OAuth2. Usually, just reading the email is sufficient.
-          signin_module:                # Specify the module name that implements the sign-in. see, cmdbox.app.signin.SignIn
+          signin_module:                # Specify the module name that implements the sign-in.
+            cmdbox.app.auth.github_signin
           note:                         # Specify a description, such as a reference site for OAuth2 on GitHub.
           - https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes
         azure:                          # OAuth2 settings for Azure AD.
@@ -137,9 +169,37 @@ Configuration items in `user_list.yml`
           client_secret: XXXXXXXXXXX    # Specify the Azure AD OAuth2 client secret.
           redirect_uri: https://localhost:8443/oauth2/azure/callback # Specify the OAuth2 redirect URI for Azure AD.
           scope: ['openid', 'profile', 'email', 'https://graph.microsoft.com/mail.read']
-          signin_module:                # Specify the module name that implements the sign-in. see, cmdbox.app.signin.SignIn
+          signin_module:                # Specify the module name that implements the sign-in.
+            cmdbox.app.auth.azure_signin
           note:                         # Specify a description, such as a reference site for Azure AD's OAuth2.
           - https://learn.microsoft.com/ja-jp/entra/identity-platform/v2-oauth2-auth-code-flow
+    saml:                               # SAML settings.
+      providers:                        # This is a per-provider setting for OAuth2.
+        azure:                          # SAML settings for Azure AD.
+          enabled: false                # Specify whether to enable SAML authentication for Azure AD.
+          signin_module:                # Specify the module name that implements the sign-in.
+            cmdbox.app.auth.azure_signin_saml # Specify the python3-saml configuration.
+                                        # see) https://github.com/SAML-Toolkits/python3-saml
+          sp:
+            entityId: https://localhost:8443/
+            assertionConsumerService:
+              url: https://localhost:8443/saml/azure/callback
+              binding: urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
+            attributeConsumingService: {}
+            singleLogoutService:
+              binding: urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect
+            NameIDFormat: urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+            x509cert: ''
+            privateKey: ''
+          idp:
+            entityId: https://sts.windows.net/{tenant-id}/
+            singleSignOnService:
+              url: https://login.microsoftonline.com/{tenant-id}/saml2
+              binding: urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect
+            x509cert: XXXXXXXXXXX
+            singleLogoutService: {}
+            certFingerprint: ''
+            certFingerprintAlgorithm: sha1
 
 
 - See also the contents of `.sample/sample_project/sample/extensions/user_list.yml`.

@@ -1,11 +1,16 @@
 from cmdbox.app import common, options
+from cryptography import x509
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
 from fastapi import Request, Response, HTTPException, WebSocket
 from fastapi.responses import RedirectResponse
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
+import argparse
 import copy
 import contextvars
 import logging
+import jwt
 import string
 
 
@@ -87,7 +92,7 @@ class Signin(object):
         if self.signin_file_data is None:
             return None
         if 'signin' in req.session:
-            self.signin_file_data = Signin.load_signin_file(self.signin_file, self.signin_file_data) # サインインファイルの更新をチェック
+            self.signin_file_data = Signin.load_signin_file(self.signin_file, self.signin_file_data, self=self) # サインインファイルの更新をチェック
         return Signin._check_signin(req, res, self.signin_file_data, self.logger)
     
     @classmethod
@@ -157,17 +162,37 @@ class Signin(object):
         if not auth.startswith('Bearer '):
             #self.logger.warning(f"Bearer not found. headers={req.headers}")
             return RedirectResponse(url=f'/signin{req.url.path}?error=apikeyfail')
-        bearer, apikey = auth.split(' ')
-        apikey = common.hash_password(apikey.strip(), 'sha1')
+        bearer, apikey = auth.split(' ').strip()
         if logger.level == logging.DEBUG:
-            logger.debug(f"hashed apikey: {apikey}")
+            logger.debug(f"received apikey: {apikey}")
         find_user = None
+        jwt_enabled = signin_file_data['apikey']['verify_jwt']['enabled']
         for user in signin_file_data['users']:
             if 'apikeys' not in user:
                 continue
             for ak, key in user['apikeys'].items():
                 if apikey == key:
-                    find_user = user
+                    if jwt_enabled:
+                        publickey = None
+                        if hasattr(cls, 'verify_jwt_certificate') and cls.verify_jwt_certificate is not None:
+                            publickey = cls.verify_jwt_certificate.public_key()
+                        if hasattr(cls, 'verify_jwt_publickey') and cls.verify_jwt_publickey is not None:
+                            publickey = cls.verify_jwt_publickey
+                        algorithm = signin_file_data['apikey']['verify_jwt']['algorithm']
+                        issuer = signin_file_data['apikey']['verify_jwt']['issuer']
+                        audience = signin_file_data['apikey']['verify_jwt']['audience']
+                        claims = jwt.decode(apikey, publickey, algorithms=[algorithm],
+                                            issuer=issuer, audience=audience,
+                                            options={'verify_iss': issuer is not None,
+                                                     'verify_aud': audience is not None},)
+                        find_user = dict(**claims, **user)
+                        find_user['uid'] = find_user['uid'] if 'uid' in find_user else -1
+                        find_user['name'] = find_user['name'] if 'name' in find_user else None
+                        find_user['groups'] = find_user['groups'] if 'groups' in find_user else None
+                        find_user['email'] = find_user['email'] if 'email' in find_user else None
+                        find_user['apikey_name'] = find_user['apikey_name'] if 'apikey_name' in find_user else None
+                    else:
+                        find_user = user
         if find_user is None:
             logger.warning(f"No matching user found for apikey.")
             return RedirectResponse(url=f'/signin{req.url.path}?error=apikeyfail')
@@ -196,7 +221,22 @@ class Signin(object):
         return RedirectResponse(url=f'/signin{req.url.path}?error=unauthorizedsite')
 
     @classmethod
-    def load_signin_file(cls, signin_file:Path, signin_file_data:Dict[str, Any]=None) -> Dict[str, Any]:
+    def load_pem_private_key(cls, data:bytes, passphrase:str=None):
+        return serialization.load_pem_private_key(
+            data,
+            password=passphrase.encode('utf-8') if passphrase else None,
+            backend=default_backend())
+
+    @classmethod
+    def load_pem_public_key(cls, data:bytes):
+        return serialization.load_pem_public_key(data, backend=default_backend())
+
+    @classmethod
+    def load_pem_x509_certificate(cls, data:bytes):
+        return x509.load_pem_x509_certificate(data, backend=default_backend())
+
+    @classmethod
+    def load_signin_file(cls, signin_file:Path, signin_file_data:Dict[str, Any]=None, self=None) -> Dict[str, Any]:
         """
         サインインファイルを読み込む
 
@@ -390,6 +430,90 @@ class Signin(object):
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "reset" not found in "password.lockout". ({signin_file})')
             if type(yml['password']['lockout']['reset']) is not int:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "reset" not int type in "password.lockout". ({signin_file})')
+        # apikeyのフォーマットチェック
+        if 'apikey' not in yml:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "apikey" not found. ({signin_file})')
+        if 'gen_cert' not in yml['apikey']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "gen_cert" not found in "apikey". ({signin_file})')
+        if 'enabled' not in yml['apikey']['gen_cert']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "apikey.gen_cert". ({signin_file})')
+        if type(yml['apikey']['gen_cert']['enabled']) is not bool:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "apikey.gen_cert". ({signin_file})')
+        if yml['apikey']['gen_cert']['enabled']:
+            if 'privatekey' not in yml['apikey']['gen_cert']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "privatekey" not found in "apikey.gen_cert". ({signin_file})')
+            if 'certificate' not in yml['apikey']['gen_cert']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "certificate" not found in "apikey.gen_cert". ({signin_file})')
+            if 'publickey' not in yml['apikey']['gen_cert']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "publickey" not found in "apikey.gen_cert". ({signin_file})')
+            if not Path(yml['apikey']['gen_cert']['certificate']).is_file():
+                from cmdbox.app.features.cli.cmdbox_web_gencert import WebGencert
+                gencert = WebGencert(self.appcls, self.ver)
+                opt = dict(webhost=self.ver.__appid__, overwrite=True,
+                           output_cert=yml['apikey']['gen_cert']['certificate'], output_cert_format='PEM',
+                           output_pkey=yml['apikey']['gen_cert']['publickey'], output_pkey_format='PEM',
+                           output_key=yml['apikey']['gen_cert']['privatekey'], output_key_format='PEM',)
+                args = argparse.Namespace(**opt)
+                status, res, _ = gencert.apprun(self.logger, args, 0, [])
+                if status != 0:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "gen_cert" generate error in "apikey.gen_cert". ({signin_file}) {res}')
+        if 'gen_jwt' not in yml['apikey']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "gen_jwt" not found in "apikey". ({signin_file})')
+        if 'enabled' not in yml['apikey']['gen_jwt']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "apikey.gen_jwt". ({signin_file})')
+        if type(yml['apikey']['gen_jwt']['enabled']) is not bool:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "apikey.gen_jwt". ({signin_file})')
+        if yml['apikey']['gen_jwt']['enabled']:
+            if 'privatekey' not in yml['apikey']['gen_jwt']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "privatekey" not found in "apikey.gen_jwt". ({signin_file})')
+            if 'privatekey_passphrase' not in yml['apikey']['gen_jwt']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "privatekey_passphrase" not found in "apikey.gen_jwt". ({signin_file})')
+            if not Path(yml['apikey']['gen_jwt']['privatekey']).is_file():
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "privatekey" file not found in "apikey.gen_jwt". ({signin_file})')
+            with open(yml['apikey']['gen_jwt']['privatekey'], 'rb') as f:
+                cls.gen_jwt_privatekey = cls.load_pem_private_key(f.read(), yml['apikey']['gen_jwt'].get('privatekey_passphrase', None))
+            if 'algorithm' not in yml['apikey']['gen_jwt']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "algorithm" not found in "apikey.gen_jwt". ({signin_file})')
+            cls.gen_jwt_algorithm = yml['apikey']['gen_jwt']['algorithm']
+            if 'claims' not in yml['apikey']['gen_jwt']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "claims" not found in "apikey.gen_jwt". ({signin_file})')
+            cls.gen_jwt_claims = yml['apikey']['gen_jwt']['claims'].copy()
+            if type(yml['apikey']['gen_jwt']['claims']) is not dict:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "claims" not dict type in "apikey.gen_jwt". ({signin_file})')
+        if 'verify_jwt' not in yml['apikey']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "verify_jwt" not found in "apikey". ({signin_file})')
+        if 'enabled' not in yml['apikey']['verify_jwt']:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not found in "apikey.verify_jwt". ({signin_file})')
+        if type(yml['apikey']['verify_jwt']['enabled']) is not bool:
+            raise HTTPException(status_code=500, detail=f'signin_file format error. "enabled" not bool type in "apikey.verify_jwt". ({signin_file})')
+        if yml['apikey']['verify_jwt']['enabled']:
+            if 'certificate' not in yml['apikey']['verify_jwt']:
+                if 'publickey' not in yml['apikey']['verify_jwt']:
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "certificate" or "publickey" not found in "apikey.verify_jwt". ({signin_file})')
+                if not Path(yml['apikey']['verify_jwt']['publickey']).is_file():
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "publickey" file not found in "apikey.verify_jwt". ({signin_file})')
+                with open(yml['apikey']['verify_jwt']['publickey'], 'rb') as f:
+                    cls.verify_jwt_publickey_str = f.read()
+                    cls.verify_jwt_publickey = cls.load_pem_public_key(cls.verify_jwt_publickey_str)
+                    cls.verify_jwt_publickey_str = cls.verify_jwt_publickey_str.decode('utf-8')
+            else:
+                if not Path(yml['apikey']['verify_jwt']['certificate']).is_file():
+                    raise HTTPException(status_code=500, detail=f'signin_file format error. "certificate" file not found in "apikey.verify_jwt". ({signin_file})')
+                with open(yml['apikey']['verify_jwt']['certificate'], 'rb') as f:
+                    cls.verify_jwt_certificate = cls.load_pem_x509_certificate(f.read())
+                    cls.verify_jwt_publickey = cls.verify_jwt_certificate.public_key()
+                    cls.verify_jwt_publickey_str = cls.verify_jwt_publickey.public_bytes(
+                        encoding=serialization.Encoding.PEM,
+                        format=serialization.PublicFormat.SubjectPublicKeyInfo).decode('utf-8')
+            if 'issuer' not in yml['apikey']['verify_jwt']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "issuer" not found in "apikey.verify_jwt". ({signin_file})')
+            cls.verify_jwt_issuer = yml['apikey']['verify_jwt']['issuer']
+            if 'audience' not in yml['apikey']['verify_jwt']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "audience" not found in "apikey.verify_jwt". ({signin_file})')
+            cls.verify_jwt_audience = yml['apikey']['verify_jwt']['audience']
+            if 'algorithm' not in yml['apikey']['verify_jwt']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "algorithm" not found in "apikey.verify_jwt". ({signin_file})')
+            cls.verify_jwt_algorithm = yml['apikey']['verify_jwt']['algorithm']
         # oauth2のフォーマットチェック
         if 'oauth2' not in yml:
             raise HTTPException(status_code=500, detail=f'signin_file format error. "oauth2" not found. ({signin_file})')
@@ -485,7 +609,7 @@ class Signin(object):
             group_names (List[str]): グループ名リスト
             master_groups (List[Dict[str, Any]], optional): 親グループ名. Defaults to None.
         """
-        copy_signin_data = copy.deepcopy(signin_file_data)
+        copy_signin_data = copy.deepcopy(dict(groups=signin_file_data['groups']))
         master_groups = copy_signin_data['groups'] if master_groups is None else master_groups
         gns = []
         for gn in group_names.copy():
@@ -788,16 +912,12 @@ async def create_request_scope(req:Request=None, res:Response=None, websocket:We
     これは、FastAPIのDependsで使用されることを意図しています。
     次のように使用します。
 
-    Example:
+    from cmdbox.app.auth import signin
+    from fastapi import Depends, Request, Response
 
-        ::
-
-        from cmdbox.app.auth import signin
-        from fastapi import Depends, Request, Response
-
-        @app.get("/some-endpoint")
-        async def some_endpoint(req: Request, res: Response, scope=Depends(signin.create_request_scope)):
-            # 何らかの処理
+    @app.get("/some-endpoint")
+    async def some_endpoint(req: Request, res: Response, scope=Depends(signin.create_request_scope)):
+        pass
 
     Args:
         req (Request): リクエスト
@@ -818,18 +938,14 @@ def get_request_scope() -> Dict[str, Any]:
     """
     FastAPIのDepends用に、ContextVarからリクエストスコープを取得します。
 
-    Example:
-
-        ::
-
-        from cmdbox.app.auth import signin
-        from fastapi import Request, Response
-        scope = signin.get_request_scope()
-        scope['req']  # Requestオブジェクト
-        scope['res']  # Responseオブジェクト
-        scope['session']  # sessionを表す辞書
-        scope['websocket']  # WebSocket接続
-        scope['logger']  # loggerオブジェクト
+    from cmdbox.app.auth import signin
+    from fastapi import Request, Response
+    scope = signin.get_request_scope()
+    scope['req']  # Requestオブジェクト
+    scope['res']  # Responseオブジェクト
+    scope['session']  # sessionを表す辞書
+    scope['websocket']  # WebSocket接続
+    scope['logger']  # loggerオブジェクト
 
     Returns:
         Dict[str, Any]: リクエストとレスポンスとWebSocket接続

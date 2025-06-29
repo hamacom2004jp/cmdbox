@@ -15,6 +15,7 @@ python-multipart
 pycryptodome
 plyer             # For desktop notifications
 psycopg[binary]
+pyjwt
 pystray           # For system tray icon
 #pyobjus          # Mac OS only
 questionary

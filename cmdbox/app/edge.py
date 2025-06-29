@@ -450,7 +450,7 @@ class Edge(object):
 
             status, res, headers = self.site_request(self.session.post, "/dosignin/gui", data=dict(name=user, password=password), ok_status=[200, 307])
             if status != 0 or headers.get('signin') is None:
-                return 1, dict(warn=f"Signin failed.")
+                return 1, dict(warn=f"Signin failed.", headers=headers)
             status, self.user_info = self.load_user_info()
             self.user_info['auth_type'] = auth_type
             self.user_info['password'] = password

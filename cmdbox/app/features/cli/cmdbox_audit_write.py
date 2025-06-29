@@ -41,6 +41,9 @@ class AuditWrite(audit_base.AuditBase):
         opt['discription_ja'] = "監査を記録します。"
         opt['discription_en'] = "Record the audit."
         opt['choice'] += [
+            dict(opt="client_only", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
+                 discription_ja="サーバーへの接続を行わないようにします。",
+                 discription_en="Do not make connections to the server."),
             dict(opt="audit_type", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=Options.AUDITS,
                  discription_ja="監査の種類を指定します。",
                  discription_en="Specifies the audit type."),
@@ -105,6 +108,12 @@ class AuditWrite(audit_base.AuditBase):
             args.clmsg_id = str(uuid.uuid4())
         if args.clmsg_date is None:
             args.clmsg_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + common.get_tzoffset_str()
+        if hasattr(args, 'client_only') and args.client_only==True:
+            # クライアントのみの場合は、サーバーへの接続を行わない
+            logger.warning(f"client_only is True. Not connecting to server. Skip writing the audit log.")
+            ret = dict(success={k:v for k, v in vars(args).items() if v})
+            common.print_format(ret, False, tm, args.output_json, args.output_json_append, pf=pf)
+            return 0, ret, None
 
         audit_type_b64 = convert.str2b64str(args.audit_type)
         clmsg_id_b64 = convert.str2b64str(args.clmsg_id)

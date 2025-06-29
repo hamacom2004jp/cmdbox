@@ -204,13 +204,16 @@ class WebStart(feature.UnsupportEdgeFeature, agent_base.AgentBase):
         """
         logger.info(f"Agent={args.agent}")
         if args.agent=='use':
+            if not hasattr(self, 'mcp'):
+                from cmdbox.app import mcp
+                self.mcp = mcp.Mcp(logger, args.data, w.signin, self.appcls, self.ver)
             if args.agent_session_store == 'sqlite':
                 args.agent_session_dburl = "sqlite://" + pathname2url(str(w.agent_path / 'session.db'))
             elif args.agent_session_store == 'postgresql':
                 args.agent_session_dburl = f"postgresql+psycopg://{args.agent_pg_user}:{args.agent_pg_password}@{args.agent_pg_host}:{args.agent_pg_port}/{args.agent_pg_dbname}"
             else:
                 args.agent_session_dburl = None
-            return self.init_agent_runner(logger, args)
+            return self.mcp.init_agent_runner(logger, args)
         return None, None
 
     def start(self, w:web.Web, agent_runner, mcp, logger:logging.Logger, args:argparse.Namespace) -> None:

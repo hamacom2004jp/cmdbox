@@ -90,7 +90,7 @@ class CmdList(feature.OneshotResultEdgeFeature):
         if kwd is None or kwd == '':
             kwd = '*'
         if not hasattr(self, 'signin_file_data') or self.signin_file_data is None:
-            self.signin_file_data = signin.Signin.load_signin_file(args.signin_file, None)
+            self.signin_file_data = signin.Signin.load_signin_file(args.signin_file, None, self=self)
         paths = glob.glob(str(Path(args.data) / ".cmds" / f"cmd-{kwd}.json"))
         ret = [common.loadopt(path, True) for path in paths]
         ret = sorted(ret, key=lambda cmd: cmd["title"])

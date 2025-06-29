@@ -1,5 +1,4 @@
 from cmdbox.app import common, options
-from cmdbox.app.auth import signin, signin_saml
 from cmdbox.app.commons import module
 from fastapi import FastAPI, Request, Response
 from pathlib import Path
@@ -12,6 +11,7 @@ import copy
 import ctypes
 import datetime
 import gevent
+import jwt
 import logging
 import multiprocessing
 import os
@@ -120,7 +120,8 @@ class Web:
         self.cb_queue = queue.Queue(1000)
         self.options = options.Options.getInstance()
         self.webcap_client = requests.Session()
-        signin_file_data = signin.Signin.load_signin_file(self.signin_file)
+        from cmdbox.app.auth import signin, signin_saml
+        signin_file_data = signin.Signin.load_signin_file(self.signin_file, self=self)
         self.signin = signin.Signin(self.logger, self.signin_file, signin_file_data, self.appcls, self.ver)
         self.signin_saml = signin_saml.SigninSAML(self.logger, self.signin_file, signin_file_data, self.appcls, self.ver)
 
@@ -247,7 +248,25 @@ class Web:
         for u in copy.deepcopy(signin_data['users']):
             u['password'] = '********'
             if 'apikeys' in u:
-                u['apikeys'] = dict([(ak, '********') for ak in u['apikeys']])
+                for an, ak in u['apikeys'].items():
+                    exp = '-'
+                    try:
+                        cls = self.signin.__class__
+                        publickey = None
+                        if cls.verify_jwt_certificate is not None:
+                            publickey = cls.verify_jwt_certificate.public_key()
+                        if publickey is None and cls.verify_jwt_publickey is not None:
+                            publickey = cls.verify_jwt_publickey
+                        t = jwt.decode(ak, publickey, algorithms=[cls.verify_jwt_algorithm],
+                                       issuer=cls.verify_jwt_issuer, audience=cls.verify_jwt_audience,
+                                       options={'verify_iss': cls.verify_jwt_issuer is not None,
+                                                'verify_aud': cls.verify_jwt_audience is not None})
+                        exp = datetime.datetime.fromtimestamp(t['exp']).strftime('%Y-%m-%d %H:%M:%S')
+                        u['apikeys'][an] = (ak, exp, '-')
+                    except jwt.exceptions.InvalidTokenError as e:
+                        u['apikeys'][an] = (ak, '-', str(e))
+                    except Exception as e:
+                        u['apikeys'][an] = (ak, '-', '-')
             if u['name'] == name:
                 return [u]
             signin_last = self.user_data(None, u['uid'], u['name'], 'signin', 'last_update')
@@ -289,10 +308,19 @@ class Web:
                 if user['apikey_name'] in u['apikeys']:
                     raise ValueError(f"ApiKey name is already exists. ({user})")
                 apikey = common.random_string(64)
-                u['apikeys'][user['apikey_name']] = common.hash_password(apikey, 'sha1')
+                u['apikeys'][user['apikey_name']] = apikey
+                if signin_data['apikey']['gen_jwt']['enabled']:
+                    cls = self.signin.__class__
+                    claims = cls.gen_jwt_claims.copy() if cls.gen_jwt_claims is not None else dict()
+                    claims['exp'] = int(time.time()) + int(claims.get('exp', 3600))
+                    claims['uid'] = u['uid']
+                    claims['name'] = u['name']
+                    claims['groups'] = u['groups']
+                    claims['email'] = u['email']
+                    claims['apikey_name'] = user['apikey_name']
+                    apikey = jwt.encode(claims, cls.gen_jwt_privatekey, algorithm=cls.gen_jwt_algorithm)
+                    u['apikeys'][user['apikey_name']] = apikey
 
-        if self.signin_file is None:
-            raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"apikey_add: {user} -> {self.signin_file}")
         common.save_yml(self.signin_file, signin_data)
