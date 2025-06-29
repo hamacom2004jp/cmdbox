@@ -56,7 +56,7 @@ class Tool(object):
         """
         self.session = session
         self.svcert_no_verify = svcert_no_verify
-        self.endpoint = endpoint
+        self.endpoint = endpoint.rstrip('/')
         self.icon_path = icon_path
         self.user = user_info
         self.oauth2 = oauth2

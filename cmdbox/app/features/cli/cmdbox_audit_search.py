@@ -210,8 +210,6 @@ class AuditSearch(audit_base.AuditBase):
                 ret = buf.getvalue()
                 ret = ret.replace('\r\n', '\n') if ret is not None else ''
 
-        common.print_format(ret, getattr(args, 'format', False), tm, None, False, pf=pf)
-
         return 0, ret, cl
 
     def is_cluster_redirect(self):
