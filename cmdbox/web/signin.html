@@ -8,9 +8,30 @@
         cursor: pointer;
     }
     </style>
+    <script type="text/javascript">
+        const self_name = 'signin';
+        var write_script_Tag = (src, type) => {
+            const ctx_path = window.location.pathname;
+            if (ctx_path.indexOf('dosignin') >= 0) {
+                src = `../${ctx_path}`;
+            }
+            if (type === 'css') {
+                const link = document.createElement('link');
+                link.href = src;
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                document.write(link.outerHTML);
+                return;
+            }
+            const script = document.createElement('script');
+            script.src = src;
+            script.type = 'text/javascript';
+            document.write(script.outerHTML);
+        };
+    </script>
 </head>
 <body lang="ja" class="overflow-hidden p-2" style="background-color:rgb(33, 37, 41)">
-    <script type="text/javascript" src="../assets/cmdbox/svgicon.js"></script>
+    <script type="text/javascript">write_script_Tag("../assets/cmdbox/svgicon.js")</script>
     <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
         <button class="btn btn-primary py-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
             <svg class="bi my-1 theme-icon-active" width="1em" height="1em"><use href="#circle-half"></use></svg>
@@ -122,10 +143,12 @@
         document.querySelector(`body`).style.setProperty(`--bs-secondary-bg`, null);
     });
 </script>
-<link rel="stylesheet" href="../assets/bootstrap/bootstrap.min.5.3.0.css">
-<link rel="stylesheet" href="../assets/cmdbox/color_mode.css">
-<script type="text/javascript" src="../assets/bootstrap/bootstrap.bundle.min.5.3.0.js"></script>
-<script type="text/javascript" src="../assets/jquery/jquery.min.3.2.0.js"></script>
-<script type="text/javascript" src="../assets/cmdbox/common.js"></script>
-<script type="text/javascript" src="../assets/cmdbox/signin.js"></script>
+<script type="text/javascript">
+    write_script_Tag("../assets/bootstrap/bootstrap.min.5.3.0.css", "css");
+    write_script_Tag("../assets/cmdbox/color_mode.css", "css");
+    write_script_Tag("../assets/bootstrap/bootstrap.bundle.min.5.3.0.js");
+    write_script_Tag("../assets/jquery/jquery.min.3.2.0.js");
+    write_script_Tag("../assets/cmdbox/common.js");
+    write_script_Tag("../assets/cmdbox/signin.js");
+</script>
 </html>

@@ -13,6 +13,8 @@ class AzureSignin(Signin):
             #url='https://graph.microsoft.com/v1.0/me/transitiveMemberOf?$Top=999',
             headers={'Authorization': f'Bearer {data}'}
         )
+        if not user_info_resp.ok and user_info_resp.text:
+            raise requests.exceptions.HTTPError(user_info_resp.text, response=user_info_resp)
         user_info_resp.raise_for_status()
         user_info_json = user_info_resp.json()
         if isinstance(user_info_json, dict):
@@ -27,12 +29,14 @@ class AzureSignin(Signin):
                 'code': req.query_params['code'],
                 'scope': " ".join(conf['scope']),
                 'client_id': conf['client_id'],
-                #'client_secret': conf['client_secret'],
+                'client_secret': conf['client_secret'],
                 'redirect_uri': conf['redirect_uri'],
                 'grant_type': 'authorization_code'}
         query = '&'.join([f'{k}={urllib.parse.quote(v)}' for k, v in data.items()])
         # アクセストークン取得
         token_resp = requests.post(url=f'https://login.microsoftonline.com/{conf["tenant_id"]}/oauth2/v2.0/token', headers=headers, data=query)
+        if not token_resp.ok and token_resp.text:
+            raise requests.exceptions.HTTPError(token_resp.text, response=token_resp)
         token_resp.raise_for_status()
         token_json = token_resp.json()
         return token_json['access_token']

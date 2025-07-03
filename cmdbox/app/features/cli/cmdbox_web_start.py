@@ -208,7 +208,7 @@ class WebStart(feature.UnsupportEdgeFeature, agent_base.AgentBase):
                 from cmdbox.app import mcp
                 self.mcp = mcp.Mcp(logger, args.data, w.signin, self.appcls, self.ver)
             if args.agent_session_store == 'sqlite':
-                args.agent_session_dburl = "sqlite://" + pathname2url(str(w.agent_path / 'session.db'))
+                args.agent_session_dburl = "sqlite:" + pathname2url(str(w.agent_path / 'session.db'))
             elif args.agent_session_store == 'postgresql':
                 args.agent_session_dburl = f"postgresql+psycopg://{args.agent_pg_user}:{args.agent_pg_password}@{args.agent_pg_host}:{args.agent_pg_port}/{args.agent_pg_dbname}"
             else:
