@@ -29,6 +29,6 @@ class GuiStop(cmdbox_web_stop.WebStop):
             Dict[str, Any]: オプション
         """
         opt = super().get_option()
-        opt['discription_ja'] = "GUIモードを停止します。"
-        opt['discription_en'] = "Stop GUI mode."
+        opt['description_ja'] = "GUIモードを停止します。"
+        opt['description_en'] = "Stop GUI mode."
         return opt

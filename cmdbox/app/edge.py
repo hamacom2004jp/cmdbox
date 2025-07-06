@@ -94,9 +94,9 @@ class Edge(object):
             default = str(default) if isinstance(default, Path) else default
             default = str(default) if isinstance(default, bool) else default
             default = str(default) if isinstance(default, int) or isinstance(default, float) else default
-            discription_ja = r['discription_ja'] if 'discription_ja' in r else None
-            discription_en = r['discription_en'] if 'discription_en' in r else None
-            help = discription_en if language.find('Japan') < 0 and language.find('ja_JP') < 0 else discription_ja
+            description_ja = r['description_ja'] if 'description_ja' in r else None
+            description_en = r['description_en'] if 'description_en' in r else None
+            help = description_en if language.find('Japan') < 0 and language.find('ja_JP') < 0 else description_ja
             choice = r['choice'] if 'choice' in r else None
             choice = [str(c) for c in choice] if choice is not None else None
             required = r['required'] if 'required' in r else False

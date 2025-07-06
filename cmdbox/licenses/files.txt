@@ -27,11 +27,13 @@ The cloudpickle developer team	BSD License	cloudpickle	https://github.com/cloudp
 Jonathan Hartley <tartley@tartley.com>	BSD License	colorama	https://github.com/tartley/colorama	0.4.6	cmdbox\licenses\LICENSE_colorama_0_4_6_BSD_License.txt
 The cryptography developers <cryptography-dev@python.org>	Apache-2.0 OR BSD-3-Clause	cryptography	https://github.com/pyca/cryptography	45.0.4	cmdbox\licenses\LICENSE_cryptography_45_0_4_Apache-2_0_OR_BSD-3-Clause.txt
 Nir Cohen	Apache Software License	distro	https://github.com/python-distro/distro	1.9.0	cmdbox\licenses\LICENSE_distro_1_9_0_Apache_Software_License.txt
+Bob Halley <halley@dnspython.org>	ISC License (ISCL)	dnspython	https://www.dnspython.org	2.7.0	cmdbox\licenses\LICENSE_dnspython_2_7_0_ISC_License-ISCL.txt
 Marcin Kurczewski	MIT License	docstring_parser	https://github.com/rr-/docstring_parser	0.16	cmdbox\licenses\LICENSE_docstring_parser_0_16_MIT_License.txt
 David Goodger <goodger@python.org>	BSD License; GNU General Public License (GPL); Public Domain; Python Software Foundation License	docutils	https://docutils.sourceforge.io	0.21.2	cmdbox\licenses\LICENSE_docutils_0_21_2_BSD_License-GNU_General_Public_License-GPL-Public_Domain-Python_Software_Foundation_License.txt
+Joshua Tauberer	The Unlicense (Unlicense)	email_validator	https://github.com/JoshData/python-email-validator	2.2.0	cmdbox\licenses\LICENSE_email_validator_2_2_0_The_Unlicense-Unlicense.txt
 Alex Grönholm <alex.gronholm@nextday.fi>	MIT License	exceptiongroup	https://github.com/agronholm/exceptiongroup/blob/main/CHANGES.rst	1.3.0	cmdbox\licenses\LICENSE_exceptiongroup_1_3_0_MIT_License.txt
 =?utf-8?q?Sebasti=C3=A1n_Ram=C3=ADrez?= <tiangolo@gmail.com>	MIT License	fastapi	https://github.com/fastapi/fastapi	0.115.14	cmdbox\licenses\LICENSE_fastapi_0_115_14_MIT_License.txt
-Jeremiah Lowin	Apache Software License	fastmcp	https://gofastmcp.com	2.9.2	cmdbox\licenses\LICENSE_fastmcp_2_9_2_Apache_Software_License.txt
+Jeremiah Lowin	Apache Software License	fastmcp	https://gofastmcp.com	2.10.1	cmdbox\licenses\LICENSE_fastmcp_2_10_1_Apache_Software_License.txt
 UNKNOWN	The Unlicense (Unlicense)	filelock	https://github.com/tox-dev/py-filelock	3.18.0	cmdbox\licenses\LICENSE_filelock_3_18_0_The_Unlicense-Unlicense.txt
 UNKNOWN	Apache-2.0	frozenlist	https://github.com/aio-libs/frozenlist	1.7.0	cmdbox\licenses\LICENSE_frozenlist_1_7_0_Apache-2_0.txt
 UNKNOWN	BSD License	fsspec	https://github.com/fsspec/filesystem_spec	2025.5.1	cmdbox\licenses\LICENSE_fsspec_2025_5_1_BSD_License.txt
@@ -83,7 +85,7 @@ Julian Berman <Julian+jsonschema-specifications@GrayVines.com>	UNKNOWN	jsonschem
 Kang Zhang <jobo.zh@gmail.com>	MIT License	keyring	https://github.com/jaraco/keyring	25.6.0	cmdbox\licenses\LICENSE_keyring_25_6_0_MIT_License.txt
 BerriAI	MIT License	litellm	https://litellm.ai	1.73.6	cmdbox\licenses\LICENSE_litellm_1_73_6_MIT_License.txt
 Chris Sewell <chrisj_sewell@hotmail.com>	MIT License	markdown-it-py	https://github.com/executablebooks/markdown-it-py	3.0.0	cmdbox\licenses\LICENSE_markdown-it-py_3_0_0_MIT_License.txt
-Anthropic, PBC.	MIT License	mcp	https://modelcontextprotocol.io	1.9.4	cmdbox\licenses\LICENSE_mcp_1_9_4_MIT_License.txt
+Anthropic, PBC.	MIT License	mcp	https://modelcontextprotocol.io	1.10.1	cmdbox\licenses\LICENSE_mcp_1_10_1_MIT_License.txt
 Taneli Hukkinen <hukkin@users.noreply.github.com>	MIT License	mdurl	https://github.com/executablebooks/mdurl	0.1.2	cmdbox\licenses\LICENSE_mdurl_0_1_2_MIT_License.txt
 Erik Rose <erikrose@grinchcentral.com>	MIT License	more-itertools	https://github.com/more-itertools/more-itertools	10.7.0	cmdbox\licenses\LICENSE_more-itertools_10_7_0_MIT_License.txt
 Andrew Svetlov	Apache License 2.0	multidict	https://github.com/aio-libs/multidict	6.6.2	cmdbox\licenses\LICENSE_multidict_6_6_2_Apache_License_2_0.txt

@@ -23,8 +23,8 @@ class GuiStart(cmdbox_web_start.WebStart):
         """
         opt = super().get_option()
         opt['use_agent'] = False
-        opt['discription_ja'] = "GUIモードを起動します。"
-        opt['discription_en'] = "Start GUI mode."
+        opt['description_ja'] = "GUIモードを起動します。"
+        opt['description_en'] = "Start GUI mode."
         return opt
 
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:

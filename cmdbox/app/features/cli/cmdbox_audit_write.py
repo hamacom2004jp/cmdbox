@@ -38,39 +38,39 @@ class AuditWrite(audit_base.AuditBase):
             Dict[str, Any]: オプション
         """
         opt = super().get_option()
-        opt['discription_ja'] = "監査を記録します。"
-        opt['discription_en'] = "Record the audit."
+        opt['description_ja'] = "監査を記録します。"
+        opt['description_en'] = "Record the audit."
         opt['choice'] += [
             dict(opt="client_only", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
-                 discription_ja="サーバーへの接続を行わないようにします。",
-                 discription_en="Do not make connections to the server."),
+                 description_ja="サーバーへの接続を行わないようにします。",
+                 description_en="Do not make connections to the server."),
             dict(opt="audit_type", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=Options.AUDITS,
-                 discription_ja="監査の種類を指定します。",
-                 discription_en="Specifies the audit type."),
+                 description_ja="監査の種類を指定します。",
+                 description_en="Specifies the audit type."),
             dict(opt="clmsg_id", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                 discription_ja="クライアントのメッセージIDを指定します。省略した場合はuuid4で生成されます。",
-                 discription_en="Specifies the message ID of the client. If omitted, uuid4 will be generated."),
+                 description_ja="クライアントのメッセージIDを指定します。省略した場合はuuid4で生成されます。",
+                 description_en="Specifies the message ID of the client. If omitted, uuid4 will be generated."),
             dict(opt="clmsg_date", type=Options.T_DATETIME, default=None, required=False, multi=False, hide=False, choice=None,
-                 discription_ja="クライアントのメッセージ発生日時を指定します。省略した場合はサーバーの現在日時が使用されます。",
-                 discription_en="Specifies the date and time the client message occurred. If omitted, the server's current date/time is used."),
+                 description_ja="クライアントのメッセージ発生日時を指定します。省略した場合はサーバーの現在日時が使用されます。",
+                 description_en="Specifies the date and time the client message occurred. If omitted, the server's current date/time is used."),
             dict(opt="clmsg_src", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                 discription_ja="クライアントのメッセージの発生源を指定します。通常 `cmdbox.app.feature.Feature` を継承したクラス名を指定します。",
-                 discription_en="Specifies the source of client messages. Usually specifies the name of a class that extends `cmdbox.app.feature.Feature` ."),
+                 description_ja="クライアントのメッセージの発生源を指定します。通常 `cmdbox.app.feature.Feature` を継承したクラス名を指定します。",
+                 description_en="Specifies the source of client messages. Usually specifies the name of a class that extends `cmdbox.app.feature.Feature` ."),
             dict(opt="clmsg_title", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                 discription_ja="クライアントのメッセージタイトルを指定します。通常コマンドタイトルを指定します。",
-                 discription_en="Specifies the client message title. Usually specifies the command title."),
+                 description_ja="クライアントのメッセージタイトルを指定します。通常コマンドタイトルを指定します。",
+                 description_en="Specifies the client message title. Usually specifies the command title."),
             dict(opt="clmsg_user", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                 discription_ja="クライアントのメッセージを発生させたユーザーを指定します。",
-                 discription_en="SpecSpecifies the user who generated the client message."),
+                 description_ja="クライアントのメッセージを発生させたユーザーを指定します。",
+                 description_en="SpecSpecifies the user who generated the client message."),
             dict(opt="clmsg_body", type=Options.T_DICT, default=None, required=False, multi=True, hide=False, choice=None,
-                 discription_ja="クライアントのメッセージの本文を辞書形式で指定します。",
-                 discription_en="Specifies the body of the client's message in dictionary format."),
+                 description_ja="クライアントのメッセージの本文を辞書形式で指定します。",
+                 description_en="Specifies the body of the client's message in dictionary format."),
             dict(opt="clmsg_tag", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
-                 discription_ja="クライアントのメッセージのタグを指定します。後で検索しやすくするために指定します。",
-                 discription_en="Specifies the tag for the client's message. Specify to make it easier to search later."),
+                 description_ja="クライアントのメッセージのタグを指定します。後で検索しやすくするために指定します。",
+                 description_en="Specifies the tag for the client's message. Specify to make it easier to search later."),
             dict(opt="retention_period_days", type=Options.T_INT, default=365, required=False, multi=False, hide=True, choice=None, web="mask",
-                 discription_ja="監査を保存する日数を指定します。この日数より古い監査は削除します。0以下を指定すると無期限で保存されます。",
-                 discription_en="Specify the number of days to keep the audit. If the number is less than or equal to 0, the audit will be kept indefinitely."),
+                 description_ja="監査を保存する日数を指定します。この日数より古い監査は削除します。0以下を指定すると無期限で保存されます。",
+                 description_en="Specify the number of days to keep the audit. If the number is less than or equal to 0, the audit will be kept indefinitely."),
         ]
         return opt
     

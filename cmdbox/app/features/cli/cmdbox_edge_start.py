@@ -33,12 +33,12 @@ class EdgeStart(feature.UnsupportEdgeFeature):
         """
         return dict(
             use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
-            discription_ja="端末モードを起動します。",
-            discription_en="Start Edge mode.",
+            description_ja="端末モードを起動します。",
+            description_en="Start Edge mode.",
             choice=[
                 dict(opt="data", type=Options.T_FILE, default=self.default_data, required=True, multi=False, hide=True, choice=None,
-                     discription_ja=f"省略した時は f`$HONE/.{self.ver.__appid__}` を使用します。",
-                     discription_en=f"When omitted, f`$HONE/.{self.ver.__appid__}` is used."),
+                     description_ja=f"省略した時は f`$HONE/.{self.ver.__appid__}` を使用します。",
+                     description_en=f"When omitted, f`$HONE/.{self.ver.__appid__}` is used."),
             ]
         )
 

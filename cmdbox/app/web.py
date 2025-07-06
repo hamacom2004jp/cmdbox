@@ -1,6 +1,6 @@
 from cmdbox.app import common, options
 from cmdbox.app.commons import module
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, WebSocket
 from pathlib import Path
 from starlette.applications import Starlette
 from starlette.middleware.sessions import SessionMiddleware
@@ -833,6 +833,7 @@ class Web:
         else:
             app = FastAPI()
 
+        from cmdbox.app.auth import signin
         @app.middleware("http")
         async def set_context_cookie(req:Request, call_next):
             res:Response = await call_next(req)

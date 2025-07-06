@@ -110,6 +110,9 @@ class Signin(object):
             Union[None, RedirectResponse]: サインインエラーの場合はリダイレクトレスポンス
         """
         Signin._enable_cors(req, res)
+        if req is None or req.url is None:
+            logger.warning(f"Request or URL is None. req={req}, url={req.url if req else 'None'}")
+            return RedirectResponse(url='/signin?error=invalidrequest')
         if signin_file_data is None:
             return None
         if 'signin' in req.session:
@@ -162,7 +165,7 @@ class Signin(object):
         if not auth.startswith('Bearer '):
             #self.logger.warning(f"Bearer not found. headers={req.headers}")
             return RedirectResponse(url=f'/signin{req.url.path}?error=apikeyfail')
-        bearer, apikey = auth.split(' ').strip()
+        apikey = auth.replace('Bearer ', '').strip()
         if logger.level == logging.DEBUG:
             logger.debug(f"received apikey: {apikey}")
         find_user = None
@@ -181,11 +184,12 @@ class Signin(object):
                         algorithm = signin_file_data['apikey']['verify_jwt']['algorithm']
                         issuer = signin_file_data['apikey']['verify_jwt']['issuer']
                         audience = signin_file_data['apikey']['verify_jwt']['audience']
-                        claims = jwt.decode(apikey, publickey, algorithms=[algorithm],
+                        claims:Dict = jwt.decode(apikey, publickey, algorithms=[algorithm],
                                             issuer=issuer, audience=audience,
                                             options={'verify_iss': issuer is not None,
                                                      'verify_aud': audience is not None},)
-                        find_user = dict(**claims, **user)
+                        claims.update(user)
+                        find_user = claims
                         find_user['uid'] = find_user['uid'] if 'uid' in find_user else -1
                         find_user['name'] = find_user['name'] if 'name' in find_user else None
                         find_user['groups'] = find_user['groups'] if 'groups' in find_user else None

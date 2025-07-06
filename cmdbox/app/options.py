@@ -180,7 +180,7 @@ class Options:
             o = [f'-{val["short"]}'] if "short" in val else []
             o += [f'--{key}']
             language, _ = locale.getlocale()
-            opt['help'] = val['discription_en'] if language.find('Japan') < 0 and language.find('ja_JP') < 0 else val['discription_ja']
+            opt['help'] = val['description_en'] if language.find('Japan') < 0 and language.find('ja_JP') < 0 else val['description_ja']
             opt['default'] = val['default']
             if val['multi'] and val['default'] is not None:
                 raise ValueError(f'list_options: The default value must be None if multi is True. key={key}, val={val}')
@@ -256,49 +256,49 @@ class Options:
         self._options = dict()
         self._options["version"] = dict(
             short="v", type=Options.T_BOOL, default=None, required=False, multi=False, hide=True, choice=None,
-            discription_ja="バージョン表示",
-            discription_en="Display version")
+            description_ja="バージョン表示",
+            description_en="Display version")
         self._options["useopt"] = dict(
             short="u", type=Options.T_STR, default=None, required=False, multi=False, hide=True, choice=None,
-            discription_ja="オプションを保存しているファイルを使用します。",
-            discription_en="Use the file that saves the options.")
+            description_ja="オプションを保存しているファイルを使用します。",
+            description_en="Use the file that saves the options.")
         self._options["saveopt"] = dict(
             short="s", type=Options.T_BOOL, default=None, required=False, multi=False, hide=True, choice=[True, False],
-            discription_ja="指定しているオプションを `-u` で指定したファイルに保存します。",
-            discription_en="Save the specified options to the file specified by `-u`.")
+            description_ja="指定しているオプションを `-u` で指定したファイルに保存します。",
+            description_en="Save the specified options to the file specified by `-u`.")
         self._options["debug"] = dict(
             short="d", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
-            discription_ja="デバックモードで起動します。",
-            discription_en="Starts in debug mode.")
+            description_ja="デバックモードで起動します。",
+            description_en="Starts in debug mode.")
         self._options["format"] = dict(
             short="f", type=Options.T_BOOL, default=None, required=False, multi=False, hide=True,
-            discription_ja="処理結果を見やすい形式で出力します。指定しない場合json形式で出力します。",
-            discription_en="Output the processing result in an easy-to-read format. If not specified, output in json format.",
+            description_ja="処理結果を見やすい形式で出力します。指定しない場合json形式で出力します。",
+            description_en="Output the processing result in an easy-to-read format. If not specified, output in json format.",
             choice=None)
         self._options["mode"] = dict(
             short="m", type=Options.T_STR, default=None, required=True, multi=False, hide=True,
-            discription_ja="起動モードを指定します。",
-            discription_en="Specify the startup mode.",
+            description_ja="起動モードを指定します。",
+            description_en="Specify the startup mode.",
             choice=[])
         self._options["cmd"] = dict(
             short="c", type=Options.T_STR, default=None, required=True, multi=False, hide=True,
-            discription_ja="コマンドを指定します。",
-            discription_en="Specify the command.",
+            description_ja="コマンドを指定します。",
+            description_en="Specify the command.",
             choice=[])
         self._options["tag"] = dict(
             short="t", type=Options.T_STR, default=None, required=False, multi=True, hide=True,
-            discription_ja="このコマンドのタグを指定します。",
-            discription_en="Specify the tag for this command.",
+            description_ja="このコマンドのタグを指定します。",
+            description_en="Specify the tag for this command.",
             choice=None)
         self._options["clmsg_id"] = dict(
             type=Options.T_STR, default=None, required=False, multi=False, hide=True,
-            discription_ja="クライアントのメッセージIDを指定します。省略した場合はuuid4で生成されます。",
-            discription_en="Specifies the message ID of the client. If omitted, uuid4 will be generated.",
+            description_ja="クライアントのメッセージIDを指定します。省略した場合はuuid4で生成されます。",
+            description_en="Specifies the message ID of the client. If omitted, uuid4 will be generated.",
             choice=None)
         self._options["description"] = dict(
             type=Options.T_TEXT, default=None, required=False, multi=False, hide=True,
-            discription_ja="このコマンド登録の説明文を指定します。Agentがこのコマンドの用途を理解するのに使用します。",
-            discription_en="Specifies a description of this command registration, used to help the Agent understand the use of this command.",
+            description_ja="このコマンド登録の説明文を指定します。Agentがこのコマンドの用途を理解するのに使用します。",
+            description_en="Specifies a description of this command registration, used to help the Agent understand the use of this command.",
             choice=None)
 
     def init_debugoption(self):

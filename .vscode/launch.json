@@ -40,7 +40,7 @@
             "type": "python",
             "request": "launch",
             "args": ["-m","web","-c","start","--signin_file",".cmdbox/user_list.yml", "--guvicorn_workers", "20","--debug",
-            "--ssl_cert","server.cert","--ssl_key","server.key",
+            //"--ssl_cert","server.cert","--ssl_key","server.key",
             //"--client_only",
             "--agent", "use",
             "--agent_session_store", "sqlite",

@@ -94,14 +94,23 @@ users.users_list = async () => {
                 continue;
             }
             if (col == 'apikeys') {
-                const apikeys = user && user[col] && Object.keys(user[col]).length>0 ? user[col] : {'':''};
-                const apikeys_add_func = (apikey,) => {
+                const apikeys = user && user[col] && Object.keys(user[col]).length>0 ? user[col] : {};
+                const apikeys_add_func = (apikeys, apikey,) => {
                     const row = $(modal.find('.row_content_template_str').html()).appendTo(row_content);
-                    row_content.find('.row_content_template_title').removeClass('row_content_template_title').text(col);
+                    row_content.find('.row_content_template_title').removeClass('row_content_template_title').text(`${col}:${apikey}`);
                     const input = row_content.find('.row_content_template_input').removeClass('row_content_template_input');
-                    input.attr('disabled', 'disabled').val(apikey);
+                    input.attr('disabled', 'disabled').val(apikeys[apikey][1]);
+                    const btn_m = $('<button class="btn btn-secondary copy_buton" type="button"></button>').appendTo(input.parent());
+                    btn_m.append('<svg width="16" height="16" fill="currentColor" class="bi bi-copy" viewBox="0 0 16 16"><use href="#btn_copy"></use></svg>');
+                    btn_m.off('click').on('click', (event) => {
+                        navigator.clipboard.writeText(apikeys[apikey][0]).then(() => {
+                            cmdbox.message({'success': 'Key copied to clipboard.'});
+                        }).catch((err) => {
+                            cmdbox.message({'error': `Failed to copy key: ${err}`});
+                        });
+                    });
                 };
-                for (const apikey in apikeys) apikeys_add_func(apikey);
+                for (const apikey in apikeys) apikeys_add_func(apikeys, apikey);
                 continue;
             }
             const row = $(modal.find('.row_content_template_str').html()).appendTo(row_content);

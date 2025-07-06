@@ -1320,10 +1320,10 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
             const opt = arr.map(row => {
                 if (row && typeof row === 'object') {
                     key = Object.keys(row)[0];
-                    d = window.navigator.language=='ja'?row[key].discription_ja:row[key].discription_en;
-                    return `<option value="${key}" discription="${d}">${key}</option>`;
+                    d = window.navigator.language=='ja'?row[key].description_ja:row[key].description_en;
+                    return `<option value="${key}" description="${d}">${key}</option>`;
                 }
-                return `<option value="${row}" discription="">${row}</option>`;
+                return `<option value="${row}" description="">${row}</option>`;
             }).join('');
             return opt;
         }
@@ -1426,7 +1426,7 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
     }
     const title = elem.find('.row_content_template_title');
     title.html('');
-    title.attr('title', window.navigator.language=='ja'?row.discription_ja:row.discription_en)
+    title.attr('title', window.navigator.language=='ja'?row.description_ja:row.description_en)
     if (row.required) {
         title.append('<span class="text-danger" title="required">*</span>');
     }

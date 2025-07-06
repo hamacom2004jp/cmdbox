@@ -34,12 +34,12 @@ class ClientTime(feature.Feature):
         """
         return dict(
             type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
-            discription_ja="クライアント側の現在時刻を表示します。",
-            discription_en="Displays the current time at the client side.",
+            description_ja="クライアント側の現在時刻を表示します。",
+            description_en="Displays the current time at the client side.",
             choice=[
                 dict(opt="timedelta", type=Options.T_INT, default=9, required=False, multi=False, hide=False, choice=None,
-                        discription_ja="時差の時間数を指定します。",
-                        discription_en="Specify the number of hours of time difference."),
+                        description_ja="時差の時間数を指定します。",
+                        description_en="Specify the number of hours of time difference."),
             ])
 
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:

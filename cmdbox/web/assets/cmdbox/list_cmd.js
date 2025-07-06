@@ -124,10 +124,10 @@ const list_cmd_func_then = () => {
         const opt = arr.map(row => {
             if (typeof row === 'object') {
                 key = Object.keys(row)[0];
-                d = window.navigator.language=='ja'?row[key].discription_ja:row[key].discription_en;
-                return `<option value="${key}" discription="${d}">${key}</option>`;
+                d = window.navigator.language=='ja'?row[key].description_ja:row[key].description_en;
+                return `<option value="${key}" description="${d}">${key}</option>`;
             }
-            return `<option value="${row}" discription="">${row}</option>`;
+            return `<option value="${row}" description="">${row}</option>`;
         }).join('');
         return opt;
     }
@@ -143,7 +143,7 @@ const list_cmd_func_then = () => {
             const py_get_cmds = await get_cmds(mode);
             cmd_modal.find('[name="cmd"]').html(mkopt(py_get_cmds));
             const selected_mode = cmd_modal.find('[name="mode"] option:selected');
-            cmd_modal.find('.mode_label').attr('title', selected_mode.attr('discription'));
+            cmd_modal.find('.mode_label').attr('title', selected_mode.attr('description'));
             const row_content = cmd_modal.find('.row_content');
             row_content.html('');
         }
@@ -158,7 +158,7 @@ const list_cmd_func_then = () => {
             const mode = cmd_modal.find('[name="mode"]').val();
             const cmd = cmd_modal.find('[name="cmd"]').val();
             const selected_cmd = cmd_modal.find('[name="cmd"] option:selected');
-            cmd_modal.find('.cmd_label').attr('title', selected_cmd.attr('discription'));
+            cmd_modal.find('.cmd_label').attr('title', selected_cmd.attr('description'));
             const py_get_cmd_choices = await cmdbox.get_cmd_choices(mode, cmd);
             row_content.html('');
             // 表示オプションを追加

@@ -18,4 +18,5 @@ MCP stdio to transport proxy start : `cmdbox -m mcp -c proxy <Option>`
     "Option","Required","Description"
     "--mcpserver_name <name>","","Specify the name of the MCP server. If omitted, it will be `mcpserver`."
     "--mcpserver_url <url>","","Specifies the URL of the remote MCP server. If omitted, it will be `http://localhost:8081/mcpsv/mcp`."
+    "--mcpserver_apikey <apikey>","","Specify the API Key of the remote MCP server."
     "--mcpserver_transport <transport>","","Specifies the transport of the remote MCP server. If omitted, it is `streamable-http`."
