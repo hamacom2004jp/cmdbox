@@ -93,6 +93,20 @@ cmdbox.message = (res) => {
     cmdbox.hide_loading();
 };
 /**
+ * コンテキストパスを取得
+ * @returns {string} - コンテキストパス
+ */
+cmdbox.ctx_path = () => {
+    const cur_path = window.location.pathname;
+    if (cur_path.indexOf('dosignin') >= 0) {
+        return cur_path.slice(0, cur_path.indexOf('dosignin'));
+    }
+    else if (cur_path.indexOf('signin') >= 0) {
+        return cur_path.slice(0, cur_path.indexOf('signin'));
+    }
+    return '';
+}
+/**
  * コピーライト表示
  */
 cmdbox.copyright = async () => {
@@ -105,7 +119,7 @@ cmdbox.copyright = async () => {
  * @param {string} sel - セレクタ
  */
 cmdbox.appid = async (sel) => {
-    const res = await fetch('gui/appid', {method: 'GET'});
+    const res = await fetch(`${cmdbox.ctx_path()}gui/appid`, {method: 'GET'});
     if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     const appid = await res.text()
     $(sel).text(appid);
@@ -136,7 +150,7 @@ cmdbox.set_logoicon = async (sel) => {
 cmdbox.singout = (sitepath) => {
     if (confirm('Sign out ok ?')) {
         const rand = cmdbox.random_string(8);
-        location.href = `../dosignout/${sitepath}?r=${rand}`;
+        location.href = `dosignout/${sitepath}?r=${rand}`;
     }
 };
 cmdbox.editapikey = async () => {
@@ -414,7 +428,7 @@ $(()=>{
     if (window.location.search) {
         const params = new URLSearchParams(window.location.search);
         if (params.has('error') || params.has('warn')) {
-            const elem = $(`<div class="alert alert-warning alert-dismissible d-block" role="alert">`).css('z-index', '10000');
+            const elem = $(`<div class="alert alert-warning alert-dismissible d-block position-absolute start-50 translate-middle-x" role="alert">`).css('z-index', '10000');
             const msgelem = $('<div>Sign in faild: The ID or PW is incorrect or the user is not authorized.</div>').appendTo(elem);
             if (params.get('error') == 'noauth') msgelem.text('Sign in faild: No credentials are available. Please sign in.');
             if (params.get('error') == 'expirationofpassword') msgelem.text('Sign in faild: The password has expired.');

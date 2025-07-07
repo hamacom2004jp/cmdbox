@@ -11,9 +11,12 @@
     <script type="text/javascript">
         const self_name = 'signin';
         var write_script_Tag = (src, type) => {
-            const ctx_path = window.location.pathname;
-            if (ctx_path.indexOf('dosignin') >= 0) {
-                src = `../${ctx_path}`;
+            const cur_path = window.location.pathname;
+            if (cur_path.indexOf('dosignin') >= 0) {
+                src = `${cur_path.slice(0, cur_path.indexOf('dosignin'))}${src}`;
+            }
+            else if (cur_path.indexOf('signin') >= 0) {
+                src = `${cur_path.slice(0, cur_path.indexOf('signin'))}${src}`;
             }
             if (type === 'css') {
                 const link = document.createElement('link');
@@ -31,7 +34,7 @@
     </script>
 </head>
 <body lang="ja" class="overflow-hidden p-2" style="background-color:rgb(33, 37, 41)">
-    <script type="text/javascript">write_script_Tag("../assets/cmdbox/svgicon.js")</script>
+    <script type="text/javascript">write_script_Tag("assets/cmdbox/svgicon.js")</script>
     <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
         <button class="btn btn-primary py-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
             <svg class="bi my-1 theme-icon-active" width="1em" height="1em"><use href="#circle-half"></use></svg>
@@ -144,11 +147,11 @@
     });
 </script>
 <script type="text/javascript">
-    write_script_Tag("../assets/bootstrap/bootstrap.min.5.3.0.css", "css");
-    write_script_Tag("../assets/cmdbox/color_mode.css", "css");
-    write_script_Tag("../assets/bootstrap/bootstrap.bundle.min.5.3.0.js");
-    write_script_Tag("../assets/jquery/jquery.min.3.2.0.js");
-    write_script_Tag("../assets/cmdbox/common.js");
-    write_script_Tag("../assets/cmdbox/signin.js");
+    write_script_Tag("assets/bootstrap/bootstrap.min.5.3.0.css", "css");
+    write_script_Tag("assets/cmdbox/color_mode.css", "css");
+    write_script_Tag("assets/bootstrap/bootstrap.bundle.min.5.3.0.js");
+    write_script_Tag("assets/jquery/jquery.min.3.2.0.js");
+    write_script_Tag("assets/cmdbox/common.js");
+    write_script_Tag("assets/cmdbox/signin.js");
 </script>
 </html>

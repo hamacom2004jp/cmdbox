@@ -63,6 +63,10 @@ Configuration items in `user_list.yml`
         mode: server
         cmds: [list]
         rule: allow
+    - groups: [user]
+        mode: cmd
+        cmds: [list, load]
+        rule: allow
       - groups: [user, guest]
         mode: audit
         cmds: [write]

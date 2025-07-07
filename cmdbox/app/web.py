@@ -833,7 +833,6 @@ class Web:
         else:
             app = FastAPI()
 
-        from cmdbox.app.auth import signin
         @app.middleware("http")
         async def set_context_cookie(req:Request, call_next):
             res:Response = await call_next(req)

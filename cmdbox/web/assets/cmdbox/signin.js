@@ -62,19 +62,19 @@ $(() => {
     const btn_saml_azure = $('.btn-saml-azure');
     btn_google.off('click').on('click', async (event) => {
         const path = window.location.pathname.replace('/signin', '');
-        window.location.href = `../oauth2/google${path}?n=${cmdbox.random_string(8)}`;
+        window.location.href = `${ctx_path()}oauth2/google${path}?n=${cmdbox.random_string(8)}`;
     });
     btn_github.off('click').on('click', async (event) => {
         const path = window.location.pathname.replace('/signin', '');
-        window.location.href = `../oauth2/github${path}?n=${cmdbox.random_string(8)}`;
+        window.location.href = `${ctx_path()}oauth2/github${path}?n=${cmdbox.random_string(8)}`;
     });
     btn_azure.off('click').on('click', async (event) => {
         const path = window.location.pathname.replace('/signin', '');
-        window.location.href = `../oauth2/azure${path}?n=${cmdbox.random_string(8)}`;
+        window.location.href = `${ctx_path()}oauth2/azure${path}?n=${cmdbox.random_string(8)}`;
     });
     btn_saml_azure.off('click').on('click', async (event) => {
         const path = window.location.pathname.replace('/signin', '');
-        window.location.href = `../saml/azure${path}?n=${cmdbox.random_string(8)}`;
+        window.location.href = `${ctx_path()}saml/azure${path}?n=${cmdbox.random_string(8)}`;
     });
     oauth2_enabled().then((res) => {
         if (res.google) btn_google.show();
@@ -98,10 +98,20 @@ const bbforce_cmd = async () => {
     return await res.json();
 }
 const oauth2_enabled = async () => {
-    const res = await fetch('../oauth2/enabled', {method: 'GET'});
+    const res = await fetch(`${ctx_path()}oauth2/enabled`, {method: 'GET'});
     return await res.json();
 }
 const saml_enabled = async () => {
-    const res = await fetch('../saml/enabled', {method: 'GET'});
+    const res = await fetch(`${ctx_path()}saml/enabled`, {method: 'GET'});
     return await res.json();
+}
+const ctx_path = () => {
+    const cur_path = window.location.pathname;
+    if (cur_path.indexOf('dosignin') >= 0) {
+        return cur_path.slice(0, cur_path.indexOf('dosignin'));
+    }
+    else if (cur_path.indexOf('signin') >= 0) {
+        return cur_path.slice(0, cur_path.indexOf('signin'));
+    }
+    return '';
 }

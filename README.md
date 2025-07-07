@@ -375,6 +375,10 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     mode: server
     cmds: [list]
     rule: allow
+  - groups: [user]
+    mode: cmd
+    cmds: [list, load]
+    rule: allow
   - groups: [user, guest]
     mode: audit
     cmds: [write]

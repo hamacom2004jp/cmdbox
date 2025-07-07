@@ -42,7 +42,7 @@
             "args": ["-m","web","-c","start","--signin_file",".cmdbox/user_list.yml", "--guvicorn_workers", "20","--debug",
             //"--ssl_cert","server.cert","--ssl_key","server.key",
             //"--client_only",
-            "--agent", "use",
+            //"--agent", "use",
             "--agent_session_store", "sqlite",
             //"--agent_session_store", "postgresql", "--agent_pg_host", "localhost", "--agent_pg_port", "15432", "--agent_pg_user", "iinfer",
             //"--agent_pg_password", "iinfer", "--agent_pg_dbname", "iinfer",
