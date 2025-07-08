@@ -20,7 +20,7 @@ $(() => {
     const selecter_password = '.form-signin .form-signin-password';
     const selecter_remember = '.form-signin .form-signin-remember';
     const form_signin = $('.form-signin');
-    form_signin.attr('action', location.pathname.replace('/signin', '/dosignin'));
+    form_signin.attr('action', location.pathname.replace('/signin', '/dosignin').replace('/dosignin/dosignin', '/dosignin'));
     form_signin.off('submit').on('submit', (event) => {
         const remember = $(selecter_remember).prop('checked');
         if (remember) {
