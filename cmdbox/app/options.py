@@ -809,6 +809,7 @@ class Options:
         logger = self.default_logger
         clmsg_body = body.copy() if body is not None else dict()
         func_feature = None
+        audited_by = True
         for arg in list(args) + list(kwargs.values()):
             if isinstance(arg, logging.Logger): logger = arg
             elif isinstance(arg, argparse.Namespace):
@@ -842,6 +843,7 @@ class Options:
             elif isinstance(arg, feature.Feature):
                 func_feature = arg
                 opt['clmsg_src'] = func_feature.__class__.__name__
+                audited_by = arg.audited_by()
             elif isinstance(arg, Request) or isinstance(arg, WebSocket):
                 if 'signin' in arg.session and arg.session['signin'] is not None and 'name' in arg.session['signin']:
                     opt['clmsg_user'] = arg.session['signin']['name']
@@ -856,5 +858,6 @@ class Options:
             opt['clmsg_src'] = src
         if title is not None and title != "":
             opt['clmsg_title'] = title
-        audit_write_args = argparse.Namespace(**{k:common.chopdq(v) for k,v in opt.items()})
-        self.audit_write.apprun(logger, audit_write_args, tm=0.0, pf=[])
+        if audited_by:
+            audit_write_args = argparse.Namespace(**{k:common.chopdq(v) for k,v in opt.items()})
+            self.audit_write.apprun(logger, audit_write_args, tm=0.0, pf=[])

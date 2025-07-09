@@ -182,7 +182,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
             console = common.create_console(file=old_stdout)
 
             try:
-                console.log(f'EXEC  - {opt_list}\n'[:logsize])
+                common.console_log(console, f'EXEC  - {opt_list}\n'[:logsize])
                 status, ret_main, obj = cmdbox_app.main(args_list=[common.chopdq(o) for o in opt_list], file_dict=file_dict, webcall=True)
                 if isinstance(obj, server.Server):
                     cmdbox_app.sv = obj
@@ -213,7 +213,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
             except Exception as e:
                 web.logger.disabled = False # ログ出力を有効にする
                 msg = f'exec_cmd error. {traceback.format_exc()}'
-                console.log(f'EXEC  - {msg}'[:logsize])
+                common.console_log(console, f'EXEC  - {msg}'[:logsize])
                 web.logger.warning(msg)
                 output = [dict(warn=f'<pre>{html.escape(traceback.format_exc())}</pre>')]
             sys.stdout = old_stdout

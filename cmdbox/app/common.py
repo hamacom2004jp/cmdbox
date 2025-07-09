@@ -172,10 +172,22 @@ def create_console(stderr:bool=False, file=None) -> Console:
     """
     #console = Console(soft_wrap=True, height=True, highlighter=loghandler.LogLevelHighlighter(), theme=loghandler.theme,
     #                  stderr=stderr, file=file)
-    console = Console(height=True, highlighter=loghandler.LogLevelHighlighter(), theme=loghandler.theme,
-                      soft_wrap=True, stderr=stderr, file=file, log_time=True, log_path=False, log_time_format='[%Y-%m-%d %H:%M:%S]')
+    console = Console(height=False, highlighter=loghandler.LogLevelHighlighter(), theme=loghandler.theme,
+                      soft_wrap=False, stderr=stderr, file=file, log_time=True, log_path=False, log_time_format='[%Y-%m-%d %H:%M:%S]')
     #console = Console(soft_wrap=True, stderr=stderr, file=file, log_time=True, log_path=False, log_time_format='[%Y-%m-%d %H:%M:%S]')
     return console
+
+def console_log(console:Console, message:Any, **kwargs) -> None:
+    """
+    コンソールにログを出力します。
+
+    Args:
+        console (Console): コンソール
+        message (Any): 出力するメッセージ
+        **kwargs: その他のキーワード引数
+    """
+    dtstr = datetime.datetime.now().strftime('[%Y-%m-%d %H:%M:%S]')
+    console.print(f"{dtstr} {message}", highlight=True, **kwargs)
 
 def default_logger(debug:bool=False, ver=version, webcall:bool=False) -> logging.Logger:
     """

@@ -123,6 +123,15 @@ class Feature(object):
         status, res = tool.exec_cmd(opt, logger, timeout, prevres)
         yield status, res
 
+    def audited_by(self) -> bool:
+        """
+        この機能が監査ログを記録する対象かどうかを返します
+
+        Returns:
+            bool: 監査ログを記録する場合はTrue
+        """
+        return True
+
 class OneshotEdgeFeature(Feature):
     """
     一度だけ実行するエッジ機能の基底クラス

@@ -105,13 +105,13 @@ theme=Theme({
 class LogLevelHighlighter(highlighter.ReprHighlighter):
     def __init__(self):
         #self.highlights = []
-        self.highlights.append(r"(?P<log_debug>DEBUG)")
+        self.highlights.append(r"(?P<log_debug>DEBUG|EXEC)")
         self.highlights.append(r"(?P<log_info>INFO)")
         self.highlights.append(r"(?P<log_warn>WARN|WARNING|WARN|CAUTION|NOTICE|STOP|DISCONNECTED|DENY)")
         self.highlights.append(r"(?P<log_error>ERROR|ALERT|ABORT|FAILED)")
         self.highlights.append(r"(?P<log_fatal>FATAL|CRITICAL)")
         self.highlights.append(r"(?P<log_product>CMDBOX|IINFER|USOUND|GAIAN|GAIC|WITSHAPE)")
-        self.highlights.append(r"(?P<log_success>SUCCESS|OK|PASSED|DONE|COMPLETE|START|FINISH|OPEN|CONNECTED|ALLOW|EXEC)")
+        self.highlights.append(r"(?P<log_success>SUCCESS|OK|PASSED|DONE|COMPLETE|START|FINISH|OPEN|CONNECTED|ALLOW)")
         """
         self.highlights.append(r"(?P<tag_start><)(?P<tag_name>[-\w.:|]*)(?P<tag_contents>[\w\W]*)(?P<tag_end>>)")
         self.highlights.append(r'(?P<attrib_name>[\w_]{1,50})=(?P<attrib_value>"?[\w_]+"?)?')
