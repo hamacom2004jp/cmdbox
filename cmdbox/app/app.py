@@ -144,6 +144,13 @@ class CmdBoxApp:
             eloggerinittime = time.perf_counter()
             if logger.level == logging.DEBUG:
                 logger.debug(f"args.mode={args.mode}, args.cmd={args.cmd}")
+                # 警告出力時にスタックを出力する
+                #import warnings
+                #def custom_warning_handler(message, category, filename, lineno, file=None, line=None):
+                #    import traceback
+                #    print(f"Warning: {message}, Category: {category}, File: {filename}, Line: {lineno}")
+                #    traceback.print_stack()
+                #warnings.showwarning = custom_warning_handler
 
             #scmdexectime = time.perf_counter()
             feat = self.options.get_cmd_attr(args.mode, args.cmd, 'feature')

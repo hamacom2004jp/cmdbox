@@ -123,13 +123,17 @@ class Feature(object):
         status, res = tool.exec_cmd(opt, logger, timeout, prevres)
         yield status, res
 
-    def audited_by(self) -> bool:
+    def audited_by(self, logger:logging.Logger, args:argparse.Namespace) -> bool:
         """
         この機能が監査ログを記録する対象かどうかを返します
 
         Returns:
+            logger (logging.Logger): ロガー
+            args (argparse.Namespace): 引数
             bool: 監査ログを記録する場合はTrue
         """
+        if hasattr(self, 'client_only') and self.client_only:
+            return False
         return True
 
 class OneshotEdgeFeature(Feature):

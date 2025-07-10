@@ -843,7 +843,6 @@ class Options:
             elif isinstance(arg, feature.Feature):
                 func_feature = arg
                 opt['clmsg_src'] = func_feature.__class__.__name__
-                audited_by = arg.audited_by()
             elif isinstance(arg, Request) or isinstance(arg, WebSocket):
                 if 'signin' in arg.session and arg.session['signin'] is not None and 'name' in arg.session['signin']:
                     opt['clmsg_user'] = arg.session['signin']['name']
@@ -858,6 +857,6 @@ class Options:
             opt['clmsg_src'] = src
         if title is not None and title != "":
             opt['clmsg_title'] = title
-        if audited_by:
-            audit_write_args = argparse.Namespace(**{k:common.chopdq(v) for k,v in opt.items()})
+        audit_write_args = argparse.Namespace(**{k:common.chopdq(v) for k,v in opt.items()})
+        if func_feature is None or func_feature is not None and func_feature.audited_by(logger, audit_write_args):
             self.audit_write.apprun(logger, audit_write_args, tm=0.0, pf=[])

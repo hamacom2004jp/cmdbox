@@ -238,6 +238,7 @@ cmdbox.editapikey = async () => {
         }
         cmdbox.message(await res.json());
         editapikey_modal.modal('hide');
+        cmdbox.editapikey();
     });
     const delapikey_btn = $(`<button type="button" class="btn btn-warning">Del apikey</button>`).appendTo(footer);
     delapikey_btn.off('click').on('click', async (event) => {
@@ -254,6 +255,7 @@ cmdbox.editapikey = async () => {
         }
         cmdbox.message(await res.json());
         editapikey_modal.modal('hide');
+        cmdbox.editapikey();
     });
     const close_btn = $('<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>').appendTo(footer);
     editapikey_modal.appendTo('body');

@@ -217,7 +217,7 @@ class Signin(object):
                 continue
             jadge = rule['rule']
         if logger.level == logging.DEBUG:
-            logger.debug(f"rule: {req.url.path}: {jadge}")
+            logger.debug(f"path rule: {req.url.path}: {jadge}")
         if jadge == 'allow':
             res.headers['signin'] = 'success'
             return None
@@ -663,7 +663,7 @@ class Signin(object):
                 continue
             jadge = rule['rule']
         if logger.level == logging.DEBUG:
-            logger.debug(f"rule: {path}: {jadge}")
+            logger.debug(f"path rule: {path}: {jadge}")
         if jadge == 'allow':
             return None
         else:
@@ -747,7 +747,7 @@ class Signin(object):
                     continue
             jadge = rule['rule']
         if logger.level == logging.DEBUG:
-            logger.debug(f"rule: mode={mode}, cmd={cmd}: {jadge}")
+            logger.debug(f"cmd rule: mode={mode}, cmd={cmd}: {jadge}")
         return jadge == 'allow'
 
     def get_enable_modes(self, req:Request, res:Response) -> List[str]:
