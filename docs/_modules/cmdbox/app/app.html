@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.app &mdash; cmdbox 2025/06/28 documentation</title>
+  <title>cmdbox.app.app &mdash; cmdbox 2025/07/13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=90fe4c9e"></script>
+      <script src="../../../_static/documentation_options.js?v=3b03b92d"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -232,6 +232,13 @@
             <span class="n">eloggerinittime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;args.mode=</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s2">, args.cmd=</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="c1"># 警告出力時にスタックを出力する</span>
+                <span class="c1">#import warnings</span>
+                <span class="c1">#def custom_warning_handler(message, category, filename, lineno, file=None, line=None):</span>
+                <span class="c1">#    import traceback</span>
+                <span class="c1">#    print(f&quot;Warning: {message}, Category: {category}, File: {filename}, Line: {lineno}&quot;)</span>
+                <span class="c1">#    traceback.print_stack()</span>
+                <span class="c1">#warnings.showwarning = custom_warning_handler</span>
 
             <span class="c1">#scmdexectime = time.perf_counter()</span>
             <span class="n">feat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">cmd</span><span class="p">,</span> <span class="s1">&#39;feature&#39;</span><span class="p">)</span>

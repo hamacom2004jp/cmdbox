@@ -423,7 +423,7 @@ class Mcp:
             Any: ミドルウェア
         """
         from cmdbox.app.web import Web
-        from fastmcp.server.middleware import Middleware, MiddlewareContext, ListToolsResult
+        from fastmcp.server.middleware import Middleware, MiddlewareContext
         from fastmcp.tools import FunctionTool
         func_tools:List[FunctionTool] = self.create_tools(logger, args)
         options = Options.getInstance()

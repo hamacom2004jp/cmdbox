@@ -144,6 +144,12 @@ class AuditSearch(audit_base.AuditBase):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
+        if not hasattr(args, 'format') or not args.format:
+            args.format = False
+        if not hasattr(args, 'output_json') or not args.output_json:
+            args.output_json = None
+        if not hasattr(args, 'output_json_append') or not args.output_json_append:
+            args.output_json_append = False
         if args.svname is None:
             msg = dict(warn=f"Please specify the --svname option.")
             common.print_format(msg, args.format, tm, None, False, pf=pf)
