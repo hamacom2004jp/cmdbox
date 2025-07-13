@@ -37,7 +37,7 @@ class WebStop(feature.UnsupportEdgeFeature):
             description_ja="Webモードを停止します。",
             description_en="Stop Web mode.",
             choice=[
-                dict(opt="data", type=Options.T_FILE, default=self.default_data, required=False, multi=False, hide=False, choice=None,
+                dict(opt="data", type=Options.T_DIR, default=self.default_data, required=False, multi=False, hide=False, choice=None,
                      description_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
                      description_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
                 dict(opt="stdout_log", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],

@@ -25,12 +25,14 @@
             "justMyCode": false
         },
         {
-            "name": "Python: cmdbox mcp_proxy",
+            "name": "Python: cmdbox mcp_client",
             "type": "python",
             "request": "launch",
-            "args": ["-m","mcp","-c","proxy","-f", "--debug"],
-            //"module": "cmdbox",
-            "program": "cmdbox/autoload.py",
+            "args": ["-m","mcp","-c","client","-f", "--debug", "-f",
+                "--mcpserver_apikey", "-"
+            ],
+            "module": "cmdbox",
+            //"program": "cmdbox/autoload.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "justMyCode": false

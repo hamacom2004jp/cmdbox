@@ -143,11 +143,13 @@ fmodal.list_tree_server = async (current_path) => {
         opt['capture_stdout'] = true;
         opt['svpath'] = current_path;
         const res = await cmdbox.sv_exec_cmd(opt);
-        if(!res[0] || !res[0]['success']) {
+        let success = res && res['success'];
+        success = !success ? res[0] && res[0]['success'] : success;
+        if(!success) {
             cmdbox.message(res);
             return {};
         }
-        const data = Object.entries(res[0]['success']).sort();
+        const data = Object.entries(success).sort();
         const ret = {};
         for (let i = 0; i < data.length; i++) {
             const [key, value] = data[i];

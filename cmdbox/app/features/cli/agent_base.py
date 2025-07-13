@@ -60,7 +60,7 @@ class AgentBase(feature.ResultEdgeFeature):
                 dict(opt="llmprojectid", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="llmのプロバイダ接続のためのプロジェクトIDを指定します。",
                      description_en="Specify the project ID for llm's provider connection."),
-                dict(opt="llmsvaccountfile", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None,
+                dict(opt="llmsvaccountfile", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
                      description_ja="llmのプロバイダ接続のためのサービスアカウントファイルを指定します。",
                      description_en="Specifies the service account file for llm's provider connection."),
                 dict(opt="llmlocation", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,

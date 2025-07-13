@@ -8,6 +8,7 @@ from rich.logging import RichHandler
 from rich.console import Console
 from tabulate import tabulate
 from typing import List, Tuple, Dict, Any
+import argparse
 import asyncio
 import datetime
 import logging
@@ -27,6 +28,7 @@ import tempfile
 import time
 import yaml
 import sys
+import threading
 
 
 HOME_DIR = Path(os.path.expanduser("~"))
@@ -439,7 +441,7 @@ def check_fname(fname:str) -> bool:
     Returns:
         bool: Trueの場合は使えない文字が含まれている
     """
-    return re.search('[\s:\\\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]',str(fname)) is not None
+    return re.search('[\s:;\\\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]',str(fname)) is not None
 
 def mkdirs(dir_path:Path):
     """
@@ -696,28 +698,32 @@ def is_event_loop_running() -> bool:
     except RuntimeError:
         return False
 
-def exec_sync(func, *args, **kwargs) -> Any:
+def exec_sync(apprun, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]) -> Tuple[int, Dict[str, Any], Any]:
     """"
     指定された関数が非同期関数であっても同期的に実行します。
 
     Args:
-        func (function): 関数
-        args (Any): 引数
-        kwargs (Any): キーワード引数
+        apprun (function): 関数
+        logger (logging.Logger): ロガー
+        args (argparse.Namespace): コマンドライン引数
+        tm (float): 処理時間
+        pf (List[Dict[str, float]]): パフォーマンス情報
 
     Returns:
-        Any: 関数の戻り値
+        Tuple[int, Dict[str, Any], Any]: 戻り値のタプル。0は成功、1は失敗、2はキャンセル
     """
-    if inspect.iscoroutinefunction(func):
+    if inspect.iscoroutinefunction(apprun):
         if is_event_loop_running():
-            loop = asyncio.get_running_loop()
-            futuer = asyncio.run_coroutine_threadsafe(func(*args, **kwargs), loop)
-            while futuer.done() or futuer.cancelled():
-                time.sleep(0.1)
-            ret = futuer.result()
-            return ret
-        return asyncio.run(func(*args, **kwargs))
-    return func(*args, **kwargs)
+            def _run(apprun, ctx, logger, args, tm, pf):
+                ctx.append(asyncio.run(apprun(logger, args, tm, pf)))
+            ctx = []
+            th = threading.Thread(target=_run, args=(apprun, ctx, logger, args, tm, pf))
+            th.start()
+            th.join()
+            result = ctx[0] if ctx else None
+            return 0, result, None
+        return asyncio.run(apprun(logger, args, tm, pf))
+    return apprun(logger, args, tm, pf)
 
 def get_tzoffset_str() -> str:
     """
