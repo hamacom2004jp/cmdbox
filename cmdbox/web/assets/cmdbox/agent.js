@@ -253,6 +253,7 @@ agent.create_history = (histories, session_id, msg) => {
         e.preventDefault();
         e.stopPropagation();
         agent.delete_session(session_id).then((res) => {
+            const messages = $('#messages');
             if (res['success']) {
                 history.remove();
                 const sid = messages.attr('data-session_id');

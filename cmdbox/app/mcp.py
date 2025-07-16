@@ -35,11 +35,12 @@ class Mcp:
         self.ver = ver
         self.signin = sign
 
-    def create_mcpserver(self, args:argparse.Namespace, tools:List[Any], web:Any) -> Any:
+    def create_mcpserver(self, logger:logging.Logger, args:argparse.Namespace, tools:List[Any], web:Any) -> Any:
         """
         mcpserverを作成します
 
         Args:
+            logger (logging.Logger): ロガー
             args (argparse.Namespace): 引数
             tools (List[Any]): ツールのリスト
             web (Any): Web関連のオブジェクト
@@ -60,13 +61,85 @@ class Mcp:
                 issuer=issuer,
                 audience=audience
             )
-            mcp = FastMCP(name=self.ver.__appid__, tools=tools, auth=auth)
+            mcp = FastMCP(name=self.ver.__appid__, auth=auth)
         else:
             self.logger.info(f"Using BearerAuthProvider without public key, issuer, or audience.")
-            mcp = FastMCP(name=self.ver.__appid__, tools=tools)
+            mcp = FastMCP(name=self.ver.__appid__)
         mcp.add_middleware(self.create_mw_logging(self.logger, args))
         mcp.add_middleware(self.create_mw_reqscope(self.logger, args, web))
-        mcp.add_middleware(self.create_mw_toollist(self.logger, args))
+
+        options = Options.getInstance()
+        cmd_list:feature.Feature = options.get_cmd_attr('cmd', 'list', "feature")
+        language, _ = locale.getlocale()
+        is_japan = language.find('Japan') >= 0 or language.find('ja_JP') >= 0
+        _self_mcp = self
+        from cmdbox.app.web import Web
+        from fastmcp.tools import tool, tool_manager
+        class CustomToolManager(tool_manager.ToolManager):
+            async def _load_tools(self, *, via_server: bool = False) -> dict[str, tool.Tool]:
+                if hasattr(self, '_tools') and self._tools:
+                    return self._tools
+                ret = await super()._load_tools(via_server=via_server)
+                #scope = signin.get_request_scope()
+                #web:Web = scope["web"]
+                signin_file = web.signin_file
+                #signin_data = signin.Signin.load_signin_file(signin_file)
+                #if signin.Signin._check_signin(scope["req"], scope["res"], signin_data, logger) is not None:
+                #    logger.warning("Unable to execute command because authentication information cannot be obtained")
+                #    raise Exception("Unable to execute command because authentication information cannot be obtained")
+                #groups = scope["req"].session["signin"]["groups"]
+                ret_tools = dict()
+                # システムコマンドリストのフィルタリング
+                for func in tools:
+                    mode = [t.replace('mode=', '') for t in func.tags if t.startswith('mode=')]
+                    mode = mode[0] if mode else None
+                    cmd = [t.replace('cmd=', '') for t in func.tags if t.startswith('cmd=')]
+                    cmd = cmd[0] if cmd else None
+                    if mode is None or cmd is None:
+                        logger.warning(f"Tool {func.name} does not have mode or cmd tag, skipping.")
+                        continue
+                    #if not signin.Signin._check_cmd(signin_data, groups, mode, cmd, logger):
+                    #    logger.warning(f"User does not have permission to use tool {func.name} (mode={mode}, cmd={cmd}), skipping.")
+                    #    continue
+                    ret_tools[func.name] = func
+                #　ユーザーコマンドリストの取得(すべてのコマンドを取得するためにgroupsをadminに設定)
+                args = argparse.Namespace(data=web.data, signin_file=signin_file, groups=['admin'], kwd=None,
+                                          format=False, output_json=None, output_json_append=False,)
+                st, ret, _ = cmd_list.apprun(logger, args, time.perf_counter(), [])
+                if ret is None or 'success' not in ret or not ret['success']:
+                    return ret_tools
+                for opt in ret['success']:
+                    func_name = opt['title']
+                    mode, cmd, description = opt['mode'], opt['cmd'], opt['description'] if 'description' in opt and opt['description'] else ''
+                    choices = options.get_cmd_choices(mode, cmd, False)
+                    description += '\n' + options.get_cmd_attr(mode, cmd, 'description_ja' if is_japan else 'description_en')
+                    # 関数の定義を生成
+                    func_txt  = _self_mcp._create_func_txt(func_name, mode, cmd, is_japan, options, title=opt['title'])
+                    if logger.level == logging.DEBUG:
+                        logger.debug(f"generating agent tool: {func_name}")
+                    func_ctx = []
+                    # 関数を実行してコンテキストに追加
+                    exec(func_txt,
+                        dict(time=time,List=List, Path=Path, argparse=argparse, common=common, options=options, logging=logging, signin=signin,),
+                        dict(func_ctx=func_ctx))
+                    # 関数のスキーマを生成
+                    input_schema = dict(
+                        type="object",
+                        properties={o['opt']: _self_mcp._to_schema(o, is_japan) for o in choices},
+                        required=[],
+                    )
+                    output_schema = dict(type="object", properties=dict())
+                    func_tool = tool.FunctionTool(fn=func_ctx[0], name=func_name, title=func_name.title(), description=description, 
+                                                   tags=[f"mode={mode}", f"cmd={cmd}"],
+                                                   parameters=input_schema, output_schema=output_schema,)
+                    # ツールリストに追加
+                    ret_tools[func_name] = func_tool
+                self._tools = ret_tools
+                return ret_tools
+        mcp._tool_manager = CustomToolManager(
+            duplicate_behavior=mcp._tool_manager.duplicate_behavior,
+            mask_error_details=mcp._tool_manager.mask_error_details
+        )
         return mcp
 
     def create_session_service(self, args:argparse.Namespace) -> Any:
@@ -335,6 +408,8 @@ class Mcp:
         func_txt += f'        opt_path = opt["data"] / ".cmds" / f"cmd-{title}.json"\n'
         func_txt += f'        opt.update(common.loadopt(opt_path))\n'
         func_txt += f'    scope = signin.get_request_scope()\n'
+        func_txt += f'    if logger.level == logging.DEBUG:\n'
+        func_txt +=  '        logger.debug(f"MCP Call scope={scope}")\n'
         func_txt += f'    opt["mode"] = "{mode}"\n'
         func_txt += f'    opt["cmd"] = "{cmd}"\n'
         func_txt += f'    opt["format"] = False\n'
@@ -356,6 +431,8 @@ class Mcp:
         func_txt += f'    feat = options.get_cmd_attr("{mode}", "{cmd}", "feature")\n'
         func_txt += f'    args.groups = groups\n'
         func_txt += f'    try:\n'
+        func_txt += f'        if logger.level == logging.DEBUG:\n'
+        func_txt +=  '            logger.debug(f"MCP Call {feat}#apprun, args={args}")\n'
         func_txt += f'        st, ret, _ = feat.apprun(logger, args, time.perf_counter(), [])\n'
         func_txt += f'        return ret\n'
         func_txt += f'    except Exception as e:\n'
@@ -410,87 +487,6 @@ class Mcp:
                 # ツールリストに追加
                 func_tools.append(func_tool)
         return func_tools
-
-    def create_mw_toollist(self, logger:logging.Logger, args:argparse.Namespace) -> Any:
-        """
-        ツールリストを作成するミドルウェアを作成します
-
-        Args:
-            logger (logging.Logger): ロガー
-            args (argparse.Namespace): 引数
-
-        Returns:
-            Any: ミドルウェア
-        """
-        from cmdbox.app.web import Web
-        from fastmcp.server.middleware import Middleware, MiddlewareContext
-        from fastmcp.tools import FunctionTool
-        func_tools:List[FunctionTool] = self.create_tools(logger, args)
-        options = Options.getInstance()
-        cmd_list:feature.Feature = options.get_cmd_attr('cmd', 'list', "feature")
-        language, _ = locale.getlocale()
-        is_japan = language.find('Japan') >= 0 or language.find('ja_JP') >= 0
-        mcp = self
-        class CommandListMiddleware(Middleware):
-            async def on_list_tools(self, context: MiddlewareContext, call_next):
-                # 認証情報の取得
-                scope = signin.get_request_scope()
-                web:Web = scope["web"]
-                signin_file = web.signin_file
-                signin_data = signin.Signin.load_signin_file(signin_file)
-                if signin.Signin._check_signin(scope["req"], scope["res"], signin_data, logger) is not None:
-                    logger.warning("Unable to execute command because authentication information cannot be obtained")
-                    return dict(warn="Unable to execute command because authentication information cannot be obtained")
-                groups = scope["req"].session["signin"]["groups"]
-                ret_tools = []
-                # システムコマンドリストのフィルタリング
-                for func in func_tools:
-                    mode = [t.replace('mode=', '') for t in func.tags if t.startswith('mode=')]
-                    mode = mode[0] if mode else None
-                    cmd = [t.replace('cmd=', '') for t in func.tags if t.startswith('cmd=')]
-                    cmd = cmd[0] if cmd else None
-                    if mode is None or cmd is None:
-                        logger.warning(f"Tool {func.name} does not have mode or cmd tag, skipping.")
-                        continue
-                    if not signin.Signin._check_cmd(signin_data, groups, mode, cmd, logger):
-                        logger.warning(f"User does not have permission to use tool {func.name} (mode={mode}, cmd={cmd}), skipping.")
-                        continue
-                    ret_tools.append(func)
-                #　ユーザーコマンドリストの取得
-                args = argparse.Namespace(data=web.data, signin_file=signin_file, groups=groups, kwd=None,
-                                          format=False, output_json=None, output_json_append=False,)
-                st, ret, _ = cmd_list.apprun(logger, args, time.perf_counter(), [])
-                if ret is None or 'success' not in ret or not ret['success']:
-                    return ret_tools
-                for opt in ret['success']:
-                    func_name = f"user_{opt['title']}"
-                    mode, cmd, description = opt['mode'], opt['cmd'], opt['description'] if 'description' in opt and opt['description'] else ''
-                    choices = options.get_cmd_choices(mode, cmd, False)
-                    description += '\n' + options.get_cmd_attr(mode, cmd, 'description_ja' if is_japan else 'description_en')
-                    # 関数の定義を生成
-                    func_txt  = mcp._create_func_txt(func_name, mode, cmd, is_japan, options, title=opt['title'])
-                    if logger.level == logging.DEBUG:
-                        logger.debug(f"generating agent tool: {func_name}")
-                    func_ctx = []
-                    # 関数を実行してコンテキストに追加
-                    exec(func_txt,
-                        dict(time=time,List=List, Path=Path, argparse=argparse, common=common, options=options, logging=logging, signin=signin,),
-                        dict(func_ctx=func_ctx))
-                    # 関数のスキーマを生成
-                    input_schema = dict(
-                        type="object",
-                        properties={o['opt']: mcp._to_schema(o, is_japan) for o in choices},
-                        required=[],
-                    )
-                    output_schema = dict(type="object", properties=dict())
-                    func_tool = FunctionTool(fn=func_ctx[0], name=func_name, title=func_name.title(), description=description, 
-                                            tags=[f"mode={mode}", f"cmd={cmd}"],
-                                            parameters=input_schema, output_schema=output_schema,)
-                    # ツールリストに追加
-                    ret_tools.append(func_tool)
-
-                return ret_tools
-        return CommandListMiddleware()
 
     def create_mw_logging(self, logger:logging.Logger, args:argparse.Namespace) -> Any:
         """
@@ -563,7 +559,7 @@ class Mcp:
         session_service:BaseSessionService = self.create_session_service(args)
         from fastmcp.tools import FunctionTool
         tools:List[FunctionTool] = self.create_tools(logger, args)
-        mcp:FastMCP = self.create_mcpserver(args, tools, web)
+        mcp:FastMCP = self.create_mcpserver(logger, args, tools, web)
         root_agent = self.create_agent(logger, args, [t.fn for t in tools])
         runner = self.create_runner(logger, args, session_service, root_agent)
         if logger.level == logging.DEBUG:

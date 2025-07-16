@@ -931,7 +931,8 @@ async def create_request_scope(req:Request=None, res:Response=None, websocket:We
     sess = None
     if req is not None:
         sess = req.session if hasattr(req, 'session') else None
-    request_scope.set(dict(req=req, res=res, websocket=websocket))
+    from cmdbox.app.web import Web
+    request_scope.set(dict(req=req, res=res, websocket=websocket, web=Web.getInstance()))
     try:
         yield # リクエストの処理
     finally:
@@ -954,4 +955,4 @@ def get_request_scope() -> Dict[str, Any]:
     Returns:
         Dict[str, Any]: リクエストとレスポンスとWebSocket接続
     """
-    return request_scope.get() if request_scope.get() is not None else dict(req=None, res=None, session=None, websocket=None)
+    return request_scope.get() if request_scope.get() is not None else dict(req=None, res=None, session=None, websocket=None, web=None)

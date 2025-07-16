@@ -27,6 +27,21 @@ import webbrowser
 
 
 class Web:
+    @classmethod
+    def getInstance(cls, *args, **kwargs) -> 'Web':
+        """
+        Webクラスのインスタンスを取得する
+        Args:
+            *args: 可変長引数
+            **kwargs: キーワード引数
+
+        Returns:
+            Web: Webクラスのインスタンス
+        """
+        if not hasattr(cls, '_instance'):
+            cls._instance = cls(*args, **kwargs)
+        return cls._instance
+
     def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None,
                  redis_host:str="localhost", redis_port:int=6379, redis_password:str=None, svname:str='server',
                  client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None, result_html:str=None, users_html:str=None,
