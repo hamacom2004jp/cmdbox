@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( client mode ) &mdash; cmdbox 2025/07/13 documentation</title>
+  <title>Command Reference ( client mode ) &mdash; cmdbox 2025/07/20 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=3b03b92d"></script>
+      <script src="../_static/documentation_options.js?v=a1ab438b"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -59,6 +59,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#client-delete-folder-cmdbox-m-client-c-file-rmdir-option">client ( Delete Folder ) : <cite>cmdbox -m client -c file_rmdir &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#client-upload-file-cmdbox-m-client-c-file-upload-option">client ( Upload File ) : <cite>cmdbox -m client -c file_upload &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#client-server-info-cmdbox-m-client-c-server-info-option">client ( Server Info ) : <cite>cmdbox -m client -c server_info &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-http-cmdbox-m-client-c-http-option">client ( Http ) : <cite>cmdbox -m client -c http &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
@@ -683,6 +684,67 @@
 <tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="client-http-cmdbox-m-client-c-http-option">
+<h2>client ( Http ) : <cite>cmdbox -m client -c http &lt;Option&gt;</cite><a class="headerlink" href="#client-http-cmdbox-m-client-c-http-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Retrieve server information.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--url &lt;url&gt;</p></td>
+<td></td>
+<td><p>Specify the URL to request.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--proxy &lt;yes|no&gt;</p></td>
+<td></td>
+<td><p>Specifies whether or not to send the received request parameters to the destination URL when invoked in web mode.</p></td>
+</tr>
+<tr class="row-even"><td><p>--send_method &lt;method&gt;</p></td>
+<td></td>
+<td><p>Specifies the request method.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--send_content_type &lt;content_type&gt;</p></td>
+<td></td>
+<td><p>Specifies the Content-Type of the data to be sent.</p></td>
+</tr>
+<tr class="row-even"><td><p>--send_apikey &lt;apikey&gt;</p></td>
+<td></td>
+<td><p>Specify the API key to be used for authentication of the request destination.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--send_header &lt;header&gt;</p></td>
+<td></td>
+<td><p>Specifies the request header.</p></td>
+</tr>
+<tr class="row-even"><td><p>--send_param &lt;param&gt;</p></td>
+<td></td>
+<td><p>Specifies parameters to be sent.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--send_data &lt;data&gt;</p></td>
+<td></td>
+<td><p>Specifies the data to be sent.</p></td>
+</tr>
+<tr class="row-even"><td><p>--send_verify</p></td>
+<td></td>
+<td><p>Specifies the timeout before a response is received.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--send_timeout &lt;time-out&gt;</p></td>
+<td></td>
+<td><p>Specifies the timeout before a response is received.</p></td>
 </tr>
 </tbody>
 </table>

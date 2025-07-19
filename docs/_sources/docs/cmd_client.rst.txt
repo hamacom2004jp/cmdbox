@@ -207,3 +207,24 @@ client ( Server Info ) : `cmdbox -m client -c server_info <Option>`
     "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
     "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+client ( Http ) : `cmdbox -m client -c http <Option>`
+========================================================================================
+
+- Retrieve server information.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--url <url>","","Specify the URL to request."
+    "--proxy <yes|no>","","Specifies whether or not to send the received request parameters to the destination URL when invoked in web mode."
+    "--send_method <method>","","Specifies the request method."
+    "--send_content_type <content_type>","","Specifies the Content-Type of the data to be sent."
+    "--send_apikey <apikey>","","Specify the API key to be used for authentication of the request destination."
+    "--send_header <header>","","Specifies the request header."
+    "--send_param <param>","","Specifies parameters to be sent."
+    "--send_data <data>","","Specifies the data to be sent."
+    "--send_verify","","Specifies the timeout before a response is received."
+    "--send_timeout <time-out>","","Specifies the timeout before a response is received."

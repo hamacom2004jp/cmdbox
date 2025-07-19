@@ -43,6 +43,9 @@ agentrule:                              # Specifies a list of rules that determi
   - mode: cmd                           # Specify the "mode" as the condition for applying the rule.
     cmds: [list, load]                  # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
     rule: allow                         # Specifies whether the specified command is allowed or not. Values are allow or deny.
+  - mode: client
+    cmds: [http]
+    rule: allow
 audit:
   enabled: true                         # Specify whether to enable the audit function.
   write:

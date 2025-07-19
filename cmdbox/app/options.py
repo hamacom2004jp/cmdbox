@@ -389,7 +389,8 @@ class Options:
             features_yml = Path(ver.__file__).parent / 'extensions' / 'features.yml'
         #if not features_yml.exists() or not features_yml.is_file():
         #    features_yml = Path('.samples/features.yml')
-        logger.info(f"load features.yml: {features_yml}, is_file={features_yml.is_file()}")
+        if logger.level == logging.DEBUG:
+            logger.debug(f"load features.yml: {features_yml}, is_file={features_yml.is_file()}")
         if features_yml.exists() and features_yml.is_file():
             if self.features_yml_data is None:
                 self.features_yml_data = yml = common.load_yml(features_yml)

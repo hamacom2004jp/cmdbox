@@ -13,6 +13,7 @@ import asyncio
 import datetime
 import logging
 import logging.config
+import locale
 import hashlib
 import inspect
 import json
@@ -498,19 +499,23 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
     Returns:
         str: 生成された文字列
     """
-    if type(data) is dict and "success" in data and type(data["success"]) is dict and "performance" in data["success"] and type(data["success"]["performance"]) is list and pf is not None:
+    is_data_dict = isinstance(data, dict)
+    in_data_success = is_data_dict and 'success' in data
+    is_success_dict = in_data_success and isinstance(data['success'], dict)
+    is_data_list = isinstance(data, list)
+    if is_success_dict and "performance" in data["success"] and isinstance(data["success"]["performance"], list) and pf is not None:
         data["success"]["performance"] += pf
     txt = ''
     if format:
-        if 'success' in data and type(data["success"]) is dict:
-            data = data['success']['data'] if 'data' in data['success'] else data['success']
-            if type(data) == list:
-                txt = tabulate(data, headers='keys', tablefmt=tablefmt)
-            elif type(data) == dict:
-                txt = tabulate([data], headers='keys', tablefmt=tablefmt)
+        if is_success_dict:
+            _data = data['success']['data'] if 'data' in data['success'] else data['success']
+            if isinstance(_data, list):
+                txt = tabulate(_data, headers='keys', tablefmt=tablefmt)
+            elif isinstance(_data, dict):
+                txt = tabulate([_data], headers='keys', tablefmt=tablefmt)
             else:
-                txt = str(data)
-        elif type(data) == list:
+                txt = str(_data)
+        elif is_data_list:
             txt = tabulate(data, headers='keys', tablefmt=tablefmt)
         else:
             txt = tabulate([data], headers='keys', tablefmt=tablefmt)
@@ -521,13 +526,13 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
             except BrokenPipeError:
                 pass
     else:
-        if 'success' in data and type(data['success']) is dict:
+        if is_success_dict:
             if "performance" not in data["success"]:
                 data["success"]["performance"] = []
             performance = data["success"]["performance"]
             performance.append(dict(key="app_proc", val=f"{time.perf_counter() - tm:.03f}s"))
         try:
-            if type(data) == dict:
+            if is_data_dict:
                 txt = json.dumps(data, default=default_json_enc, ensure_ascii=False)
             else:
                 txt = data
@@ -685,6 +690,17 @@ def chopdq(target:str):
         return target
     return target[1:-1] if target.startswith('"') and target.endswith('"') else target
 
+def is_japan() -> bool:
+    """
+    日本語環境かどうかを判定します
+
+    Returns:
+        bool: 日本語環境ならTrue、そうでなければFalse
+    """
+    language, _ = locale.getlocale()
+    is_japan = language.find('Japan') >= 0 or language.find('ja_JP') >= 0
+    return is_japan
+
 def is_event_loop_running() -> bool:
     """
     イベントループが実行中かどうかを取得します。
@@ -721,7 +737,7 @@ def exec_sync(apprun, logger:logging.Logger, args:argparse.Namespace, tm:float, 
             th.start()
             th.join()
             result = ctx[0] if ctx else None
-            return 0, result, None
+            return result
         return asyncio.run(apprun(logger, args, tm, pf))
     return apprun(logger, args, tm, pf)
 

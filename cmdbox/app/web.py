@@ -289,7 +289,7 @@ class Web:
             pass_miss_count = self.user_data(None, u['uid'], u['name'], 'password', 'pass_miss_count')
             pass_miss_last = self.user_data(None, u['uid'], u['name'], 'password', 'pass_miss_last')
 
-            if name is None:
+            if name is None or name == '':
                 ret.append({**u, **dict(last_signin=signin_last, pass_last_update=pass_last_update,
                                 pass_miss_count=pass_miss_count, pass_miss_last=pass_miss_last)})
         return ret
@@ -530,7 +530,7 @@ class Web:
         signin_data = self.signin.get_data()
         if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
-        if name is None:
+        if name is None or name == '':
             return copy.deepcopy(signin_data['groups'])
         for g in copy.deepcopy(signin_data['groups']):
             if g['name'] == name:

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.options &mdash; cmdbox 2025/07/13 documentation</title>
+  <title>cmdbox.app.options &mdash; cmdbox 2025/07/20 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=3b03b92d"></script>
+      <script src="../../../_static/documentation_options.js?v=a1ab438b"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -516,7 +516,8 @@
             <span class="n">features_yml</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ver</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;extensions&#39;</span> <span class="o">/</span> <span class="s1">&#39;features.yml&#39;</span>
         <span class="c1">#if not features_yml.exists() or not features_yml.is_file():</span>
         <span class="c1">#    features_yml = Path(&#39;.samples/features.yml&#39;)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;load features.yml: </span><span class="si">{</span><span class="n">features_yml</span><span class="si">}</span><span class="s2">, is_file=</span><span class="si">{</span><span class="n">features_yml</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;load features.yml: </span><span class="si">{</span><span class="n">features_yml</span><span class="si">}</span><span class="s2">, is_file=</span><span class="si">{</span><span class="n">features_yml</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">features_yml</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">features_yml</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_yml_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">features_yml_data</span> <span class="o">=</span> <span class="n">yml</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">load_yml</span><span class="p">(</span><span class="n">features_yml</span><span class="p">)</span>
