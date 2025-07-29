@@ -3,9 +3,8 @@ from cmdbox.app import feature, options
 from cmdbox.app.commons import convert, module, loghandler
 from cryptography.fernet import Fernet
 from pathlib import Path
-from pkg_resources import resource_string
-from rich.logging import RichHandler
 from rich.console import Console
+from rich.logging import RichHandler
 from tabulate import tabulate
 from typing import List, Tuple, Dict, Any
 import argparse
@@ -133,10 +132,11 @@ def reset_logger(name:str, stderr:bool=False, fmt:str='[%(asctime)s] %(levelname
         level (int, optional): ログレベル. Defaults to logging.INFO.
     """
     logger = logging.getLogger(name)
+    #colorful = [h for h in logger.handlers if isinstance(h, loghandler.ColorfulStreamHandler) or isinstance(h, RichHandler)]
     logger.handlers.clear()
     logger.propagate = False
     logger.setLevel(level)
-    logger.addHandler(create_log_handler(stderr, fmt, datefmt, level))
+    logger.addHandler(create_log_handler(stderr, fmt, datefmt, level, colorful=True))
     if get_common_value('webcall', False):
         # webcallの場合はStreamHandlerを削除
         for handler in logger.handlers:
@@ -144,7 +144,7 @@ def reset_logger(name:str, stderr:bool=False, fmt:str='[%(asctime)s] %(levelname
             if issubclass(hc, logging.StreamHandler) and not issubclass(hc, logging.FileHandler):
                 logger.removeHandler(handler)
 
-def create_log_handler(stderr:bool=False, fmt:str='[%(asctime)s] %(levelname)s - %(message)s', datefmt:str='%Y-%m-%d %H:%M:%S', level:int=logging.INFO) -> logging.Handler:
+def create_log_handler(stderr:bool=False, fmt:str='[%(asctime)s] %(levelname)s - %(message)s', datefmt:str='%Y-%m-%d %H:%M:%S', level:int=logging.INFO, colorful:bool=True) -> logging.Handler:
     """
     ログハンドラを生成します。
 
@@ -152,13 +152,18 @@ def create_log_handler(stderr:bool=False, fmt:str='[%(asctime)s] %(levelname)s -
         stderr (bool, optional): 標準エラー出力を使用するかどうか. Defaults to False.
         fmt (str, optional): ログフォーマット. Defaults to '[%(asctime)s] %(levelname)s - %(message)s'.
         datefmt (str, optional): 日時フォーマット. Defaults to '%Y-%m-%d %H:%M:%S'.
+        level (int, optional): ログレベル. Defaults to logging.INFO.
+        colorful (bool, optional): カラフルなログを使用するかどうか. Defaults to True.
     Returns:
         logging.Handler: ログハンドラ
     """
     formatter = logging.Formatter(fmt, datefmt)
     #handler = RichHandler(console=Console(stderr=stderr), show_path=False, omit_repeated_times=False,
     #                      tracebacks_word_wrap=False, log_time_format='[%Y-%m-%d %H:%M]')
-    handler = loghandler.ColorfulStreamHandler(sys.stdout if not stderr else sys.stderr)
+    if colorful:
+        handler = loghandler.ColorfulStreamHandler(sys.stdout if not stderr else sys.stderr)
+    else:
+        handler = logging.StreamHandler(sys.stdout if not stderr else sys.stderr)
     handler.setFormatter(formatter)
     handler.setLevel(level)
     return handler
@@ -180,7 +185,7 @@ def create_console(stderr:bool=False, file=None) -> Console:
     #console = Console(soft_wrap=True, stderr=stderr, file=file, log_time=True, log_path=False, log_time_format='[%Y-%m-%d %H:%M:%S]')
     return console
 
-def console_log(console:Console, message:Any, **kwargs) -> None:
+def console_log(console:Console, message:Any, highlight:bool=True, **kwargs) -> None:
     """
     コンソールにログを出力します。
 
@@ -190,7 +195,7 @@ def console_log(console:Console, message:Any, **kwargs) -> None:
         **kwargs: その他のキーワード引数
     """
     dtstr = datetime.datetime.now().strftime('[%Y-%m-%d %H:%M:%S]')
-    console.print(f"{dtstr} {message}", highlight=True, **kwargs)
+    console.print(f"{dtstr} {message}", highlight=highlight, **kwargs)
 
 def default_logger(debug:bool=False, ver=version, webcall:bool=False) -> logging.Logger:
     """
@@ -269,8 +274,7 @@ def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, v
     logging.config.dictConfig(log_config)
     logger = logging.getLogger(log_name)
     set_debug(logger, debug)
-    config = yaml.safe_load(resource_string(version.__appid__, "config.yml"))
-    return logger, config
+    return logger, {}
 
 def set_debug(logger:logging.Logger, debug:bool=False) -> None:
     """
