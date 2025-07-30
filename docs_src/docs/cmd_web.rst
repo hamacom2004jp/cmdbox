@@ -6,6 +6,34 @@ Command Reference ( web mode )
 
 - List of web mode commands.
 
+API Key generation : `cmdbox -m web -c apikey_add <Option>`
+=================================================================================
+
+- Add an ApiKey for a user in Web mode.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--user_name <name>","","Specify the target user name."
+    "--apikey_name <name>","","Specify the ApiKey name for this user."
+    "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."
+
+API Key destroy : `cmdbox -m web -c apikey_del <Option>`
+=================================================================================
+
+- Del an ApiKey for a user in Web mode.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--user_name <name>","","Specify the target user name."
+    "--apikey_name <name>","","Specify the ApiKey name for this user."
+    "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."
+
 Self-signed server certificate generation : `cmdbox -m web -c gencert <Option>`
 =================================================================================
 
@@ -52,11 +80,6 @@ Add Group : `cmdbox -m web -c group_add <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
     "--group_id <Group ID>","required","Specify the group ID. Do not duplicate other groups."
     "--group_name <Group Name>","required","Specify a group name. Do not duplicate other groups."
     "--group_parent <parent group name>","","Specifies the parent group name."
@@ -72,11 +95,6 @@ Delete Group : `cmdbox -m web -c group_del <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
     "--group_id <Group ID>","required","Specify the group ID. Do not duplicate other groups."
     "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."
 
@@ -90,11 +108,6 @@ Edit Group : `cmdbox -m web -c group_edit <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
     "--group_id <Group ID>","required","Specify the group ID. Do not duplicate other groups."
     "--group_name <Group Name>","required","Specify a group name. Do not duplicate other groups."
     "--group_parent <parent group name>","","Specifies the parent group name."
@@ -110,11 +123,6 @@ List Group : `cmdbox -m web -c group_list <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
     "--group_name <Group Name>","","Retrieved by specifying a group name. If omitted, all groups are retrieved."
     "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."
 
@@ -200,11 +208,6 @@ Add User : `cmdbox -m web -c user_add <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
     "--user_id <user ID>","required","Specify the user ID. Do not duplicate other users."
     "--user_name <username>","required","Specify a user name. Do not duplicate other users."
     "--user_pass <user password>","","Specify the user password."
@@ -223,11 +226,6 @@ Delete User : `cmdbox -m web -c user_del <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
     "--user_id <user ID>","required","Specify the user ID. Do not duplicate other users."
     "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."
 
@@ -241,11 +239,6 @@ Edit User : `cmdbox -m web -c user_edit <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
     "--user_id <user ID>","required","Specify the user ID. Do not duplicate other users."
     "--user_name <username>","required","Specify a user name. Do not duplicate other users."
     "--user_pass <user password>","","Specify the user password."
@@ -264,10 +257,5 @@ List User : `cmdbox -m web -c user_list <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--data <data folder>","","When omitted, f`$HONE/.{version.__appid__}` is used."
     "--user_name <username>","","Retrieved by specifying a user name. If omitted, all users are retrieved."
     "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."

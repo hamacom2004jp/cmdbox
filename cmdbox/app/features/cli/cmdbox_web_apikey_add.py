@@ -37,24 +37,9 @@ class WebApikeyAdd(feature.UnsupportEdgeFeature):
             description_ja="WebモードのユーザーのApiKeyを追加します。",
             description_en="Add an ApiKey for a user in Web mode.",
             choice=[
-                dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
-                     description_ja="Redisサーバーのサービスホストを指定します。",
-                     description_en="Specify the service host of the Redis server."),
-                dict(opt="port", type=Options.T_INT, default=self.default_port, required=True, multi=False, hide=True, choice=None, web="mask",
-                     description_ja="Redisサーバーのサービスポートを指定します。",
-                     description_en="Specify the service port of the Redis server."),
-                dict(opt="password", type=Options.T_STR, default=self.default_pass, required=True, multi=False, hide=True, choice=None, web="mask",
-                     description_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
-                     description_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
-                dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",
-                     description_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
-                     description_en="Specify the service name of the inference server. If omitted, `server` is used."),
-                dict(opt="data", type=Options.T_DIR, default=self.default_data, required=False, multi=False, hide=False, choice=None,
-                     description_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
-                     description_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
                 dict(opt="user_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
-                     description_ja="ユーザー名を指定します。他のユーザーと重複しないようにしてください。",
-                     description_en="Specify a user name. Do not duplicate other users."),
+                     description_ja="対象のユーザー名を指定します。",
+                     description_en="Specify the target user name."),
                 dict(opt="apikey_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="このユーザーのApiKey名を指定します。",
                      description_en="Specify the ApiKey name for this user."),
@@ -92,8 +77,8 @@ class WebApikeyAdd(feature.UnsupportEdgeFeature):
             return 1, msg, None
         w = None
         try:
-            w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
-                        redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
+            w = web.Web(logger, self.default_data, appcls=self.appcls, ver=self.ver,
+                        redis_host=self.default_host, redis_port=self.default_port, redis_password=self.default_pass, svname=self.default_svname,
                         signin_file=args.signin_file)
             user = dict(name=args.user_name, apikey_name=args.apikey_name)
             apikey = w.apikey_add(user)

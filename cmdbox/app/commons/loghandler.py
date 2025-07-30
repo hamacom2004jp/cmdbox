@@ -144,7 +144,10 @@ class ColorfulStreamHandler(logging.StreamHandler):
         #super().emit(record)
         record.levelname = level_mapping_nc[record.levelno]
         record.msg = self.format(record)
-        self.console.print(record.msg)
+        try:
+            self.console.print(record.msg)
+        except Exception as e:
+            self.console.print(record.msg, highlight=False)
 
 class TimedRotatingFileHandler(logging.handlers.TimedRotatingFileHandler):
     def emit(self, record: logging.LogRecord) -> None:

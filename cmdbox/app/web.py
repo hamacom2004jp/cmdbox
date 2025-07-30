@@ -475,7 +475,7 @@ class Web:
         for u in signin_data['users']:
             if u['uid'] == user['uid']:
                 u['name'] = user['name']
-                if 'password' in user and user['password'] != '':
+                if 'password' in user and user['password'] is not None and user['password'] != '':
                     jadge, msg = self.signin.check_password_policy(user['name'], u['password'], user['password'])
                     if not jadge:
                         raise ValueError(msg)
