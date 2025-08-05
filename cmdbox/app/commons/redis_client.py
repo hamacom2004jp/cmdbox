@@ -104,7 +104,7 @@ class RedisClient(object):
                 i = 0
                 return True
             except redis.exceptions.ConnectionError as e:
-                self.logger.warning(f"fail to ping server. {e}")
+                self.logger.warning(f"fail to ping server. {self.host}:{self.port}, error={e}")
                 if i >= retry_count and retry_count > 0:
                     return False
                 time.sleep(retry_interval if retry_interval > 0 else 5)

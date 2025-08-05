@@ -29,7 +29,7 @@ class AuditWrite(audit_base.AuditBase):
             str: コマンド
         """
         return 'write'
-    
+
     def get_option(self):
         """
         この機能のオプションを返します
@@ -99,11 +99,11 @@ class AuditWrite(audit_base.AuditBase):
         if args.svname is None:
             msg = dict(warn=f"Please specify the --svname option.")
             common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         if args.audit_type is None:
             msg = dict(warn=f"Please specify the --audit_type option.")
             common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         if args.clmsg_id is None:
             args.clmsg_id = str(uuid.uuid4())
         if args.clmsg_date is None:
@@ -113,7 +113,7 @@ class AuditWrite(audit_base.AuditBase):
             logger.warning(f"client_only is True. Not connecting to server. Skip writing the audit log.")
             ret = dict(success={k:v for k, v in vars(args).items() if v})
             common.print_format(ret, False, tm, args.output_json, args.output_json_append, pf=pf)
-            return 0, ret, None
+            return self.RESP_SUCCESS, ret, None
 
         audit_type_b64 = convert.str2b64str(args.audit_type)
         clmsg_id_b64 = convert.str2b64str(args.clmsg_id)
@@ -142,7 +142,7 @@ class AuditWrite(audit_base.AuditBase):
                               retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=True)
         ret = dict(success=True)
         #common.print_format(ret, False, tm, None, False, pf=pf)
-        return 0, ret, cl
+        return self.RESP_SUCCESS, ret, cl
 
     def is_cluster_redirect(self):
         """
@@ -249,7 +249,7 @@ class AuditWrite(audit_base.AuditBase):
                             cursor.execute("DELETE FROM audit WHERE svmsg_date < CURRENT_TIMESTAMP + %s ",
                                            (f'-{retention_period_days} day',))
                     conn.commit()
-                    rescode, msg = (self.RESP_SCCESS, dict(success=True))
+                    rescode, msg = (self.RESP_SUCCESS, dict(success=True))
                     redis_cli.rpush(reskey, msg)
                     return rescode
                 finally:

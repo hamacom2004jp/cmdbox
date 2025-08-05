@@ -102,16 +102,16 @@ class ClientServerInfo(feature.OneshotResultEdgeFeature):
         if args.svname is None:
             msg = dict(warn=f"Please specify the --svname option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
         ret = cl.server_info(retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:
-            return 1, ret, cl
+            return self.RESP_WARN, ret, cl
 
-        return 0, ret, cl
+        return self.RESP_SUCCESS, ret, cl
 
     def is_cluster_redirect(self):
         """
@@ -159,7 +159,7 @@ class ClientServerInfo(feature.OneshotResultEdgeFeature):
             server_info = dict(svname=redis_cli.svname, redis_host=redis_cli.host, redis_port=redis_cli.port, redis_password=redis_cli.password, data_dir=data_dir)
             msg = dict(success=server_info)
             redis_cli.rpush(reskey, msg)
-            return self.RESP_SCCESS
+            return self.RESP_SUCCESS
         except Exception as e:
             logger.warning(f"Failed to get server info: {e}", exc_info=True)
             redis_cli.rpush(reskey, dict(warn=f"Failed to get server info: {e}"))

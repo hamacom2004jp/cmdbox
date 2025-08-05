@@ -135,8 +135,8 @@ class ClientTime(feature.Feature):
         ret = dict(success=dict(data=dt.strftime('%Y-%m-%d %H:%M:%S')))
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in ret:
-            return 1, ret, None
-        return 0, ret, None
+            return self.RESP_WARN, ret, None
+        return self.RESP_SUCCESS, ret, None
 
     def edgerun(self, opt, tool, logger, timeout, prevres = None):
         status, res = tool.exec_cmd(opt, logger, timeout, prevres)
@@ -205,8 +205,8 @@ class ServerTime(feature.Feature):
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in ret:
-            return 1, ret, None
-        return 0, ret, None
+            return self.RESP_WARN, ret, None
+        return self.RESP_SUCCESS, ret, None
 
     def is_cluster_redirect(self):
         return False
@@ -218,7 +218,7 @@ class ServerTime(feature.Feature):
         dt = datetime.datetime.now(tz)
         ret = dict(success=dict(data=dt.strftime('%Y-%m-%d %H:%M:%S')))
         redis_cli.rpush(msg[1], ret)
-        return self.RESP_SCCESS
+        return self.RESP_SUCCESS
 
     def edgerun(self, opt, tool, logger, timeout, prevres = None):
         status, res = tool.exec_cmd(opt, logger, timeout, prevres)
@@ -276,20 +276,11 @@ aliases:                                # Specify the alias for the specified co
 agentrule:                              # Specifies a list of rules that determine which commands the agent can execute.
   policy: deny                          # Specify the default policy for the rule. The value can be allow or deny.
   rules:                                # Specify the rules for the commands that the agent can execute according to the group to which the user belongs.
-  - mode: audit                         # Specify the "mode" as the condition for applying the rule.
-    cmds: [search, write]               # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
+  - mode: cmd                           # Specify the "mode" as the condition for applying the rule.
+    cmds: [list, load]                  # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
     rule: allow                         # Specifies whether the specified command is allowed or not. Values are allow or deny.
   - mode: client
-    cmds: [file_copy, file_download, file_list, file_mkdir, file_move, file_remove, file_rmdir, file_upload, server_info]
-    rule: allow
-  - mode: cmd
-    cmds: [list, load]
-    rule: allow
-  - mode: server
-    cmds: [list]
-    rule: allow
-  - mode: web
-    cmds: [gencert, genpass, group_list, user_list]
+    cmds: [http]
     rule: allow
 audit:
   enabled: true                         # Specify whether to enable the audit function.

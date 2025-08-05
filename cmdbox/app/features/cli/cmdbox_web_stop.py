@@ -69,4 +69,4 @@ class WebStop(feature.UnsupportEdgeFeature):
         w.stop()
         msg = dict(success="web complate.")
         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-        return 0, msg, w
+        return self.RESP_SUCCESS, msg, w

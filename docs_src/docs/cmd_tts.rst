@@ -1,0 +1,96 @@
+.. -*- coding: utf-8 -*-
+
+****************************************************
+Command Reference ( tts mode )
+****************************************************
+
+- List of tts mode commands.
+
+Installs the Text-to-Speech (TTS) engine : `cmdbox -m tts -c install <Option>`
+==============================================================================
+
+- Installs the Text-to-Speech (TTS) engine.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+    "--tts_engine <TTS Engine>","","Specify the TTS engine to use."
+    "--voicevox_ver <version>","","Specify the version of the TTS engine to use."
+    "--voicevox_os <os>","","Specify the OS for the TTS engine."
+    "--voicevox_arc <arch>","","Specify the architecture for the TTS engine."
+    "--voicevox_device <device>","","Specify the device for the TTS engine."
+    "--voicevox_whl <whl>","","Specify the wheel file for the TTS engine."
+
+
+Starts the Text-to-Speech (TTS) engine : `cmdbox -m tts -c start <Option>`
+==============================================================================
+
+- Starts the Text-to-Speech (TTS) engine.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+    "--tts_engine <TTS Engine>","","Specify the TTS engine to use."
+    "--voicevox_model <model>","","Specify the model of the TTS engine to use."
+
+
+Stops the Text-to-Speech (TTS) engine : `cmdbox -m tts -c stop <Option>`
+==============================================================================
+
+- Stops the Text-to-Speech (TTS) engine.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+    "--tts_engine <TTS Engine>","","Specify the TTS engine to use."
+    "--voicevox_model <model>","","Specify the model of the TTS engine to use."
+
+
+Exec the Text-to-Speech (TTS) engine : `cmdbox -m tts -c say <Option>`
+==============================================================================
+
+- Converts text to speech using the Text-to-Speech (TTS) engine.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+    "--tts_engine <TTS Engine>","","Specify the TTS engine to use."
+    "--voicevox_model <model>","","Specify the model of the TTS engine to use."
+    "--tts_text <text>","","Specifies the text to convert"
+    "--tts_output <file>","","Specifies the output file for the converted audio."

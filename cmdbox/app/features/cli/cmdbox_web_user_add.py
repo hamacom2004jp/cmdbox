@@ -86,7 +86,7 @@ class WebUserAdd(feature.UnsupportEdgeFeature):
         if args.data is None:
             msg = dict(warn=f"Please specify the --data option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         w = None
         try:
             w = web.Web(logger, self.default_data, appcls=self.appcls, ver=self.ver,
@@ -97,8 +97,8 @@ class WebUserAdd(feature.UnsupportEdgeFeature):
             w.user_add(user)
             msg = dict(success=f"User ID {args.user_id} has been added.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 0, msg, w
+            return self.RESP_SUCCESS, msg, w
         except Exception as e:
             msg = dict(warn=f"{e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, w
+            return self.RESP_WARN, msg, w

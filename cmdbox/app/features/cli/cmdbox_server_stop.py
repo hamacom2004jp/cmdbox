@@ -102,13 +102,13 @@ class ServerStop(feature.OneshotNotifyEdgeFeature):
         if args.svname is None:
             msg = dict(warn=f"Please specify the --svname option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg
+            return self.RESP_WARN, msg
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.stop_server(retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in ret:
-                return 1, ret, cl
-        return 0, ret, cl
+                return self.RESP_WARN, ret, cl
+        return self.RESP_SUCCESS, ret, cl
 
     def is_cluster_redirect(self):
         """
@@ -135,4 +135,4 @@ class ServerStop(feature.OneshotNotifyEdgeFeature):
             int: 終了コード
         """
         redis_cli.rpush(msg[1], dict(success=f"Successful stop server. svname={redis_cli.svname}"))
-        return self.RESP_SCCESS
+        return self.RESP_SUCCESS

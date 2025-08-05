@@ -163,7 +163,7 @@ class McpClient(feature.UnsupportEdgeFeature):
                 else:
                     raise ValueError(f"Unknown operation: {args.operation}")
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_SCCESS, ret, None
+            return self.RESP_SUCCESS, ret, None
         except Exception as e:
             logger.setLevel(logging.ERROR)
             for h in logger.handlers:

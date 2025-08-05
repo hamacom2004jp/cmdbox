@@ -174,7 +174,7 @@ class Server(filer.Filer):
                     self.logger.warning(f"Unknown command {msg}")
                     st = self.RESP_WARN
 
-                if st==self.RESP_SCCESS:
+                if st==self.RESP_SUCCESS:
                     sccess_cnt += 1
                     self.redis_cli.hset(self.redis_cli.hbname, 'sccess_cnt', sccess_cnt)
                 elif st==self.RESP_WARN:

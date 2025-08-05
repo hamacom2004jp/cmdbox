@@ -60,8 +60,8 @@ class ClientTime(feature.Feature):
         ret = dict(success=dict(data=dt.strftime('%Y-%m-%d %H:%M:%S')))
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in ret:
-            return 1, ret, None
-        return 0, ret, None
+            return self.RESP_WARN, ret, None
+        return self.RESP_SUCCESS, ret, None
 
     def edgerun(self, opt, tool, logger, timeout, prevres = None):
         """

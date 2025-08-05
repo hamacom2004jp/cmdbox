@@ -16,5 +16,6 @@ See below for available options for the various commands.
    GUI <cmd_gui.rst>
    Web <cmd_web.rst>
    MCP <cmd_mcp.rst>
+   TTS <cmd_tts.rst>
    Edge <cmd_edge.rst>
    Audit <cmd_audit.rst>

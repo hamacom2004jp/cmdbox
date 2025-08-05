@@ -15,25 +15,25 @@ Configuration items in `user_list.yml`
     users:                         # A list of users, each of which is a map that contains the following fields.
     - uid: 1                       # An ID that identifies a user. No two users can have the same ID.
       name: admin                  # A name that identifies the user. No two users can have the same name.
-      password: admin              # The user's password. The value is hashed with the hash function specified in the next hash field.
+      password: XXXXX              # The user's password. The value is hashed with the hash function specified in the next hash field.
       hash: plain                  # The hash function used to hash the password, which can be plain, md5, sha1, or sha256, or oauth2, or saml.
       groups: [admin]              # A list of groups to which the user belongs, as specified in the groups field.
       email: admin@aaa.bbb.jp      # The email address of the user, used when authenticating using the provider specified in the oauth2 or saml field.
     - uid: 101
       name: user01
-      password: b75705d7e35e7014521a46b532236ec3
+      password: XXXXX
       hash: md5
       groups: [user]
       email: user01@aaa.bbb.jp
     - uid: 102
       name: user02
-      password: a7659675668c2b34f0a456dbaa508200340dc36c
+      password: XXXXX
       hash: sha1
       groups: [readonly]
       email: user02@aaa.bbb.jp
     - uid: 103
       name: user03
-      password: d64243e8519cce2304fffb92d31acaca622585011b40439c97e9274fae146189
+      password: XXXXX
       hash: sha256
       groups: [editor]
       email: user03@aaa.bbb.jp
@@ -63,7 +63,7 @@ Configuration items in `user_list.yml`
         mode: server
         cmds: [list]
         rule: allow
-    - groups: [user]
+      - groups: [user]
         mode: cmd
         cmds: [list, load]
         rule: allow

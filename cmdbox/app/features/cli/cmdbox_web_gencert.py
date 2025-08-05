@@ -94,7 +94,7 @@ class WebGencert(feature.UnsupportEdgeFeature):
         if args.webhost is None:
             msg = dict(warn=f"Please specify the --webhost option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         if args.output_cert is None:
             args.output_cert = f"{args.webhost}.crt"
         if args.output_pkey is None:
@@ -107,15 +107,15 @@ class WebGencert(feature.UnsupportEdgeFeature):
         if not args.overwrite and output_cert.exists():
             msg = dict(warn=f"File already exists. {output_cert}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         if not args.overwrite and output_pkey.exists():
             msg = dict(warn=f"File already exists. {output_pkey}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         if not args.overwrite and output_key.exists():
             msg = dict(warn=f"File already exists. {output_key}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
 
         try:
             self.gen_cert(logger, args.webhost,
@@ -126,8 +126,8 @@ class WebGencert(feature.UnsupportEdgeFeature):
         except Exception as e:
             msg = dict(error=f"Failed to generate certificate. {e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
-        return 0, ret, None
+            return self.RESP_WARN, msg, None
+        return self.RESP_SUCCESS, ret, None
 
     def gen_cert(self, logger:logging.Logger, webhost:str,
                  output_cert:Path, output_cert_format:str,

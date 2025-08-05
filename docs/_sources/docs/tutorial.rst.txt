@@ -97,8 +97,8 @@ How to implement a new command using cmdbox
             ret = dict(success=dict(data=dt.strftime('%Y-%m-%d %H:%M:%S')))
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             if 'success' not in ret:
-                return 1, ret, None
-            return 0, ret, None
+                return self.RESP_WARN, ret, None
+            return self.RESP_SUCCESS, ret, None
 
 - If you want to implement server-side processing, please refer to ```sample_server_time```.
 
@@ -162,8 +162,8 @@ How to implement a new command using cmdbox
                                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             if 'success' not in ret:
-                return 1, ret, None
-            return 0, ret, None
+                return self.RESP_WARN, ret, None
+            return self.RESP_SUCCESS, ret, None
 
         def is_cluster_redirect(self):
             return False
@@ -175,7 +175,7 @@ How to implement a new command using cmdbox
             dt = datetime.datetime.now(tz)
             ret = dict(success=dict(data=dt.strftime('%Y-%m-%d %H:%M:%S')))
             redis_cli.rpush(msg[1], ret)
-            return self.RESP_SCCESS
+            return self.RESP_SUCCESS
 
         def edgerun(self, opt, tool, logger, timeout, prevres = None):
             status, res = tool.exec_cmd(opt, logger, timeout, prevres)
@@ -246,8 +246,8 @@ How to implement a new command using cmdbox
                                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             if 'success' not in ret:
-                return 1, ret, None
-            return 0, ret, None
+                return self.RESP_WARN, ret, None
+            return self.RESP_SUCCESS, ret, None
 
         def is_cluster_redirect(self):
             return False
@@ -259,7 +259,7 @@ How to implement a new command using cmdbox
             dt = datetime.datetime.now(tz)
             ret = dict(success=dict(data=dt.strftime('%Y-%m-%d %H:%M:%S')))
             redis_cli.rpush(msg[1], ret)
-            return self.RESP_SCCESS
+            return self.RESP_SUCCESS
 
 
 - Open the file `.sample/extensions/features.yml`. The file should look something like this.

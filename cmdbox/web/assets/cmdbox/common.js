@@ -1282,6 +1282,11 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
     }
     else {
         // 選択肢がある場合
+        let select_html = '<select class="form-select row_content_template_select"></select>';
+        if (row.choice_edit){
+            select_html = `<input type="text" class="form-control row_content_key row_content_template_input">`;
+            select_html+= `<datalist class="row_content_template_select"></datalist>`;
+        }
         if(row.type=='dict') {
             if (Array.isArray(row.choice)) {
                 elem = $(`<div class="col-${lcolsize} mb-3">` // row_content_template_dict_choice
@@ -1289,7 +1294,7 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
                         +'<label class="input-group-text row_content_template_title">title</label>'
                         +'<input type="text" class="form-control row_content_key row_content_template_input">'
                         +'<label class="input-group-text">=</label>'
-                        +'<select class="form-select row_content_template_select"></select>'
+                        + select_html
                         +'</div></div>');
             }
             else {
@@ -1298,14 +1303,14 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
                         +'<label class="input-group-text row_content_template_title">title</label>'
                         +'<select class="form-select row_content_key row_content_template_select"></select>'
                         +'<label class="input-group-text">=</label>'
-                        +'<select class="form-select row_content_template_select"></select>'
+                        + select_html
                         +'</div></div>');
             }
         } else {
             elem = $(`<div class="col-${scolsize} mb-3">` // row_content_template_choice
                     +'<div class="input-group">'
                     +'<label class="input-group-text row_content_template_title">title</label>'
-                    +'<select class="form-select row_content_template_select"></select>'
+                    + select_html
                     +'</div></div>');
         }
         if (next_elem) next_elem.after(elem);
@@ -1385,6 +1390,14 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
     input_elem.attr('param_data_web', row.web);
     if (row.web=='mask' || row.web=='readonly') {
         input_elem.attr('disabled', 'disabled');
+    }
+    // 選択肢編集可能な場合はinputのIDを参考にdatalistのIDを設定
+    if (row.choice_edit) {
+        input_elem.each((i, e) => {
+            const elem = $(e), elem_id = elem.attr('id');
+            elem.next().attr('id', elem_id + '_options');
+            elem.attr('list', elem_id + '_options');
+        });
     }
     // ファイルタイプの場合はファイラーモーダルを開くボタンを追加
     if(row.type=='file'){

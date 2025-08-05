@@ -85,11 +85,11 @@ class CmdLoad(feature.OneshotResultEdgeFeature):
         if args.data is None:
             msg = dict(warn=f"Please specify the --data option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         if args.title is None:
             msg = dict(warn=f"Please specify the --title option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         if not hasattr(self, 'signin_file_data') or self.signin_file_data is None:
             self.signin_file_data = signin.Signin.load_signin_file(args.signin_file, None, self=self)
         opt_path = Path(args.data) / ".cmds" / f"cmd-{args.title}.json"
@@ -97,12 +97,12 @@ class CmdLoad(feature.OneshotResultEdgeFeature):
         if not signin.Signin._check_cmd(self.signin_file_data, args.groups, opt['mode'], opt['cmd'], logger):
             ret = dict(warn=f"You do not have permission to execute this command.")
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, ret, None
+            return self.RESP_WARN, ret, None
         ret = dict(success=opt)
 
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:
-            return 1, ret, None
+            return self.RESP_WARN, ret, None
 
-        return 0, ret, None
+        return self.RESP_SUCCESS, ret, None

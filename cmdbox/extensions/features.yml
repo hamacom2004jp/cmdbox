@@ -46,6 +46,9 @@ agentrule:                              # Specifies a list of rules that determi
   - mode: client
     cmds: [http]
     rule: allow
+  - mode: tts
+    cmds: [say]
+    rule: allow
 audit:
   enabled: true                         # Specify whether to enable the audit function.
   write:

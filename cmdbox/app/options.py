@@ -368,20 +368,7 @@ class Options:
         """
         return ftype in self.features_loaded and self.features_loaded[ftype]
 
-    def load_features_file(self, ftype:str, func, appcls, ver, logger:logging.Logger=None):
-        """
-        フィーチャーファイル（features.yml）を読み込みます。
-
-        Args:
-            ftype (str): フィーチャータイプ。cli又はweb
-            func (Any): フィーチャーの処理関数
-            appcls (Any): アプリケーションクラス
-            ver (Any): バージョンモジュール
-            logger (logging.Logger): ロガー
-        """
-        # 読込み済みかどうかの判定
-        if self.is_features_loaded(ftype):
-            return
+    def _load_features_yml(self, ver, logger:logging.Logger=None):
         # cmdboxを拡張したアプリをカスタマイズするときのfeatures.ymlを読み込む
         features_yml = Path(f'.{ver.__appid__}/features.yml')
         if not features_yml.exists() or not features_yml.is_file():
@@ -398,35 +385,51 @@ class Options:
                     logger.debug(f"features.yml data: {yml}")
             else:
                 yml = self.features_yml_data
-            if yml is None: return
-            if 'features' not in yml:
-                raise Exception('features.yml is invalid. (The root element must be "features".)')
-            if ftype not in yml['features']:
-                raise Exception(f'features.yml is invalid. (There is no “{ftype}” in the “features” element.)')
-            if yml['features'][ftype] is None:
-                return
-            if type(yml['features'][ftype]) is not list:
-                raise Exception(f'features.yml is invalid. (The “features.{ftype} element must be a list. {ftype}={yml["features"][ftype]})')
-            # featureモジュール読込みの前にagentruleの読み込み
-            self.load_features_agentrule(logger)
-            for data in yml['features'][ftype]:
-                if type(data) is not dict:
-                    raise Exception(f'features.yml is invalid. (The “features.{ftype}” element must be a list element must be a dictionary. data={data})')
-                if 'package' not in data:
-                    raise Exception(f'features.yml is invalid. (The “package” element must be in the dictionary of the list element of the “features.{ftype}” element. data={data})')
-                if 'prefix' not in data:
-                    raise Exception(f'features.yml is invalid. (The prefix element must be in the dictionary of the list element of the “features.{ftype}” element. data={data})')
-                if data['package'] is None or data['package'] == "":
-                    continue
-                if data['prefix'] is None or data['prefix'] == "":
-                    continue
-                exclude_modules = []
-                if 'exclude_modules' in data:
-                    if type(data['exclude_modules']) is not list:
-                        raise Exception(f'features.yml is invalid. (The “exclude_modules” element must be a list element. data={data})')
-                    exclude_modules = data['exclude_modules']
-                func(data['package'], data['prefix'], exclude_modules, appcls, ver, logger, self.is_features_loaded(ftype))
-                self.features_loaded[ftype] = True
+            return yml
+        return None
+
+    def load_features_file(self, ftype:str, func, appcls, ver, logger:logging.Logger=None):
+        """
+        フィーチャーファイル（features.yml）を読み込みます。
+
+        Args:
+            ftype (str): フィーチャータイプ。cli又はweb
+            func (Any): フィーチャーの処理関数
+            appcls (Any): アプリケーションクラス
+            ver (Any): バージョンモジュール
+            logger (logging.Logger): ロガー
+        """
+        # 読込み済みかどうかの判定
+        if self.is_features_loaded(ftype):
+            return
+        yml = self._load_features_yml(ver, logger)
+        if yml is None: return
+        if 'features' not in yml:
+            raise Exception('features.yml is invalid. (The root element must be "features".)')
+        if ftype not in yml['features']:
+            raise Exception(f'features.yml is invalid. (There is no “{ftype}” in the “features” element.)')
+        if yml['features'][ftype] is None:
+            return
+        if type(yml['features'][ftype]) is not list:
+            raise Exception(f'features.yml is invalid. (The “features.{ftype} element must be a list. {ftype}={yml["features"][ftype]})')
+        for data in yml['features'][ftype]:
+            if type(data) is not dict:
+                raise Exception(f'features.yml is invalid. (The “features.{ftype}” element must be a list element must be a dictionary. data={data})')
+            if 'package' not in data:
+                raise Exception(f'features.yml is invalid. (The “package” element must be in the dictionary of the list element of the “features.{ftype}” element. data={data})')
+            if 'prefix' not in data:
+                raise Exception(f'features.yml is invalid. (The prefix element must be in the dictionary of the list element of the “features.{ftype}” element. data={data})')
+            if data['package'] is None or data['package'] == "":
+                continue
+            if data['prefix'] is None or data['prefix'] == "":
+                continue
+            exclude_modules = []
+            if 'exclude_modules' in data:
+                if type(data['exclude_modules']) is not list:
+                    raise Exception(f'features.yml is invalid. (The “exclude_modules” element must be a list element. data={data})')
+                exclude_modules = data['exclude_modules']
+            func(data['package'], data['prefix'], exclude_modules, appcls, ver, logger, self.is_features_loaded(ftype))
+            self.features_loaded[ftype] = True
 
 
     def load_features_args(self, args_dict:Dict[str, Any]):

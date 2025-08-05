@@ -62,7 +62,7 @@ class EdgeStart(feature.UnsupportEdgeFeature):
 
         msg = dict(success="edge complate.")
         common.print_format(msg, True, tm, None, False, pf=pf)
-        return 0, msg, None
+        return self.RESP_SUCCESS, msg, None
 
     def load_cmds(self, logger:logging.Logger, args:argparse.Namespace) -> Tuple[int, List[Dict[str, Any]]]:
         """
@@ -80,7 +80,7 @@ class EdgeStart(feature.UnsupportEdgeFeature):
         if res.status_code != 200:
             return res.status_code, dict(warn=f"Access failed. status_code={res.status_code}")
         cmds = res.json()
-        return 0, cmds
+        return self.RESP_SUCCESS, cmds
 
     def load_pipes(self, logger:logging.Logger, args:argparse.Namespace) -> Tuple[int, List[Dict[str, Any]]]:
         """
@@ -98,5 +98,5 @@ class EdgeStart(feature.UnsupportEdgeFeature):
         if res.status_code != 200:
             return res.status_code, dict(warn=f"Access failed. status_code={res.status_code}")
         pipes = res.json()
-        return 0, pipes
+        return self.RESP_SUCCESS, pipes
     

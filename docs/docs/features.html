@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Features &mdash; cmdbox 2025/07/30 documentation</title>
+  <title>Features &mdash; cmdbox 2025/08/03 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=c56493cf"></script>
+      <script src="../_static/documentation_options.js?v=b5af3dff"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -143,20 +143,11 @@
 <span class="nt">agentrule</span><span class="p">:</span><span class="w">                              </span><span class="c1"># Specifies a list of rules that determine which commands the agent can execute.</span>
 <span class="w">  </span><span class="nt">policy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deny</span><span class="w">                          </span><span class="c1"># Specify the default policy for the rule. The value can be allow or deny.</span>
 <span class="w">  </span><span class="nt">rules</span><span class="p">:</span><span class="w">                                </span><span class="c1"># Specify the rules for the commands that the agent can execute according to the group to which the user belongs.</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">audit</span><span class="w">                         </span><span class="c1"># Specify the &quot;mode&quot; as the condition for applying the rule.</span>
-<span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">search</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">write</span><span class="p p-Indicator">]</span><span class="w">               </span><span class="c1"># Specify the &quot;cmd&quot; to which the rule applies. Multiple items can be specified in a list.</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cmd</span><span class="w">                           </span><span class="c1"># Specify the &quot;mode&quot; as the condition for applying the rule.</span>
+<span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">load</span><span class="p p-Indicator">]</span><span class="w">                  </span><span class="c1"># Specify the &quot;cmd&quot; to which the rule applies. Multiple items can be specified in a list.</span>
 <span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span><span class="w">                         </span><span class="c1"># Specifies whether the specified command is allowed or not. Values are allow or deny.</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span>
-<span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">file_copy</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_download</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_list</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_mkdir</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_move</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_remove</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_rmdir</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_upload</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">server_info</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cmd</span>
-<span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">load</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span>
-<span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
-<span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">gencert</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">genpass</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">group_list</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">user_list</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">http</span><span class="p p-Indicator">]</span>
 <span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
 <span class="nt">audit</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">                         </span><span class="c1"># Specify whether to enable the audit function.</span>

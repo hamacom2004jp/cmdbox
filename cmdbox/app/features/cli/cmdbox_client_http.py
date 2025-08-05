@@ -57,6 +57,7 @@ class ClientHttp(feature.ResultEdgeFeature):
                      choice_show={'application/octet-stream':["send_param", "send_data",],
                                   'application/json':["send_data",],
                                   'multipart/form-data':["send_param",],},
+                     choice_edit=True,
                      description_ja="送信するデータのContent-Typeを指定します。",
                      description_en="Specifies the Content-Type of the data to be sent."),
                 dict(opt="send_apikey", type=Options.T_TEXT, default=None, required=False, multi=False, hide=False, choice=None,
@@ -105,7 +106,7 @@ class ClientHttp(feature.ResultEdgeFeature):
         if args.url is None:
             msg = dict(warn=f"Please specify the --url option.")
             common.print_format(msg, args.format, tm, None, False, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         query_param = {}
         if args.proxy == 'yes':
             from cmdbox.app.auth import signin
@@ -114,7 +115,7 @@ class ClientHttp(feature.ResultEdgeFeature):
             if scope is None:
                 msg = dict(warn=f"Request scope is not set. Please set the request scope.")
                 common.print_format(msg, args.format, tm, None, False, pf=pf)
-                return 1, msg, None
+                return self.RESP_WARN, msg, None
             req:Request = scope['req']
             args.send_method = req.method
             args.send_content_type = req.headers.get('Content-Type', None)
@@ -136,7 +137,7 @@ class ClientHttp(feature.ResultEdgeFeature):
         if res.status_code != 200:
             msg = dict(error=f"Request failed with status code {res.status_code}.")
             common.print_format(msg, False, tm, None, False, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         content_type = res.headers.get('Content-Type', '')
         if content_type.startswith('application/json'):
             try:
@@ -144,11 +145,11 @@ class ClientHttp(feature.ResultEdgeFeature):
             except ValueError as e:
                 msg = res.text
             common.print_format(msg, False, tm, None, False, pf=pf)
-            return 0, msg, None
+            return self.RESP_SUCCESS, msg, None
         elif content_type.startswith('text/'):
             msg = res.text
             common.print_format(msg, False, tm, None, False, pf=pf)
-            return 0, msg, None
+            return self.RESP_SUCCESS, msg, None
         common.print_format(res.content, False, tm, None, False, pf=pf)
 
-        return 0, res.content, None
+        return self.RESP_SUCCESS, res.content, None

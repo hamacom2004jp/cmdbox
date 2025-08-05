@@ -153,7 +153,7 @@ class AuditSearch(audit_base.AuditBase):
         if args.svname is None:
             msg = dict(warn=f"Please specify the --svname option.")
             common.print_format(msg, args.format, tm, None, False, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
 
         select_str = json.dumps(args.select, default=common.default_json_enc, ensure_ascii=False) if getattr(args, 'select', None) else '{}'
         select_b64 = convert.str2b64str(select_str)
@@ -202,7 +202,7 @@ class AuditSearch(audit_base.AuditBase):
 
         if 'success' not in ret:
             common.print_format(ret, getattr(args, 'format', False), tm, None, False, pf=pf)
-            return 1, ret, cl
+            return self.RESP_WARN, ret, cl
 
         if 'data' in ret['success']:
             cols = list()
@@ -232,7 +232,7 @@ class AuditSearch(audit_base.AuditBase):
                 ret = ret.replace('\r\n', '\n') if ret is not None else ''
 
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-        return 0, ret, cl
+        return self.RESP_SUCCESS, ret, cl
 
     def is_cluster_redirect(self):
         """
@@ -464,7 +464,7 @@ class AuditSearch(audit_base.AuditBase):
                         redis_cli.rpush(reskey, msg)
                         return rescode
                     else:
-                        rescode, msg = (self.RESP_SCCESS, dict(success=rows))
+                        rescode, msg = (self.RESP_SUCCESS, dict(success=rows))
                         redis_cli.rpush(reskey, msg)
                         return rescode
                 finally:

@@ -84,5 +84,5 @@ class ServerList(feature.OneshotResultEdgeFeature):
         ret = sv.list_server()
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in ret:
-                return 1, ret, sv
-        return 0, ret, sv
+                return self.RESP_WARN, ret, sv
+        return self.RESP_SUCCESS, ret, sv

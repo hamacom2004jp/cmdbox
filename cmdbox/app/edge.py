@@ -676,7 +676,7 @@ class Edge(object):
                     if time.time() - tm > oauth2_timeout:
                         return 1, dict(warn="Signin Timeout.")
                     time.sleep(1)
-                return 0, dict(success="Signin success.")
+                return feature.Feature.RESP_SUCCESS, dict(success="Signin success.")
 
         # saml認証を使用する場合
         elif auth_type == "saml":

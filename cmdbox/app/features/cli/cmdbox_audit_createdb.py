@@ -111,31 +111,31 @@ class AuditCreatedb(feature.UnsupportEdgeFeature):
         if args.svname is None:
             msg = dict(warn=f"Please specify the --svname option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         if args.pg_host is None:
             msg = dict(warn=f"Please specify the --pg_host option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         if args.pg_port is None:
             msg = dict(warn=f"Please specify the --pg_port option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         if args.pg_user is None:
             msg = dict(warn=f"Please specify the --pg_user option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         if args.pg_password is None:
             msg = dict(warn=f"Please specify the --pg_password option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         if args.pg_dbname is None:
             msg = dict(warn=f"Please specify the --pg_dbname option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         if args.new_pg_dbname is None:
             msg = dict(warn=f"Please specify the --new_pg_dbname option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
 
         pg_host_b64 = convert.str2b64str(args.pg_host)
         pg_port = args.pg_port if isinstance(args.pg_port, int) else None
@@ -150,8 +150,8 @@ class AuditCreatedb(feature.UnsupportEdgeFeature):
                                      retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, False, tm, None, False, pf=pf)
         if 'success' not in ret:
-            return 1, ret, cl
-        return 0, ret, cl
+            return self.RESP_WARN, ret, cl
+        return self.RESP_SUCCESS, ret, cl
 
     def is_cluster_redirect(self):
         """
@@ -213,7 +213,7 @@ class AuditCreatedb(feature.UnsupportEdgeFeature):
                 cursor = conn.cursor()
                 try:
                     cursor.execute(f'create database {new_pg_dbname}')
-                    rescode, msg = (self.RESP_SCCESS, dict(success=True))
+                    rescode, msg = (self.RESP_SUCCESS, dict(success=True))
                     redis_cli.rpush(reskey, msg)
                     return rescode
                 finally:

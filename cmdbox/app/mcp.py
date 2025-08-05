@@ -49,21 +49,21 @@ class Mcp:
             Any: FastMCP
         """
         from fastmcp import FastMCP
-        from fastmcp.server.auth import BearerAuthProvider
+        from fastmcp.server.auth.providers.jwt import JWTVerifier
         cls = self.signin.__class__
         publickey_str = cls.verify_jwt_publickey_str if hasattr(cls, 'verify_jwt_publickey_str') else None
         issuer = cls.verify_jwt_issuer if hasattr(cls, 'verify_jwt_issuer') else None
         audience = cls.verify_jwt_audience if hasattr(cls, 'verify_jwt_audience') else None
         if publickey_str is not None and issuer is not None and audience is not None:
-            self.logger.info(f"Using BearerAuthProvider with public key, issuer: {issuer}, audience: {audience}")
-            auth = BearerAuthProvider(
+            self.logger.info(f"Using JWTVerifier with public key, issuer: {issuer}, audience: {audience}")
+            auth = JWTVerifier(
                 public_key=publickey_str,
                 issuer=issuer,
                 audience=audience
             )
             mcp = FastMCP(name=self.ver.__appid__, auth=auth, tools=tools)
         else:
-            self.logger.info(f"Using BearerAuthProvider without public key, issuer, or audience.")
+            self.logger.info(f"Using JWTVerifier without public key, issuer, or audience.")
             mcp = FastMCP(name=self.ver.__appid__)
         mcp.add_middleware(self.create_mw_logging(self.logger, args))
         mcp.add_middleware(self.create_mw_reqscope(self.logger, args))
@@ -328,6 +328,9 @@ class Mcp:
         func_txt += f'        Dict[str, Any]: 実行結果\n'
         func_txt += f'    """\n'
         func_txt += f'    logger = logging.getLogger("web")\n'
+        func_txt += f'    if not options.get_cmd_attr("'+mode+'", "'+cmd+'", "use_agent"):\n'
+        func_txt += f'        logger.warning("{func_name} is not allowed to be executed by the system.")\n'
+        func_txt += f'        return dict(warn="{func_name} is not allowed to be executed by the system.")\n'
         func_txt +=  '    opt = {o["opt"]: kwargs.get(o["opt"], o["default"]) for o in options.get_cmd_choices("'+mode+'", "'+cmd+'", False)}\n'
         func_txt += f'    opt["data"] = Path(opt["data"]) if hasattr(opt, "data") else common.HOME_DIR / f".{self.ver.__appid__}"\n'
         func_txt += f'    if "{title}":\n'
@@ -379,7 +382,7 @@ class Mcp:
         Returns:
             ToolList: ToolListのリスト
         """
-        tool_list = ToolList(self, logger)
+        tool_list = ToolList(self, logger, self.data)
         tool_list.extract_callable = extract_callable
         return tool_list
 
@@ -461,13 +464,14 @@ class Mcp:
         return runner, mcp
 
 class ToolList(object):
-    def __init__(self, mcp:Mcp, logger:logging.Logger, *args:List):
+    def __init__(self, mcp:Mcp, logger:logging.Logger, data:Path, *args:List):
         """
         ツールリストを初期化します
 
         Args:
             mcp (Mcp): MCPインスタンス
             logger (logging.Logger): ロガー
+            data (Path): データパス
             *args (List): 追加するツールのリスト
         """
         from fastmcp.tools import FunctionTool
@@ -477,6 +481,7 @@ class ToolList(object):
         self.tools = []
         self.mcp = mcp
         self.logger = logger
+        self.data = data
         self.extract_callable = False
         for mode in options.get_mode_keys():
             for cmd in options.get_cmd_keys(mode):
@@ -602,7 +607,7 @@ class ToolList(object):
         options = Options.getInstance()
         is_japan = common.is_japan()
         ret_tools = self.tools.copy()
-        web = Web.getInstance()
+        web = Web.getInstance(self.logger, self.data)
         if web.signin.signin_file_data is None:
             # サインインファイルが読み込まれていない場合は登録済みのリストを返す
             if self.extract_callable:
@@ -633,6 +638,9 @@ class ToolList(object):
         for opt in cmd_list:
             func_name = opt['title']
             mode, cmd, description = opt['mode'], opt['cmd'], opt['description'] if 'description' in opt and opt['description'] else ''
+            # ユーザーコマンドもfeatures.ymlの定義に従って実行許可するかどうか。
+            #if not options.get_cmd_attr(mode, cmd, 'use_agent'):
+            #    continue
             choices = options.get_cmd_choices(mode, cmd, False)
             description += '\n' + options.get_cmd_attr(mode, cmd, 'description_ja' if is_japan else 'description_en')
             # 関数の定義を生成

@@ -85,7 +85,7 @@ class CmdList(feature.OneshotResultEdgeFeature):
         if args.data is None:
             msg = dict(warn=f"Please specify the --data option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         kwd = args.kwd
         if kwd is None or kwd == '':
             kwd = '*'
@@ -105,6 +105,6 @@ class CmdList(feature.OneshotResultEdgeFeature):
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:
-            return 1, ret, None
+            return self.RESP_WARN, ret, None
 
-        return 0, ret, None
+        return self.RESP_SUCCESS, ret, None

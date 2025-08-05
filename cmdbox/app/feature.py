@@ -14,7 +14,7 @@ class Feature(object):
     USE_REDIS_FALSE:int = -1
     USE_REDIS_MEIGHT:int = 0
     USE_REDIS_TRUE:int = 1
-    RESP_SCCESS:int = 0
+    RESP_SUCCESS:int = 0
     RESP_WARN:int = 1
     RESP_ERROR:int = 2
     DEFAULT_CAPTURE_MAXSIZE:int = 1024 * 1024 * 10

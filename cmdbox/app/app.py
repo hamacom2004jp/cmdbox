@@ -58,6 +58,8 @@ class CmdBoxApp:
 
         # プラグイン読込み
         sfeatureloadtime = time.perf_counter()
+        self.options._load_features_yml(self.ver, logger=self.default_logger)
+        self.options.load_features_agentrule(self.default_logger)
         self.options.load_svcmd('cmdbox.app.features.cli', prefix="cmdbox_", excludes=[], appcls=self.appcls, ver=self.ver, logger=self.default_logger,
                                 isloaded=self.options.is_features_loaded('cli'))
         if self.cli_features_packages is not None:
@@ -92,7 +94,7 @@ class CmdBoxApp:
         except argparse.ArgumentError as e:
             msg = dict(warn=f"ArgumentError: {e}")
             common.print_format(msg, False, 0, None, False)
-            return 1, msg, None
+            return feature.Feature.RESP_WARN, msg, None
         # 起動時引数で指定されたオプションをファイルから読み込んだオプションで上書きする
         args_dict = vars(args)
         for key, val in file_dict.items():
@@ -120,7 +122,7 @@ class CmdBoxApp:
             if args.useopt is None:
                 msg = dict(warn=f"Please specify the --useopt option.")
                 common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
-                return 1, msg, None
+                return feature.Feature.RESP_WARN, msg, None
             common.saveopt(opt, args.useopt)
             ret = dict(success=f"Save options file. {args.useopt}")
 
@@ -133,15 +135,15 @@ class CmdBoxApp:
         if args.version:
             v = self.ver.__logo__ + '\n' + self.ver.__description__
             common.print_format(v, False, smaintime, None, False)
-            return 0, v, None
+            return feature.Feature.RESP_SUCCESS, v, None
 
         if args.mode is None:
             msg = dict(warn=f"mode is None. Please specify the --help option.")
             common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
-            return 1, msg, None
+            return feature.Feature.RESP_WARN, msg, None
 
         sloggerinittime = time.perf_counter()
-        logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall if args.cmd != 'webcap' else True, ver=self.ver)
+        logger = self.load_config(args, webcall=webcall if args.cmd != 'webcap' else True)
         try:
             eloggerinittime = time.perf_counter()
             if logger.level == logging.DEBUG:
@@ -168,7 +170,14 @@ class CmdBoxApp:
             else:
                 msg = dict(warn=f"Unkown mode or cmd. mode={args.mode}, cmd={args.cmd}")
                 common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
-                return 1, msg, None
+                return feature.Feature.RESP_WARN, msg, None
         finally:
             # ログの状態をwebcallから戻す
-            common.load_config(args.mode, debug=args.debug, data=args.data, webcall=False, ver=self.ver)
+            self.load_config(args, webcall=False)
+
+    def load_config(self, args:argparse.Namespace, webcall:bool=False) -> logging.Logger:
+        """
+        アプリケーションの設定を読み込みます。
+        """
+        logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall if args.cmd != 'webcap' else True, ver=self.ver)
+        return logger

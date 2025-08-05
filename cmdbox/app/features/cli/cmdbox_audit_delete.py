@@ -105,7 +105,7 @@ class AuditDelete(audit_base.AuditBase):
         if args.svname is None:
             msg = dict(warn=f"Please specify the --svname option.")
             common.print_format(msg, args.format, tm, None, False, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
 
         delete_audit_type_b64 = convert.str2b64str(args.delete_audit_type)
         delete_clmsg_id_b64 = convert.str2b64str(args.delete_clmsg_id)
@@ -140,7 +140,7 @@ class AuditDelete(audit_base.AuditBase):
         common.print_format(ret, args.format, tm, None, False, pf=pf)
 
         if 'success' not in ret:
-            return 1, ret, cl
+            return self.RESP_WARN, ret, cl
 
         if 'data' in ret['success']:
             for row in ret['success']['data']:
@@ -153,7 +153,7 @@ class AuditDelete(audit_base.AuditBase):
                 except:
                     pass
 
-        return 0, ret, cl
+        return self.RESP_SUCCESS, ret, cl
 
     def is_cluster_redirect(self):
         """
@@ -297,7 +297,7 @@ class AuditDelete(audit_base.AuditBase):
                         redis_cli.rpush(reskey, msg)
                         return rescode
                     else:
-                        rescode, msg = (self.RESP_SCCESS, dict(success=dict(msg=f"{delete_count} records deleted.", count=delete_count)))
+                        rescode, msg = (self.RESP_SUCCESS, dict(success=dict(msg=f"{delete_count} records deleted.", count=delete_count)))
                         redis_cli.rpush(reskey, msg)
                         return rescode
                 finally:

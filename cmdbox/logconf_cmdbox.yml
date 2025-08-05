@@ -22,6 +22,22 @@ handlers:
         omit_repeated_times: false
         tracebacks_word_wrap: false
         log_time_format: '[%Y-%m-%d %H:%M]'
+    audit:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/cmdbox_audit.log
+    client:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/cmdbox_client.log
     cmdbox:
         class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
         level: INFO
@@ -30,12 +46,100 @@ handlers:
         when : 'D'
         encoding : 'utf-8'
         filename: .logs/cmdbox.log
+    edge:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/cmdbox_edge.log
+    gui:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/cmdbox_gui.log
+    mcp:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/cmdbox_mcp.log
+    server:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/cmdbox_server.log
+    tts:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/cmdbox_tts.log
+    web:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/cmdbox_web.log
 
 loggers:
+    audit:
+        handlers: [audit, std]
+        level: INFO
+        qualname: audit
+        propagate: false
+    client:
+        handlers: [client, std]
+        level: INFO
+        qualname: client
+        propagate: false
     cmdbox:
         handlers: [cmdbox, std]
         level: INFO
         qualname: cmdbox
+        propagate: false
+    edge:
+        handlers: [edge, std]
+        level: INFO
+        qualname: edge
+        propagate: false
+    gui:
+        handlers: [gui, std]
+        level: INFO
+        qualname: gui
+        propagate: false
+    mcp:
+        handlers: [mcp, std]
+        level: INFO
+        qualname: mcp
+        propagate: false
+    server:
+        handlers: [server, std]
+        level: INFO
+        qualname: server
+        propagate: false
+    tts:
+        handlers: [tts, std]
+        level: INFO
+        qualname: tts
+        propagate: false
+    web:
+        handlers: [web, std]
+        level: INFO
+        qualname: web
         propagate: false
 
 #root:

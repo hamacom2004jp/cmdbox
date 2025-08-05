@@ -141,9 +141,15 @@
             <div class="w-100 d-flex justify-content-center">
                 <div class="chat-input mt-2" style="width:800px;">
                     <div class="chat-group w-100 p-2">
-                        <textarea id="user_msg" class="form-control d-inline-block align-middle" rows="1" style="width:calc(100% - 60px);border:0px;box-shadow:none;resize:none;field-sizing:content;"></textarea>
-                        <button id="btn_user_msg" class="btn btn_hover" type="button" style="border:0px;" disabled="disabled">
+                        <button id="btn_say" class="btn btn_hover p-1" type="button" style="border:0px;" disabled="disabled">
+                            <svg class="bi bi-say" width="24" height="24" fill="currentColor"><use href="#btn_megaphone"></use></svg>
+                        </button>
+                        <textarea id="user_msg" class="form-control d-inline-block align-middle" rows="1" style="width:calc(100% - 120px);border:0px;box-shadow:none;resize:none;field-sizing:content;"></textarea>
+                        <button id="btn_user_msg" class="btn btn_hover p-1" type="button" style="border:0px;" disabled="disabled">
                             <svg class="bi bi-send" width="24" height="24" fill="currentColor"><use href="#btn_send"></use></svg>
+                        </button>
+                        <button id="btn_rec" class="btn btn_hover p-1" type="button" style="border:0px;" disabled="disabled">
+                            <svg class="bi bi-mic" width="24" height="24" fill="currentColor"><use href="#btn_mic"></use></svg>
                         </button>
                     </div>
                 </div>

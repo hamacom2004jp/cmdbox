@@ -93,4 +93,4 @@ class McpProxy(feature.UnsupportEdgeFeature):
                 h.setLevel(logging.ERROR)
             logger.error(f"Failed to start MCP proxy: {e}", exc_info=True)
             return self.RESP_ERROR, dict(warn=f"Failed to start MCP proxy: {e}"), None
-        return self.RESP_SCCESS, dict(info="MCP proxy successfully."), None
+        return self.RESP_SUCCESS, dict(info="MCP proxy successfully."), None

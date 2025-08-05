@@ -124,4 +124,4 @@ class EdgeConfig(feature.UnsupportEdgeFeature):
         app = edge.Edge(logger, args.data, self.appcls, self.ver)
         msg = app.configure(self.get_mode(), self.get_cmd(), args, tm, pf)
         common.print_format(msg, True, tm, None, False, pf=pf)
-        return 0, msg, None
+        return self.RESP_SUCCESS, msg, None

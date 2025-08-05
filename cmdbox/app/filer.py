@@ -8,7 +8,7 @@ import mimetypes
 import shutil
 
 class Filer(object):
-    RESP_SCCESS:int = 0
+    RESP_SUCCESS:int = 0
     RESP_WARN:int = 1
     RESP_ERROR:int = 2
     def __init__(self, data_dir: Path, logger: logging.Logger,):
@@ -132,7 +132,7 @@ class Filer(object):
             file_list:Path = self.data_dir / cpath
             tpath_key, pt = _path_tree(file_list, cpart, i, recursive if i+1==len(current_path_parts) else False)
             path_tree[tpath_key] = pt
-        return self.RESP_SCCESS, dict(success=path_tree)
+        return self.RESP_SUCCESS, dict(success=path_tree)
     
     def file_mkdir(self, current_path:str) -> Tuple[int, Dict[str, Any]]:
         """
@@ -152,7 +152,7 @@ class Filer(object):
         try:
             abspath.mkdir(parents=True)
             ret_path = str(Path(current_path).parent).replace("\\","/")
-            return self.RESP_SCCESS, dict(success=dict(path=f"{ret_path}",msg=f"Created {abspath}"))
+            return self.RESP_SUCCESS, dict(success=dict(path=f"{ret_path}",msg=f"Created {abspath}"))
         except Exception as e:
             self.logger.warning(f"Failed to create {abspath}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to create {abspath}. {e}")
@@ -178,7 +178,7 @@ class Filer(object):
         try:
             common.rmdirs(abspath, ignore_errors=False)
             ret_path = str(Path(current_path).parent).replace("\\","/")
-            return self.RESP_SCCESS, dict(success=dict(path=f"{ret_path}",msg=f"Removed {abspath}"))
+            return self.RESP_SUCCESS, dict(success=dict(path=f"{ret_path}",msg=f"Removed {abspath}"))
         except Exception as e:
             self.logger.warning(f"Failed to remove {abspath}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to remove {abspath}. {e}")
@@ -213,7 +213,7 @@ class Filer(object):
                     fd = convert.img2byte(img, "jpeg")
                     fname = f"{fname}.thumbnail.jpg"
                 data = convert.bytes2b64str(fd)
-            return self.RESP_SCCESS, dict(success=dict(name=fname, data=data, mime_type=mime_type))
+            return self.RESP_SUCCESS, dict(success=dict(name=fname, data=data, mime_type=mime_type))
         except Exception as e:
             self.logger.warning(f"Failed to download {abspath}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to download {abspath}. {e}")
@@ -254,7 +254,7 @@ class Filer(object):
                 save_path.parent.mkdir(parents=True, exist_ok=True)
             with open(save_path, "wb") as f:
                 f.write(file_data)
-            return self.RESP_SCCESS, dict(success=f"Uploaded {save_path}")
+            return self.RESP_SUCCESS, dict(success=f"Uploaded {save_path}")
         except Exception as e:
             self.logger.warning(f"Failed to upload {save_path}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to upload {save_path}. {e}")
@@ -280,7 +280,7 @@ class Filer(object):
         try:
             abspath.unlink()
             ret_path = str(Path(current_path).parent).replace("\\","/")
-            return self.RESP_SCCESS, dict(success=dict(path=ret_path, msg=f"Removed {abspath}"))
+            return self.RESP_SUCCESS, dict(success=dict(path=ret_path, msg=f"Removed {abspath}"))
         except Exception as e:
             self.logger.warning(f"Failed to remove {abspath}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to remove {abspath}. {e}")
@@ -316,7 +316,7 @@ class Filer(object):
             self.logger.warning(f"Path {from_abspath} is not file or directory.")
             return self.RESP_WARN, dict(warn=f"Path {from_abspath} is not file or directory.")
 
-        return self.RESP_SCCESS, dict(success=dict(path=Path(to_path).parent,
+        return self.RESP_SUCCESS, dict(success=dict(path=Path(to_path).parent,
                                                     to_path=to_path,
                                                     from_path=from_path,
                                                     ret_path=ret_path,
@@ -344,7 +344,7 @@ class Filer(object):
 
         ret_path = shutil.move(from_abspath, to_abspath)
 
-        return self.RESP_SCCESS, dict(success=dict(path=Path(to_path).parent,
+        return self.RESP_SUCCESS, dict(success=dict(path=Path(to_path).parent,
                                                     to_path=to_path,
                                                     from_path=from_path,
                                                     ret_path=ret_path,

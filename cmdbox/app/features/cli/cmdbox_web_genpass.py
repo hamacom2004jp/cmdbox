@@ -90,15 +90,15 @@ class WebGenpass(feature.OneshotResultEdgeFeature):
         if args.pass_length < 1:
             msg = dict(warn="The password length must be 1 or more.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         if args.pass_count < 1:
             msg = dict(warn="The number of passwords to generate must be 1 or more.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         if args.pass_count >= 40:
             msg = dict(warn="The number of passwords to generate must be less than 40.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         ret = {}
         try:
             chars = ""
@@ -121,8 +121,8 @@ class WebGenpass(feature.OneshotResultEdgeFeature):
         except Exception as e:
             msg = dict(error=f"Failed to generate password. {e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
-        return 0, ret, None
+            return self.RESP_WARN, msg, None
+        return self.RESP_SUCCESS, ret, None
 
     def gen_cert(self, logger:logging.Logger, webhost:str,
                  output_cert:Path, output_cert_format:str,

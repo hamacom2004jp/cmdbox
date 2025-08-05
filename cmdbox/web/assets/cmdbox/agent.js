@@ -28,11 +28,16 @@ agent.format_agent_message = (container, messages, txt, message) => {
             if (!start || start.length < 0) {
                 // JSON開始部分が無い場合はそのまま表示
                 const msg = message.replace(/\n/g, '<br/>');
+                agent.say.say(msg);
                 txt.append(msg);
                 break;
             }
             start = message.substring(0, start.index);
-            if (start) txt.append(start.replace(/\n/g, '<br/>'));
+            if (start) {
+                const msg = start.replace(/\n/g, '<br/>');
+                agent.say.say(msg);
+                txt.append(msg);
+            }
             message = message.replace(start+regs_start.source, '');
 
             // JSON内容部分を探す
@@ -92,6 +97,83 @@ agent.recursive_json_parse = (jobj) => {
         }
     });
 };
+agent.say = {};
+agent.say.model = 'ずんだもんノーマル';
+agent.say.start = ()=> {
+    const opt = cmdbox.get_server_opt(false, $('#filer_form'));
+    opt['mode'] = 'tts';
+    opt['cmd'] = 'start';
+    opt['tts_engine'] = 'voicevox';
+    opt['voicevox_model'] = agent.say.model;
+    cmdbox.show_loading();
+    return cmdbox.sv_exec_cmd(opt).then(res => {
+        if (res && res['success']) res = [res];
+        cmdbox.hide_loading();
+        if (!res[0] || !res[0]['success']) {
+            if (res[0] && res[0]['warn']) throw res[0]['warn'];
+            else if (res['warn']) throw res['warn'];
+            throw res;
+        }
+        if (res[0]['success']['data']) return res[0]['success']['data'];
+        return res[0]['success'];
+    });
+};
+agent.say.stop = () => {
+    const opt = cmdbox.get_server_opt(false, $('#filer_form'));
+    opt['mode'] = 'tts';
+    opt['cmd'] = 'stop';
+    opt['tts_engine'] = 'voicevox';
+    opt['voicevox_model'] = agent.say.model;
+    cmdbox.show_loading();
+    return cmdbox.sv_exec_cmd(opt).then(res => {
+        if (res && res['success']) res = [res];
+        cmdbox.hide_loading();
+        if (!res[0] || !res[0]['success']) {
+            if (res[0] && res[0]['warn']) throw res[0]['warn'];
+            else if (res['warn']) throw res['warn'];
+            throw res;
+        }
+        if (res[0]['success']['data']) return res[0]['success']['data'];
+        return res[0]['success'];
+    });
+};
+agent.say.isStart = () => {
+    const btn_say = $('#btn_say');
+    return btn_say.hasClass('say_on')
+};
+agent.say.say = (tts_text) => {
+    if (!agent.say.isStart()) return;
+    const opt = cmdbox.get_server_opt(false, $('#filer_form'));
+    opt['mode'] = 'tts';
+    opt['cmd'] = 'say';
+    opt['tts_engine'] = 'voicevox';
+    opt['voicevox_model'] = agent.say.model;
+    opt['tts_text'] = tts_text;
+    cmdbox.show_loading();
+    return cmdbox.sv_exec_cmd(opt).then(async (res) => {
+        if (res && res['success']) res = [res];
+        cmdbox.hide_loading();
+        if (!res[0] || !res[0]['success']) {
+            if (res[0] && res[0]['warn']) throw res[0]['warn'];
+            throw res;
+        }
+        if (!res[0]['success']['data']) {
+            throw res[0]['success'];
+        }
+        // 音声データを再生
+        const binary_string = window.atob(res[0]['success']['data']);
+        const bytesArray  = new Uint8Array(binary_string.length);
+        for (let i = 0; i < binary_string.length; i++) {
+            bytesArray[i] = binary_string.charCodeAt(i);
+        }
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const audioBuffer = await audioContext.decodeAudioData(bytesArray.buffer);
+        const source = audioContext.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(audioContext.destination);
+        source.start(0);
+    });
+};
 agent.init_form = async () => {
     const container = $('#message_container');
     const histories = $('#histories');
@@ -109,7 +191,9 @@ agent.init_form = async () => {
             clearInterval(agent.chat_callback_ping_handler);
         }
         messages.attr('data-session_id', session_id);
+        const btn_say = $('#btn_say');
         const btn_user_msg = $('#btn_user_msg');
+        const btn_rec = $('#btn_rec');
         const user_msg = $('#user_msg');
         let message_id = null;
         btn_user_msg.prop('disabled', true); // 初期状態で送信ボタンを無効化
@@ -133,6 +217,101 @@ agent.init_form = async () => {
             agent.list_sessions();
             // メッセージ一覧を一番下までスクロール
             container.scrollTop(container.prop('scrollHeight'));
+        });
+        // sayボタンのクリックイベント
+        btn_say.off('click').on('click', async () => {
+            if (agent.say.isStart()) {
+                agent.say.stop().then((msg) => {
+                    //cmdbox.message(msg);
+                    btn_say.removeClass('say_on');
+                    btn_say.find('use').attr('href', '#btn_megaphone');
+                }).catch((err) => {
+                    cmdbox.message(err);
+                    if (err.startsWith('VoiceVox model is not running:')) {
+                        btn_say.removeClass('say_on');
+                        btn_say.find('use').attr('href', '#btn_megaphone');
+                    }
+                });
+                return;
+            }
+            agent.say.start().then((msg) => {
+                //cmdbox.message(msg);
+                btn_say.addClass('say_on');
+                btn_say.find('use').attr('href', '#btn_megaphone_fill');
+            }).catch((err) => {
+                cmdbox.message(err);
+                if (err.startsWith('VoiceVox model is already running:')) {
+                    btn_say.addClass('say_on');
+                    btn_say.find('use').attr('href', '#btn_megaphone_fill');
+                }
+            });
+        });
+        // recボタンのクリックイベント
+        btn_rec.off('click').on('click', async () => {
+            // 録音を終了
+            if (btn_rec.hasClass('rec_on')) {
+                btn_rec.removeClass('rec_on');
+                btn_rec.find('use').attr('href', '#btn_mic');
+                // 録音中を停止
+                if (agent.recognition) {
+                    agent.recognition.stop();
+                }
+                return;
+            }
+            // 録音を開始
+            const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+            if (!SpeechRecognition) {
+                cmdbox.message({'error':'Speech Recognition API is not supported in this browser.'});
+                return;
+            }
+            btn_rec.addClass('rec_on');
+            btn_rec.find('use').attr('href', '#btn_mic_fill');
+            let finalTranscript = user_msg.val();
+            agent.recognition = new SpeechRecognition();
+            agent.recognition.lang = 'ja-JP'; // 言語設定
+            agent.recognition.interimResults = true; // 中間結果を取得する
+            agent.recognition.maxAlternatives = 1; // 最小の候補数
+            agent.recognition.continuous = false; // 連続認識を無効にする
+            agent.recognition.onresult = (event) => {
+                let interimTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    let transcript = event.results[i][0].transcript;
+                    console.log(`transcript: ${transcript}`);
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript = transcript;
+                    }
+                }
+                user_msg.val(finalTranscript + interimTranscript);
+            };
+            agent.recognition.onerror = (event) => {
+                console.error(`Speech Recognition error: ${event.error}`);
+                if (event.error === 'no-speech') {
+                    agent.recognition.restart();
+                    return; // no-speechエラーは無視して再度認識を開始
+                }
+                btn_rec.removeClass('rec_on');
+                btn_rec.find('use').attr('href', '#btn_mic');
+                cmdbox.message({'error':`Speech Recognition error: ${event.error}`});
+            };
+            agent.recognition.onend = () => {
+                // 連続認識を無効にしているので、認識が終了したら再稼働させる。
+                console.log(`onend event triggered.`);
+                agent.recognition.restart();
+            };
+            agent.recognition.restart = () => {
+                if (btn_rec.hasClass('rec_on')) {
+                    setTimeout(() => {
+                        try {
+                            agent.recognition.start();
+                        } catch (error) {
+                            console.error(`Error restarting recognition: ${error}`);
+                        }
+                    }, 100);
+                }
+            };
+            agent.recognition.start();
         });
         // ws接続
         const protocol = window.location.protocol.endsWith('s:') ? 'wss' : 'ws';
@@ -164,7 +343,9 @@ agent.init_form = async () => {
                 ws.send('ping');
                 agent.chat_reconnect_count = 0; // pingが成功したら再接続回数をリセット
             };
+            btn_say.prop('disabled', false);
             btn_user_msg.prop('disabled', false);
+            btn_rec.prop('disabled', false);
             agent.chat_callback_ping_handler = setInterval(() => {ping();}, ping_interval);
         };
         ws.onerror = (e) => {

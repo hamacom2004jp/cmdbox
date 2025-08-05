@@ -74,7 +74,7 @@ class WebApikeyDel(feature.UnsupportEdgeFeature):
         if args.data is None:
             msg = dict(warn=f"Please specify the --data option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         w = None
         try:
             w = web.Web(logger, self.default_data, appcls=self.appcls, ver=self.ver,
@@ -84,8 +84,8 @@ class WebApikeyDel(feature.UnsupportEdgeFeature):
             w.apikey_del(user)
             msg = dict(success=dict(msg=f"User ApiKey deleted. user_name={args.user_name} apikey_name={args.apikey_name}"))
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 0, msg, w
+            return self.RESP_SUCCESS, msg, w
         except Exception as e:
             msg = dict(warn=f"{e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, w
+            return self.RESP_WARN, msg, w

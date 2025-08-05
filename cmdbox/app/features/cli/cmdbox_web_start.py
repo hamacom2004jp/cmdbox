@@ -153,7 +153,7 @@ class WebStart(feature.UnsupportEdgeFeature, agent_base.AgentBase):
         if args.data is None:
             msg = dict(warn=f"Please specify the --data option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         w = None
         try:
             args.gui_mode = False if not hasattr(args, 'gui_mode') or not args.gui_mode else args.gui_mode
@@ -165,12 +165,12 @@ class WebStart(feature.UnsupportEdgeFeature, agent_base.AgentBase):
             self.start(w, agent_runner, mcp, logger, args)
             msg = dict(success="web complate.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 0, msg, w
+            return self.RESP_SUCCESS, msg, w
         except Exception as e:
             logger.error(f"Web server start error. {e}", exc_info=True)
             msg = dict(warn=f"Web server start error. {e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, w
+            return self.RESP_WARN, msg, w
 
     def createWeb(self, logger:logging.Logger, args:argparse.Namespace) -> web.Web:
         """
@@ -206,7 +206,7 @@ class WebStart(feature.UnsupportEdgeFeature, agent_base.AgentBase):
         if args.agent=='use':
             if not hasattr(self, 'mcp'):
                 from cmdbox.app import mcp
-                self.mcp = mcp.Mcp(logger, args.data, w.signin, self.appcls, self.ver)
+                self.mcp = mcp.Mcp(logger, Path(args.data), w.signin, self.appcls, self.ver)
             if args.agent_session_store == 'sqlite':
                 args.agent_session_dburl = "sqlite:" + pathname2url(str(w.agent_path / 'session.db'))
             elif args.agent_session_store == 'postgresql':

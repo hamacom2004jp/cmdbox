@@ -92,12 +92,12 @@ class ServerStart(feature.OneshotNotifyEdgeFeature):
         if args.data is None:
             msg = dict(warn=f"Please specify the --data option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg
+            return self.RESP_WARN, msg
         if args.svname is None:
             msg = dict(warn=f"Please specify the --svname option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg
+            return self.RESP_WARN, msg
         sv = server.Server(Path(args.data), logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         sv.start_server(args.retry_count, args.retry_interval)
 
-        return 0, dict(warn=f"server stoped. svname={sv.svname}"), sv
+        return self.RESP_SUCCESS, dict(success=f"server stoped. svname={sv.svname}"), sv
