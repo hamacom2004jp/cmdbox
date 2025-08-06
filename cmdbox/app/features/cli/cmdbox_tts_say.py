@@ -73,8 +73,6 @@ class TtsSay(cmdbox_tts_start.TtsStart):
         voicevox_model_b64 = convert.str2b64str(args.voicevox_model) if args.voicevox_model is not None else '-'
         tts_text_b64 = convert.str2b64str(args.tts_text)
 
-        if logger.level == logging.DEBUG:
-            logger.debug(f"audit write args: {args}")
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.redis_cli.send_cmd(self.get_svcmd(),
                                     [tts_engine_b64, voicevox_model_b64, tts_text_b64],

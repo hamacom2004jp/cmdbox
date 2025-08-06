@@ -1,3 +1,4 @@
+from cmdbox import version
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, redis_client
 from cmdbox.app.options import Options
@@ -225,8 +226,6 @@ class TtsStart(feature.OneshotNotifyEdgeFeature):
         tts_engine_b64 = convert.str2b64str(args.tts_engine)
         voicevox_model_b64 = convert.str2b64str(args.voicevox_model) if args.voicevox_model is not None else '-'
 
-        if logger.level == logging.DEBUG:
-            logger.debug(f"audit write args: {args}")
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.redis_cli.send_cmd(self.get_svcmd(),
                                     [tts_engine_b64, voicevox_model_b64],
@@ -289,7 +288,7 @@ class TtsStart(feature.OneshotNotifyEdgeFeature):
                 #===============================================================
                 # voicevoxの初期化
                 from voicevox_core.blocking import Onnxruntime, OpenJtalk, Synthesizer, VoiceModelFile
-                voicevox_dir = Path(self.ver.__file__).parent / '.voicevox' / 'voicevox_core'
+                voicevox_dir = Path(version.__file__).parent / '.voicevox' / 'voicevox_core'
                 if not voicevox_dir.exists():
                     logger.error(f"Failed to start VoiceVox core: voicevox directory does not exist: {voicevox_dir}")
                     redis_cli.rpush(reskey, dict(warn=f"Failed to start VoiceVox core: voicevox directory does not exist: {voicevox_dir}"))

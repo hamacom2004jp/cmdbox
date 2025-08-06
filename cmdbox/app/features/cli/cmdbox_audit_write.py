@@ -132,8 +132,6 @@ class AuditWrite(audit_base.AuditBase):
         pg_password_b64 = convert.str2b64str(args.pg_password)
         pg_dbname_b64 = convert.str2b64str(args.pg_dbname)
 
-        if logger.level == logging.DEBUG:
-            logger.debug(f"audit write args: {args}")
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         cl.redis_cli.send_cmd(self.get_svcmd(),
                               [audit_type_b64, clmsg_id_b64, clmsg_date_b64, clmsg_src_b64, clmsg_title_b64, clmsg_user_b64, clmsg_body_b64, clmsg_tag_b64,

@@ -1,3 +1,4 @@
+from cmdbox import version
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, redis_client
 from cmdbox.app.options import Options
@@ -6,6 +7,7 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import glob
 import logging
+import pip
 import requests
 import shutil
 import subprocess
@@ -64,6 +66,9 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                 dict(opt="timeout", type=Options.T_INT, default="300", required=False, multi=False, hide=True, choice=None,
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                      description_en="Specify the maximum waiting time until the server responds."),
+                dict(opt="client_only", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
+                     description_ja="サーバーへの接続を行わないようにします。",
+                     description_en="Do not make connections to the server."),
                 dict(opt="tts_engine", type=Options.T_STR, default="voicevox", required=True, multi=False, hide=False,
                      choice=["voicevox"],
                      choice_show=dict(voicevox=["voicevox_ver", "voicevox_os", "voicevox_arc", "voicevox_device", "voicevox_whl"]),
@@ -142,23 +147,32 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                 common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, msg, None
 
-        tts_engine_b64 = convert.str2b64str(args.tts_engine)
-        voicevox_ver_b64 = convert.str2b64str(args.voicevox_ver) if args.voicevox_ver is not None else '-'
-        voicevox_os_b64 = convert.str2b64str(args.voicevox_os) if args.voicevox_os is not None else '-'
-        voicevox_arc_b64 = convert.str2b64str(args.voicevox_arc) if args.voicevox_arc is not None else '-'
-        voicevox_device_b64 = convert.str2b64str(args.voicevox_device) if args.voicevox_device is not None else '-'
-        voicevox_whl_b64 = convert.str2b64str(args.voicevox_whl) if args.voicevox_whl is not None else '-'
+        tts_engine = args.tts_engine
+        voicevox_ver = args.voicevox_ver if args.voicevox_ver is not None else '-'
+        voicevox_os = args.voicevox_os if args.voicevox_os is not None else '-'
+        voicevox_arc = args.voicevox_arc if args.voicevox_arc is not None else '-'
+        voicevox_device = args.voicevox_device if args.voicevox_device is not None else '-'
+        voicevox_whl = args.voicevox_whl if args.voicevox_whl is not None else '-'
 
-        if logger.level == logging.DEBUG:
-            logger.debug(f"audit write args: {args}")
-        cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-        ret = cl.redis_cli.send_cmd(self.get_svcmd(),
-                                    [tts_engine_b64, voicevox_ver_b64, voicevox_os_b64, voicevox_arc_b64, voicevox_device_b64, voicevox_whl_b64],
-                                    retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
+        if args.client_only:
+            # クライアントのみの場合は、サーバーに接続せずに実行
+            ret = self.install(common.random_string(), tts_engine, voicevox_ver, voicevox_os, voicevox_arc,
+                               voicevox_device, voicevox_whl, logger)
+        else:
+            tts_engine_b64 = convert.str2b64str(tts_engine)
+            voicevox_ver_b64 = convert.str2b64str(voicevox_ver)
+            voicevox_os_b64 = convert.str2b64str(voicevox_os)
+            voicevox_arc_b64 = convert.str2b64str(voicevox_arc)
+            voicevox_device_b64 = convert.str2b64str(voicevox_device)
+            voicevox_whl_b64 = convert.str2b64str(voicevox_whl)
+            cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
+            ret = cl.redis_cli.send_cmd(self.get_svcmd(),
+                                        [tts_engine_b64, voicevox_ver_b64, voicevox_os_b64, voicevox_arc_b64, voicevox_device_b64, voicevox_whl_b64],
+                                        retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
         common.print_format(ret, False, tm, None, False, pf=pf)
         if 'success' not in ret:
-                return self.RESP_WARN, ret, cl
-        return self.RESP_SUCCESS, ret, cl
+                return self.RESP_WARN, ret, None
+        return self.RESP_SUCCESS, ret, None
 
     def is_cluster_redirect(self):
         """
@@ -192,12 +206,15 @@ class TtsInstall(feature.UnsupportEdgeFeature):
         voicevox_arc = convert.b64str2str(msg[5])
         voicevox_device = convert.b64str2str(msg[6])
         voicevox_whl = convert.b64str2str(msg[7])
-        st = self.install(msg[1], tts_engine, voicevox_ver, voicevox_os, voicevox_arc, voicevox_device, voicevox_whl,
-                        data_dir, logger, redis_cli)
-        return st
+        ret = self.install(msg[1], tts_engine, voicevox_ver, voicevox_os, voicevox_arc, voicevox_device, voicevox_whl, logger)
+
+        if 'success' not in ret:
+            redis_cli.rpush(msg[1], ret)
+            return self.RESP_WARN
+        return self.RESP_SUCCESS
 
     def install(self, reskey:str, tts_engine:str, voicevox_ver:str, voicevox_os:str, voicevox_arc:str,
-              voicevox_device:str, voicevox_whl:str, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient) -> int:
+              voicevox_device:str, voicevox_whl:str, logger:logging.Logger) -> Dict[str, Any]:
         """
         TTSエンジンをインストールします
 
@@ -209,12 +226,10 @@ class TtsInstall(feature.UnsupportEdgeFeature):
             voicevox_arc (str): VoiceVox アーキテクチャ
             voicevox_device (str): VoiceVox デバイス
             voicevox_whl (str): VoiceVox ホイールファイル
-            data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
-            redis_cli (redis_client.RedisClient): Redisクライアント
 
         Returns:
-            int: レスポンスコード
+            Dict[str, Any]: 結果
         """
         try:
             if tts_engine == 'voicevox':
@@ -225,7 +240,7 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                 else:
                     dlfile = f"download-{voicevox_os}-{voicevox_arc}"
                 downloader_url = f"https://github.com/VOICEVOX/voicevox_core/releases/download/{voicevox_ver}/{dlfile}"
-                voicevox_dir = Path(self.ver.__file__).parent / '.voicevox' / 'voicevox_core'
+                voicevox_dir = Path(version.__file__).parent / '.voicevox' / 'voicevox_core'
                 # すでにダウンローダーが存在する場合は削除
                 if voicevox_dir.exists():
                     shutil.rmtree(voicevox_dir)
@@ -234,9 +249,9 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                 # ダウンローダーを保存
                 responce = requests.get(downloader_url, allow_redirects=True)
                 if responce.status_code != 200:
-                    logger.error(f"Failed to download VoiceVox core: {responce.status_code} {responce.reason}. {downloader_url}")
-                    redis_cli.rpush(reskey, dict(warn=f"Failed to download VoiceVox core: {responce.status_code} {responce.reason}. {downloader_url}"))
-                    return self.RESP_WARN
+                    _msg = f"Failed to download VoiceVox core: {responce.status_code} {responce.reason}. {downloader_url}"
+                    logger.error(_msg, exc_info=True)
+                    return dict(warn=_msg)
                 with open(dlfile, mode='wb') as f:
                     f.write(responce.content)
                 # ダウンローダーの実行権限を付与
@@ -252,11 +267,11 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                 proc = subprocess.Popen(cmd_line, cwd=str(voicevox_dir), stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
                 outs, errs = proc.communicate(input=b'y\ny\n')  # 'y' to confirm installation
                 if proc.returncode != 0:
-                    msg = outs.decode('utf-8') if outs else ''
-                    msg += errs.decode('utf-8') if errs else msg
-                    logger.error(f"Failed to install VoiceVox core: {msg}")
-                    redis_cli.rpush(reskey, dict(warn=f"Failed to install VoiceVox core: {msg}"))
-                    return self.RESP_WARN
+                    _msg = outs.decode('utf-8') if outs else ''
+                    _msg += errs.decode('utf-8') if errs else _msg
+                    _msg += f"Failed to install VoiceVox core: {_msg}"
+                    logger.error(_msg, exc_info=True)
+                    return dict(warn=_msg)
                 if (voicevox_dir / 'voicevox_core').exists():
                     for file in glob.glob(str(voicevox_dir / 'voicevox_core' / '*')):
                         shutil.move(file, voicevox_dir)
@@ -270,26 +285,23 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                 # whlファイルをダウンロード
                 responce = requests.get(whl_url, allow_redirects=True)
                 if responce.status_code != 200:
-                    logger.error(f"Failed to download VoiceVox whl: {responce.status_code} {responce.reason}. {whl_url}")
-                    redis_cli.rpush(reskey, dict(warn=f"Failed to download VoiceVox whl: {responce.status_code} {responce.reason}. {whl_url}"))
-                    return self.RESP_WARN
+                    _msg = f"Failed to download VoiceVox whl: {responce.status_code} {responce.reason}. {whl_url}"
+                    logger.error(_msg, exc_info=True)
+                    return dict(warn=_msg)
                 with open(voicevox_whl, mode='wb') as f:
                     f.write(responce.content)
                 # whlファイルをpipでインストール
-                cmd_line = [sys.executable, '-m', 'pip', 'install', str(voicevox_whl)]
-                msg = " ".join(cmd_line)
-                logger.info(f"Install command: {msg}")
-                proc = subprocess.run(cmd_line, cwd=str(voicevox_dir), shell=True)
-                if proc.returncode != 0:
-                    logger.error(f"Failed to install VoiceVox python library: Possible whl not in the environment. {msg}. {whl_url}")
-                    redis_cli.rpush(reskey, dict(warn=f"Failed to install VoiceVox python library: Possible whl not in the environment. {msg}. {whl_url}"))
-                    return self.RESP_WARN
+                rescode = pip.main(['install', str(voicevox_whl)])  # pipのインストール
+                logger.info(f"Install wheel: {voicevox_whl}")
+                if rescode != 0:
+                    _msg = f"Failed to install VoiceVox python library: Possible whl not in the environment. {voicevox_whl}. {whl_url}"
+                    logger.error(_msg, exc_info=True)
+                    return dict(warn=_msg)
                 #===============================================================
                 # 成功時の処理
-                rescode, msg = (self.RESP_SUCCESS, dict(success=f'Success to install VoiceVox python library. {whl_url}'))
-                redis_cli.rpush(reskey, msg)
-                return rescode
+                rescode, _msg = (self.RESP_SUCCESS, dict(success=f'Success to install VoiceVox python library. {whl_url}'))
+                return dict(success=_msg)
         except Exception as e:
-            logger.warning(f"Failed to install: {e}", exc_info=True)
-            redis_cli.rpush(reskey, dict(warn=f"Failed to install: {e}"))
-            return self.RESP_WARN
+            _msg = f"Failed to install VoiceVox: {e}"
+            logger.warning(_msg, exc_info=True)
+            return dict(warn=_msg)
