@@ -7,7 +7,7 @@ import argparse
 import logging
 
 
-class ServerStop(feature.OneshotNotifyEdgeFeature):
+class ServerStop(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -34,7 +34,7 @@ class ServerStop(feature.OneshotNotifyEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_TRUE, nouse_webmode=True,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=True, use_agent=False,
             description_ja="サーバーを停止します。installモードで `cmdbox -m install -c server` を実行している場合は、 `docker-compose down` を使用してください。",
             description_en="Stop the inference server. If you are running `cmdbox -m install -c server` in install mode, use `docker-compose down`.",
             choice=[

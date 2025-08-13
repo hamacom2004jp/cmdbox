@@ -33,7 +33,7 @@ class WebApikeyAdd(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False, use_agent=False,
             description_ja="WebモードのユーザーのApiKeyを追加します。",
             description_en="Add an ApiKey for a user in Web mode.",
             choice=[

@@ -19,7 +19,9 @@ cmdbox
    Tutorial <docs/tutorial.rst>
    Command Reference <docs/command.rst>
    Features <docs/features.rst>
+   Audit <docs/audit.rst>
    Authentication <docs/authentication.rst>
+   Text-to-Speech (TTS) <docs/tts.rst>
    Developer Information <docs/developer.rst>
    Common Errors <docs/errors.rst>
    License <docs/license.rst>

@@ -1,5 +1,6 @@
 from cmdbox.app import common, feature
 from cmdbox.app.auth import signin
+from cmdbox.app.features.cli import agent_base
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Depends, HTTPException, Request, Response, WebSocket
 from fastapi.responses import HTMLResponse, StreamingResponse
@@ -37,6 +38,16 @@ class Agent(feature.WebFeature):
             res.headers['Access-Control-Allow-Origin'] = '*'
             web.options.audit_exec(req, res, web)
             return web.agent_html_data
+
+        @app.get('/agent/llmsetting')
+        async def agent(req:Request, res:Response):
+            signin = web.signin.check_signin(req, res)
+            if signin is not None:
+                return signin
+            res.headers['Access-Control-Allow-Origin'] = '*'
+            web.options.audit_exec(req, res, web)
+            cmd = agent_base.AgentBase(web.appcls, web.ver)
+            return cmd.get_option().get('choice')
 
         @app.post('/agent/session/list')
         async def agent_session_list(req:Request, res:Response):
@@ -150,12 +161,9 @@ class Agent(feature.WebFeature):
             if 'signin' in session:
                 user_id = session['signin']['name']
                 groups = session['signin']['groups']
-            # 言語認識
-            language, _ = locale.getlocale()
-            is_japan = language.find('Japan') >= 0 or language.find('ja_JP') >= 0
             # セッションを作成する
             agent_session = await web.create_agent_session(web.agent_runner.session_service, user_id, session_id=session_id)
-            startmsg = "こんにちは！何かお手伝いできることはありますか？" if is_japan else "Hello! Is there anything I can help you with?"
+            startmsg = "こんにちは！何かお手伝いできることはありますか？" if common.is_japan() else "Hello! Is there anything I can help you with?"
             yield json.dumps(dict(message=startmsg), default=common.default_json_enc)
             def _replace_match(match_obj):
                 json_str = match_obj.group(0)
@@ -228,6 +236,10 @@ class Agent(feature.WebFeature):
                     web.logger.warning('chat: websocket disconnected.')
                     break
                 except self.SSEDisconnect as e:
+                    break
+                except NotImplementedError as e:
+                    web.logger.warning(f'The session table needs to be reloaded.{e}', exc_info=True)
+                    yield json.dumps(dict(message=f'The session table needs to be reloaded. Please reload your browser.'), default=common.default_json_enc)
                     break
                 except Exception as e:
                     web.logger.warning(f'chat error.', exc_info=True)

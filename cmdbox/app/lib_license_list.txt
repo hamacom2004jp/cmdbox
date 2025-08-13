@@ -1,0 +1,41 @@
+Author	License	Name	URL	Version	File
+Hiroshiba Kazuyuki	MIT	voicevox_core	https://github.com/VOICEVOX/voicevox_core	0.16.0	-
+Copyright (C) 2025 SSS LLC	Proprietary	VOICEVOX：四国めたん	https://zunko.jp/con_ongen_kiyaku.html	-	-
+Copyright (C) 2025 SSS LLC	Proprietary	VOICEVOX：ずんだもん	https://zunko.jp/con_ongen_kiyaku.html	-	-
+©KASUKABE project 2022	Proprietary	VOICEVOX：春日部つむぎ	https://tsumugi-official.studio.site/rule	-	-
+©2025 Amehare Project	Proprietary	VOICEVOX：雨晴はう	https://amehau.com/rules/amehare-hau-rule	-	-
+冥鳴 ひまり	VOICEVOX：冥鳴ひまり	https://www.meimeihimari.com/terms-of-use	-	-
+Copyright (C) 2025 SSS LLC	Proprietary	VOICEVOX：九州そら	https://zunko.jp/guideline.html	-	-
+©2023 Canon's Falling Castle	Proprietary	VOICEVOX：波音リツ	https://www.canon-voice.com/terms/	-	-
+Copyright (C) 2025 SSS LLC	Proprietary	VOICEVOX：中国うさぎ	https://zunko.jp/con_ongen_kiyaku.html	-	-
+©2024 by VirVox Project	Proprietary	VOICEVOX：玄野武宏	https://www.virvoxproject.com/	-	-
+Copyright (C) 2025 SSS LLC	Proprietary	VOICEVOX：No.7	https://voiceseven.com/	-	-
+©2025 Tsuina-chan	Proprietary	VOICEVOX：後鬼	https://xn--n8jychz0k1d.com/voice_terms/	-	-
+©2022 WhiteCUL, ZAN-SHIN KK.	Proprietary	VOICEVOX：WhiteCUL	https://www.whitecul.com/guideline	-	-
+©2024 by VirVox Project	Proprietary	VOICEVOX：白上虎太郎	https://www.virvoxproject.com/	-	-
+ちび式じい	Proprietary	VOICEVOX：ちび式じい	https://docs.google.com/presentation/d/1AcD8zXkfzKFf2ertHwWRwJuQXjNnijMxhz7AJzEkaI4	-	-
+©︎2019 みこみこうしき	Proprietary	VOICEVOX：櫻歌ミコ	https://voicevox35miko.studio.site/rule	-	-
+捨て犬A	Proprietary	VOICEVOX：ナースロボ＿タイプＴ	https://www.krnr.top/rules	-	-
+百花繚乱	Proprietary	VOICEVOX：†聖騎士 紅桜†	https://commons.nicovideo.jp/material/nc296132	-	-
+©2024 by VirVox Project	Proprietary	VOICEVOX：雀松朱司	https://www.virvoxproject.com/voicevox%E3%81%AE%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84	-	-
+©2024 by VirVox Project	Proprietary	VOICEVOX：麒ヶ島宗麟	https://www.virvoxproject.com/voicevox%E3%81%AE%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84	-	-
+Copyright© 2009 春歌ナナ制作チーム	VOICEVOX：春歌ナナ	https://nanahira.jp/haruka_nana/guideline.html	-	-
+猫使アル	VOICEVOX：猫使アル	https://nekotukarb.wixsite.com/nekonohako/%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84	-	-
+猫使ビィ	VOICEVOX：猫使ビィ	https://nekotukarb.wixsite.com/nekonohako/%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84	-	-
+Copyright © AI, Inc	VOICEVOX：栗田まろん	https://aivoice.jp/character/maron/	-	-
+©infiniteloop Co.,Ltd.	VOICEVOX：あいえるたん	https://www.infiniteloop.co.jp/special/iltan/terms/	-	-
+©2023 満別花丸	VOICEVOX：満別花丸	https://100hanamaru.wixsite.com/manbetsu-hanamaru/rule	-	-
+琴詠ニア	VOICEVOX：琴詠ニア	https://commons.nicovideo.jp/works/nc315435	-	-
+©2024 by VirVox Project	Proprietary	VOICEVOX：青山龍星	https://www.virvoxproject.com/	-	-
+もちぞら模型店	Proprietary	VOICEVOX：もち子さん	https://vtubermochio.wixsite.com/mochizora/%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84	-	-
+©SAYO Project 2022	Proprietary	VOICEVOX：小夜/SAYO	https://316soramegu.wixsite.com/sayo-official/guideline	-	-
+©DWANGO Co., Ltd.	Proprietary	VOICEVOX：Voidoll(CV:丹下桜)	https://blog.nicovideo.jp/niconews/224589.html	-	-
+©ZONe	Proprietary	VOICEVOX：ぞん子	https://zonko.zone-energy.jp/guideline	-	-
+Copyright (C) 2025 SSS LLC	Proprietary	VOICEVOX：中部つるぎ	https://zunko.jp/con_ongen_kiyaku.html	-	-
+©2022 - 2025 LitMus9_.	Proprietary	VOICEVOX：離途	https://litmus9.com/#/voicebank#rules	-	-
+©2024 by VirVox Project	Proprietary	VOICEVOX：黒沢冴白	https://www.virvoxproject.com/voicevox%E3%81%AE%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84	-	-
+Copyright © U-Stella Inc.	Proprietary	VOICEVOX：ユーレイちゃん(CV:神崎零)	https://u-stella.co.jp/voicevox-ure-chan-tucumo-terms-of-use/	-	-
+Copyright (C) 2025 SSS LLC	Proprietary	VOICEVOX：東北ずん子	https://zunko.jp/con_ongen_kiyaku.html	-	-
+Copyright (C) 2025 SSS LLC	Proprietary	VOICEVOX：東北きりたん	https://zunko.jp/con_ongen_kiyaku.html	-	-
+Copyright (C) 2025 SSS LLC	Proprietary	VOICEVOX：東北イタコ	https://zunko.jp/con_ongen_kiyaku.html	-	-
+銃口會	Proprietary	VOICEVOX：剣崎雌雄	https://frontier.creatia.cc/fanclubs/413/posts/4507	-	-

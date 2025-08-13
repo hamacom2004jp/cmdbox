@@ -6,6 +6,7 @@ import argparse
 import argcomplete
 import logging
 import time
+import threading
 import sys
 
 
@@ -180,4 +181,9 @@ class CmdBoxApp:
         アプリケーションの設定を読み込みます。
         """
         logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall if args.cmd != 'webcap' else True, ver=self.ver)
+        if not hasattr(common, 'logsv') and hasattr(args, 'logsv') and args.logsv:
+            from cmdbox.app.commons import loghandler
+            common.logsv = loghandler.LogRecordTCPServer("logsv", host="localhost", port=9020, debug=args.debug)
+            threading.Thread(daemon=True, target=common.logsv.serve_until_stopped, name="logsv").start()
+
         return logger

@@ -148,7 +148,7 @@ agent.say.say = (tts_text) => {
     opt['cmd'] = 'say';
     opt['tts_engine'] = 'voicevox';
     opt['voicevox_model'] = agent.say.model;
-    opt['tts_text'] = tts_text;
+    opt['tts_text'] = tts_text.replace(/<br\s*\/?>/g, '\n'); // <br>タグを改行に変換
     cmdbox.show_loading();
     return cmdbox.sv_exec_cmd(opt).then(async (res) => {
         if (res && res['success']) res = [res];
@@ -236,6 +236,7 @@ agent.init_form = async () => {
             }
             agent.say.start().then((msg) => {
                 //cmdbox.message(msg);
+                agent.say.say(msg);
                 btn_say.addClass('say_on');
                 btn_say.find('use').attr('href', '#btn_megaphone_fill');
             }).catch((err) => {
@@ -255,6 +256,8 @@ agent.init_form = async () => {
                 // 録音中を停止
                 if (agent.recognition) {
                     agent.recognition.stop();
+                    const transcript = user_msg.val();
+                    transcript && $('#btn_user_msg').click(); // 録音が終了したら自動的にメッセージを送信
                 }
                 return;
             }
@@ -492,6 +495,47 @@ agent.delete_session = async (session_id) => {
     if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }
+agent.llmsetting = async () => {
+    const user = await cmdbox.user_info();
+    if (!user) {
+        cmdbox.message('user not found');
+        return;
+    }
+    const llmsetting_modal = $('#llmsetting_modal').length?$('#llmsetting_modal'):$(`<div id="llmsetting_modal" class="modal" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
+    llmsetting_modal.html('');
+    const daialog = $(`<div class="modal-dialog modal-lg ui-draggable ui-draggable-handle"/>`).appendTo(llmsetting_modal);
+    const form = $(`<form id="llmsetting_form" class="modal-content novalidate"/>`).appendTo(daialog);
+    const header = $(`<div class="modal-header"/>`).appendTo(form);
+    header.append('<h5 class="modal-title">LLM Setting</h5>');
+    header.append('<button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">'
+                 +'<svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>'
+                 +'</button>');
+    const body = $(`<div class="modal-body"/>`).appendTo(form);
+    const row_content = $(`<div class="row row_content"/>`).appendTo(body);
+    const appid = $(`.navbar-brand`).text();
+    const llmsetting_choices = async () => {
+        const res = await fetch('agent/llmsetting');
+        if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+        return await res.json();
+    };
+    const llmsetting_rows = await llmsetting_choices();
+    row_content.html('');
+    // 表示オプションを追加
+    llmsetting_rows.filter(row => !row.hide).forEach((row, i) => cmdbox.add_form_func(i, llmsetting_modal, row_content, row, null));
+    // 高度なオプションを表示するリンクを追加
+    const show_link = $('<div class="text-center card-hover mb-3"><a href="#">[ advanced options ]</a></div>');
+    show_link.click(() => row_content.find('.row_content_hide').toggle());
+    row_content.append(show_link);
+    // 非表示オプションを追加
+    llmsetting_rows.filter(row => row.hide).forEach((row, i) => cmdbox.add_form_func(i, llmsetting_modal, row_content, row, null));
+    // フッターを追加
+    const footer = $(`<div class="modal-footer"/>`).appendTo(form);
+    // 閉じるボタンを追加
+    const close_btn = $('<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>').appendTo(footer);
+    llmsetting_modal.appendTo('body');
+    daialog.draggable({cursor:'move',cancel:'.modal-body'});
+    llmsetting_modal.modal('show');
+};
 $(() => {
   // カラーモード対応
   cmdbox.change_color_mode();

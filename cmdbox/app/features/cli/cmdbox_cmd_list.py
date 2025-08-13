@@ -99,7 +99,7 @@ class CmdList(feature.OneshotResultEdgeFeature):
         cmd_list = [dict(title=r.get('title',''), mode=r['mode'], cmd=r['cmd'],
                     description=r.get('description','') + options.get_cmd_attr(r['mode'], r['cmd'], 'description_ja' if is_japan else 'description_en'),
                     tag=r.get('tag','')) for r in cmd_list \
-               if signin.Signin._check_cmd(self.signin_file_data, args.groups, r['mode'], r['cmd'], logger)]
+                    if signin.Signin._check_cmd(self.signin_file_data, args.groups, r['mode'], r['cmd'], logger)]
         ret = dict(success=cmd_list)
 
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)

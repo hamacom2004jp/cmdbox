@@ -33,7 +33,7 @@ class WebUserDel(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False, use_agent=False,
             description_ja="Webモードのユーザーを削除します。",
             description_en="Delete a user in Web mode.",
             choice=[

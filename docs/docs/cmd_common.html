@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( Common ) &mdash; cmdbox 2025/08/03 documentation</title>
+  <title>Command Reference ( Common ) &mdash; cmdbox 2025/08/13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b5af3dff"></script>
+      <script src="../_static/documentation_options.js?v=d160edbb"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -57,6 +57,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_mcp.html">MCP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_audit.html">Audit</a></li>
 </ul>
@@ -131,41 +132,45 @@
 <td></td>
 <td><p>Output the processing result in an easy-to-read format. If not specified, output in json format.</p></td>
 </tr>
-<tr class="row-odd"><td><p>-t,--tag</p></td>
-<td></td>
-<td><p>Specify the tag for this command.</p></td>
-</tr>
-<tr class="row-even"><td><p>-o, --output_json &lt;Destination file for processing result json&gt;</p></td>
+<tr class="row-odd"><td><p>-o, --output_json &lt;Destination file for processing result json&gt;</p></td>
 <td></td>
 <td><p>Specify the destination file for saving the processing result json.</p></td>
 </tr>
-<tr class="row-odd"><td><p>-a, --output_json_append</p></td>
+<tr class="row-even"><td><p>-a, --output_json_append</p></td>
 <td></td>
 <td><p>Save the processing result json file by appending.</p></td>
 </tr>
-<tr class="row-even"><td><p>--stdout_log</p></td>
+<tr class="row-odd"><td><p>--stdout_log</p></td>
 <td></td>
 <td><p>Available only in GUI mode. Outputs standard output to Console log when executing commands.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--capture_stdout</p></td>
+<tr class="row-even"><td><p>--capture_stdout</p></td>
 <td></td>
 <td><p>Available in GUI mode only. Captures standard output during command execution and displays it on the execution result screen.</p></td>
 </tr>
-<tr class="row-even"><td><p>--capture_maxsize</p></td>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;size&gt;</p></td>
 <td></td>
 <td><p>Available in GUI mode only. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
-<tr class="row-odd"><td><p>-v, --version</p></td>
+<tr class="row-even"><td><p>-v, --version</p></td>
 <td></td>
 <td><p>Display version</p></td>
 </tr>
-<tr class="row-even"><td><p>--clmsg_id</p></td>
+<tr class="row-odd"><td><p>-t,--tag &lt;tag&gt;</p></td>
+<td></td>
+<td><p>Specify the tag for this command.</p></td>
+</tr>
+<tr class="row-even"><td><p>--clmsg_id &lt;id&gt;</p></td>
 <td></td>
 <td><p>Specifies the message ID of the client. If omitted, uuid4 will be generated.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--description</p></td>
+<tr class="row-odd"><td><p>--description &lt;description&gt;</p></td>
 <td></td>
 <td><p>Specifies a description of this command registration, used to help the Agent understand the use of this command.</p></td>
+</tr>
+<tr class="row-even"><td><p>--logsv</p></td>
+<td></td>
+<td><p>Enables logsv. Logsv is a feature that synchronizes log file writing among multiple processes. If there is already an active process with logsv enabled, it will be ignored.</p></td>
 </tr>
 </tbody>
 </table>

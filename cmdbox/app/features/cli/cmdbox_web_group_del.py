@@ -33,7 +33,7 @@ class WebGroupDel(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False, use_agent=False,
             description_ja="Webモードのグループを削除します。",
             description_en="Del a group in Web mode.",
             choice=[

@@ -38,6 +38,14 @@ handlers:
         when : 'D'
         encoding : 'utf-8'
         filename: .logs/cmdbox_client.log
+    cmd:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/cmdbox_cmd.log
     cmdbox:
         class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
         level: INFO
@@ -94,6 +102,20 @@ handlers:
         when : 'D'
         encoding : 'utf-8'
         filename: .logs/cmdbox_web.log
+    logcl:
+        class: logging.handlers.SocketHandler
+        level: INFO
+        formatter: fmt
+        host: 'localhost'
+        port: 9020
+    logsv:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/cmdbox_logsv.log
 
 loggers:
     audit:
@@ -105,6 +127,11 @@ loggers:
         handlers: [client, std]
         level: INFO
         qualname: client
+        propagate: false
+    cmd:
+        handlers: [cmd, std]
+        level: INFO
+        qualname: cmd
         propagate: false
     cmdbox:
         handlers: [cmdbox, std]
@@ -140,6 +167,11 @@ loggers:
         handlers: [web, std]
         level: INFO
         qualname: web
+        propagate: false
+    logsv:
+        handlers: [logsv]
+        level: INFO
+        qualname: logsv
         propagate: false
 
 #root:

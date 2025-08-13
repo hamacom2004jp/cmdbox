@@ -6,7 +6,7 @@ import argparse
 import logging
 
 
-class WebGroupList(feature.OneshotResultEdgeFeature):
+class WebGroupList(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -33,7 +33,7 @@ class WebGroupList(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False, use_agent=False,
             description_ja="Webモードのグループー一覧を取得します。",
             description_en="Get a list of users in Web mode.",
             choice=[

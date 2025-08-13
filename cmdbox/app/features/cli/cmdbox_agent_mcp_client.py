@@ -6,7 +6,7 @@ import argparse
 import logging
 
 
-class McpClient(feature.UnsupportEdgeFeature):
+class AgentMcpClient(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -14,7 +14,7 @@ class McpClient(feature.UnsupportEdgeFeature):
         Returns:
             Union[str, List[str]]: モード
         """
-        return 'mcp'
+        return 'agent'
 
     def get_cmd(self) -> str:
         """
@@ -23,7 +23,7 @@ class McpClient(feature.UnsupportEdgeFeature):
         Returns:
             str: コマンド
         """
-        return 'client'
+        return 'mcp_client'
 
     def get_option(self):
         """
@@ -33,6 +33,7 @@ class McpClient(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
+            # webからclientを実行するとmcp処理とデッドロックが発生するため、webmodeを無効にします。
             use_redis=self.USE_REDIS_FALSE, nouse_webmode=True, use_agent=False,
             description_ja="リモートMCPサーバーにリクエストを行うMCPクライアントを起動します。",
             description_en="Starts an MCP client that makes requests to a remote MCP server.",

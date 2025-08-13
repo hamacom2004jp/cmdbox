@@ -9,7 +9,6 @@ from uvicorn.config import Config
 import argparse
 import json
 import logging
-import locale
 import queue
 import requests
 import time
@@ -54,7 +53,6 @@ class Edge(object):
 
         import questionary
         ref_opts = self.options.get_cmd_choices(edge_mode, edge_cmd)
-        language, _ = locale.getlocale()
         edge_dir = Path(self.data) / '.edge'
         common.mkdirs(edge_dir)
         conf_file = edge_dir / 'edge.conf'
@@ -96,7 +94,7 @@ class Edge(object):
             default = str(default) if isinstance(default, int) or isinstance(default, float) else default
             description_ja = r['description_ja'] if 'description_ja' in r else None
             description_en = r['description_en'] if 'description_en' in r else None
-            help = description_en if language.find('Japan') < 0 and language.find('ja_JP') < 0 else description_ja
+            help = description_en if not common.is_japan() else description_ja
             choice = r['choice'] if 'choice' in r else None
             choice = [str(c) for c in choice] if choice is not None else None
             required = r['required'] if 'required' in r else False

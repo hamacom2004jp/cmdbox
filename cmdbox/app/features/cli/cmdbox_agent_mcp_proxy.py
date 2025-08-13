@@ -6,7 +6,7 @@ import argparse
 import logging
 
 
-class McpProxy(feature.UnsupportEdgeFeature):
+class AgentMcpProxy(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -14,7 +14,7 @@ class McpProxy(feature.UnsupportEdgeFeature):
         Returns:
             Union[str, List[str]]: モード
         """
-        return 'mcp'
+        return 'agent'
 
     def get_cmd(self) -> str:
         """
@@ -23,7 +23,7 @@ class McpProxy(feature.UnsupportEdgeFeature):
         Returns:
             str: コマンド
         """
-        return 'proxy'
+        return 'mcp_proxy'
 
     def get_option(self):
         """
@@ -33,7 +33,7 @@ class McpProxy(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True, use_agent=False,
             description_ja="標準入力を受け付け、リモートMCPサーバーにリクエストを行うProxyサーバーを起動します。",
             description_en="Starts a Proxy server that accepts standard input and makes requests to a remote MCP server.",
             choice=[

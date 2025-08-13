@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.common &mdash; cmdbox 2025/07/30 documentation</title>
+  <title>cmdbox.app.common &mdash; cmdbox 2025/08/12 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=c56493cf"></script>
+      <script src="../../../_static/documentation_options.js?v=751869a2"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -82,7 +82,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">cryptography.fernet</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fernet</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rich.console</span><span class="w"> </span><span class="kn">import</span> <span class="n">Console</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">rich.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">RichHandler</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">tabulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">tabulate</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
@@ -305,7 +304,7 @@
 <span class="sd">        **kwargs: その他のキーワード引数</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dtstr</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;[%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S]&#39;</span><span class="p">)</span>
-    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dtstr</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">highlight</span><span class="o">=</span><span class="n">highlight</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dtstr</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">highlight</span><span class="o">=</span><span class="n">highlight</span><span class="p">,</span> <span class="n">crop</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">soft_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="default_logger">
@@ -361,13 +360,13 @@
         <span class="n">log_name</span> <span class="o">=</span> <span class="n">mode</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">log_conf_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="n">log_conf_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ver</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;logconf_</span><span class="si">{</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">.yml&quot;</span>
-        <span class="n">log_name</span> <span class="o">=</span> <span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span>
+        <span class="n">log_name</span> <span class="o">=</span> <span class="n">mode</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">log_conf_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="n">log_conf_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">version</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;logconf_</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">.yml&quot;</span>
         <span class="n">log_name</span> <span class="o">=</span> <span class="n">mode</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">log_conf_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="n">log_conf_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">version</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;logconf_</span><span class="si">{</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">.yml&quot;</span>
-        <span class="n">log_name</span> <span class="o">=</span> <span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span>
+        <span class="n">log_name</span> <span class="o">=</span> <span class="n">mode</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_conf_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">log_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="n">std_key</span> <span class="o">=</span> <span class="kc">None</span>
@@ -384,8 +383,12 @@
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="s1">&#39;handlers&#39;</span> <span class="ow">in</span> <span class="n">l</span> <span class="ow">and</span> <span class="n">std_key</span> <span class="ow">in</span> <span class="n">l</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">]:</span>
                 <span class="n">l</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">std_key</span><span class="p">)</span>
-    <span class="k">if</span> <span class="s1">&#39;loggers&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">log_config</span> <span class="ow">or</span> <span class="n">log_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">BaseException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loggers not found.(</span><span class="si">{</span><span class="n">log_name</span><span class="si">}</span><span class="s2">) at log_conf_path=</span><span class="si">{</span><span class="n">log_conf_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;loggers&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">log_config</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">BaseException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loggers not found at log_conf_path=</span><span class="si">{</span><span class="n">log_conf_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">log_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">BaseException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loggers not found.(</span><span class="si">{</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">) at log_conf_path=</span><span class="si">{</span><span class="n">log_conf_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">log_name</span> <span class="o">=</span> <span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span>
     <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;disable_existing_loggers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># これを入れないとdictConfigで既存のロガーが無効になる</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">log_config</span><span class="p">)</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">log_name</span><span class="p">)</span>

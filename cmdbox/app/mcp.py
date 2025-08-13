@@ -81,8 +81,9 @@ class Mcp:
         """
         from google.adk.events import Event
         from google.adk.sessions import DatabaseSessionService, InMemorySessionService, session
-        from typing_extensions import override
+        #from typing_extensions import override
         if hasattr(args, 'agent_session_dburl') and args.agent_session_dburl is not None:
+            """
             class _DatabaseSessionService(DatabaseSessionService):
                 @override
                 async def append_event(self, session: session.Session, event: Event) -> Event:
@@ -98,6 +99,8 @@ class Mcp:
                     ret.content.parts = bk_parts
                     return ret
             dss = _DatabaseSessionService(db_url=args.agent_session_dburl)
+            """
+            dss = DatabaseSessionService(db_url=args.agent_session_dburl)
             #dss.db_engine.echo = True
             return dss
         else:

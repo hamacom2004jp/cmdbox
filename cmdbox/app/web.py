@@ -793,10 +793,15 @@ class Web:
                 """
                 if session_id is None:
                     session_id = common.random_string(32)
-                session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
-                if session is None:
+                try:
+                    session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
+                    if session is None:
+                        session = await session_service.create_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
+                    return session
+                except NotImplementedError:
+                    # セッションが１件もない場合はNotImplementedErrorが発生することがある
                     session = await session_service.create_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
-                return session
+                    return session
             self.create_agent_session = create_agent_session
             async def list_agent_sessions(session_service:BaseSessionService, user_id:str, session_id:str=None) -> List[Session]:
                 """
@@ -809,20 +814,37 @@ class Web:
                 Returns:
                     List[Session]: セッションリスト
                 """
-                if session_id is None:
-                    sessions = await session_service.list_sessions(app_name=self.ver.__appid__, user_id=user_id)
-                    ret = []
-                    for s in sessions.sessions:
-                        session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=s.id)
+                try:
+                    if session_id is None:
+                        sessions = await session_service.list_sessions(app_name=self.ver.__appid__, user_id=user_id)
+                        ret = []
+                        for s in sessions.sessions:
+                            try:
+                                session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=s.id)
+                                if session is None:
+                                    continue
+                                ret.append(session)
+                            except:
+                                # セッションが取得できない場合は削除する
+                                try:
+                                    await session_service.delete_session(app_name=self.ver.__appid__, user_id=user_id, session_id=s.id)
+                                except:
+                                    pass
+                                finally:
+                                    continue
+                        return ret
+                    else:
+                        session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
                         if session is None:
-                            continue
-                        ret.append(session)
-                    return ret
-                else:
-                    session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
-                    if session is None:
-                        return []
-                    return [session]
+                            return []
+                        return [session]
+                except NotImplementedError:
+                    # セッションが１件もない場合はNotImplementedErrorが発生することがある
+                    return []
+                except Exception as e:
+                    # それ以外のエラーが発生した時はログに出力して空リストを返す
+                    self.logger.warning(f"list_agent_sessions warning: {e}", exc_info=True)
+                    return []
             self.list_agent_sessions = list_agent_sessions
             async def delete_agent_session(session_service:BaseSessionService, user_id:str, session_id:str) -> bool:
                 """
@@ -841,7 +863,7 @@ class Web:
 
         mcp_app:Starlette = None
         if self.mcp is not None:
-            mcp_app:Starlette = self.mcp.streamable_http_app()
+            mcp_app:Starlette = self.mcp.http_app()
             #mcp_app:Starlette = self.mcp.http_app()
         if mcp_app is not None:
             app = FastAPI(lifespan=mcp_app.lifespan)

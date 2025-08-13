@@ -8,10 +8,8 @@ from starlette.routing import Route
 from typing import List, Dict, Any 
 import argparse
 import functools
-import locale
 import logging
 import re
-import time
 import uuid
 
 
@@ -179,8 +177,7 @@ class Options:
                 opt['action'] = 'append' if val['multi'] else None
             o = [f'-{val["short"]}'] if "short" in val else []
             o += [f'--{key}']
-            language, _ = locale.getlocale()
-            opt['help'] = val['description_en'] if language.find('Japan') < 0 and language.find('ja_JP') < 0 else val['description_ja']
+            opt['help'] = val['description_en'] if not common.is_japan() else val['description_ja']
             opt['default'] = val['default']
             if val['multi'] and val['default'] is not None:
                 raise ValueError(f'list_options: The default value must be None if multi is True. key={key}, val={val}')
@@ -300,6 +297,11 @@ class Options:
             description_ja="このコマンド登録の説明文を指定します。Agentがこのコマンドの用途を理解するのに使用します。",
             description_en="Specifies a description of this command registration, used to help the Agent understand the use of this command.",
             choice=None)
+        self._options["logsv"] = dict(
+            type=Options.T_BOOL, default=False, required=False, multi=False, hide=True,
+            description_ja="logsvを有効にします。logsvは複数のプロセスがログファイルへの書き込みを同期するための機能です。すでにlogsvが有効なプロセスがある場合は無視されます。",
+            description_en="Enables logsv. Logsv is a feature that synchronizes log file writing among multiple processes. If there is already an active process with logsv enabled, it will be ignored.",
+            choice=[False, True])
 
     def init_debugoption(self):
         # デバックオプションを追加

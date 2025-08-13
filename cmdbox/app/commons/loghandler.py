@@ -4,6 +4,11 @@ from rich.theme import Theme
 import re
 import logging
 import logging.handlers
+import pickle
+import socketserver
+import struct
+import socket
+
 
 class Colors:
     S = "\033["
@@ -103,6 +108,9 @@ theme=Theme({
     "repr.log_success": "green",})
 
 class LogLevelHighlighter(highlighter.ReprHighlighter):
+    """
+    ログメッセージのログレベルをハイライトします。
+    """
     def __init__(self):
         #self.highlights = []
         self.highlights.append(r"(?P<log_debug>DEBUG|EXEC)")
@@ -112,29 +120,12 @@ class LogLevelHighlighter(highlighter.ReprHighlighter):
         self.highlights.append(r"(?P<log_fatal>FATAL|CRITICAL)")
         self.highlights.append(r"(?P<log_product>CMDBOX|IINFER|USOUND|GAIAN|GAIC|WITSHAPE)")
         self.highlights.append(r"(?P<log_success>SUCCESS|OK|PASSED|DONE|COMPLETE|START|FINISH|OPEN|CONNECTED|ALLOW)")
-        """
-        self.highlights.append(r"(?P<tag_start><)(?P<tag_name>[-\w.:|]*)(?P<tag_contents>[\w\W]*)(?P<tag_end>>)")
-        self.highlights.append(r'(?P<attrib_name>[\w_]{1,50})=(?P<attrib_value>"?[\w_]+"?)?')
-        self.highlights.append(r"(?P<brace>[][{}()])")
-        self.highlights.append(highlighter._combine_regex(
-            r"(?P<ipv4>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})",
-            r"(?P<ipv6>([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4})",
-            r"(?P<eui64>(?:[0-9A-Fa-f]{1,2}-){7}[0-9A-Fa-f]{1,2}|(?:[0-9A-Fa-f]{1,2}:){7}[0-9A-Fa-f]{1,2}|(?:[0-9A-Fa-f]{4}\.){3}[0-9A-Fa-f]{4})",
-            r"(?P<eui48>(?:[0-9A-Fa-f]{1,2}-){5}[0-9A-Fa-f]{1,2}|(?:[0-9A-Fa-f]{1,2}:){5}[0-9A-Fa-f]{1,2}|(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4})",
-            r"(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})",
-            r"(?P<call>[\w.]*?)\(",
-            r"\b(?P<bool_true>True)\b|\b(?P<bool_false>False)\b|\b(?P<none>None)\b",
-            r"(?P<ellipsis>\.\.\.)",
-            r"(?P<number_complex>(?<!\w)(?:\-?[0-9]+\.?[0-9]*(?:e[-+]?\d+?)?)(?:[-+](?:[0-9]+\.?[0-9]*(?:e[-+]?\d+)?))?j)",
-            r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*(e[-+]?\d+?)?\b|0x[0-9a-fA-F]*)",
-            r"(?P<path>\B(/[-\w._+]+)*\/)(?P<filename>[-\w._+]*)?",
-            r"(?<![\\\w])(?P<str>b?'''.*?(?<!\\)'''|b?'.*?(?<!\\)'|b?\"\"\".*?(?<!\\)\"\"\"|b?\".*?(?<!\\)\")",
-            r"(?P<url>(file|https|http|ws|wss)://[-0-9a-zA-Z$_+!`(),.?/;:&=%#~@]*)",
-        ))
-        """
         self.highlights = [re.compile(h, re.IGNORECASE) for h in self.highlights]
 
 class ColorfulStreamHandler(logging.StreamHandler):
+    """
+    コンソールにカラフルなログメッセージを出力します。
+    """
     console = Console(soft_wrap=True, height=True, highlighter=LogLevelHighlighter(), theme=theme)
 
     def emit(self, record: logging.LogRecord) -> None:
@@ -154,3 +145,93 @@ class TimedRotatingFileHandler(logging.handlers.TimedRotatingFileHandler):
         record.levelname = level_mapping_nc[record.levelno]
         super().emit(record)
 
+class SocketHandler(logging.handlers.SocketHandler):
+    def emit(self, record: logging.LogRecord) -> None:
+        record.levelname = level_mapping_nc[record.levelno]
+        super().emit(record)
+
+class LogRecordRequestHandler(socketserver.StreamRequestHandler):
+    """
+    ログリクエストを処理するためのハンドラ
+    """
+    def setup(self):
+        super().setup()
+        from cmdbox.app import common
+        common.set_debug(self._getLogger(), LogRecordTCPServer.debug)
+
+    def _getLogger(self):
+        if self.server.logname is not None:
+            name = self.server.logname
+        else:
+            name = self.logname
+        return logging.getLogger(name)
+
+    def handle(self):
+        """
+        ログリクエストを処理します。
+        """
+        while True:
+            chunk = self.connection.recv(4)
+            if len(chunk) < 4:
+                break
+            slen = struct.unpack('>L', chunk)[0]
+            chunk = self.connection.recv(slen)
+            while len(chunk) < slen:
+                chunk = chunk + self.connection.recv(slen - len(chunk))
+            obj = self.unPickle(chunk)
+            record = logging.makeLogRecord(obj)
+            self.handleLogRecord(record)
+
+    def unPickle(self, data):
+        return pickle.loads(data)
+    
+    def handleLogRecord(self, record):
+        logger = self._getLogger()
+        logger.handle(record)
+
+class LogRecordTCPServer(socketserver.ThreadingTCPServer):
+    """
+    ログレコードを受信するためのTCPサーバー。
+    """
+    # 停止後すぐにサーバーを再起動できるようにする
+    allow_reuse_address = True
+
+    def __init__(self, logname, host='localhost', port=logging.handlers.DEFAULT_TCP_LOGGING_PORT,
+                 handler=LogRecordRequestHandler, debug=False):
+        """
+        コンストラクタ
+
+        Args:
+            logname (str): ログ名
+            host (str): ホスト名
+            port (int): ポート番号
+            handler (socketserver.RequestHandler): リクエストハンドラ
+            debug (bool): デバッグモード
+        """
+        socketserver.ThreadingTCPServer.__init__(self, (host, port), handler, bind_and_activate=False)
+        self.allow_reuse_address = False
+        self.allow_reuse_port = False
+        self.request_queue_size = 15
+        self.abort = 0
+        self.timeout = 1
+        self.logname = logname
+        self.handler = handler
+        LogRecordTCPServer.debug = debug
+
+    def serve_until_stopped(self):
+        import select
+        abort = 0
+        try:
+            self.server_bind()
+            self.server_activate()
+        except:
+            # すでにlogsvが起動中の場合は待機しない
+            self.server_close()
+            abort = 1
+        while not abort:
+            rd, wr, ex = select.select([self.socket.fileno()],
+                                       [], [],
+                                       self.timeout)
+            if rd:
+                self.handle_request()
+            abort = self.abort

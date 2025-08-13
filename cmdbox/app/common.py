@@ -4,7 +4,6 @@ from cmdbox.app.commons import convert, module, loghandler
 from cryptography.fernet import Fernet
 from pathlib import Path
 from rich.console import Console
-from rich.logging import RichHandler
 from tabulate import tabulate
 from typing import List, Tuple, Dict, Any
 import argparse
@@ -195,7 +194,7 @@ def console_log(console:Console, message:Any, highlight:bool=True, **kwargs) -> 
         **kwargs: その他のキーワード引数
     """
     dtstr = datetime.datetime.now().strftime('[%Y-%m-%d %H:%M:%S]')
-    console.print(f"{dtstr} {message}", highlight=highlight, **kwargs)
+    console.print(f"{dtstr} {message}", highlight=highlight, crop=False, soft_wrap=True, **kwargs)
 
 def default_logger(debug:bool=False, ver=version, webcall:bool=False) -> logging.Logger:
     """
@@ -268,8 +267,12 @@ def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, v
         for k, l in log_config['loggers'].items():
             if 'handlers' in l and std_key in l['handlers']:
                 l['handlers'].remove(std_key)
-    if 'loggers' not in log_config or log_name not in log_config['loggers']:
-        raise BaseException(f"Loggers not found.({log_name}) at log_conf_path={log_conf_path}")
+    if 'loggers' not in log_config:
+        raise BaseException(f"Loggers not found at log_conf_path={log_conf_path}")
+    if log_name not in log_config['loggers']:
+        if ver.__appid__ not in log_config['loggers']:
+            raise BaseException(f"Loggers not found.({ver.__appid__}) at log_conf_path={log_conf_path}")
+        log_name = ver.__appid__
     log_config['disable_existing_loggers'] = False # これを入れないとdictConfigで既存のロガーが無効になる
     logging.config.dictConfig(log_config)
     logger = logging.getLogger(log_name)

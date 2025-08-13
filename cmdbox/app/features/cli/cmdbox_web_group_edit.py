@@ -33,7 +33,7 @@ class WebGroupEdit(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False, use_agent=False,
             description_ja="Webモードのグループを編集します。",
             description_en="Edit a group in Web mode.",
             choice=[

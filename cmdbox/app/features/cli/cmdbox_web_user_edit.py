@@ -33,7 +33,7 @@ class WebUserEdit(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False, use_agent=False,
             description_ja="Webモードのユーザーを編集します。",
             description_en="Edit users in Web mode.",
             choice=[

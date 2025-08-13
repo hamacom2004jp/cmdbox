@@ -33,7 +33,7 @@ class WebStop(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=True,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=True, use_agent=False,
             description_ja="Webモードを停止します。",
             description_en="Stop Web mode.",
             choice=[

@@ -8,7 +8,7 @@ import argparse
 import logging
 
 
-class TtsStart(feature.OneshotNotifyEdgeFeature):
+class TtsStart(feature.UnsupportEdgeFeature):
     VOICEVOX_STYLE = dict()
     VOICEVOX_STYLE['0.vvm_2'] = dict(fn='0.vvm',ch='四国めたん',md='ノーマル',st=2)
     VOICEVOX_STYLE['0.vvm_0'] = dict(fn='0.vvm',ch='四国めたん',md='あまあま',st=0)

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.options &mdash; cmdbox 2025/07/20 documentation</title>
+  <title>cmdbox.app.options &mdash; cmdbox 2025/08/13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=a1ab438b"></script>
+      <script src="../../../_static/documentation_options.js?v=d160edbb"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -86,10 +86,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span> 
 <span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">locale</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
 
 
@@ -288,8 +286,7 @@
                 <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;action&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;append&#39;</span> <span class="k">if</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;multi&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="n">o</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;-</span><span class="si">{</span><span class="n">val</span><span class="p">[</span><span class="s2">&quot;short&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;short&quot;</span> <span class="ow">in</span> <span class="n">val</span> <span class="k">else</span> <span class="p">[]</span>
             <span class="n">o</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;--</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
-            <span class="n">language</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">locale</span><span class="o">.</span><span class="n">getlocale</span><span class="p">()</span>
-            <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;help&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;description_en&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">language</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;Japan&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">language</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;ja_JP&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;description_ja&#39;</span><span class="p">]</span>
+            <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;help&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;description_en&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">common</span><span class="o">.</span><span class="n">is_japan</span><span class="p">()</span> <span class="k">else</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;description_ja&#39;</span><span class="p">]</span>
             <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;multi&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;list_options: The default value must be None if multi is True. key=</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">, val=</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -414,7 +411,12 @@
             <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_TEXT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">description_ja</span><span class="o">=</span><span class="s2">&quot;このコマンド登録の説明文を指定します。Agentがこのコマンドの用途を理解するのに使用します。&quot;</span><span class="p">,</span>
             <span class="n">description_en</span><span class="o">=</span><span class="s2">&quot;Specifies a description of this command registration, used to help the Agent understand the use of this command.&quot;</span><span class="p">,</span>
-            <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+            <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;logsv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_BOOL</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">description_ja</span><span class="o">=</span><span class="s2">&quot;logsvを有効にします。logsvは複数のプロセスがログファイルへの書き込みを同期するための機能です。すでにlogsvが有効なプロセスがある場合は無視されます。&quot;</span><span class="p">,</span>
+            <span class="n">description_en</span><span class="o">=</span><span class="s2">&quot;Enables logsv. Logsv is a feature that synchronizes log file writing among multiple processes. If there is already an active process with logsv enabled, it will be ignored.&quot;</span><span class="p">,</span>
+            <span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="Options.init_debugoption">
@@ -493,22 +495,7 @@
         <span class="k">return</span> <span class="n">ftype</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_loaded</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_loaded</span><span class="p">[</span><span class="n">ftype</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="Options.load_features_file">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.load_features_file">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">load_features_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ftype</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        フィーチャーファイル（features.yml）を読み込みます。</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            ftype (str): フィーチャータイプ。cli又はweb</span>
-<span class="sd">            func (Any): フィーチャーの処理関数</span>
-<span class="sd">            appcls (Any): アプリケーションクラス</span>
-<span class="sd">            ver (Any): バージョンモジュール</span>
-<span class="sd">            logger (logging.Logger): ロガー</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># 読込み済みかどうかの判定</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_features_loaded</span><span class="p">(</span><span class="n">ftype</span><span class="p">):</span>
-            <span class="k">return</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_features_yml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># cmdboxを拡張したアプリをカスタマイズするときのfeatures.ymlを読み込む</span>
         <span class="n">features_yml</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;.</span><span class="si">{</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">/features.yml&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">features_yml</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">features_yml</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
@@ -525,35 +512,53 @@
                     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;features.yml data: </span><span class="si">{</span><span class="n">yml</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">yml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_yml_data</span>
-            <span class="k">if</span> <span class="n">yml</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span>
-            <span class="k">if</span> <span class="s1">&#39;features&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The root element must be &quot;features&quot;.)&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">ftype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;features.yml is invalid. (There is no “</span><span class="si">{</span><span class="n">ftype</span><span class="si">}</span><span class="s1">” in the “features” element.)&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="n">ftype</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span>
-            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">yml</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="n">ftype</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;features.yml is invalid. (The “features.</span><span class="si">{</span><span class="n">ftype</span><span class="si">}</span><span class="s1"> element must be a list. </span><span class="si">{</span><span class="n">ftype</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">yml</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">ftype</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
-            <span class="c1"># featureモジュール読込みの前にagentruleの読み込み</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">load_features_agentrule</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="n">ftype</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">dict</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;features.yml is invalid. (The “features.</span><span class="si">{</span><span class="n">ftype</span><span class="si">}</span><span class="s1">” element must be a list element must be a dictionary. data=</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="s1">&#39;package&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;features.yml is invalid. (The “package” element must be in the dictionary of the list element of the “features.</span><span class="si">{</span><span class="n">ftype</span><span class="si">}</span><span class="s1">” element. data=</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="s1">&#39;prefix&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;features.yml is invalid. (The prefix element must be in the dictionary of the list element of the “features.</span><span class="si">{</span><span class="n">ftype</span><span class="si">}</span><span class="s1">” element. data=</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;package&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;package&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-                    <span class="k">continue</span>
-                <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;prefix&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;prefix&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-                    <span class="k">continue</span>
-                <span class="n">exclude_modules</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">if</span> <span class="s1">&#39;exclude_modules&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;exclude_modules&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;features.yml is invalid. (The “exclude_modules” element must be a list element. data=</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
-                    <span class="n">exclude_modules</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;exclude_modules&#39;</span><span class="p">]</span>
-                <span class="n">func</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;package&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;prefix&#39;</span><span class="p">],</span> <span class="n">exclude_modules</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_features_loaded</span><span class="p">(</span><span class="n">ftype</span><span class="p">))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">features_loaded</span><span class="p">[</span><span class="n">ftype</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
+            <span class="k">return</span> <span class="n">yml</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Options.load_features_file">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.load_features_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_features_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ftype</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        フィーチャーファイル（features.yml）を読み込みます。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ftype (str): フィーチャータイプ。cli又はweb</span>
+<span class="sd">            func (Any): フィーチャーの処理関数</span>
+<span class="sd">            appcls (Any): アプリケーションクラス</span>
+<span class="sd">            ver (Any): バージョンモジュール</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># 読込み済みかどうかの判定</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_features_loaded</span><span class="p">(</span><span class="n">ftype</span><span class="p">):</span>
+            <span class="k">return</span>
+        <span class="n">yml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_features_yml</span><span class="p">(</span><span class="n">ver</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">yml</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span>
+        <span class="k">if</span> <span class="s1">&#39;features&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The root element must be &quot;features&quot;.)&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ftype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;features.yml is invalid. (There is no “</span><span class="si">{</span><span class="n">ftype</span><span class="si">}</span><span class="s1">” in the “features” element.)&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="n">ftype</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">yml</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="n">ftype</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;features.yml is invalid. (The “features.</span><span class="si">{</span><span class="n">ftype</span><span class="si">}</span><span class="s1"> element must be a list. </span><span class="si">{</span><span class="n">ftype</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">yml</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">ftype</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="n">ftype</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">dict</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;features.yml is invalid. (The “features.</span><span class="si">{</span><span class="n">ftype</span><span class="si">}</span><span class="s1">” element must be a list element must be a dictionary. data=</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;package&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;features.yml is invalid. (The “package” element must be in the dictionary of the list element of the “features.</span><span class="si">{</span><span class="n">ftype</span><span class="si">}</span><span class="s1">” element. data=</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;prefix&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;features.yml is invalid. (The prefix element must be in the dictionary of the list element of the “features.</span><span class="si">{</span><span class="n">ftype</span><span class="si">}</span><span class="s1">” element. data=</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;package&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;package&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;prefix&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;prefix&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">exclude_modules</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="s1">&#39;exclude_modules&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;exclude_modules&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;features.yml is invalid. (The “exclude_modules” element must be a list element. data=</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+                <span class="n">exclude_modules</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;exclude_modules&#39;</span><span class="p">]</span>
+            <span class="n">func</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;package&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;prefix&#39;</span><span class="p">],</span> <span class="n">exclude_modules</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_features_loaded</span><span class="p">(</span><span class="n">ftype</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">features_loaded</span><span class="p">[</span><span class="n">ftype</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
 
 
 

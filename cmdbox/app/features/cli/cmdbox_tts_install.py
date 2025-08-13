@@ -41,7 +41,7 @@ class TtsInstall(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False, use_agent=False,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=True, use_agent=False,
             description_ja="Text-to-Speech(TTS)エンジンをインストールします。",
             description_en="Installs the Text-to-Speech (TTS) engine.",
             choice=[
@@ -247,6 +247,8 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                 voicevox_dir.mkdir(parents=True, exist_ok=True)
                 dlfile = voicevox_dir / dlfile
                 # ダウンローダーを保存
+                if logger.level == logging.DEBUG:
+                    logger.debug(f"Downloading.. : {downloader_url}")
                 responce = requests.get(downloader_url, allow_redirects=True)
                 if responce.status_code != 200:
                     _msg = f"Failed to download VoiceVox core: {responce.status_code} {responce.reason}. {downloader_url}"
@@ -264,6 +266,8 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                     cmd_line.extend(['--devices', 'directml'])
                 elif voicevox_device == 'cuda':
                     cmd_line.extend(['--devices', 'cuda'])
+                if logger.level == logging.DEBUG:
+                    logger.debug(f"EXEC - {cmd_line}")
                 proc = subprocess.Popen(cmd_line, cwd=str(voicevox_dir), stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
                 outs, errs = proc.communicate(input=b'y\ny\n')  # 'y' to confirm installation
                 if proc.returncode != 0:
@@ -272,6 +276,8 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                     _msg += f"Failed to install VoiceVox core: {_msg}"
                     logger.error(_msg, exc_info=True)
                     return dict(warn=_msg)
+                if logger.level == logging.DEBUG:
+                    logger.debug(f"Completed - {cmd_line}")
                 if (voicevox_dir / 'voicevox_core').exists():
                     for file in glob.glob(str(voicevox_dir / 'voicevox_core' / '*')):
                         shutil.move(file, voicevox_dir)
@@ -283,6 +289,8 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                 whl_url = f'https://github.com/VOICEVOX/voicevox_core/releases/download/{voicevox_ver}/{voicevox_whl}'
                 voicevox_whl = voicevox_dir / voicevox_whl
                 # whlファイルをダウンロード
+                if logger.level == logging.DEBUG:
+                    logger.debug(f"Downloading.. : {whl_url}")
                 responce = requests.get(whl_url, allow_redirects=True)
                 if responce.status_code != 200:
                     _msg = f"Failed to download VoiceVox whl: {responce.status_code} {responce.reason}. {whl_url}"
@@ -291,6 +299,8 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                 with open(voicevox_whl, mode='wb') as f:
                     f.write(responce.content)
                 # whlファイルをpipでインストール
+                if logger.level == logging.DEBUG:
+                    logger.debug(f"pip install {voicevox_whl}")
                 rescode = pip.main(['install', str(voicevox_whl)])  # pipのインストール
                 logger.info(f"Install wheel: {voicevox_whl}")
                 if rescode != 0:

@@ -6,7 +6,7 @@ import argparse
 import logging
 
 
-class ServerStart(feature.OneshotNotifyEdgeFeature):
+class ServerStart(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -33,7 +33,7 @@ class ServerStart(feature.OneshotNotifyEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_TRUE, nouse_webmode=True,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=True, use_agent=False,
             description_ja="サーバーを起動します。installモードで `cmdbox -m install -c server` を実行している場合は、 `docker-compose up -d` を使用してください。",
             description_en="Start the inference server. If you are running `cmdbox -m install -c server` in install mode, use `docker-compose up -d`.",
             choice=[
