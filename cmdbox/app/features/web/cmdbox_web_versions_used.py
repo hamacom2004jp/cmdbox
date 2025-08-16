@@ -25,7 +25,7 @@ class VersionsUsed(feature.WebFeature):
                 for i, line in enumerate(f.readlines()):
                     parts = line.strip().split('\t')
                     ret.append(parts)
-            with open(Path(cmdbox.__file__).parent / 'app' / 'lib_license_list.txt', 'r', encoding='utf-8') as f:
+            with open(Path(cmdbox.__file__).parent / 'web' / 'voicevox_license_list.txt', 'r', encoding='utf-8') as f:
                 for i, line in enumerate(f.readlines()):
                     parts = line.strip().split('\t')
                     ret.append(parts)
