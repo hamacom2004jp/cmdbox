@@ -25,14 +25,14 @@
             "justMyCode": false
         },
         {
-            "name": "Python: cmdbox mcp_client",
+            "name": "Python: cmdbox attach",
             "type": "python",
-            "request": "launch",
-            "args": ["-m","mcp","-c","client","-f", "--debug", "-f",
-                "--mcpserver_apikey", "-"
-            ],
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            },
             "module": "cmdbox",
-            //"program": "cmdbox/autoload.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "justMyCode": false
@@ -41,7 +41,7 @@
             "name": "Python: cmdbox web",
             "type": "python",
             "request": "launch",
-            "args": ["-m","web","-c","start","--signin_file",".cmdbox/user_list.yml", "--guvicorn_workers", "20","--debug",
+            "args": ["-m","web","-c","start",//"--signin_file",".cmdbox/user_list.yml","--debug",//"--debug_attach","--debug_attach_port","5678",
             //"--ssl_cert","server.cert","--ssl_key","server.key",
             //"--client_only",
             "--agent", "use",
@@ -50,16 +50,6 @@
             //"--agent_pg_password", "iinfer", "--agent_pg_dbname", "iinfer",
             //"--llmprov", "ollama", "--llmmodel", "gemma3:4b", "--llmendpoint", "http://localhost:11434"],
             "--llmprov", "vertexai", "--llmmodel", "gemini-2.0-flash", "--llmlocation", "us-central1", "--llmsvaccountfile", "inspectionbox-hama-4d7b588f29ab.json"],
-            "module": "cmdbox",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "justMyCode": false
-        },
-        {
-            "name": "Python: cmdbox web nosignin",
-            "type": "python",
-            "request": "launch",
-            "args": ["-m","web","-c","start","--debug"],
             "module": "cmdbox",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",

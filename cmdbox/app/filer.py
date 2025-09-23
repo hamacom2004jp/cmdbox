@@ -206,13 +206,15 @@ class Filer(object):
         try:
             mime_type, encoding = mimetypes.guess_type(str(abspath))
             fname = abspath.name
-            with open(abspath, "rb") as f:
+            def _r(f):
                 fd = f.read()
                 if mime_type is not None and mime_type != 'image/svg+xml' and mime_type.startswith('image') and img_thumbnail > 0:
                     img = convert.imgbytes2thumbnail(fd, (img_thumbnail, img_thumbnail))
                     fd = convert.img2byte(img, "jpeg")
                     fname = f"{fname}.thumbnail.jpg"
                 data = convert.bytes2b64str(fd)
+                return data
+            data = common.load_file(abspath, _r, mode='rb')
             return self.RESP_SUCCESS, dict(success=dict(name=fname, data=data, mime_type=mime_type))
         except Exception as e:
             self.logger.warning(f"Failed to download {abspath}. {e}")
@@ -252,8 +254,9 @@ class Filer(object):
         try:
             if mkdir:
                 save_path.parent.mkdir(parents=True, exist_ok=True)
-            with open(save_path, "wb") as f:
+            def _w(f):
                 f.write(file_data)
+            common.save_file(Path(save_path), _w, mode='wb')
             return self.RESP_SUCCESS, dict(success=f"Uploaded {save_path}")
         except Exception as e:
             self.logger.warning(f"Failed to upload {save_path}. {e}")

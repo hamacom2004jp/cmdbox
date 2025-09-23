@@ -186,8 +186,9 @@ class Mcp:
             if args.llmmodel is None: raise ValueError("llmmodel is required.")
             if args.llmlocation is None: raise ValueError("llmlocation is required.")
             if args.llmsvaccountfile is not None: 
-                with open(args.llmsvaccountfile, "r", encoding="utf-8") as f:
-                    vertex_credentials = json.load(f)
+                def _r(f):
+                    return json.load(f)
+                vertex_credentials = common.load_file(Path(args.llmsvaccountfile), _r, mode='r')
             elif args.llmprojectid is None: raise ValueError("llmprojectid is required.")
             agent = Agent(
                 name=args.agent_name,
@@ -353,7 +354,7 @@ class Mcp:
         func_txt += f'    signin_data = signin.Signin.load_signin_file(args.signin_file)\n'
         func_txt += f'    req = scope["req"] if scope["req"] is not None else scope["websocket"]\n'
         func_txt += f'    sign = signin.Signin._check_signin(req, scope["res"], signin_data, logger)\n'
-        func_txt += f'    if sign is not None:\n'
+        func_txt += f'    if sign is not None or "signin" not in req.session or "groups" not in req.session["signin"]:\n'
         func_txt += f'        logger.warning("Unable to execute command because authentication information cannot be obtained")\n'
         func_txt += f'        return dict(warn="Unable to execute command because authentication information cannot be obtained")\n'
         func_txt += f'    groups = req.session["signin"]["groups"]\n'

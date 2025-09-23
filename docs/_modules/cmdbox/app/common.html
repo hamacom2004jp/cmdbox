@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.common &mdash; cmdbox 2025/08/12 documentation</title>
+  <title>cmdbox.app.common &mdash; cmdbox 2025/09/20 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=751869a2"></script>
+      <script src="../../../_static/documentation_options.js?v=590e2b07"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -45,7 +45,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">Command Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/audit.html">Audit</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">Developer Information</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/errors.html">Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/license.html">License</a></li>
@@ -166,8 +168,9 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: 読み込んだYAMLファイルの内容</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">yml_path</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_r</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">load_file</span><span class="p">(</span><span class="n">yml_path</span><span class="p">,</span> <span class="n">_r</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="save_yml">
@@ -180,8 +183,89 @@
 <span class="sd">        yml_path (Path): YAMLファイルのパス</span>
 <span class="sd">        data (dict): 書き込むデータ</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">yml_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_w</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+        <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">save_file</span><span class="p">(</span><span class="n">yml_path</span><span class="p">,</span> <span class="n">_w</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load_file">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.load_file">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ファイルを読み込みます。読み込み時に排他ロックします。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path (Path): ファイルのパス</span>
+<span class="sd">        func: 読み込んだデータを処理する関数</span>
+<span class="sd">        mode (str, optional): ファイルモード. Defaults to &#39;r&#39;.</span>
+<span class="sd">        encoding (str, optional): エンコーディング. Defaults to &#39;utf-8&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lock_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s1">.lock&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lock_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s1">&#39;win32&#39;</span><span class="p">:</span>
+                    <span class="kn">import</span><span class="w"> </span><span class="nn">msvcrt</span>
+                    <span class="n">msvcrt</span><span class="o">.</span><span class="n">locking</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="n">msvcrt</span><span class="o">.</span><span class="n">LK_LOCK</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="kn">import</span><span class="w"> </span><span class="nn">fcntl</span>
+                    <span class="n">fcntl</span><span class="o">.</span><span class="n">lockf</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">fcntl</span><span class="o">.</span><span class="n">LOCK_EX</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s1">&#39;b&#39;</span> <span class="ow">in</span> <span class="n">mode</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s1">&#39;win32&#39;</span><span class="p">:</span>
+                    <span class="n">msvcrt</span><span class="o">.</span><span class="n">locking</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="n">msvcrt</span><span class="o">.</span><span class="n">LK_UNLCK</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">fcntl</span><span class="o">.</span><span class="n">lockf</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">fcntl</span><span class="o">.</span><span class="n">LOCK_UN</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">lock_file</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="save_file">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.save_file">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ファイルに書き込みます。書き込み時に排他ロックします。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path (Path): ファイルのパス</span>
+<span class="sd">        func: 書き込む関数</span>
+<span class="sd">        mode (str, optional): ファイルモード. Defaults to &#39;w&#39;.</span>
+<span class="sd">        encoding (str, optional): エンコーディング. Defaults to &#39;utf-8&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lock_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s1">.lock&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lock_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s1">&#39;win32&#39;</span><span class="p">:</span>
+                    <span class="kn">import</span><span class="w"> </span><span class="nn">msvcrt</span>
+                    <span class="n">msvcrt</span><span class="o">.</span><span class="n">locking</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="n">msvcrt</span><span class="o">.</span><span class="n">LK_LOCK</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="kn">import</span><span class="w"> </span><span class="nn">fcntl</span>
+                    <span class="n">fcntl</span><span class="o">.</span><span class="n">lockf</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">fcntl</span><span class="o">.</span><span class="n">LOCK_EX</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s1">&#39;b&#39;</span> <span class="ow">in</span> <span class="n">mode</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                        <span class="n">func</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                        <span class="n">func</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s1">&#39;win32&#39;</span><span class="p">:</span>
+                    <span class="n">msvcrt</span><span class="o">.</span><span class="n">locking</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="n">msvcrt</span><span class="o">.</span><span class="n">LK_UNLCK</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">fcntl</span><span class="o">.</span><span class="n">lockf</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">fcntl</span><span class="o">.</span><span class="n">LOCK_UN</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">lock_file</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="CommonValue">
@@ -367,8 +451,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">log_conf_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="n">log_conf_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">version</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;logconf_</span><span class="si">{</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">.yml&quot;</span>
         <span class="n">log_name</span> <span class="o">=</span> <span class="n">mode</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_conf_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">log_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">log_config</span> <span class="o">=</span> <span class="n">load_yml</span><span class="p">(</span><span class="n">log_conf_path</span><span class="p">)</span>
     <span class="n">std_key</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">set_common_value</span><span class="p">(</span><span class="s1">&#39;webcall&#39;</span><span class="p">,</span> <span class="n">webcall</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -468,8 +551,9 @@
                 <span class="n">k</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span>
                 <span class="n">d</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;default&#39;</span> <span class="ow">in</span> <span class="n">r</span> <span class="k">else</span> <span class="kc">None</span>
                 <span class="n">opt</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lopts</span> <span class="k">else</span> <span class="n">lopts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">opt_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default_json_enc</span><span class="p">)</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_w</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default_json_enc</span><span class="p">)</span>
+    <span class="n">save_file</span><span class="p">(</span><span class="n">opt_path</span><span class="p">,</span> <span class="n">_w</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="saveuser">
@@ -707,9 +791,10 @@
                 <span class="k">pass</span>
     <span class="k">if</span> <span class="n">output_json</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_json</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span> <span class="k">if</span> <span class="n">output_json_append</span> <span class="k">else</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_w</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
                 <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default_json_enc</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">save_file</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">output_json</span><span class="p">),</span> <span class="n">_w</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;a&#39;</span> <span class="k">if</span> <span class="n">output_json_append</span> <span class="k">else</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">pass</span>
     <span class="k">return</span> <span class="n">txt</span></div>
@@ -745,8 +830,9 @@
 <span class="sd">        Path: 保存したファイルのパス</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_w</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+    <span class="n">save_file</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">save_path</span><span class="p">),</span> <span class="n">_w</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">save_path</span></div>
 
 

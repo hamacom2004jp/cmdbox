@@ -719,7 +719,7 @@ class Web:
     def start(self, allow_host:str="0.0.0.0", listen_port:int=8081, ssl_listen_port:int=8443,
               ssl_cert:Path=None, ssl_key:Path=None, ssl_keypass:str=None, ssl_ca_certs:Path=None,
               session_domain:str=None, session_path:str='/', session_secure:bool=False, session_timeout:int=900, outputs_key:List[str]=[],
-              guvicorn_workers:int=-1, guvicorn_timeout:int=30,
+              gunicorn_workers:int=-1, gunicorn_timeout:int=30,
               agent_runner=None, mcp=None,):
         """
         Webサーバを起動する
@@ -737,8 +737,8 @@ class Web:
             session_secure (bool, optional): セッションセキュア. Defaults to False.
             session_timeout (int, optional): セッションタイムアウト. Defaults to 900.
             outputs_key (list, optional): 出力キー. Defaults to [].
-            guvicorn_workers (int, optional): Gunicornワーカー数. Defaults to -1.
-            guvicorn_timeout (int, optional): Gunicornタイムアウト. Defaults to 30.
+            gunicorn_workers (int, optional): Gunicornワーカー数. Defaults to -1.
+            gunicorn_timeout (int, optional): Gunicornタイムアウト. Defaults to 30.
             agent_runner (Runner, optional): エージェントランナー. Defaults to None.
             mcp (MCP, optional): MCP. Defaults to None.
         """
@@ -754,8 +754,8 @@ class Web:
         self.session_path = session_path
         self.session_secure = session_secure
         self.session_timeout = session_timeout
-        self.guvicorn_workers = guvicorn_workers
-        self.guvicorn_timeout = guvicorn_timeout
+        self.gunicorn_workers = gunicorn_workers
+        self.gunicorn_timeout = gunicorn_timeout
         self.agent_runner = agent_runner
         self.mcp = mcp
         if self.logger.level == logging.DEBUG:
@@ -771,8 +771,8 @@ class Web:
             self.logger.debug(f"web start parameter: session_path={self.session_path}")
             self.logger.debug(f"web start parameter: session_secure={self.session_secure}")
             self.logger.debug(f"web start parameter: session_timeout={self.session_timeout}")
-            self.logger.debug(f"web start parameter: guvicorn_worker={self.guvicorn_workers}")
-            self.logger.debug(f"web start parameter: guvicorn_timeout={self.guvicorn_timeout}")
+            self.logger.debug(f"web start parameter: gunicorn_workers={self.gunicorn_workers}")
+            self.logger.debug(f"web start parameter: gunicorn_timeout={self.gunicorn_timeout}")
             self.logger.debug(f"web start parameter: agent_runner={self.agent_runner}")
             self.logger.debug(f"web start parameter: mcp={self.mcp}")
 
@@ -894,21 +894,22 @@ class Web:
             https_config = Config(app=app, host=self.allow_host, port=self.ssl_listen_port,
                                   ssl_certfile=self.ssl_cert, ssl_keyfile=self.ssl_key,
                                   ssl_keyfile_password=self.ssl_keypass, ssl_ca_certs=self.ssl_ca_certs)
-            th_ssl = ThreadedUvicorn(self.logger, config=https_config,
-                                     guvicorn_config=dict(workers=self.guvicorn_workers, timeout=self.guvicorn_timeout))
+            th_ssl = ThreadedASGI(app, self.logger, config=https_config,
+                                  gunicorn_config=dict(workers=self.gunicorn_workers, timeout=self.gunicorn_timeout))
             th_ssl.start()
             browser_port = self.ssl_listen_port
         else:
             http_config = Config(app=app, host=self.allow_host, port=self.listen_port)
-            th = ThreadedUvicorn(self.logger, config=http_config,
-                                guvicorn_config=dict(workers=self.guvicorn_workers, timeout=self.guvicorn_timeout))
+            th = ThreadedASGI(app, self.logger, config=http_config,
+                              gunicorn_config=dict(workers=self.gunicorn_workers, timeout=self.gunicorn_timeout))
             th.start()
             browser_port = self.listen_port
         try:
             if self.gui_mode:
                 webbrowser.open(f'http://localhost:{browser_port}/gui')
-            with open("web.pid", mode="w", encoding="utf-8") as f:
+            def _w(f):
                 f.write(str(os.getpid()))
+            common.save_file("web.pid", _w)
             while self.is_running:
                 gevent.sleep(1)
             if th is not None:
@@ -926,35 +927,42 @@ class Web:
         Webサーバを停止する
         """
         try:
-            with open("web.pid", mode="r", encoding="utf-8") as f:
+            def _r(f):
                 pid = f.read()
                 if pid != "":
-                    os.kill(int(pid), signal.CTRL_C_EVENT)
+                    if platform.system() == "Windows":
+                        os.system(f"taskkill /F /PID {pid}")
+                    else:
+                        os.kill(int(pid), signal.CTRL_C_EVENT)
                     self.logger.info(f"Stop web.")
                 else:
                     self.logger.warning(f"pid is empty.")
+            common.load_file("web.pid", _r)
             Path("web.pid").unlink(missing_ok=True)
         except:
             traceback.print_exc()
         finally:
             self.logger.info(f"Exit web.")
 
-class ThreadedUvicorn:
-    def __init__(self, logger:logging.Logger, config:Config, guvicorn_config:Dict[str, Any]=None, force_uvicorn:bool=False):
+class ThreadedASGI:
+    def __init__(self, app:FastAPI, logger:logging.Logger, config:Config, gunicorn_config:Dict[str, Any]=None, force_single:bool=False):
+        self.app = app
         self.logger = logger
-        self.guvicorn_config = guvicorn_config
-        self.force_uvicorn = True if platform.system() == "Windows" else force_uvicorn
+        self.config = config
+        self.gunicorn_config = gunicorn_config
+        # windows環境下ではシングルプロセスで動作させる
+        self.force_single = True if platform.system() == "Windows" else force_single
         # loggerの設定
         common.reset_logger("uvicorn")
         common.reset_logger("uvicorn.error")
         common.reset_logger("uvicorn.access")
         #common.reset_logger("gunicorn.error")
         #common.reset_logger("gunicorn.access")
-        if self.force_uvicorn:
+        if self.force_single:
+            config.ws = "wsproto"
             self.server = uvicorn.Server(config)
             self.thread = RaiseThread(daemon=True, target=self.server.run)
         else:
-
             from gunicorn.app.wsgiapp import WSGIApplication
             class App(WSGIApplication):
                 def __init__(self, app, options):
@@ -969,29 +977,28 @@ class ThreadedUvicorn:
                 def load(self):
                     return self.application
             opt = dict(bind=f"{config.host}:{config.port}",
-                       worker_class="uvicorn.workers.UvicornWorker",
+                       worker_class="cmdbox.app.web.ASGIWorker",
                        access_log_format='[%(t)s] %(p)s %(l)s %(h)s "%(r)s" %(s)s',
                        loglevel=logging.getLevelName(self.logger.level),
                        keyfile=config.ssl_keyfile, certfile=config.ssl_certfile,
                        ca_certs=config.ssl_ca_certs, keyfile_password=config.ssl_keyfile_password,
                        limit_request_line=8190, limit_request_fields=100, limit_request_field_size=8190)
 
-            self.guvicorn_config = self.guvicorn_config or {}
-            if 'workers' not in self.guvicorn_config:
-                self.guvicorn_config['workers'] = None
-            if self.guvicorn_config['workers'] is None or self.guvicorn_config['workers'] <= 0:
-                self.guvicorn_config['workers'] = multiprocessing.cpu_count()*2
-            if 'timeout' not in self.guvicorn_config:
-                self.guvicorn_config['timeout'] = None
-            if self.guvicorn_config['timeout'] is None or self.guvicorn_config['timeout'] <= 0:
-                self.guvicorn_config['timeout'] = 30
+            self.gunicorn_config = self.gunicorn_config or {}
+            if 'workers' not in self.gunicorn_config:
+                self.gunicorn_config['workers'] = None
+            if self.gunicorn_config['workers'] is None or self.gunicorn_config['workers'] <= 0:
+                self.gunicorn_config['workers'] = multiprocessing.cpu_count()*2
+            if 'timeout' not in self.gunicorn_config:
+                self.gunicorn_config['timeout'] = None
+            if self.gunicorn_config['timeout'] is None or self.gunicorn_config['timeout'] <= 0:
+                self.gunicorn_config['timeout'] = 30
 
-            opt = {**opt, **self.guvicorn_config}
-            self.server = App(config.app, opt)
-            #self.thread = RaiseThread(daemon=True, target=self.server.run)
+            opt = {**opt, **self.gunicorn_config}
+            self.server = App(app, opt)
 
     def start(self):
-        if self.force_uvicorn:
+        if self.force_single:
             asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
             self.thread.start()
             asyncio.run(self.wait_for_started())
@@ -1005,7 +1012,7 @@ class ThreadedUvicorn:
             await asyncio.sleep(0.1)
 
     def stop(self):
-        if self.force_uvicorn:
+        if self.force_single:
             if self.thread.is_alive():
                 self.server.should_exit = True
                 self.thread.raise_exception()
@@ -1015,7 +1022,7 @@ class ThreadedUvicorn:
             self.server.started = False
 
     def is_alive(self):
-        if self.force_uvicorn:
+        if self.force_single:
             return self.thread.is_alive()
         else:
             return self.server.started
@@ -1044,3 +1051,10 @@ class RaiseThread(threading.Thread):
                 0
             )
             print('Failure in raising exception')
+
+if platform.system() != "Windows":
+    from uvicorn.workers import UvicornWorker
+    class ASGIWorker(UvicornWorker):
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            super().__init__(*args, **kwargs)
+            self.config.ws = "wsproto"

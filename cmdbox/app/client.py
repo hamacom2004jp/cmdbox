@@ -1,5 +1,5 @@
 from pathlib import Path
-from cmdbox.app import filer
+from cmdbox.app import common, filer
 from cmdbox.app.commons import convert, redis_client
 import base64
 import logging
@@ -196,12 +196,13 @@ class Client(object):
                 if download_file.exists():
                     self.logger.warning(f"download_file {download_file} already exists.")
                     return dict(warn=f"download_file {download_file} already exists.")
-                with open(download_file, "wb") as f:
+                def _wd(f):
                     f.write(base64.b64decode(res_json["success"]["data"]))
                     del res_json["success"]["data"]
                     res_json["success"]["download_file"] = str(download_file.absolute())
+                common.save_file(download_file, _wd, mode='wb')
         return res_json
-    
+
     def file_upload(self, svpath:str, upload_file:Path, scope:str="client", client_data:Path=None, mkdir:bool=False, orverwrite:bool=False,
                     retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """

@@ -267,6 +267,14 @@ class Options:
             short="d", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
             description_ja="デバックモードで起動します。",
             description_en="Starts in debug mode.")
+        self._options["debug_attach"] = dict(
+            short="debug_attach", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
+            description_ja="デバックプロセスへのアタッチを有効にするかどうかを指定します。",
+            description_en="Specify whether to enable attaching to the debug process.")
+        self._options["debug_attach_port"] = dict(
+            short="debug_attach_port", type=Options.T_INT, default=5678, required=False, multi=False, hide=True, choice=None,
+            description_ja="デバックプロセスにアタッチするポート番号を指定します。",
+            description_en="Specify the port number to attach to the debug process.")
         self._options["format"] = dict(
             short="f", type=Options.T_BOOL, default=None, required=False, multi=False, hide=True,
             description_ja="処理結果を見やすい形式で出力します。指定しない場合json形式で出力します。",

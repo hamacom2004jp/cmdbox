@@ -1,7 +1,9 @@
 argcomplete
 async-timeout
 collectlicense
+cffi
 cryptography
+debugpy
 fastapi
 gevent
 #google-adk

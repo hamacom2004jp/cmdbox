@@ -34,16 +34,14 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
                 opt = None
                 content_type = req.headers.get('content-type')
-                def _marge_opt(opt, param):
-                    for k in opt.keys():
-                        if k in param: opt[k] = param[k]
+                def _marge_opt(opt:Dict[str, Any], param:Dict[str, Any]) -> Dict[str, Any]:
+                    opt.update(param)
                     return opt
+                opt_def = self.load_cmd(web, title)
                 if content_type is None:
-                    opt = self.load_cmd(web, title)
-                    opt = _marge_opt(opt, req.query_params)
+                    opt = _marge_opt(opt_def, req.query_params)
                 elif content_type.startswith('multipart/form-data'):
-                    opt = self.load_cmd(web, title)
-                    opt = _marge_opt(opt, req.query_params)
+                    opt = _marge_opt(opt_def, req.query_params)
                     form = await req.form()
                     #files = {key: value for key, value in form.multi_items() if isinstance(value, UploadFile)}
                     for key, fv in form.multi_items():
@@ -52,13 +50,12 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                         if key == 'input_file': opt['stdin'] = False
                 elif content_type.startswith('application/json'):
                     opt = await req.json()
+                    opt = _marge_opt(opt_def, opt)
                 elif content_type.startswith('application/octet-stream'):
-                    opt = self.load_cmd(web, title)
-                    opt = _marge_opt(opt, req.query_params)
+                    opt = _marge_opt(opt_def, req.query_params)
                     opt['_stdin_body'] = await req.body()
                 else:
-                    opt = self.load_cmd(web, title)
-                    opt = _marge_opt(opt, req.query_params)
+                    opt = _marge_opt(opt_def, req.query_params)
                 if 'mode' not in opt or 'cmd' not in opt:
                     raise HTTPException(status_code=404, detail='mode or cmd is not found.')
                 opt['capture_stdout'] = nothread = True
@@ -147,9 +144,10 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         if 'port' in opt: opt['port'] = web.redis_port
         if 'password' in opt: opt['password'] = web.redis_password
         if 'svname' in opt: opt['svname'] = web.svname
-        if req.session is not None and 'signin' in req.session and req.session['signin'] is not None:
-            if 'clmsg_id' in req.session['signin'] and req.session['signin']['clmsg_id'] is not None:
-                opt['clmsg_id'] = req.session['signin']['clmsg_id']
+        if not 'clmsg_id' in opt:  # optに含まれる場合は処理しない
+            if req.session is not None and 'signin' in req.session and req.session['signin'] is not None:
+                if 'clmsg_id' in req.session['signin'] and req.session['signin']['clmsg_id'] is not None:
+                    opt['clmsg_id'] = req.session['signin']['clmsg_id']
         ap.sv = None
         ap.cl = None
         ap.web = None

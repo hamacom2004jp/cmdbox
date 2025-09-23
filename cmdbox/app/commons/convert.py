@@ -99,8 +99,10 @@ def npy2imgfile(npy, output_image_file:Path=None, image_type:str='jpeg') -> byte
     image_type = 'jpeg' if image_type == 'jpg' else image_type
     img_byte = img2byte(image, format=image_type)
     if output_image_file is not None:
-        with open(output_image_file, 'wb') as f:
+        from cmdbox.app import common
+        def _w(f):
             f.write(img_byte)
+        common.save_file(output_image_file, _w, mode='wb')
     return img_byte
 
 def bytes2b64str(img:bytes) -> str:

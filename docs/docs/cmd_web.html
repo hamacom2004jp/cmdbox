@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( web mode ) &mdash; cmdbox 2025/08/13 documentation</title>
+  <title>Command Reference ( web mode ) &mdash; cmdbox 2025/09/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=d160edbb"></script>
+      <script src="../_static/documentation_options.js?v=6ef6a16d"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -76,7 +76,9 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audit.html">Audit</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tts.html">Text-to-Speech (TTS)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Information</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
@@ -494,13 +496,13 @@
 <td></td>
 <td><p>Specify the session timeout in seconds for signed-in users.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--guvicorn_workers &lt;second&gt;</p></td>
+<tr class="row-odd"><td><p>--gunicorn_workers &lt;second&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of guvicorn workers, valid only in Linux environment. If -1 or unspecified, twice the number of CPUs is used.</p></td>
+<td><p>Specifies the number of gunicorn workers, valid only in Linux environment. If -1 or unspecified, twice the number of CPUs is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--guvicorn_timeout &lt;second&gt;</p></td>
+<tr class="row-even"><td><p>--gunicorn_timeout &lt;second&gt;</p></td>
 <td></td>
-<td><p>Specify the timeout duration of the guvicorn worker in seconds.</p></td>
+<td><p>Specify the timeout duration of the gunicorn worker in seconds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--client_only</p></td>
 <td></td>

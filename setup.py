@@ -17,9 +17,11 @@ PYTHON_REQUIRES = '>=3.8'
 INSTALL_REQUIRES = [
     'argcomplete',
     'async-timeout',
+    'cffi',
     'cryptography',
     'fastapi',
     #'fastmcp',
+    'debugpy',
     'gevent',
     #'google-adk',
     'gunicorn',

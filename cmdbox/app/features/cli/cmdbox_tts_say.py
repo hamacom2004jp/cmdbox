@@ -81,8 +81,9 @@ class TtsSay(cmdbox_tts_start.TtsStart):
             if 'success' in ret and 'data' in ret['success']:
                 wav_b64 = ret['success']['data']
                 wav_data = convert.b64str2bytes(wav_b64)
-                with open(args.tts_output, 'wb') as f:
+                def _w(f):
                     f.write(wav_data)
+                common.save_file(args.tts_output, _w, mode='wb')
                 del ret['success']['data'] # 音声データは削除
         common.print_format(ret, False, tm, None, False, pf=pf)
         if 'success' not in ret:

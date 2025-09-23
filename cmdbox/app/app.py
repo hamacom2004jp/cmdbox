@@ -118,6 +118,13 @@ class CmdBoxApp:
         args = argparse.Namespace(**{k:common.chopdq(v) for k,v in args_dict.items()})
         eargsparsetime = time.perf_counter()
 
+        if args.debug_attach:
+            import debugpy
+            debugpy.listen(("", args.debug_attach_port))
+            self.default_logger.info(f"Waiting for debugger attach on port {args.debug_attach_port}...")
+            debugpy.wait_for_client()
+            self.default_logger.info("Debugger attached.")
+
         ret = dict(success=f"Start command. {args}")
         if args.saveopt:
             if args.useopt is None:

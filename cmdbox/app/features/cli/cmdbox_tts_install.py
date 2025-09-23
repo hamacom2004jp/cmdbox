@@ -254,8 +254,9 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                     _msg = f"Failed to download VoiceVox core: {responce.status_code} {responce.reason}. {downloader_url}"
                     logger.error(_msg, exc_info=True)
                     return dict(warn=_msg)
-                with open(dlfile, mode='wb') as f:
+                def _wd(f):
                     f.write(responce.content)
+                common.save_file(dlfile, _wd, mode='wb')
                 # ダウンローダーの実行権限を付与
                 if voicevox_os != 'windows':
                     dlfile.chmod(dlfile.stat().st_mode | 0o111)
@@ -296,8 +297,9 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                     _msg = f"Failed to download VoiceVox whl: {responce.status_code} {responce.reason}. {whl_url}"
                     logger.error(_msg, exc_info=True)
                     return dict(warn=_msg)
-                with open(voicevox_whl, mode='wb') as f:
+                def _ww(f):
                     f.write(responce.content)
+                common.save_file(voicevox_whl, _ww, mode='wb')
                 # whlファイルをpipでインストール
                 if logger.level == logging.DEBUG:
                     logger.debug(f"pip install {voicevox_whl}")

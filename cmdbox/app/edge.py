@@ -515,9 +515,9 @@ class Edge(object):
                     except Exception as e:
                         raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
 
-                if not hasattr(self, 'thUvicorn') or not self.thUvicorn.is_alive():
-                    self.thUvicorn = web.ThreadedUvicorn(config=Config(app=fastapi, host='localhost', port=oauth2_port))
-                    self.thUvicorn.start()
+                if not hasattr(self, 'thHttp') or not self.thHttp.is_alive():
+                    self.thHttp = web.ThreadedASGI(config=Config(app=fastapi, host='localhost', port=oauth2_port))
+                    self.thHttp.start()
                     time.sleep(1)
 
                 # OAuth2認証のリクエストを送信
@@ -581,9 +581,9 @@ class Edge(object):
                     except Exception as e:
                         raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
 
-                if not hasattr(self, 'thUvicorn') or not self.thUvicorn.is_alive():
-                    self.thUvicorn = web.ThreadedUvicorn(config=Config(app=fastapi, host='localhost', port=oauth2_port))
-                    self.thUvicorn.start()
+                if not hasattr(self, 'thHttp') or not self.thHttp.is_alive():
+                    self.thHttp = web.ThreadedASGI(config=Config(app=fastapi, host='localhost', port=oauth2_port))
+                    self.thHttp.start()
                     time.sleep(1)
 
                 # OAuth2認証のリクエストを送信
@@ -652,9 +652,9 @@ class Edge(object):
                     except Exception as e:
                         raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
 
-                if not hasattr(self, 'thUvicorn') or not self.thUvicorn.is_alive():
-                    self.thUvicorn = web.ThreadedUvicorn(self.logger, Config(app=fastapi, host='localhost', port=oauth2_port), {})
-                    self.thUvicorn.start()
+                if not hasattr(self, 'thHttp') or not self.thHttp.is_alive():
+                    self.thHttp = web.ThreadedASGI(config=Config(app=fastapi, host='localhost', port=oauth2_port))
+                    self.thHttp.start()
                     time.sleep(1)
 
                 # OAuth2認証のリクエストを送信
@@ -734,9 +734,9 @@ class Edge(object):
                     except Exception as e:
                         raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
 
-                if not hasattr(self, 'thUvicorn') or not self.thUvicorn.is_alive():
-                    self.thUvicorn = web.ThreadedUvicorn(self.logger, Config(app=fastapi, host='localhost', port=saml_port), {})
-                    self.thUvicorn.start()
+                if not hasattr(self, 'thHttp') or not self.thHttp.is_alive():
+                    self.thHttp = web.ThreadedASGI(config=Config(app=fastapi, host='localhost', port=saml_port))
+                    self.thHttp.start()
                     time.sleep(1)
 
                 # SAML認証のリクエストを送信

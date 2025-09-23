@@ -80,8 +80,9 @@ def load_yml(yml_path:Path) -> dict:
     Returns:
         dict: 読み込んだYAMLファイルの内容
     """
-    with open(yml_path, encoding="utf-8") as f:
+    def _r(f):
         return yaml.safe_load(f)
+    return load_file(yml_path, _r)
 
 def save_yml(yml_path:Path, data:dict) -> None:
     """
@@ -91,8 +92,83 @@ def save_yml(yml_path:Path, data:dict) -> None:
         yml_path (Path): YAMLファイルのパス
         data (dict): 書き込むデータ
     """
-    with open(yml_path, 'w') as f:
+    def _w(f):
         yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+    save_file(yml_path, _w)
+
+def load_file(file_path:Path, func, mode='r', encoding='utf-8') -> None:
+    """
+    ファイルを読み込みます。読み込み時に排他ロックします。
+
+    Args:
+        file_path (Path): ファイルのパス
+        func: 読み込んだデータを処理する関数
+        mode (str, optional): ファイルモード. Defaults to 'r'.
+        encoding (str, optional): エンコーディング. Defaults to 'utf-8'.
+    """
+    lock_file = f'{file_path}.lock'
+    try:
+        with open(lock_file, 'w') as fd:
+            try:
+                if sys.platform == 'win32':
+                    import msvcrt
+                    msvcrt.locking(fd.fileno(), msvcrt.LK_LOCK, 0)
+                else:
+                    import fcntl
+                    fcntl.lockf(fd, fcntl.LOCK_EX)
+                if 'b' in mode:
+                    with open(file_path, mode) as f:
+                        return func(f)
+                else:
+                    with open(file_path, mode, encoding=encoding) as f:
+                        return func(f)
+            finally:
+                if sys.platform == 'win32':
+                    msvcrt.locking(fd.fileno(), msvcrt.LK_UNLCK, 0)
+                else:
+                    fcntl.lockf(fd, fcntl.LOCK_UN)
+    finally:
+        try:
+            os.remove(lock_file)
+        except:
+            pass
+
+def save_file(file_path:Path, func, mode='w', encoding='utf-8') -> None:
+    """
+    ファイルに書き込みます。書き込み時に排他ロックします。
+
+    Args:
+        file_path (Path): ファイルのパス
+        func: 書き込む関数
+        mode (str, optional): ファイルモード. Defaults to 'w'.
+        encoding (str, optional): エンコーディング. Defaults to 'utf-8'.
+    """
+    lock_file = f'{file_path}.lock'
+    try:
+        with open(lock_file, 'w') as fd:
+            try:
+                if sys.platform == 'win32':
+                    import msvcrt
+                    msvcrt.locking(fd.fileno(), msvcrt.LK_LOCK, 0)
+                else:
+                    import fcntl
+                    fcntl.lockf(fd, fcntl.LOCK_EX)
+                if 'b' in mode:
+                    with open(file_path, mode) as f:
+                        func(f)
+                else:
+                    with open(file_path, mode, encoding=encoding) as f:
+                        func(f)
+            finally:
+                if sys.platform == 'win32':
+                    msvcrt.locking(fd.fileno(), msvcrt.LK_UNLCK, 0)
+                else:
+                    fcntl.lockf(fd, fcntl.LOCK_UN)
+    finally:
+        try:
+            os.remove(lock_file)
+        except:
+            pass
 
 class CommonValue:
     _map = dict()
@@ -251,8 +327,7 @@ def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, v
     if not log_conf_path.exists():
         log_conf_path = Path(version.__file__).parent / f"logconf_{ver.__appid__}.yml"
         log_name = mode
-    with open(log_conf_path) as f:
-        log_config = yaml.safe_load(f)
+    log_config = load_yml(log_conf_path)
     std_key = None
     set_common_value('webcall', webcall)
     for k, h in log_config['handlers'].items():
@@ -343,8 +418,9 @@ def saveopt(opt:dict, opt_path:Path, webmode:bool=False) -> None:
                 k = r['opt']
                 d = r['default'] if 'default' in r else None
                 opt[k] = d if k not in lopts else lopts.get(k, d)
-    with open(opt_path, 'w') as f:
+    def _w(f):
         json.dump(opt, f, indent=4, default=default_json_enc)
+    save_file(opt_path, _w)
 
 def saveuser(user_data:dict, user_path:Path) -> None:
     """
@@ -552,9 +628,10 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
                 pass
     if output_json is not None:
         try:
-            with open(output_json, 'a' if output_json_append else 'w', encoding='utf-8') as f:
+            def _w(f):
                 json.dump(data, f, default=default_json_enc, ensure_ascii=False)
                 print('', file=f)
+            save_file(Path(output_json), _w, mode='a' if output_json_append else 'w')
         except Exception as e:
             pass
     return txt
@@ -584,8 +661,9 @@ def download_file(url:str, save_path:Path) -> Path:
         Path: 保存したファイルのパス
     """
     r = requests.get(url, stream=True)
-    with open(save_path, 'wb') as f:
+    def _w(f):
         f.write(r.content)
+    save_file(Path(save_path), _w)
     return save_path
 
 def cmd(cmd:str, logger:logging.Logger, slise:int=100, newenv:Dict=None) -> Tuple[int, str, str]:

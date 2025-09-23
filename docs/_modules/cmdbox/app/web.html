@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.web &mdash; cmdbox 2025/08/12 documentation</title>
+  <title>cmdbox.app.web &mdash; cmdbox 2025/09/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=751869a2"></script>
+      <script src="../../../_static/documentation_options.js?v=6ef6a16d"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -45,7 +45,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">Command Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/audit.html">Audit</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">Developer Information</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/errors.html">Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/license.html">License</a></li>
@@ -843,7 +845,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">allow_host</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">listen_port</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">8081</span><span class="p">,</span> <span class="n">ssl_listen_port</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">8443</span><span class="p">,</span>
               <span class="n">ssl_cert</span><span class="p">:</span><span class="n">Path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ssl_key</span><span class="p">:</span><span class="n">Path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ssl_keypass</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ssl_ca_certs</span><span class="p">:</span><span class="n">Path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
               <span class="n">session_domain</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">session_path</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">session_secure</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">session_timeout</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span> <span class="n">outputs_key</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">[],</span>
-              <span class="n">guvicorn_workers</span><span class="p">:</span><span class="nb">int</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">guvicorn_timeout</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+              <span class="n">gunicorn_workers</span><span class="p">:</span><span class="nb">int</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">gunicorn_timeout</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
               <span class="n">agent_runner</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mcp</span><span class="o">=</span><span class="kc">None</span><span class="p">,):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Webサーバを起動する</span>
@@ -861,8 +863,8 @@
 <span class="sd">            session_secure (bool, optional): セッションセキュア. Defaults to False.</span>
 <span class="sd">            session_timeout (int, optional): セッションタイムアウト. Defaults to 900.</span>
 <span class="sd">            outputs_key (list, optional): 出力キー. Defaults to [].</span>
-<span class="sd">            guvicorn_workers (int, optional): Gunicornワーカー数. Defaults to -1.</span>
-<span class="sd">            guvicorn_timeout (int, optional): Gunicornタイムアウト. Defaults to 30.</span>
+<span class="sd">            gunicorn_workers (int, optional): Gunicornワーカー数. Defaults to -1.</span>
+<span class="sd">            gunicorn_timeout (int, optional): Gunicornタイムアウト. Defaults to 30.</span>
 <span class="sd">            agent_runner (Runner, optional): エージェントランナー. Defaults to None.</span>
 <span class="sd">            mcp (MCP, optional): MCP. Defaults to None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -878,8 +880,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">session_path</span> <span class="o">=</span> <span class="n">session_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">session_secure</span> <span class="o">=</span> <span class="n">session_secure</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">session_timeout</span> <span class="o">=</span> <span class="n">session_timeout</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_workers</span> <span class="o">=</span> <span class="n">guvicorn_workers</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_timeout</span> <span class="o">=</span> <span class="n">guvicorn_timeout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_workers</span> <span class="o">=</span> <span class="n">gunicorn_workers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_timeout</span> <span class="o">=</span> <span class="n">gunicorn_timeout</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">agent_runner</span> <span class="o">=</span> <span class="n">agent_runner</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mcp</span> <span class="o">=</span> <span class="n">mcp</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
@@ -895,8 +897,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: session_path=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">session_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: session_secure=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">session_secure</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: session_timeout=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">session_timeout</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: guvicorn_worker=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_workers</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: guvicorn_timeout=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_timeout</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: gunicorn_workers=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_workers</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: gunicorn_timeout=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_timeout</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: agent_runner=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_runner</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web start parameter: mcp=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mcp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -1018,21 +1020,22 @@
             <span class="n">https_config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ssl_listen_port</span><span class="p">,</span>
                                   <span class="n">ssl_certfile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ssl_cert</span><span class="p">,</span> <span class="n">ssl_keyfile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ssl_key</span><span class="p">,</span>
                                   <span class="n">ssl_keyfile_password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ssl_keypass</span><span class="p">,</span> <span class="n">ssl_ca_certs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ssl_ca_certs</span><span class="p">)</span>
-            <span class="n">th_ssl</span> <span class="o">=</span> <span class="n">ThreadedUvicorn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">https_config</span><span class="p">,</span>
-                                     <span class="n">guvicorn_config</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_workers</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_timeout</span><span class="p">))</span>
+            <span class="n">th_ssl</span> <span class="o">=</span> <span class="n">ThreadedASGI</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">https_config</span><span class="p">,</span>
+                                  <span class="n">gunicorn_config</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_workers</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_timeout</span><span class="p">))</span>
             <span class="n">th_ssl</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
             <span class="n">browser_port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssl_listen_port</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">http_config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="p">)</span>
-            <span class="n">th</span> <span class="o">=</span> <span class="n">ThreadedUvicorn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">http_config</span><span class="p">,</span>
-                                <span class="n">guvicorn_config</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_workers</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_timeout</span><span class="p">))</span>
+            <span class="n">th</span> <span class="o">=</span> <span class="n">ThreadedASGI</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">http_config</span><span class="p">,</span>
+                              <span class="n">gunicorn_config</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_workers</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_timeout</span><span class="p">))</span>
             <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
             <span class="n">browser_port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui_mode</span><span class="p">:</span>
                 <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;http://localhost:</span><span class="si">{</span><span class="n">browser_port</span><span class="si">}</span><span class="s1">/gui&#39;</span><span class="p">)</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;web.pid&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_w</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()))</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">save_file</span><span class="p">(</span><span class="s2">&quot;web.pid&quot;</span><span class="p">,</span> <span class="n">_w</span><span class="p">)</span>
             <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
                 <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">th</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1053,13 +1056,17 @@
 <span class="sd">        Webサーバを停止する</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;web.pid&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_r</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
                 <span class="n">pid</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">pid</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-                    <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pid</span><span class="p">),</span> <span class="n">signal</span><span class="o">.</span><span class="n">CTRL_C_EVENT</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Windows&quot;</span><span class="p">:</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;taskkill /F /PID </span><span class="si">{</span><span class="n">pid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pid</span><span class="p">),</span> <span class="n">signal</span><span class="o">.</span><span class="n">CTRL_C_EVENT</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stop web.&quot;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;pid is empty.&quot;</span><span class="p">)</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s2">&quot;web.pid&quot;</span><span class="p">,</span> <span class="n">_r</span><span class="p">)</span>
             <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;web.pid&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
@@ -1068,24 +1075,27 @@
 </div>
 
 
-<div class="viewcode-block" id="ThreadedUvicorn">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.ThreadedUvicorn">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ThreadedUvicorn</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span><span class="n">Config</span><span class="p">,</span> <span class="n">guvicorn_config</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_uvicorn</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="ThreadedASGI">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.ThreadedASGI">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ThreadedASGI</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">:</span><span class="n">FastAPI</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span><span class="n">Config</span><span class="p">,</span> <span class="n">gunicorn_config</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_single</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_config</span> <span class="o">=</span> <span class="n">guvicorn_config</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">force_uvicorn</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Windows&quot;</span> <span class="k">else</span> <span class="n">force_uvicorn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_config</span> <span class="o">=</span> <span class="n">gunicorn_config</span>
+        <span class="c1"># windows環境下ではシングルプロセスで動作させる</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">force_single</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Windows&quot;</span> <span class="k">else</span> <span class="n">force_single</span>
         <span class="c1"># loggerの設定</span>
         <span class="n">common</span><span class="o">.</span><span class="n">reset_logger</span><span class="p">(</span><span class="s2">&quot;uvicorn&quot;</span><span class="p">)</span>
         <span class="n">common</span><span class="o">.</span><span class="n">reset_logger</span><span class="p">(</span><span class="s2">&quot;uvicorn.error&quot;</span><span class="p">)</span>
         <span class="n">common</span><span class="o">.</span><span class="n">reset_logger</span><span class="p">(</span><span class="s2">&quot;uvicorn.access&quot;</span><span class="p">)</span>
         <span class="c1">#common.reset_logger(&quot;gunicorn.error&quot;)</span>
         <span class="c1">#common.reset_logger(&quot;gunicorn.access&quot;)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_uvicorn</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_single</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">ws</span> <span class="o">=</span> <span class="s2">&quot;wsproto&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">uvicorn</span><span class="o">.</span><span class="n">Server</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">thread</span> <span class="o">=</span> <span class="n">RaiseThread</span><span class="p">(</span><span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">run</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-
             <span class="kn">from</span><span class="w"> </span><span class="nn">gunicorn.app.wsgiapp</span><span class="w"> </span><span class="kn">import</span> <span class="n">WSGIApplication</span>
             <span class="k">class</span><span class="w"> </span><span class="nc">App</span><span class="p">(</span><span class="n">WSGIApplication</span><span class="p">):</span>
                 <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
@@ -1100,31 +1110,30 @@
                 <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">application</span>
             <span class="n">opt</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                       <span class="n">worker_class</span><span class="o">=</span><span class="s2">&quot;uvicorn.workers.UvicornWorker&quot;</span><span class="p">,</span>
+                       <span class="n">worker_class</span><span class="o">=</span><span class="s2">&quot;cmdbox.app.web.ASGIWorker&quot;</span><span class="p">,</span>
                        <span class="n">access_log_format</span><span class="o">=</span><span class="s1">&#39;[</span><span class="si">%(t)s</span><span class="s1">] </span><span class="si">%(p)s</span><span class="s1"> </span><span class="si">%(l)s</span><span class="s1"> </span><span class="si">%(h)s</span><span class="s1"> &quot;</span><span class="si">%(r)s</span><span class="s1">&quot; </span><span class="si">%(s)s</span><span class="s1">&#39;</span><span class="p">,</span>
                        <span class="n">loglevel</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">getLevelName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span><span class="p">),</span>
                        <span class="n">keyfile</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_keyfile</span><span class="p">,</span> <span class="n">certfile</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_certfile</span><span class="p">,</span>
                        <span class="n">ca_certs</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_ca_certs</span><span class="p">,</span> <span class="n">keyfile_password</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_keyfile_password</span><span class="p">,</span>
                        <span class="n">limit_request_line</span><span class="o">=</span><span class="mi">8190</span><span class="p">,</span> <span class="n">limit_request_fields</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">limit_request_field_size</span><span class="o">=</span><span class="mi">8190</span><span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_config</span> <span class="ow">or</span> <span class="p">{}</span>
-            <span class="k">if</span> <span class="s1">&#39;workers&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_config</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_config</span><span class="p">[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_config</span><span class="p">[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_config</span><span class="p">[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_config</span><span class="p">[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span><span class="o">*</span><span class="mi">2</span>
-            <span class="k">if</span> <span class="s1">&#39;timeout&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_config</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_config</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_config</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_config</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_config</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_config</span> <span class="ow">or</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="s1">&#39;workers&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_config</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_config</span><span class="p">[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_config</span><span class="p">[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_config</span><span class="p">[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_config</span><span class="p">[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span><span class="o">*</span><span class="mi">2</span>
+            <span class="k">if</span> <span class="s1">&#39;timeout&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_config</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_config</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_config</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_config</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_config</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
 
-            <span class="n">opt</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">opt</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">guvicorn_config</span><span class="p">}</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">App</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">app</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span>
-            <span class="c1">#self.thread = RaiseThread(daemon=True, target=self.server.run)</span>
+            <span class="n">opt</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">opt</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_config</span><span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">App</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ThreadedUvicorn.start">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.ThreadedUvicorn.start">[docs]</a>
+<div class="viewcode-block" id="ThreadedASGI.start">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.ThreadedASGI.start">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_uvicorn</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_single</span><span class="p">:</span>
             <span class="n">asyncio</span><span class="o">.</span><span class="n">set_event_loop_policy</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">WindowsSelectorEventLoopPolicy</span><span class="p">())</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
             <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wait_for_started</span><span class="p">())</span>
@@ -1134,17 +1143,17 @@
             <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="ThreadedUvicorn.wait_for_started">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.ThreadedUvicorn.wait_for_started">[docs]</a>
+<div class="viewcode-block" id="ThreadedASGI.wait_for_started">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.ThreadedASGI.wait_for_started">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">wait_for_started</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">started</span><span class="p">:</span>
             <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ThreadedUvicorn.stop">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.ThreadedUvicorn.stop">[docs]</a>
+<div class="viewcode-block" id="ThreadedASGI.stop">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.ThreadedASGI.stop">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_uvicorn</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_single</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">should_exit</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">raise_exception</span><span class="p">()</span>
@@ -1154,10 +1163,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">started</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 
-<div class="viewcode-block" id="ThreadedUvicorn.is_alive">
-<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.ThreadedUvicorn.is_alive">[docs]</a>
+<div class="viewcode-block" id="ThreadedASGI.is_alive">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.ThreadedASGI.is_alive">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_alive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_uvicorn</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_single</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">started</span></div>
@@ -1200,6 +1209,13 @@
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Failure in raising exception&#39;</span><span class="p">)</span></div>
 </div>
 
+
+<span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;Windows&quot;</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">uvicorn.workers</span><span class="w"> </span><span class="kn">import</span> <span class="n">UvicornWorker</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">ASGIWorker</span><span class="p">(</span><span class="n">UvicornWorker</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ws</span> <span class="o">=</span> <span class="s2">&quot;wsproto&quot;</span>
 </pre></div>
 
            </div>
