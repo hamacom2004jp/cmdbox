@@ -28,15 +28,6 @@ class TtsStop(cmdbox_tts_start.TtsStart):
         opt['description_en'] = "Stops the Text-to-Speech (TTS) engine."
         return opt
 
-    def get_svcmd(self):
-        """
-        この機能のサーバー側のコマンドを返します
-
-        Returns:
-            str: サーバー側のコマンド
-        """
-        return 'tts_stop'
-
     def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
               sessions:Dict[str, Dict[str, Any]]) -> int:
         """

@@ -118,15 +118,6 @@ class VisionPredict(cmdbox_vision_start.VisionStart):
                      description_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
             ]
         )
-    
-    def get_svcmd(self):
-        """
-        この機能のサーバー側のコマンドを返します
-
-        Returns:
-            str: サーバー側のコマンド
-        """
-        return 'vision_predict'
 
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """

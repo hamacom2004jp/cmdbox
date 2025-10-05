@@ -933,7 +933,7 @@ class Web:
                     if platform.system() == "Windows":
                         os.system(f"taskkill /F /PID {pid}")
                     else:
-                        os.kill(int(pid), signal.CTRL_C_EVENT)
+                        os.kill(int(pid), signal.SIGKILL)
                     self.logger.info(f"Stop web.")
                 else:
                     self.logger.warning(f"pid is empty.")
@@ -999,9 +999,14 @@ class ThreadedASGI:
 
     def start(self):
         if self.force_single:
-            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-            self.thread.start()
-            asyncio.run(self.wait_for_started())
+            if platform.system() == "Windows":
+                asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+                self.thread.start()
+                asyncio.run(self.wait_for_started())
+            else:
+                self.thread.start()
+                task = asyncio.get_event_loop().create_task(self.wait_for_started())
+                # task.result()
         else:
             async def run():
                 self.server.run()

@@ -90,15 +90,6 @@ class TtsSay(cmdbox_tts_start.TtsStart):
                 return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl
 
-    def get_svcmd(self):
-        """
-        この機能のサーバー側のコマンドを返します
-
-        Returns:
-            str: サーバー側のコマンド
-        """
-        return 'tts_say'
-
     def is_cluster_redirect(self):
         """
         クラスター宛のメッセージの場合、メッセージを転送するかどうかを返します

@@ -122,15 +122,6 @@ class AuditSearch(audit_base.AuditBase):
         ]
         return opt
 
-    def get_svcmd(self):
-        """
-        この機能のサーバー側のコマンドを返します
-
-        Returns:
-            str: サーバー側のコマンド
-        """
-        return 'audit_search'
-
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います

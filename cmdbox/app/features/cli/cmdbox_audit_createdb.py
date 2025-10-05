@@ -38,7 +38,7 @@ class AuditCreatedb(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=True,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=True, use_agent=False,
             description_ja="監査を記録するデータベースを作成します。",
             description_en="Create a database to record audits.",
             choice=[
@@ -84,16 +84,6 @@ class AuditCreatedb(feature.UnsupportEdgeFeature):
                      description_en="Specify the maximum waiting time until the server responds."),
             ]
         )
-
-
-    def get_svcmd(self):
-        """
-        この機能のサーバー側のコマンドを返します
-
-        Returns:
-            str: サーバー側のコマンド
-        """
-        return 'audit_create'
 
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """

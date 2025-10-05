@@ -13,6 +13,7 @@ See below for available options for the various commands.
    Server <cmd_server.rst>
    Client <cmd_client.rst>
    Cmd <cmd_cmd.rst>
+   Excel <cmd_excel.rst>
    GUI <cmd_gui.rst>
    Web <cmd_web.rst>
    MCP <cmd_mcp.rst>

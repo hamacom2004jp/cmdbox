@@ -63,7 +63,7 @@ class Feature(object):
         Returns:
             str: サーバー側のコマンド
         """
-        return None
+        return f"{self.get_mode()}_{self.get_cmd()}"
 
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]) -> Tuple[int, Dict[str, Any], Any]:
         """

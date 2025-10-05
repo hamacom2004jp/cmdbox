@@ -1,5 +1,6 @@
 argcomplete
 async-timeout
+build
 collectlicense
 cffi
 cryptography
@@ -11,6 +12,7 @@ gunicorn
 itsdangerous
 #litellm
 numpy
+openpyxl
 Pillow
 python-multipart
 #python3-saml

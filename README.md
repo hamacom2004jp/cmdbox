@@ -21,14 +21,14 @@ cmdbox -v
 
 - When using SAML in web mode, install the modules with dependencies.
 ```bash
-pip install xmlsec==1.3.13 python3-saml
+pip install cmdbox[saml]
 apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl build-essential libopencv-dev
 ```
 
 - When using `--agent use` in web mode, install the modules with dependencies.
 ```bash
-pip install google-adk litellm fastmcp
-pip install backoff cryptography orjson apscheduler litellm-enterprise email-validator fastapi-sso
+pip install cmdbox[agent]
+pip install backoff orjson apscheduler litellm-enterprise fastapi-sso
 ```
 
 # Run
@@ -197,9 +197,6 @@ class ServerTime(feature.Feature):
                         description_en="Specify the maximum waiting time until the server responds."),
             ])
 
-    def get_svcmd(self):
-        return 'server_time'
-
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.redis_cli.send_cmd(self.get_svcmd(), [str(args.timedelta)],
@@ -281,7 +278,16 @@ agentrule:                              # Specifies a list of rules that determi
     cmds: [list, load]                  # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
     rule: allow                         # Specifies whether the specified command is allowed or not. Values are allow or deny.
   - mode: client
-    cmds: [http]
+    cmds: [file_download, file_list, http, server_info]
+    rule: allow
+  - mode: excel
+    cmds: [cell_details, cell_search, cell_values, sheet_list]
+    rule: allow
+  - mode: server
+    cmds: [list]
+    rule: allow
+  - mode: tts
+    cmds: [say]
     rule: allow
 audit:
   enabled: true                         # Specify whether to enable the audit function.

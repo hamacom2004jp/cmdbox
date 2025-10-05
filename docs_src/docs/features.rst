@@ -66,7 +66,16 @@ Configuration items in `features.yml`
         cmds: [list, load]                  # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
         rule: allow                         # Specifies whether the specified command is allowed or not. Values are allow or deny.
       - mode: client
-        cmds: [http]
+        cmds: [file_download, file_list, http, server_info]
+        rule: allow
+      - mode: excel
+        cmds: [cell_details, cell_search, cell_values, sheet_list]
+        rule: allow
+      - mode: server
+        cmds: [list]
+        rule: allow
+      - mode: tts
+        cmds: [say]
         rule: allow
     audit:
       enabled: true                         # Specify whether to enable the audit function.

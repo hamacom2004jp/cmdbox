@@ -46,6 +46,9 @@ agentrule:                              # Specifies a list of rules that determi
   - mode: client
     cmds: [file_download, file_list, http, server_info]
     rule: allow
+  - mode: excel
+    cmds: [cell_details, cell_search, cell_values, sheet_list]
+    rule: allow
   - mode: server
     cmds: [list]
     rule: allow

@@ -44,8 +44,7 @@ To install the project, follow these steps:
         sphinx-apidoc -F -o docs_src/resources cmdbox
         sphinx-build -b html docs_src docs
         python -m collectlicense --out cmdbox/licenses --clear
-        python setup.py sdist
-        python setup.py bdist_wheel
+        python -m build --wheel
 
 .. sphinx-build -b gettext docs_src docs_build
 .. sphinx-intl update -p docs_build -l en
