@@ -112,7 +112,8 @@ class RedisClient(object):
             except KeyboardInterrupt as e:
                 return False
 
-    def send_cmd(self, cmd:str, params:List[str], retry_count:int=20, retry_interval:int=5, outstatus:bool=False, timeout:int=60, nowait:bool=False):
+    def send_cmd(self, cmd:str, params:List[str], retry_count:int=20, retry_interval:int=5,
+                 outstatus:bool=False, timeout:int=60, nowait:bool=False):
         """
         コマンドをRedisサーバーに送信し、応答を取得します。
         nowait=Trueの場合は、応答を待たずにスレッドで実行します。
@@ -130,13 +131,37 @@ class RedisClient(object):
         Returns:
             dict: Redisサーバーからの応答
         """
+        return next(self.send_cmd_sse(cmd, params, retry_count, retry_interval,
+                                      outstatus, timeout, nowait, sse=False))
+
+    def send_cmd_sse(self, cmd:str, params:List[str], retry_count:int=20, retry_interval:int=5,
+                 outstatus:bool=False, timeout:int=60, nowait:bool=False, sse:bool=True):
+        """
+        コマンドをRedisサーバーに送信し、応答を取得します。
+        nowait=Trueの場合は、応答を待たずにスレッドで実行します。
+        その場合、応答は受信できません。
+
+        Args:
+            cmd (str): コマンド
+            params (List[str]): コマンドのパラメータ
+            retry_count (int, optional): リトライ回数. Defaults to 20.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
+            outstatus (bool, optional): ステータスを出力する. Defaults to False.
+            timeout (int, optional): タイムアウト時間. Defaults to 60.
+            nowait (bool, optional): 応答を待たない. Defaults to False.
+            sse (bool, optional): サーバーサイドからの終了メッセージを受けるまで連続してレスポンスを受け取る. Defaults to False.
+
+        Returns:
+            dict: Redisサーバーからの応答
+        """
         def send(nowait:bool=False):
             try:
                 if timeout <= 0:
                     raise ValueError(f"timeout must be greater than 0. timeout={timeout}")
                 sreqtime = time.perf_counter()
                 if not self.check_server(find_svname=True, retry_count=retry_count, retry_interval=retry_interval, outstatus=outstatus):
-                    return dict(error=f"Connected server failed or server not found. svname={self.svname.split('-')[1]}")
+                    yield dict(error=f"Connected server failed or server not found. svname={self.svname.split('-')[1]}")
+                    return
                 reskey = common.random_string()
                 reskey = f"cl-{reskey}-{int(time.time())}"
                 self.redis_cli.rpush(self.svname, f"{cmd} {reskey} {' '.join([str(p) for p in params])}")
@@ -151,36 +176,51 @@ class RedisClient(object):
                     if res is None or len(res) <= 0:
                         time.sleep(0.001)
                         continue
-                    return self._res_cmd(reskey, res, sreqtime)
+                    stime = time.time()
+                    if sse:
+                        msg = self._res_cmd(reskey, res, sreqtime, True)
+                        yield msg
+                        if 'end' in msg: return
+                    else:
+                        yield self._res_cmd(reskey, res, sreqtime)
+                        return
                 raise KeyboardInterrupt(f"Stop command.")
             except KeyboardInterrupt as e:
                 self.logger.warning(f"Stop command. cmd={cmd}", exc_info=True)
-                return dict(error=f"Stop command. cmd={cmd}")
+                yield dict(error=f"Stop command. cmd={cmd}")
+                return
             except Exception as e:
                 self.logger.warning(f"fail to execute command. cmd={cmd}, msg={e}", exc_info=True)
-                return dict(error=f"fail to execute command. cmd={cmd}, msg={e}")
+                yield dict(error=f"fail to execute command. cmd={cmd}, msg={e}")
+                return
         if not nowait:
-            return send(nowait)
+            for msg in send(nowait):
+                yield msg
+            return
         else:
             thread = threading.Thread(target=send, args=(nowait,))
             thread.start()
+            yield dict(success=f"Command sent. cmd={cmd}, nowait={nowait}")
 
-    def _res_cmd(self, reskey:str, res_msg:bytes, sreqtime:float):
+    def _res_cmd(self, reskey:str, res_msg:bytes, sreqtime:float, sse:bool=False) -> dict:
         """
         Redisサーバーからの応答を解析する
 
         Args:
             reskey (str): Redisサーバーからの応答のキー
             res_msg (bytes): Redisサーバーからの応答
+            sreqtime (float): コマンド送信時の時間
+            sse (bool, optional): サーバーサイドからの終了メッセージを受けるまで連続してレスポンスを受け取る. Defaults to False.
 
         Returns:
             dict: 解析された応答
         """
-        self.redis_cli.delete(reskey)
         reskbyte = len(res_msg) / 1024
         msg = res_msg.decode('utf-8')
         res_json = json.loads(msg)
         msg_json = res_json.copy()
+        if not sse or (sse and 'end' in res_json):
+            self.redis_cli.delete(reskey)
         if "output_image" in msg_json:
             msg_json["output_image"] = "binary"
         if "error" in res_json:

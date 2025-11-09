@@ -1,9 +1,10 @@
 from cmdbox.app import app, client, common, options, server, web as _web
-from cmdbox.app.commons import convert, loghandler
+from cmdbox.app.auth import signin
+from cmdbox.app.commons import convert
 from cmdbox.app.features.cli import cmdbox_audit_search, cmdbox_audit_write
 from cmdbox.app.features.web import cmdbox_web_load_cmd
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response, HTTPException
+from fastapi import FastAPI, Depends, Request, Response, HTTPException
 from fastapi.responses import PlainTextResponse
 from starlette.datastructures import UploadFile
 from typing import Dict, Any, List
@@ -27,7 +28,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         @app.post('/exec_cmd')
         @app.get('/exec_cmd/{title}')
         @app.post('/exec_cmd/{title}')
-        async def exec_cmd(req:Request, res:Response, title:str=None):
+        async def exec_cmd(req:Request, res:Response, title:str=None, scope=Depends(signin.create_request_scope)):
             try:
                 signin = web.signin.check_signin(req, res)
                 if signin is not None:

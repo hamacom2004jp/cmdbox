@@ -81,7 +81,8 @@ class CmdBoxApp:
         for opt in opts.values():
             default = opt["default"] if opt["default"] is not None and opt["default"] != "" else None
             if opt["action"] is None:
-                parser.add_argument(*opt["opts"], help=opt["help"], type=opt["type"], default=default, choices=opt["choices"])
+                choices = opt["choices"] if opt["choices"] is not None and len(opt["choices"]) > 0 else None
+                parser.add_argument(*opt["opts"], help=opt["help"], type=opt["type"], default=default, choices=choices)
             else:
                 parser.add_argument(*opt["opts"], help=opt["help"], default=default, action=opt["action"])
 

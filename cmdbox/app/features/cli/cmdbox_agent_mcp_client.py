@@ -1,5 +1,5 @@
 from cmdbox.app import common, feature
-from cmdbox.app.features.cli import cmdbox_web_start
+from cmdbox.app.auth import signin
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -34,7 +34,7 @@ class AgentMcpClient(feature.UnsupportEdgeFeature):
         """
         return dict(
             # webからclientを実行するとmcp処理とデッドロックが発生するため、webmodeを無効にします。
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True, use_agent=False,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
             description_ja="リモートMCPサーバーにリクエストを行うMCPクライアントを起動します。",
             description_en="Starts an MCP client that makes requests to a remote MCP server.",
             choice=[
@@ -127,7 +127,15 @@ class AgentMcpClient(feature.UnsupportEdgeFeature):
         )
         try:
             common.reset_logger('FastMCP.fastmcp.server.server')
-            client = Client(config)
+            scope = signin.get_request_scope()
+            webexec_and_selfreq = (scope is not None and scope['web'] is not None)
+            if webexec_and_selfreq:
+                web = scope['web']
+                url1 = f"http://localhost:{web.listen_port}/mcpsv/mcp"
+                url2 = f"https://localhost:{web.ssl_listen_port}/mcpsv/mcp"
+                if url1 != args.mcpserver_url and url2 != args.mcpserver_url:
+                    webexec_and_selfreq = False
+            client = Client(config if not webexec_and_selfreq or scope['web'].mcp is None else scope['web'].mcp)
             if logger.level == logging.DEBUG:
                 logger.debug(f"Starting MCP client: {config}")
             async with client:

@@ -24,7 +24,8 @@ class Options:
     T_TEXT = 'text'
     T_FILE = 'file'
     T_DIR = 'dir'
-    
+    T_MLIST = 'mlist'
+
     def __setattr__(self, name:str, value):
         if name.startswith("T_") and name in self.__dict__:
             raise ValueError(f'Cannot set attribute. ({name})')
@@ -114,19 +115,22 @@ class Options:
             return None
         return self._options["svcmd"][svcmd]
 
-    def get_cmd_choices(self, mode:str, cmd:str, webmode:bool=False) -> List[Dict[str, Any]]:
+    def get_cmd_choices(self, mode:str, cmd:str, webmode:bool=False, opt:Dict[str, Any]={}) -> List[Dict[str, Any]]:
         """
         コマンドのオプション一覧を取得します。
         Args:
             mode: 起動モード
             cmd: コマンド
             webmode (bool, optional): Webモードからの呼び出し. Defaults to False
+            opt (Dict[str, Any], optional): オプション値. Defaults to {}
         Returns:
             List[Dict[str, Any]]: オプションの選択肢
         """
         opts = self.get_cmd_attr(mode, cmd, "choice")
         ret = []
         for o in opts:
+            if 'choice_fn' in o and o['choice_fn'] is not None:
+                o['choice'] = o['choice_fn'](o, webmode, opt)
             if not webmode or type(o) is not dict:
                 ret.append(o)
                 continue
@@ -171,6 +175,9 @@ class Options:
                 opt['type'] = dict
                 if not val['multi']:
                     raise ValueError(f'list_options: The multi must be True if type is dict. key={key}, val={val}')
+                opt['action'] = 'append'
+            elif val['type'] == Options.T_MLIST:
+                opt['type'] = str
                 opt['action'] = 'append'
             else:
                 opt['type'] = str

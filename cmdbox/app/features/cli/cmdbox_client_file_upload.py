@@ -63,7 +63,7 @@ class ClientFileUpload(feature.UnsupportEdgeFeature):
                      test_true={"server":"server",
                                "client":"client",
                                "current":"current"}),
-                dict(opt="upload_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="out",
+                dict(opt="upload_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
                      description_ja="クライアントのアップロード元パスを指定します。",
                      description_en="Specify the source path of the client.",
                      test_true={"server":"tests/dog.jpg"}),

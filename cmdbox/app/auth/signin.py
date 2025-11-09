@@ -956,3 +956,12 @@ def get_request_scope() -> Dict[str, Any]:
         Dict[str, Any]: リクエストとレスポンスとWebSocket接続
     """
     return request_scope.get() if request_scope.get() is not None else dict(req=None, res=None, session=None, websocket=None, web=None)
+
+def set_request_scope(scope: Dict[str, Any]) -> None:
+    """
+    FastAPIのDepends用に、ContextVarにリクエストスコープを設定します。
+
+    Args:
+        scope (Dict[str, Any]): リクエストスコープ
+    """
+    request_scope.set(scope)

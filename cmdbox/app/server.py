@@ -169,7 +169,7 @@ class Server(filer.Filer):
                         continue
                     if msg[0] == 'stop_server':
                         self.is_running = False
-                    st = svcmd_feature.svrun(self.data_dir, self.logger, self.redis_cli, msg, self.sessions)
+                    st = common.exec_svrun_sync(svcmd_feature.svrun, self.data_dir, self.logger, self.redis_cli, msg, self.sessions)
                 else:
                     self.logger.warning(f"Unknown command {msg}")
                     st = self.RESP_WARN

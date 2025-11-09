@@ -230,8 +230,8 @@ Implement a class that extends `cmdbox.app.feature.Feature`
             yield status, res
 
 
-- エッジ側の実装を簡単にするために、 `cmdbox.app.feature` を継承したいくつかのクラスを用意しています。
-- 詳しくは `cmdbox.app.feature` モジュールを参照してください。
+- To simplify implementation on the edge, we provide several classes that inherit from `cmdbox.app.feature`.
+- For details, refer to the `cmdbox.app.feature` module.
 
 
 .. code-block:: python
@@ -260,3 +260,110 @@ Implement a class that extends `cmdbox.app.feature.Feature`
         """
         Base class for unsupported edge features.
         """
+
+
+Implementation of the `get_option(self) -> Dict[str, Any]` method
+-------------------------------------------------------------------------
+
+- The `get_option(self) -> Dict[str, Any]` method returns the command line options for the command.
+- Below is an example of how to implement this method.
+
+
+.. code-block:: python
+
+    def get_option(self) -> Dict[str, Any]:
+        return dict(
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
+            description_ja="MCP サーバ設定を保存します。",
+            description_en="Saves MCP server configuration.",
+            choice=[
+                dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
+                    description_ja="Redisサーバーのサービスホストを指定します。",
+                    description_en="Specify the service host of the Redis server."),
+                dict(opt="port", type=Options.T_INT, default=self.default_port, required=True, multi=False, hide=True, choice=None, web="mask",
+                    description_ja="Redisサーバーのサービスポートを指定します。",
+                    description_en="Specify the service port of the Redis server."),
+            ]
+        )
+
+
+- The options returned here correspond to the command line options.
+- Details for each option item are as follows.
+
+    - use_redis: Specifies whether to use Redis. Specify one of the following constants defined in `cmdbox.app.feature.Feature`: `USE_REDIS_TRUE`, `USE_REDIS_FALSE`, `USE_REDIS_MEIGHT`.
+    - nouse_webmode: Specifies whether the command is not executable in Web mode. The default is False.
+    - use_agent: Specifies whether the command is available to agents. The default is False.
+    - description_ja: Description in Japanese
+    - description_en: Description in English
+    - choice: Specifies the list of command line options. Each option is specified as a dictionary with the following items.
+        - opt: Option name
+        - type: Option type. Specify one of the following constants defined in `cmdbox.app.options.Options`:
+            - T_INT = 'int'
+            - T_FLOAT = 'float'
+            - T_BOOL = 'bool'
+            - T_STR = 'str'
+            - T_DATE = 'date'
+            - T_DATETIME = 'datetime'
+            - T_DICT = 'dict'
+            - T_TEXT = 'text'
+            - T_FILE = 'file'
+            - T_DIR = 'dir'
+            - T_MLIST = 'mlist'
+        - default: Default value
+        - required: Whether this option is required
+        - multi: Whether multiple values can be specified
+        - hide: Whether to hide this option by default in Web mode
+        - web: Specifies how to display options that cannot be edited in web mode. Specifying “mask” masks the option. Specifying “readonly” makes it read-only.
+        - fileio: When the type is file, specify whether it is a read file or a write file. Specify `in` or `out`.
+        - choice: Specifies the choices for this option. If dynamic generation is required, implement the `choice_fn` method in the feature class.
+            Choices can be specified in either of the following two ways.
+
+            - Options when type is a list or mlist.
+
+            .. code-block:: python
+
+                choice=[False, True]
+
+            - Options when type is a dictionary.
+
+            .. code-block:: python
+
+                choice=dict(key=["dictkey1","dictkey2","dictkey3"], val=["dictval1","dictval2","dictval3"])
+
+        - choice_edit: Specifies whether values other than the options can be entered. If true, values other than the options can be entered.
+
+            .. code-block:: python
+
+                choice_edit=True,
+
+        - choice_fn: A function that generates the choices dynamically.
+
+            .. code-block:: python
+
+                def choice_fn(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
+                    """
+                    オプションのchoiceを動的に生成する関数
+
+                    Args:
+                        o (Dict[str, Any]): choice_fn関数が呼ばれたコマンドオプションのchoice定義
+                        webmode (bool): Webモードかどうか
+                        opt (Dict[str, Any]): このコマンドのすべてのコマンドオプションのchoice定義
+
+                    Returns:
+                        Any: choice情報
+                    """
+                    choices = []
+                    return choices
+
+        - choice_show: Specify the other options to display when this option is selected.
+
+            .. code-block:: python
+
+                choice_show=dict(choice1=["opt1", "opt2"], choice2=["opt3"], choice3=["opt4", "opt5"]),
+
+
+        - callcmd: コマンドボタンを追加し、そのコマンドボタンが押されたときに呼ばれるjavascript関数を指定します。
+
+            .. code-block:: python
+
+                callcmd="()=>{cmdbox.callcmd('cmd','list',{'kwd':'*'},(res)=>{console.log(res);},$(\"[name='title']\").val(),'tag');}",

@@ -876,6 +876,12 @@ class Web:
             res.set_cookie("context_path", self.session_path, path=self.session_path, domain=self.session_domain)
             return res
 
+        @app.middleware("http")
+        async def set_allow_origin(req:Request, call_next):
+            res:Response = await call_next(req)
+            res.headers["Access-Control-Allow-Origin"] = "*"
+            return res
+
         mwparam = dict(path=self.session_path, max_age=self.session_timeout, secret_key=common.random_string())
         if self.session_domain is not None:
             mwparam['domain'] = self.session_domain

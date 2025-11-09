@@ -273,6 +273,8 @@ class Mcp:
         if t == Options.T_STR or t == Options.T_TEXT:
             return dict(title=title, type="array", items=dict(type="string"), description=description) if m \
                     else dict(title=title, type="string", description=description)
+        if t == Options.T_MLIST:
+            return dict(title=title, type="array", items=dict(type="string"), description=description)
         raise ValueError(f"Unknown type: {t} for option {o['opt']}")
 
     def _ds(self, d:str) -> str:
@@ -307,6 +309,9 @@ class Mcp:
         elif t == Options.T_STR or t == Options.T_TEXT:
             ret = "List[str]" if m else f"str"
             dft = "[]" if m else self._ds(d)
+        elif t == Options.T_MLIST:
+            ret = "List[str]"
+            dft = "[]"
         else:
             raise ValueError(f"Unknown type: {t} for option {o['opt']}")
         return f"{ret}={dft}" if use_default else ret
@@ -433,7 +438,22 @@ class Mcp:
         from fastmcp.server.middleware import Middleware, MiddlewareContext
         class ReqScopeMiddleware(Middleware):
             async def on_message(self, context: MiddlewareContext, call_next):
-                signin.request_scope.set(dict(req=context.fastmcp_context.request_context.request, res=Response(), websocket=None, web=Web.getInstance()))
+                try:
+                    fastmcp_ctx = getattr(context, 'fastmcp_context', None)
+                    req = None
+                    if fastmcp_ctx is not None:
+                        try:
+                            req = fastmcp_ctx.request_context.request
+                        except Exception:
+                            # request_context がまだ用意されていない場合など
+                            req = None
+                    signin.request_scope.set(dict(req=req, res=Response(), websocket=None, web=Web.getInstance()))
+                except Exception as e:
+                    # ログだけ残して処理は続行する（ミドルウェアで例外が発生すると全体に影響するため）
+                    try:
+                        logger.debug(f"ReqScopeMiddleware: failed to set request scope: {e}")
+                    except Exception:
+                        pass
                 result = await call_next(context)
                 return result
         return ReqScopeMiddleware()

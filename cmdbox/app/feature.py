@@ -65,6 +65,20 @@ class Feature(object):
         """
         return f"{self.get_mode()}_{self.get_cmd()}"
 
+    def choice_fn(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
+        """
+        オプションのchoiceを動的に生成する関数
+
+        Args:
+            o (Dict[str, Any]): choice_fn関数が呼ばれたコマンドオプションのchoice定義
+            webmode (bool): Webモードかどうか
+            opt (Dict[str, Any]): このコマンドのすべてのコマンドオプションのchoice定義
+
+        Returns:
+            Any: choice情報
+        """
+        return None
+
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います

@@ -8,6 +8,11 @@ import pickle
 import socketserver
 import struct
 import socket
+import os
+import time
+import shutil
+import sys
+import traceback
 
 
 class Colors:
@@ -142,8 +147,105 @@ class ColorfulStreamHandler(logging.StreamHandler):
 
 class TimedRotatingFileHandler(logging.handlers.TimedRotatingFileHandler):
     def emit(self, record: logging.LogRecord) -> None:
+        """
+        ログ出力時に例外（特に Windows の PermissionError）で処理が止まらないように保護します。
+        - 通常は親クラスの emit を呼ぶ
+        - PermissionError 等で回転に失敗した場合はフォールバックして標準エラーへ出力し、処理を継続する
+        """
         record.levelname = level_mapping_nc[record.levelno]
-        super().emit(record)
+        try:
+            super().emit(record)
+        except PermissionError:
+            # ローテーションでファイルのリネームに失敗した可能性
+            try:
+                # 一度ストリームを閉じて再試行してみる
+                try:
+                    if getattr(self, 'stream', None):
+                        try:
+                            self.stream.close()
+                        except Exception:
+                            pass
+                        self.stream = None
+                except Exception:
+                    pass
+                # doRollover を安全に呼ぶ（内部でも例外を捕まえる実装にしている）
+                try:
+                    self.doRollover()
+                except Exception:
+                    # doRollover が失敗しても続行
+                    pass
+                # 再度 emit を試みる
+                try:
+                    super().emit(record)
+                except Exception:
+                    # 最終フォールバック：標準エラーに書く
+                    try:
+                        sys.stderr.write(self.format(record) + '\n')
+                    except Exception:
+                        # ここでは何もしない（ログ出力でプロセスが落ちるのを避ける）
+                        pass
+            except Exception:
+                # どのパスでも例外が出たら最終的に標準エラーへ出力して握りつぶす
+                try:
+                    sys.stderr.write(self.format(record) + '\n')
+                except Exception:
+                    pass
+        except Exception:
+            # その他の予期しない例外も握りつぶして標準エラーへ出力
+            try:
+                sys.stderr.write(self.format(record) + '\n')
+            except Exception:
+                pass
+
+    def doRollover(self) -> None:
+        """
+        Windows 上で os.rename が失敗するケースに備えたフォールバック実装。
+        まず親クラス実装を試み、PermissionError の場合はファイルのコピーで代替する。
+        """
+        try:
+            return super().doRollover()
+        except PermissionError:
+            try:
+                # コピー先ファイル名を親クラスと整合する形で作成する
+                # parent の実装では rolloverAt - interval の時刻を使う
+                if not hasattr(self, 'baseFilename'):
+                    return
+                timestamp = time.strftime(self.suffix, time.localtime(self.rolloverAt - self.interval))
+                dfn = self.baseFilename + "." + timestamp
+                # 既存のバックアップがあれば削除
+                try:
+                    if os.path.exists(dfn):
+                        os.remove(dfn)
+                except Exception:
+                    pass
+                # ファイルをコピーしてバックアップを作る
+                try:
+                    shutil.copyfile(self.baseFilename, dfn)
+                except Exception:
+                    # コピーにも失敗したら諦める
+                    pass
+                # 再オープン
+                try:
+                    if getattr(self, 'stream', None):
+                        try:
+                            self.stream.close()
+                        except Exception:
+                            pass
+                        self.stream = None
+                    if not getattr(self, 'delay', False):
+                        try:
+                            self.stream = self._open()
+                        except Exception:
+                            self.stream = None
+                except Exception:
+                    pass
+                # ロールオーバー時刻を更新（親実装と同様）
+                newRolloverAt = self.computeRollover(time.time())
+                self.rolloverAt = newRolloverAt
+            except Exception:
+                # ここで失敗しても握りつぶす
+                traceback.print_exc()
+                return
 
 class SocketHandler(logging.handlers.SocketHandler):
     def emit(self, record: logging.LogRecord) -> None:

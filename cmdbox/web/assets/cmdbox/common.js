@@ -1260,7 +1260,7 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
     }
     else {
         // 選択肢がある場合
-        let select_html = '<select class="form-select row_content_template_select"></select>';
+        let select_html = `<select class="form-select row_content_template_select"${row.type=='mlist'?' multiple':''}></select>`;
         if (row.choice_edit){
             select_html = `<input type="text" class="form-control row_content_key row_content_template_input">`;
             select_html+= `<datalist class="row_content_template_select"></datalist>`;
@@ -1403,6 +1403,13 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
         }
         btn.click(mk_func(input_elem.attr('id'), input_elem.attr('name')));
     }
+    // コマンド実行ボタンを追加
+    if(row.callcmd){
+        const btn_a = $('<button class="btn btn-secondary callcmd_buton" type="button"></button>');
+        btn_a.append('<svg class="bi bi-command" width="16" height="16" fill="currentColor"><use href="#btn_command"></use></svg>');
+        input_elem.parent().append(btn_a);
+        btn_a.click(eval(row.callcmd));
+    }
     // マルチの場合は追加ボタンを追加
     if(row.multi){
         const btn_a = $('<button class="btn btn-secondary add_buton" type="button"></button>');
@@ -1451,6 +1458,65 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
         elem.find(':input').prop('disabled', true);
         elem.find('.row_content_template_title').remove();
     }
+}
+/**
+ * コマンドボタンを実行します
+ * @param {object} mode - モード
+ * @param {string} cmd - コマンド
+ * @param {object} params - パラメータ
+ * @param {function} callback - コールバック関数
+ * @param {string} title - コマンドタイトル
+ * @param {string} opt_name - オプション名
+ */
+cmdbox.callcmd = async (mode, cmd, params, callback, title, opt_name) => {
+    const opt = {
+        mode: mode,
+        cmd: cmd,
+        ...params,
+    };
+    let res = await fetch('exec_cmd', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(opt)
+    });
+    if (res.status != 200) {
+        cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+        console.log({'error':`${res.status}: ${res.statusText}`});
+        return;
+    }
+    try {
+        res = await res.json();
+    } catch (e) {
+        cmdbox.message({'error':`JSON parse error: ${e}`});
+        console.log({'error':`JSON parse error: ${e}`});
+        return;
+    }
+    if (res && res['success']) res = [res];
+    if (!res[0] || !res[0]['success']) {
+        cmdbox.message(res);
+        console.log({'error':res});
+        return;
+    }
+    if (callback) callback(res[0]['success']);
+    if (!title || !opt_name) return;
+    cmdbox.load_cmd(title).then(cmd_opt => {
+        if (!cmd_opt || cmd_opt['error']) {
+            cmdbox.message(cmd_opt);
+            console.log({'error':cmd_opt});
+            return;
+        }
+        if (!cmd_opt[opt_name]) return;
+        $(`[name="${opt_name}"]`).val(cmd_opt[opt_name]);
+    });
+};
+cmdbox.load_cmd = async (title) => {
+    const formData = new FormData();
+    formData.append('title', title);
+    const res = await fetch('gui/load_cmd', {method: 'POST', body: formData});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+    return await res.json();
 }
 /**
  * コマンド選択肢取得

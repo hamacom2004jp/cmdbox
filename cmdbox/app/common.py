@@ -513,7 +513,7 @@ def safe_fname(fname:str) -> str:
         str: 置換後のファイル名
     """
     fname = re.sub('[_]', '-_-',str(fname))
-    return re.sub('[\s:;\\\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]', '_',str(fname))
+    return re.sub('[\\s:;\\\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]', '_',str(fname))
 
 def check_fname(fname:str) -> bool:
     """
@@ -525,7 +525,7 @@ def check_fname(fname:str) -> bool:
     Returns:
         bool: Trueの場合は使えない文字が含まれている
     """
-    return re.search('[\s:;\\\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]',str(fname)) is not None
+    return re.search('[\\s:;\\\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]',str(fname)) is not None
 
 def mkdirs(dir_path:Path):
     """
@@ -815,16 +815,47 @@ def exec_sync(apprun, logger:logging.Logger, args:argparse.Namespace, tm:float, 
     """
     if inspect.iscoroutinefunction(apprun):
         if is_event_loop_running():
-            def _run(apprun, ctx, logger, args, tm, pf):
+            def _run(apprun, ctx, logger, args, scope, tm, pf):
+                signin.set_request_scope(scope)
                 ctx.append(asyncio.run(apprun(logger, args, tm, pf)))
             ctx = []
-            th = threading.Thread(target=_run, args=(apprun, ctx, logger, args, tm, pf))
+            from cmdbox.app.auth import signin
+            scope = signin.get_request_scope()
+            th = threading.Thread(target=_run, args=(apprun, ctx, logger, args, scope, tm, pf))
             th.start()
             th.join()
             result = ctx[0] if ctx else None
             return result
         return asyncio.run(apprun(logger, args, tm, pf))
     return apprun(logger, args, tm, pf)
+
+def exec_svrun_sync(svran, data_dir, logger:logging.Logger, redis_cli, msg, sessions) -> int:
+    """"
+    指定された関数が非同期関数であっても同期的に実行します。
+
+    Args:
+        svran (function): 関数
+        data_dir (Path): データディレクトリ
+        logger (logging.Logger): ロガー
+        redis_cli: Redisクライアント
+        msg: メッセージ
+        sessions: セッション情報
+
+    Returns:
+        int: 戻り値のタプル。0は成功、1は失敗、2はキャンセル
+    """
+    if inspect.iscoroutinefunction(svran):
+        if is_event_loop_running():
+            def _run(svran, ctx, data_dir, logger, redis_cli, msg, sessions):
+                ctx.append(asyncio.run(svran(data_dir, logger, redis_cli, msg, sessions)))
+            ctx = []
+            th = threading.Thread(target=_run, args=(svran, ctx, data_dir, logger, redis_cli, msg, sessions))
+            th.start()
+            th.join()
+            result = ctx[0] if ctx else None
+            return result
+        return asyncio.run(svran(data_dir, logger, redis_cli, msg, sessions))
+    return svran(data_dir, logger, redis_cli, msg, sessions)
 
 def get_tzoffset_str() -> str:
     """

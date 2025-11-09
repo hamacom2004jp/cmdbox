@@ -170,6 +170,18 @@ const list_cmd_func_then = () => {
             // 非表示オプションを追加
             py_get_cmd_choices.filter(row => row.hide).forEach((row, i) => cmdbox.add_form_func(i, cmd_modal, row_content, row, null));
             cmd_modal.find('.choice_show').change();
+            // タグにモードの値を設定
+            let mode_tag_id = null;
+            let empty_tag_id = null;
+            cmd_modal.find('[name="tag"]').each((i, e) => {
+                const id = $(e).attr('id');
+                const tag = $(e).val();
+                if (!tag) empty_tag_id = id;
+                if (tag == mode) mode_tag_id = id;
+            });
+            if (!mode_tag_id) {
+                cmd_modal.find(`#${empty_tag_id}`).val(mode);
+            }
         }
         //row_content.find('is-invalid, is-valid').removeClass('is-invalid').removeClass('is-valid');
         cmd_modal.find('[name="modal_mode"]').val('');
@@ -184,11 +196,11 @@ const list_cmd_func_then = () => {
             await mode_change();
             cmd_modal.find('[name="cmd"]').val(py_load_cmd.cmd);
             await cmd_change();
+            // フォームに値をセット
             Object.entries(py_load_cmd).forEach(([key, val]) => {
                 if (typeof val === 'boolean') {
                     val = val.toString();
                 }
-                // フォームに値をセット
                 if(Array.isArray(val)){
                     val.forEach((v, i) => {
                         e = cmd_modal.find(`[name="${key}"]`).parent().find('.add_buton')[i];
@@ -226,6 +238,8 @@ const list_cmd_func_then = () => {
                 cmd_modal.find('[name="name"]').after('<input name="name_disabled" type="text" class="form-control" disabled="disabled" style="display:none;">');
             }
             cmd_modal.find('[name="name_disabled"]').val(cmd_modal.find('[name="name"]').hide().val()).show();
+            // コマンド実行ボタンをクリック
+            cmd_modal.find('.callcmd_buton').click();
         } else {
             cmd_modal.find('[name="modal_mode"]').val('add');
             // 新規コマンドファイルの作成

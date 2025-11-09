@@ -1,0 +1,357 @@
+from cmdbox.app import common, client, feature
+from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.options import Options
+from pathlib import Path
+from typing import Dict, Any, Tuple, List, Union
+import argparse
+import logging
+import json
+import re
+import time
+
+
+class CmdAgentStart(feature.OneshotResultEdgeFeature):
+
+    def get_mode(self) -> Union[str, List[str]]:
+        return 'agent'
+
+    def get_cmd(self) -> str:
+        return 'start'
+
+    def get_option(self) -> Dict[str, Any]:
+        return dict(
+            use_redis=self.USE_REDIS_FALSE,
+            nouse_webmode=False,
+            use_agent=True,
+            description_ja="Runner を起動します。",
+            description_en="Starts a runner.",
+            choice=[
+                dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
+                     description_ja="Redisサーバーのサービスホストを指定します。",
+                     description_en="Specify the service host of the Redis server."),
+                dict(opt="port", type=Options.T_INT, default=self.default_port, required=True, multi=False, hide=True, choice=None, web="mask",
+                     description_ja="Redisサーバーのサービスポートを指定します。",
+                     description_en="Specify the service port of the Redis server."),
+                dict(opt="password", type=Options.T_STR, default=self.default_pass, required=True, multi=False, hide=True, choice=None, web="mask",
+                     description_ja=f"Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `{self.default_pass}` を使用します。",
+                     description_en=f"Specify the access password of the Redis server (optional). If omitted, `{self.default_pass}` is used."),
+                dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",
+                     description_ja="サーバーのサービス名を指定します。",
+                     description_en="Specify the service name of the inference server."),
+                dict(opt="retry_count", type=Options.T_INT, default=3, required=False, multi=False, hide=True, choice=None,
+                     description_ja="Redisサーバーへの再接続回数を指定します。",
+                     description_en="Specifies the number of reconnections to the Redis server."),
+                dict(opt="retry_interval", type=Options.T_INT, default=5, required=False, multi=False, hide=True, choice=None,
+                     description_ja="Redisサーバーに再接続までの秒数を指定します。",
+                     description_en="Specifies the number of seconds before reconnecting to the Redis server."),
+                dict(opt="timeout", type=Options.T_INT, default="120", required=False, multi=False, hide=True, choice=None,
+                     description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
+                     description_en="Specify the maximum waiting time until the server responds."),
+                dict(opt="runner_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                    description_ja="Runner設定の名前を指定します。",
+                    description_en="Specify the name of the Runner configuration."),
+                dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
+                    description_ja="処理結果jsonの保存先ファイルを指定。",
+                    description_en="Specify the destination file for saving the processing result json."),
+                dict(opt="output_json_append", short="a", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
+                    description_ja="処理結果jsonファイルを追記保存します。",
+                    description_en="Save the processing result json file by appending."),
+                dict(opt="stdout_log", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
+                    description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
+                    description_en="Available only in GUI mode. Outputs standard output during command execution to Console log."),
+                dict(opt="capture_stdout", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
+                    description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
+                    description_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                dict(opt="capture_maxsize", type=Options.T_INT, default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choice=None,
+                    description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                    description_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
+            ]
+        )
+
+    def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
+        if not getattr(args, 'runner_name', None):
+            msg = dict(warn="Please specify --runner_name")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
+        if not re.match(r'^[\w\-]+$', args.runner_name):
+            msg = dict(warn="Runner name can only contain alphanumeric characters, underscores, and hyphens.")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
+
+        payload = dict(runner_name=args.runner_name)
+        payload_b64 = convert.str2b64str(common.to_str(payload))
+
+        cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
+        ret = cl.redis_cli.send_cmd(self.get_svcmd(), [payload_b64],
+                                    retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
+        common.print_format(ret, False, tm, None, False, pf=pf)
+        if 'success' not in ret:
+            return self.RESP_WARN, ret, cl
+        return self.RESP_SUCCESS, ret, cl
+
+    def is_cluster_redirect(self):
+        return True
+
+    def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
+              sessions:Dict[str, Dict[str, Any]]) -> int:
+        reskey = msg[1]
+        try:
+            if logger.level == logging.DEBUG:
+                logger.debug(f"{self.get_mode()}_{self.get_cmd()} msg: {msg}")
+            if 'agents' not in sessions:
+                sessions['agents'] = {}
+
+            payload = json.loads(convert.b64str2str(msg[2]))
+            name = payload.get('runner_name')
+            if name in sessions['agents']:
+                msg = dict(warn=f"Runner '{name}' is already running.")
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
+
+            runner_conf_path = data_dir / ".agent" / f"runner-{name}.json"
+            if not runner_conf_path.exists():
+                msg = dict(warn=f"Specified runner configuration '{name}' not found on server at '{str(runner_conf_path)}'.")
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
+            with runner_conf_path.open('r', encoding='utf-8') as f:
+                runner_conf = json.load(f)
+
+            llm_conf_path = data_dir / ".agent" / f"llm-{runner_conf['llm']}.json"
+            if not llm_conf_path.exists():
+                msg = dict(warn=f"Specified llm configuration '{runner_conf['llm']}' not found on server at '{str(llm_conf_path)}'.")
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
+            with llm_conf_path.open('r', encoding='utf-8') as f:
+                llm_conf = json.load(f)
+
+            mcpsv_confs = []
+            if runner_conf['mcpservers'] is not None and isinstance(runner_conf['mcpservers'], list):
+                for mcpsv_name in runner_conf['mcpservers']:
+                    mcpsv_conf_path = data_dir / ".agent" / f"mcpsv-{mcpsv_name}.json"
+                    if not mcpsv_conf_path.exists():
+                        msg = dict(warn=f"Specified MCP server configuration '{mcpsv_name}' not found on server at '{str(mcpsv_conf_path)}'.")
+                        redis_cli.rpush(reskey, msg)
+                        return self.RESP_WARN
+                    with mcpsv_conf_path.open('r', encoding='utf-8') as f:
+                        mcpsv_conf = json.load(f)
+                        mcpsv_confs.append(mcpsv_conf)
+
+            agent = self.create_agent(logger, runner_conf, llm_conf, mcpsv_confs)
+            from google.adk.runners import Runner
+            runner = Runner(
+                app_name=runner_conf.get('runner_name', self.ver.__appid__),
+                agent=agent,
+                session_service=self.create_session_service(data_dir, logger, runner_conf),
+            )
+            sessions['agents'][name] = dict(
+                name=name,
+                runner=runner
+            )
+            msg = dict(success=f"Runner '{name}' started successfully.")
+            redis_cli.rpush(reskey, msg)
+            return self.RESP_SUCCESS
+
+        except Exception as e:
+            msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
+            logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
+            redis_cli.rpush(reskey, msg)
+            return self.RESP_WARN
+
+
+    def create_agent(self, logger:logging.Logger,
+                     runner_conf:Dict[str, Any], llm_conf:Dict[str, Any], mcpsv_confs:List[Dict[str, Any]]) -> Any:
+        """
+        エージェントを作成します
+
+        Args:
+            logger (logging.Logger): ロガー
+            runner_conf (Dict[str, Any]): ランナー設定
+            llm_conf (Dict[str, Any]): LLM設定
+            mcpsv_confs (List[Dict[str, Any]]): MCPサーバー設定リスト
+
+        Returns:
+            Agent: エージェント
+        """
+        if logger.level == logging.DEBUG:
+            logger.debug(f"create_agent processing..")
+        description = runner_conf.get("llm_description", f"{self.ver.__appid__}に登録されているコマンド提供")
+        instruction = runner_conf.get("runner_instruction", f"あなたはコマンドの意味を熟知しているエキスパートです。" + \
+                      f"ユーザーがコマンドを実行したいとき、あなたは以下の手順に従ってコマンドを確実に実行してください。\n" + \
+                      f"1. ユーザーのクエリからが実行したいコマンドを特定します。\n" + \
+                      f"2. コマンド実行に必要なパラメータのなかで、ユーザーのクエリから取得できないものは、コマンド定義にあるデフォルト値を指定して実行してください。\n" + \
+                      f"3. もしエラーが発生した場合は、ユーザーにコマンド名とパラメータとエラー内容を提示してください。\n" \
+                      f"4. コマンドの実行結果は、json文字列で出力するようにしてください。この時json文字列は「```json」と「```」で囲んだ文字列にしてください。\n")
+
+        if logger.level == logging.DEBUG:
+            logger.debug(f"google-adk loading..")
+        from google.adk.agents import Agent
+        if logger.level == logging.DEBUG:
+            logger.debug(f"litellm loading..")
+        from google.adk.models.lite_llm import LiteLlm
+        # loggerの初期化
+        common.reset_logger("LiteLLM Proxy")
+        common.reset_logger("LiteLLM Router")
+        common.reset_logger("LiteLLM")
+        # 各種設定値の取得
+        runner_name = runner_conf.get('runner_name', None)
+        llmprov = llm_conf.get('llmprov', None)
+        llmprojectid = llm_conf.get('llmprojectid', None)
+        llmsvaccountfile = llm_conf.get('llmsvaccountfile', None)
+        llmsvaccountfile_data = llm_conf.get('llmsvaccountfile_data', {})
+        llmlocation = llm_conf.get('llmlocation', None)
+        llmapikey = llm_conf.get('llmapikey', None)
+        llmapiversion = llm_conf.get('llmapiversion', None)
+        llmendpoint = llm_conf.get('llmendpoint', None)
+        llmmodel = llm_conf.get('llmmodel', None)
+        llmseed = llm_conf.get('llmseed', None)
+        llmtemperature = llm_conf.get('llmtemperature', None)
+        
+        if llmprov == 'openai':
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmapikey is None: raise ValueError("llmapikey is required.")
+            from google.adk.planners import PlanReActPlanner
+            agent = Agent(
+                name=runner_name,
+                model=LiteLlm(
+                    model=llmmodel,
+                    api_key=llmapikey,
+                    endpoint=llmendpoint,
+                ),
+                description=description,
+                instruction=instruction,
+                planner=PlanReActPlanner(),
+                tools=self.create_tool_mcpsv(logger, mcpsv_confs)
+            )
+        elif llmprov == 'azureopenai':
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmendpoint is None: raise ValueError("llmendpoint is required.")
+            if llmapikey is None: raise ValueError("llmapikey is required.")
+            if llmapiversion is None: raise ValueError("llmapiversion is required.")
+            from google.adk.planners import PlanReActPlanner
+            agent = Agent(
+                name=runner_name,
+                model=LiteLlm(
+                    model=llmmodel,
+                    api_key=llmapikey,
+                    endpoint=llmendpoint,
+                    api_version=llmapiversion,
+                ),
+                description=description,
+                instruction=instruction,
+                planner=PlanReActPlanner(),
+                tools=self.create_tool_mcpsv(logger, mcpsv_confs)
+            )
+        elif llmprov == 'vertexai':
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmlocation is None: raise ValueError("llmlocation is required.")
+            if llmsvaccountfile_data is None: raise ValueError("llmsvaccountfile_data is required.")
+            from google.adk.planners import BuiltInPlanner
+            from google.genai import types
+            agent = Agent(
+                name=runner_name,
+                model=LiteLlm(
+                    model=llmmodel,
+                    #vertex_project=llmprojectid,
+                    vertex_credentials=llmsvaccountfile_data,
+                    vertex_location=llmlocation,
+                    seed=llmseed,
+                    temperature=llmtemperature,
+                ),
+                description=description,
+                instruction=instruction,
+                planner=BuiltInPlanner(thinking_config=types.ThinkingConfig(
+                    include_thoughts=True,
+                    thinking_budget=1024,
+                )),
+                tools=self.create_tool_mcpsv(logger, mcpsv_confs)
+            )
+        elif llmprov == 'ollama':
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmendpoint is None: raise ValueError("llmendpoint is required.")
+            from google.adk.planners import PlanReActPlanner
+            agent = Agent(
+                name=runner_name,
+                model=LiteLlm(
+                    model=f"ollama/{llmmodel}",
+                    api_base=llmendpoint,
+                    temperature=llmtemperature,
+                    stream=True
+                ),
+                description=description,
+                instruction=instruction,
+                planner=PlanReActPlanner(),
+                tools=self.create_tool_mcpsv(logger, mcpsv_confs)
+            )
+        else:
+            raise ValueError("llmprov is required.")
+        if logger.level == logging.DEBUG:
+            logger.debug(f"create_agent complate.")
+        return agent
+
+
+    def create_tool_mcpsv(self, logger:logging.Logger, mcpsv_confs:List[Dict[str, Any]]) -> List[Any]:
+        """
+        MCPサーバーツールを作成します
+        Args:
+            logger (logging.Logger): ロガー
+            mcpsv_confs (List[Dict[str, Any]]): MCPサーバー設定リスト
+        Returns:
+            List[MCPToolset]: MCPToolsetのリスト
+        """
+        from fastapi.openapi.models import HTTPBearer, SecuritySchemeType
+        from google.adk.auth.auth_credential import AuthCredential, AuthCredentialTypes
+        from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset
+        from google.adk.tools.mcp_tool.mcp_session_manager import SseConnectionParams, StreamableHTTPConnectionParams
+
+        auth_scheme = HTTPBearer()
+        tools = []
+        for mcpsv_conf in mcpsv_confs:
+            mcpserver_url = mcpsv_conf.get('mcpserver_url', None)
+            mcpserver_apikey = mcpsv_conf.get('mcpserver_apikey', None)
+            mcpserver_transport = mcpsv_conf.get('mcpserver_transport', 'streamable-http')
+            auth_cred = AuthCredential(auth_type=AuthCredentialTypes.HTTP,
+                                       http=dict(scheme="bearer", credentials=dict(token=mcpserver_apikey)))
+            if mcpserver_transport == 'sse':
+                conn_params = SseConnectionParams(
+                    url=mcpserver_url,
+                    timeout=120,
+                    sse_read_timeout=600,
+                )
+            else:
+                conn_params = StreamableHTTPConnectionParams(
+                    url=mcpserver_url,
+                    timeout=120,
+                    sse_read_timeout=600,
+                )
+            toolset = MCPToolset(
+                connection_params=conn_params,
+                tool_filter=mcpsv_conf.get('mcpserver_mcp_tools', []),
+                auth_scheme=auth_scheme,
+                auth_credential=auth_cred,
+            )
+            tools.append(toolset)
+        return tools
+
+    def create_session_service(self, data_dir:Path, logger:logging.Logger, runner_conf:Dict[str, Any]) -> Any:
+        """
+        セッションサービスを作成します
+
+        Args:
+            runner_conf (Dict[str, Any]): Runnerの設定
+
+        Returns:
+            BaseSessionService: セッションサービス
+        """
+        if runner_conf.get('agent_session_store') == 'sqlite':
+            runner_conf['agent_session_dburl'] = f"sqlite:{data_dir / 'session.db'}"
+        elif runner_conf.get('agent_session_store') == 'postgresql':
+            runner_conf['agent_session_dburl'] = f"postgresql+psycopg://{runner_conf['session_store_pguser']}:{runner_conf['session_store_pgpass']}@{runner_conf['session_store_pghost']}:{runner_conf['session_store_pgport']}/{runner_conf['session_store_pgdbname']}"
+        else:
+            runner_conf['agent_session_dburl'] = None
+        from google.adk.sessions import DatabaseSessionService, InMemorySessionService
+        #from typing_extensions import override
+        if runner_conf['agent_session_dburl'] is not None:
+            dss = DatabaseSessionService(db_url=runner_conf['agent_session_dburl'], logger=logger)
+            return dss
+        else:
+            return InMemorySessionService()
