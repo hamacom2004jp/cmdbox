@@ -232,8 +232,9 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
                 name=runner_name,
                 model=LiteLlm(
                     model=llmmodel,
+                    api_type='azure',
                     api_key=llmapikey,
-                    endpoint=llmendpoint,
+                    api_base=llmendpoint,
                     api_version=llmapiversion,
                 ),
                 description=description,
@@ -302,6 +303,7 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
         from google.adk.auth.auth_credential import AuthCredential, AuthCredentialTypes
         from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset
         from google.adk.tools.mcp_tool.mcp_session_manager import SseConnectionParams, StreamableHTTPConnectionParams
+        from google.adk.agents.readonly_context import ReadonlyContext
 
         auth_scheme = HTTPBearer()
         tools = []
@@ -323,11 +325,16 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
                     timeout=120,
                     sse_read_timeout=600,
                 )
+            def header_provider(readonly_context:ReadonlyContext) -> Dict[str, str]:
+                if mcpserver_apikey is not None:
+                    return dict(Authorization=f"Bearer {mcpserver_apikey}")
+                return {}
             toolset = MCPToolset(
                 connection_params=conn_params,
                 tool_filter=mcpsv_conf.get('mcpserver_mcp_tools', []),
                 auth_scheme=auth_scheme,
                 auth_credential=auth_cred,
+                header_provider=header_provider,
             )
             tools.append(toolset)
         return tools

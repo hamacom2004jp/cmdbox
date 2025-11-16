@@ -56,7 +56,7 @@ class FilerUpload(cmdbox_web_exec_cmd.ExecCmd):
                 opt['capture_stdout'] = True
                 shutil.copyfileobj(fv.file, Path(opt['upload_file']).open('wb'))
                 web.options.audit_exec(req, res, web)
-                ret = self.exec_cmd(req, res, web, "file_upload", opt, nothread=True)
+                ret = await self.exec_cmd(req, res, web, "file_upload", opt, nothread=True)
                 if type(ret) is dict and 'success' not in ret:
                     return str(ret)
                 if type(ret) is list and (len(ret) == 0 or 'success' not in ret[0]):

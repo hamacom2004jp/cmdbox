@@ -65,7 +65,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 if options.Options.getInstance().get_cmd_attr(opt['mode'], opt['cmd'], "nouse_webmode"):
                     return dict(warn=f'Command "{title}" failed. This command is not available in web mode.')
 
-                return self.exec_cmd(req, res, web, title, opt, nothread)
+                return await self.exec_cmd(req, res, web, title, opt, nothread)
             except:
                 return dict(warn=f'Command "{title}" failed. {traceback.format_exc()}')
 
@@ -95,7 +95,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 return True, output
         return False, None
 
-    def exec_cmd(self, req:Request, res:Response, web:Web,
+    async def exec_cmd(self, req:Request, res:Response, web:Web,
                  title:str, opt:Dict[str, Any], nothread:bool=False, appcls=None) -> List[Dict[str, Any]]:
         """
         コマンドを実行する
@@ -152,7 +152,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         ap.sv = None
         ap.cl = None
         ap.web = None
-        def _exec_cmd(cmdbox_app:app.CmdBoxApp, title, opt, nothread=False):
+        async def _exec_cmd(cmdbox_app:app.CmdBoxApp, title, opt, nothread=False):
             _stdin_body = None
             if '_stdin_body' in opt:
                 _stdin_body = opt['_stdin_body']
@@ -246,8 +246,9 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     return output
                 self.callback_return_cmd_exec_func(web, title, output)
         if nothread:
-            return _exec_cmd(ap, title, opt, True)
-        th = _web.RaiseThread(target=_exec_cmd, args=(ap, title, opt, False))
-        th.start()
+            return await _exec_cmd(ap, title, opt, True)
+        _exec_cmd(ap, title, opt, True)
+        #th = _web.RaiseThread(target=_exec_cmd, args=(ap, title, opt, False))
+        #th.start()
         return [dict(warn='start_cmd')]
 

@@ -153,7 +153,7 @@ Web Service Launch : `cmdbox -m web -c start <Option>`
     "--session_path <path>","","Specify the session timeout in seconds for signed-in users."
     "--session_secure","","Set the Secure flag for the signed-in user's session."
     "--session_timeout <second>","","Specify the session timeout in seconds for signed-in users."
-    "--gunicorn_workers <second>","","Specifies the number of gunicorn workers, valid only in Linux environment. If -1 or unspecified, twice the number of CPUs is used."
+    "--gunicorn_workers <second>","","Specifies the number of gunicorn workers, valid only in Linux environment. If -1 or unspecified, the number of CPUs is used."
     "--gunicorn_timeout <second>","","Specify the timeout duration of the gunicorn worker in seconds."
     "--client_only","","Do not make connections to the server."
     "--outputs_key <output key>","","Specify items to be displayed on the showimg and webcap screens. If omitted, all items are displayed."

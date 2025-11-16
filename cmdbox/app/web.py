@@ -994,7 +994,7 @@ class ThreadedASGI:
             if 'workers' not in self.gunicorn_config:
                 self.gunicorn_config['workers'] = None
             if self.gunicorn_config['workers'] is None or self.gunicorn_config['workers'] <= 0:
-                self.gunicorn_config['workers'] = multiprocessing.cpu_count()*2
+                self.gunicorn_config['workers'] = multiprocessing.cpu_count()
             if 'timeout' not in self.gunicorn_config:
                 self.gunicorn_config['timeout'] = None
             if self.gunicorn_config['timeout'] is None or self.gunicorn_config['timeout'] <= 0:
