@@ -1,30 +1,29 @@
-from cmdbox.app import common, client, feature
+from cmdbox.app import common, client, feature, options
 from cmdbox.app.commons import convert, redis_client
 from cmdbox.app.options import Options
 from pathlib import Path
-from typing import Dict, Any, Tuple, List, Union
+from typing import Dict, Any, Tuple, List
 import argparse
 import logging
 import json
 import re
-import time
 
 
-class CmdAgentStop(feature.OneshotResultEdgeFeature):
+class CmdAgentSessionList(feature.ResultEdgeFeature):
 
-    def get_mode(self) -> Union[str, List[str]]:
+    def get_mode(self) -> str:
         return 'agent'
 
     def get_cmd(self) -> str:
-        return 'stop'
+        return 'session_list'
 
     def get_option(self) -> Dict[str, Any]:
         return dict(
             use_redis=self.USE_REDIS_FALSE,
             nouse_webmode=False,
             use_agent=True,
-            description_ja="Runner を停止します。",
-            description_en="Stops a runner.",
+            description_ja="Agentのセッション一覧を取得します。",
+            description_en="List sessions for the agent.",
             choice=[
                 dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
                      description_ja="Redisサーバーのサービスホストを指定します。",
@@ -50,6 +49,12 @@ class CmdAgentStop(feature.OneshotResultEdgeFeature):
                 dict(opt="runner_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                     description_ja="Runner設定の名前を指定します。",
                     description_en="Specify the name of the Runner configuration."),
+                dict(opt="userid", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                    description_ja="Runnerに送信するユーザーIDを指定します。",
+                    description_en="Specify the user ID to send to the Runner."),
+                dict(opt="sessionid", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                    description_ja="Runnerに送信するセッションIDを指定します。",
+                    description_en="Specify the session ID to send to the Runner."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                     description_ja="処理結果jsonの保存先ファイルを指定。",
                     description_en="Specify the destination file for saving the processing result json."),
@@ -77,8 +82,12 @@ class CmdAgentStop(feature.OneshotResultEdgeFeature):
             msg = dict(warn="Runner name can only contain alphanumeric characters, underscores, and hyphens.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
+        if not getattr(args, 'userid', None):
+            msg = dict(warn="Please specify --userid")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
 
-        payload = dict(runner_name=args.runner_name)
+        payload = dict(runner_name=args.runner_name, sessionid=args.sessionid, user_id=args.userid)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -90,10 +99,10 @@ class CmdAgentStop(feature.OneshotResultEdgeFeature):
         return self.RESP_SUCCESS, ret, cl
 
     def is_cluster_redirect(self):
-        return True
+        return False
 
-    def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
-              sessions:Dict[str, Dict[str, Any]]) -> int:
+    async def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
+                    sessions:Dict[str, Dict[str, Any]]):
         reskey = msg[1]
         try:
             if logger.level == logging.DEBUG:
@@ -103,21 +112,50 @@ class CmdAgentStop(feature.OneshotResultEdgeFeature):
 
             payload = json.loads(convert.b64str2str(msg[2]))
             name = payload.get('runner_name')
+            sessionid = payload.get('sessionid')
+            user_id = payload.get('user_id')
             if name not in sessions['agents']:
-                msg = dict(warn=f"Runner '{name}' is not running.")
-                redis_cli.rpush(reskey, msg)
+                out = dict(warn=f"Runner '{name}' is not running.", end=True)
+                redis_cli.rpush(reskey, out)
                 return self.RESP_WARN
-
-            from google.adk.runners import Runner
-            runner:Runner = sessions['agents'][name]['runner']
-            del sessions['agents'][name]
-            msg = dict(success=f"Runner '{name}' stopped successfully.")
-            redis_cli.rpush(reskey, msg)
-            return self.RESP_SUCCESS
-
-        except Exception as e:
-            msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
-            logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
-            redis_cli.rpush(reskey, msg)
+            runner = sessions['agents'][name]['runner']
+            session_service = runner.session_service
+            if sessionid is None:
+                sessions = await session_service.list_sessions(app_name=self.ver.__appid__, user_id=user_id)
+                ret = []
+                for s in sessions.sessions:
+                    try:
+                        session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=s.id)
+                        if session is None:
+                            continue
+                        ret.append(session)
+                    except:
+                        # セッションが取得できない場合は削除する
+                        try:
+                            await session_service.delete_session(app_name=self.ver.__appid__, user_id=user_id, session_id=s.id)
+                        except:
+                            pass
+                        finally:
+                            continue
+                out = dict(success=ret, end=True)
+                redis_cli.rpush(reskey, out)
+                return self.RESP_SUCCESS
+            else:
+                session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=sessionid)
+                if session is None:
+                    out = dict(success=[], end=True)
+                else:
+                    out = dict(success=[session], end=True)
+                redis_cli.rpush(reskey, out)
+                return self.RESP_SUCCESS
+        except NotImplementedError as e:
+            logger.warning(f"Session listing is not implemented for this Runner: {e}", exc_info=True)
+            out = dict(warn="Session listing is not implemented for this Runner.", end=True)
+            redis_cli.rpush(reskey, out)
             return self.RESP_WARN
-
+        except Exception as e:
+            # それ以外のエラーが発生した時はログに出力して空リストを返す
+            logger.warning(f"list_agent_sessions warning: {e}", exc_info=True)
+            out = dict(success=[], end=True)
+            redis_cli.rpush(reskey, out)
+            return self.RESP_WARN

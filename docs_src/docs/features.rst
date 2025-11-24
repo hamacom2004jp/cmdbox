@@ -309,6 +309,7 @@ Implementation of the `get_option(self) -> Dict[str, Any]` method
             - T_FILE = 'file'
             - T_DIR = 'dir'
             - T_MLIST = 'mlist'
+            - T_PASSWD = 'passwd'
         - default: Default value
         - required: Whether this option is required
         - multi: Whether multiple values can be specified

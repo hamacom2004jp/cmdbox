@@ -44,7 +44,7 @@ class ClientFileCopy(feature.UnsupportEdgeFeature):
                 dict(opt="port", type=Options.T_INT, default=self.default_port, required=True, multi=False, hide=True, choice=None, web="mask",
                      description_ja="Redisサーバーのサービスポートを指定します。",
                      description_en="Specify the service port of the Redis server."),
-                dict(opt="password", type=Options.T_STR, default=self.default_pass, required=True, multi=False, hide=True, choice=None, web="mask",
+                dict(opt="password", type=Options.T_PASSWD, default=self.default_pass, required=True, multi=False, hide=True, choice=None, web="mask",
                      description_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
                      description_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
                 dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",

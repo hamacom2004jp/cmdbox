@@ -32,7 +32,7 @@ class CmdAgentChat(feature.ResultEdgeFeature):
                 dict(opt="port", type=Options.T_INT, default=self.default_port, required=True, multi=False, hide=True, choice=None, web="mask",
                      description_ja="Redisサーバーのサービスポートを指定します。",
                      description_en="Specify the service port of the Redis server."),
-                dict(opt="password", type=Options.T_STR, default=self.default_pass, required=True, multi=False, hide=True, choice=None, web="mask",
+                dict(opt="password", type=Options.T_PASSWD, default=self.default_pass, required=True, multi=False, hide=True, choice=None, web="mask",
                      description_ja=f"Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `{self.default_pass}` を使用します。",
                      description_en=f"Specify the access password of the Redis server (optional). If omitted, `{self.default_pass}` is used."),
                 dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",
@@ -172,7 +172,6 @@ class CmdAgentChat(feature.ResultEdgeFeature):
                 except json.JSONDecodeError:
                     return json_str
             json_pattern = re.compile(r'\{.*?\}')
-            
 
             runner:Runner = sessions['agents'][name]['runner']
             content = types.Content(role='user', parts=[types.Part(text=message)])
@@ -180,7 +179,7 @@ class CmdAgentChat(feature.ResultEdgeFeature):
             agent_session = await create_agent_session(runner.session_service, runner.app_name, user_id, session_id=session_id)
             # チャットを実行する
             for event in runner.run(user_id=user_id, session_id=agent_session.id, new_message=content):
-                outputs = dict(success=dict())
+                outputs = dict(success=dict(agent_session_id=agent_session.id))
                 if event.turn_complete:
                     outputs['success']['turn_complete'] = True
                 if event.interrupted:

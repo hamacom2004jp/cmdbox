@@ -211,8 +211,12 @@ agent.init_form = async () => {
                 const txt = agent.create_agent_message(messages, message_id);
                 cmdbox.show_loading(txt);
             }
+            if (!agent.ws) {
+                cmdbox.message({'warn':'The connection to the runner has not yet been established.'});
+                return;
+            }
             // メッセージを送信
-            ws.send(msg);
+            agent.ws.send(msg);
             // セッション一覧を再表示
             agent.list_sessions();
             // メッセージ一覧を一番下までスクロール
@@ -257,7 +261,7 @@ agent.init_form = async () => {
                 if (agent.recognition) {
                     agent.recognition.stop();
                     const transcript = user_msg.val();
-                    transcript && $('#btn_user_msg').click(); // 録音が終了したら自動的にメッセージを送信
+                    transcript && btn_user_msg.click(); // 録音が終了したら自動的にメッセージを送信
                 }
                 return;
             }
@@ -321,12 +325,15 @@ agent.init_form = async () => {
         const host = window.location.hostname;
         const port = window.location.port;
         const path = window.location.pathname;
-        const ws = new WebSocket(`${protocol}://${host}:${port}${path}/chat/ws/${session_id}`);
+        const runner_name = $('#runner_name_input').val();
+        if (!runner_name || runner_name.length <= 0) return;
+        if (agent.ws) agent.ws.close();
+        agent.ws = new WebSocket(`${protocol}://${host}:${port}${path}/chat/ws/${runner_name}/${session_id}`);
         // エージェントからのメッセージ受信時の処理
-        ws.onmessage = (event) => {
+        agent.ws.onmessage = (event) => {
             const packet = JSON.parse(event.data);
             console.log(packet);
-            if (packet.turn_complete && packet.turn_complete) {
+            if (packet.turn_complete && packet.turn_complete && !packet.message) {
                 return;
             }
             let txt;
@@ -341,9 +348,9 @@ agent.init_form = async () => {
             message_id = null;
             agent.format_agent_message(container, messages, txt, packet.message);
         };
-        ws.onopen = () => {
+        agent.ws.onopen = () => {
             const ping = () => {
-                ws.send('ping');
+                agent.ws.send('ping');
                 agent.chat_reconnect_count = 0; // pingが成功したら再接続回数をリセット
             };
             btn_say.prop('disabled', false);
@@ -351,11 +358,11 @@ agent.init_form = async () => {
             btn_rec.prop('disabled', false);
             agent.chat_callback_ping_handler = setInterval(() => {ping();}, ping_interval);
         };
-        ws.onerror = (e) => {
+        agent.ws.onerror = (e) => {
             console.error(`Websocket error: ${e}`);
             clearInterval(agent.chat_callback_ping_handler);
         };
-        ws.onclose = () => {
+        agent.ws.onclose = () => {
             clearInterval(agent.chat_callback_ping_handler);
             if (agent.chat_reconnect_count >= max_reconnect_count) {
                 clearInterval(agent.chat_reconnectInterval_handler);
@@ -388,20 +395,19 @@ agent.init_form = async () => {
         // メッセージ一覧をクリア
         messages.html('');
         // 新しいセッションを作成
-        const session_id = cmdbox.random_string(16);
-        agent.chat(session_id);
+        agent.chat(cmdbox.random_string(16));
     });
     // テキストエリアのリサイズに合わせてメッセージ一覧の高さを調整
     container.scrollTop(container.prop('scrollHeight'));
-    // セッション一覧を表示
-    agent.list_sessions();
+    // runnnerリストを更新
+    await agent.update_runner_list();
     // 新しいセッションでチャットを開始
-    const session_id = cmdbox.random_string(16);
-    agent.chat(session_id);
+    agent.chat(cmdbox.random_string(16));
 };
 agent.list_sessions = async (session_id) => {
     const formData = new FormData();
     session_id && formData.append('session_id', session_id);
+    formData.append('runner_name', $('#runner_name_input').val());
     const histories = $('#histories');
     const res = await fetch('agent/session/list', {method: 'POST', body: formData});
     if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
@@ -444,7 +450,7 @@ agent.create_history = (histories, session_id, msg) => {
                 if (sid == session_id) {
                     // 削除したセッションが現在のセッションだった場合は、メッセージ一覧をクリア
                     messages.html('');
-                    agent.chat(cmdbox.random_string(16)); // 新しいセッションを開始
+                    agent.chat(cmdbox.random_string(16));
                 }
                 agent.list_sessions();
             } else {
@@ -458,6 +464,7 @@ agent.create_history = (histories, session_id, msg) => {
         agent.chat(session_id);
         const formData = new FormData();
         formData.append('session_id', session_id);
+        formData.append('runner_name', $('#runner_name_input').val());
         const res = await fetch('agent/session/list', {method: 'POST', body: formData});
         if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
         res.json().then((res) => {
@@ -491,73 +498,839 @@ agent.create_history = (histories, session_id, msg) => {
 agent.delete_session = async (session_id) => {
     const formData = new FormData();
     formData.append('session_id', session_id);
+    formData.append('runner_name', $('#runner_name_input').val());
     const res = await fetch('agent/session/delete', {method: 'POST', body: formData});
     if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }
-agent.llmsetting = async () => {
+
+agent.exec_cmd = async (mode, cmd, opt={}, error_func=null) => {
     const user = await cmdbox.user_info();
-    if (!user) {
-        cmdbox.message('user not found');
+    if(!user) {
+        cmdbox.message({'error':'Connection to the agent has failed for several minutes. Please reload to resume reconnection.'});
+        window.location.reload();
         return;
     }
-    const llmsetting_modal = $('#llmsetting_modal').length?$('#llmsetting_modal'):$(`<div id="llmsetting_modal" class="modal" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
-    llmsetting_modal.html('');
-    const daialog = $(`<div class="modal-dialog modal-lg ui-draggable ui-draggable-handle"/>`).appendTo(llmsetting_modal);
-    const form = $(`<form id="llmsetting_form" class="modal-content novalidate"/>`).appendTo(daialog);
-    const header = $(`<div class="modal-header"/>`).appendTo(form);
-    header.append('<h5 class="modal-title">LLM Setting</h5>');
-    header.append('<button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">'
-                 +'<svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>'
-                 +'</button>');
-    const body = $(`<div class="modal-body"/>`).appendTo(form);
-    const row_content = $(`<div class="row row_content"/>`).appendTo(body);
-    const appid = $(`.navbar-brand`).text();
-    const llmsetting_choices = async () => {
-        const res = await fetch('agent/llmsetting');
-        if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
-        return await res.json();
-    };
-    const llmsetting_rows = await llmsetting_choices();
-    row_content.html('');
-    // 表示オプションを追加
-    llmsetting_rows.filter(row => !row.hide).forEach((row, i) => cmdbox.add_form_func(i, llmsetting_modal, row_content, row, null));
-    // 高度なオプションを表示するリンクを追加
-    const show_link = $('<div class="text-center card-hover mb-3"><a href="#">[ advanced options ]</a></div>');
-    show_link.click(() => row_content.find('.row_content_hide').toggle());
-    row_content.append(show_link);
-    // 非表示オプションを追加
-    llmsetting_rows.filter(row => row.hide).forEach((row, i) => cmdbox.add_form_func(i, llmsetting_modal, row_content, row, null));
-    // フッターを追加
-    const footer = $(`<div class="modal-footer"/>`).appendTo(form);
-    // 閉じるボタンを追加
-    const close_btn = $('<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>').appendTo(footer);
-    llmsetting_modal.appendTo('body');
-    daialog.draggable({cursor:'move',cancel:'.modal-body'});
-    llmsetting_modal.modal('show');
+    opt['mode'] = mode;
+    opt['cmd'] = cmd;
+    opt['user_id'] = user['name'];
+    opt['capture_stdout'] = true;
+    cmdbox.show_loading();
+    return cmdbox.sv_exec_cmd(opt).then(res => {
+        if(!res[0] || !res[0]['success']) {
+            cmdbox.hide_loading();
+            if (error_func) {
+                error_func(res);
+                return;
+            }
+            //cmdbox.message(res);
+            return res[0];
+        }
+        cmdbox.hide_loading();
+        return res[0];
+    });
+}
+agent.get_llm_form_def = async () => {
+    const opts = await cmdbox.get_cmd_choices('agent', 'llm_save');
+    const vform_names = ['llmname', 'llmprov', 'llmapikey', 'llmendpoint', 'llmmodel', 'llmapiversion',
+                        'llmprojectid', 'llmsvaccountfile', 'llmlocation', 'llmtemperature', 'llmseed'];
+    const ret = opts.filter(o => vform_names.includes(o.opt));
+    return ret;
 };
+
+agent.build_llm_form = async () => {
+    const form = $('#form_llm_edit');
+    form.empty();
+    const defs = await agent.get_llm_form_def();
+    const model = $('#llm_edit_modal');
+    defs.forEach((row, i) => {
+        cmdbox.add_form_func(i, model, form, row, null);
+    });
+};
+
+agent.list_llm = async () => {
+    const container = $('#llm_list_container');
+    container.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+    
+    try {
+        const res = await agent.exec_cmd('agent', 'llm_list');
+        container.html('');
+        if (!res || !res.success) {
+            container.html('<div class="text-danger p-3">Failed to load LLM list.</div>');
+            return;
+        }
+        
+        const list = res.success['data'] || [];
+        if (list.length === 0) {
+            container.html('<div class="text-muted p-3">No LLM configurations found.</div>');
+            return;
+        }
+
+        list.forEach(async item => {
+            const res = await agent.exec_cmd('agent', 'llm_load', { llmname: item.name });
+            if (!res || !res.success) return;
+            const config = res.success || {};
+            const itemEl = $(`
+                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="cursor: pointer;">
+                    <div>
+                        <h6 class="mb-1">${config.llmname}</h6>
+                        <small>${config.llmprov} / ${config.llmmodel}</small>
+                    </div>
+                </div>
+            `);
+            
+            // リストアイテムクリックで編集
+            itemEl.on('click', async () => {
+                await agent.build_llm_form();
+                const form = $('#form_llm_edit');
+                form.find('[name="llmname"]').val(config.llmname).prop('readonly', true);
+                
+                // 各フィールドに値をセット
+                Object.keys(config).forEach(key => {
+                    if (key === 'llmname') return;
+                    const input = form.find(`[name="${key}"]`);
+                    if (input.length > 0) {
+                        input.val(config[key]);
+                    }
+                });
+                
+                // Delete button handler
+                $('#btn_del_llm').show().off('click').on('click', async () => {
+                    if (!confirm(`Are you sure you want to delete '${config.llmname}'?`)) return;
+                    await agent.exec_cmd('agent', 'llm_del', { llmname: config.llmname });
+                    $('#llm_edit_modal').modal('hide');
+                    agent.list_llm();
+                });
+
+                $('#llm_edit_modal').modal('show');
+            });
+
+            container.append(itemEl);
+        });
+    } catch (e) {
+        console.error(e);
+        container.html(`<div class="text-danger p-3">Error: ${e.message}</div>`);
+    }
+};
+
+agent.save_llm = async () => {
+    const form = $('#form_llm_edit');
+    const data = {};
+    form.serializeArray().forEach(item => {
+        if (item.value) data[item.name] = item.value;
+    });
+
+    if (!data.llmname || !data.llmprov) {
+        alert('Name and Provider are required.');
+        return;
+    }
+
+    try {
+        const res = await agent.exec_cmd('agent', 'llm_save', data);
+        if (res && res.success) {
+            $('#llm_edit_modal').modal('hide');
+            agent.list_llm();
+        } else {
+            alert('Failed to save LLM settings.');
+        }
+    } catch (e) {
+        console.error(e);
+        alert(`Error: ${e.message}`);
+    }
+};
+
+agent.get_mcpsv_form_def = async () => {
+    const opts = await cmdbox.get_cmd_choices('agent', 'mcpsv_save');
+    const vform_names = ['mcpserver_name', 'mcpserver_url', 'mcpserver_apikey', 'mcpserver_transport', 'mcp_tools'];
+    const ret = opts.filter(o => vform_names.includes(o.opt));
+    return ret;
+};
+
+agent.build_mcpsv_form = async () => {
+    const form = $('#form_mcpsv_edit');
+    form.empty();
+    const defs = await agent.get_mcpsv_form_def();
+    const model = $('#mcpsv_edit_modal');
+    defs.forEach((row, i) => {
+        cmdbox.add_form_func(i, model, form, row, null);
+    });
+};
+agent.list_mcpsv = async () => {
+    const container = $('#mcpsv_list_container');
+    container.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+    
+    try {
+        const res = await agent.exec_cmd('agent', 'mcpsv_list');
+        container.html('');
+        if (!res || !res.success) {
+            container.html('<div class="text-danger p-3">Failed to load MCPSV list.</div>');
+            return;
+        }
+        
+        const list = res.success['data'] || [];
+        if (list.length === 0) {
+            container.html('<div class="text-muted p-3">No MCPSV connections found.</div>');
+            return;
+        }
+
+        list.forEach(async item => {
+            const res = await agent.exec_cmd('agent', 'mcpsv_load', { mcpserver_name: item.name });
+            if (!res || !res.success) return;
+            const config = res.success || {};
+            const itemEl = $(`
+                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="cursor: pointer;">
+                    <div>
+                        <h6 class="mb-1">${config.mcpserver_name}</h6>
+                        <small>${config.mcpserver_url}</small>
+                    </div>
+                </div>
+            `);
+            
+            // リストアイテムクリックで編集
+            itemEl.on('click', async () => {
+                await agent.build_mcpsv_form();
+                const form = $('#form_mcpsv_edit');
+                form.find('[name="mcpserver_name"]').val(config.mcpserver_name).prop('readonly', true);
+                
+                // 各フィールドに値をセット
+                Object.keys(config).forEach(key => {
+                    if (key === 'mcpserver_name') return;
+                    const input = form.find(`[name="${key}"]`);
+                    if (input.length > 0) {
+                        input.val(config[key]);
+                    }
+                });
+
+                // Delete button handler
+                $('#btn_del_mcpsv').show().off('click').on('click', async () => {
+                    if (!confirm(`Are you sure you want to delete '${config.mcpserver_name}'?`)) return;
+                    await agent.exec_cmd('agent', 'mcpsv_del', { mcpserver_name: config.mcpserver_name });
+                    $('#mcpsv_edit_modal').modal('hide');
+                    agent.list_mcpsv();
+                });
+
+                $('#mcpsv_edit_modal').modal('show');
+                // コマンド実行
+                await cmdbox.callcmd('agent','mcp_client',{
+                            'mcpserver_url':$('[name="mcpserver_url"]').val(),
+                            'mcpserver_apikey':$('[name="mcpserver_apikey"]').val(),
+                            'mcpserver_transport':$('[name="mcpserver_transport"]').val(),
+                            'operation':'list_tools',
+                },(res)=>{
+                    res.map(elm=>{$('[name="mcp_tools"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                    form.find('[name="mcp_tools"]').val(config.mcpserver_mcp_tools);
+                },$('[name="title"]').val(),'mcp_tools');
+            });
+
+            container.append(itemEl);
+        });
+    } catch (e) {
+        console.error(e);
+        container.html(`<div class="text-danger p-3">Error: ${e.message}</div>`);
+    }
+};
+
+agent.save_mcpsv = async () => {
+    const form = $('#form_mcpsv_edit');
+    const data = {};
+    form.find(':input').each((i, elem) => {
+        const val = $(elem).val();
+        if (val) data[elem.name] = val;
+    });
+
+    if (!data.mcpserver_name || !data.mcpserver_url) {
+        alert('Name and URL are required.');
+        return;
+    }
+
+    try {
+        const res = await agent.exec_cmd('agent', 'mcpsv_save', data);
+        if (res && res.success) {
+            $('#mcpsv_edit_modal').modal('hide');
+            agent.list_mcpsv();
+        } else {
+            alert('Failed to save MCPSV settings.');
+        }
+    } catch (e) {
+        console.error(e);
+        alert(`Error: ${e.message}`);
+    }
+};
+
+agent.get_runner_form_def = async () => {
+    const opts = await cmdbox.get_cmd_choices('agent', 'runner_save');
+    const vform_names = ['runner_name', 'llm', 'mcpservers', 'session_store_type', 'session_store_pghost',
+                        'session_store_pgport', 'session_store_pguser', 'session_store_pgpass',
+                        'session_store_pgdbname', 'llm_description', 'runner_instruction'];
+    const ret = opts.filter(o => vform_names.includes(o.opt));
+    return ret;
+};
+
+agent.build_runner_form = async () => {
+    const form = $('#form_runner_edit');
+    form.empty();
+    const defs = await agent.get_runner_form_def();
+    const model = $('#runner_edit_modal');
+    defs.forEach((row, i) => {
+        cmdbox.add_form_func(i, model, form, row, null);
+    });
+};
+
+agent.list_runner = async () => {
+    const container = $('#runner_list_container');
+    container.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+    
+    try {
+        const res = await agent.exec_cmd('agent', 'runner_list');
+        container.html('');
+        if (!res || !res.success) {
+            container.html('<div class="text-danger p-3">Failed to load Runner list.</div>');
+            return;
+        }
+        
+        const list = res.success['data'] || [];
+        if (list.length === 0) {
+            container.html('<div class="text-muted p-3">No Runner connections found.</div>');
+            return;
+        }
+
+        list.forEach(async item => {
+            const res = await agent.exec_cmd('agent', 'runner_load', { runner_name: item.name });
+            if (!res || !res.success) return;
+            const config = res.success || {};
+            const itemEl = $(`
+                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="cursor: pointer;">
+                    <div>
+                        <h6 class="mb-1">${config.runner_name}</h6>
+                        <small>LLM: ${config.llm_description || 'None'}</small>
+                    </div>
+                </div>
+            `);
+            
+            // リストアイテムクリックで編集
+            itemEl.on('click', async () => {
+                await agent.build_runner_form();
+                const form = $('#form_runner_edit');
+                form.find('[name="runner_name"]').val(config.runner_name).prop('readonly', true);
+                
+                // 各フィールドに値をセット
+                Object.keys(config).forEach(key => {
+                    if (key === 'runner_name') return;
+                    const input = form.find(`[name="${key}"]`);
+                    if (input.length > 0) {
+                        input.val(config[key]);
+                    }
+                });
+                // Trigger change to update visibility
+                form.find('[name="session_store_type"]').trigger('change');
+
+                // Delete button handler
+                $('#btn_del_runner').show().off('click').on('click', async () => {
+                    if (!confirm(`Are you sure you want to delete '${config.runner_name}'?`)) return;
+                    await agent.exec_cmd('agent', 'runner_del', { runner_name: config.runner_name });
+                    $('#runner_edit_modal').modal('hide');
+                    agent.list_runner();
+                });
+
+                $('#runner_edit_modal').modal('show');
+            });
+
+            container.append(itemEl);
+        });
+    } catch (e) {
+        console.error(e);
+        container.html(`<div class="text-danger p-3">Error: ${e.message}</div>`);
+    }
+};
+
+agent.save_runner = async () => {
+    const form = $('#form_runner_edit');
+    const data = {};
+    const array = form.serializeArray();
+    
+    // Helper to handle multiple values for same name (for mcpservers)
+    const multiMap = {};
+    array.forEach(item => {
+        if (multiMap[item.name]) {
+            if (!Array.isArray(multiMap[item.name])) {
+                multiMap[item.name] = [multiMap[item.name]];
+            }
+            multiMap[item.name].push(item.value);
+        } else {
+            multiMap[item.name] = item.value;
+        }
+    });
+    // Ensure mcpservers is array if present
+    if (multiMap['mcpservers'] && !Array.isArray(multiMap['mcpservers'])) {
+        multiMap['mcpservers'] = [multiMap['mcpservers']];
+    }
+    
+    Object.assign(data, multiMap);
+
+    if (!data.runner_name || !data.llm) {
+        alert('Name and LLM are required.');
+        return;
+    }
+
+    try {
+        const res = await agent.exec_cmd('agent', 'runner_save', data);
+        if (res && res.success) {
+            $('#runner_edit_modal').modal('hide');
+            agent.list_runner();
+        } else {
+            alert('Failed to save Runner settings.');
+        }
+    } catch (e) {
+        console.error(e);
+        alert(`Error: ${e.message}`);
+    }
+};
+agent.html = `
+    <!-- エージェントモーダル -->
+    <div id="agent_modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable" style="height: 90vh;">
+            <div class="modal-content h-100">
+                <div class="modal-header">
+                    <h5 class="modal-title">AI Chat</h5>
+                    <button type="button" class="btn btn_window_stack">
+                        <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
+                    </button>
+                    <button type="button" class="btn btn_window">
+                        <svg class="bi bi-window" width="16" height="16" fill="currentColor"><use href="#btn_window"></use></svg>
+                    </button>
+                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">
+                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                    </button>
+                </div>
+                <div class="modal-body p-0 h-100 overflow-hidden">
+                    <div id="agent_container" class="split-pane fixed-left h-100 w-100">
+                        <!-- 履歴側ペイン -->
+                        <div id="left_container" class="split-pane-component filer-pane-left" style="width:250px;">
+                            <div id="newchat_container" class="w-100 d-flex justify-content-center pt-2">
+                                <button id="btn_newchat" class="btn_hover btn me-3 p-2" type="button" style="border:0px;">
+                                    <svg class="bi bi-plus" width="24" height="24" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                    <span class="btn_text">New Chat&nbsp;</span>
+                                </button>
+                            </div>
+                            <h6 class="ps-2" style="float:left;">Histories</h6>
+                            <div id="history_container" class="w-100 d-flex justify-content-center" style="height:calc(100% - 130px);overflow-y:auto;">
+                                <div id="histories" class="w-100 p-2"></div>
+                            </div>
+                            <div id="settings_container" class="w-100 d-flex justify-content-end position-absolute bottom-0 pb-2 pe-3">
+                                <button id="btn_settings" class="btn btn_hover p-2" type="button" style="border:0px;">
+                                    <svg class="bi bi-gear" width="24" height="24" fill="currentColor"><use href="#btn_gear"></use></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- 左右のスプリッター -->
+                        <div class="split-pane-divider filer-pane-divider" style="left:250px;"></div>
+                        <!-- チャット側ペイン -->
+                        <div id="right_container" class="split-pane-component chat-container" style="left:250px;">
+                            <div id="message_container" class="w-100 d-flex justify-content-center" style="height:calc(100% - 80px);overflow-y:auto;">
+                                <div id="messages" class="ps-2 pe-2" style="width:100%; max-width: 800px;"></div>
+                            </div>
+                            <div class="w-100 d-flex justify-content-center position-absolute bottom-0 pb-3" style="background-color: var(--bs-body-bg);">
+                                <div class="chat-input mt-2" style="width:90%; max-width: 800px;">
+                                    <div class="chat-group w-100 p-2 d-flex align-items-center">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <div class="d-flex align-items-center">
+                                                <button id="btn_say" class="btn btn_hover p-1" type="button" style="border:0px;" disabled="disabled">
+                                                    <svg class="bi bi-say" width="24" height="24" fill="currentColor"><use href="#btn_megaphone"></use></svg>
+                                                </button>
+                                                <div class="dropdown d-inline-block ms-1 text-center">
+                                                    <button id="btn_runner" class="btn btn_hover p-1 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border:0px;" title="Select Runner">
+                                                        <svg class="bi bi-chat-text" width="24" height="24" fill="currentColor"><use href="#btn_chat_text"></use></svg>
+                                                    </button>
+                                                    <ul class="dropdown-menu" id="runner_menu"></ul>
+                                                </div>
+                                            </div>
+                                            <div id="runner_name_display" style="font-size: 0.6rem; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display:none;"></div>
+                                            <input type="hidden" id="runner_name_input">
+                                        </div>
+                                        <textarea id="user_msg" class="form-control d-inline-block align-middle mx-2" rows="1" style="border:0px;box-shadow:none;resize:none;field-sizing:content;"></textarea>
+                                        <button id="btn_user_msg" class="btn btn_hover p-1" type="button" style="border:0px;" disabled="disabled">
+                                            <svg class="bi bi-send" width="24" height="24" fill="currentColor"><use href="#btn_send"></use></svg>
+                                        </button>
+                                        <button id="btn_rec" class="btn btn_hover p-1" type="button" style="border:0px;" disabled="disabled">
+                                            <svg class="bi bi-mic" width="24" height="24" fill="currentColor"><use href="#btn_mic"></use></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 設定モーダル -->
+    <div id="agent_settings_modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable" style="height: 50vh;">
+            <div class="modal-content h-100">
+                <div class="modal-header">
+                    <h5 class="modal-title">Settings</h5>
+                    <button type="button" class="btn btn_window_stack">
+                        <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
+                    </button>
+                    <button type="button" class="btn btn_window">
+                        <svg class="bi bi-window" width="16" height="16" fill="currentColor"><use href="#btn_window"></use></svg>
+                    </button>
+                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close">
+                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                    </button>
+                </div>
+                <div class="modal-body p-0 h-100 overflow-hidden">
+                    <div id="settings_split_pane" class="split-pane fixed-left h-100 w-100">
+                        <!-- 左側ペイン: 設定項目リスト -->
+                        <div class="split-pane-component filer-pane-left" style="width:200px;">
+                            <div class="list-group list-group-flush">
+                                <a href="#" class="list-group-item list-group-item-action active" data-bs-target="#llm_settings">LLM Settings</a>
+                                <a href="#" class="list-group-item list-group-item-action" data-bs-target="#mcpsv_settings">MCPSV Settings</a>
+                                <a href="#" class="list-group-item list-group-item-action" data-bs-target="#runner_settings">Runner Settings</a>
+                            </div>
+                        </div>
+                        <!-- スプリッター -->
+                        <div class="split-pane-divider filer-pane-divider" style="left:200px;"></div>
+                        <!-- 右側ペイン: 設定内容 -->
+                        <div class="split-pane-component" style="left:200px; background-color: var(--bs-body-bg);">
+                            <div class="p-3 h-100 overflow-auto">
+                                <div id="llm_settings" class="settings-content">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="m-0">LLM Settings</h6>
+                                        <button id="btn_add_llm" class="btn btn-sm btn-primary">
+                                            <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                            Add Connection
+                                        </button>
+                                    </div>
+                                    <div id="llm_list_container" class="list-group">
+                                        <!-- LLM List Items will be injected here -->
+                                    </div>
+                                </div>
+                                <div id="mcpsv_settings" class="settings-content d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="m-0">MCPSV Settings</h6>
+                                        <button id="btn_add_mcpsv" class="btn btn-sm btn-primary">
+                                            <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                            Add Connection
+                                        </button>
+                                    </div>
+                                    <div id="mcpsv_list_container" class="list-group">
+                                        <!-- MCPSV List Items will be injected here -->
+                                    </div>
+                                </div>
+                                <div id="runner_settings" class="settings-content d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="m-0">Runner Settings</h6>
+                                        <button id="btn_add_runner" class="btn btn-sm btn-primary">
+                                            <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                            Add Connection
+                                        </button>
+                                    </div>
+                                    <div id="runner_list_container" class="list-group">
+                                        <!-- Runner List Items will be injected here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- AIチャットボタン -->
+    <div id="ai_chat_button" class="position-fixed bottom-0 end-0 m-3" style="z-index: 1080;">
+        <button type="button" class="btn btn-primary rounded-pill shadow-lg d-flex align-items-center gap-2 px-3 py-2" onclick="$('#agent_modal').modal('show'); agent.init();">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chat-dots-fill" viewBox="0 0 16 16">
+                <path d="M16 8c0 3.866-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7zM5 8a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+            </svg>
+            <span class="fw-bold">AIと話す</span>
+        </button>
+    </div>
+
+    <!-- LLM追加/編集モーダル -->
+    <div id="llm_edit_modal" class="modal" tabindex="-1" style="z-index: 1090;">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add/Edit LLM</h5>
+                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close">
+                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form_llm_edit" class="row"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger me-auto" id="btn_del_llm" style="display:none;">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btn_save_llm">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MCPSV追加/編集モーダル -->
+    <div id="mcpsv_edit_modal" class="modal" tabindex="-1" style="z-index: 1090;">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add/Edit MCPSV</h5>
+                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close">
+                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form_mcpsv_edit" class="row"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger me-auto" id="btn_del_mcpsv" style="display:none;">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btn_save_mcpsv">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Runner追加/編集モーダル -->
+    <div id="runner_edit_modal" class="modal" tabindex="-1" style="z-index: 1090;">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add/Edit Runner</h5>
+                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close">
+                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form_runner_edit" class="row"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger me-auto" id="btn_del_runner" style="display:none;">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btn_save_runner">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+`;
+
+agent.css = `
+    .card-hover:hover {
+        box-shadow: 0 0 8px gray;
+        cursor: pointer;
+    }
+    .filer-pane-divider {
+        border: 1px solid var(--bs-border-color-translucent) !important;
+        /**background-color: #F0F0F0 !important;*/
+        border-radius: 1px;
+        /*left: 50%;*/
+    }
+    .chat-container {
+        overflow-y: auto;
+        background-color: var(--bs-body-bg);
+    }
+    .message {
+        padding: 10px;
+        /**border: 1px solid var(--bs-border-color-translucent);*/
+        margin-bottom: 10px;
+        border-radius: 5px;
+        clear: both;
+    }
+    .user-message {
+        background-color: var(--bs-tertiary-bg);
+        color: var(--bs-body-color);
+        /**float: right;*/
+        border-bottom-left-radius: 24px;
+        border-bottom-right-radius: 24px;
+        border-top-left-radius: 24px;
+        border-top-right-radius: 4px;
+    }
+    .bot-message {
+        background-color: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        float: left;
+    }
+    .chat-input {
+        border-radius: 16px;
+        border: 1px solid var(--bs-border-color);
+    }
+    :root {
+        --cmdbox-width: 800px;
+    }
+    pre {
+        width: var(--cmdbox-width);
+        overflow-wrap: break-all;
+    }
+    .btn_hover {
+        border-radius: 24px !important;
+    }
+    .btn_hover:hover {
+        background-color: var(--bs-tertiary-bg) !important;
+    }
+`;
+
+agent.initialized = false;
+agent.init = async () => {
+    if (agent.initialized) return;
+    agent.initialized = true;
+
+    // CSSを追加
+    $('head').append(`<style>${agent.css}</style>`);
+    $('head').append('<link rel="stylesheet" href="assets/split-pane/split-pane.css">');
+
+    // HTMLを追加
+    $('body').append(agent.html);
+
+    // JSを追加
+    $.getScript('assets/split-pane/split-pane.js', () => {
+        // スプリッター初期化
+        $('.split-pane').splitPane();
+    });
+    
+    // コマンド実行用のオプション取得
+    // gui.html では既に取得済みかもしれないが、念のため
+    // cmdbox.get_server_opt(true, $('.filer_form')).then(async (opt) => {
+        agent.init_form();
+    // });
+
+    // モーダル表示時のイベント
+    $('#agent_modal').off('shown.bs.modal').on('shown.bs.modal', () => {
+        agent.list_sessions();
+    });
+
+    // dropdownメニューを閉じる
+    const histories = $('#histories');
+    $(document).on('click', (e) => {
+        histories.find('.dropdown-menu').hide();
+    }).on('contextmenu', (e) => {
+        histories.find('.dropdown-menu').hide();
+    });
+
+    // 設定ボタンのクリックイベント
+    $('#btn_settings').off('click').on('click', () => {
+        // LLM一覧の表示
+        agent.list_llm();
+        $('#agent_settings_modal').modal('show');
+    });
+    // 設定メニューの切り替え
+    $('#agent_settings_modal .list-group-item').off('click').on('click', function(e) {
+        e.preventDefault();
+        $('#agent_settings_modal .list-group-item').removeClass('active');
+        $(this).addClass('active');
+        const target = $(this).data('bs-target');
+        $('.settings-content').addClass('d-none');
+        $(target).removeClass('d-none');
+        
+        if (target === '#llm_settings') {
+            agent.list_llm();
+        } else if (target === '#mcpsv_settings') {
+            agent.list_mcpsv();
+        } else if (target === '#runner_settings') {
+            agent.list_runner();
+        }
+    });
+    
+    // モーダルボタン初期化
+    cmdbox.init_modal_button();
+
+    // LLM追加ボタンのクリックイベント
+    $('#btn_add_llm').off('click').on('click', async () => {
+        await agent.build_llm_form();
+        $('#form_llm_edit [name="llmname"]').prop('readonly', false);
+        $('#form_llm_edit [name="llmprov"]').trigger('change');
+        $('#btn_del_llm').hide();
+        $('#llm_edit_modal').modal('show');
+    });
+
+    // LLM保存ボタンのクリックイベント
+    $('#btn_save_llm').off('click').on('click', () => {
+        agent.save_llm();
+    });
+
+    // MCPSV追加ボタンのクリックイベント
+    $('#btn_add_mcpsv').off('click').on('click', () => {
+        agent.build_mcpsv_form();
+        $('#form_mcpsv_edit [name="mcpserver_name"]').prop('readonly', false);
+        $('#btn_del_mcpsv').hide();
+        $('#mcpsv_edit_modal').modal('show');
+    });
+
+    // MCPSV保存ボタンのクリックイベント
+    $('#btn_save_mcpsv').off('click').on('click', () => {
+        agent.save_mcpsv();
+    });
+
+    // Runner追加ボタンのクリックイベント
+    $('#btn_add_runner').off('click').on('click', async () => {
+        await agent.build_runner_form();
+        $('#form_runner_edit [name="runner_name"]').prop('readonly', false);
+        $('#form_runner_edit [name="session_store_type"]').trigger('change');
+        $('#btn_del_runner').hide();
+        $('#runner_edit_modal').modal('show');
+    });
+
+    // Runner保存ボタンのクリックイベント
+    $('#btn_save_runner').off('click').on('click', () => {
+        agent.save_runner();
+    });
+
+    // Runner選択ボタンのクリックイベント
+    $('#btn_runner').off('click').on('click', async () => {
+        await agent.update_runner_list();
+    });
+};
+
+agent.update_runner_list = async () => {
+    const menu = $('#runner_menu');
+    try {
+        const res = await agent.exec_cmd('agent', 'runner_list');
+        if (res && res.success && res.success.data) {
+            menu.html('');
+            res.success.data.forEach(item => {
+                const li = $(`<li><a class="dropdown-item" href="#" data-runner="${item.name}">${item.name}</a></li>`);
+                li.find('a').off('click').on('click', async (e) => {
+                    e.preventDefault();
+                    agent.select_runner(item.name);
+                    // Start the agent runner
+                    await agent.exec_cmd('agent', 'start', { runner_name: item.name });
+                    agent.chat(cmdbox.random_string(16));
+                });
+                menu.append(li);
+            });
+            if (res.success.data.length > 0 && !agent.current_runner) {
+                // Select first one by default if none selected
+                //agent.select_runner(res.success.data[0].name);
+            }
+        } else {
+            menu.html('<li><span class="dropdown-item text-muted">No runners found</span></li>');
+        }
+    } catch (e) {
+        console.error(e);
+        menu.html('<li><span class="dropdown-item text-danger">Error loading runners</span></li>');
+    }
+};
+
+agent.select_runner = async (runner_name) => {
+    agent.current_runner = runner_name;
+    $('#btn_runner').attr('title', `Runner: ${runner_name}`);
+    // Highlight the selected item
+    $('#runner_menu .dropdown-item').removeClass('active');
+    $(`#runner_menu .dropdown-item[data-runner="${runner_name}"]`).addClass('active');
+
+    // Update display and hidden input
+    $('#runner_name_display').text(runner_name).show();
+    $('#runner_name_input').val(runner_name);
+};
+
+// 自動初期化（ボタン表示のため）
 $(() => {
-  // カラーモード対応
-  cmdbox.change_color_mode();
-  // スプリッター初期化
-  $('.split-pane').splitPane();
-  // アイコンを表示
-  cmdbox.set_logoicon('.navbar-brand');
-  // copyright表示
-  cmdbox.copyright();
-  // バージョン情報モーダル初期化
-  cmdbox.init_version_modal();
-  // モーダルボタン初期化
-  cmdbox.init_modal_button();
-  // コマンド実行用のオプション取得
-  cmdbox.get_server_opt(true, $('.filer_form')).then(async (opt) => {
-    agent.init_form();
-  });
-  // dropdownメニューを閉じる
-  const histories = $('#histories');
-  $(document).on('click', (e) => {
-    histories.find('.dropdown-menu').hide();
-  }).on('contextmenu', (e) => {
-    histories.find('.dropdown-menu').hide();
-  });
+    // ボタンだけは先に表示したいが、init()で全部やるならinit()を呼ぶ
+    // ただし、init()はモーダル表示時に呼ばれる想定だったが、
+    // ボタン自体もJSで追加するので、ページロード時にinit()を呼んでボタンを表示させる必要がある。
+    // しかしinit()内でモーダルも追加してしまうので、モーダルは非表示状態で追加される。
+    // ボタンのonclickで $('#agent_modal').modal('show') するので問題ない。
+    agent.init();
 });

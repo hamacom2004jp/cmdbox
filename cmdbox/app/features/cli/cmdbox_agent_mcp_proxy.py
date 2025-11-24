@@ -40,10 +40,10 @@ class AgentMcpProxy(feature.UnsupportEdgeFeature):
                 dict(opt="mcpserver_name", type=Options.T_STR, default='mcpserver', required=True, multi=False, hide=False, choice=None,
                      description_ja="リモートMCPサーバーの名前を指定します。省略した場合は`mcpserver`となります。",
                      description_en="Specify the name of the MCP server. If omitted, it will be `mcpserver`.",),
-                dict(opt="mcpserver_url", type=Options.T_STR, default='http://localhost:8081/mcpsv/mcp', required=True, multi=False, hide=False, choice=None,
-                     description_ja="リモートMCPサーバーのURLを指定します。省略した場合は`http://localhost:8081/mcpsv/mcp`となります。",
-                     description_en="Specifies the URL of the remote MCP server. If omitted, it will be `http://localhost:8081/mcpsv/mcp`.",),
-                dict(opt="mcpserver_apikey", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                dict(opt="mcpserver_url", type=Options.T_STR, default='http://localhost:8082/mcp', required=True, multi=False, hide=False, choice=None,
+                     description_ja="リモートMCPサーバーのURLを指定します。省略した場合は`http://localhost:8082/mcp`となります。",
+                     description_en="Specifies the URL of the remote MCP server. If omitted, it will be `http://localhost:8082/mcp`.",),
+                dict(opt="mcpserver_apikey", type=Options.T_PASSWD, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="リモートMCPサーバーのAPI Keyを指定します。",
                      description_en="Specify the API Key of the remote MCP server.",),
                 dict(opt="mcpserver_transport", type=Options.T_STR, default='streamable-http', required=True, multi=False, hide=False, choice=['', 'streamable-http', 'sse', 'http'],
@@ -67,7 +67,7 @@ class AgentMcpProxy(feature.UnsupportEdgeFeature):
         if not hasattr(args, 'mcpserver_name'):
             args.mcpserver_name = 'mcpserver'
         if not hasattr(args, 'mcpserver_url'):
-            args.mcpserver_url = 'http://localhost:8081/mcpsv/mcp'
+            args.mcpserver_url = 'http://localhost:8082/mcp'
         if not hasattr(args, 'mcpserver_transport'):
             args.mcpserver_transport = 'streamable-http'
         if not hasattr(args, 'mcpserver_apikey'):

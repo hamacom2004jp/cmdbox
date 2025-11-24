@@ -28,7 +28,7 @@ class CmdAgentMcpSave(feature.OneshotResultEdgeFeature):
                 dict(opt="port", type=Options.T_INT, default=self.default_port, required=True, multi=False, hide=True, choice=None, web="mask",
                     description_ja="Redisサーバーのサービスポートを指定します。",
                     description_en="Specify the service port of the Redis server."),
-                dict(opt="password", type=Options.T_STR, default=self.default_pass, required=True, multi=False, hide=True, choice=None, web="mask",
+                dict(opt="password", type=Options.T_PASSWD, default=self.default_pass, required=True, multi=False, hide=True, choice=None, web="mask",
                     description_ja=f"Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `{self.default_pass}` を使用します。",
                     description_en=f"Specify the access password of the Redis server (optional). If omitted, `{self.default_pass}` is used."),
                 dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",
@@ -46,17 +46,17 @@ class CmdAgentMcpSave(feature.OneshotResultEdgeFeature):
                 dict(opt="mcpserver_name", type=Options.T_STR, default='mcpserver', required=True, multi=False, hide=False, choice=None,
                     description_ja="リモートMCPサーバーの名前を指定します。省略した場合は`mcpserver`となります。",
                     description_en="Specify the name of the MCP server. If omitted, it will be `mcpserver`.",),
-                dict(opt="mcpserver_url", type=Options.T_STR, default='http://localhost:8081/mcpsv/mcp', required=True, multi=False, hide=False, choice=None,
-                    description_ja="リモートMCPサーバーのURLを指定します。省略した場合は`http://localhost:8081/mcpsv/mcp`となります。",
-                    description_en="Specifies the URL of the remote MCP server. If omitted, it will be `http://localhost:8081/mcpsv/mcp`.",),
-                dict(opt="mcpserver_apikey", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                dict(opt="mcpserver_url", type=Options.T_STR, default='http://localhost:8082/mcp', required=True, multi=False, hide=False, choice=None,
+                    description_ja="リモートMCPサーバーのURLを指定します。省略した場合は`http://localhost:8082/mcp`となります。",
+                    description_en="Specifies the URL of the remote MCP server. If omitted, it will be `http://localhost:8082/mcp`.",),
+                dict(opt="mcpserver_apikey", type=Options.T_PASSWD, default=None, required=False, multi=False, hide=False, choice=None,
                     description_ja="リモートMCPサーバーのAPI Keyを指定します。",
                     description_en="Specify the API Key of the remote MCP server.",),
                 dict(opt="mcpserver_transport", type=Options.T_STR, default='streamable-http', required=True, multi=False, hide=False, choice=['', 'streamable-http', 'sse'],
                     description_ja="リモートMCPサーバーのトランスポートを指定します。省略した場合は`streamable-http`となります。",
                     description_en="Specifies the transport of the remote MCP server. If omitted, it is `streamable-http`.",),
                 dict(opt="mcp_tools", type=Options.T_MLIST, default=None, required=False, multi=False, hide=False, choice=[],
-                    callcmd="()=>{cmdbox.callcmd('agent','mcp_client',{"
+                    callcmd="async () => {await cmdbox.callcmd('agent','mcp_client',{"
                             + "'mcpserver_url':$(\"[name='mcpserver_url']\").val(),"
                             + "'mcpserver_apikey':$(\"[name='mcpserver_apikey']\").val(),"
                             + "'mcpserver_transport':$(\"[name='mcpserver_transport']\").val(),"

@@ -245,140 +245,6 @@ class Mcp:
             session_service=session_service,
         )
 
-    def _to_schema(self, o:Dict[str, Any], is_japan:bool) -> Dict[str, Any]:
-        t, m = o["type"], o["multi"]
-        title = o['opt'].title().replace('_', ' ')
-        description = o['description_ja'] if is_japan else o['description_en']
-        if t == Options.T_BOOL:
-            return dict(title=title, type="array", items=dict(type="boolean"), description=description) if m \
-                else dict(title=title, type="boolean", description=description)
-        if t == Options.T_DATE:
-            return dict(title=title, type="array", items=dict(type="string"), description=description) if m \
-                else dict(title=title, type="string", description=description)
-        if t == Options.T_DATETIME:
-            return dict(title=title, type="array", items=dict(type="string"), description=description) if m \
-                else dict(title=title, type="string", description=description)
-        if t == Options.T_DICT:
-            return dict(title=title, type="array", items=dict(additionalProperties=True, type="object"), description=description) if m \
-                else dict(title=title, type="object", description=description)
-        if t == Options.T_DIR or t == Options.T_FILE:
-            return dict(title=title, type="array", items=dict(type="string"), description=description) if m \
-                else dict(title=title, type="string", description=description)
-        if t == Options.T_FLOAT:
-            return dict(title=title, type="array", items=dict(type="number"), description=description) if m \
-                else dict(title=title, type="number", description=description)
-        if t == Options.T_INT:
-            return dict(title=title, type="array", items=dict(type="integer"), description=description) if m \
-                else dict(title=title, type="integer", description=description)
-        if t == Options.T_STR or t == Options.T_TEXT:
-            return dict(title=title, type="array", items=dict(type="string"), description=description) if m \
-                    else dict(title=title, type="string", description=description)
-        if t == Options.T_MLIST:
-            return dict(title=title, type="array", items=dict(type="string"), description=description)
-        raise ValueError(f"Unknown type: {t} for option {o['opt']}")
-
-    def _ds(self, d:str) -> str:
-        return f'"{d}"' if d is not None else 'None'
-    
-    def _doc_arg_type(self, o:Dict[str, Any], use_default:True) -> str:
-        t, m, d, r = o["type"], o["multi"], o["default"], o["required"]
-        ret = ""
-        dft = "None"
-        if t == Options.T_BOOL:
-            ret = "List[bool]" if m else f"bool"
-            dft = "[]" if m else f"{d}"
-        elif t == Options.T_DATE:
-            ret = "List[str]" if m else f"str"
-            dft = "[]" if m else self._ds(d)
-        elif t == Options.T_DATETIME:
-            ret = "List[str]" if m else f"str"
-            dft = "[]" if m else self._ds(d)
-        elif t == Options.T_DICT:
-            ret = "Dict" if m else f"Dict"
-            dft = "{}" if m else self._ds(d)
-        elif t == Options.T_DIR or t == Options.T_FILE:
-            if d is not None: d = str(d).replace('\\', '/')
-            ret = "List[str]" if m else f"str"
-            dft = "[]" if m else self._ds(d)
-        elif t == Options.T_FLOAT:
-            ret ="List[float]" if m else f"float"
-            dft ="[]" if m else f"{d}"
-        elif t == Options.T_INT:
-            ret = "List[int]" if m else f"int"
-            dft = "[]" if m else f"{d}"
-        elif t == Options.T_STR or t == Options.T_TEXT:
-            ret = "List[str]" if m else f"str"
-            dft = "[]" if m else self._ds(d)
-        elif t == Options.T_MLIST:
-            ret = "List[str]"
-            dft = "[]"
-        else:
-            raise ValueError(f"Unknown type: {t} for option {o['opt']}")
-        return f"{ret}={dft}" if use_default else ret
-
-    def _doc_arg(self, o:Dict[str, Any], is_japan) -> str:
-        s = f'        {o["opt"]}:{self._doc_arg_type(o, True)} '
-        s += f'{o["description_ja"] if is_japan else o["description_en"]}'
-        return s
-
-    def _create_func_txt(self, func_name:str, mode:str, cmd:str, is_japan:bool, options:Options, title:str='') -> str:
-        description = options.get_cmd_attr(mode, cmd, 'description_ja' if is_japan else 'description_en')
-        choices = options.get_cmd_choices(mode, cmd, False)
-        func_doc_args = "\n".join([self._doc_arg(o, is_japan) for o in choices])
-        func_txt  = f"def {func_name}(*args, **kwargs):\n"
-        func_txt += f'    """\n'
-        func_txt += f'    {func_name} - MCP Tool Function\n'
-        func_txt += f'    {description}\n'
-        func_txt += f'\n'
-        func_txt += f'    Args:\n'
-        func_txt += f'        {func_doc_args}\n'
-        func_txt += f'\n'
-        func_txt += f'    Returns:\n'
-        func_txt += f'        Dict[str, Any]: 実行結果\n'
-        func_txt += f'    """\n'
-        func_txt += f'    logger = logging.getLogger("web")\n'
-        func_txt += f'    if not options.get_cmd_attr("'+mode+'", "'+cmd+'", "use_agent"):\n'
-        func_txt += f'        logger.warning("{func_name} is not allowed to be executed by the system.")\n'
-        func_txt += f'        return dict(warn="{func_name} is not allowed to be executed by the system.")\n'
-        func_txt +=  '    opt = {o["opt"]: kwargs.get(o["opt"], o["default"]) for o in options.get_cmd_choices("'+mode+'", "'+cmd+'", False)}\n'
-        func_txt += f'    opt["data"] = Path(opt["data"]) if hasattr(opt, "data") else common.HOME_DIR / f".{self.ver.__appid__}"\n'
-        func_txt += f'    if "{title}":\n'
-        func_txt += f'        opt_path = opt["data"] / ".cmds" / f"cmd-{title}.json"\n'
-        func_txt += f'        opt.update(common.loadopt(opt_path))\n'
-        func_txt += f'    scope = signin.get_request_scope()\n'
-        func_txt += f'    if logger.level == logging.DEBUG:\n'
-        func_txt +=  '        logger.debug(f"MCP Call scope={scope}")\n'
-        func_txt += f'    opt["mode"] = "{mode}"\n'
-        func_txt += f'    opt["cmd"] = "{cmd}"\n'
-        func_txt += f'    opt["format"] = False\n'
-        func_txt += f'    opt["output_json"] = None\n'
-        func_txt += f'    opt["output_json_append"] = False\n'
-        func_txt += f'    opt["debug"] = logger.level == logging.DEBUG\n'
-        func_txt += f'    opt["signin_file"] = scope["web"].signin_file\n'
-        func_txt += f'    args = argparse.Namespace(**opt)\n'
-        func_txt += f'    signin_data = signin.Signin.load_signin_file(args.signin_file)\n'
-        func_txt += f'    req = scope["req"] if scope["req"] is not None else scope["websocket"]\n'
-        func_txt += f'    sign = signin.Signin._check_signin(req, scope["res"], signin_data, logger)\n'
-        func_txt += f'    if sign is not None or "signin" not in req.session or "groups" not in req.session["signin"]:\n'
-        func_txt += f'        logger.warning("Unable to execute command because authentication information cannot be obtained")\n'
-        func_txt += f'        return dict(warn="Unable to execute command because authentication information cannot be obtained")\n'
-        func_txt += f'    groups = req.session["signin"]["groups"]\n'
-        func_txt += f'    if not signin.Signin._check_cmd(signin_data, groups, "{mode}", "{cmd}", logger):\n'
-        func_txt += f'        logger.warning("You do not have permission to execute this command.")\n'
-        func_txt += f'        return dict(warn="You do not have permission to execute this command.")\n'
-        func_txt += f'    feat = options.get_cmd_attr("{mode}", "{cmd}", "feature")\n'
-        func_txt += f'    args.groups = groups\n'
-        func_txt += f'    try:\n'
-        func_txt += f'        if logger.level == logging.DEBUG:\n'
-        func_txt +=  '            logger.debug(f"MCP Call {feat}#apprun, args={args}")\n'
-        func_txt += f'        st, ret, _ = feat.apprun(logger, args, time.perf_counter(), [])\n'
-        func_txt += f'        return ret\n'
-        func_txt += f'    except Exception as e:\n'
-        func_txt += f'        logger.error("Error occurs when tool is executed:", exc_info=True)\n'
-        func_txt += f'        raise e\n'
-        func_txt += f'func_ctx.append({func_name})\n'
-        return func_txt
-
     def create_tools(self, logger:logging.Logger, args:argparse.Namespace, extract_callable:bool) -> Any:
         """
         ツールリストを作成します
@@ -391,7 +257,7 @@ class Mcp:
         Returns:
             ToolList: ToolListのリスト
         """
-        tool_list = ToolList(self, logger, self.data)
+        tool_list = ToolList(logger, self.data, appcls=self.appcls, ver=self.ver)
         tool_list.extract_callable = extract_callable
         return tool_list
 
@@ -488,25 +354,27 @@ class Mcp:
         return runner, mcp
 
 class ToolList(object):
-    def __init__(self, mcp:Mcp, logger:logging.Logger, data:Path, *args:List):
+    def __init__(self, logger:logging.Logger, data:Path, *tools:List, appcls=None, ver=None,):
         """
         ツールリストを初期化します
 
         Args:
-            mcp (Mcp): MCPインスタンス
             logger (logging.Logger): ロガー
             data (Path): データパス
-            *args (List): 追加するツールのリスト
+            *tools (List): 追加するツールのリスト
+            appcls ([type], optional): アプリケーションクラス. Defaults to None.
+            ver ([type], optional): バージョン. Defaults to None.
         """
         from fastmcp.tools import FunctionTool
         options = Options.getInstance()
         is_japan = common.is_japan()
 
         self.tools = []
-        self.mcp = mcp
         self.logger = logger
         self.data = data
         self.extract_callable = False
+        self.appcls = appcls
+        self.ver = ver
         for mode in options.get_mode_keys():
             for cmd in options.get_cmd_keys(mode):
                 if not options.get_cmd_attr(mode, cmd, 'use_agent'):
@@ -516,7 +384,7 @@ class ToolList(object):
                 choices = options.get_cmd_choices(mode, cmd, False)
                 func_name = f"{mode}_{cmd}"
                 # 関数の定義を生成
-                func_txt  = self.mcp._create_func_txt(func_name, mode, cmd, is_japan, options)
+                func_txt  = self._create_func_txt(func_name, mode, cmd, is_japan, options)
                 if self.logger.level == logging.DEBUG:
                     self.logger.debug(f"generating agent tool: {func_name}")
                 func_ctx = []
@@ -527,7 +395,7 @@ class ToolList(object):
                 # 関数のスキーマを生成
                 input_schema = dict(
                     type="object",
-                    properties={o['opt']: self.mcp._to_schema(o, is_japan) for o in choices},
+                    properties={o['opt']: self._to_schema(o, is_japan) for o in choices},
                     required=[o['opt'] for o in choices if o['required']],
                 )
                 output_schema = dict(type="object", properties=dict())
@@ -536,7 +404,7 @@ class ToolList(object):
                                         parameters=input_schema, output_schema=output_schema,)
                 # ツールリストに追加
                 self.tools.append(func_tool)
-        for tool in args:
+        for tool in tools:
             if isinstance(tool, FunctionTool):
                 if self.logger.level == logging.DEBUG:
                     self.logger.debug(f"adding tool: {tool.name}")
@@ -668,7 +536,7 @@ class ToolList(object):
             choices = options.get_cmd_choices(mode, cmd, False)
             description += '\n' + options.get_cmd_attr(mode, cmd, 'description_ja' if is_japan else 'description_en')
             # 関数の定義を生成
-            func_txt  = self.mcp._create_func_txt(func_name, mode, cmd, is_japan, options, title=opt['title'])
+            func_txt  = self._create_func_txt(func_name, mode, cmd, is_japan, options, title=opt['title'])
             if self.logger.level == logging.DEBUG:
                 self.logger.debug(f"generating agent tool: {func_name}")
             func_ctx = []
@@ -679,7 +547,7 @@ class ToolList(object):
             # 関数のスキーマを生成
             input_schema = dict(
                 type="object",
-                properties={o['opt']: self.mcp._to_schema(o, is_japan) for o in choices},
+                properties={o['opt']: self._to_schema(o, is_japan) for o in choices},
                 required=[],
             )
             output_schema = dict(type="object", properties=dict())
@@ -695,3 +563,137 @@ class ToolList(object):
             # 関数を抽出する場合はツールリストから関数を抽出して返す
             return (tool.fn for tool in ret_tools if callable(tool.fn)).__iter__()
         return ret_tools.__iter__()
+
+    def _to_schema(self, o:Dict[str, Any], is_japan:bool) -> Dict[str, Any]:
+        t, m = o["type"], o["multi"]
+        title = o['opt'].title().replace('_', ' ')
+        description = o['description_ja'] if is_japan else o['description_en']
+        if t == Options.T_BOOL:
+            return dict(title=title, type="array", items=dict(type="boolean"), description=description) if m \
+                else dict(title=title, type="boolean", description=description)
+        if t == Options.T_DATE:
+            return dict(title=title, type="array", items=dict(type="string"), description=description) if m \
+                else dict(title=title, type="string", description=description)
+        if t == Options.T_DATETIME:
+            return dict(title=title, type="array", items=dict(type="string"), description=description) if m \
+                else dict(title=title, type="string", description=description)
+        if t == Options.T_DICT:
+            return dict(title=title, type="array", items=dict(additionalProperties=True, type="object"), description=description) if m \
+                else dict(title=title, type="object", description=description)
+        if t == Options.T_DIR or t == Options.T_FILE:
+            return dict(title=title, type="array", items=dict(type="string"), description=description) if m \
+                else dict(title=title, type="string", description=description)
+        if t == Options.T_FLOAT:
+            return dict(title=title, type="array", items=dict(type="number"), description=description) if m \
+                else dict(title=title, type="number", description=description)
+        if t == Options.T_INT:
+            return dict(title=title, type="array", items=dict(type="integer"), description=description) if m \
+                else dict(title=title, type="integer", description=description)
+        if t == Options.T_STR or t == Options.T_TEXT or t == Options.T_PASSWD:
+            return dict(title=title, type="array", items=dict(type="string"), description=description) if m \
+                    else dict(title=title, type="string", description=description)
+        if t == Options.T_MLIST:
+            return dict(title=title, type="array", items=dict(type="string"), description=description)
+        raise ValueError(f"Unknown type: {t} for option {o['opt']}")
+
+    def _ds(self, d:str) -> str:
+        return f'"{d}"' if d is not None else 'None'
+    
+    def _doc_arg_type(self, o:Dict[str, Any], use_default:True) -> str:
+        t, m, d, r = o["type"], o["multi"], o["default"], o["required"]
+        ret = ""
+        dft = "None"
+        if t == Options.T_BOOL:
+            ret = "List[bool]" if m else f"bool"
+            dft = "[]" if m else f"{d}"
+        elif t == Options.T_DATE:
+            ret = "List[str]" if m else f"str"
+            dft = "[]" if m else self._ds(d)
+        elif t == Options.T_DATETIME:
+            ret = "List[str]" if m else f"str"
+            dft = "[]" if m else self._ds(d)
+        elif t == Options.T_DICT:
+            ret = "Dict" if m else f"Dict"
+            dft = "{}" if m else self._ds(d)
+        elif t == Options.T_DIR or t == Options.T_FILE:
+            if d is not None: d = str(d).replace('\\', '/')
+            ret = "List[str]" if m else f"str"
+            dft = "[]" if m else self._ds(d)
+        elif t == Options.T_FLOAT:
+            ret ="List[float]" if m else f"float"
+            dft ="[]" if m else f"{d}"
+        elif t == Options.T_INT:
+            ret = "List[int]" if m else f"int"
+            dft = "[]" if m else f"{d}"
+        elif t == Options.T_STR or t == Options.T_TEXT or t == Options.T_PASSWD:
+            ret = "List[str]" if m else f"str"
+            dft = "[]" if m else self._ds(d)
+        elif t == Options.T_MLIST:
+            ret = "List[str]"
+            dft = "[]"
+        else:
+            raise ValueError(f"Unknown type: {t} for option {o['opt']}")
+        return f"{ret}={dft}" if use_default else ret
+
+    def _doc_arg(self, o:Dict[str, Any], is_japan) -> str:
+        s = f'        {o["opt"]}:{self._doc_arg_type(o, True)} '
+        s += f'{o["description_ja"] if is_japan else o["description_en"]}'
+        return s
+
+    def _create_func_txt(self, func_name:str, mode:str, cmd:str, is_japan:bool, options:Options, title:str='') -> str:
+        description = options.get_cmd_attr(mode, cmd, 'description_ja' if is_japan else 'description_en')
+        choices = options.get_cmd_choices(mode, cmd, False)
+        func_doc_args = "\n".join([self._doc_arg(o, is_japan) for o in choices])
+        func_txt  = f"def {func_name}(*args, **kwargs):\n"
+        func_txt += f'    """\n'
+        func_txt += f'    {func_name} - MCP Tool Function\n'
+        func_txt += f'    {description}\n'
+        func_txt += f'\n'
+        func_txt += f'    Args:\n'
+        func_txt += f'        {func_doc_args}\n'
+        func_txt += f'\n'
+        func_txt += f'    Returns:\n'
+        func_txt += f'        Dict[str, Any]: 実行結果\n'
+        func_txt += f'    """\n'
+        func_txt += f'    logger = logging.getLogger("web")\n'
+        func_txt += f'    if not options.get_cmd_attr("'+mode+'", "'+cmd+'", "use_agent"):\n'
+        func_txt += f'        logger.warning("{func_name} is not allowed to be executed by the system.")\n'
+        func_txt += f'        return dict(warn="{func_name} is not allowed to be executed by the system.")\n'
+        func_txt +=  '    opt = {o["opt"]: kwargs.get(o["opt"], o["default"]) for o in options.get_cmd_choices("'+mode+'", "'+cmd+'", False)}\n'
+        func_txt += f'    opt["data"] = Path(opt["data"]) if hasattr(opt, "data") else common.HOME_DIR / f".{self.ver.__appid__}"\n'
+        func_txt += f'    if "{title}":\n'
+        func_txt += f'        opt_path = opt["data"] / ".cmds" / f"cmd-{title}.json"\n'
+        func_txt += f'        opt.update(common.loadopt(opt_path))\n'
+        func_txt += f'    scope = signin.get_request_scope()\n'
+        func_txt += f'    if logger.level == logging.DEBUG:\n'
+        func_txt +=  '        logger.debug(f"MCP Call scope={scope}")\n'
+        func_txt += f'    opt["mode"] = "{mode}"\n'
+        func_txt += f'    opt["cmd"] = "{cmd}"\n'
+        func_txt += f'    opt["format"] = False\n'
+        func_txt += f'    opt["output_json"] = None\n'
+        func_txt += f'    opt["output_json_append"] = False\n'
+        func_txt += f'    opt["debug"] = logger.level == logging.DEBUG\n'
+        func_txt += f'    opt["signin_file"] = scope["web"].signin_file\n'
+        func_txt += f'    args = argparse.Namespace(**opt)\n'
+        func_txt += f'    signin_data = signin.Signin.load_signin_file(args.signin_file)\n'
+        func_txt += f'    req = scope["req"] if scope["req"] is not None else scope["websocket"]\n'
+        func_txt += f'    sign = signin.Signin._check_signin(req, scope["res"], signin_data, logger)\n'
+        func_txt += f'    if sign is not None or "signin" not in req.session or "groups" not in req.session["signin"]:\n'
+        func_txt += f'        logger.warning("Unable to execute command because authentication information cannot be obtained")\n'
+        func_txt += f'        return dict(warn="Unable to execute command because authentication information cannot be obtained")\n'
+        func_txt += f'    groups = req.session["signin"]["groups"]\n'
+        func_txt += f'    if not signin.Signin._check_cmd(signin_data, groups, "{mode}", "{cmd}", logger):\n'
+        func_txt += f'        logger.warning("You do not have permission to execute this command.")\n'
+        func_txt += f'        return dict(warn="You do not have permission to execute this command.")\n'
+        func_txt += f'    feat = options.get_cmd_attr("{mode}", "{cmd}", "feature")\n'
+        func_txt += f'    args.groups = groups\n'
+        func_txt += f'    try:\n'
+        func_txt += f'        if logger.level == logging.DEBUG:\n'
+        func_txt +=  '            logger.debug(f"MCP Call {feat}#apprun, args={args}")\n'
+        func_txt += f'        st, ret, _ = feat.apprun(logger, args, time.perf_counter(), [])\n'
+        func_txt += f'        return ret\n'
+        func_txt += f'    except Exception as e:\n'
+        func_txt += f'        logger.error("Error occurs when tool is executed:", exc_info=True)\n'
+        func_txt += f'        raise e\n'
+        func_txt += f'func_ctx.append({func_name})\n'
+        return func_txt

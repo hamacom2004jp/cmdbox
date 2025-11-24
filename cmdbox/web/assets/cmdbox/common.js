@@ -1243,6 +1243,22 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
                     +'<label class="input-group-text">=</label>'
                     +'<input type="text" class="form-control row_content_val row_content_template_input">'
                     +'</div></div>');
+        } else if (row.type=='passwd') {
+            elem = $(`<div class="col-${scolsize} mb-3">` // row_content_template_str
+                    +'<div class="input-group">'
+                    +'<label class="input-group-text row_content_template_title">title</label>'
+                    +'<input type="password" class="form-control row_content_template_input">'
+                    +'<button class="btn btn-outline-secondary" type="button">'
+                    +'<svg class="bi bi-eyeslash" width="16" height="16" fill="currentColor"><use href="#svg_eyeslash_btn"></use></svg>'
+                    +'<svg class="bi bi-eye d-none" width="16" height="16" fill="currentColor"><use href="#svg_eye_btn"></use></svg>'
+                    +'</button>'
+                    +'</div></div>');
+            elem.find('button').on('click', function() {
+                const elem = $(this);
+                elem.find('svg').toggleClass('d-none');
+                const i = elem.prev('input');
+                i.attr('type', i.attr('type')==='password'?'text':'password');
+            });
         } else {
             elem = $(`<div class="col-${scolsize} mb-3">` // row_content_template_str
                     +'<div class="input-group">'
@@ -1501,7 +1517,7 @@ cmdbox.callcmd = async (mode, cmd, params, callback, title, opt_name) => {
     }
     if (callback) callback(res[0]['success']);
     if (!title || !opt_name) return;
-    cmdbox.load_cmd(title).then(cmd_opt => {
+    return cmdbox.load_cmd(title).then(cmd_opt => {
         if (!cmd_opt || cmd_opt['error']) {
             cmdbox.message(cmd_opt);
             console.log({'error':cmd_opt});

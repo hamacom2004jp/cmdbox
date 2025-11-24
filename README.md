@@ -25,7 +25,7 @@ pip install cmdbox[saml]
 apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl build-essential libopencv-dev
 ```
 
-- When using `--agent use` in web mode, install the modules with dependencies.
+- When using agent mode, install the modules with dependencies.
 ```bash
 pip install cmdbox[agent]
 pip install backoff orjson apscheduler litellm-enterprise fastapi-sso
@@ -177,7 +177,7 @@ class ServerTime(feature.Feature):
                 dict(opt="port", type=Options.T_INT, default=self.default_port, required=True, multi=False, hide=True, choice=None,
                         description_ja="Redisサーバーのサービスポートを指定します。",
                         description_en="Specify the service port of the Redis server."),
-                dict(opt="password", type=Options.T_STR, default=self.default_pass, required=True, multi=False, hide=True, choice=None,
+                dict(opt="password", type=Options.T_PASSWD, default=self.default_pass, required=True, multi=False, hide=True, choice=None,
                         description_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
                         description_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
                 dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None,

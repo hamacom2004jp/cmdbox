@@ -60,7 +60,7 @@ class ClientHttp(feature.ResultEdgeFeature):
                      choice_edit=True,
                      description_ja="送信するデータのContent-Typeを指定します。",
                      description_en="Specifies the Content-Type of the data to be sent."),
-                dict(opt="send_apikey", type=Options.T_TEXT, default=None, required=False, multi=False, hide=False, choice=None,
+                dict(opt="send_apikey", type=Options.T_PASSWD, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="リクエスト先の認証で使用するAPIキーを指定します。",
                      description_en="Specify the API key to be used for authentication of the request destination."),
                 dict(opt="send_header", type=Options.T_DICT, default=None, required=False, multi=True, hide=False, choice=None,

@@ -25,6 +25,25 @@ import traceback
 import uvicorn
 import webbrowser
 
+# Windowsでは、asyncioのproactor transportがリモートピアが強制的にソケットを閉じた場合に
+# ConnectionResetErrorを発生させることがあります。このトレースバックは無害ですが騒がしいです。
+# 内部の_call_connection_lostをラップしてConnectionResetErrorを無視することで、
+# サーバーがクライアントの切断時に例外トレースを出力しないようにします。
+if platform.system() == "Windows":
+    try:
+        from asyncio import proactor_events
+        _orig__call_connection_lost = proactor_events._ProactorBasePipeTransport._call_connection_lost
+        def _call_connection_lost_safe(self, *args, **kwargs):
+            try:
+                return _orig__call_connection_lost(self, *args, **kwargs)
+            except ConnectionResetError:
+                # シャットダウン中に発生した良性な接続リセットを無視する
+                return None
+        proactor_events._ProactorBasePipeTransport._call_connection_lost = _call_connection_lost_safe
+    except Exception:
+        # monkeypatchingに問題が発生した場合は、デフォルトの動作に戻す
+        pass
+
 
 class Web:
     @classmethod
@@ -45,7 +64,7 @@ class Web:
     def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None,
                  redis_host:str="localhost", redis_port:int=6379, redis_password:str=None, svname:str='server',
                  client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None, result_html:str=None, users_html:str=None,
-                 audit_html:str=None, agent_html:str=None, assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
+                 audit_html:str=None, assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
                  web_features_packages:List[str]=None, web_features_prefix:List[str]=[]):
         """
         cmdboxクライアント側のwebapiサービス
@@ -66,7 +85,6 @@ class Web:
             result_html (str, optional): 結果のHTMLファイル. Defaults to None.
             users_html (str, optional): ユーザーのHTMLファイル. Defaults to None.
             audit_html (str, optional): 監査のHTMLファイル. Defaults to None.
-            agent_html (str, optional): エージェントのHTMLファイル. Defaults to None.
             assets (List[str], optional): 静的ファイルのリスト. Defaults to None.
             signin_html (str, optional): ログイン画面のHTMLファイル. Defaults to None.
             signin_file (str, optional): ログイン情報のファイル. Defaults to args.signin_file.
@@ -93,7 +111,6 @@ class Web:
         self.result_html = Path(result_html) if result_html is not None else Path(__file__).parent.parent / 'web' / 'result.html'
         self.users_html = Path(users_html) if users_html is not None else Path(__file__).parent.parent / 'web' / 'users.html'
         self.audit_html = Path(audit_html) if audit_html is not None else Path(__file__).parent.parent / 'web' / 'audit.html'
-        self.agent_html = Path(agent_html) if agent_html is not None else Path(__file__).parent.parent / 'web' / 'agent.html'
         self.assets = []
         if assets is not None:
             if not isinstance(assets, list):
@@ -113,7 +130,6 @@ class Web:
         self.result_html_data = None
         self.users_html_data = None
         self.audit_html_data = None
-        self.agent_html_data = None
         self.assets_data = None
         self.signin_html_data = None
         self.gui_mode = gui_mode
@@ -152,7 +168,6 @@ class Web:
             self.logger.debug(f"web init parameter: result_html={self.result_html} -> {self.result_html.absolute() if self.result_html is not None else None}")
             self.logger.debug(f"web init parameter: users_html={self.users_html} -> {self.users_html.absolute() if self.users_html is not None else None}")
             self.logger.debug(f"web init parameter: audit_html={self.audit_html} -> {self.audit_html.absolute() if self.audit_html is not None else None}")
-            self.logger.debug(f"web init parameter: agent_html={self.agent_html} -> {self.agent_html.absolute() if self.agent_html is not None else None}")
             self.logger.debug(f"web init parameter: assets={self.assets} -> {[a.absolute() for a in self.assets] if self.assets is not None else None}")
             self.logger.debug(f"web init parameter: signin_html={self.signin_html} -> {self.signin_html.absolute() if self.signin_html is not None else None}")
             self.logger.debug(f"web init parameter: signin_file={self.signin_file} -> {self.signin_file.absolute() if self.signin_file is not None else None}")
@@ -719,8 +734,7 @@ class Web:
     def start(self, allow_host:str="0.0.0.0", listen_port:int=8081, ssl_listen_port:int=8443,
               ssl_cert:Path=None, ssl_key:Path=None, ssl_keypass:str=None, ssl_ca_certs:Path=None,
               session_domain:str=None, session_path:str='/', session_secure:bool=False, session_timeout:int=900, outputs_key:List[str]=[],
-              gunicorn_workers:int=-1, gunicorn_timeout:int=30,
-              agent_runner=None, mcp=None,):
+              gunicorn_workers:int=-1, gunicorn_timeout:int=30):
         """
         Webサーバを起動する
 
@@ -739,8 +753,6 @@ class Web:
             outputs_key (list, optional): 出力キー. Defaults to [].
             gunicorn_workers (int, optional): Gunicornワーカー数. Defaults to -1.
             gunicorn_timeout (int, optional): Gunicornタイムアウト. Defaults to 30.
-            agent_runner (Runner, optional): エージェントランナー. Defaults to None.
-            mcp (MCP, optional): MCP. Defaults to None.
         """
         self.allow_host = allow_host
         self.listen_port = listen_port
@@ -756,8 +768,6 @@ class Web:
         self.session_timeout = session_timeout
         self.gunicorn_workers = gunicorn_workers
         self.gunicorn_timeout = gunicorn_timeout
-        self.agent_runner = agent_runner
-        self.mcp = mcp
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web start parameter: allow_host={self.allow_host}")
             self.logger.debug(f"web start parameter: listen_port={self.listen_port}")
@@ -773,102 +783,8 @@ class Web:
             self.logger.debug(f"web start parameter: session_timeout={self.session_timeout}")
             self.logger.debug(f"web start parameter: gunicorn_workers={self.gunicorn_workers}")
             self.logger.debug(f"web start parameter: gunicorn_timeout={self.gunicorn_timeout}")
-            self.logger.debug(f"web start parameter: agent_runner={self.agent_runner}")
-            self.logger.debug(f"web start parameter: mcp={self.mcp}")
 
-        if self.agent_runner is not None:
-            # google.adkが大きいので必要な時にだけ読込む
-            from google.adk.sessions import BaseSessionService, Session
-            async def create_agent_session(session_service:BaseSessionService, user_id:str, session_id:str=None) -> Session:
-                """
-                セッションを作成します
-
-                Args:
-                    session_service (BaseSessionService): セッションサービス
-                    user_id (str): ユーザーID
-                    session_id (str): セッションID
-
-                Returns:
-                    Any: セッション
-                """
-                if session_id is None:
-                    session_id = common.random_string(32)
-                try:
-                    session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
-                    if session is None:
-                        session = await session_service.create_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
-                    return session
-                except NotImplementedError:
-                    # セッションが１件もない場合はNotImplementedErrorが発生することがある
-                    session = await session_service.create_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
-                    return session
-            self.create_agent_session = create_agent_session
-            async def list_agent_sessions(session_service:BaseSessionService, user_id:str, session_id:str=None) -> List[Session]:
-                """
-                セッションをリストします
-
-                Args:
-                    session_service (BaseSessionService): セッションサービス
-                    user_id (str): ユーザーID
-
-                Returns:
-                    List[Session]: セッションリスト
-                """
-                try:
-                    if session_id is None:
-                        sessions = await session_service.list_sessions(app_name=self.ver.__appid__, user_id=user_id)
-                        ret = []
-                        for s in sessions.sessions:
-                            try:
-                                session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=s.id)
-                                if session is None:
-                                    continue
-                                ret.append(session)
-                            except:
-                                # セッションが取得できない場合は削除する
-                                try:
-                                    await session_service.delete_session(app_name=self.ver.__appid__, user_id=user_id, session_id=s.id)
-                                except:
-                                    pass
-                                finally:
-                                    continue
-                        return ret
-                    else:
-                        session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
-                        if session is None:
-                            return []
-                        return [session]
-                except NotImplementedError:
-                    # セッションが１件もない場合はNotImplementedErrorが発生することがある
-                    return []
-                except Exception as e:
-                    # それ以外のエラーが発生した時はログに出力して空リストを返す
-                    self.logger.warning(f"list_agent_sessions warning: {e}", exc_info=True)
-                    return []
-            self.list_agent_sessions = list_agent_sessions
-            async def delete_agent_session(session_service:BaseSessionService, user_id:str, session_id:str) -> bool:
-                """
-                セッションを削除します
-
-                Args:
-                    session_service (BaseSessionService): セッションサービス
-                    user_id (str): ユーザーID
-                    session_id (str): セッションID
-
-                Returns:
-                    bool: 成功した場合はTrue, 失敗した場合はFalse
-                """
-                return await session_service.delete_session(app_name=self.ver.__appid__, user_id=user_id, session_id=session_id)
-            self.delete_agent_session = delete_agent_session
-
-        mcp_app:Starlette = None
-        if self.mcp is not None:
-            mcp_app:Starlette = self.mcp.http_app()
-            #mcp_app:Starlette = self.mcp.http_app()
-        if mcp_app is not None:
-            app = FastAPI(lifespan=mcp_app.lifespan)
-        else:
-            app = FastAPI()
+        app = FastAPI()
 
         @app.middleware("http")
         async def set_context_cookie(req:Request, call_next):
@@ -888,9 +804,6 @@ class Web:
         if self.session_secure:
             mwparam['https_only'] = True # セッションハイジャック対策
         app.add_middleware(SessionMiddleware, **mwparam)
-        if mcp_app is not None:
-            app.mount("/mcpsv", mcp_app, name="mcp")
-            self.logger.info(f"mcp server mount: mount_path=/mcpsv app={mcp_app} routes={mcp_app.routes}")
         self.init_webfeatures(app)
 
         self.is_running = True

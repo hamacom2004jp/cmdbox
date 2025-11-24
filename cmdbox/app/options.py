@@ -24,6 +24,7 @@ class Options:
     T_TEXT = 'text'
     T_FILE = 'file'
     T_DIR = 'dir'
+    T_PASSWD = 'passwd'
     T_MLIST = 'mlist'
 
     def __setattr__(self, name:str, value):

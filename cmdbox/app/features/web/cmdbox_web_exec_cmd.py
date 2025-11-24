@@ -1,4 +1,4 @@
-from cmdbox.app import app, client, common, options, server, web as _web
+from cmdbox.app import app, client, common, options, server
 from cmdbox.app.auth import signin
 from cmdbox.app.commons import convert
 from cmdbox.app.features.cli import cmdbox_audit_search, cmdbox_audit_write
@@ -8,12 +8,12 @@ from fastapi import FastAPI, Depends, Request, Response, HTTPException
 from fastapi.responses import PlainTextResponse
 from starlette.datastructures import UploadFile
 from typing import Dict, Any, List
+import asyncio
 import html
 import io
 import json
 import traceback
 import sys
-import uuid
 
 
 class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
@@ -247,7 +247,8 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 self.callback_return_cmd_exec_func(web, title, output)
         if nothread:
             return await _exec_cmd(ap, title, opt, True)
-        _exec_cmd(ap, title, opt, True)
+        asyncio.create_task(_exec_cmd(ap, title, opt, True))
+        await asyncio.sleep(0)
         #th = _web.RaiseThread(target=_exec_cmd, args=(ap, title, opt, False))
         #th.start()
         return [dict(warn='start_cmd')]

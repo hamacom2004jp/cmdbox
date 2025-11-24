@@ -1,12 +1,16 @@
-from cmdbox.app import common, feature, server
+from cmdbox.app import common, feature
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import os
+import platform
+import signal
+import traceback
 
 
-class ServerList(feature.OneshotResultEdgeFeature):
+class McpsvStop(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -14,7 +18,7 @@ class ServerList(feature.OneshotResultEdgeFeature):
         Returns:
             Union[str, List[str]]: モード
         """
-        return 'server'
+        return 'mcpsv'
 
     def get_cmd(self):
         """
@@ -23,7 +27,7 @@ class ServerList(feature.OneshotResultEdgeFeature):
         Returns:
             str: コマンド
         """
-        return 'list'
+        return 'stop'
 
     def get_option(self):
         """
@@ -33,22 +37,13 @@ class ServerList(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=True,
-            description_ja="起動中のサーバーの一覧を表示します。クライアント環境からの利用も可能です。",
-            description_en="Displays a list of running inference servers. Can also be used from the client environment.",
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=True, use_agent=False,
+            description_ja="MCP サーバーを停止します。",
+            description_en="Stop MCP server.",
             choice=[
-                dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
-                     description_ja="Redisサーバーのサービスホストを指定します。",
-                     description_en="Specify the service host of the Redis server."),
-                dict(opt="port", type=Options.T_INT, default=self.default_port, required=True, multi=False, hide=True, choice=None, web="mask",
-                     description_ja="Redisサーバーのサービスポートを指定します。",
-                     description_en="Specify the service port of the Redis server."),
-                dict(opt="password", type=Options.T_PASSWD, default=self.default_pass, required=True, multi=False, hide=True, choice=None, web="mask",
-                     description_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
-                     description_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
-                dict(opt="timeout", type=Options.T_INT, default="15", required=False, multi=False, hide=True, choice=None,
-                     description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
-                     description_en="Specify the maximum waiting time until the server responds."),
+                dict(opt="data", type=Options.T_DIR, default=self.default_data, required=False, multi=False, hide=False, choice=None,
+                     description_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
+                     description_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                      description_ja="処理結果jsonの保存先ファイルを指定。",
                      description_en="Specify the destination file for saving the processing result json."),
@@ -71,18 +66,32 @@ class ServerList(feature.OneshotResultEdgeFeature):
         """
         この機能の実行を行います
 
-        Args:
-            logger (logging.Logger): ロガー
-            args (argparse.Namespace): 引数
-            tm (float): 実行開始時間
-            pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報
-
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        sv = server.Server(Path(args.data), logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname='server') # list取得なのでデフォルトのsvnameを指定
-        ret = sv.list_server()
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-        if 'success' not in ret:
-                return self.RESP_WARN, ret, sv
-        return self.RESP_SUCCESS, ret, sv
+        try:
+            def _r(f):
+                pid = f.read()
+                if pid != "":
+                    try:
+                        if platform.system() == "Windows":
+                            os.system(f"taskkill /F /PID {pid}")
+                        else:
+                            os.kill(int(pid), signal.SIGKILL)
+                        logger.info(f"Stop mcpsv.")
+                    except Exception:
+                        logger.warning(f"Failed to stop process pid={pid}")
+                else:
+                    logger.warning(f"pid is empty.")
+
+            common.load_file("mcpsv.pid", _r)
+            Path("mcpsv.pid").unlink(missing_ok=True)
+            msg = dict(success="mcpsv complate.")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_SUCCESS, msg, None
+        except Exception:
+            traceback.print_exc()
+            logger.error("Exit mcpsv.")
+            msg = dict(warn="mcpsv stop error.")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None

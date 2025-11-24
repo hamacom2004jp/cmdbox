@@ -41,10 +41,10 @@ class AgentMcpClient(feature.UnsupportEdgeFeature):
                 dict(opt="mcpserver_name", type=Options.T_STR, default='mcpserver', required=True, multi=False, hide=False, choice=None,
                      description_ja="リモートMCPサーバーの名前を指定します。省略した場合は`mcpserver`となります。",
                      description_en="Specify the name of the MCP server. If omitted, it will be `mcpserver`.",),
-                dict(opt="mcpserver_url", type=Options.T_STR, default='http://localhost:8081/mcpsv/mcp', required=True, multi=False, hide=False, choice=None,
-                     description_ja="リモートMCPサーバーのURLを指定します。省略した場合は`http://localhost:8081/mcpsv/mcp`となります。",
-                     description_en="Specifies the URL of the remote MCP server. If omitted, it will be `http://localhost:8081/mcpsv/mcp`.",),
-                dict(opt="mcpserver_apikey", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                dict(opt="mcpserver_url", type=Options.T_STR, default='http://localhost:8082/mcp', required=True, multi=False, hide=False, choice=None,
+                     description_ja="リモートMCPサーバーのURLを指定します。省略した場合は`http://localhost:8082/mcp`となります。",
+                     description_en="Specifies the URL of the remote MCP server. If omitted, it will be `http://localhost:8082/mcp`.",),
+                dict(opt="mcpserver_apikey", type=Options.T_PASSWD, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="リモートMCPサーバーのAPI Keyを指定します。",
                      description_en="Specify the API Key of the remote MCP server.",),
                 dict(opt="mcpserver_transport", type=Options.T_STR, default='streamable-http', required=True, multi=False, hide=False, choice=['', 'streamable-http', 'sse', 'http'],
@@ -109,7 +109,7 @@ class AgentMcpClient(feature.UnsupportEdgeFeature):
         if not hasattr(args, 'mcpserver_name'):
             args.mcpserver_name = 'mcpserver'
         if not hasattr(args, 'mcpserver_url'):
-            args.mcpserver_url = 'http://localhost:8081/mcpsv/mcp'
+            args.mcpserver_url = 'http://localhost:8082/mcp'
         if not hasattr(args, 'mcpserver_transport'):
             args.mcpserver_transport = 'streamable-http'
         if not hasattr(args, 'mcpserver_apikey'):
@@ -131,8 +131,8 @@ class AgentMcpClient(feature.UnsupportEdgeFeature):
             webexec_and_selfreq = (scope is not None and scope['web'] is not None)
             if webexec_and_selfreq:
                 web = scope['web']
-                url1 = f"http://localhost:{web.listen_port}/mcpsv/mcp"
-                url2 = f"https://localhost:{web.ssl_listen_port}/mcpsv/mcp"
+                url1 = f"http://localhost:{web.listen_port}/mcp"
+                url2 = f"https://localhost:{web.ssl_listen_port}/mcp"
                 if url1 != args.mcpserver_url and url2 != args.mcpserver_url:
                     webexec_and_selfreq = False
             client = Client(config if not webexec_and_selfreq or scope['web'].mcp is None else scope['web'].mcp)
