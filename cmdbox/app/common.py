@@ -513,7 +513,7 @@ def safe_fname(fname:str) -> str:
         str: 置換後のファイル名
     """
     fname = re.sub('[_]', '-_-',str(fname))
-    return re.sub('[\\s:;\\\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]', '_',str(fname))
+    return re.sub(r'[\s:;\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]', '_',str(fname))
 
 def check_fname(fname:str) -> bool:
     """
@@ -525,7 +525,7 @@ def check_fname(fname:str) -> bool:
     Returns:
         bool: Trueの場合は使えない文字が含まれている
     """
-    return re.search('[\\s:;\\\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]',str(fname)) is not None
+    return re.search(r'[\s:;\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]',str(fname)) is not None
 
 def mkdirs(dir_path:Path):
     """

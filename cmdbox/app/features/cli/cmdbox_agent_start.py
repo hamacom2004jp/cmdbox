@@ -184,10 +184,18 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
 
         if logger.level == logging.DEBUG:
             logger.debug(f"google-adk loading..")
-        from google.adk.agents import Agent
+        from google.adk.agents import Agent as AdkAgent
+
+        # App name mismatch警告を回避するためのラッパークラス
+        class Agent(AdkAgent):
+            pass
+
         if logger.level == logging.DEBUG:
             logger.debug(f"litellm loading..")
-        from google.adk.models.lite_llm import LiteLlm
+        from google.adk.models import lite_llm
+        from litellm import _logging
+        _logging._turn_on_debug()
+
         # loggerの初期化
         common.reset_logger("LiteLLM Proxy")
         common.reset_logger("LiteLLM Router")
@@ -212,7 +220,7 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
             from google.adk.planners import PlanReActPlanner
             agent = Agent(
                 name=runner_name,
-                model=LiteLlm(
+                model=lite_llm.LiteLlm(
                     model=llmmodel,
                     api_key=llmapikey,
                     endpoint=llmendpoint,
@@ -225,14 +233,17 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
         elif llmprov == 'azureopenai':
             if llmmodel is None: raise ValueError("llmmodel is required.")
             if llmendpoint is None: raise ValueError("llmendpoint is required.")
+            if "/openai/deployments" in llmendpoint:
+                llmendpoint = llmendpoint.split("/openai/deployments")[0]
             if llmapikey is None: raise ValueError("llmapikey is required.")
             if llmapiversion is None: raise ValueError("llmapiversion is required.")
             from google.adk.planners import PlanReActPlanner
+            if not llmmodel.startswith("azure/"):
+                llmmodel = f"azure/{llmmodel}"
             agent = Agent(
                 name=runner_name,
-                model=LiteLlm(
+                model=lite_llm.LiteLlm(
                     model=llmmodel,
-                    api_type='azure',
                     api_key=llmapikey,
                     api_base=llmendpoint,
                     api_version=llmapiversion,
@@ -250,7 +261,7 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
             from google.genai import types
             agent = Agent(
                 name=runner_name,
-                model=LiteLlm(
+                model=lite_llm.LiteLlm(
                     model=llmmodel,
                     #vertex_project=llmprojectid,
                     vertex_credentials=llmsvaccountfile_data,
@@ -272,7 +283,7 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
             from google.adk.planners import PlanReActPlanner
             agent = Agent(
                 name=runner_name,
-                model=LiteLlm(
+                model=lite_llm.LiteLlm(
                     model=f"ollama/{llmmodel}",
                     api_base=llmendpoint,
                     temperature=llmtemperature,
@@ -310,7 +321,7 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
         for mcpsv_conf in mcpsv_confs:
             mcpserver_url = mcpsv_conf.get('mcpserver_url', None)
             mcpserver_apikey = mcpsv_conf.get('mcpserver_apikey', None)
-            mcpserver_transport = mcpsv_conf.get('mcpserver_transport', 'streamable-http')
+            mcpserver_transport = mcpsv_conf.get('mcpserver_transport', 'streamable-http')  # sse
             auth_cred = AuthCredential(auth_type=AuthCredentialTypes.HTTP,
                                        http=dict(scheme="bearer", credentials=dict(token=mcpserver_apikey)))
             if mcpserver_transport == 'sse':
@@ -349,16 +360,17 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
         Returns:
             BaseSessionService: セッションサービス
         """
-        if runner_conf.get('agent_session_store') == 'sqlite':
-            runner_conf['agent_session_dburl'] = f"sqlite:{data_dir / 'session.db'}"
-        elif runner_conf.get('agent_session_store') == 'postgresql':
+        if runner_conf.get('session_store_type') == 'sqlite':
+            uri = (data_dir / '.agent' / 'session.db').as_uri()
+            runner_conf['agent_session_dburl'] = f"sqlite:{uri.replace('file:///', '///')}"
+        elif runner_conf.get('session_store_type') == 'postgresql':
             runner_conf['agent_session_dburl'] = f"postgresql+psycopg://{runner_conf['session_store_pguser']}:{runner_conf['session_store_pgpass']}@{runner_conf['session_store_pghost']}:{runner_conf['session_store_pgport']}/{runner_conf['session_store_pgdbname']}"
         else:
             runner_conf['agent_session_dburl'] = None
         from google.adk.sessions import DatabaseSessionService, InMemorySessionService
         #from typing_extensions import override
         if runner_conf['agent_session_dburl'] is not None:
-            dss = DatabaseSessionService(db_url=runner_conf['agent_session_dburl'], logger=logger)
+            dss = DatabaseSessionService(db_url=runner_conf['agent_session_dburl'])
             return dss
         else:
             return InMemorySessionService()

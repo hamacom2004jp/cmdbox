@@ -50,10 +50,10 @@ class CmdAgentChat(feature.ResultEdgeFeature):
                 dict(opt="runner_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                     description_ja="Runner設定の名前を指定します。",
                     description_en="Specify the name of the Runner configuration."),
-                dict(opt="userid", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
-                    description_ja="Runnerに送信するユーザーIDを指定します。",
-                    description_en="Specify the user ID to send to the Runner."),
-                dict(opt="sessionid", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                dict(opt="user_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                     description_ja="ユーザー名を指定します。",
+                     description_en="Specify a user name."),
+                dict(opt="session_id", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                     description_ja="Runnerに送信するセッションIDを指定します。",
                     description_en="Specify the session ID to send to the Runner."),
                 dict(opt="message", type=Options.T_TEXT, default=None, required=True, multi=False, hide=False, choice=None,
@@ -78,8 +78,8 @@ class CmdAgentChat(feature.ResultEdgeFeature):
         )
 
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        if not getattr(args, 'userid', None):
-            msg = dict(warn="Please specify --userid")
+        if not getattr(args, 'user_name', None):
+            msg = dict(warn="Please specify --user_name")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
         if not getattr(args, 'runner_name', None):
@@ -91,7 +91,7 @@ class CmdAgentChat(feature.ResultEdgeFeature):
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
 
-        payload = dict(runner_name=args.runner_name, user_id=args.userid, session_id=args.sessionid,
+        payload = dict(runner_name=args.runner_name, user_name=args.user_name, session_id=args.session_id,
                        message=args.message)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
@@ -126,7 +126,7 @@ class CmdAgentChat(feature.ResultEdgeFeature):
 
             payload = json.loads(convert.b64str2str(msg[2]))
             name = payload.get('runner_name')
-            user_id = payload.get('user_id')
+            user_name = payload.get('user_name')
             session_id = payload.get('session_id')
             message = payload.get('message')
             if name not in sessions['agents']:
@@ -134,19 +134,20 @@ class CmdAgentChat(feature.ResultEdgeFeature):
                 redis_cli.rpush(reskey, msg)
                 return self.RESP_WARN
 
+            from google.adk.events import Event
             from google.adk.runners import Runner
             from google.adk.sessions import BaseSessionService, Session
             from google.genai import types
 
-            async def create_agent_session(session_service:BaseSessionService, app_name:str, 
-                                           user_id:str, session_id:str=None) -> Session:
+            async def create_agent_session(session_service:BaseSessionService, runner_name:str, 
+                                           user_name:str, session_id:str=None) -> Session:
                 """
                 セッションを作成します
 
                 Args:
                     session_service (BaseSessionService): セッションサービス
                     app_name (str): アプリケーション名
-                    user_id (str): ユーザーID
+                    user_name (str): ユーザー名
                     session_id (str): セッションID
 
                 Returns:
@@ -155,13 +156,13 @@ class CmdAgentChat(feature.ResultEdgeFeature):
                 if session_id is None:
                     session_id = common.random_string(32)
                 try:
-                    session = await session_service.get_session(app_name=app_name, user_id=user_id, session_id=session_id)
+                    session = await session_service.get_session(app_name=runner_name, user_id=user_name, session_id=session_id)
                     if session is None:
-                        session = await session_service.create_session(app_name=app_name, user_id=user_id, session_id=session_id)
+                        session = await session_service.create_session(app_name=runner_name, user_id=user_name, session_id=session_id)
                     return session
                 except NotImplementedError:
                     # セッションが１件もない場合はNotImplementedErrorが発生することがある
-                    session = await session_service.create_session(app_name=app_name, user_id=user_id, session_id=session_id)
+                    session = await session_service.create_session(app_name=runner_name, user_id=user_name, session_id=session_id)
                     return session
 
             def _replace_match(match_obj):
@@ -176,9 +177,10 @@ class CmdAgentChat(feature.ResultEdgeFeature):
             runner:Runner = sessions['agents'][name]['runner']
             content = types.Content(role='user', parts=[types.Part(text=message)])
             # セッションを作成する
-            agent_session = await create_agent_session(runner.session_service, runner.app_name, user_id, session_id=session_id)
+            agent_session = await create_agent_session(runner.session_service, name, user_name, session_id=session_id)
+            await runner.session_service.append_event(agent_session, Event(content=content, author=user_name))
             # チャットを実行する
-            for event in runner.run(user_id=user_id, session_id=agent_session.id, new_message=content):
+            for event in runner.run(user_id=user_name, session_id=agent_session.id, new_message=content):
                 outputs = dict(success=dict(agent_session_id=agent_session.id))
                 if event.turn_complete:
                     outputs['success']['turn_complete'] = True
@@ -199,7 +201,7 @@ class CmdAgentChat(feature.ResultEdgeFeature):
                     msg = json_pattern.sub(_replace_match, msg)
                     outputs['success']['message'] = msg
                     options.Options.getInstance().audit_exec(body=dict(agent_session=agent_session.id, result=msg),
-                                                             audit_type=options.Options.AT_USER, user=user_id)
+                                                             audit_type=options.Options.AT_USER, user=user_name)
                     redis_cli.rpush(reskey, outputs)
                     if event.is_final_response():
                         break

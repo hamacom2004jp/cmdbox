@@ -2,7 +2,6 @@ from cmdbox.app import common, options
 from cmdbox.app.commons import module
 from fastapi import FastAPI, Request, Response
 from pathlib import Path
-from starlette.applications import Starlette
 from starlette.middleware.sessions import SessionMiddleware
 from typing import Any, Dict, List
 from uvicorn.config import Config

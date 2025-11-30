@@ -48,10 +48,10 @@ class CmdAgentSessionDel(feature.ResultEdgeFeature):
                 dict(opt="runner_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                     description_ja="Runner設定の名前を指定します。",
                     description_en="Specify the name of the Runner configuration."),
-                dict(opt="userid", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
-                    description_ja="Runnerに送信するユーザーIDを指定します。",
-                    description_en="Specify the user ID to send to the Runner."),
-                dict(opt="sessionid", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                dict(opt="user_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                     description_ja="ユーザー名を指定します。",
+                     description_en="Specify a user name."),
+                dict(opt="session_id", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                     description_ja="Runnerに送信するセッションIDを指定します。",
                     description_en="Specify the session ID to send to the Runner."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
@@ -77,16 +77,16 @@ class CmdAgentSessionDel(feature.ResultEdgeFeature):
             msg = dict(warn="Please specify --runner_name")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
-        if not getattr(args, 'userid', None):
-            msg = dict(warn="Please specify --userid to delete sessions")
+        if not getattr(args, 'user_name', None):
+            msg = dict(warn="Please specify --user_name to delete sessions")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
-        if not getattr(args, 'sessionid', None):
-            msg = dict(warn="Please specify --sessionid to delete sessions")
+        if not getattr(args, 'session_id', None):
+            msg = dict(warn="Please specify --session_id to delete sessions")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
 
-        payload = dict(runner_name=args.runner_name, sessionid=args.sessionid, user_id=args.userid)
+        payload = dict(runner_name=args.runner_name, session_id=args.session_id, user_name=args.user_name)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -111,8 +111,8 @@ class CmdAgentSessionDel(feature.ResultEdgeFeature):
 
             payload = json.loads(convert.b64str2str(msg[2]))
             name = payload.get('runner_name')
-            sessionid = payload.get('sessionid')
-            user_id = payload.get('user_id')
+            session_id = payload.get('session_id')
+            user_name = payload.get('user_name')
             if name not in sessions['agents']:
                 out = dict(warn=f"Runner '{name}' is not running.", end=True)
                 redis_cli.rpush(reskey, out)
@@ -125,7 +125,7 @@ class CmdAgentSessionDel(feature.ResultEdgeFeature):
                 redis_cli.rpush(reskey, out)
                 return self.RESP_WARN
 
-            await session_service.delete_session(app_name=self.ver.__appid__, user_id=user_id, session_id=sessionid)
+            await session_service.delete_session(app_name=name, user_id=user_name, session_id=session_id)
 
             msg = dict(success=f"Session delete executed for '{name}'.", end=True)
             redis_cli.rpush(reskey, msg)

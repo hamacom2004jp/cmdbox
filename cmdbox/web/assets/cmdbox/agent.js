@@ -182,6 +182,7 @@ agent.init_form = async () => {
     const max_reconnect_count = 60000/ping_interval*1; // 最大再接続回数
     agent.chat_reconnect_count = 0;
     agent.chat = (session_id) => {
+        cmdbox.show_loading();
         // ws再接続のためのインターバル初期化
         if (agent.chat_reconnectInterval_handler) {
             clearInterval(agent.chat_reconnectInterval_handler);
@@ -326,16 +327,28 @@ agent.init_form = async () => {
         const port = window.location.port;
         const path = window.location.pathname;
         const runner_name = $('#runner_name_input').val();
+        cmdbox.hide_loading();
         if (!runner_name || runner_name.length <= 0) return;
+        if (agent.ws && agent.ws.readyState === WebSocket.OPEN) return;
+        cmdbox.show_loading();
         if (agent.ws) agent.ws.close();
         agent.ws = new WebSocket(`${protocol}://${host}:${port}${path}/chat/ws/${runner_name}/${session_id}`);
         // エージェントからのメッセージ受信時の処理
         agent.ws.onmessage = (event) => {
             const packet = JSON.parse(event.data);
-            console.log(packet);
-            if (packet.turn_complete && packet.turn_complete && !packet.message) {
+            if (packet && packet['warn']) {
+                message_id = cmdbox.random_string(16);
+                const txt = agent.create_agent_message(messages, message_id);
+                agent.format_agent_message(container, messages, txt, `${packet['warn']}`);
                 return;
             }
+            if (packet.turn_complete && packet.turn_complete) {
+                return;
+            }
+            if (!packet.message || packet.message.length <= 0) {
+                return;
+            }
+            console.log(packet);
             let txt;
             if (!message_id) {
                 // エージェント側の表示枠が無かったら追加
@@ -358,8 +371,8 @@ agent.init_form = async () => {
             btn_rec.prop('disabled', false);
             agent.chat_callback_ping_handler = setInterval(() => {ping();}, ping_interval);
         };
-        agent.ws.onerror = (e) => {
-            console.error(`Websocket error: ${e}`);
+        agent.ws.onerror = (event) => {
+            console.error(event);
             clearInterval(agent.chat_callback_ping_handler);
         };
         agent.ws.onclose = () => {
@@ -375,6 +388,7 @@ agent.init_form = async () => {
                 agent.chat(session_id);
             }, ping_interval);
         };
+        cmdbox.hide_loading();
     };
     const user_msg = $('#user_msg');
     user_msg.off('keydown').on('keydown', (e) => {
@@ -405,20 +419,19 @@ agent.init_form = async () => {
     agent.chat(cmdbox.random_string(16));
 };
 agent.list_sessions = async (session_id) => {
-    const formData = new FormData();
-    session_id && formData.append('session_id', session_id);
-    formData.append('runner_name', $('#runner_name_input').val());
+    const res = await agent.exec_cmd('agent', 'session_list', {
+        'runner_name': $('#runner_name_input').val(),
+        'session_id': session_id
+    });
     const histories = $('#histories');
-    const res = await fetch('agent/session/list', {method: 'POST', body: formData});
-    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
-    res.json().then((res) => {
-        if (!res['success']) return;
-        histories.html('');
-        res['success'].forEach(async (row) => {
-            if (!row['events'] || row['events'].length <= 0) return;
-            const msg = row['events'][0]['text'];
-            const history = agent.create_history(histories, row['id'], msg);
-        });
+    if (!res['success']) return [];
+    if (!res['success']['data'] || typeof res['success']['data'] !== 'object') return [];
+    if (session_id) return res['success']['data'];
+    histories.html('');
+    res['success']['data'].forEach(async (row) => {
+        if (!row['events'] || row['events'].length <= 0) return;
+        const msg = row['events'][0]['text'];
+        const history = agent.create_history(histories, row['session_id'], msg);
     });
 }
 agent.create_history = (histories, session_id, msg) => {
@@ -462,46 +475,40 @@ agent.create_history = (histories, session_id, msg) => {
         // セッションを選択したときの処理
         e.preventDefault();
         agent.chat(session_id);
-        const formData = new FormData();
-        formData.append('session_id', session_id);
-        formData.append('runner_name', $('#runner_name_input').val());
-        const res = await fetch('agent/session/list', {method: 'POST', body: formData});
-        if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
-        res.json().then((res) => {
-            if (!res['success'] || res['success'].length<=0) {
-                cmdbox.message({'error':'No messages found for this session.'});
-                return;
+        const data = await agent.list_sessions(session_id);
+        if (data.length<=0) {
+            cmdbox.message({'error':'No messages found for this session.'});
+            return;
+        }
+        const session = data[0];
+        if (!session['events'] || session['events'].length <= 0) {
+            cmdbox.message({'error':'No messages found for this session.'});
+            return;
+        }
+        const container = $('#message_container');
+        const messages = $('#messages');
+        messages.html('');
+        session['events'].forEach((event) => {
+            if (!event['text'] || event['text'].length <= 0) return;
+            if (event['author'] == 'user') {
+                // ユーザーメッセージ
+                agent.create_user_message(messages, event['text']);
+            } else {
+                // エージェントメッセージ
+                txt = agent.create_agent_message(messages, cmdbox.random_string(16));
+                agent.format_agent_message(container, messages, txt, event['text']);
             }
-            const session = res['success'][0];
-            if (!session['events'] || session['events'].length <= 0) {
-                cmdbox.message({'error':'No messages found for this session.'});
-                return;
-            }
-            const container = $('#message_container');
-            const messages = $('#messages');
-            messages.html('');
-            session['events'].forEach((event) => {
-                if (!event['text'] || event['text'].length <= 0) return;
-                if (event['author'] == 'user') {
-                    // ユーザーメッセージ
-                    agent.create_user_message(messages, event['text']);
-                } else {
-                    // エージェントメッセージ
-                    txt = agent.create_agent_message(messages, cmdbox.random_string(16));
-                    agent.format_agent_message(container, messages, txt, event['text']);
-                }
-            });
         });
     });
     return history;
 };
 agent.delete_session = async (session_id) => {
-    const formData = new FormData();
-    formData.append('session_id', session_id);
-    formData.append('runner_name', $('#runner_name_input').val());
-    const res = await fetch('agent/session/delete', {method: 'POST', body: formData});
-    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
-    return await res.json();
+    const res = await agent.exec_cmd('agent', 'session_del', {
+        'runner_name': $('#runner_name_input').val(),
+        'session_id': session_id
+    });
+    if (!res['success']) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+    return res;
 }
 
 agent.exec_cmd = async (mode, cmd, opt={}, error_func=null) => {
@@ -513,7 +520,7 @@ agent.exec_cmd = async (mode, cmd, opt={}, error_func=null) => {
     }
     opt['mode'] = mode;
     opt['cmd'] = cmd;
-    opt['user_id'] = user['name'];
+    opt['user_name'] = user['name'];
     opt['capture_stdout'] = true;
     cmdbox.show_loading();
     return cmdbox.sv_exec_cmd(opt).then(res => {
@@ -593,7 +600,11 @@ agent.list_llm = async () => {
                         input.val(config[key]);
                     }
                 });
-                
+                // 選択肢による表示非表示の設定
+                form.find(`.choice_show`).each((i, elem) => {
+                    const input_elem = $(elem);
+                    input_elem.change();
+                });
                 // Delete button handler
                 $('#btn_del_llm').show().off('click').on('click', async () => {
                     if (!confirm(`Are you sure you want to delete '${config.llmname}'?`)) return;
@@ -700,7 +711,11 @@ agent.list_mcpsv = async () => {
                         input.val(config[key]);
                     }
                 });
-
+                // 選択肢による表示非表示の設定
+                form.find(`.choice_show`).each((i, elem) => {
+                    const input_elem = $(elem);
+                    input_elem.change();
+                });
                 // Delete button handler
                 $('#btn_del_mcpsv').show().off('click').on('click', async () => {
                     if (!confirm(`Are you sure you want to delete '${config.mcpserver_name}'?`)) return;
@@ -821,9 +836,11 @@ agent.list_runner = async () => {
                         input.val(config[key]);
                     }
                 });
-                // Trigger change to update visibility
-                form.find('[name="session_store_type"]').trigger('change');
-
+                // 選択肢による表示非表示の設定
+                form.find(`.choice_show`).each((i, elem) => {
+                    const input_elem = $(elem);
+                    input_elem.change();
+                });
                 // Delete button handler
                 $('#btn_del_runner').show().off('click').on('click', async () => {
                     if (!confirm(`Are you sure you want to delete '${config.runner_name}'?`)) return;
@@ -927,10 +944,10 @@ agent.html = `
                         <!-- チャット側ペイン -->
                         <div id="right_container" class="split-pane-component chat-container" style="left:250px;">
                             <div id="message_container" class="w-100 d-flex justify-content-center" style="height:calc(100% - 80px);overflow-y:auto;">
-                                <div id="messages" class="ps-2 pe-2" style="width:100%; max-width: 800px;"></div>
+                                <div id="messages" class="ps-2 pe-2" style="width:100%; max-width: 80%;"></div>
                             </div>
                             <div class="w-100 d-flex justify-content-center position-absolute bottom-0 pb-3" style="background-color: var(--bs-body-bg);">
-                                <div class="chat-input mt-2" style="width:90%; max-width: 800px;">
+                                <div class="chat-input mt-2" style="width:90%; max-width: 80%;">
                                     <div class="chat-group w-100 p-2 d-flex align-items-center">
                                         <div class="d-flex flex-column align-items-center">
                                             <div class="d-flex align-items-center">
@@ -1286,6 +1303,7 @@ agent.init = async () => {
 agent.update_runner_list = async () => {
     const menu = $('#runner_menu');
     try {
+        cmdbox.show_loading();
         const res = await agent.exec_cmd('agent', 'runner_list');
         if (res && res.success && res.success.data) {
             menu.html('');
@@ -1293,9 +1311,17 @@ agent.update_runner_list = async () => {
                 const li = $(`<li><a class="dropdown-item" href="#" data-runner="${item.name}">${item.name}</a></li>`);
                 li.find('a').off('click').on('click', async (e) => {
                     e.preventDefault();
+                    $('#runner_menu a').each(async (i, a_elem) => {
+                        const rn = $(a_elem).attr('data-runner');
+                        if (rn) await agent.exec_cmd('agent', 'stop', { runner_name: rn });
+                    });
+                    cmdbox.show_loading();
                     agent.select_runner(item.name);
                     // Start the agent runner
+                    cmdbox.show_loading();
                     await agent.exec_cmd('agent', 'start', { runner_name: item.name });
+                    cmdbox.show_loading();
+                    await agent.list_sessions();
                     agent.chat(cmdbox.random_string(16));
                 });
                 menu.append(li);

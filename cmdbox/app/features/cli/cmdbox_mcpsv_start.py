@@ -118,15 +118,15 @@ class McpsvStart(feature.UnsupportEdgeFeature):
             # Signin 準備
             signin_file = None if not hasattr(args, 'signin_file') or args.signin_file is None else Path(args.signin_file)
             signin_data = signin.Signin.load_signin_file(signin_file) if signin_file is not None else None
-            sign = signin.Signin(logger, signin_file, signin_data, self.appcls, self.ver)
-
-            from fastmcp import FastMCP
-            self.mcp = mcp_mod.Mcp(logger, Path(args.data), sign, self.appcls, self.ver)
-            fastmcp:FastMCP = self.mcp.create_mcpserver(logger, args, self.mcp.create_tools(logger, args, False))
             # ツール側で参照できるようにするためにインスタンス化
             web.Web.getInstance(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
                                 redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                                 signin_file=args.signin_file)
+
+            from fastmcp import FastMCP
+            sign = signin.Signin(logger, signin_file, signin_data, self.appcls, self.ver)
+            self.mcp = mcp_mod.Mcp(logger, Path(args.data), sign, self.appcls, self.ver)
+            fastmcp:FastMCP = self.mcp.create_mcpserver(logger, args, self.mcp.create_tools(logger, args, False))
 
             # SSL/paths を Path に揃える
             args.ssl_cert = None if args.ssl_cert is None else Path(args.ssl_cert)
@@ -139,6 +139,11 @@ class McpsvStart(feature.UnsupportEdgeFeature):
                 msg = dict(warn="MCP app is not created.")
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, msg, None
+            
+            # mcpsvはセッションを使用しないが、signinミドルウェアでセッションが必要なため追加する
+            from starlette.middleware.sessions import SessionMiddleware
+            mwparam = dict(path='/mcp', max_age=900, secret_key=common.random_string())
+            mcp_app.add_middleware(SessionMiddleware, **mwparam)
 
             # スタート
             if args.ssl_cert is not None and args.ssl_key is not None:

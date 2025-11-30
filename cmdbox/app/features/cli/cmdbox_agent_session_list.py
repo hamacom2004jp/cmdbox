@@ -49,10 +49,10 @@ class CmdAgentSessionList(feature.ResultEdgeFeature):
                 dict(opt="runner_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                     description_ja="Runner設定の名前を指定します。",
                     description_en="Specify the name of the Runner configuration."),
-                dict(opt="userid", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
-                    description_ja="Runnerに送信するユーザーIDを指定します。",
-                    description_en="Specify the user ID to send to the Runner."),
-                dict(opt="sessionid", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                dict(opt="user_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                     description_ja="ユーザー名を指定します。",
+                     description_en="Specify a user name."),
+                dict(opt="session_id", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                     description_ja="Runnerに送信するセッションIDを指定します。",
                     description_en="Specify the session ID to send to the Runner."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
@@ -82,12 +82,12 @@ class CmdAgentSessionList(feature.ResultEdgeFeature):
             msg = dict(warn="Runner name can only contain alphanumeric characters, underscores, and hyphens.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
-        if not getattr(args, 'userid', None):
-            msg = dict(warn="Please specify --userid")
+        if not getattr(args, 'user_name', None):
+            msg = dict(warn="Please specify --user_name")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
 
-        payload = dict(runner_name=args.runner_name, sessionid=args.sessionid, user_id=args.userid)
+        payload = dict(runner_name=args.runner_name, session_id=args.session_id, user_name=args.user_name)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -112,40 +112,35 @@ class CmdAgentSessionList(feature.ResultEdgeFeature):
 
             payload = json.loads(convert.b64str2str(msg[2]))
             name = payload.get('runner_name')
-            sessionid = payload.get('sessionid')
-            user_id = payload.get('user_id')
+            session_id = payload.get('session_id')
+            user_name = payload.get('user_name')
             if name not in sessions['agents']:
                 out = dict(warn=f"Runner '{name}' is not running.", end=True)
                 redis_cli.rpush(reskey, out)
                 return self.RESP_WARN
             runner = sessions['agents'][name]['runner']
             session_service = runner.session_service
-            if sessionid is None:
-                sessions = await session_service.list_sessions(app_name=self.ver.__appid__, user_id=user_id)
-                ret = []
+            if session_id is None:
+                sessions = await session_service.list_sessions(app_name=name, user_id=user_name)
+                data = []
                 for s in sessions.sessions:
-                    try:
-                        session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=s.id)
-                        if session is None:
-                            continue
-                        ret.append(session)
-                    except:
-                        # セッションが取得できない場合は削除する
-                        try:
-                            await session_service.delete_session(app_name=self.ver.__appid__, user_id=user_id, session_id=s.id)
-                        except:
-                            pass
-                        finally:
-                            continue
-                out = dict(success=ret, end=True)
+                    if not s: continue
+                    row = dict(runner_name=s.app_name, session_id=s.id, user_name=s.user_id, last_update_time=s.last_update_time)
+                    ss = await session_service.get_session(app_name=name, user_id=user_name, session_id=s.id)
+                    row['events'] = [dict(author=ev.author, text=ev.content.parts[0].text) for ev in ss.events if ev.content and ev.content.parts]
+                    data.append(row)
+                data.reverse()
+                out = dict(success=data, end=True)
                 redis_cli.rpush(reskey, out)
                 return self.RESP_SUCCESS
             else:
-                session = await session_service.get_session(app_name=self.ver.__appid__, user_id=user_id, session_id=sessionid)
-                if session is None:
+                s = await session_service.get_session(app_name=name, user_id=user_name, session_id=session_id)
+                if s is None:
                     out = dict(success=[], end=True)
                 else:
-                    out = dict(success=[session], end=True)
+                    row = dict(runner_name=s.app_name, session_id=s.id, user_name=s.user_id, last_update_time=s.last_update_time)
+                    row['events'] = [dict(author=ev.author, text=ev.content.parts[0].text) for ev in s.events if ev.content and ev.content.parts]
+                    out = dict(success=[row], end=True)
                 redis_cli.rpush(reskey, out)
                 return self.RESP_SUCCESS
         except NotImplementedError as e:

@@ -155,15 +155,15 @@ class CmdBoxApp:
         logger = self.load_config(args, webcall=webcall if args.cmd != 'webcap' else True)
         try:
             eloggerinittime = time.perf_counter()
-            if logger.level == logging.DEBUG:
-                logger.debug(f"args.mode={args.mode}, args.cmd={args.cmd}")
-                # 警告出力時にスタックを出力する
-                import warnings
-                def custom_warning_handler(message, category, filename, lineno, file=None, line=None):
-                    import traceback
-                    logger.warning(f"Warning: {message}, Category: {category}, File: {filename}, Line: {lineno}", exc_info=True)
-                    traceback.print_stack()
-                warnings.showwarning = custom_warning_handler
+            #if logger.level == logging.DEBUG:
+            #    logger.debug(f"args.mode={args.mode}, args.cmd={args.cmd}")
+            #    # 警告出力時にスタックを出力する
+            #    import warnings
+            #    def custom_warning_handler(message, category, filename, lineno, file=None, line=None):
+            #        import traceback
+            #        logger.warning(f"Warning: {message}, Category: {category}, File: {filename}, Line: {lineno}", exc_info=True)
+            #        traceback.print_stack()
+            #    warnings.showwarning = custom_warning_handler
 
             #scmdexectime = time.perf_counter()
             feat = self.options.get_cmd_attr(args.mode, args.cmd, 'feature')

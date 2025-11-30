@@ -1,11 +1,9 @@
-from cmdbox.app import common, feature
+from cmdbox.app import common
 from cmdbox.app.auth import signin
 from cmdbox.app.features.web import cmdbox_web_exec_cmd
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Depends, HTTPException, Request, Response, WebSocket
-from fastapi.responses import HTMLResponse, StreamingResponse
 from starlette.websockets import WebSocketDisconnect
-from starlette.datastructures import UploadFile
 from typing import Dict, Any, Tuple, List, Union
 import locale
 import logging
@@ -16,54 +14,6 @@ import traceback
 
 class Agent(cmdbox_web_exec_cmd.ExecCmd):
     def route(self, web:Web, app:FastAPI) -> None:
-        """
-        webモードのルーティングを設定します
-
-        Args:
-            web (Web): Webオブジェクト
-            app (FastAPI): FastAPIオブジェクト
-        """
-        @app.post('/agent/session/list')
-        async def agent_session_list(req:Request, res:Response):
-            signin = web.signin.check_signin(req, res)
-            if signin is not None:
-                return signin
-            res.headers['Access-Control-Allow-Origin'] = '*'
-            # ユーザー名を取得する
-            user_id = common.random_string(16)
-            if 'signin' in req.session:
-                user_id = req.session['signin']['name']
-            form = await req.form()
-            runner_name = form.get('runner_name', None)
-            session_id = form.get('session_id', None)
-            opt = dict(mode='agent', cmd='session_list', runner_name=runner_name, userid=user_id, session_id=session_id)
-            sessions = await self.exec_cmd(req, res, web, '', opt, True, self.appcls)
-            if 'success' not in sessions:
-                return sessions
-            sessions = sessions['success']['data']
-            if sessions is None:
-                return dict(success=[])
-            data = [dict(id=s.id, app_name=s.app_name, user_id=s.user_id, last_update_time=s.last_update_time,
-                         events=[dict(author=ev.author,text=ev.content.parts[0].text) for ev in s.events if ev.content and ev.content.parts]) for s in sessions if s]
-            data.reverse()  # 最新のセッションを先頭にする
-            return dict(success=data)
-
-        @app.post('/agent/session/delete')
-        async def agent_session_delete(req:Request, res:Response):
-            signin = web.signin.check_signin(req, res)
-            if signin is not None:
-                return signin
-            res.headers['Access-Control-Allow-Origin'] = '*'
-            # ユーザー名を取得する
-            user_id = common.random_string(16)
-            if 'signin' in req.session:
-                user_id = req.session['signin']['name']
-            form = await req.form()
-            runner_name = form.get('runner_name', None)
-            session_id = form.get('session_id', None)
-            opt = dict(mode='agent', cmd='session_del', runner_name=runner_name, userid=user_id, session_id=session_id)
-            ret = await self.exec_cmd(req, res, web, '', opt, True, self.appcls)
-            return ret
 
         @app.websocket('/{webapp}/chat/ws/{runner_name}')
         @app.websocket('/{webapp}/chat/ws/{runner_name}/{session_id}')
@@ -124,10 +74,10 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
             if web.logger.level == logging.DEBUG:
                 web.logger.debug(f"agent_chat: connected")
             # ユーザー名を取得する
-            user_id = common.random_string(16)
+            user_name = common.random_string(16)
             groups = []
             if 'signin' in session:
-                user_id = session['signin']['name']
+                user_name = session['signin']['name']
                 groups = session['signin']['groups']
 
             startmsg = "こんにちは！何かお手伝いできることはありますか？" if common.is_japan() else "Hello! Is there anything I can help you with?"
@@ -150,8 +100,8 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
                         time.sleep(0.5)
                         continue
 
-                    web.options.audit_exec(sock, web, body=dict(agent_session=session_id, user_id=user_id, groups=groups, query=query))
-                    opt = dict(mode='agent', cmd='chat', runner_name=runner_name, userid=user_id,
+                    web.options.audit_exec(sock, web, body=dict(agent_session=session_id, user=user_name, groups=groups, query=query))
+                    opt = dict(mode='agent', cmd='chat', runner_name=runner_name, user_name=user_name,
                             session_id=session_id, message=query)
                     ret = await self.exec_cmd(sock, res, web, '', opt, True, self.appcls)
                     if 'success' not in ret:
