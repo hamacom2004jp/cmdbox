@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( web mode ) &mdash; cmdbox 2025/10/05 documentation</title>
+  <title>Command Reference ( web mode ) &mdash; cmdbox 2025/11/30 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,13 +14,13 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b11ff6bd"></script>
+      <script src="../_static/documentation_options.js?v=568024d5"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Command Reference ( mcp mode )" href="cmd_mcp.html" />
+    <link rel="next" title="Command Reference ( tts mode )" href="cmd_tts.html" />
     <link rel="prev" title="Command Reference ( gui mode )" href="cmd_gui.html" /> 
 </head>
 
@@ -70,7 +70,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#list-user-cmdbox-m-web-c-user-list-option">List User : <cite>cmdbox -m web -c user_list &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_mcp.html">MCP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_audit.html">Audit</a></li>
@@ -499,7 +498,7 @@
 </tr>
 <tr class="row-odd"><td><p>--gunicorn_workers &lt;second&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of gunicorn workers, valid only in Linux environment. If -1 or unspecified, twice the number of CPUs is used.</p></td>
+<td><p>Specifies the number of gunicorn workers, valid only in Linux environment. If -1 or unspecified, the number of CPUs is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--gunicorn_timeout &lt;second&gt;</p></td>
 <td></td>
@@ -540,86 +539,6 @@
 <tr class="row-odd"><td><p>--signin_html &lt;signin.html file path&gt;</p></td>
 <td></td>
 <td><p>Specify <cite>signin.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--agent &lt;use&gt;</p></td>
-<td></td>
-<td><p>Specifies whether the agent is used. <cite>no</cite> or <cite>use</cite> can be specified.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--agent_name &lt;name&gt;</p></td>
-<td></td>
-<td><p>Specifies the agent name.</p></td>
-</tr>
-<tr class="row-even"><td><p>--agent_description &lt;description&gt;</p></td>
-<td></td>
-<td><p>Specify agent description.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--agent_instruction &lt;instruction&gt;</p></td>
-<td></td>
-<td><p>Specifies the agent's system instructions.</p></td>
-</tr>
-<tr class="row-even"><td><p>--agent_session_store &lt;session_store&gt;</p></td>
-<td></td>
-<td><p>Specify how the agent's session is to be saved.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--agent_pg_host &lt;host&gt;</p></td>
-<td></td>
-<td><p>Specify the postgresql host.</p></td>
-</tr>
-<tr class="row-even"><td><p>--agent_pg_port &lt;posrt&gt;</p></td>
-<td></td>
-<td><p>Specify the postgresql port.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--agent_pg_user &lt;user&gt;</p></td>
-<td></td>
-<td><p>Specify the postgresql user name.</p></td>
-</tr>
-<tr class="row-even"><td><p>--agent_pg_password &lt;passwd&gt;</p></td>
-<td></td>
-<td><p>Specify the postgresql password.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--agent_pg_dbname &lt;dbname&gt;</p></td>
-<td></td>
-<td><p>Specify the postgresql database name.</p></td>
-</tr>
-<tr class="row-even"><td><p>--llmprov &lt;provider&gt;</p></td>
-<td></td>
-<td><p>Specify llm provider.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--llmprojectid &lt;projectid&gt;</p></td>
-<td></td>
-<td><p>Specify the project ID for llm's provider connection.</p></td>
-</tr>
-<tr class="row-even"><td><p>--llmsvaccountfile &lt;file&gt;</p></td>
-<td></td>
-<td><p>Specifies the service account file for llm's provider connection.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--llmlocation &lt;location&gt;</p></td>
-<td></td>
-<td><p>Specifies the location for llm provider connections.</p></td>
-</tr>
-<tr class="row-even"><td><p>--llmapikey &lt;apikey&gt;</p></td>
-<td></td>
-<td><p>Specify API key for llm provider connection.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--llmapiversion &lt;apiver&gt;</p></td>
-<td></td>
-<td><p>Specifies the API version for llm provider connections.</p></td>
-</tr>
-<tr class="row-even"><td><p>--llmendpoint &lt;endpoint&gt;</p></td>
-<td></td>
-<td><p>Specifies the endpoint for llm provider connections.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--llmmodel &lt;model&gt;</p></td>
-<td></td>
-<td><p>Specifies the llm model.</p></td>
-</tr>
-<tr class="row-even"><td><p>--llmseed &lt;seed&gt;</p></td>
-<td></td>
-<td><p>Specifies the seed value when using llm model.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--llmtemperature &lt;temperature&gt;</p></td>
-<td></td>
-<td><p>Specifies the temperature when using llm model.</p></td>
 </tr>
 </tbody>
 </table>
@@ -812,7 +731,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="cmd_gui.html" class="btn btn-neutral float-left" title="Command Reference ( gui mode )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cmd_mcp.html" class="btn btn-neutral float-right" title="Command Reference ( mcp mode )" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cmd_tts.html" class="btn btn-neutral float-right" title="Command Reference ( tts mode )" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

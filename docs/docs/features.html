@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Features &mdash; cmdbox 2025/10/05 documentation</title>
+  <title>Features &mdash; cmdbox 2025/11/30 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b11ff6bd"></script>
+      <script src="../_static/documentation_options.js?v=568024d5"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -50,7 +50,10 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Features</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#reading-order-of-features-yml">Reading order of <cite>features.yml</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#configuration-items-in-features-yml">Configuration items in <cite>features.yml</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#implement-a-class-that-extends-cmdbox-app-feature-feature">Implement a class that extends <cite>cmdbox.app.feature.Feature</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#implement-a-class-that-extends-cmdbox-app-feature-feature">Implement a class that extends <cite>cmdbox.app.feature.Feature</cite></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#implementation-of-the-get-option-self-dict-str-any-method">Implementation of the <cite>get_option(self) -&gt; Dict[str, Any]</cite> method</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="audit.html">Audit</a></li>
@@ -314,8 +317,8 @@
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>エッジ側の実装を簡単にするために、 <cite>cmdbox.app.feature</cite> を継承したいくつかのクラスを用意しています。</p></li>
-<li><p>詳しくは <cite>cmdbox.app.feature</cite> モジュールを参照してください。</p></li>
+<li><p>To simplify implementation on the edge, we provide several classes that inherit from <cite>cmdbox.app.feature</cite>.</p></li>
+<li><p>For details, refer to the <cite>cmdbox.app.feature</cite> module.</p></li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">OneshotEdgeFeature</span><span class="p">(</span><span class="n">Feature</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -343,6 +346,132 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 </pre></div>
 </div>
+<section id="implementation-of-the-get-option-self-dict-str-any-method">
+<h3>Implementation of the <cite>get_option(self) -&gt; Dict[str, Any]</cite> method<a class="headerlink" href="#implementation-of-the-get-option-self-dict-str-any-method" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>The <cite>get_option(self) -&gt; Dict[str, Any]</cite> method returns the command line options for the command.</p></li>
+<li><p>Below is an example of how to implement this method.</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">use_redis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">USE_REDIS_FALSE</span><span class="p">,</span> <span class="n">nouse_webmode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_agent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">description_ja</span><span class="o">=</span><span class="s2">&quot;MCP サーバ設定を保存します。&quot;</span><span class="p">,</span>
+        <span class="n">description_en</span><span class="o">=</span><span class="s2">&quot;Saves MCP server configuration.&quot;</span><span class="p">,</span>
+        <span class="n">choice</span><span class="o">=</span><span class="p">[</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">&quot;host&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_host</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">&quot;mask&quot;</span><span class="p">,</span>
+                <span class="n">description_ja</span><span class="o">=</span><span class="s2">&quot;Redisサーバーのサービスホストを指定します。&quot;</span><span class="p">,</span>
+                <span class="n">description_en</span><span class="o">=</span><span class="s2">&quot;Specify the service host of the Redis server.&quot;</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">&quot;port&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_port</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">&quot;mask&quot;</span><span class="p">,</span>
+                <span class="n">description_ja</span><span class="o">=</span><span class="s2">&quot;Redisサーバーのサービスポートを指定します。&quot;</span><span class="p">,</span>
+                <span class="n">description_en</span><span class="o">=</span><span class="s2">&quot;Specify the service port of the Redis server.&quot;</span><span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<ul>
+<li><p>The options returned here correspond to the command line options.</p></li>
+<li><p>Details for each option item are as follows.</p>
+<blockquote>
+<div><ul>
+<li><p>use_redis: Specifies whether to use Redis. Specify one of the following constants defined in <cite>cmdbox.app.feature.Feature</cite>: <cite>USE_REDIS_TRUE</cite>, <cite>USE_REDIS_FALSE</cite>, <cite>USE_REDIS_MEIGHT</cite>.</p></li>
+<li><p>nouse_webmode: Specifies whether the command is not executable in Web mode. The default is False.</p></li>
+<li><p>use_agent: Specifies whether the command is available to agents. The default is False.</p></li>
+<li><p>description_ja: Description in Japanese</p></li>
+<li><p>description_en: Description in English</p></li>
+<li><dl>
+<dt>choice: Specifies the list of command line options. Each option is specified as a dictionary with the following items.</dt><dd><ul>
+<li><p>opt: Option name</p></li>
+<li><dl class="simple">
+<dt>type: Option type. Specify one of the following constants defined in <cite>cmdbox.app.options.Options</cite>:</dt><dd><ul class="simple">
+<li><p>T_INT = 'int'</p></li>
+<li><p>T_FLOAT = 'float'</p></li>
+<li><p>T_BOOL = 'bool'</p></li>
+<li><p>T_STR = 'str'</p></li>
+<li><p>T_DATE = 'date'</p></li>
+<li><p>T_DATETIME = 'datetime'</p></li>
+<li><p>T_DICT = 'dict'</p></li>
+<li><p>T_TEXT = 'text'</p></li>
+<li><p>T_FILE = 'file'</p></li>
+<li><p>T_DIR = 'dir'</p></li>
+<li><p>T_MLIST = 'mlist'</p></li>
+<li><p>T_PASSWD = 'passwd'</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>default: Default value</p></li>
+<li><p>required: Whether this option is required</p></li>
+<li><p>multi: Whether multiple values can be specified</p></li>
+<li><p>hide: Whether to hide this option by default in Web mode</p></li>
+<li><p>web: Specifies how to display options that cannot be edited in web mode. Specifying “mask” masks the option. Specifying “readonly” makes it read-only.</p></li>
+<li><p>fileio: When the type is file, specify whether it is a read file or a write file. Specify <cite>in</cite> or <cite>out</cite>.</p></li>
+<li><dl>
+<dt>choice: Specifies the choices for this option. If dynamic generation is required, implement the <cite>choice_fn</cite> method in the feature class.</dt><dd><p>Choices can be specified in either of the following two ways.</p>
+<ul class="simple">
+<li><p>Options when type is a list or mlist.</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Options when type is a dictionary.</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">choice</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dictkey1&quot;</span><span class="p">,</span><span class="s2">&quot;dictkey2&quot;</span><span class="p">,</span><span class="s2">&quot;dictkey3&quot;</span><span class="p">],</span> <span class="n">val</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dictval1&quot;</span><span class="p">,</span><span class="s2">&quot;dictval2&quot;</span><span class="p">,</span><span class="s2">&quot;dictval3&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><p>choice_edit: Specifies whether values other than the options can be entered. If true, values other than the options can be entered.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">choice_edit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>choice_fn: A function that generates the choices dynamically.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">choice_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">webmode</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    オプションのchoiceを動的に生成する関数</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        o (Dict[str, Any]): choice_fn関数が呼ばれたコマンドオプションのchoice定義</span>
+<span class="sd">        webmode (bool): Webモードかどうか</span>
+<span class="sd">        opt (Dict[str, Any]): このコマンドのすべてのコマンドオプションのchoice定義</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Any: choice情報</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">choices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="n">choices</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>choice_show: Specify the other options to display when this option is selected.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">choice_show</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">choice1</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;opt1&quot;</span><span class="p">,</span> <span class="s2">&quot;opt2&quot;</span><span class="p">],</span> <span class="n">choice2</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;opt3&quot;</span><span class="p">],</span> <span class="n">choice3</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;opt4&quot;</span><span class="p">,</span> <span class="s2">&quot;opt5&quot;</span><span class="p">]),</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>callcmd: コマンドボタンを追加し、そのコマンドボタンが押されたときに呼ばれるjavascript関数を指定します。</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">callcmd</span><span class="o">=</span><span class="s2">&quot;()=&gt;{cmdbox.callcmd(&#39;cmd&#39;,&#39;list&#39;,{&#39;kwd&#39;:&#39;*&#39;},(res)=&gt;{console.log(res);},$(</span><span class="se">\&quot;</span><span class="s2">[name=&#39;title&#39;]</span><span class="se">\&quot;</span><span class="s2">).val(),&#39;tag&#39;);}&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</section>
 </section>
 </section>
 

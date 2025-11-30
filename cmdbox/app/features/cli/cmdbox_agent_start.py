@@ -362,7 +362,7 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
         """
         if runner_conf.get('session_store_type') == 'sqlite':
             uri = (data_dir / '.agent' / 'session.db').as_uri()
-            runner_conf['agent_session_dburl'] = f"sqlite:{uri.replace('file:///', '///')}"
+            runner_conf['agent_session_dburl'] = f"sqlite+aiosqlite:{uri.replace('file:///', '///')}"
         elif runner_conf.get('session_store_type') == 'postgresql':
             runner_conf['agent_session_dburl'] = f"postgresql+psycopg://{runner_conf['session_store_pguser']}:{runner_conf['session_store_pgpass']}@{runner_conf['session_store_pghost']}:{runner_conf['session_store_pgport']}/{runner_conf['session_store_pgdbname']}"
         else:

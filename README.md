@@ -28,7 +28,10 @@ apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl buil
 - When using agent mode, install the modules with dependencies.
 ```bash
 pip install cmdbox[agent]
-pip install backoff orjson apscheduler litellm-enterprise fastapi-sso
+```
+- or
+```bash
+pip install fastmcp google-adk litellm
 ```
 
 # Run
