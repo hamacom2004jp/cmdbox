@@ -196,7 +196,7 @@ agent.init_form = async () => {
         const btn_user_msg = $('#btn_user_msg');
         const btn_rec = $('#btn_rec');
         const user_msg = $('#user_msg');
-        let message_id = null;
+        agent.message_id = null;
         btn_user_msg.prop('disabled', true); // 初期状態で送信ボタンを無効化
         // 送信ボタンのクリックイベント
         btn_user_msg.off('click').on('click', async () => {
@@ -207,9 +207,9 @@ agent.init_form = async () => {
             agent.create_user_message(messages, msg);
             agent.create_history(histories, session_id, msg);
             // エージェント側のメッセージ読込中を表示
-            if (!message_id) {
-                message_id = cmdbox.random_string(16);
-                const txt = agent.create_agent_message(messages, message_id);
+            if (!agent.message_id) {
+                agent.message_id = cmdbox.random_string(16);
+                agent.create_agent_message(messages, agent.message_id);
                 cmdbox.show_loading(txt);
             }
             if (!agent.ws) {
@@ -336,10 +336,14 @@ agent.init_form = async () => {
         // エージェントからのメッセージ受信時の処理
         agent.ws.onmessage = (event) => {
             const packet = JSON.parse(event.data);
+            if (!agent.message_id || $(`#${agent.message_id}`).length <= 0) {
+                // エージェント側の表示枠が無かったら追加
+                agent.message_id = cmdbox.random_string(16);
+            }
             if (packet && packet['warn']) {
-                message_id = cmdbox.random_string(16);
-                const txt = agent.create_agent_message(messages, message_id);
+                const txt = agent.create_agent_message(messages, agent.message_id);
                 agent.format_agent_message(container, messages, txt, `${packet['warn']}`);
+                agent.message_id = null;
                 return;
             }
             if (packet.turn_complete && packet.turn_complete) {
@@ -350,16 +354,14 @@ agent.init_form = async () => {
             }
             console.log(packet);
             let txt;
-            if (!message_id) {
+            if ($(`#${agent.message_id}`).length <= 0) {
                 // エージェント側の表示枠が無かったら追加
-                message_id = cmdbox.random_string(16);
-                txt = agent.create_agent_message(messages, message_id);
+                txt = agent.create_agent_message(messages, agent.message_id);
             } else {
-                txt = $(`#${message_id}`);
+                txt = $(`#${agent.message_id}`);
             }
-            txt.html('');
-            message_id = null;
             agent.format_agent_message(container, messages, txt, packet.message);
+            agent.message_id = null;
         };
         agent.ws.onopen = () => {
             const ping = () => {
@@ -457,18 +459,14 @@ agent.create_history = (histories, session_id, msg) => {
         e.stopPropagation();
         agent.delete_session(session_id).then((res) => {
             const messages = $('#messages');
-            if (res['success']) {
-                history.remove();
-                const sid = messages.attr('data-session_id');
-                if (sid == session_id) {
-                    // 削除したセッションが現在のセッションだった場合は、メッセージ一覧をクリア
-                    messages.html('');
-                    agent.chat(cmdbox.random_string(16));
-                }
-                agent.list_sessions();
-            } else {
-                cmdbox.message({'error':res['error'] || 'Failed to delete session.'});
+            history.remove();
+            const sid = messages.attr('data-session_id');
+            if (sid == session_id) {
+                // 削除したセッションが現在のセッションだった場合は、メッセージ一覧をクリア
+                messages.html('');
+                agent.chat(cmdbox.random_string(16));
             }
+            agent.list_sessions();
         });
     });
     history.off('click').on('click', async (e) => {
@@ -503,15 +501,13 @@ agent.create_history = (histories, session_id, msg) => {
     return history;
 };
 agent.delete_session = async (session_id) => {
-    const res = await agent.exec_cmd('agent', 'session_del', {
+    return agent.exec_cmd('agent', 'session_del', {
         'runner_name': $('#runner_name_input').val(),
         'session_id': session_id
     });
-    if (!res['success']) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
-    return res;
 }
 
-agent.exec_cmd = async (mode, cmd, opt={}, error_func=null) => {
+agent.exec_cmd = async (mode, cmd, opt={}, error_func=null, loading=true) => {
     const user = await cmdbox.user_info();
     if(!user) {
         cmdbox.message({'error':'Connection to the agent has failed for several minutes. Please reload to resume reconnection.'});
@@ -522,10 +518,14 @@ agent.exec_cmd = async (mode, cmd, opt={}, error_func=null) => {
     opt['cmd'] = cmd;
     opt['user_name'] = user['name'];
     opt['capture_stdout'] = true;
-    cmdbox.show_loading();
+    if (loading) cmdbox.show_loading();
     return cmdbox.sv_exec_cmd(opt).then(res => {
+        if(res && Array.isArray(res) && res.length <=0) {
+            if (loading) cmdbox.hide_loading();
+            return res;
+        }
         if(!res[0] || !res[0]['success']) {
-            cmdbox.hide_loading();
+            if (loading) cmdbox.hide_loading();
             if (error_func) {
                 error_func(res);
                 return;
@@ -533,7 +533,7 @@ agent.exec_cmd = async (mode, cmd, opt={}, error_func=null) => {
             //cmdbox.message(res);
             return res[0];
         }
-        cmdbox.hide_loading();
+        if (loading) cmdbox.hide_loading();
         return res[0];
     });
 }
@@ -794,7 +794,7 @@ agent.build_runner_form = async () => {
 agent.list_runner = async () => {
     const container = $('#runner_list_container');
     container.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
-    
+
     try {
         const res = await agent.exec_cmd('agent', 'runner_list');
         container.html('');
@@ -1311,15 +1311,18 @@ agent.update_runner_list = async () => {
                 const li = $(`<li><a class="dropdown-item" href="#" data-runner="${item.name}">${item.name}</a></li>`);
                 li.find('a').off('click').on('click', async (e) => {
                     e.preventDefault();
+                    const promises = [];
+                    cmdbox.show_loading();
                     $('#runner_menu a').each(async (i, a_elem) => {
                         const rn = $(a_elem).attr('data-runner');
-                        if (rn) await agent.exec_cmd('agent', 'stop', { runner_name: rn });
+                        if (rn) {
+                            promises.push(agent.exec_cmd('agent', 'stop', { runner_name: rn }, null, false));
+                        }
                     });
-                    cmdbox.show_loading();
+                    await Promise.all(promises);
                     agent.select_runner(item.name);
                     // Start the agent runner
-                    cmdbox.show_loading();
-                    await agent.exec_cmd('agent', 'start', { runner_name: item.name });
+                    await agent.exec_cmd('agent', 'start', { runner_name: item.name }, null, false);
                     cmdbox.show_loading();
                     await agent.list_sessions();
                     agent.chat(cmdbox.random_string(16));

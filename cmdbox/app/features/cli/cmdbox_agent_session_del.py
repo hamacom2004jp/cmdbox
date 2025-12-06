@@ -127,7 +127,7 @@ class CmdAgentSessionDel(feature.ResultEdgeFeature):
 
             await session_service.delete_session(app_name=name, user_id=user_name, session_id=session_id)
 
-            msg = dict(success=f"Session delete executed for '{name}'.", end=True)
+            msg = dict(success=[session_id], end=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_SUCCESS
 

@@ -178,7 +178,6 @@ class CmdAgentChat(feature.ResultEdgeFeature):
             content = types.Content(role='user', parts=[types.Part(text=message)])
             # セッションを作成する
             agent_session = await create_agent_session(runner.session_service, name, user_name, session_id=session_id)
-            await runner.session_service.append_event(agent_session, Event(content=content, author=user_name))
             # チャットを実行する
             for event in runner.run(user_id=user_name, session_id=agent_session.id, new_message=content):
                 outputs = dict(success=dict(agent_session_id=agent_session.id))
