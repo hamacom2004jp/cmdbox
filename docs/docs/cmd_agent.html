@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( agent mode ) &mdash; cmdbox 2025/11/30 documentation</title>
+  <title>Command Reference ( agent mode ) &mdash; cmdbox 2025/12/07 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,12 +14,14 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=568024d5"></script>
+      <script src="../_static/documentation_options.js?v=071380fa"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Command Reference ( audit mode )" href="cmd_audit.html" />
+    <link rel="prev" title="Command Reference ( Common )" href="cmd_common.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,10 +43,44 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command.html">Command Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Agent</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#deletes-llm-configuration-cmdbox-m-agent-c-llm-del-option">Deletes LLM configuration. : <cite>cmdbox -m agent -c llm_del &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lists-saved-llm-configurations-cmdbox-m-agent-c-llm-list-option">Lists saved LLM configurations. : <cite>cmdbox -m agent -c llm_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#loads-llm-configuration-cmdbox-m-agent-c-llm-load-option">Loads LLM configuration. : <cite>cmdbox -m agent -c llm_load &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#saves-llm-configuration-cmdbox-m-agent-c-llm-save-option">Saves LLM configuration. : <cite>cmdbox -m agent -c llm_save &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-client-start-cmdbox-m-agent-c-mcp-client-option">Agent client start : <cite>cmdbox -m agent -c mcp_client &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-stdio-to-transport-proxy-start-cmdbox-m-agent-c-mcp-proxy-option">Agent stdio to transport proxy start : <cite>cmdbox -m agent -c mcp_proxy &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#delete-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-del-option">Delete MCP server configuration. : <cite>cmdbox -m agent -c mcpsv_del &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lists-mcp-server-configurations-cmdbox-m-agent-c-mcpsv-list-option">Lists MCP server configurations. : <cite>cmdbox -m agent -c mcpsv_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#loads-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-load-option">Loads MCP server configuration. : <cite>cmdbox -m agent -c mcpsv_load &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#saves-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-save-option">Saves MCP server configuration. : <cite>cmdbox -m agent -c mcpsv_save &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#delete-runner-configuration-cmdbox-m-agent-c-runner-del-option">Delete runner configuration. : <cite>cmdbox -m agent -c runner_del &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#list-runner-configuration-cmdbox-m-agent-c-runner-list-option">List runner configuration. : <cite>cmdbox -m agent -c runner_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#load-runner-configuration-cmdbox-m-agent-c-runner-load-option">Load runner configuration. : <cite>cmdbox -m agent -c runner_load &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#save-runner-configuration-cmdbox-m-agent-c-runner-save-option">Save runner configuration. : <cite>cmdbox -m agent -c runner_save &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starts-a-runner-cmdbox-m-agent-c-start-option">Starts a runner. : <cite>cmdbox -m agent -c start &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stops-a-runner-cmdbox-m-agent-c-stop-option">Stops a runner. : <cite>cmdbox -m agent -c stop &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#chat-with-the-agent-cmdbox-m-agent-c-chat-option">Chat with the agent. : <cite>cmdbox -m agent -c chat &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#list-sessions-for-the-agent-cmdbox-m-agent-c-session-list-option">List sessions for the agent. : <cite>cmdbox -m agent -c session_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#delete-sessions-for-the-agent-cmdbox-m-agent-c-session-del-option">Delete sessions for the agent. : <cite>cmdbox -m agent -c session_del &lt;Option&gt;</cite></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_audit.html">Audit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audit.html">Audit</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
@@ -68,6 +104,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="command.html">Command Reference</a></li>
       <li class="breadcrumb-item active">Command Reference ( agent mode )</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/docs/cmd_agent.rst.txt" rel="nofollow"> View page source</a>
@@ -1212,7 +1249,10 @@
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cmd_common.html" class="btn btn-neutral float-left" title="Command Reference ( Common )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmd_audit.html" class="btn btn-neutral float-right" title="Command Reference ( audit mode )" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

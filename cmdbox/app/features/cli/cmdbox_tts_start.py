@@ -184,7 +184,7 @@ class TtsStart(feature.UnsupportEdgeFeature):
                      description_ja="使用するTTSエンジンを指定します。",
                      description_en="Specify the TTS engine to use."),
                 dict(opt="voicevox_model", type=Options.T_STR, default=None, required=False, multi=False, hide=False,
-                     choice=[v['select'] for v in TtsStart.VOICEVOX_STYLE.values()],
+                     choice=sorted([v['select'] for v in TtsStart.VOICEVOX_STYLE.values()]),
                      choice_edit=True,
                      description_ja="使用するTTSエンジンのモデルを指定します。",
                      description_en="Specify the model of the TTS engine to use."),
@@ -251,7 +251,7 @@ class TtsStart(feature.UnsupportEdgeFeature):
             int: 終了コード
         """
         if logger.level == logging.DEBUG:
-            logger.debug(f"audit write svrun msg: {msg}")
+            logger.debug(f"tts start svrun msg: {msg}")
         tts_engine = convert.b64str2str(msg[2])
         voicevox_model = convert.b64str2str(msg[3])
         st = self.start(msg[1], tts_engine, voicevox_model, data_dir, logger, redis_cli, sessions)

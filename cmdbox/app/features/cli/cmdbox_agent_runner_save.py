@@ -1,5 +1,6 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.features.cli import cmdbox_tts_start
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -80,6 +81,16 @@ class CmdAgentRunnerSave(feature.OneshotResultEdgeFeature):
                 dict(opt="runner_instruction", type=Options.T_TEXT, default=instruction, required=False, multi=False, hide=False, choice=None,
                     description_ja="Runnerが使用するLLMモデル向けの指示を指定します。これはエージェントの挙動を促すものになります。",
                     description_en="Specify instructions for the LLM model used by the runner. These will guide the agent's behavior."),
+                dict(opt="tts_engine", type=Options.T_STR, default="voicevox", required=False, multi=False, hide=False,
+                     choice=["voicevox"],
+                     choice_show=dict(voicevox=["voicevox_model"]),
+                     description_ja="使用するTTSエンジンを指定します。",
+                     description_en="Specify the TTS engine to use."),
+                dict(opt="voicevox_model", type=Options.T_STR, default=None, required=False, multi=False, hide=False,
+                     choice=sorted([v['select'] for v in cmdbox_tts_start.TtsStart.VOICEVOX_STYLE.values()]),
+                     choice_edit=True,
+                     description_ja="使用するTTSエンジンのモデルを指定します。",
+                     description_en="Specify the model of the TTS engine to use."),
                 dict(opt="session_store_pghost", type=Options.T_STR, default='localhost', required=False, multi=False, hide=False, choice=None,
                     description_ja="セッション保存用PostgreSQLホストを指定します。",
                     description_en="Specify the postgresql host for session store."),
@@ -190,6 +201,8 @@ class CmdAgentRunnerSave(feature.OneshotResultEdgeFeature):
             runner_instruction=args.runner_instruction if hasattr(args, 'runner_instruction') else None,
             mcpservers=list(set(args.mcpservers)) if hasattr(args, 'mcpservers') else None,
             llm=args.llm if hasattr(args, 'llm') else None,
+            tts_engine=args.tts_engine if hasattr(args, 'tts_engine') else None,
+            voicevox_model=args.voicevox_model if hasattr(args, 'voicevox_model') else None,
             session_store_type=args.session_store_type if hasattr(args, 'session_store_type') else None,
             session_store_pghost=args.session_store_pghost if hasattr(args, 'session_store_pghost') else None,
             session_store_pgport=args.session_store_pgport if hasattr(args, 'session_store_pgport') else None,

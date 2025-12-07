@@ -66,6 +66,14 @@ class Signin(object):
         return group_names, gids
 
     @classmethod
+    def set_webcls(cls, webcls) -> None:
+        cls.web_cls = webcls
+    
+    @classmethod
+    def get_webcls(cls):
+        return cls.web_cls
+
+    @classmethod
     def _enable_cors(cls, req:Request, res:Response) -> None:
         """
         CORSを有効にする
@@ -931,8 +939,10 @@ async def create_request_scope(req:Request=None, res:Response=None, websocket:We
     sess = None
     if req is not None:
         sess = req.session if hasattr(req, 'session') else None
-    from cmdbox.app.web import Web
-    request_scope.set(dict(req=req, res=res, websocket=websocket, web=Web.getInstance()))
+    if Signin.get_webcls() is None:
+        from cmdbox.app.web import Web
+        Signin.set_webcls(Web)
+    request_scope.set(dict(req=req, res=res, websocket=websocket, web=Signin.get_webcls().getInstance()))
     try:
         yield # リクエストの処理
     finally:

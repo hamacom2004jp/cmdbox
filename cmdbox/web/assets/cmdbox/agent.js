@@ -14,7 +14,7 @@ agent.create_agent_message = (messages, message_id) => {
     const txt = $(`<div id="${message_id}" class="d-inline-block" style="width:calc(100% - 48px);"></div>`).appendTo(bot_message);
     return txt;
 }
-agent.format_agent_message = (container, messages, txt, message) => {
+agent.format_agent_message =  async (container, messages, txt, message) => {
     // メッセージが空の場合は何もしない
     if (!message || message.length <= 0) return;
     txt.html('');
@@ -99,42 +99,20 @@ agent.recursive_json_parse = (jobj) => {
 };
 agent.say = {};
 agent.say.model = 'ずんだもんノーマル';
-agent.say.start = ()=> {
-    const opt = cmdbox.get_server_opt(false, $('#filer_form'));
-    opt['mode'] = 'tts';
-    opt['cmd'] = 'start';
-    opt['tts_engine'] = 'voicevox';
-    opt['voicevox_model'] = agent.say.model;
-    cmdbox.show_loading();
-    return cmdbox.sv_exec_cmd(opt).then(res => {
-        if (res && res['success']) res = [res];
-        cmdbox.hide_loading();
-        if (!res[0] || !res[0]['success']) {
-            if (res[0] && res[0]['warn']) throw res[0]['warn'];
-            else if (res['warn']) throw res['warn'];
-            throw res;
-        }
-        if (res[0]['success']['data']) return res[0]['success']['data'];
-        return res[0]['success'];
+agent.say.start = async ()=> {
+    const data = await agent.exec_cmd('agent', 'runner_load', {runner_name: $('#runner_name_input').val()});
+    if (data && data.success) {
+        agent.say.model = data.success.voicevox_model || 'ずんだもんノーマル';
+    }
+    return agent.exec_cmd('tts', 'start', {'tts_engine': 'voicevox', 'voicevox_model': agent.say.model}).then((data) => {
+        if (!data['success']) throw data['warn'] || data;
+        return data['success'];
     });
 };
-agent.say.stop = () => {
-    const opt = cmdbox.get_server_opt(false, $('#filer_form'));
-    opt['mode'] = 'tts';
-    opt['cmd'] = 'stop';
-    opt['tts_engine'] = 'voicevox';
-    opt['voicevox_model'] = agent.say.model;
-    cmdbox.show_loading();
-    return cmdbox.sv_exec_cmd(opt).then(res => {
-        if (res && res['success']) res = [res];
-        cmdbox.hide_loading();
-        if (!res[0] || !res[0]['success']) {
-            if (res[0] && res[0]['warn']) throw res[0]['warn'];
-            else if (res['warn']) throw res['warn'];
-            throw res;
-        }
-        if (res[0]['success']['data']) return res[0]['success']['data'];
-        return res[0]['success'];
+agent.say.stop = async () => {
+    return agent.exec_cmd('tts', 'stop', {'tts_engine': 'voicevox', 'voicevox_model': agent.say.model}).then((data) => {
+        if (!data['success']) throw data['warn'] || data;
+        return data['success'];
     });
 };
 agent.say.isStart = () => {
@@ -143,25 +121,14 @@ agent.say.isStart = () => {
 };
 agent.say.say = (tts_text) => {
     if (!agent.say.isStart()) return;
-    const opt = cmdbox.get_server_opt(false, $('#filer_form'));
-    opt['mode'] = 'tts';
-    opt['cmd'] = 'say';
-    opt['tts_engine'] = 'voicevox';
-    opt['voicevox_model'] = agent.say.model;
-    opt['tts_text'] = tts_text.replace(/<br\s*\/?>/g, '\n'); // <br>タグを改行に変換
-    cmdbox.show_loading();
-    return cmdbox.sv_exec_cmd(opt).then(async (res) => {
-        if (res && res['success']) res = [res];
-        cmdbox.hide_loading();
-        if (!res[0] || !res[0]['success']) {
-            if (res[0] && res[0]['warn']) throw res[0]['warn'];
-            throw res;
-        }
-        if (!res[0]['success']['data']) {
-            throw res[0]['success'];
-        }
+    return agent.exec_cmd('tts', 'say', {
+        'tts_engine': 'voicevox',
+        'voicevox_model': agent.say.model,
+        'tts_text': tts_text.replace(/<br\s*\/?>/g, '\n') // <br>タグを改行に変換
+    }).then(async (data) => {
+        if (!data['success']) throw data;
         // 音声データを再生
-        const binary_string = window.atob(res[0]['success']['data']);
+        const binary_string = window.atob(data['success']['data']);
         const bytesArray  = new Uint8Array(binary_string.length);
         for (let i = 0; i < binary_string.length; i++) {
             bytesArray[i] = binary_string.charCodeAt(i);
@@ -209,7 +176,7 @@ agent.init_form = async () => {
             // エージェント側のメッセージ読込中を表示
             if (!agent.message_id) {
                 agent.message_id = cmdbox.random_string(16);
-                agent.create_agent_message(messages, agent.message_id);
+                const txt = agent.create_agent_message(messages, agent.message_id);
                 cmdbox.show_loading(txt);
             }
             if (!agent.ws) {
@@ -226,12 +193,12 @@ agent.init_form = async () => {
         // sayボタンのクリックイベント
         btn_say.off('click').on('click', async () => {
             if (agent.say.isStart()) {
-                agent.say.stop().then((msg) => {
-                    //cmdbox.message(msg);
+                await agent.say.stop().then((msg) => {
                     btn_say.removeClass('say_on');
                     btn_say.find('use').attr('href', '#btn_megaphone');
                 }).catch((err) => {
                     cmdbox.message(err);
+                    err = err['warn'] || err;
                     if (err.startsWith('VoiceVox model is not running:')) {
                         btn_say.removeClass('say_on');
                         btn_say.find('use').attr('href', '#btn_megaphone');
@@ -239,13 +206,13 @@ agent.init_form = async () => {
                 });
                 return;
             }
-            agent.say.start().then((msg) => {
-                //cmdbox.message(msg);
+            await agent.say.start().then((msg) => {
                 agent.say.say(msg);
                 btn_say.addClass('say_on');
                 btn_say.find('use').attr('href', '#btn_megaphone_fill');
             }).catch((err) => {
                 cmdbox.message(err);
+                err = err['warn'] || err;
                 if (err.startsWith('VoiceVox model is already running:')) {
                     btn_say.addClass('say_on');
                     btn_say.find('use').attr('href', '#btn_megaphone_fill');
@@ -334,7 +301,7 @@ agent.init_form = async () => {
         if (agent.ws) agent.ws.close();
         agent.ws = new WebSocket(`${protocol}://${host}:${port}${path}/chat/ws/${runner_name}/${session_id}`);
         // エージェントからのメッセージ受信時の処理
-        agent.ws.onmessage = (event) => {
+        agent.ws.onmessage = async (event) => {
             const packet = JSON.parse(event.data);
             if (!agent.message_id || $(`#${agent.message_id}`).length <= 0) {
                 // エージェント側の表示枠が無かったら追加
@@ -342,14 +309,16 @@ agent.init_form = async () => {
             }
             if (packet && packet['warn']) {
                 const txt = agent.create_agent_message(messages, agent.message_id);
-                agent.format_agent_message(container, messages, txt, `${packet['warn']}`);
+                await agent.format_agent_message(container, messages, txt, `${packet['warn']}`);
                 agent.message_id = null;
                 return;
             }
-            if (packet.turn_complete && packet.turn_complete) {
+            if (packet.turn_complete) {
+                agent.message_id = null;
                 return;
             }
             if (!packet.message || packet.message.length <= 0) {
+                agent.message_id = null;
                 return;
             }
             console.log(packet);
@@ -360,7 +329,7 @@ agent.init_form = async () => {
             } else {
                 txt = $(`#${agent.message_id}`);
             }
-            agent.format_agent_message(container, messages, txt, packet.message);
+            await agent.format_agent_message(container, messages, txt, packet.message);
             agent.message_id = null;
         };
         agent.ws.onopen = () => {
@@ -486,17 +455,17 @@ agent.create_history = (histories, session_id, msg) => {
         const container = $('#message_container');
         const messages = $('#messages');
         messages.html('');
-        session['events'].forEach((event) => {
-            if (!event['text'] || event['text'].length <= 0) return;
+        for (const event of session['events']) {
+            if (!event['text'] || event['text'].length <= 0) continue;
             if (event['author'] == 'user') {
                 // ユーザーメッセージ
                 agent.create_user_message(messages, event['text']);
             } else {
                 // エージェントメッセージ
                 txt = agent.create_agent_message(messages, cmdbox.random_string(16));
-                agent.format_agent_message(container, messages, txt, event['text']);
+                await agent.format_agent_message(container, messages, txt, event['text']);
             }
-        });
+        }
     });
     return history;
 };
@@ -507,17 +476,19 @@ agent.delete_session = async (session_id) => {
     });
 }
 
+agent.disabled = false;
 agent.exec_cmd = async (mode, cmd, opt={}, error_func=null, loading=true) => {
     const user = await cmdbox.user_info();
     if(!user) {
-        cmdbox.message({'error':'Connection to the agent has failed for several minutes. Please reload to resume reconnection.'});
-        window.location.reload();
+        if (!agent.disabled) {
+            cmdbox.message({'error':'User information could not be retrieved. AI features are unavailable.'});
+            agent.disabled = true;
+            $('#ai_chat_button').hide();
+        }
         return;
     }
-    opt['mode'] = mode;
-    opt['cmd'] = cmd;
-    opt['user_name'] = user['name'];
-    opt['capture_stdout'] = true;
+    const opt_def = cmdbox.get_server_opt(false, $('#filer_form'));
+    opt = {...opt_def, ...opt, 'mode':mode, 'cmd':cmd, 'user_name':user['name'], 'capture_stdout':true};
     if (loading) cmdbox.show_loading();
     return cmdbox.sv_exec_cmd(opt).then(res => {
         if(res && Array.isArray(res) && res.length <=0) {
@@ -776,7 +747,8 @@ agent.get_runner_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('agent', 'runner_save');
     const vform_names = ['runner_name', 'llm', 'mcpservers', 'session_store_type', 'session_store_pghost',
                         'session_store_pgport', 'session_store_pguser', 'session_store_pgpass',
-                        'session_store_pgdbname', 'llm_description', 'runner_instruction'];
+                        'session_store_pgdbname', 'llm_description', 'runner_instruction',
+                        'tts_engine', 'voicevox_model'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };
@@ -827,7 +799,7 @@ agent.list_runner = async () => {
                 await agent.build_runner_form();
                 const form = $('#form_runner_edit');
                 form.find('[name="runner_name"]').val(config.runner_name).prop('readonly', true);
-                
+
                 // 各フィールドに値をセット
                 Object.keys(config).forEach(key => {
                     if (key === 'runner_name') return;
@@ -898,6 +870,116 @@ agent.save_runner = async () => {
             alert('Failed to save Runner settings.');
         }
     } catch (e) {
+        console.error(e);
+        alert(`Error: ${e.message}`);
+    }
+};
+
+agent.get_tts_form_def = async () => {
+    const opts = await cmdbox.get_cmd_choices('tts', 'install');
+    const vform_names = ['tts_engine', 'voicevox_ver', 'voicevox_os', 'voicevox_arc', 'voicevox_device', 'voicevox_whl', 'force_install'];
+    const ret = opts.filter(o => vform_names.includes(o.opt));
+    return ret;
+};
+
+agent.build_tts_form = async () => {
+    const form = $('#form_tts_install');
+    form.empty();
+    const defs = await agent.get_tts_form_def();
+    const model = $('#tts_settings'); // モーダルではなく、設定ペイン内の要素を渡す
+    defs.forEach((row, i) => {
+        cmdbox.add_form_func(i, model, form, row, null);
+    });
+    // 選択肢による表示非表示の設定
+    form.find(`.choice_show`).each((i, elem) => {
+        const input_elem = $(elem);
+        input_elem.change();
+    });
+};
+
+agent.list_tts = async () => {
+    // フォームが空の場合のみ構築する（再描画を避けるため）
+    if ($('#form_tts_install').children().length === 0) {
+        await agent.build_tts_form();
+    }
+    if ($('#form_tts_uninstall').children().length === 0) {
+        await agent.build_tts_uninstall_form();
+    }
+};
+
+agent.install_tts = async () => {
+    const form = $('#form_tts_install');
+    const data = {};
+    form.serializeArray().forEach(item => {
+        if (item.value) data[item.name] = item.value;
+    });
+    // チェックボックスの処理 (serializeArrayではチェックされていないと含まれないため)
+    form.find('input[type="checkbox"]').each((i, elem) => {
+        data[elem.name] = $(elem).prop('checked');
+    });
+    if (data['force_install'] != 'true') delete data['force_install'];
+
+    if (!confirm('Are you sure you want to install the TTS engine? This may take a while.')) return;
+
+    try {
+        cmdbox.show_loading();
+        data['timeout'] = 900; // 15分のタイムアウトを設定
+        const res = await agent.exec_cmd('tts', 'install', data, null, false);
+        cmdbox.hide_loading();
+        
+        if (res && res.success) {
+            alert('TTS engine installation started/completed successfully. Check server logs for details.');
+        } else {
+            const msg = res && res.warn ? res.warn : 'Failed to install TTS engine.';
+            alert(msg);
+        }
+    } catch (e) {
+        cmdbox.hide_loading();
+        console.error(e);
+        alert(`Error: ${e.message}`);
+    }
+};
+
+agent.get_tts_uninstall_form_def = async () => {
+    const opts = await cmdbox.get_cmd_choices('tts', 'uninstall');
+    const vform_names = ['tts_engine'];
+    const ret = opts.filter(o => vform_names.includes(o.opt));
+    return ret;
+};
+
+agent.build_tts_uninstall_form = async () => {
+    const form = $('#form_tts_uninstall');
+    form.empty();
+    const defs = await agent.get_tts_uninstall_form_def();
+    const model = $('#tts_settings');
+    defs.forEach((row, i) => {
+        cmdbox.add_form_func(i, model, form, row, null);
+    });
+};
+
+agent.uninstall_tts = async () => {
+    const form = $('#form_tts_uninstall');
+    const data = {};
+    form.serializeArray().forEach(item => {
+        if (item.value) data[item.name] = item.value;
+    });
+
+    if (!confirm('Are you sure you want to uninstall the TTS engine?')) return;
+
+    try {
+        cmdbox.show_loading();
+        data['timeout'] = 300;
+        const res = await agent.exec_cmd('tts', 'uninstall', data, null, false);
+        cmdbox.hide_loading();
+        
+        if (res && res.success) {
+            alert('TTS engine uninstallation started/completed successfully. Check server logs for details.');
+        } else {
+            const msg = res && res.warn ? res.warn : 'Failed to uninstall TTS engine.';
+            alert(msg);
+        }
+    } catch (e) {
+        cmdbox.hide_loading();
         console.error(e);
         alert(`Error: ${e.message}`);
     }
@@ -982,16 +1064,10 @@ agent.html = `
     </div>
     <!-- 設定モーダル -->
     <div id="agent_settings_modal" class="modal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable" style="height: 50vh;">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable" style="height: 80vh;">
             <div class="modal-content h-100">
                 <div class="modal-header">
                     <h5 class="modal-title">Settings</h5>
-                    <button type="button" class="btn btn_window_stack">
-                        <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
-                    </button>
-                    <button type="button" class="btn btn_window">
-                        <svg class="bi bi-window" width="16" height="16" fill="currentColor"><use href="#btn_window"></use></svg>
-                    </button>
                     <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close">
                         <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
                     </button>
@@ -1004,6 +1080,7 @@ agent.html = `
                                 <a href="#" class="list-group-item list-group-item-action active" data-bs-target="#llm_settings">LLM Settings</a>
                                 <a href="#" class="list-group-item list-group-item-action" data-bs-target="#mcpsv_settings">MCPSV Settings</a>
                                 <a href="#" class="list-group-item list-group-item-action" data-bs-target="#runner_settings">Runner Settings</a>
+                                <a href="#" class="list-group-item list-group-item-action" data-bs-target="#tts_settings">TTS Settings</a>
                             </div>
                         </div>
                         <!-- スプリッター -->
@@ -1045,6 +1122,29 @@ agent.html = `
                                     </div>
                                     <div id="runner_list_container" class="list-group">
                                         <!-- Runner List Items will be injected here -->
+                                    </div>
+                                </div>
+                                <div id="tts_settings" class="settings-content d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="m-0">TTS Settings</h6>
+                                    </div>
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Install TTS Engine</h6>
+                                            <form id="form_tts_install" class="row"></form>
+                                            <div class="mt-3 text-end">
+                                                <button id="btn_install_tts" class="btn btn-primary">Install</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card mt-3">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Uninstall TTS Engine</h6>
+                                            <form id="form_tts_uninstall" class="row"></form>
+                                            <div class="mt-3 text-end">
+                                                <button id="btn_uninstall_tts" class="btn btn-danger">Uninstall</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1247,6 +1347,8 @@ agent.init = async () => {
             agent.list_mcpsv();
         } else if (target === '#runner_settings') {
             agent.list_runner();
+        } else if (target === '#tts_settings') {
+            agent.list_tts();
         }
     });
     
@@ -1298,6 +1400,16 @@ agent.init = async () => {
     $('#btn_runner').off('click').on('click', async () => {
         await agent.update_runner_list();
     });
+
+    // TTSインストールボタンのクリックイベント
+    $('#btn_install_tts').off('click').on('click', () => {
+        agent.install_tts();
+    });
+
+    // TTSアンインストールボタンのクリックイベント
+    $('#btn_uninstall_tts').off('click').on('click', () => {
+        agent.uninstall_tts();
+    });
 };
 
 agent.update_runner_list = async () => {
@@ -1321,6 +1433,10 @@ agent.update_runner_list = async () => {
                     });
                     await Promise.all(promises);
                     agent.select_runner(item.name);
+                    const item_data = await agent.exec_cmd('agent', 'runner_load', { runner_name: item.name }, null, false);
+                    if (item_data && item_data.success) {
+                        agent.say.model = item_data.success.voicevox_model || 'ずんだもんノーマル';
+                    }
                     // Start the agent runner
                     await agent.exec_cmd('agent', 'start', { runner_name: item.name }, null, false);
                     cmdbox.show_loading();

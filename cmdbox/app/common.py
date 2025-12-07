@@ -28,6 +28,7 @@ import time
 import yaml
 import sys
 import threading
+import types
 
 
 HOME_DIR = Path(os.path.expanduser("~"))
@@ -395,6 +396,8 @@ def default_json_enc(o) -> Any:
         return o.strftime('%Y-%m-%dT%H:%M:%S%z')
     if isinstance(o, feature.Feature):
         return 'object'
+    if isinstance(o, types.MethodType):
+        return 'method'
     raise TypeError(f"Type {type(o)} not serializable")
 
 def saveopt(opt:dict, opt_path:Path, webmode:bool=False) -> None:

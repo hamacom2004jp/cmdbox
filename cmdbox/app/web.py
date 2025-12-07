@@ -154,6 +154,7 @@ class Web:
         signin_file_data = signin.Signin.load_signin_file(self.signin_file, self=self)
         self.signin = signin.Signin(self.logger, self.signin_file, signin_file_data, self.appcls, self.ver)
         self.signin_saml = signin_saml.SigninSAML(self.logger, self.signin_file, signin_file_data, self.appcls, self.ver)
+        signin.Signin.set_webcls(self.__class__)
 
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web init parameter: data={self.data} -> {self.data.absolute() if self.data is not None else None}")
