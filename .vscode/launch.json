@@ -18,7 +18,7 @@
             "name": "Python: cmdbox tts_install",
             "type": "python",
             "request": "launch",
-            "args": ["-m","tts","-c","install","-f"],
+            "args": ["-m","tts","-c","install","--client_only","-f"],
             "module": "cmdbox",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",

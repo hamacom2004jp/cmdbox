@@ -301,8 +301,9 @@ class TtsInstall(feature.UnsupportEdgeFeature):
 
                 #===============================================================
                 # ダウンローダーを実行してVoiceVox coreをダウンロード
-                if not (voicevox_dir / 'models').exists() or not (voicevox_dir / 'onnxruntime').exists():
-                    cmd_line = [str(dlfile), '-o', '.', '--exclude', 'c-api', '--exclude', 'dict']
+                if not (voicevox_dir / 'models').exists():
+                    # モデルもダウンロード
+                    cmd_line = [str(dlfile), '-o', '.', '--only', 'models']
                     if voicevox_device == 'directml':
                         cmd_line.extend(['--devices', 'directml'])
                     elif voicevox_device == 'cuda':
@@ -310,22 +311,35 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                     if logger.level == logging.DEBUG:
                         logger.debug(f"EXEC - {cmd_line}")
                     proc = subprocess.Popen(cmd_line, cwd=str(voicevox_dir), stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
-                    # 自動的に許諾するために y(同意) を送信します
                     outs, errs = proc.communicate(input=b'y\n')
                     if proc.returncode != 0:
                         _msg = outs.decode('utf-8') if outs else ''
-                        _msg += errs.decode('utf-8') if errs else _msg
+                        _msg += errs.decode('utf-8') if errs else ''
                         _msg = f"Failed to install VoiceVox core: {_msg}"
                         logger.error(_msg, exc_info=True)
                         return dict(warn=_msg)
                     if logger.level == logging.DEBUG:
                         logger.debug(f"Completed - {cmd_line}")
-                    if (voicevox_dir / 'voicevox_core').exists():
-                        for file in glob.glob(str(voicevox_dir / 'voicevox_core' / '*')):
-                            shutil.move(file, voicevox_dir)
-                        shutil.rmtree(voicevox_dir / 'voicevox_core')
-                    logger.info(outs.decode('utf-8'))
-                    logger.info(f"VoiceVox core download successfully. {dlfile}")
+                if not (voicevox_dir / 'onnxruntime').exists():
+                    # onnxruntimeもダウンロード
+                    cmd_line = [str(dlfile), '-o', '.', '--only', 'onnxruntime']
+                    if voicevox_device == 'directml':
+                        cmd_line.extend(['--devices', 'directml'])
+                    elif voicevox_device == 'cuda':
+                        cmd_line.extend(['--devices', 'cuda'])
+                    if logger.level == logging.DEBUG:
+                        logger.debug(f"EXEC - {cmd_line}")
+                    proc = subprocess.Popen(cmd_line, cwd=str(voicevox_dir), stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
+                    outs, errs = proc.communicate(input=b'y\n')
+                    if proc.returncode != 0:
+                        _msg = outs.decode('utf-8') if outs else ''
+                        _msg += errs.decode('utf-8') if errs else ''
+                        _msg = f"Failed to install VoiceVox core: {_msg}"
+                        logger.error(_msg, exc_info=True)
+                        return dict(warn=_msg)
+                    if logger.level == logging.DEBUG:
+                        logger.debug(f"Completed - {cmd_line}")
+                logger.info(f"VoiceVox core download successfully. {dlfile}")
                 #===============================================================
                 # voicevoxのpythonライブラリのインストール
                 whl_url = f'https://github.com/VOICEVOX/voicevox_core/releases/download/{voicevox_ver}/{voicevox_whl}'
