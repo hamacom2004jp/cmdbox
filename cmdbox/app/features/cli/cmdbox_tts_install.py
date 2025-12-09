@@ -58,6 +58,9 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                 dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",
                      description_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
                      description_en="Specify the service name of the inference server. If omitted, `server` is used."),
+                dict(opt="data", type=Options.T_DIR, default=self.default_data, required=False, multi=False, hide=False, choice=None,
+                     description_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
+                     description_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
                 dict(opt="retry_count", type=Options.T_INT, default=3, required=False, multi=False, hide=True, choice=None,
                      description_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",
                      description_en="Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."),
@@ -74,17 +77,17 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                      description_ja="既にインストール済みであっても上書きインストールを行います。",
                      description_en="Overwrite the installation even if it is already installed."),
                 dict(opt="tts_engine", type=Options.T_STR, default="voicevox", required=True, multi=False, hide=False,
-                     choice=["voicevox"],
+                     choice=["", "voicevox"],
                      choice_show=dict(voicevox=["voicevox_ver", "voicevox_os", "voicevox_arc", "voicevox_device", "voicevox_whl"]),
                      description_ja="使用するTTSエンジンを指定します。",
                      description_en="Specify the TTS engine to use."),
-                dict(opt="voicevox_ver", type=Options.T_STR, default='0.16.2', required=False, multi=False, hide=False,
-                     choice=['0.16.0', '0.16.1', '0.16.2'],
+                dict(opt="voicevox_ver", type=Options.T_STR, default='0.16.3', required=False, multi=False, hide=False,
+                     choice=['0.16.0', '0.16.3'],
                      choice_edit=True,
                      description_ja="使用するTTSエンジンのバージョンを指定します。",
                      description_en="Specify the version of the TTS engine to use."),
                 dict(opt="voicevox_os", type=Options.T_STR, default='windows', required=False, multi=False, hide=False, choice=['windows', 'osx', 'linux'],
-                     description_ja="使用するTTSエンジンのOSを指定します。",
+                     description_ja="使用するTTSエンジンのOSを指定します.",
                      description_en="Specify the OS for the TTS engine."),
                 dict(opt="voicevox_arc", type=Options.T_STR, default='x64', required=False, multi=False, hide=False, choice=['x64', 'arm64'],
                      description_ja="使用するTTSエンジンのアーキテクチャを指定します。",
@@ -92,19 +95,13 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                 dict(opt="voicevox_device", type=Options.T_STR, default='cpu', required=False, multi=False, hide=False, choice=['cpu', 'directml', 'cuda'],
                      description_ja="使用するTTSエンジンのデバイスを指定します。",
                      description_en="Specify the device for the TTS engine."),
-                dict(opt="voicevox_whl", type=Options.T_STR, default='voicevox_core-0.16.2-cp310-abi3-win_amd64.whl', required=False, multi=False, hide=False,
-                     choice=['voicevox_core-0.16.2-cp310-abi3-win32.whl',
-                             'voicevox_core-0.16.2-cp310-abi3-win_amd64.whl',
-                             'voicevox_core-0.16.2-cp310-abi3-macosx_10_12_x86_64.whl',
-                             'voicevox_core-0.16.2-cp310-abi3-macosx_11_0_arm64.whl',
-                             'voicevox_core-0.16.2-cp310-abi3-manylinux_2_34_aarch64.whl',
-                             'voicevox_core-0.16.2-cp310-abi3-manylinux_2_34_x86_64.whl',
-                             'voicevox_core-0.16.1-cp310-abi3-win32.whl',
-                             'voicevox_core-0.16.1-cp310-abi3-win_amd64.whl',
-                             'voicevox_core-0.16.1-cp310-abi3-macosx_10_12_x86_64.whl',
-                             'voicevox_core-0.16.1-cp310-abi3-macosx_11_0_arm64.whl',
-                             'voicevox_core-0.16.1-cp310-abi3-manylinux_2_34_aarch64.whl',
-                             'voicevox_core-0.16.1-cp310-abi3-manylinux_2_34_x86_64.whl',
+                dict(opt="voicevox_whl", type=Options.T_STR, default='voicevox_core-0.16.3-cp310-abi3-win_amd64.whl', required=False, multi=False, hide=False,
+                     choice=['voicevox_core-0.16.3-cp310-abi3-win32.whl',
+                             'voicevox_core-0.16.3-cp310-abi3-win_amd64.whl',
+                             'voicevox_core-0.16.3-cp310-abi3-macosx_10_12_x86_64.whl',
+                             'voicevox_core-0.16.3-cp310-abi3-macosx_11_0_arm64.whl',
+                             'voicevox_core-0.16.3-cp310-abi3-manylinux_2_34_aarch64.whl',
+                             'voicevox_core-0.16.3-cp310-abi3-manylinux_2_34_x86_64.whl',
                              'voicevox_core-0.16.0-cp310-abi3-win32.whl',
                              'voicevox_core-0.16.0-cp310-abi3-win_amd64.whl',
                              'voicevox_core-0.16.0-cp310-abi3-macosx_10_12_x86_64.whl',
@@ -131,6 +128,10 @@ class TtsInstall(feature.UnsupportEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
+        if args.data is None and not args.client_only:
+            msg = dict(warn=f"Please specify the --data option.")
+            common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
         if args.tts_engine is None:
             msg = dict(warn=f"Please specify the --tts_engine option.")
             common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
@@ -157,6 +158,7 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                 common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, msg, None
 
+        data = Path(args.data) if args.data is not None else None
         tts_engine = args.tts_engine
         voicevox_ver = args.voicevox_ver if args.voicevox_ver is not None else '-'
         voicevox_os = args.voicevox_os if args.voicevox_os is not None else '-'
@@ -167,7 +169,7 @@ class TtsInstall(feature.UnsupportEdgeFeature):
 
         if args.client_only:
             # クライアントのみの場合は、サーバーに接続せずに実行
-            ret = self.install(common.random_string(), tts_engine, voicevox_ver, voicevox_os, voicevox_arc,
+            ret = self.install(common.random_string(), data, tts_engine, voicevox_ver, voicevox_os, voicevox_arc,
                                voicevox_device, voicevox_whl, force_install, logger)
         else:
             tts_engine_b64 = convert.str2b64str(tts_engine)
@@ -219,7 +221,7 @@ class TtsInstall(feature.UnsupportEdgeFeature):
         voicevox_device = convert.b64str2str(msg[6])
         voicevox_whl = convert.b64str2str(msg[7])
         force_install = convert.b64str2str(msg[8]).lower() == 'true'
-        ret = self.install(msg[1], tts_engine, voicevox_ver, voicevox_os, voicevox_arc, voicevox_device, voicevox_whl,
+        ret = self.install(msg[1], data_dir, tts_engine, voicevox_ver, voicevox_os, voicevox_arc, voicevox_device, voicevox_whl,
                            force_install, logger)
 
         redis_cli.rpush(msg[1], ret)
@@ -227,13 +229,14 @@ class TtsInstall(feature.UnsupportEdgeFeature):
             return self.RESP_WARN
         return self.RESP_SUCCESS
 
-    def install(self, reskey:str, tts_engine:str, voicevox_ver:str, voicevox_os:str, voicevox_arc:str,
+    def install(self, reskey:str, data_dir:Path, tts_engine:str, voicevox_ver:str, voicevox_os:str, voicevox_arc:str,
               voicevox_device:str, voicevox_whl:str, force_install:bool, logger:logging.Logger) -> Dict[str, Any]:
         """
         TTSエンジンをインストールします
 
         Args:
             reskey (str): レスポンスキー
+            data_dir (Path): データディレクトリ
             tts_engine (str): TTSエンジン
             voicevox_ver (str): VoiceVoxバージョン
             voicevox_os (str): VoiceVox OS
@@ -255,7 +258,7 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                 else:
                     dlfile = f"download-{voicevox_os}-{voicevox_arc}"
                 downloader_url = f"https://github.com/VOICEVOX/voicevox_core/releases/download/{voicevox_ver}/{dlfile}"
-                voicevox_dir = Path(version.__file__).parent / '.voicevox' / 'voicevox_core'
+                voicevox_dir = data_dir / '.voicevox' / 'voicevox_core'
                 # すでにダウンローダーの存在確認
                 if voicevox_dir.exists() and force_install:
                     shutil.rmtree(voicevox_dir)
@@ -301,25 +304,27 @@ class TtsInstall(feature.UnsupportEdgeFeature):
 
                 #===============================================================
                 # ダウンローダーを実行してVoiceVox coreをダウンロード
-                if not (voicevox_dir / 'models').exists():
-                    # モデルもダウンロード
-                    cmd_line = [str(dlfile), '-o', '.', '--only', 'models']
-                    if voicevox_device == 'directml':
-                        cmd_line.extend(['--devices', 'directml'])
-                    elif voicevox_device == 'cuda':
-                        cmd_line.extend(['--devices', 'cuda'])
+                model_url = "https://raw.githubusercontent.com/VOICEVOX/voicevox_vvm/main/vvms/"
+                model_dir = voicevox_dir / 'models' / "vvms"
+                if not (model_dir).exists():
+                    model_dir.mkdir(parents=True, exist_ok=True)
+                    for i in range(0, 22):
+                        # モデルダウンロード
+                        if logger.level == logging.DEBUG:
+                            logger.debug(f"Downloading model. : {model_url}{i}.vvm")
+                        responce = requests.get(f"{model_url}{i}.vvm", allow_redirects=True)
+                        if responce.status_code != 200:
+                            _msg = f"Failed to download vvm: {responce.status_code} {responce.reason}. {model_url}{i}.vvm"
+                            logger.error(_msg, exc_info=True)
+                            return dict(warn=_msg)
+                        def _wd_model(f):
+                            f.write(responce.content)
+                        save_file = model_dir / f'{i}.vvm'
+                        common.save_file(save_file, _wd_model, mode='wb')
+                        if logger.level == logging.DEBUG:
+                            logger.debug(f"Saved model. : {save_file}")
                     if logger.level == logging.DEBUG:
-                        logger.debug(f"EXEC - {cmd_line}")
-                    proc = subprocess.Popen(cmd_line, cwd=str(voicevox_dir), stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
-                    outs, errs = proc.communicate(input=b'y\n')
-                    if proc.returncode != 0:
-                        _msg = outs.decode('utf-8') if outs else ''
-                        _msg += errs.decode('utf-8') if errs else ''
-                        _msg = f"Failed to install VoiceVox core: {_msg}"
-                        logger.error(_msg, exc_info=True)
-                        return dict(warn=_msg)
-                    if logger.level == logging.DEBUG:
-                        logger.debug(f"Completed - {cmd_line}")
+                        logger.debug(f"Downloading models Completed.")
                 if not (voicevox_dir / 'onnxruntime').exists():
                     # onnxruntimeもダウンロード
                     cmd_line = [str(dlfile), '-o', '.', '--only', 'onnxruntime']

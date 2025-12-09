@@ -179,8 +179,8 @@ class TtsStart(feature.UnsupportEdgeFeature):
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                      description_en="Specify the maximum waiting time until the server responds."),
                 dict(opt="tts_engine", type=Options.T_STR, default="voicevox", required=True, multi=False, hide=False,
-                     choice=["voicevox"],
-                     choice_show=dict(voicevox=["voicevox_model"]),
+                     choice=["", "voicevox"],
+                     choice_show=dict(voicevox=["voicevox_ver", "voicevox_os", "voicevox_arc", "voicevox_device", "voicevox_whl"]),
                      description_ja="使用するTTSエンジンを指定します。",
                      description_en="Specify the TTS engine to use."),
                 dict(opt="voicevox_model", type=Options.T_STR, default=None, required=False, multi=False, hide=False,
@@ -254,19 +254,19 @@ class TtsStart(feature.UnsupportEdgeFeature):
             logger.debug(f"tts start svrun msg: {msg}")
         tts_engine = convert.b64str2str(msg[2])
         voicevox_model = convert.b64str2str(msg[3])
-        st = self.start(msg[1], tts_engine, voicevox_model, data_dir, logger, redis_cli, sessions)
+        st = self.start(msg[1], data_dir, tts_engine, voicevox_model, logger, redis_cli, sessions)
         return st
 
-    def start(self, reskey:str, tts_engine:str, voicevox_model:str, data_dir:Path, logger:logging.Logger,
+    def start(self, reskey:str, data_dir:Path, tts_engine:str, voicevox_model:str, logger:logging.Logger,
               redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         TTSエンジンのモデルを開始します
 
         Args:
             reskey (str): レスポンスキー
+            data_dir (Path): データディレクトリ
             tts_engine (str): TTSエンジン
             voicevox_model (str): VoiceVoxモデル
-            data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
             sessions (Dict[str, Dict[str, Any]]): セッション情報
@@ -279,7 +279,7 @@ class TtsStart(feature.UnsupportEdgeFeature):
                 #===============================================================
                 # voicevoxの初期化
                 from voicevox_core.blocking import Onnxruntime, OpenJtalk, Synthesizer, VoiceModelFile
-                voicevox_dir = Path(version.__file__).parent / '.voicevox' / 'voicevox_core'
+                voicevox_dir = data_dir / '.voicevox' / 'voicevox_core'
                 if not voicevox_dir.exists():
                     logger.error(f"Failed to start VoiceVox core: voicevox directory does not exist: {voicevox_dir}")
                     redis_cli.rpush(reskey, dict(warn=f"Failed to start VoiceVox core: voicevox directory does not exist: {voicevox_dir}"))

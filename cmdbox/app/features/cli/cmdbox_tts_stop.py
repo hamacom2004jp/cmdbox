@@ -47,19 +47,19 @@ class TtsStop(cmdbox_tts_start.TtsStart):
             logger.debug(f"audit write svrun msg: {msg}")
         tts_engine = convert.b64str2str(msg[2])
         voicevox_model = convert.b64str2str(msg[3])
-        st = self.stop(msg[1], tts_engine, voicevox_model, data_dir, logger, redis_cli, sessions)
+        st = self.stop(msg[1], data_dir, tts_engine, voicevox_model, logger, redis_cli, sessions)
         return st
 
-    def stop(self, reskey:str, tts_engine:str, voicevox_model:str, data_dir:Path, logger:logging.Logger,
+    def stop(self, reskey:str, data_dir:Path, tts_engine:str, voicevox_model:str, logger:logging.Logger,
               redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         TTSエンジンのモデルを停止します
 
         Args:
             reskey (str): レスポンスキー
+            data_dir (Path): データディレクトリ
             tts_engine (str): TTSエンジン
             voicevox_model (str): VoiceVoxモデル
-            data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
             sessions (Dict[str, Dict[str, Any]]): セッション情報
