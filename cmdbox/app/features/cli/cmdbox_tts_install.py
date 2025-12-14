@@ -78,40 +78,59 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                      description_en="Overwrite the installation even if it is already installed."),
                 dict(opt="tts_engine", type=Options.T_STR, default="voicevox", required=True, multi=False, hide=False,
                      choice=["", "voicevox"],
-                     choice_show=dict(voicevox=["voicevox_ver", "voicevox_os", "voicevox_arc", "voicevox_device", "voicevox_whl"]),
+                     choice_show=dict(voicevox=["voicevox_ver", "voicevox_whl",
+                                                "openjtalk_ver", "openjtalk_dic",
+                                                "onnxruntime_ver", "onnxruntime_lib"]),
                      description_ja="使用するTTSエンジンを指定します。",
                      description_en="Specify the TTS engine to use."),
                 dict(opt="voicevox_ver", type=Options.T_STR, default='0.16.3', required=False, multi=False, hide=False,
-                     choice=['0.16.0', '0.16.3'],
+                     choice=['', '0.16.3'],
                      choice_edit=True,
-                     description_ja="使用するTTSエンジンのバージョンを指定します。",
-                     description_en="Specify the version of the TTS engine to use."),
-                dict(opt="voicevox_os", type=Options.T_STR, default='windows', required=False, multi=False, hide=False, choice=['windows', 'osx', 'linux'],
-                     description_ja="使用するTTSエンジンのOSを指定します.",
-                     description_en="Specify the OS for the TTS engine."),
-                dict(opt="voicevox_arc", type=Options.T_STR, default='x64', required=False, multi=False, hide=False, choice=['x64', 'arm64'],
-                     description_ja="使用するTTSエンジンのアーキテクチャを指定します。",
-                     description_en="Specify the architecture for the TTS engine."),
-                dict(opt="voicevox_device", type=Options.T_STR, default='cpu', required=False, multi=False, hide=False, choice=['cpu', 'directml', 'cuda'],
-                     description_ja="使用するTTSエンジンのデバイスを指定します。",
-                     description_en="Specify the device for the TTS engine."),
+                     description_ja="使用するVOICEVOXのバージョンを指定します。",
+                     description_en="Specify the version of VOICEVOX to use."),
                 dict(opt="voicevox_whl", type=Options.T_STR, default='voicevox_core-0.16.3-cp310-abi3-win_amd64.whl', required=False, multi=False, hide=False,
-                     choice=['voicevox_core-0.16.3-cp310-abi3-win32.whl',
+                     choice=['',
+                             'voicevox_core-0.16.3-cp310-abi3-win32.whl',
                              'voicevox_core-0.16.3-cp310-abi3-win_amd64.whl',
                              'voicevox_core-0.16.3-cp310-abi3-macosx_10_12_x86_64.whl',
                              'voicevox_core-0.16.3-cp310-abi3-macosx_11_0_arm64.whl',
                              'voicevox_core-0.16.3-cp310-abi3-manylinux_2_34_aarch64.whl',
                              'voicevox_core-0.16.3-cp310-abi3-manylinux_2_34_x86_64.whl',
-                             'voicevox_core-0.16.0-cp310-abi3-win32.whl',
-                             'voicevox_core-0.16.0-cp310-abi3-win_amd64.whl',
-                             'voicevox_core-0.16.0-cp310-abi3-macosx_10_12_x86_64.whl',
-                             'voicevox_core-0.16.0-cp310-abi3-macosx_11_0_arm64.whl',
-                             'voicevox_core-0.16.0-cp310-abi3-manylinux_2_34_aarch64.whl',
-                             'voicevox_core-0.16.0-cp310-abi3-manylinux_2_34_x86_64.whl',
                              ],
                      choice_edit=True,
-                     description_ja="使用するTTSエンジンのホイールファイルを指定します。",
-                     description_en="Specify the wheel file for the TTS engine."),
+                     description_ja="使用するVOICEVOXのホイールファイルを指定します。",
+                     description_en="Specify the VOICEVOX wheel file to use."),
+                dict(opt="openjtalk_ver", type=Options.T_STR, default='v1.11.1', required=False, multi=False, hide=False,
+                     choice=['', 'v1.11.1'],
+                     choice_edit=True,
+                     description_ja="使用するopenjtalkのバージョンを指定します。",
+                     description_en="Specify the version of openjtalk to use."),
+                dict(opt="openjtalk_dic", type=Options.T_STR, default='open_jtalk_dic_utf_8-1.11.tar.gz', required=False, multi=False, hide=False,
+                     choice=['', 'open_jtalk_dic_utf_8-1.11.tar.gz'],
+                     choice_edit=True,
+                     description_ja="使用するopenjtalkの辞書ファイルを指定します。",
+                     description_en="Specify the openjtalk dictionary file to use."),
+                dict(opt="onnxruntime_ver", type=Options.T_STR, default='voicevox_onnxruntime-1.17.3', required=False, multi=False, hide=False,
+                     choice=['', 'voicevox_onnxruntime-1.17.3'],
+                     choice_edit=True,
+                     description_ja="使用するONNX Runtimeのバージョンを指定します。",
+                     description_en="Specify the version of ONNX Runtime to use."),
+                dict(opt="onnxruntime_lib", type=Options.T_STR, default='voicevox_onnxruntime-win-x64-1.17.3.tgz', required=False, multi=False, hide=False,
+                     choice=['',
+                             'voicevox_onnxruntime-linux-arm64-1.17.3.tgz',
+                             'voicevox_onnxruntime-linux-armhf-1.17.3.tgz',
+                             'voicevox_onnxruntime-linux-x64-1.17.3.tgz',
+                             'voicevox_onnxruntime-linux-x64-cuda-1.17.3.tgz',
+                             'voicevox_onnxruntime-osx-arm64-1.17.3.tgz',
+                             'voicevox_onnxruntime-osx-x86_64-1.17.3.tgz',
+                             'voicevox_onnxruntime-win-x64-1.17.3.tgz',
+                             'voicevox_onnxruntime-win-x64-cuda-1.17.3.tgz',
+                             'voicevox_onnxruntime-win-x64-dml-1.17.3.tgz',
+                             'voicevox_onnxruntime-win-x86-1.17.3.tgz',
+                             ],
+                     choice_edit=True,
+                     description_ja="使用するONNX Runtimeのライブラリファイルを指定します。",
+                     description_en="Specify the ONNX Runtime library file to use."),
             ]
         )
 
@@ -141,47 +160,54 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                 msg = dict(warn=f"Please specify the --voicevox_ver option.")
                 common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, msg, None
-            if args.voicevox_os is None:
-                msg = dict(warn=f"Please specify the --voicevox_os option.")
-                common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
-                return self.RESP_WARN, msg, None
-            if args.voicevox_arc is None:
-                msg = dict(warn=f"Please specify the --voicevox_arc option.")
-                common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
-                return self.RESP_WARN, msg, None
-            if args.voicevox_device is None:
-                msg = dict(warn=f"Please specify the --voicevox_device option.")
-                common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
-                return self.RESP_WARN, msg, None
             if args.voicevox_whl is None:
                 msg = dict(warn=f"Please specify the --voicevox_whl option.")
+                common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, msg, None
+            if args.openjtalk_ver is None:
+                msg = dict(warn=f"Please specify the --openjtalk_ver option.")
+                common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, msg, None
+            if args.openjtalk_dic is None:
+                msg = dict(warn=f"Please specify the --openjtalk_dic option.")
+                common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, msg, None
+            if args.onnxruntime_ver is None:
+                msg = dict(warn=f"Please specify the --onnxruntime_ver option.")
+                common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, msg, None
+            if args.onnxruntime_lib is None:
+                msg = dict(warn=f"Please specify the --onnxruntime_lib option.")
                 common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, msg, None
 
         data = Path(args.data) if args.data is not None else None
         tts_engine = args.tts_engine
         voicevox_ver = args.voicevox_ver if args.voicevox_ver is not None else '-'
-        voicevox_os = args.voicevox_os if args.voicevox_os is not None else '-'
-        voicevox_arc = args.voicevox_arc if args.voicevox_arc is not None else '-'
-        voicevox_device = args.voicevox_device if args.voicevox_device is not None else '-'
         voicevox_whl = args.voicevox_whl if args.voicevox_whl is not None else '-'
+        openjtalk_ver = args.openjtalk_ver if args.openjtalk_ver is not None else '-'
+        openjtalk_dic = args.openjtalk_dic if args.openjtalk_dic is not None else '-'
+        onnxruntime_ver = args.onnxruntime_ver if args.onnxruntime_ver is not None else '-'
+        onnxruntime_lib = args.onnxruntime_lib if args.onnxruntime_lib is not None else '-'
         force_install = args.force_install if args.force_install is not None else False
 
         if args.client_only:
             # クライアントのみの場合は、サーバーに接続せずに実行
-            ret = self.install(common.random_string(), data, tts_engine, voicevox_ver, voicevox_os, voicevox_arc,
-                               voicevox_device, voicevox_whl, force_install, logger)
+            ret = self.install(common.random_string(), data, tts_engine, voicevox_ver, voicevox_whl,
+                               openjtalk_ver, openjtalk_dic,
+                               onnxruntime_ver, onnxruntime_lib, force_install, logger)
         else:
             tts_engine_b64 = convert.str2b64str(tts_engine)
             voicevox_ver_b64 = convert.str2b64str(voicevox_ver)
-            voicevox_os_b64 = convert.str2b64str(voicevox_os)
-            voicevox_arc_b64 = convert.str2b64str(voicevox_arc)
-            voicevox_device_b64 = convert.str2b64str(voicevox_device)
             voicevox_whl_b64 = convert.str2b64str(voicevox_whl)
+            openjtalk_ver_b64 = convert.str2b64str(openjtalk_ver)
+            openjtalk_dic_b64 = convert.str2b64str(openjtalk_dic)
+            onnxruntime_ver_b64 = convert.str2b64str(onnxruntime_ver)
+            onnxruntime_lib_b64 = convert.str2b64str(onnxruntime_lib)
             force_install_b64 = convert.str2b64str(str(force_install))
             cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
             ret = cl.redis_cli.send_cmd(self.get_svcmd(),
-                                        [tts_engine_b64, voicevox_ver_b64, voicevox_os_b64, voicevox_arc_b64, voicevox_device_b64, voicevox_whl_b64, force_install_b64],
+                                        [tts_engine_b64, voicevox_ver_b64, voicevox_whl_b64, openjtalk_ver_b64, openjtalk_dic_b64, onnxruntime_ver_b64, onnxruntime_lib_b64, force_install_b64],
                                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
         common.print_format(ret, False, tm, None, False, pf=pf)
         if 'success' not in ret:
@@ -216,12 +242,14 @@ class TtsInstall(feature.UnsupportEdgeFeature):
             logger.debug(f"audit write svrun msg: {msg}")
         tts_engine = convert.b64str2str(msg[2])
         voicevox_ver = convert.b64str2str(msg[3])
-        voicevox_os = convert.b64str2str(msg[4])
-        voicevox_arc = convert.b64str2str(msg[5])
-        voicevox_device = convert.b64str2str(msg[6])
-        voicevox_whl = convert.b64str2str(msg[7])
-        force_install = convert.b64str2str(msg[8]).lower() == 'true'
-        ret = self.install(msg[1], data_dir, tts_engine, voicevox_ver, voicevox_os, voicevox_arc, voicevox_device, voicevox_whl,
+        voicevox_whl = convert.b64str2str(msg[4])
+        openjtalk_ver = convert.b64str2str(msg[5])
+        openjtalk_dic = convert.b64str2str(msg[6])
+        onnxruntime_ver = convert.b64str2str(msg[7])
+        onnxruntime_lib = convert.b64str2str(msg[8])
+        force_install = convert.b64str2str(msg[9]).lower() == 'true'
+        ret = self.install(msg[1], data_dir, tts_engine, voicevox_ver, voicevox_whl,
+                           openjtalk_ver, openjtalk_dic, onnxruntime_ver, onnxruntime_lib,
                            force_install, logger)
 
         redis_cli.rpush(msg[1], ret)
@@ -229,8 +257,10 @@ class TtsInstall(feature.UnsupportEdgeFeature):
             return self.RESP_WARN
         return self.RESP_SUCCESS
 
-    def install(self, reskey:str, data_dir:Path, tts_engine:str, voicevox_ver:str, voicevox_os:str, voicevox_arc:str,
-              voicevox_device:str, voicevox_whl:str, force_install:bool, logger:logging.Logger) -> Dict[str, Any]:
+    def install(self, reskey:str, data_dir:Path, tts_engine:str, voicevox_ver:str, voicevox_whl:str,
+                openjtalk_ver:str, openjtalk_dic:str,
+                onnxruntime_ver:str, onnxruntime_lib:str,
+                force_install:bool, logger:logging.Logger) -> Dict[str, Any]:
         """
         TTSエンジンをインストールします
 
@@ -239,10 +269,11 @@ class TtsInstall(feature.UnsupportEdgeFeature):
             data_dir (Path): データディレクトリ
             tts_engine (str): TTSエンジン
             voicevox_ver (str): VoiceVoxバージョン
-            voicevox_os (str): VoiceVox OS
-            voicevox_arc (str): VoiceVox アーキテクチャ
-            voicevox_device (str): VoiceVox デバイス
             voicevox_whl (str): VoiceVox ホイールファイル
+            openjtalk_ver (str): Open JTalk バージョン
+            openjtalk_dic (str): Open JTalk 辞書
+            onnxruntime_ver (str): ONNX Runtime バージョン
+            onnxruntime_lib (str): ONNX Runtime ライブラリ
             force_install (bool): 強制インストールフラグ
             logger (logging.Logger): ロガー
 
@@ -251,38 +282,15 @@ class TtsInstall(feature.UnsupportEdgeFeature):
         """
         try:
             if tts_engine == 'voicevox':
-                #===============================================================
-                # voicevoxのダウンローダーのダウンロード
-                if voicevox_os == 'windows':
-                    dlfile = f"download-{voicevox_os}-{voicevox_arc}.exe"
-                else:
-                    dlfile = f"download-{voicevox_os}-{voicevox_arc}"
-                downloader_url = f"https://github.com/VOICEVOX/voicevox_core/releases/download/{voicevox_ver}/{dlfile}"
                 voicevox_dir = data_dir / '.voicevox' / 'voicevox_core'
-                # すでにダウンローダーの存在確認
                 if voicevox_dir.exists() and force_install:
                     shutil.rmtree(voicevox_dir)
                 voicevox_dir.mkdir(parents=True, exist_ok=True)
-                # ダウンローダーを保存
-                dlfile = voicevox_dir / dlfile
-                if not dlfile.exists():
-                    if logger.level == logging.DEBUG:
-                        logger.debug(f"Downloading.. : {downloader_url}")
-                    responce = requests.get(downloader_url, allow_redirects=True)
-                    if responce.status_code != 200:
-                        _msg = f"Failed to download VoiceVox core: {responce.status_code} {responce.reason}. {downloader_url}"
-                        logger.error(_msg, exc_info=True)
-                        return dict(warn=_msg)
-                    def _wd(f):
-                        f.write(responce.content)
-                    common.save_file(dlfile, _wd, mode='wb')
-                # ダウンローダーの実行権限を付与
-                if voicevox_os != 'windows':
-                    dlfile.chmod(dlfile.stat().st_mode | 0o111)
+
                 #===============================================================
                 # Open JTalk辞書のダウンロード (SourceForgeが不安定なためGitHubから)
-                dic_url = "https://github.com/r9y9/open_jtalk/releases/download/v1.11.1/open_jtalk_dic_utf_8-1.11.tar.gz"
-                dic_file = voicevox_dir / 'dict' / "open_jtalk_dic_utf_8-1.11.tar.gz"
+                dic_url = f"https://github.com/r9y9/open_jtalk/releases/download/{openjtalk_ver}/{openjtalk_dic}"
+                dic_file = voicevox_dir / 'dict' / openjtalk_dic
                 if not dic_file.exists():
                     dic_file.parent.mkdir(parents=True, exist_ok=True)
                     if logger.level == logging.DEBUG:
@@ -299,14 +307,21 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                     if logger.level == logging.DEBUG:
                         logger.debug(f"Extracting dictionary.. : {dic_file}")
                     with tarfile.open(dic_file, 'r:gz') as tar:
-                        tar.extractall(path=voicevox_dir)
-                    shutil.move(str(voicevox_dir / 'open_jtalk_dic_utf_8-1.11'), str(voicevox_dir / 'dict'))
+                        tar.extractall(path=dic_file.parent)
+                    src_dir = dic_file.parent / str(openjtalk_dic).replace('.tar.gz', '')
+                    for src_file in src_dir.glob('*'):
+                        shutil.move(src_file, dic_file.parent)
+                    shutil.rmtree(src_dir)
+                    if logger.level == logging.DEBUG:
+                        logger.debug(f"Extracted dictionary. : {dic_file.parent}")
+                else:
+                    logger.info(f"Since it already existed, I skipped downloading Open JTalk dictionary. : {dic_file}")
 
                 #===============================================================
-                # ダウンローダーを実行してVoiceVox coreをダウンロード
+                # モデルファイルをダウンロード
                 model_url = "https://raw.githubusercontent.com/VOICEVOX/voicevox_vvm/main/vvms/"
-                model_dir = voicevox_dir / 'models' / "vvms"
-                if not (model_dir).exists():
+                model_dir = voicevox_dir / 'models' / 'vvms'
+                if not model_dir.exists():
                     model_dir.mkdir(parents=True, exist_ok=True)
                     for i in range(0, 22):
                         # モデルダウンロード
@@ -325,26 +340,43 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                             logger.debug(f"Saved model. : {save_file}")
                     if logger.level == logging.DEBUG:
                         logger.debug(f"Downloading models Completed.")
-                if not (voicevox_dir / 'onnxruntime').exists():
-                    # onnxruntimeもダウンロード
-                    cmd_line = [str(dlfile), '-o', '.', '--only', 'onnxruntime']
-                    if voicevox_device == 'directml':
-                        cmd_line.extend(['--devices', 'directml'])
-                    elif voicevox_device == 'cuda':
-                        cmd_line.extend(['--devices', 'cuda'])
+                else:
+                    logger.info(f"Since it already existed, I skipped downloading VOICEVOX models. : {model_dir}")
+
+                #===============================================================
+                # ONNX Runtimeをダウンロード
+                onnx_url = f"https://github.com/VOICEVOX/onnxruntime-builder/releases/download/{onnxruntime_ver}/{onnxruntime_lib}"
+                onnx_dir = voicevox_dir / 'onnxruntime'
+                if not onnx_dir.exists():
+                    onnx_dir.mkdir(parents=True, exist_ok=True)
+                    # onnxruntimeダウンロード
                     if logger.level == logging.DEBUG:
-                        logger.debug(f"EXEC - {cmd_line}")
-                    proc = subprocess.Popen(cmd_line, cwd=str(voicevox_dir), stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
-                    outs, errs = proc.communicate(input=b'y\n')
-                    if proc.returncode != 0:
-                        _msg = outs.decode('utf-8') if outs else ''
-                        _msg += errs.decode('utf-8') if errs else ''
-                        _msg = f"Failed to install VoiceVox core: {_msg}"
+                        logger.debug(f"Downloading onnxruntime. : {onnx_url}")
+                    responce = requests.get(f"{onnx_url}", allow_redirects=True)
+                    if responce.status_code != 200:
+                        _msg = f"Failed to download onnxruntime: {responce.status_code} {responce.reason}. {onnx_url}"
                         logger.error(_msg, exc_info=True)
                         return dict(warn=_msg)
+                    def _wd_model(f):
+                        f.write(responce.content)
+                    save_file = onnx_dir / f'{onnxruntime_lib}'
+                    common.save_file(save_file, _wd_model, mode='wb')
                     if logger.level == logging.DEBUG:
-                        logger.debug(f"Completed - {cmd_line}")
-                logger.info(f"VoiceVox core download successfully. {dlfile}")
+                        logger.debug(f"Downloading onnxruntime Completed.")
+                    # libの展開
+                    if logger.level == logging.DEBUG:
+                        logger.debug(f"Extracting dictionary.. : {save_file}")
+                    with tarfile.open(save_file, 'r:gz') as tar:
+                        tar.extractall(path=save_file.parent)
+                    src_dir = Path(str(save_file).replace('.tgz', ''))
+                    for src_file in src_dir.glob('*'):
+                        shutil.move(src_file, onnx_dir)
+                    shutil.rmtree(src_dir)
+                    if logger.level == logging.DEBUG:
+                        logger.debug(f"Extracted dictionary. : {onnx_dir}")
+                else:
+                    logger.info(f"Since it already existed, I skipped downloading ONNX Runtime. : {onnx_dir}")
+
                 #===============================================================
                 # voicevoxのpythonライブラリのインストール
                 whl_url = f'https://github.com/VOICEVOX/voicevox_core/releases/download/{voicevox_ver}/{voicevox_whl}'
@@ -361,6 +393,8 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                     def _ww(f):
                         f.write(responce.content)
                     common.save_file(voicevox_whl, _ww, mode='wb')
+                else:
+                    logger.info(f"Since it already existed, I skipped downloading VOICEVOX whl. : {voicevox_whl}")
                 # whlファイルをpipでインストール
                 if logger.level == logging.DEBUG:
                     logger.debug(f"pip install {voicevox_whl}")
@@ -372,7 +406,7 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                     return dict(warn=_msg)
                 #===============================================================
                 # 成功時の処理
-                rescode, _msg = (self.RESP_SUCCESS, dict(success=f'Success to install VoiceVox python library. {whl_url}'))
+                rescode, _msg = (self.RESP_SUCCESS, dict(success=f'Success to install VoiceVox. {whl_url}'))
                 return dict(success=_msg)
         except Exception as e:
             _msg = f"Failed to install VoiceVox: {e}"

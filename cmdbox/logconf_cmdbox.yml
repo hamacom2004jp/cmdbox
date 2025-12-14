@@ -22,6 +22,14 @@ handlers:
         omit_repeated_times: false
         tracebacks_word_wrap: false
         log_time_format: '[%Y-%m-%d %H:%M]'
+    agent:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/cmdbox_agent.log
     audit:
         class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
         level: INFO
@@ -62,6 +70,14 @@ handlers:
         when : 'D'
         encoding : 'utf-8'
         filename: .logs/cmdbox_edge.log
+    excel:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/cmdbox_excel.log
     gui:
         class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
         level: INFO
@@ -70,14 +86,14 @@ handlers:
         when : 'D'
         encoding : 'utf-8'
         filename: .logs/cmdbox_gui.log
-    mcp:
+    mcpsv:
         class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
         level: INFO
         formatter: fmt
         backupCount: 5
         when : 'D'
         encoding : 'utf-8'
-        filename: .logs/cmdbox_mcp.log
+        filename: .logs/cmdbox_mcpsv.log
     server:
         class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
         level: INFO
@@ -118,6 +134,11 @@ handlers:
         filename: .logs/cmdbox_logsv.log
 
 loggers:
+    agent:
+        handlers: [agent, std]
+        level: INFO
+        qualname: agent
+        propagate: false
     audit:
         handlers: [audit, std]
         level: INFO
@@ -143,15 +164,20 @@ loggers:
         level: INFO
         qualname: edge
         propagate: false
+    excel:
+        handlers: [excel, std]
+        level: INFO
+        qualname: excel
+        propagate: false
     gui:
         handlers: [gui, std]
         level: INFO
         qualname: gui
         propagate: false
-    mcp:
-        handlers: [mcp, std]
+    mcpsv:
+        handlers: [mcpsv, std]
         level: INFO
-        qualname: mcp
+        qualname: mcpsv
         propagate: false
     server:
         handlers: [server, std]

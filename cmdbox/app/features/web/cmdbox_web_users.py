@@ -36,7 +36,7 @@ class Users(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin.get_data() is None:
+            if web.signin.signin_file_data is None:
                 return dict(error='signin_file_data is None.')
             web.options.audit_exec(req, res, web)
             return web.user_list(None)
@@ -46,7 +46,7 @@ class Users(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin.get_data() is None:
+            if web.signin.signin_file_data is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
@@ -61,7 +61,7 @@ class Users(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin.get_data() is None:
+            if web.signin.signin_file_data is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
@@ -76,7 +76,7 @@ class Users(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin.get_data() is None:
+            if web.signin.signin_file_data is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
@@ -94,7 +94,7 @@ class Users(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin.get_data() is None:
+            if web.signin.signin_file_data is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
@@ -110,7 +110,7 @@ class Users(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin.get_data() is None:
+            if web.signin.signin_file_data is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
@@ -125,7 +125,7 @@ class Users(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin.get_data() is None:
+            if web.signin.signin_file_data is None:
                 return dict(error='signin_file_data is None.')
             try:
                 web.options.audit_exec(req, res, web)
@@ -138,7 +138,7 @@ class Users(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin.get_data() is None:
+            if web.signin.signin_file_data is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
@@ -153,7 +153,7 @@ class Users(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin.get_data() is None:
+            if web.signin.signin_file_data is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
@@ -168,7 +168,7 @@ class Users(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin.get_data() is None:
+            if web.signin.signin_file_data is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:
@@ -185,10 +185,11 @@ class Users(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin.get_data() is None:
+            data = web.signin.signin_file_data
+            if data is None:
                 return dict(error='signin_file_data is None.')
             try:
-                return web.signin.get_data()['cmdrule']
+                return data['cmdrule']
             except Exception as e:
                 return dict(error=str(e))
 
@@ -197,10 +198,11 @@ class Users(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin.get_data() is None:
+            data = web.signin.signin_file_data
+            if data is None:
                 return dict(error='signin_file_data is None.')
             try:
-                return web.signin.get_data()['pathrule']
+                return data['pathrule']
             except Exception as e:
                 return dict(error=str(e))
 
@@ -209,10 +211,11 @@ class Users(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin.get_data() is None:
+            data = web.signin.signin_file_data
+            if data is None:
                 return dict(error='signin_file_data is None.')
             try:
-                return web.signin.get_data()['password']
+                return data['password']
             except Exception as e:
                 return dict(error=str(e))
 
@@ -221,7 +224,7 @@ class Users(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin.get_data() is None:
+            if web.signin.signin_file_data is None:
                 return dict(error='signin_file_data is None.')
             form = await req.json()
             try:

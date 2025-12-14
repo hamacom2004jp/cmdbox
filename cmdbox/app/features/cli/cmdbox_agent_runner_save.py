@@ -63,12 +63,26 @@ class CmdAgentRunnerSave(feature.OneshotResultEdgeFeature):
                 dict(opt="runner_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                     description_ja="保存するRunnerの名前を指定します。",
                     description_en="Specify the name of the runner configuration to save."),
-                dict(opt="llm", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                    choice_fn=self.choice_fn,
+                dict(opt="llm", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
+                    #choice_fn=self.choice_fn,
+                    callcmd="async () => {await cmdbox.callcmd('agent','llm_list',{},(res)=>{"
+                            + "const val = $(\"[name='llm']\").val();"
+                            + "$(\"[name='llm']\").empty().append('<option></option>');"
+                            + "res['data'].map(elm=>{$(\"[name='llm']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
+                            + "$(\"[name='llm']\").val(val);"
+                            + "},$(\"[name='title']\").val(),'llm');"
+                            + "}",
                     description_ja="Runnerが参照するLLM設定名を指定します。",
                     description_en="LLM configuration name or reference."),
-                dict(opt="mcpservers", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
-                    choice_fn=self.choice_fn,
+                dict(opt="mcpservers", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=[],
+                    #choice_fn=self.choice_fn,
+                    callcmd="async () => {await cmdbox.callcmd('agent','mcpsv_list',{},(res)=>{"
+                            + "const val = $(\"[name='mcpservers']\").val();"
+                            + "$(\"[name='mcpservers']\").empty().append('<option></option>');"
+                            + "res['data'].map(elm=>{$(\"[name='mcpservers']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
+                            + "$(\"[name='mcpservers']\").val(val);"
+                            + "},$(\"[name='title']\").val(),'mcpservers');"
+                            + "}",
                     description_ja="Runnerが利用するMCPサーバー名を指定します。",
                     description_en="List or mapping of MCP servers used by the runner."),
                 dict(opt="session_store_type", type=Options.T_STR, default='memory', required=False, multi=False, hide=False, choice=['memory', 'sqlite', 'postgresql'],
@@ -181,19 +195,10 @@ class CmdAgentRunnerSave(feature.OneshotResultEdgeFeature):
             msg = dict(warn="Runner name can only contain alphanumeric characters, underscores, and hyphens.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
-        if hasattr(args, 'llm') and args.llm is not None:
-            llm_list = self.list_llms(self.default_data)
-            if args.llm not in llm_list:
-                msg = dict(warn=f"Specified LLM configuration '{args.llm}' not found.")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                return self.RESP_WARN, msg, None
-        if hasattr(args, 'mcpservers') and args.mcpservers is not None:
-            mcp_list = self.list_mcvpservers(self.default_data)
-            for m in args.mcpservers:
-                if m not in mcp_list:
-                    msg = dict(warn=f"Specified MCP server configuration '{m}' not found.")
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                    return self.RESP_WARN, msg, None
+        if not hasattr(args, 'llm') or args.llm is None:
+            msg = dict(warn="Please specify --llm")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
 
         configure = dict(
             runner_name=args.runner_name,
@@ -231,6 +236,16 @@ class CmdAgentRunnerSave(feature.OneshotResultEdgeFeature):
             if logger.level == logging.DEBUG:
                 logger.debug(f"{self.get_mode()}_{self.get_cmd()} msg: {msg}")
             configure = json.loads(convert.b64str2str(msg[2]))
+
+            if configure['llm'] not in self.list_llms(data_dir):
+                msg = dict(warn=f"Specified LLM configuration '{configure['llm']}' not found.")
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
+            for m in self.list_mcvpservers(data_dir):
+                if m not in configure['mcpservers']:
+                    msg = dict(warn=f"Specified MCP server configuration '{m}' not found.")
+                    redis_cli.rpush(reskey, msg)
+                    return self.RESP_WARN
 
             name = configure.get('runner_name')
             configure_path = data_dir / ".agent" / f"runner-{name}.json"

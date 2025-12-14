@@ -62,8 +62,10 @@ class CmdAgentMcpSave(feature.OneshotResultEdgeFeature):
                             + "'mcpserver_transport':$(\"[name='mcpserver_transport']\").val(),"
                             + "'operation':'list_tools',"
                             + "},(res)=>{"
+                            + "const val = $(\"[name='mcp_tools']\").val();"
                             + "$(\"[name='mcp_tools']\").empty();"
                             + "res.map(elm=>{$(\"[name='mcp_tools']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
+                            + "$(\"[name='mcp_tools']\").val(val);"
                             + "},$(\"[name='title']\").val(),'mcp_tools');"
                             + "}",
                     description_ja="リモートサーバーが提供しているツールを指定します。",

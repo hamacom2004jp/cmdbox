@@ -1,5 +1,5 @@
 from cmdbox.app import common, options
-from cmdbox.app.commons import module
+from cmdbox.app.commons import module, redis_client
 from fastapi import FastAPI, Request, Response
 from pathlib import Path
 from starlette.middleware.sessions import SessionMiddleware
@@ -104,6 +104,11 @@ class Web:
         self.client_only = client_only
         if self.client_only:
             self.svname = 'client'
+        if self.svname is None or self.svname == "":
+            raise Exception("svname is empty.")
+        if self.svname.find('-') >= 0:
+            raise ValueError(f"Server name is invalid. '-' is not allowed. svname={svname}")
+        self.redis_cli = redis_client.RedisClient(logger, host=redis_host, port=redis_port, password=redis_password, svname=svname)
         self.doc_root = Path(doc_root) if doc_root is not None else Path(__file__).parent.parent / 'web'
         self.gui_html = Path(gui_html) if gui_html is not None else Path(__file__).parent.parent / 'web' / 'gui.html'
         self.filer_html = Path(filer_html) if filer_html is not None else Path(__file__).parent.parent / 'web' / 'filer.html'
@@ -152,8 +157,8 @@ class Web:
         self.webcap_client = requests.Session()
         from cmdbox.app.auth import signin, signin_saml
         signin_file_data = signin.Signin.load_signin_file(self.signin_file, self=self)
-        self.signin = signin.Signin(self.logger, self.signin_file, signin_file_data, self.appcls, self.ver)
-        self.signin_saml = signin_saml.SigninSAML(self.logger, self.signin_file, signin_file_data, self.appcls, self.ver)
+        self.signin = signin.Signin(self.logger, self.signin_file, signin_file_data, self.redis_cli, self.appcls, self.ver)
+        self.signin_saml = signin_saml.SigninSAML(self.logger, self.signin_file, signin_file_data, self.redis_cli, self.appcls, self.ver)
         signin.Signin.set_webcls(self.__class__)
 
         if self.logger.level == logging.DEBUG:
@@ -228,7 +233,7 @@ class Web:
             HTTPException: パスワードが一致しない場合
             HTTPException: ユーザーが存在しない場合
         """
-        signin_data = self.signin.get_data()
+        signin_data = self.signin.signin_file_data
         if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
@@ -255,6 +260,7 @@ class Web:
                 # パスワード更新日時の保存
                 self.user_data(None, u['uid'], user_name, 'password', 'last_update', datetime.datetime.now())
                 # サインインファイルの保存
+                self.signin.signin_file_data = signin_data
                 common.save_yml(self.signin_file, signin_data)
                 return dict(success="Password changed.")
         return dict(warn="User not found.")
@@ -269,7 +275,7 @@ class Web:
         Returns:
             List[Dict[str, Any]]: ユーザー一覧
         """
-        signin_data = self.signin.get_data()
+        signin_data = self.signin.signin_file_data
         if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
@@ -319,7 +325,7 @@ class Web:
         Returns:
             str: ApiKey
         """
-        signin_data = self.signin.get_data()
+        signin_data = self.signin.signin_file_data
         if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
@@ -353,6 +359,7 @@ class Web:
 
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"apikey_add: {user} -> {self.signin_file}")
+        self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data)
         return apikey
 
@@ -363,7 +370,7 @@ class Web:
         Args:
             user (Dict[str, Any]): ユーザー情報
         """
-        signin_data = self.signin.get_data()
+        signin_data = self.signin.signin_file_data
         if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
@@ -392,6 +399,7 @@ class Web:
             raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"apikey_del: {user} -> {self.signin_file}")
+        self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data)
 
     def user_add(self, user:Dict[str, Any]):
@@ -401,7 +409,7 @@ class Web:
         Args:
             user (Dict[str, Any]): ユーザー情報
         """
-        signin_data = self.signin.get_data()
+        signin_data = self.signin.signin_file_data
         if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
@@ -447,6 +455,7 @@ class Web:
         # パスワード更新日時の保存
         self.user_data(None, user['uid'], user['name'], 'password', 'last_update', datetime.datetime.now())
         # サインインファイルの保存
+        self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data)
 
     def user_edit(self, user:Dict[str, Any]):
@@ -456,7 +465,7 @@ class Web:
         Args:
             user (Dict[str, Any]): ユーザー情報
         """
-        signin_data = self.signin.get_data()
+        signin_data = self.signin.signin_file_data
         if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
@@ -506,6 +515,7 @@ class Web:
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"user_edit: {user} -> {self.signin_file}")
         # サインインファイルの保存
+        self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data)
 
     def user_del(self, uid:int):
@@ -515,7 +525,7 @@ class Web:
         Args:
             uid (int): ユーザーID
         """
-        signin_data = self.signin.get_data()
+        signin_data = self.signin.signin_file_data
         if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
@@ -530,6 +540,7 @@ class Web:
         signin_data['users'] = users
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"user_del: {uid} -> {self.signin_file}")
+        self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data)
 
     def group_list(self, name:str=None) -> List[Dict[str, Any]]:
@@ -542,7 +553,7 @@ class Web:
         Returns:
             List[Dict[str, Any]]: グループ一覧
         """
-        signin_data = self.signin.get_data()
+        signin_data = self.signin.signin_file_data
         if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if name is None or name == '':
@@ -559,7 +570,7 @@ class Web:
         Args:
             group (Dict[str, Any]): グループ情報
         """
-        signin_data = self.signin.get_data()
+        signin_data = self.signin.signin_file_data
         if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
@@ -587,6 +598,7 @@ class Web:
             raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"group_add: {group} -> {self.signin_file}")
+        self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data)
 
     def group_edit(self, group:Dict[str, Any]):
@@ -596,7 +608,7 @@ class Web:
         Args:
             group (Dict[str, Any]): グループ情報
         """
-        signin_data = self.signin.get_data()
+        signin_data = self.signin.signin_file_data
         if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
@@ -627,6 +639,7 @@ class Web:
             raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"group_edit: {group} -> {self.signin_file}")
+        self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data)
 
     def group_del(self, gid:int):
@@ -636,7 +649,7 @@ class Web:
         Args:
             gid (int): グループID
         """
-        signin_data = self.signin.get_data()
+        signin_data = self.signin.signin_file_data
         if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
@@ -681,6 +694,7 @@ class Web:
         signin_data['groups'] = groups
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"group_del: {gid} -> {self.signin_file}")
+        self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data)
 
     def user_data(self, req:Request, uid:str, user_name:str, categoly:str, key:str=None, val:Any=None, delkey:bool=False) -> Any:

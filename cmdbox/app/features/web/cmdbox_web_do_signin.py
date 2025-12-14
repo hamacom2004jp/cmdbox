@@ -35,7 +35,7 @@ class DoSignin(cmdbox_web_signin.Signin):
             name = form.get('name')
             passwd = form.get('password')
             # edgeからtokenによる認証の場合
-            signin_data = web.signin.get_data()
+            signin_data = web.signin.signin_file_data
             token_ok = False
             if token is not None:
                 if web.logger.level == logging.DEBUG:
@@ -151,21 +151,21 @@ class DoSignin(cmdbox_web_signin.Signin):
             try:
                 mod = importlib.import_module(signin_module)
                 members = inspect.getmembers(mod, inspect.isclass)
-                signin_data = web.signin.get_data()
+                signin_data = web.signin.signin_file_data
                 for name, cls in members:
                     if cls is signin.Signin or issubclass(cls, signin.Signin):
-                        sobj = cls(web.logger, web.signin_file, signin_data, appcls, ver)
+                        sobj = cls(web.logger, web.signin_file, signin_data, web.redis_cli, appcls, ver)
                         return sobj
                 return None
             except Exception as e:
                 web.logger.error(f'Failed to load signin. {e}', exc_info=True)
                 raise e
 
-        signin_data = web.signin.get_data()
-        self.google_signin = google_signin.GoogleSignin(web.logger, web.signin_file, signin_data, self.appcls, self.ver)
-        self.github_signin = github_signin.GithubSignin(web.logger, web.signin_file, signin_data, self.appcls, self.ver)
-        self.azure_signin = azure_signin.AzureSignin(web.logger, web.signin_file, signin_data, self.appcls, self.ver)
-        self.azure_saml_signin = azure_signin_saml.AzyreSigninSAML(web.logger, web.signin_file, signin_data, self.appcls, self.ver)
+        signin_data = web.signin.signin_file_data
+        self.google_signin = google_signin.GoogleSignin(web.logger, web.signin_file, signin_data, web.redis_cli, self.appcls, self.ver)
+        self.github_signin = github_signin.GithubSignin(web.logger, web.signin_file, signin_data, web.redis_cli, self.appcls, self.ver)
+        self.azure_signin = azure_signin.AzureSignin(web.logger, web.signin_file, signin_data, web.redis_cli, self.appcls, self.ver)
+        self.azure_saml_signin = azure_signin_saml.AzyreSigninSAML(web.logger, web.signin_file, signin_data, web.redis_cli, self.appcls, self.ver)
         if signin_data is not None:
             # signinオブジェクトの指定があった場合読込む
             if 'signin_module' in signin_data['oauth2']['providers']['google']:
@@ -213,7 +213,7 @@ class DoSignin(cmdbox_web_signin.Signin):
 
         @app.get('/oauth2/google/callback')
         async def oauth2_google_callback(req:Request, res:Response):
-            conf = web.signin.get_data()['oauth2']['providers']['google']
+            conf = web.signin.signin_file_data['oauth2']['providers']['google']
             next = req.query_params['state']
             try:
                 # アクセストークン取得
@@ -229,7 +229,7 @@ class DoSignin(cmdbox_web_signin.Signin):
 
         @app.get('/oauth2/github/callback')
         async def oauth2_github_callback(req:Request, res:Response):
-            conf = web.signin.get_data()['oauth2']['providers']['github']
+            conf = web.signin.signin_file_data['oauth2']['providers']['github']
             next = req.query_params['state']
             try:
                 # アクセストークン取得
@@ -245,7 +245,7 @@ class DoSignin(cmdbox_web_signin.Signin):
 
         @app.get('/oauth2/azure/callback')
         async def oauth2_azure_callback(req:Request, res:Response):
-            conf = web.signin.get_data()['oauth2']['providers']['azure']
+            conf = web.signin.signin_file_data['oauth2']['providers']['azure']
             next = req.query_params['state']
             try:
                 # アクセストークン取得

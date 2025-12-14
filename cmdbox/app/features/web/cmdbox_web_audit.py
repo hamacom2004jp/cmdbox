@@ -38,7 +38,7 @@ class Audit(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            if web.signin.get_data() is None:
+            if web.signin.signin_file_data is None:
                 return dict(error='signin_file_data is None.')
             if not hasattr(web.options, 'audit_search') or web.options.audit_search is None:
                 return dict(warn='audit feature is disabled.')

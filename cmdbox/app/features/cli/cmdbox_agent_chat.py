@@ -3,6 +3,7 @@ from cmdbox.app.commons import convert, redis_client
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
+import asyncio
 import argparse
 import logging
 import json
@@ -123,6 +124,7 @@ class CmdAgentChat(feature.ResultEdgeFeature):
                 logger.debug(f"{self.get_mode()}_{self.get_cmd()} msg: {msg}")
             if 'agents' not in sessions:
                 sessions['agents'] = {}
+            asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
 
             payload = json.loads(convert.b64str2str(msg[2]))
             name = payload.get('runner_name')
@@ -134,6 +136,7 @@ class CmdAgentChat(feature.ResultEdgeFeature):
                 redis_cli.rpush(reskey, msg)
                 return self.RESP_WARN
 
+            from google.adk.agents.run_config import RunConfig, StreamingMode
             from google.adk.events import Event
             from google.adk.runners import Runner
             from google.adk.sessions import BaseSessionService, Session
@@ -179,7 +182,8 @@ class CmdAgentChat(feature.ResultEdgeFeature):
             # セッションを作成する
             agent_session = await create_agent_session(runner.session_service, name, user_name, session_id=session_id)
             # チャットを実行する
-            for event in runner.run(user_id=user_name, session_id=agent_session.id, new_message=content):
+            run_config = RunConfig(streaming_mode=StreamingMode.NONE)
+            for event in runner.run(user_id=user_name, session_id=agent_session.id, new_message=content, run_config=run_config):
                 outputs = dict(success=dict(agent_session_id=agent_session.id))
                 if event.turn_complete:
                     outputs['success']['turn_complete'] = True

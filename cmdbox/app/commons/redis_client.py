@@ -29,6 +29,7 @@ class RedisClient(object):
         self.svname = f"sv-{svname}"
         self.hbname = f"hb-{svname}"
         self.siname = f"showimg-{svname}"
+        self.memname = f"mem-{svname}"
         self.redis_cli = self.connect()
 
     def connect(self):

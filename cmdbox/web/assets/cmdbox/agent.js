@@ -703,6 +703,7 @@ agent.list_mcpsv = async () => {
                             'mcpserver_transport':$('[name="mcpserver_transport"]').val(),
                             'operation':'list_tools',
                 },(res)=>{
+                    $("[name='mcp_tools']").empty().append('<option></option>');
                     res.map(elm=>{$('[name="mcp_tools"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
                     form.find('[name="mcp_tools"]').val(config.mcpserver_mcp_tools);
                 },$('[name="title"]').val(),'mcp_tools');
@@ -822,6 +823,17 @@ agent.list_runner = async () => {
                 });
 
                 $('#runner_edit_modal').modal('show');
+                // コマンド実行
+                await cmdbox.callcmd('agent','llm_list',{},(res)=>{
+                    $("[name='llm']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                    form.find('[name="llm"]').val(config.llm);
+                },$('[name="title"]').val(),'llm');
+                await cmdbox.callcmd('agent','mcpsv_list',{},(res)=>{
+                    $("[name='mcpservers']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="mcpservers"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                    form.find('[name="mcpservers"]').val(config.mcpservers);
+                },$('[name="title"]').val(),'mcpservers');
             });
 
             container.append(itemEl);
@@ -877,7 +889,8 @@ agent.save_runner = async () => {
 
 agent.get_tts_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('tts', 'install');
-    const vform_names = ['tts_engine', 'voicevox_ver', 'voicevox_os', 'voicevox_arc', 'voicevox_device', 'voicevox_whl', 'force_install'];
+    const vform_names = ['tts_engine', 'voicevox_ver', 'voicevox_whl',
+        'openjtalk_ver', 'openjtalk_dic', 'onnxruntime_ver', 'onnxruntime_lib', 'force_install'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };

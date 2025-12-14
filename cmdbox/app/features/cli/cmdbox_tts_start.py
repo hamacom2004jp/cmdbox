@@ -285,7 +285,7 @@ class TtsStart(feature.UnsupportEdgeFeature):
                     redis_cli.rpush(reskey, dict(warn=f"Failed to start VoiceVox core: voicevox directory does not exist: {voicevox_dir}"))
                     return self.RESP_WARN
                 voicevox_onnxruntime_path = voicevox_dir / 'onnxruntime' / 'lib' / Onnxruntime.LIB_VERSIONED_FILENAME
-                open_jtalk_dict_dir = voicevox_dir / 'dict' / 'open_jtalk_dic_utf_8-1.11'
+                open_jtalk_dict_dir = voicevox_dir / 'dict'
                 # voicevox_modelのチェック
                 style_key = [k for k,v in TtsStart.VOICEVOX_STYLE.items() if v['select'] == voicevox_model]
                 if not style_key:

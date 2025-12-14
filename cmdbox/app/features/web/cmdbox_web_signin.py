@@ -16,7 +16,7 @@ class Signin(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        web.signin.signin_file_data = web.signin.load_signin_file(web.signin_file, web.signin.get_data(), self=self)
+        web.signin.signin_file_data = web.signin.load_signin_file(web.signin_file, web.signin.signin_file_data, self=self)
         if web.signin_html is not None:
             if not web.signin_html.is_file():
                 raise HTTPException(status_code=500, detail=f'signin_html is not found. ({web.signin_html})')
@@ -35,7 +35,7 @@ class Signin(feature.WebFeature):
         async def oauth2_google(next:str, req:Request, res:Response):
             if web.signin_html_data is None:
                 return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
-            conf = web.signin.get_data()['oauth2']['providers']['google']
+            conf = web.signin.signin_file_data['oauth2']['providers']['google']
             data = {'scope': ' '.join(conf['scope']),
                     'access_type': 'offline',
                     'response_type': 'code',
@@ -50,7 +50,7 @@ class Signin(feature.WebFeature):
         async def oauth2_github(next:str, req:Request, res:Response):
             if web.signin_html_data is None:
                 return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
-            conf = web.signin.get_data()['oauth2']['providers']['github']
+            conf = web.signin.signin_file_data['oauth2']['providers']['github']
             data = {'scope': ' '.join(conf['scope']),
                     'access_type': 'offline',
                     'response_type': 'code',
@@ -65,7 +65,7 @@ class Signin(feature.WebFeature):
         async def oauth2_azure(next:str, req:Request, res:Response):
             if web.signin_html_data is None:
                 return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
-            conf = web.signin.get_data()['oauth2']['providers']['azure']
+            conf = web.signin.signin_file_data['oauth2']['providers']['azure']
             data = {'scope': ' '.join(conf['scope']),
                     'access_type': 'offline',
                     'response_type': 'code',
@@ -80,7 +80,7 @@ class Signin(feature.WebFeature):
         async def oauth2_enabled(req:Request, res:Response):
             if web.signin_html_data is None:
                 return dict(google=False, github=False, azure=False)
-            signin_data = web.signin.get_data()
+            signin_data = web.signin.signin_file_data
             return dict(google=signin_data['oauth2']['providers']['google']['enabled'],
                         github=signin_data['oauth2']['providers']['github']['enabled'],
                         azure=signin_data['oauth2']['providers']['azure']['enabled'],)
@@ -104,5 +104,5 @@ class Signin(feature.WebFeature):
         async def saml_enabled(req:Request, res:Response):
             if web.signin_html_data is None:
                 return dict(azure=False)
-            signin_data = web.signin_saml.get_data()
+            signin_data = web.signin_saml.signin_file_data
             return dict(azure=signin_data['saml']['providers']['azure']['enabled'],)

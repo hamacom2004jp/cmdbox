@@ -119,12 +119,12 @@ class McpsvStart(feature.UnsupportEdgeFeature):
             signin_file = None if not hasattr(args, 'signin_file') or args.signin_file is None else Path(args.signin_file)
             signin_data = signin.Signin.load_signin_file(signin_file) if signin_file is not None else None
             # ツール側で参照できるようにするためにインスタンス化
-            web.Web.getInstance(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
-                                redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
-                                signin_file=args.signin_file)
+            _web = web.Web.getInstance(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
+                                       redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
+                                       signin_file=args.signin_file)
 
             from fastmcp import FastMCP
-            sign = signin.Signin(logger, signin_file, signin_data, self.appcls, self.ver)
+            sign = signin.Signin(logger, signin_file, signin_data, _web.redis_cli, self.appcls, self.ver)
             self.mcp = mcp_mod.Mcp(logger, Path(args.data), sign, self.appcls, self.ver)
             fastmcp:FastMCP = self.mcp.create_mcpserver(logger, args, self.mcp.create_tools(logger, args, False))
 

@@ -33,7 +33,7 @@ class SigninSAML(Signin):
         Returns:
             OneLogin_Saml2_Auth: SAML認証オブジェクト
         """
-        sd = self.get_data()
+        sd = self.signin_file_data
         saml_settings = dict(
             strict=False,
             debug=self.logger.level==logging.DEBUG,

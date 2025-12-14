@@ -1,4 +1,5 @@
 from cmdbox.app import common, options
+from cmdbox.app.commons import redis_client
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
@@ -10,28 +11,45 @@ import argparse
 import copy
 import contextvars
 import logging
+import json
 import jwt
 import string
 
 
 class Signin(object):
 
-    def __init__(self, logger:logging.Logger, signin_file:Path, signin_file_data:Dict[str, Any], appcls, ver):
+    def __init__(self, logger:logging.Logger, signin_file:Path, signin_file_data:Dict[str, Any],
+                 redis_cli:redis_client.RedisClient, appcls, ver):
         self.logger = logger
         self.signin_file = signin_file
-        self.signin_file_data = signin_file_data
         self.options = options.Options.getInstance(appcls, ver)
         self.ver = ver
         self.appcls = appcls
+        if redis_cli is None:
+            raise ValueError(f"redis_cli is None.")
+        self.redis_cli = redis_cli
+        self.signin_file_data = signin_file_data
 
-    def get_data(self) -> Dict[str, Any]:
+    @property
+    def signin_file_data(self) -> Dict[str, Any]:
         """
         サインインデータを返します
 
         Returns:
             Dict[str, Any]: サインインデータ
         """
-        return self.signin_file_data
+        json_str = self.redis_cli.hget(self.redis_cli.memname, "signin_file_data")
+        return json.loads(json_str)
+
+    @signin_file_data.setter
+    def signin_file_data(self, signin_file_data) -> None:
+        """
+        サインインデータを設定します
+        
+        Args:
+            signin_file_data (Dict[str, Any]): サインインデータ
+        """
+        self.redis_cli.hset(self.redis_cli.memname, "signin_file_data", common.to_str(signin_file_data))
 
     def jadge(self, email:str) -> Tuple[bool, Dict[str, Any]]:
         """
@@ -55,7 +73,6 @@ class Signin(object):
         Args:
             access_token (str): アクセストークン
             user (Dict[str, Any]): ユーザーデータ
-            signin_file_data (Dict[str, Any]): サインインファイルデータ（変更不可）
 
         Returns:
             Tuple[List[str], List[int]]: (グループ名, グループID)
@@ -97,11 +114,12 @@ class Signin(object):
         Returns:
             Union[None, RedirectResponse]: サインインエラーの場合はリダイレクトレスポンス
         """
-        if self.signin_file_data is None:
+        data = self.signin_file_data
+        if data is None:
             return None
-        if 'signin' in req.session:
-            self.signin_file_data = Signin.load_signin_file(self.signin_file, self.signin_file_data, self=self) # サインインファイルの更新をチェック
-        return Signin._check_signin(req, res, self.signin_file_data, self.logger)
+        #if 'signin' in req.session:
+        #    signin_file_data = Signin.load_signin_file(self.signin_file, signin_file_data, self=self) # サインインファイルの更新をチェック
+        return Signin._check_signin(req, res, data, self.logger)
     
     @classmethod
     def _check_signin(cls, req:Request, res:Response, signin_file_data:Dict[str, Any], logger:logging.Logger) -> Union[None, RedirectResponse]:
@@ -146,7 +164,7 @@ class Signin(object):
         Returns:
              Union[None, RedirectResponse]: サインインエラーの場合はリダイレクトレスポンス
         """
-        return Signin._check_apikey(req, res, self.signin_file_data)
+        return Signin._check_apikey(req, res, self.signin_file_data, self.logger)
 
     @classmethod
     def _check_apikey(cls, req:Request, res:Response, signin_file_data:Dict[str, Any], logger:logging.Logger) -> Union[None, RedirectResponse]:
@@ -176,12 +194,14 @@ class Signin(object):
         apikey = auth.replace('Bearer ', '').strip()
         if logger.level == logging.DEBUG:
             logger.debug(f"received apikey: {apikey}")
+        logger.info(f"received apikey: {apikey}")
         find_user = None
         jwt_enabled = signin_file_data['apikey']['verify_jwt']['enabled']
         for user in signin_file_data['users']:
             if 'apikeys' not in user:
                 continue
             for ak, key in user['apikeys'].items():
+                logger.info(f"apikey == key: {apikey} == {key}")
                 if apikey == key:
                     if jwt_enabled:
                         publickey = None
@@ -458,7 +478,7 @@ class Signin(object):
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "certificate" not found in "apikey.gen_cert". ({signin_file})')
             if 'publickey' not in yml['apikey']['gen_cert']:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "publickey" not found in "apikey.gen_cert". ({signin_file})')
-            if not Path(yml['apikey']['gen_cert']['certificate']).is_file():
+            if not Path(yml['apikey']['gen_cert']['certificate']).is_file() and self is not None:
                 from cmdbox.app.features.cli.cmdbox_web_gencert import WebGencert
                 gencert = WebGencert(self.appcls, self.ver)
                 opt = dict(webhost=self.ver.__appid__, overwrite=True,
@@ -691,11 +711,12 @@ class Signin(object):
         Returns:
             bool: 認可されたかどうか
         """
-        if self.signin_file_data is None:
+        data = self.signin_file_data
+        if data is None:
             return True
         if 'signin' not in req.session or 'groups' not in req.session['signin']:
             return False
-        return Signin._check_cmd(self.signin_file_data, req.session['signin']['groups'], mode, cmd, self.logger)
+        return Signin._check_cmd(data, req.session['signin']['groups'], mode, cmd, self.logger)
 
     @classmethod
     def load_groups(cls, signin_file_data:Dict[str, Any], apikey:str, logger:logging.Logger):
@@ -769,18 +790,19 @@ class Signin(object):
         Returns:
             List[str]: 認可されたモード
         """
-        if self.signin_file_data is None:
+        data = self.signin_file_data
+        if data is None:
             return self.options.get_modes().copy()
         if 'signin' not in req.session or 'groups' not in req.session['signin']:
             return []
         modes = self.options.get_modes().copy()
         user_groups = req.session['signin']['groups']
-        jadge = self.signin_file_data['cmdrule']['policy']
+        jadge = data['cmdrule']['policy']
         jadge_modes = []
         if jadge == 'allow':
             for m in modes:
                 jadge_modes += list(m.keys()) if type(m) is dict else [m]
-        for rule in self.signin_file_data['cmdrule']['rules']:
+        for rule in data['cmdrule']['rules']:
             if len([g for g in rule['groups'] if g in user_groups]) <= 0:
                 continue
             if 'mode' not in rule:
@@ -810,7 +832,8 @@ class Signin(object):
         Returns:
             List[str]: 認可されたコマンド
         """
-        if self.signin_file_data is None:
+        data = self.signin_file_data
+        if data is None:
             cmds = self.options.get_cmds(mode).copy()
             return cmds
         if 'signin' not in req.session or 'groups' not in req.session['signin']:
@@ -819,12 +842,12 @@ class Signin(object):
         if mode == '':
             return cmds
         user_groups = req.session['signin']['groups']
-        jadge = self.signin_file_data['cmdrule']['policy']
+        jadge = data['cmdrule']['policy']
         jadge_cmds = []
         if jadge == 'allow':
             for c in cmds:
                 jadge_cmds += list(c.keys()) if type(c) is dict else [c]
-        for rule in self.signin_file_data['cmdrule']['rules']:
+        for rule in data['cmdrule']['rules']:
             if len([g for g in rule['groups'] if g in user_groups]) <= 0:
                 continue
             if 'mode' not in rule:
@@ -859,9 +882,10 @@ class Signin(object):
             bool: True:ポリシーOK, False:ポリシーNG
             str: メッセージ
         """
-        if self.signin_file_data is None or 'password' not in self.signin_file_data:
+        data = self.signin_file_data
+        if data is None or 'password' not in data:
             return True, "There is no password policy set."
-        policy = self.signin_file_data['password']['policy']
+        policy = data['password']['policy']
         if not policy['enabled']:
             return True, "Password policy is disabled."
         if policy['not_same_before'] and password == new_password:

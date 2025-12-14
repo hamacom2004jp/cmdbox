@@ -61,10 +61,10 @@ class Mcp:
                 issuer=issuer,
                 audience=audience
             )
-            mcp = FastMCP(name=self.ver.__appid__, auth=auth, tools=tools)
+            mcp = FastMCP(name=self.ver.__appid__, auth=auth, tools=tools, stateless_http=True)
         else:
             self.logger.info(f"Using JWTVerifier without public key, issuer, or audience.")
-            mcp = FastMCP(name=self.ver.__appid__)
+            mcp = FastMCP(name=self.ver.__appid__, stateless_http=True)
         mcp.add_middleware(self.create_mw_logging(self.logger, args))
         mcp.add_middleware(self.create_mw_reqscope(self.logger, args))
         return mcp
@@ -500,7 +500,8 @@ class ToolList(object):
         is_japan = common.is_japan()
         ret_tools = self.tools.copy()
         web = Web.getInstance(self.logger, self.data)
-        if web.signin.signin_file_data is None:
+        data = web.signin.signin_file_data
+        if data is None:
             # サインインファイルが読み込まれていない場合は登録済みのリストを返す
             if self.extract_callable:
                 # 関数を抽出する場合はツールリストから関数を抽出して返す
@@ -516,7 +517,7 @@ class ToolList(object):
             cmd_list = [dict(title=r.get('title',''), mode=r['mode'], cmd=r['cmd'],
                         description=r.get('description','') + options.get_cmd_attr(r['mode'], r['cmd'], 'description_ja' if is_japan else 'description_en'),
                         tag=r.get('tag','')) for r in cmd_list \
-                       if signin.Signin._check_cmd(web.signin.signin_file_data, ['admin'], r['mode'], r['cmd'], self.logger)]
+                       if signin.Signin._check_cmd(data, ['admin'], r['mode'], r['cmd'], self.logger)]
 
         except Exception as e:
             # ユーザーコマンドの読み込みに失敗した場合は警告を出して登録済みのリストを返す
@@ -685,10 +686,14 @@ class ToolList(object):
         func_txt += f'    sign = signin.Signin._check_signin(req, scope["res"], signin_data, logger)\n'
         func_txt += f'    if sign is not None or "signin" not in req.session or "groups" not in req.session["signin"]:\n'
         func_txt += f'        logger.warning("Unable to execute command because authentication information cannot be obtained")\n'
+        func_txt += f'        logger.warning("mode={mode}, cmd={cmd}, sign="+str(sign)+", req.session="+str(req.session))\n'
+        func_txt += f'        logger.warning("mode={mode}, cmd={cmd}, signin_file="+str(args.signin_file)+", signin_data="+str(signin_data))\n'
         func_txt += f'        return dict(warn="Unable to execute command because authentication information cannot be obtained")\n'
         func_txt += f'    groups = req.session["signin"]["groups"]\n'
         func_txt += f'    if not signin.Signin._check_cmd(signin_data, groups, "{mode}", "{cmd}", logger):\n'
         func_txt += f'        logger.warning("You do not have permission to execute this command.")\n'
+        func_txt += f'        logger.debug("mode={mode}, cmd={cmd}, groups="+str(groups))\n'
+        func_txt += f'        logger.debug("mode={mode}, cmd={cmd}, signin_file="+str(args.signin_file)+", signin_data="+str(signin_data))\n'
         func_txt += f'        return dict(warn="You do not have permission to execute this command.")\n'
         func_txt += f'    feat = options.get_cmd_attr("{mode}", "{cmd}", "feature")\n'
         func_txt += f'    args.groups = groups\n'

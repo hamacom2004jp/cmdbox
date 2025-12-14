@@ -177,7 +177,7 @@ class AgentMcpClient(feature.UnsupportEdgeFeature):
             logger.setLevel(logging.ERROR)
             for h in logger.handlers:
                 h.setLevel(logging.ERROR)
-            logger.error(f"Failed to start MCP proxy: {e}", exc_info=True)
-            msg = dict(warn=f"Failed to start MCP proxy: {e}")
+            logger.error(f"Failed to start MCP client: {e}", exc_info=True)
+            msg = dict(warn=f"Failed to start MCP client: {e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_ERROR, msg, None
