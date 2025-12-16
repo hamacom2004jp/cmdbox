@@ -395,7 +395,7 @@ agent.list_sessions = async (session_id) => {
         'session_id': session_id
     });
     const histories = $('#histories');
-    if (!res['success']) return [];
+    if (!res || !res['success']) return [];
     if (!res['success']['data'] || typeof res['success']['data'] !== 'object') return [];
     if (session_id) return res['success']['data'];
     histories.html('');

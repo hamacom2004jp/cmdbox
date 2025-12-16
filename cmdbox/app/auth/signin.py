@@ -194,14 +194,12 @@ class Signin(object):
         apikey = auth.replace('Bearer ', '').strip()
         if logger.level == logging.DEBUG:
             logger.debug(f"received apikey: {apikey}")
-        logger.info(f"received apikey: {apikey}")
         find_user = None
         jwt_enabled = signin_file_data['apikey']['verify_jwt']['enabled']
         for user in signin_file_data['users']:
             if 'apikeys' not in user:
                 continue
             for ak, key in user['apikeys'].items():
-                logger.info(f"apikey == key: {apikey} == {key}")
                 if apikey == key:
                     if jwt_enabled:
                         publickey = None
