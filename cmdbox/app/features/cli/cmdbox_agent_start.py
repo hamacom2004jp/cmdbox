@@ -7,7 +7,7 @@ import argparse
 import logging
 import json
 import re
-import time
+import platform
 
 
 class CmdAgentStart(feature.OneshotResultEdgeFeature):
@@ -362,7 +362,10 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
         """
         if runner_conf.get('session_store_type') == 'sqlite':
             uri = (data_dir / '.agent' / 'session.db').as_uri()
-            runner_conf['agent_session_dburl'] = f"sqlite+aiosqlite:{uri.replace('file:///', '///')}"
+            if platform.system() == 'Windows':
+                runner_conf['agent_session_dburl'] = f"sqlite+aiosqlite:{uri.replace('file:///', '///')}"
+            else:
+                runner_conf['agent_session_dburl'] = f"sqlite+aiosqlite:{uri.replace('file:///', '////')}"
         elif runner_conf.get('session_store_type') == 'postgresql':
             runner_conf['agent_session_dburl'] = f"postgresql+psycopg://{runner_conf['session_store_pguser']}:{runner_conf['session_store_pgpass']}@{runner_conf['session_store_pghost']}:{runner_conf['session_store_pgport']}/{runner_conf['session_store_pgdbname']}"
         else:
@@ -370,7 +373,9 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
         from google.adk.sessions import DatabaseSessionService, InMemorySessionService
         #from typing_extensions import override
         if runner_conf['agent_session_dburl'] is not None:
+            logger.info(f"Using DatabaseSessionService: {runner_conf['agent_session_dburl']}")
             dss = DatabaseSessionService(db_url=runner_conf['agent_session_dburl'])
             return dss
         else:
+            logger.info(f"Using InMemorySessionService")
             return InMemorySessionService()

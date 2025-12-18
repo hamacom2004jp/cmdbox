@@ -39,7 +39,11 @@ class Signin(object):
             Dict[str, Any]: サインインデータ
         """
         json_str = self.redis_cli.hget(self.redis_cli.memname, "signin_file_data")
-        return json.loads(json_str)
+        try:
+            return json.loads(json_str)
+        except Exception as e:
+            self.logger.error(f"Failed to load signin_file_data from redis. data={json_str}, error={e}")
+            return None
 
     @signin_file_data.setter
     def signin_file_data(self, signin_file_data) -> None:
@@ -49,6 +53,9 @@ class Signin(object):
         Args:
             signin_file_data (Dict[str, Any]): サインインデータ
         """
+        if signin_file_data is None:
+            self.logger.warning("Since you attempted to set signin_file_data to none, the configuration will be skipped.", exc_info=True)
+            return
         self.redis_cli.hset(self.redis_cli.memname, "signin_file_data", common.to_str(signin_file_data))
 
     def jadge(self, email:str) -> Tuple[bool, Dict[str, Any]]:

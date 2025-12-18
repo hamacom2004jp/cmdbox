@@ -124,7 +124,22 @@ class CmdAgentChat(feature.ResultEdgeFeature):
                 logger.debug(f"{self.get_mode()}_{self.get_cmd()} msg: {msg}")
             if 'agents' not in sessions:
                 sessions['agents'] = {}
-            asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
+            # Linux上でのイベントループポリシー設定
+            # Windowsではデフォルト、Linuxではマルチプロセス対応ポリシーを使用
+            import platform
+            if platform.system() != "Windows":
+                try:
+                    asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
+                except Exception as e:
+                    if logger.level == logging.DEBUG:
+                        logger.debug(f"Failed to set event loop policy: {e}")
+            # LiteLLMのロギングワーカーがイベントループをリセットするのを防ぐため、
+            # 既存のイベントループを再利用する
+            try:
+                loop = asyncio.get_running_loop()
+            except RuntimeError:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
 
             payload = json.loads(convert.b64str2str(msg[2]))
             name = payload.get('runner_name')
@@ -177,6 +192,15 @@ class CmdAgentChat(feature.ResultEdgeFeature):
                     return json_str
             json_pattern = re.compile(r'\{.*?\}')
 
+            # LiteLLMのロギングワーカーのイベントループ問題を回避するため、
+            # runner.runの実行時にLiteLLMのロギングをオフにする
+            try:
+                import litellm
+                original_logging_value = litellm.logging.logging_level
+                litellm.set_verbose(False)
+            except Exception:
+                original_logging_value = None
+
             runner:Runner = sessions['agents'][name]['runner']
             content = types.Content(role='user', parts=[types.Part(text=message)])
             # セッションを作成する
@@ -211,10 +235,28 @@ class CmdAgentChat(feature.ResultEdgeFeature):
 
             msg = dict(success=f"Chat '{name}' successfully.", end=True)
             redis_cli.rpush(reskey, msg)
+            
+            # LiteLLMのログレベルを復元
+            try:
+                if original_logging_value is not None:
+                    import litellm
+                    litellm.logging.logging_level = original_logging_value
+            except Exception:
+                pass
+                
             return self.RESP_SUCCESS
 
         except Exception as e:
             msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}", end=True)
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, msg)
+            
+            # LiteLLMのログレベルを復元
+            try:
+                if 'original_logging_value' in locals() and original_logging_value is not None:
+                    import litellm
+                    litellm.logging.logging_level = original_logging_value
+            except Exception:
+                pass
+                
             return self.RESP_WARN
