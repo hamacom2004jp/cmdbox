@@ -661,7 +661,7 @@ class ToolList(object):
         func_txt += f'        logger.warning("{func_name} is not allowed to be executed by the system.")\n'
         func_txt += f'        return dict(warn="{func_name} is not allowed to be executed by the system.")\n'
         func_txt +=  '    opt = {o["opt"]: kwargs.get(o["opt"], o["default"]) for o in options.get_cmd_choices("'+mode+'", "'+cmd+'", False)}\n'
-        func_txt += f'    opt["data"] = Path(opt["data"]) if hasattr(opt, "data") else common.HOME_DIR / f".{self.ver.__appid__}"\n'
+        func_txt += f'    opt["data"] = Path(opt["data"]) if hasattr(opt, "data") else Path("{self.data}")\n'
         func_txt += f'    if "{title}":\n'
         func_txt += f'        opt_path = opt["data"] / ".cmds" / f"cmd-{title}.json"\n'
         func_txt += f'        opt.update(common.loadopt(opt_path))\n'

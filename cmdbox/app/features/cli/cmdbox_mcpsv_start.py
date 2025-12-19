@@ -139,7 +139,7 @@ class McpsvStart(feature.UnsupportEdgeFeature):
                 msg = dict(warn="MCP app is not created.")
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, msg, None
-            
+
             # mcpsvはセッションを使用しないが、signinミドルウェアでセッションが必要なため追加する
             from starlette.middleware.sessions import SessionMiddleware
             mwparam = dict(path='/mcp', max_age=900, secret_key=common.random_string())
