@@ -17,7 +17,7 @@ See below for available options for the various commands.
    Edge <cmd_edge.rst>
    Excel <cmd_excel.rst>
    GUI <cmd_gui.rst>
-   MCP <cmd_mcp.rst>
+   MCPServer <cmd_mcpsv.rst>
    Server <cmd_server.rst>
    TTS <cmd_tts.rst>
    Web <cmd_web.rst>

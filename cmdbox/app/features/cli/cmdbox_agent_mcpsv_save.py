@@ -51,7 +51,7 @@ class CmdAgentMcpSave(feature.OneshotResultEdgeFeature):
                     description_en="Specifies the URL of the remote MCP server. If omitted, it will be `http://localhost:8082/mcp`.",),
                 dict(opt="mcpserver_delegated_auth", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
                     description_ja="Agentが受信したAPI Keyを使用して、MCPサーバーに認証要求します。",
-                    description_en="Specify the API Key of the remote MCP server.",),
+                    description_en="The Agent uses the received API Key to send an authentication request to the MCP server.",),
                 dict(opt="mcpserver_apikey", type=Options.T_PASSWD, default=None, required=False, multi=False, hide=False, choice=None,
                     description_ja="リモートMCPサーバーのAPI Keyを指定します。",
                     description_en="Specify the API Key of the remote MCP server.",),

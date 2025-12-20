@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( agent mode ) &mdash; cmdbox 2025/12/07 documentation</title>
+  <title>Command Reference ( agent mode ) &mdash; cmdbox 2025/12/20 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=071380fa"></script>
+      <script src="../_static/documentation_options.js?v=0505b0bf"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -76,6 +76,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
@@ -675,27 +676,31 @@
 <td><p>Yes</p></td>
 <td><p>Specifies the URL of the remote MCP server. If omitted, it will be <cite>http://localhost:8081/mcpsv/mcp</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--mcpserver_apikey &lt;apikey&gt;</p></td>
+<tr class="row-even"><td><p>--mcpserver_delegated_auth</p></td>
+<td></td>
+<td><p>The Agent uses the received API Key to send an authentication request to the MCP server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--mcpserver_apikey &lt;apikey&gt;</p></td>
 <td><p>No</p></td>
 <td><p>Specify the API Key of the remote MCP server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--mcpserver_transport &lt;transport&gt;</p></td>
+<tr class="row-even"><td><p>--mcpserver_transport &lt;transport&gt;</p></td>
 <td><p>Yes</p></td>
 <td><p>Specifies the transport of the remote MCP server. If omitted, it is <cite>streamable-http</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--mcp_tools &lt;list&gt;</p></td>
+<tr class="row-odd"><td><p>--mcp_tools &lt;list&gt;</p></td>
 <td><p>No</p></td>
 <td><p>Specify the tools provided by the remote server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
@@ -1103,19 +1108,23 @@
 <td><p>No</p></td>
 <td><p>Specify the session ID to send to the Runner.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--message &lt;text&gt;</p></td>
+<tr class="row-odd"><td><p>--mcpserver_apikey &lt;apikey&gt;</p></td>
+<td><p>No</p></td>
+<td><p>Specify the API Key of the remote MCP server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--message &lt;text&gt;</p></td>
 <td><p>Yes</p></td>
 <td><p>Specify the message to send to the Runner.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>

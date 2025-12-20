@@ -21,3 +21,18 @@ cmd ( list ) : `cmdbox -m cmd -c list <Option>`
     "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."
     "--groups <group name>","","Specifies that `signin_file`, if specified, should return the list of commands allowed for this user group."
 
+cmd ( load ) : `cmdbox -m cmd -c load <Option>`
+========================================================================================
+
+- Obtains the contents of commands under the data folder.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--data <data folder>","","When omitted, `$HONE/.{self.ver.__appid__}` is used."
+    "--title <title>","","Specify the name of the command to be read."
+    "--signin_file <user list file>","","Specify a file containing users and passwords with which they can signin."
+    "--groups <group name>","","Specifies that `signin_file`, if specified, should return the list of commands allowed for this user group."
+

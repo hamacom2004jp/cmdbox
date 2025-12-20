@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.auth.signin_saml &mdash; cmdbox 2025/04/29 documentation</title>
+  <title>cmdbox.app.auth.signin_saml &mdash; cmdbox 2025/12/20 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=110ab0b3"></script>
+      <script src="../../../../_static/documentation_options.js?v=0505b0bf"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -45,7 +45,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/command.html">Command Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/audit.html">Audit</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/developer.html">Developer Information</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/errors.html">Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/license.html">License</a></li>
@@ -118,7 +120,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            OneLogin_Saml2_Auth: SAML認証オブジェクト</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+        <span class="n">sd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin_file_data</span>
         <span class="n">saml_settings</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span><span class="o">==</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
