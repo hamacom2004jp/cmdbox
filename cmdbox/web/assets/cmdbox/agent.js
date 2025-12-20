@@ -380,6 +380,7 @@ agent.init_form = async () => {
         // メッセージ一覧をクリア
         messages.html('');
         // 新しいセッションを作成
+        agent.ws && agent.ws.close();
         agent.chat(cmdbox.random_string(16));
     });
     // テキストエリアのリサイズに合わせてメッセージ一覧の高さを調整
@@ -408,7 +409,7 @@ agent.list_sessions = async (session_id) => {
 agent.create_history = (histories, session_id, msg) => {
     if (histories.find(`#${session_id}`).length > 0) return;
     msg = cell_chop(msg, 300);
-    const history = $(`<a id="${session_id}" href="#" class="history pt-2 pb-1 d-block btn_hover"></a>`).appendTo(histories);
+    const history = $(`<a id="${session_id}" href="#" class="history pt-2 pb-1 d-block btn_hover"></a>`).prependTo(histories);
     $(`<span class="d-inline-block align-top ms-2 me-2" style="fill:gray;"><svg class="align-top" width="24" height="24" viewBox="0 0 16 16">`
         +`<use href="#svg_justify_left"></use></svg></span>`).appendTo(history);
     $(`<div class="d-inline-block mb-2" style="width:calc(100% - 88px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>`).appendTo(history).text(msg);
@@ -433,6 +434,7 @@ agent.create_history = (histories, session_id, msg) => {
             if (sid == session_id) {
                 // 削除したセッションが現在のセッションだった場合は、メッセージ一覧をクリア
                 messages.html('');
+                agent.ws && agent.ws.close();
                 agent.chat(cmdbox.random_string(16));
             }
             agent.list_sessions();
@@ -441,6 +443,7 @@ agent.create_history = (histories, session_id, msg) => {
     history.off('click').on('click', async (e) => {
         // セッションを選択したときの処理
         e.preventDefault();
+        agent.ws && agent.ws.close();
         agent.chat(session_id);
         const data = await agent.list_sessions(session_id);
         if (data.length<=0) {
@@ -623,7 +626,8 @@ agent.save_llm = async () => {
 
 agent.get_mcpsv_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('agent', 'mcpsv_save');
-    const vform_names = ['mcpserver_name', 'mcpserver_url', 'mcpserver_apikey', 'mcpserver_transport', 'mcp_tools'];
+    const vform_names = ['mcpserver_name', 'mcpserver_url', 'mcpserver_delegated_auth', 'mcpserver_apikey',
+                         'mcpserver_transport', 'mcp_tools'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };
@@ -679,7 +683,7 @@ agent.list_mcpsv = async () => {
                     if (key === 'mcpserver_name') return;
                     const input = form.find(`[name="${key}"]`);
                     if (input.length > 0) {
-                        input.val(config[key]);
+                        if (config[key]) input.val(`${config[key]}`);
                     }
                 });
                 // 選択肢による表示非表示の設定
@@ -697,11 +701,17 @@ agent.list_mcpsv = async () => {
 
                 $('#mcpsv_edit_modal').modal('show');
                 // コマンド実行
+                const user = await cmdbox.user_info();
+                let apikey = $('[name="mcpserver_apikey"]').val();
+                if (!apikey && user && user['apikeys']) {
+                    const keys = Object.keys(user['apikeys']);
+                    if (keys.length > 0) apikey = user['apikeys'][keys[0]][0];
+                }
                 await cmdbox.callcmd('agent','mcp_client',{
-                            'mcpserver_url':$('[name="mcpserver_url"]').val(),
-                            'mcpserver_apikey':$('[name="mcpserver_apikey"]').val(),
-                            'mcpserver_transport':$('[name="mcpserver_transport"]').val(),
-                            'operation':'list_tools',
+                    'mcpserver_url':$('[name="mcpserver_url"]').val(),
+                    'mcpserver_apikey':apikey,
+                    'mcpserver_transport':$('[name="mcpserver_transport"]').val(),
+                    'operation':'list_tools',
                 },(res)=>{
                     $("[name='mcp_tools']").empty().append('<option></option>');
                     res.map(elm=>{$('[name="mcp_tools"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});

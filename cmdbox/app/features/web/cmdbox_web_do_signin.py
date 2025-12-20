@@ -122,12 +122,14 @@ class DoSignin(cmdbox_web_signin.Signin):
                         return RedirectResponse(url=f'/signin/{next}?error=expirationofpassword')
                     if datetime.datetime.now() > last_update + datetime.timedelta(days=notify):
                         # セッションに保存
-                        _set_session(req, dict(uid=uid, name=name), email, passwd, None, group_names, gids)
+                        _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None)),
+                                     email, passwd, None, group_names, gids)
                         next = f"../{next}" if token_ok else next
                         web.options.audit_exec(req, res, web, body=dict(msg='Signin succeeded. However, you should change your password.'), audit_type='auth', user=name)
                         return RedirectResponse(url=f'../{next}?warn=passchange', headers=dict(signin="success"))
             # セッションに保存
-            _set_session(req, dict(uid=uid, name=name), email, passwd, None, group_names, gids)
+            _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None)),
+                         email, passwd, None, group_names, gids)
             next = f"../{next}" if token_ok else next
             if notify_passchange:
                 web.options.audit_exec(req, res, web, body=dict(msg='Signin succeeded. However, you should change your password.'), audit_type='auth', user=name)
@@ -206,7 +208,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 web.user_data(None, user['uid'], user['name'], 'password', 'pass_miss_count', 0, delkey=True)
             # セッションに保存
             req.session['signin'] = dict(uid=user['uid'], name=user['name'],
-                                         password=hashed_password, access_token=access_token,
+                                         password=hashed_password, access_token=access_token, apikeys=user.get('apikeys', None),
                                          gids=gids, groups=group_names, email=email)
             if web.logger.level == logging.DEBUG:
                 web.logger.debug(f'Set session, uid={user["uid"]}, name={user["name"]}, email={email}, gids={gids}, groups={group_names}')

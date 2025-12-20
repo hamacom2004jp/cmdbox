@@ -1,4 +1,5 @@
 from cmdbox.app import common, client, feature
+from cmdbox.app.auth import signin
 from cmdbox.app.commons import convert, redis_client
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -321,6 +322,7 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
         for mcpsv_conf in mcpsv_confs:
             mcpserver_url = mcpsv_conf.get('mcpserver_url', None)
             mcpserver_apikey = mcpsv_conf.get('mcpserver_apikey', None)
+            mcpserver_delegated_auth = mcpsv_conf.get('mcpserver_delegated_auth', False)
             mcpserver_transport = mcpsv_conf.get('mcpserver_transport', 'streamable-http')  # sse
             auth_cred = AuthCredential(auth_type=AuthCredentialTypes.HTTP,
                                        http=dict(scheme="bearer", credentials=dict(token=mcpserver_apikey)))
@@ -336,16 +338,22 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
                     timeout=120,
                     sse_read_timeout=600,
                 )
-            def header_provider(readonly_context:ReadonlyContext) -> Dict[str, str]:
-                if mcpserver_apikey is not None:
-                    return dict(Authorization=f"Bearer {mcpserver_apikey}")
-                return {}
+            def _warp(mcpserver_apikey:str, mcpserver_delegated_auth:bool):
+                def header_provider(readonly_context:ReadonlyContext) -> Dict[str, str]:
+                    scope = signin.get_request_scope()
+                    if scope is not None and mcpserver_delegated_auth:
+                        apikey = scope["mcpserver_apikey"] if scope["mcpserver_apikey"] is not None else mcpserver_apikey
+                        return dict(Authorization=f"Bearer {apikey}")
+                    if mcpserver_apikey is not None:
+                        return dict(Authorization=f"Bearer {mcpserver_apikey}")
+                    return {}
+                return header_provider
             toolset = MCPToolset(
                 connection_params=conn_params,
                 tool_filter=mcpsv_conf.get('mcpserver_mcp_tools', []),
                 auth_scheme=auth_scheme,
                 auth_credential=auth_cred,
-                header_provider=header_provider,
+                header_provider=_warp(mcpserver_apikey, mcpserver_delegated_auth),
             )
             tools.append(toolset)
         return tools

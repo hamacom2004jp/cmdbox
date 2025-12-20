@@ -1,4 +1,5 @@
 from cmdbox.app import common, client, feature, options
+from cmdbox.app.auth import signin
 from cmdbox.app.commons import convert, redis_client
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -57,6 +58,9 @@ class CmdAgentChat(feature.ResultEdgeFeature):
                 dict(opt="session_id", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                     description_ja="Runnerに送信するセッションIDを指定します。",
                     description_en="Specify the session ID to send to the Runner."),
+                dict(opt="mcpserver_apikey", type=Options.T_PASSWD, default=None, required=False, multi=False, hide=False, choice=None,
+                    description_ja="リモートMCPサーバーのAPI Keyを指定します。",
+                    description_en="Specify the API Key of the remote MCP server.",),
                 dict(opt="message", type=Options.T_TEXT, default=None, required=True, multi=False, hide=False, choice=None,
                     description_ja="Runnerに送信するメッセージを指定します。",
                     description_en="Specify the message to send to the Runner."),
@@ -93,7 +97,7 @@ class CmdAgentChat(feature.ResultEdgeFeature):
             return self.RESP_WARN, msg, None
 
         payload = dict(runner_name=args.runner_name, user_name=args.user_name, session_id=args.session_id,
-                       message=args.message)
+                       mcpserver_apikey=args.mcpserver_apikey, message=args.message)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -125,16 +129,14 @@ class CmdAgentChat(feature.ResultEdgeFeature):
             if 'agents' not in sessions:
                 sessions['agents'] = {}
 
-            # Linux上でのイベントループポリシー設定
-            # Windowsではデフォルト、Linuxではマルチプロセス対応ポリシーを使用
+            # イベントループポリシー設定
+            try:
+                asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
+            except Exception as e:
+                if logger.level == logging.DEBUG:
+                    logger.debug(f"Failed to set event loop policy: {e}")
             import platform
-            if platform.system() == "Windows":
-                try:
-                    asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
-                except Exception as e:
-                    if logger.level == logging.DEBUG:
-                        logger.debug(f"Failed to set event loop policy: {e}")
-            else:
+            if platform.system() != "Windows":
                 # LiteLLMのロギングワーカーがイベントループをリセットするのを防ぐため、
                 # 既存のイベントループを再利用する
                 try:
@@ -147,6 +149,7 @@ class CmdAgentChat(feature.ResultEdgeFeature):
             name = payload.get('runner_name')
             user_name = payload.get('user_name')
             session_id = payload.get('session_id')
+            mcpserver_apikey = payload.get('mcpserver_apikey')
             message = payload.get('message')
             if name not in sessions['agents']:
                 msg = dict(warn=f"Runner '{name}' is not running.", end=True)
@@ -185,13 +188,6 @@ class CmdAgentChat(feature.ResultEdgeFeature):
                     session = await session_service.create_session(app_name=runner_name, user_id=user_name, session_id=session_id)
                     return session
 
-            def _replace_match(match_obj):
-                json_str = match_obj.group(0)
-                try:
-                    data = json.loads(json_str) # ユニコード文字列をエンコード
-                    return json.dumps(data, ensure_ascii=False, default=common.default_json_enc)
-                except json.JSONDecodeError:
-                    return json_str
             json_pattern = re.compile(r'\{.*?\}')
 
             runner:Runner = sessions['agents'][name]['runner']
@@ -199,6 +195,7 @@ class CmdAgentChat(feature.ResultEdgeFeature):
             # セッションを作成する
             agent_session = await create_agent_session(runner.session_service, name, user_name, session_id=session_id)
             # チャットを実行する
+            signin.set_request_scope(dict(mcpserver_apikey=mcpserver_apikey))
             run_config = RunConfig(streaming_mode=StreamingMode.NONE)
             run_iter = runner.run_async(user_id=user_name, session_id=agent_session.id, new_message=content, run_config=run_config)
             async for event in run_iter:
@@ -207,19 +204,8 @@ class CmdAgentChat(feature.ResultEdgeFeature):
                     outputs['success']['turn_complete'] = True
                 if event.interrupted:
                     outputs['success']['interrupted'] = True
-                msg = None
-                if event.content and event.content.parts:
-                    msg = "\n".join([p.text for p in event.content.parts if p and p.text])
-                    calls = event.get_function_calls()
-                    if calls:
-                        msg += '\n```json{"function_calls":'+common.to_str([dict(fn=c.name,args=c.args) for c in calls])+'}```'
-                    responses = event.get_function_responses()
-                    if responses:
-                        msg += '\n```json{"function_responses":'+common.to_str([dict(fn=r.name, res=r.response) for r in responses])+'}```'
-                elif event.actions and event.actions.escalate:
-                    msg = f"Agent escalated: {event.error_message or 'No specific message.'}"
+                msg = self.__class__.gen_msg(event)
                 if msg:
-                    msg = json_pattern.sub(_replace_match, msg)
                     outputs['success']['message'] = msg
                     options.Options.getInstance().audit_exec(body=dict(agent_session=agent_session.id, result=msg),
                                                                 audit_type=options.Options.AT_USER, user=user_name)
@@ -236,3 +222,30 @@ class CmdAgentChat(feature.ResultEdgeFeature):
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
+
+    @classmethod
+    def _replace_match(cls, match_obj):
+        json_str = match_obj.group(0)
+        try:
+            data = json.loads(json_str) # ユニコード文字列をエンコード
+            return json.dumps(data, ensure_ascii=False, default=common.default_json_enc)
+        except json.JSONDecodeError:
+            return json_str
+
+    @classmethod
+    def gen_msg(cls, event:Any) -> str:
+        json_pattern = re.compile(r'\{.*?\}')
+        msg = None
+        if event.content and event.content.parts:
+            msg = "\n".join([p.text for p in event.content.parts if p and p.text])
+            calls = event.get_function_calls()
+            if calls:
+                msg += '\n```json{"function_calls":'+common.to_str([dict(fn=c.name,args=c.args) for c in calls])+'}```'
+            responses = event.get_function_responses()
+            if responses:
+                msg += '\n```json{"function_responses":'+common.to_str([dict(fn=r.name, res=r.response) for r in responses])+'}```'
+        elif event.actions and event.actions.escalate:
+            msg = f"Agent escalated: {event.error_message or 'No specific message.'}"
+        if msg:
+            msg = json_pattern.sub(cls._replace_match, msg)
+        return msg

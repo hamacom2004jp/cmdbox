@@ -76,9 +76,15 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
             # ユーザー名を取得する
             user_name = common.random_string(16)
             groups = []
+            mcpserver_apikey = None
             if 'signin' in session:
                 user_name = session['signin']['name']
                 groups = session['signin']['groups']
+                mcpserver_apikey = session['signin'].get('apikey', None)
+                if mcpserver_apikey is None:
+                    apikeys = session['signin'].get('apikeys', None)
+                    if apikeys is not None and isinstance(apikeys, dict) and len(apikeys) > 0:
+                        mcpserver_apikey = apikeys.values().__iter__().__next__()
 
             startmsg = "こんにちは！何かお手伝いできることはありますか？" if common.is_japan() else "Hello! Is there anything I can help you with?"
             yield json.dumps(dict(message=startmsg), default=common.default_json_enc)
@@ -102,7 +108,7 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
 
                     web.options.audit_exec(sock, web, body=dict(agent_session=session_id, user=user_name, groups=groups, query=query))
                     opt = dict(mode='agent', cmd='chat', runner_name=runner_name, user_name=user_name,
-                            session_id=session_id, message=query)
+                            session_id=session_id, mcpserver_apikey=mcpserver_apikey, message=query)
                     ret = await self.exec_cmd(sock, res, web, '', opt, True, self.appcls)
                     if 'success' not in ret:
                         yield common.to_str(ret)

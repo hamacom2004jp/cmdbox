@@ -237,7 +237,7 @@ class Signin(object):
         group_names = list(set(Signin.correct_group(signin_file_data, find_user['groups'], None)))
         gids = [g['gid'] for g in signin_file_data['groups'] if g['name'] in group_names]
         req.session['signin'] = dict(uid=find_user['uid'], name=find_user['name'], password=find_user['password'],
-                                     gids=gids, groups=group_names)
+                                     gids=gids, groups=group_names, apikeys=find_user.get('apikeys', None), apikey=apikey)
         if logger.level == logging.DEBUG:
             logger.debug(f"find user: name={find_user['name']}, group_names={group_names}")
         # パスルールチェック

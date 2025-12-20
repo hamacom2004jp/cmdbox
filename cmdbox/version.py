@@ -1,6 +1,6 @@
 import datetime
 
-dt_now = datetime.datetime(2025, 12, 18)
+dt_now = datetime.datetime(2025, 12, 20)
 days_ago = (datetime.datetime.now() - dt_now).days
 __appid__ = 'cmdbox'
 __title__ = 'cmdbox (Command Development Application)'

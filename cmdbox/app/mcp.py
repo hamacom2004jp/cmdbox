@@ -67,6 +67,7 @@ class Mcp:
             mcp = FastMCP(name=self.ver.__appid__, stateless_http=True)
         mcp.add_middleware(self.create_mw_logging(self.logger, args))
         mcp.add_middleware(self.create_mw_reqscope(self.logger, args))
+        mcp.add_middleware(self.create_mw_toollist(self.logger, args, tools))
         return mcp
 
     def create_session_service(self, args:argparse.Namespace) -> Any:
@@ -324,34 +325,26 @@ class Mcp:
                 return result
         return ReqScopeMiddleware()
 
-    def init_agent_runner(self, logger:logging.Logger, args:argparse.Namespace, web:Any) -> Tuple[Any, Any]:
+    def create_mw_toollist(self, logger:logging.Logger, args:argparse.Namespace, tools:Any) -> Any:
         """
-        エージェントの初期化を行います
+        toolsリスト取得用のミドルウェアを作成します
 
         Args:
             logger (logging.Logger): ロガー
             args (argparse.Namespace): 引数
-            web (Any): Web関連のオブジェクト
+            tools (Any): ツールリスト
 
         Returns:
-            Tuple[Any, Any]: ランナーとFastMCP
+            Any: ミドルウェア
         """
-        if logger.level == logging.DEBUG:
-            logger.debug(f"init_agent_runner processing..")
-        # loggerの初期化
-        common.reset_logger("httpx")
-        common.reset_logger("google_adk.google.adk.sessions.database_session_service")
-        common.reset_logger("mcp.server.streamable_http_manager")
-        # モジュールインポート
-        from fastmcp import FastMCP
-        from google.adk.sessions import BaseSessionService
-        session_service:BaseSessionService = self.create_session_service(args)
-        mcp:FastMCP = self.create_mcpserver(logger, args, self.create_tools(logger, args, False))
-        root_agent = self.create_agent(logger, args, self.create_tools(logger, args, True))
-        runner = self.create_runner(logger, args, session_service, root_agent)
-        if logger.level == logging.DEBUG:
-            logger.debug(f"init_agent_runner complate.")
-        return runner, mcp
+        from fastmcp.server.middleware import Middleware, MiddlewareContext
+        class ToolListMiddleware(Middleware):
+            async def on_list_tools(self, context: MiddlewareContext, call_next):
+                if logger.level == logging.DEBUG:
+                    logger.debug(f"Intercepting tools/list request to return latest ToolList")
+                # ツールリストの最新版を取得（ToolListクラスのイテレータを使用）
+                return [tool for tool in tools]
+        return ToolListMiddleware()
 
 class ToolList(object):
     def __init__(self, logger:logging.Logger, data:Path, *tools:List, appcls=None, ver=None,):
@@ -375,6 +368,7 @@ class ToolList(object):
         self.extract_callable = False
         self.appcls = appcls
         self.ver = ver
+        """ すべてのモードとコマンドから、エージェント用のツールを生成する場合のコード ---
         for mode in options.get_mode_keys():
             for cmd in options.get_cmd_keys(mode):
                 if not options.get_cmd_attr(mode, cmd, 'use_agent'):
@@ -404,6 +398,7 @@ class ToolList(object):
                                         parameters=input_schema, output_schema=output_schema,)
                 # ツールリストに追加
                 self.tools.append(func_tool)
+        """
         for tool in tools:
             if isinstance(tool, FunctionTool):
                 if self.logger.level == logging.DEBUG:
@@ -661,7 +656,7 @@ class ToolList(object):
         func_txt += f'        logger.warning("{func_name} is not allowed to be executed by the system.")\n'
         func_txt += f'        return dict(warn="{func_name} is not allowed to be executed by the system.")\n'
         func_txt +=  '    opt = {o["opt"]: kwargs.get(o["opt"], o["default"]) for o in options.get_cmd_choices("'+mode+'", "'+cmd+'", False)}\n'
-        func_txt += f'    opt["data"] = Path(opt["data"]) if hasattr(opt, "data") else Path("{self.data}")\n'
+        func_txt += f'    opt["data"] = Path(opt["data"]) if hasattr(opt, "data") else Path(r"{self.data}")\n'
         func_txt += f'    if "{title}":\n'
         func_txt += f'        opt_path = opt["data"] / ".cmds" / f"cmd-{title}.json"\n'
         func_txt += f'        opt.update(common.loadopt(opt_path))\n'

@@ -49,6 +49,9 @@ class CmdAgentMcpSave(feature.OneshotResultEdgeFeature):
                 dict(opt="mcpserver_url", type=Options.T_STR, default='http://localhost:8082/mcp', required=True, multi=False, hide=False, choice=None,
                     description_ja="リモートMCPサーバーのURLを指定します。省略した場合は`http://localhost:8082/mcp`となります。",
                     description_en="Specifies the URL of the remote MCP server. If omitted, it will be `http://localhost:8082/mcp`.",),
+                dict(opt="mcpserver_delegated_auth", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
+                    description_ja="Agentが受信したAPI Keyを使用して、MCPサーバーに認証要求します。",
+                    description_en="Specify the API Key of the remote MCP server.",),
                 dict(opt="mcpserver_apikey", type=Options.T_PASSWD, default=None, required=False, multi=False, hide=False, choice=None,
                     description_ja="リモートMCPサーバーのAPI Keyを指定します。",
                     description_en="Specify the API Key of the remote MCP server.",),
@@ -56,9 +59,15 @@ class CmdAgentMcpSave(feature.OneshotResultEdgeFeature):
                     description_ja="リモートMCPサーバーのトランスポートを指定します。省略した場合は`streamable-http`となります。",
                     description_en="Specifies the transport of the remote MCP server. If omitted, it is `streamable-http`.",),
                 dict(opt="mcp_tools", type=Options.T_MLIST, default=None, required=False, multi=False, hide=False, choice=[],
-                    callcmd="async () => {await cmdbox.callcmd('agent','mcp_client',{"
+                    callcmd="async () => {const user = await cmdbox.user_info();"
+                            + "let apikey = $(\"[name='mcpserver_apikey']\").val();"
+                            + "if (!apikey && user && user['apikeys']) {"
+                            + "  const keys = Object.keys(user['apikeys']);"
+                            + "  if (keys.length > 0) apikey = user['apikeys'][keys[0]][0];"
+                            + "}"
+                            + "await cmdbox.callcmd('agent','mcp_client',{"
                             + "'mcpserver_url':$(\"[name='mcpserver_url']\").val(),"
-                            + "'mcpserver_apikey':$(\"[name='mcpserver_apikey']\").val(),"
+                            + "'mcpserver_apikey':apikey,"
                             + "'mcpserver_transport':$(\"[name='mcpserver_transport']\").val(),"
                             + "'operation':'list_tools',"
                             + "},(res)=>{"
@@ -106,6 +115,7 @@ class CmdAgentMcpSave(feature.OneshotResultEdgeFeature):
             mcpserver_name=args.mcpserver_name,
             mcpserver_url=args.mcpserver_url,
             mcpserver_apikey=args.mcpserver_apikey,
+            mcpserver_delegated_auth=args.mcpserver_delegated_auth,
             mcpserver_transport=args.mcpserver_transport,
             mcpserver_mcp_tools=args.mcp_tools,
         )

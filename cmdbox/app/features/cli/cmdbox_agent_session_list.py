@@ -1,5 +1,6 @@
 from cmdbox.app import common, client, feature, options
 from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.features.cli import cmdbox_agent_chat
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List
@@ -127,9 +128,12 @@ class CmdAgentSessionList(feature.ResultEdgeFeature):
                     if not s: continue
                     row = dict(runner_name=s.app_name, session_id=s.id, user_name=s.user_id, last_update_time=s.last_update_time)
                     ss = await session_service.get_session(app_name=name, user_id=user_name, session_id=s.id)
-                    row['events'] = [dict(author=ev.author, text=ev.content.parts[0].text) for ev in ss.events if ev.content and ev.content.parts]
+                    row['events'] = []
+                    for ev in ss.events:
+                        msg = cmdbox_agent_chat.CmdAgentChat.gen_msg(ev)
+                        row['events'].append(dict(author=ev.author, text=msg))
                     data.append(row)
-                data.reverse()
+                data.sort(key=lambda x: (x['last_update_time'],))
                 out = dict(success=data, end=True)
                 redis_cli.rpush(reskey, out)
                 return self.RESP_SUCCESS
@@ -139,7 +143,10 @@ class CmdAgentSessionList(feature.ResultEdgeFeature):
                     out = dict(success=[], end=True)
                 else:
                     row = dict(runner_name=s.app_name, session_id=s.id, user_name=s.user_id, last_update_time=s.last_update_time)
-                    row['events'] = [dict(author=ev.author, text=ev.content.parts[0].text) for ev in s.events if ev.content and ev.content.parts]
+                    row['events'] = []
+                    for ev in s.events:
+                        msg = cmdbox_agent_chat.CmdAgentChat.gen_msg(ev)
+                        row['events'].append(dict(author=ev.author, text=msg))
                     out = dict(success=[row], end=True)
                 redis_cli.rpush(reskey, out)
                 return self.RESP_SUCCESS
