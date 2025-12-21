@@ -93,6 +93,34 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
     def is_cluster_redirect(self):
         return True
 
+    def _load_agent_config(self, data_dir:Path, agent_name:str) -> Dict[str, Any]:
+        agent_conf_path = data_dir / ".agent" / f"agent-{agent_name}.json"
+        if not agent_conf_path.exists():
+            raise FileNotFoundError(f"Specified agent configuration '{agent_name}' not found on server at '{str(agent_conf_path)}'.")
+        with agent_conf_path.open('r', encoding='utf-8') as f:
+            agent_conf = json.load(f)
+        return agent_conf
+
+    def _load_llm_config(self, data_dir:Path, llm_name:str) -> Dict[str, Any]:
+        llm_conf_path = data_dir / ".agent" / f"llm-{llm_name}.json"
+        if not llm_conf_path.exists():
+            raise FileNotFoundError(f"Specified llm configuration '{llm_name}' not found on server at '{str(llm_conf_path)}'.")
+        with llm_conf_path.open('r', encoding='utf-8') as f:
+            llm_conf = json.load(f)
+        return llm_conf
+
+    def _load_mcpsv_config(self, data_dir:Path, mcpservers:List[str]) -> List[Dict[str, Any]]:
+        mcpsv_confs = []
+        if isinstance(mcpservers, list):
+            for mcpsv_name in mcpservers:
+                mcpsv_conf_path = data_dir / ".agent" / f"mcpsv-{mcpsv_name}.json"
+                if not mcpsv_conf_path.exists():
+                    raise FileNotFoundError(f"Specified MCP server configuration '{mcpsv_name}' not found on server at '{str(mcpsv_conf_path)}'.")
+                with mcpsv_conf_path.open('r', encoding='utf-8') as f:
+                    mcpsv_conf = json.load(f)
+                    mcpsv_confs.append(mcpsv_conf)
+        return mcpsv_confs
+
     def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
               sessions:Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
@@ -117,27 +145,34 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
             with runner_conf_path.open('r', encoding='utf-8') as f:
                 runner_conf = json.load(f)
 
-            llm_conf_path = data_dir / ".agent" / f"llm-{runner_conf['llm']}.json"
-            if not llm_conf_path.exists():
-                msg = dict(warn=f"Specified llm configuration '{runner_conf['llm']}' not found on server at '{str(llm_conf_path)}'.")
+            try:
+                agent_conf = self._load_agent_config(data_dir, runner_conf['agent'])
+            except Exception as e:
+                msg = dict(warn=str(e))
                 redis_cli.rpush(reskey, msg)
                 return self.RESP_WARN
-            with llm_conf_path.open('r', encoding='utf-8') as f:
-                llm_conf = json.load(f)
 
-            mcpsv_confs = []
-            if runner_conf['mcpservers'] is not None and isinstance(runner_conf['mcpservers'], list):
-                for mcpsv_name in runner_conf['mcpservers']:
-                    mcpsv_conf_path = data_dir / ".agent" / f"mcpsv-{mcpsv_name}.json"
-                    if not mcpsv_conf_path.exists():
-                        msg = dict(warn=f"Specified MCP server configuration '{mcpsv_name}' not found on server at '{str(mcpsv_conf_path)}'.")
-                        redis_cli.rpush(reskey, msg)
-                        return self.RESP_WARN
-                    with mcpsv_conf_path.open('r', encoding='utf-8') as f:
-                        mcpsv_conf = json.load(f)
-                        mcpsv_confs.append(mcpsv_conf)
+            try:
+                if agent_conf.get('llm', None) is not None:
+                    llm_conf = self._load_llm_config(data_dir, agent_conf['llm'])
+                else:
+                    llm_conf = {}
+            except Exception as e:
+                msg = dict(warn=str(e))
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
 
-            agent = self.create_agent(logger, runner_conf, llm_conf, mcpsv_confs)
+            try:
+                if agent_conf.get('mcpservers', None) is not None:
+                    mcpsv_confs = self._load_mcpsv_config(data_dir, agent_conf['mcpservers'])
+                else:
+                    mcpsv_confs = []
+            except Exception as e:
+                msg = dict(warn=str(e))
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
+
+            agent = self.create_agent(logger, data_dir, agent_conf, llm_conf, mcpsv_confs)
             from google.adk.runners import Runner
             runner = Runner(
                 app_name=runner_conf.get('runner_name', self.ver.__appid__),
@@ -159,14 +194,15 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
             return self.RESP_WARN
 
 
-    def create_agent(self, logger:logging.Logger,
-                     runner_conf:Dict[str, Any], llm_conf:Dict[str, Any], mcpsv_confs:List[Dict[str, Any]]) -> Any:
+    def create_agent(self, logger:logging.Logger, data_dir:Path,
+                     agent_conf:Dict[str, Any], llm_conf:Dict[str, Any], mcpsv_confs:List[Dict[str, Any]]) -> Any:
         """
         エージェントを作成します
 
         Args:
             logger (logging.Logger): ロガー
-            runner_conf (Dict[str, Any]): ランナー設定
+            data_dir (Path): データディレクトリパス
+            agent_conf (Dict[str, Any]): エージェント設定
             llm_conf (Dict[str, Any]): LLM設定
             mcpsv_confs (List[Dict[str, Any]]): MCPサーバー設定リスト
 
@@ -175,8 +211,8 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
         """
         if logger.level == logging.DEBUG:
             logger.debug(f"create_agent processing..")
-        description = runner_conf.get("llm_description", f"{self.ver.__appid__}に登録されているコマンド提供")
-        instruction = runner_conf.get("runner_instruction", f"あなたはコマンドの意味を熟知しているエキスパートです。" + \
+        description = agent_conf.get("agent_description", f"{self.ver.__appid__}に登録されているコマンド提供")
+        instruction = agent_conf.get("agent_instruction", f"あなたはコマンドの意味を熟知しているエキスパートです。" + \
                       f"ユーザーがコマンドを実行したいとき、あなたは以下の手順に従ってコマンドを確実に実行してください。\n" + \
                       f"1. ユーザーのクエリからが実行したいコマンドを特定します。\n" + \
                       f"2. コマンド実行に必要なパラメータのなかで、ユーザーのクエリから取得できないものは、コマンド定義にあるデフォルト値を指定して実行してください。\n" + \
@@ -202,7 +238,10 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
         common.reset_logger("LiteLLM Router")
         common.reset_logger("LiteLLM")
         # 各種設定値の取得
-        runner_name = runner_conf.get('runner_name', None)
+        agent_name = agent_conf.get('agent_name', None)
+        agent_type = agent_conf.get('agent_type', None)
+        agent_card = agent_conf.get('agent_card', None)
+        agent_subagents = agent_conf.get('subagents', None)
         llmprov = llm_conf.get('llmprov', None)
         llmprojectid = llm_conf.get('llmprojectid', None)
         llmsvaccountfile = llm_conf.get('llmsvaccountfile', None)
@@ -214,13 +253,42 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
         llmmodel = llm_conf.get('llmmodel', None)
         llmseed = llm_conf.get('llmseed', None)
         llmtemperature = llm_conf.get('llmtemperature', None)
-        
-        if llmprov == 'openai':
+
+        def create_subagent(data_dir:Path, agent_name:str) -> Any:
+            agent_conf = self._load_agent_config(data_dir, agent_name)
+            if agent_conf.get('llm', None) is not None:
+                llm_conf = self._load_llm_config(data_dir, agent_conf['llm'])
+            else:
+                llm_conf = {}
+
+            if agent_conf.get('mcpservers', None) is not None:
+                mcpsv_confs = self._load_mcpsv_config(data_dir, agent_conf['mcpservers'])
+            else:
+                mcpsv_confs = []
+            return self.create_agent(logger, data_dir, agent_conf, llm_conf, mcpsv_confs)
+
+        agent_subagents = agent_subagents if agent_subagents is not None else []
+        subagents = []
+        if 'subagents' in agent_conf and isinstance(agent_subagents, list):
+            for subagent_name in agent_subagents:
+                subagents.append(create_subagent(data_dir, subagent_name))
+
+        if agent_type == 'remote':
+            from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+            agent = RemoteA2aAgent(
+                name=agent_name,
+                agent_card=agent_card,
+                description=description
+            )
+            if logger.level == logging.DEBUG:
+                logger.debug(f"create_agent complate.")
+            return agent
+        elif llmprov == 'openai':
             if llmmodel is None: raise ValueError("llmmodel is required.")
             if llmapikey is None: raise ValueError("llmapikey is required.")
             from google.adk.planners import PlanReActPlanner
             agent = Agent(
-                name=runner_name,
+                name=agent_name,
                 model=lite_llm.LiteLlm(
                     model=llmmodel,
                     api_key=llmapikey,
@@ -229,7 +297,8 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
                 description=description,
                 instruction=instruction,
                 planner=PlanReActPlanner(),
-                tools=self.create_tool_mcpsv(logger, mcpsv_confs)
+                tools=self.create_tool_mcpsv(logger, mcpsv_confs),
+                sub_agents=subagents
             )
         elif llmprov == 'azureopenai':
             if llmmodel is None: raise ValueError("llmmodel is required.")
@@ -242,7 +311,7 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
             if not llmmodel.startswith("azure/"):
                 llmmodel = f"azure/{llmmodel}"
             agent = Agent(
-                name=runner_name,
+                name=agent_name,
                 model=lite_llm.LiteLlm(
                     model=llmmodel,
                     api_key=llmapikey,
@@ -252,7 +321,8 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
                 description=description,
                 instruction=instruction,
                 planner=PlanReActPlanner(),
-                tools=self.create_tool_mcpsv(logger, mcpsv_confs)
+                tools=self.create_tool_mcpsv(logger, mcpsv_confs),
+                sub_agents=subagents
             )
         elif llmprov == 'vertexai':
             if llmmodel is None: raise ValueError("llmmodel is required.")
@@ -261,7 +331,7 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
             from google.adk.planners import BuiltInPlanner
             from google.genai import types
             agent = Agent(
-                name=runner_name,
+                name=agent_name,
                 model=lite_llm.LiteLlm(
                     model=llmmodel,
                     #vertex_project=llmprojectid,
@@ -276,14 +346,15 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
                     include_thoughts=True,
                     thinking_budget=1024,
                 )),
-                tools=self.create_tool_mcpsv(logger, mcpsv_confs)
+                tools=self.create_tool_mcpsv(logger, mcpsv_confs),
+                sub_agents=subagents
             )
         elif llmprov == 'ollama':
             if llmmodel is None: raise ValueError("llmmodel is required.")
             if llmendpoint is None: raise ValueError("llmendpoint is required.")
             from google.adk.planners import PlanReActPlanner
             agent = Agent(
-                name=runner_name,
+                name=agent_name,
                 model=lite_llm.LiteLlm(
                     model=f"ollama/{llmmodel}",
                     api_base=llmendpoint,
@@ -293,7 +364,8 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
                 description=description,
                 instruction=instruction,
                 planner=PlanReActPlanner(),
-                tools=self.create_tool_mcpsv(logger, mcpsv_confs)
+                tools=self.create_tool_mcpsv(logger, mcpsv_confs),
+                sub_agents=subagents
             )
         else:
             raise ValueError("llmprov is required.")

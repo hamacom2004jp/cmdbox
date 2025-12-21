@@ -7,6 +7,91 @@ Command Reference ( agent mode )
 - List of agent mode commands.
 
 
+Delete Agent configuration. : `cmdbox -m agent -c agent_del <Option>`
+==============================================================================
+
+- Deletes agent configuration.
+
+.. csv-table::
+    :widths: 30, 10, 60
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--agent_name <name>","Yes","Specify the name of the agent configuration to delete."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+
+List Agent configuration. : `cmdbox -m agent -c agent_list <Option>`
+==============================================================================
+
+- Lists listed agent configurations.
+
+.. csv-table::
+    :widths: 30, 10, 60
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--kwd <keyword>","No","Partial match filter for agent names."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+
+Load Agent configuration. : `cmdbox -m agent -c agent_load <Option>`
+==============================================================================
+
+- Loads agent configuration.
+
+.. csv-table::
+    :widths: 30, 10, 60
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--agent_name <name>","Yes","Specify the name of the agent configuration to load."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+
+Save Agent configuration. : `cmdbox -m agent -c agent_save <Option>`
+==============================================================================
+
+.. csv-table::
+    :widths: 30, 10, 60
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--agent_name <name>","Yes","Specify the name of the agent configuration to save."
+    "--agent_type <type>","Yes","Specify the agent type. Specify either `local` or `remote`."
+    "--agent_card <url>","","Specify the URL of the Remote Agent's agent card."
+    "--llm <name>","","LLM configuration name or reference."
+    "--mcpservers <name>","","Specify the MCP server name used by the Agent."
+    "--subagents <name>","","Specify the subagent name used by the agent."
+    "--agent_description <text>","","Specify a description of the agent's capabilities. The model uses this to determine whether to delegate control to the agent. A single line description is sufficient and recommended."
+    "--agent_instruction <text>","No","Specify instructions for the LLM model used by the agent. These will guide the agent's behavior."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+
 Deletes LLM configuration. : `cmdbox -m agent -c llm_del <Option>`
 ==============================================================================
 
@@ -242,7 +327,7 @@ Delete runner configuration. : `cmdbox -m agent -c runner_del <Option>`
 List runner configuration. : `cmdbox -m agent -c runner_list <Option>`
 ==============================================================================
 
-- Lists saved runner configurations.
+- Lists listed runner configurations.
 
 .. csv-table::
     :widths: 30, 10, 60
@@ -292,10 +377,9 @@ Save runner configuration. : `cmdbox -m agent -c runner_save <Option>`
     "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
     "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
     "--runner_name <name>","Yes","Specify the name of the runner configuration to save."
-    "--runner_instruction <text>","No","Specify instructions for the LLM model used by the runner. These will guide the agent's behavior."
-    "--llm_description <text>","No","Specify a description of the runner's capabilities. The model uses this to determine whether to delegate control to the agent. A single line description is sufficient and recommended."
-    "--llm <name>","No","LLM configuration name or reference."
-    "--mcpservers <name>","No","List or mapping of MCP servers used by the runner."
+    "--agent <name>","Yes","Agent configuration name or reference."
+    "--tts_engine <engine>","","Specify the TTS engine to use."
+    "--voicevox_model <model>","","Specify the model of the TTS engine to use."
     "--session_store_type <type>","No","Specify how the bot's session is stored."
     "--session_store_pghost <host>","No","Specify the postgresql host for session store."
     "--session_store_pgport <port>","No","Specify the postgresql port for session store."

@@ -391,8 +391,10 @@ agent.init_form = async () => {
     agent.chat(cmdbox.random_string(16));
 };
 agent.list_sessions = async (session_id) => {
+    const runner_name = $('#runner_name_input').val();
+    if (!runner_name || runner_name.length <= 0) return [];
     const res = await agent.exec_cmd('agent', 'session_list', {
-        'runner_name': $('#runner_name_input').val(),
+        'runner_name': runner_name,
         'session_id': session_id
     });
     const histories = $('#histories');
@@ -498,16 +500,17 @@ agent.exec_cmd = async (mode, cmd, opt={}, error_func=null, loading=true) => {
             if (loading) cmdbox.hide_loading();
             return res;
         }
+        if (loading) cmdbox.hide_loading();
+        if (res['success']) return res;
         if(!res[0] || !res[0]['success']) {
-            if (loading) cmdbox.hide_loading();
             if (error_func) {
                 error_func(res);
                 return;
             }
+            console.error(res);
             //cmdbox.message(res);
-            return res[0];
+            return res;
         }
-        if (loading) cmdbox.hide_loading();
         return res[0];
     });
 }
@@ -604,11 +607,6 @@ agent.save_llm = async () => {
     form.serializeArray().forEach(item => {
         if (item.value) data[item.name] = item.value;
     });
-
-    if (!data.llmname || !data.llmprov) {
-        alert('Name and Provider are required.');
-        return;
-    }
 
     try {
         const res = await agent.exec_cmd('agent', 'llm_save', data);
@@ -735,11 +733,6 @@ agent.save_mcpsv = async () => {
         if (val) data[elem.name] = val;
     });
 
-    if (!data.mcpserver_name || !data.mcpserver_url) {
-        alert('Name and URL are required.');
-        return;
-    }
-
     try {
         const res = await agent.exec_cmd('agent', 'mcpsv_save', data);
         if (res && res.success) {
@@ -754,12 +747,165 @@ agent.save_mcpsv = async () => {
     }
 };
 
+agent.get_agent_form_def = async () => {
+    const opts = await cmdbox.get_cmd_choices('agent', 'agent_save');
+    const vform_names = ['agent_name', 'agent_type', 'agent_card', 'llm', 'mcpservers', 'subagents',
+        'agent_description', 'agent_instruction'];
+    const ret = opts.filter(o => vform_names.includes(o.opt));
+    return ret;
+};
+
+agent.build_agent_form = async () => {
+    const form = $('#form_agent_edit');
+    form.empty();
+    const defs = await agent.get_agent_form_def();
+    const model = $('#agent_edit_modal');
+    defs.forEach((row, i) => {
+        cmdbox.add_form_func(i, model, form, row, null);
+    });
+};
+
+agent.list_agent = async () => {
+    const container = $('#agent_list_container');
+    container.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+
+    try {
+        const res = await agent.exec_cmd('agent', 'agent_list');
+        container.html('');
+        if (!res || !res.success) {
+            container.html('<div class="text-danger p-3">Failed to load Agent list.</div>');
+            return;
+        }
+        
+        const list = res.success['data'] || [];
+        if (list.length === 0) {
+            container.html('<div class="text-muted p-3">No Agent configurations found.</div>');
+            return;
+        }
+
+        list.forEach(async item => {
+            const res = await agent.exec_cmd('agent', 'agent_load', { agent_name: item.name });
+            if (!res || !res.success) return;
+            const config = res.success || {};
+            const itemEl = $(`
+                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="cursor: pointer;">
+                    <div>
+                        <h6 class="mb-1">${config.agent_name}</h6>
+                        <small>${config.agent_description || 'None'}</small>
+                    </div>
+                </div>
+            `);
+
+            // リストアイテムクリックで編集
+            itemEl.on('click', async () => {
+                await agent.build_agent_form();
+                const form = $('#form_agent_edit');
+                form.find('[name="agent_name"]').val(config.agent_name).prop('readonly', true);
+
+                // 各フィールドに値をセット
+                Object.keys(config).forEach(key => {
+                    if (key === 'agent_name') return;
+                    const input = form.find(`[name="${key}"]`);
+                    if (input.length > 0) {
+                        if (config[key]) {
+                            if (Array.isArray(config[key])) {
+                                input.val(config[key]);
+                            } else {
+                                input.val(`${config[key]}`);
+                            }
+                        }
+                    }
+                });
+                // 選択肢による表示非表示の設定
+                form.find(`.choice_show`).each((i, elem) => {
+                    const input_elem = $(elem);
+                    input_elem.change();
+                });
+                // Delete button handler
+                $('#btn_del_agent').show().off('click').on('click', async () => {
+                    if (!confirm(`Are you sure you want to delete '${config.agent_name}'?`)) return;
+                    await agent.exec_cmd('agent', 'agent_del', { agent_name: config.agent_name });
+                    $('#agent_edit_modal').modal('hide');
+                    agent.list_agent();
+                });
+
+                $('#agent_edit_modal').modal('show');
+                // LLMリストをロード
+                await cmdbox.callcmd('agent','llm_list',{},(res)=>{
+                    const val = $("[name='llm']").val();
+                    $("[name='llm']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                    form.find('[name="llm"]').val(config.llm);
+                },$('[name="title"]').val(),'llm');
+                // MCPサーバーリストをロード
+                await cmdbox.callcmd('agent','mcpsv_list',{},(res)=>{
+                    const val = $("[name='mcpservers']").val();
+                    $("[name='mcpservers']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="mcpservers"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                    form.find('[name="mcpservers"]').val(config.mcpservers);
+                },$('[name="title"]').val(),'mcpservers');
+                // SubAgentリストをロード
+                await cmdbox.callcmd('agent','agent_list',{},(res)=>{
+                    const val = $("[name='subagents']").val();
+                    $("[name='subagents']").empty().append('<option></option>');
+                    res['data'].map(elm=>{
+                        if (elm["name"] === $('[name="agent_name"]').val()) return;
+                        $('[name="subagents"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');
+                    });
+                    form.find('[name="subagents"]').val(config.subagents);
+                },$('[name="title"]').val(),'subagents');
+            });
+            container.append(itemEl);
+        });
+    } catch (e) {
+        console.error(e);
+        container.html(`<div class="text-danger p-3">Error: ${e.message}</div>`);
+    }
+};
+
+agent.save_agent = async () => {
+    const form = $('#form_agent_edit');
+    const data = {};
+    const array = form.serializeArray();
+    
+    // Helper to handle multiple values for same name (for mcpservers)
+    const multiMap = {};
+    array.forEach(item => {
+        if (multiMap[item.name]) {
+            if (!Array.isArray(multiMap[item.name])) {
+                multiMap[item.name] = [multiMap[item.name]];
+            }
+            multiMap[item.name].push(item.value);
+        } else {
+            multiMap[item.name] = item.value;
+        }
+    });
+    // Ensure mcpservers is array if present
+    if (multiMap['mcpservers'] && !Array.isArray(multiMap['mcpservers'])) {
+        multiMap['mcpservers'] = [multiMap['mcpservers']];
+    }
+    
+    Object.assign(data, multiMap);
+
+    try {
+        const res = await agent.exec_cmd('agent', 'agent_save', data);
+        if (res && res.success) {
+            $('#agent_edit_modal').modal('hide');
+            agent.list_agent();
+        } else {
+            alert('Failed to save Agent settings.');
+        }
+    } catch (e) {
+        console.error(e);
+        alert(`Error: ${e.message}`);
+    }
+};
+
 agent.get_runner_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('agent', 'runner_save');
-    const vform_names = ['runner_name', 'llm', 'mcpservers', 'session_store_type', 'session_store_pghost',
+    const vform_names = ['runner_name', 'agent', 'session_store_type', 'session_store_pghost',
                         'session_store_pgport', 'session_store_pguser', 'session_store_pgpass',
-                        'session_store_pgdbname', 'llm_description', 'runner_instruction',
-                        'tts_engine', 'voicevox_model'];
+                        'session_store_pgdbname', 'tts_engine', 'voicevox_model'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };
@@ -800,11 +946,11 @@ agent.list_runner = async () => {
                 <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="cursor: pointer;">
                     <div>
                         <h6 class="mb-1">${config.runner_name}</h6>
-                        <small>LLM: ${config.llm_description || 'None'}</small>
+                        <small>Agent: ${config.agent || 'None'}</small>
                     </div>
                 </div>
             `);
-            
+
             // リストアイテムクリックで編集
             itemEl.on('click', async () => {
                 await agent.build_runner_form();
@@ -834,16 +980,11 @@ agent.list_runner = async () => {
 
                 $('#runner_edit_modal').modal('show');
                 // コマンド実行
-                await cmdbox.callcmd('agent','llm_list',{},(res)=>{
-                    $("[name='llm']").empty().append('<option></option>');
-                    res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                    form.find('[name="llm"]').val(config.llm);
-                },$('[name="title"]').val(),'llm');
-                await cmdbox.callcmd('agent','mcpsv_list',{},(res)=>{
-                    $("[name='mcpservers']").empty().append('<option></option>');
-                    res['data'].map(elm=>{$('[name="mcpservers"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                    form.find('[name="mcpservers"]').val(config.mcpservers);
-                },$('[name="title"]').val(),'mcpservers');
+                await cmdbox.callcmd('agent','agent_list',{},(res)=>{
+                    $("[name='agent']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="agent"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                    form.find('[name="agent"]').val(config.agent);
+                },$('[name="title"]').val(),'agent');
             });
 
             container.append(itemEl);
@@ -877,11 +1018,6 @@ agent.save_runner = async () => {
     }
     
     Object.assign(data, multiMap);
-
-    if (!data.runner_name || !data.llm) {
-        alert('Name and LLM are required.');
-        return;
-    }
 
     try {
         const res = await agent.exec_cmd('agent', 'runner_save', data);
@@ -1100,7 +1236,8 @@ agent.html = `
                         <!-- 左側ペイン: 設定項目リスト -->
                         <div class="split-pane-component filer-pane-left" style="width:200px;">
                             <div class="list-group list-group-flush">
-                                <a href="#" class="list-group-item list-group-item-action active" data-bs-target="#llm_settings">LLM Settings</a>
+                                <a href="#" class="list-group-item list-group-item-action active" data-bs-target="#agent_settings">Agent Settings</a>
+                                <a href="#" class="list-group-item list-group-item-action" data-bs-target="#llm_settings">LLM Settings</a>
                                 <a href="#" class="list-group-item list-group-item-action" data-bs-target="#mcpsv_settings">MCPSV Settings</a>
                                 <a href="#" class="list-group-item list-group-item-action" data-bs-target="#runner_settings">Runner Settings</a>
                                 <a href="#" class="list-group-item list-group-item-action" data-bs-target="#tts_settings">TTS Settings</a>
@@ -1111,7 +1248,19 @@ agent.html = `
                         <!-- 右側ペイン: 設定内容 -->
                         <div class="split-pane-component" style="left:200px; background-color: var(--bs-body-bg);">
                             <div class="p-3 h-100 overflow-auto">
-                                <div id="llm_settings" class="settings-content">
+                                <div id="agent_settings" class="settings-content">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="m-0">Agent Settings</h6>
+                                        <button id="btn_add_agent" class="btn btn-sm btn-primary">
+                                            <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                            Add Connection
+                                        </button>
+                                    </div>
+                                    <div id="agent_list_container" class="list-group">
+                                        <!-- Agent List Items will be injected here -->
+                                    </div>
+                                </div>
+                                <div id="llm_settings" class="settings-content d-none">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h6 class="m-0">LLM Settings</h6>
                                         <button id="btn_add_llm" class="btn btn-sm btn-primary">
@@ -1234,6 +1383,28 @@ agent.html = `
         </div>
     </div>
 
+    <!-- Agent追加/編集モーダル -->
+    <div id="agent_edit_modal" class="modal" tabindex="-1" style="z-index: 1090;">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add/Edit Agent</h5>
+                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close">
+                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form_agent_edit" class="row"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger me-auto" id="btn_del_agent" style="display:none;">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btn_save_agent">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Runner追加/編集モーダル -->
     <div id="runner_edit_modal" class="modal" tabindex="-1" style="z-index: 1090;">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -1351,8 +1522,8 @@ agent.init = async () => {
 
     // 設定ボタンのクリックイベント
     $('#btn_settings').off('click').on('click', () => {
-        // LLM一覧の表示
-        agent.list_llm();
+        // Agent一覧の表示
+        agent.list_agent();
         $('#agent_settings_modal').modal('show');
     });
     // 設定メニューの切り替え
@@ -1364,14 +1535,16 @@ agent.init = async () => {
         $('.settings-content').addClass('d-none');
         $(target).removeClass('d-none');
         
-        if (target === '#llm_settings') {
+        if (target === '#agent_settings') {
+            agent.list_agent();
+        } else if (target === '#llm_settings') {
             agent.list_llm();
         } else if (target === '#mcpsv_settings') {
             agent.list_mcpsv();
-        } else if (target === '#runner_settings') {
-            agent.list_runner();
         } else if (target === '#tts_settings') {
             agent.list_tts();
+        } else if (target === '#runner_settings') {
+            agent.list_runner();
         }
     });
     
@@ -1405,6 +1578,35 @@ agent.init = async () => {
         agent.save_mcpsv();
     });
 
+    // Agent追加ボタンのクリックイベント
+    $('#btn_add_agent').off('click').on('click', async () => {
+        await agent.build_agent_form();
+        $('#form_agent_edit [name="agent_name"]').prop('readonly', false);
+        $('#btn_del_agent').hide();
+        $('[name="agent_type"]').trigger('change');
+        $('#agent_edit_modal').modal('show');
+        // LLMリストをロード
+        await cmdbox.callcmd('agent','llm_list',{},(res)=>{
+            $("[name='llm']").empty().append('<option></option>');
+            res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+        },$('[name="title"]').val(),'llm');
+        // MCPサーバーリストをロード
+        await cmdbox.callcmd('agent','mcpsv_list',{},(res)=>{
+            $("[name='mcpservers']").empty().append('<option></option>');
+            res['data'].map(elm=>{$('[name="mcpservers"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+        },$('[name="title"]').val(),'mcpservers');
+        // SubAgentリストをロード
+        await cmdbox.callcmd('agent','agent_list',{},(res)=>{
+            $("[name='subagents']").empty().append('<option></option>');
+            res['data'].map(elm=>{$('[name="subagents"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+        },$('[name="title"]').val(),'subagents');
+    });
+
+    // Agent保存ボタンのクリックイベント
+    $('#btn_save_agent').off('click').on('click', () => {
+        agent.save_agent();
+    });
+
     // Runner追加ボタンのクリックイベント
     $('#btn_add_runner').off('click').on('click', async () => {
         await agent.build_runner_form();
@@ -1412,6 +1614,11 @@ agent.init = async () => {
         $('#form_runner_edit [name="session_store_type"]').trigger('change');
         $('#btn_del_runner').hide();
         $('#runner_edit_modal').modal('show');
+        // Agentリストをロード
+        await cmdbox.callcmd('agent','agent_list',{},(res)=>{
+            $("[name='agent']").empty().append('<option></option>');
+            res['data'].map(elm=>{$('[name="agent"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+        },$('[name="title"]').val(),'agent');
     });
 
     // Runner保存ボタンのクリックイベント

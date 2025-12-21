@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( agent mode ) &mdash; cmdbox 2025/12/20 documentation</title>
+  <title>Command Reference ( agent mode ) &mdash; cmdbox 2025/12/21 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=0505b0bf"></script>
+      <script src="../_static/documentation_options.js?v=a17d34a6"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -49,6 +49,10 @@
 <li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Agent</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#delete-agent-configuration-cmdbox-m-agent-c-agent-del-option">Delete Agent configuration. : <cite>cmdbox -m agent -c agent_del &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#list-agent-configuration-cmdbox-m-agent-c-agent-list-option">List Agent configuration. : <cite>cmdbox -m agent -c agent_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#load-agent-configuration-cmdbox-m-agent-c-agent-load-option">Load Agent configuration. : <cite>cmdbox -m agent -c agent_load &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#save-agent-configuration-cmdbox-m-agent-c-agent-save-option">Save Agent configuration. : <cite>cmdbox -m agent -c agent_save &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#deletes-llm-configuration-cmdbox-m-agent-c-llm-del-option">Deletes LLM configuration. : <cite>cmdbox -m agent -c llm_del &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#lists-saved-llm-configurations-cmdbox-m-agent-c-llm-list-option">Lists saved LLM configurations. : <cite>cmdbox -m agent -c llm_list &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#loads-llm-configuration-cmdbox-m-agent-c-llm-load-option">Loads LLM configuration. : <cite>cmdbox -m agent -c llm_load &lt;Option&gt;</cite></a></li>
@@ -121,6 +125,243 @@
 <ul class="simple">
 <li><p>List of agent mode commands.</p></li>
 </ul>
+<section id="delete-agent-configuration-cmdbox-m-agent-c-agent-del-option">
+<h2>Delete Agent configuration. : <cite>cmdbox -m agent -c agent_del &lt;Option&gt;</cite><a class="headerlink" href="#delete-agent-configuration-cmdbox-m-agent-c-agent-del-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Deletes agent configuration.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 10.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--agent_name &lt;name&gt;</p></td>
+<td><p>Yes</p></td>
+<td><p>Specify the name of the agent configuration to delete.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="list-agent-configuration-cmdbox-m-agent-c-agent-list-option">
+<h2>List Agent configuration. : <cite>cmdbox -m agent -c agent_list &lt;Option&gt;</cite><a class="headerlink" href="#list-agent-configuration-cmdbox-m-agent-c-agent-list-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Lists listed agent configurations.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 10.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--kwd &lt;keyword&gt;</p></td>
+<td><p>No</p></td>
+<td><p>Partial match filter for agent names.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="load-agent-configuration-cmdbox-m-agent-c-agent-load-option">
+<h2>Load Agent configuration. : <cite>cmdbox -m agent -c agent_load &lt;Option&gt;</cite><a class="headerlink" href="#load-agent-configuration-cmdbox-m-agent-c-agent-load-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Loads agent configuration.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 10.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--agent_name &lt;name&gt;</p></td>
+<td><p>Yes</p></td>
+<td><p>Specify the name of the agent configuration to load.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="save-agent-configuration-cmdbox-m-agent-c-agent-save-option">
+<h2>Save Agent configuration. : <cite>cmdbox -m agent -c agent_save &lt;Option&gt;</cite><a class="headerlink" href="#save-agent-configuration-cmdbox-m-agent-c-agent-save-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 10.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--agent_name &lt;name&gt;</p></td>
+<td><p>Yes</p></td>
+<td><p>Specify the name of the agent configuration to save.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--agent_type &lt;type&gt;</p></td>
+<td><p>Yes</p></td>
+<td><p>Specify the agent type. Specify either <cite>local</cite> or <cite>remote</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p>--agent_card &lt;url&gt;</p></td>
+<td></td>
+<td><p>Specify the URL of the Remote Agent's agent card.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--llm &lt;name&gt;</p></td>
+<td></td>
+<td><p>LLM configuration name or reference.</p></td>
+</tr>
+<tr class="row-even"><td><p>--mcpservers &lt;name&gt;</p></td>
+<td></td>
+<td><p>Specify the MCP server name used by the Agent.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--subagents &lt;name&gt;</p></td>
+<td></td>
+<td><p>Specify the subagent name used by the agent.</p></td>
+</tr>
+<tr class="row-even"><td><p>--agent_description &lt;text&gt;</p></td>
+<td></td>
+<td><p>Specify a description of the agent's capabilities. The model uses this to determine whether to delegate control to the agent. A single line description is sufficient and recommended.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--agent_instruction &lt;text&gt;</p></td>
+<td><p>No</p></td>
+<td><p>Specify instructions for the LLM model used by the agent. These will guide the agent's behavior.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="deletes-llm-configuration-cmdbox-m-agent-c-llm-del-option">
 <h2>Deletes LLM configuration. : <cite>cmdbox -m agent -c llm_del &lt;Option&gt;</cite><a class="headerlink" href="#deletes-llm-configuration-cmdbox-m-agent-c-llm-del-option" title="Link to this heading"></a></h2>
 <ul class="simple">
@@ -763,7 +1004,7 @@
 <section id="list-runner-configuration-cmdbox-m-agent-c-runner-list-option">
 <h2>List runner configuration. : <cite>cmdbox -m agent -c runner_list &lt;Option&gt;</cite><a class="headerlink" href="#list-runner-configuration-cmdbox-m-agent-c-runner-list-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Lists saved runner configurations.</p></li>
+<li><p>Lists listed runner configurations.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -901,55 +1142,51 @@
 <td><p>Yes</p></td>
 <td><p>Specify the name of the runner configuration to save.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--runner_instruction &lt;text&gt;</p></td>
-<td><p>No</p></td>
-<td><p>Specify instructions for the LLM model used by the runner. These will guide the agent's behavior.</p></td>
+<tr class="row-odd"><td><p>--agent &lt;name&gt;</p></td>
+<td><p>Yes</p></td>
+<td><p>Agent configuration name or reference.</p></td>
 </tr>
-<tr class="row-even"><td><p>--llm_description &lt;text&gt;</p></td>
-<td><p>No</p></td>
-<td><p>Specify a description of the runner's capabilities. The model uses this to determine whether to delegate control to the agent. A single line description is sufficient and recommended.</p></td>
+<tr class="row-even"><td><p>--tts_engine &lt;engine&gt;</p></td>
+<td></td>
+<td><p>Specify the TTS engine to use.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--llm &lt;name&gt;</p></td>
-<td><p>No</p></td>
-<td><p>LLM configuration name or reference.</p></td>
+<tr class="row-odd"><td><p>--voicevox_model &lt;model&gt;</p></td>
+<td></td>
+<td><p>Specify the model of the TTS engine to use.</p></td>
 </tr>
-<tr class="row-even"><td><p>--mcpservers &lt;name&gt;</p></td>
-<td><p>No</p></td>
-<td><p>List or mapping of MCP servers used by the runner.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--session_store_type &lt;type&gt;</p></td>
+<tr class="row-even"><td><p>--session_store_type &lt;type&gt;</p></td>
 <td><p>No</p></td>
 <td><p>Specify how the bot's session is stored.</p></td>
 </tr>
-<tr class="row-even"><td><p>--session_store_pghost &lt;host&gt;</p></td>
+<tr class="row-odd"><td><p>--session_store_pghost &lt;host&gt;</p></td>
 <td><p>No</p></td>
 <td><p>Specify the postgresql host for session store.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--session_store_pgport &lt;port&gt;</p></td>
+<tr class="row-even"><td><p>--session_store_pgport &lt;port&gt;</p></td>
 <td><p>No</p></td>
 <td><p>Specify the postgresql port for session store.</p></td>
 </tr>
-<tr class="row-even"><td><p>--session_store_pguser &lt;user&gt;</p></td>
+<tr class="row-odd"><td><p>--session_store_pguser &lt;user&gt;</p></td>
 <td><p>No</p></td>
 <td><p>Specify the postgresql user name for session store.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--session_store_pgpass &lt;pass&gt;</p></td>
+<tr class="row-even"><td><p>--session_store_pgpass &lt;pass&gt;</p></td>
 <td><p>No</p></td>
 <td><p>Specify the postgresql password for session store.</p></td>
 </tr>
-<tr class="row-even"><td><p>--session_store_pgdbname &lt;name&gt;</p></td>
+<tr class="row-odd"><td><p>--session_store_pgdbname &lt;name&gt;</p></td>
 <td><p>No</p></td>
 <td><p>Specify the postgresql database name for session store.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>

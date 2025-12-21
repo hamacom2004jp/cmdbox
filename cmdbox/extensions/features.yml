@@ -44,7 +44,7 @@ agentrule:                              # Specifies a list of rules that determi
     cmds: [list, load]                  # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
     rule: allow                         # Specifies whether the specified command is allowed or not. Values are allow or deny.
   - mode: agent
-    cmds: [chat, llm_list, mcpsv_list, runner_list]
+    cmds: [chat, agent_list, llm_list, mcp_client, mcpsv_list, runner_list, session_list]
     rule: allow
   - mode: client
     cmds: [file_download, file_list, http, server_info]

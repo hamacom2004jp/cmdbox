@@ -48,12 +48,10 @@ cmdbox -m server -c start &
 cmdbox -m web -c start --signin_file .cmdbox/user_list.yml &
 ```
 
-- Run the cmdbox web with agent.
-- Below is an example of using Google vertexai.
-- Other available options include Azure OpenAI and Ollama.
+- Run the cmdbox mcpsv.
 
 ```bash
-cmdbox -m web -c start --signin_file .cmdbox/user_list.yml --agent use --llmprov vertexai --llmmodel gemini-2.0-flash --llmlocation us-central1 --llmsvaccountfile <account json file>
+cmdbox -m mcpsv -c start --signin_file .cmdbox/user_list.yml &
 ```
 
 
