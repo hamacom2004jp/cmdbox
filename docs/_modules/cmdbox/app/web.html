@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.web &mdash; cmdbox 2025/12/20 documentation</title>
+  <title>cmdbox.app.web &mdash; cmdbox 2025/12/30 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=0505b0bf"></script>
+      <script src="../../../_static/documentation_options.js?v=61ca60fb"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -1067,14 +1067,29 @@
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.ThreadedASGI.start">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_single</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Windows&quot;</span><span class="p">:</span>
                 <span class="n">asyncio</span><span class="o">.</span><span class="n">set_event_loop_policy</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">WindowsSelectorEventLoopPolicy</span><span class="p">())</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="c1"># スレッド内で新しいイベントループを作成して待機</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">loop</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>
+                    <span class="c1"># 既に実行中のイベントループがある場合は、別スレッドで待機</span>
+                    <span class="kn">import</span><span class="w"> </span><span class="nn">concurrent.futures</span>
+                    <span class="k">def</span><span class="w"> </span><span class="nf">wait_in_thread</span><span class="p">():</span>
+                        <span class="n">new_loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">new_event_loop</span><span class="p">()</span>
+                        <span class="n">asyncio</span><span class="o">.</span><span class="n">set_event_loop</span><span class="p">(</span><span class="n">new_loop</span><span class="p">)</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">new_loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wait_for_started</span><span class="p">())</span>
+                        <span class="k">finally</span><span class="p">:</span>
+                            <span class="n">new_loop</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="k">with</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">()</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+                        <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">wait_in_thread</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wait_for_started</span><span class="p">())</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+                <span class="c1"># イベントループがない場合は新規作成</span>
                 <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wait_for_started</span><span class="p">())</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-                <span class="n">task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wait_for_started</span><span class="p">())</span>
-                <span class="c1"># task.result()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( agent mode ) &mdash; cmdbox 2025/12/21 documentation</title>
+  <title>Command Reference ( agent mode ) &mdash; cmdbox 2025/12/30 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=a17d34a6"></script>
+      <script src="../_static/documentation_options.js?v=61ca60fb"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -213,7 +213,7 @@
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--kwd &lt;keyword&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Partial match filter for agent names.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
@@ -323,9 +323,9 @@
 <td><p>Yes</p></td>
 <td><p>Specify the agent type. Specify either <cite>local</cite> or <cite>remote</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--agent_card &lt;url&gt;</p></td>
+<tr class="row-even"><td><p>--a2asv_baseurl &lt;url&gt;</p></td>
 <td></td>
-<td><p>Specify the URL of the Remote Agent's agent card.</p></td>
+<td><p>Specify the base URL for the A2A Server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--llm &lt;name&gt;</p></td>
 <td></td>
@@ -344,7 +344,7 @@
 <td><p>Specify a description of the agent's capabilities. The model uses this to determine whether to delegate control to the agent. A single line description is sufficient and recommended.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--agent_instruction &lt;text&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specify instructions for the LLM model used by the agent. These will guide the agent's behavior.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
@@ -450,7 +450,7 @@
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--kwd &lt;keyword&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specify a partial match keyword to filter saved LLMs.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
@@ -564,39 +564,39 @@
 <td><p>Specify llm provider.</p></td>
 </tr>
 <tr class="row-even"><td><p>--llmprojectid &lt;id&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Project ID for provider connection.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--llmsvaccountfile &lt;file&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Service account file for provider connection.</p></td>
 </tr>
 <tr class="row-even"><td><p>--llmlocation &lt;location&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Provider location.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--llmapikey &lt;key&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>API key for provider connection.</p></td>
 </tr>
 <tr class="row-even"><td><p>--llmapiversion &lt;version&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specifies the API version for llm provider connections.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--llmendpoint &lt;endpoint&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Provider endpoint.</p></td>
 </tr>
 <tr class="row-even"><td><p>--llmmodel &lt;model&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>LLM model name.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--llmseed &lt;int&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Seed for model sampling.</p></td>
 </tr>
 <tr class="row-even"><td><p>--llmtemperature &lt;float&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Temperature for model sampling.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
@@ -638,10 +638,10 @@
 </tr>
 <tr class="row-odd"><td><p>--mcpserver_url &lt;url&gt;</p></td>
 <td><p>Yes</p></td>
-<td><p>Specifies the URL of the remote MCP server. If omitted, it will be <cite>http://localhost:8081/mcpsv/mcp</cite>.</p></td>
+<td><p>Specifies the URL of the remote MCP server. If omitted, it will be <cite>http://localhost:8091/mcp</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p>--mcpserver_apikey &lt;apikey&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specify the API Key of the remote MCP server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--mcpserver_transport &lt;transport&gt;</p></td>
@@ -653,27 +653,27 @@
 <td><p>Specifies the operations to request from the remote MCP server. If omitted, <cite>list_tools</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--tool_name &lt;name&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specify the name of the tool to run on the remote MCP server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--tool_args &lt;dict&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specify arguments for the tool to run on the remote MCP server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--mcp_timeout &lt;sec&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specifies the maximum time to wait for a response from the remote MCP server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--resource_url &lt;url&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specify the URL of the resource to retrieve from the remote MCP server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--prompt_name &lt;name&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specifies the name of the prompt to be retrieved from the remote MCP server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--prompt_args &lt;dict&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specifies prompt arguments to be retrieved from the remote MCP server.</p></td>
 </tr>
 </tbody>
@@ -703,7 +703,7 @@
 </tr>
 <tr class="row-odd"><td><p>--mcpserver_url &lt;url&gt;</p></td>
 <td></td>
-<td><p>Specifies the URL of the remote MCP server. If omitted, it will be <cite>http://localhost:8081/mcpsv/mcp</cite>.</p></td>
+<td><p>Specifies the URL of the remote MCP server. If omitted, it will be <cite>http://localhost:8091/mcp</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p>--mcpserver_apikey &lt;apikey&gt;</p></td>
 <td></td>
@@ -804,7 +804,7 @@
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--kwd &lt;keyword&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specify the name you want to search for. Searches for partial matches.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
@@ -915,22 +915,22 @@
 </tr>
 <tr class="row-odd"><td><p>--mcpserver_url &lt;url&gt;</p></td>
 <td><p>Yes</p></td>
-<td><p>Specifies the URL of the remote MCP server. If omitted, it will be <cite>http://localhost:8081/mcpsv/mcp</cite>.</p></td>
+<td><p>Specifies the URL of the remote MCP server. If omitted, it will be <cite>http://localhost:8091/mcp</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p>--mcpserver_delegated_auth</p></td>
 <td></td>
-<td><p>The Agent uses the received API Key to send an authentication request to the MCP server.</p></td>
+<td><p>Authenticate with the remote MCP server using the API key of the currently logged-in user.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--mcpserver_apikey &lt;apikey&gt;</p></td>
-<td><p>No</p></td>
-<td><p>Specify the API Key of the remote MCP server.</p></td>
+<td></td>
+<td><p>Specifies the API Key for the remote MCP server when starting the A2A Server. If <cite>mcpserver_delegated_auth</cite> is disabled, it is also used when running MCP.</p></td>
 </tr>
 <tr class="row-even"><td><p>--mcpserver_transport &lt;transport&gt;</p></td>
 <td><p>Yes</p></td>
 <td><p>Specifies the transport of the remote MCP server. If omitted, it is <cite>streamable-http</cite>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--mcp_tools &lt;list&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specify the tools provided by the remote server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
@@ -1036,7 +1036,7 @@
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--kwd &lt;keyword&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Partial match filter for runner names.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
@@ -1155,27 +1155,27 @@
 <td><p>Specify the model of the TTS engine to use.</p></td>
 </tr>
 <tr class="row-even"><td><p>--session_store_type &lt;type&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specify how the bot's session is stored.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--session_store_pghost &lt;host&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specify the postgresql host for session store.</p></td>
 </tr>
 <tr class="row-even"><td><p>--session_store_pgport &lt;port&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specify the postgresql port for session store.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--session_store_pguser &lt;user&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specify the postgresql user name for session store.</p></td>
 </tr>
 <tr class="row-even"><td><p>--session_store_pgpass &lt;pass&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specify the postgresql password for session store.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--session_store_pgdbname &lt;name&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specify the postgresql database name for session store.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
@@ -1342,26 +1342,30 @@
 <td><p>Specify a user name.</p></td>
 </tr>
 <tr class="row-even"><td><p>--session_id &lt;id&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specify the session ID to send to the Runner.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--mcpserver_apikey &lt;apikey&gt;</p></td>
-<td><p>No</p></td>
+<tr class="row-odd"><td><p>--a2asv_apikey &lt;apikey&gt;</p></td>
+<td></td>
+<td><p>Specify the API Key of the A2A Server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--mcpserver_apikey &lt;apikey&gt;</p></td>
+<td></td>
 <td><p>Specify the API Key of the remote MCP server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--message &lt;text&gt;</p></td>
+<tr class="row-odd"><td><p>--message &lt;text&gt;</p></td>
 <td><p>Yes</p></td>
 <td><p>Specify the message to send to the Runner.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
@@ -1411,7 +1415,7 @@
 <td><p>Specify a user name.</p></td>
 </tr>
 <tr class="row-even"><td><p>--session_id &lt;id&gt;</p></td>
-<td><p>No</p></td>
+<td></td>
 <td><p>Specify the session ID to send to the Runner.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app package &mdash; cmdbox 2025/12/21 documentation</title>
+  <title>cmdbox.app package &mdash; cmdbox 2025/12/30 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=a17d34a6"></script>
+      <script src="../_static/documentation_options.js?v=61ca60fb"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -673,13 +673,13 @@ targetにNoneが指定された場合はNoneを返します。</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cmdbox.app.common.exec_svrun_sync">
-<span class="sig-prename descclassname"><span class="pre">cmdbox.app.common.</span></span><span class="sig-name descname"><span class="pre">exec_svrun_sync</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svran</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redis_cli</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sessions</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/common.html#exec_svrun_sync"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.common.exec_svrun_sync" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">cmdbox.app.common.</span></span><span class="sig-name descname"><span class="pre">exec_svrun_sync</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svrun</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redis_cli</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sessions</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/cmdbox/app/common.html#exec_svrun_sync"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cmdbox.app.common.exec_svrun_sync" title="Link to this definition"></a></dt>
 <dd><p>&quot;
 指定された関数が非同期関数であっても同期的に実行します。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>svran</strong> (<em>function</em>) -- 関数</p></li>
+<li><p><strong>svrun</strong> (<em>function</em>) -- 関数</p></li>
 <li><p><strong>data_dir</strong> (<em>Path</em>) -- データディレクトリ</p></li>
 <li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
 <li><p><strong>redis_cli</strong> -- Redisクライアント</p></li>

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.common &mdash; cmdbox 2025/12/20 documentation</title>
+  <title>cmdbox.app.common &mdash; cmdbox 2025/12/30 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=0505b0bf"></script>
+      <script src="../../../_static/documentation_options.js?v=61ca60fb"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -82,6 +82,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">feature</span><span class="p">,</span> <span class="n">options</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">loghandler</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cryptography.fernet</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fernet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">RedirectResponse</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rich.console</span><span class="w"> </span><span class="kn">import</span> <span class="n">Console</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">tabulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">tabulate</span>
@@ -811,6 +812,8 @@
         <span class="n">ret</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default_json_enc</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default_json_enc</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">==</span> <span class="n">RedirectResponse</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;location&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">slise</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -1028,12 +1031,12 @@
 
 <div class="viewcode-block" id="exec_svrun_sync">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.exec_svrun_sync">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">exec_svrun_sync</span><span class="p">(</span><span class="n">svran</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sessions</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">exec_svrun_sync</span><span class="p">(</span><span class="n">svrun</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sessions</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;&quot;</span>
 <span class="sd">    指定された関数が非同期関数であっても同期的に実行します。</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        svran (function): 関数</span>
+<span class="sd">        svrun (function): 関数</span>
 <span class="sd">        data_dir (Path): データディレクトリ</span>
 <span class="sd">        logger (logging.Logger): ロガー</span>
 <span class="sd">        redis_cli: Redisクライアント</span>
@@ -1043,18 +1046,18 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        int: 戻り値のタプル。0は成功、1は失敗、2はキャンセル</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">iscoroutinefunction</span><span class="p">(</span><span class="n">svran</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">iscoroutinefunction</span><span class="p">(</span><span class="n">svrun</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">is_event_loop_running</span><span class="p">():</span>
             <span class="k">def</span><span class="w"> </span><span class="nf">_run</span><span class="p">(</span><span class="n">svran</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sessions</span><span class="p">):</span>
                 <span class="n">ctx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">svran</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sessions</span><span class="p">)))</span>
             <span class="n">ctx</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">th</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_run</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">svran</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sessions</span><span class="p">))</span>
+            <span class="n">th</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_run</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">svrun</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sessions</span><span class="p">))</span>
             <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
             <span class="n">th</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">ctx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">ctx</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="k">return</span> <span class="n">result</span>
-        <span class="k">return</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">svran</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sessions</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">svran</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sessions</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">svrun</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sessions</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">svrun</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sessions</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_tzoffset_str">
