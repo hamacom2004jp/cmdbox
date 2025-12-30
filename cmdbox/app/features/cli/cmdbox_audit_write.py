@@ -157,8 +157,6 @@ class AuditWrite(audit_base.AuditBase):
         Returns:
             int: 終了コード
         """
-        if logger.level == logging.DEBUG:
-            logger.debug(f"audit write svrun msg: {msg}")
         audit_type = convert.b64str2str(msg[2])
         clmsg_id = convert.b64str2str(msg[3])
         clmsg_date = convert.b64str2str(msg[4])

@@ -27,11 +27,9 @@ apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl buil
 
 - When using agent mode, install the modules with dependencies.
 ```bash
-pip install cmdbox[agent]
-```
-- or
-```bash
-pip install fastmcp google-adk litellm
+pip install "pydantic>=2.0.0,<3.0.0"
+pip install "fastmcp>=2.14.0" "mcp>=1.10.0,<2.0.0"
+pip install "google-adk>=1.21.0" "a2a-sdk>=0.3.4,<0.4.0" "litellm"
 ```
 
 # Run

@@ -10,7 +10,7 @@ import json
 import re
 
 
-class CmdAgentAgentSave(feature.OneshotResultEdgeFeature):
+class AgentAgentSave(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
 
@@ -66,12 +66,18 @@ class CmdAgentAgentSave(feature.OneshotResultEdgeFeature):
                 dict(opt="agent_type", type=Options.T_STR, default='local', required=True, multi=False, hide=False,
                     choice=['', 'local', 'remote'],
                     choice_show=dict(local=["llm", "mcpservers", "subagents", "agent_description", "agent_instruction"],
-                                     remote=["agent_card", "agent_description"]),
+                                     remote=["a2asv_baseurl", "a2asv_delegated_auth", "a2asv_apikey", "agent_description"]),
                     description_ja="Agentの種類を指定します。`local` または `remote` を指定します。",
                     description_en="Specify the agent type. Specify either `local` or `remote`."),
-                dict(opt="agent_card", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                    description_ja="リモートエージェントのエージェントカードのURLを指定します。",
-                    description_en="Specify the URL of the Remote Agent's agent card."),
+                dict(opt="a2asv_baseurl", type=Options.T_STR, default="http://localhost:8071/a2a/<agent_name>", required=False, multi=False, hide=False, choice=None,
+                    description_ja="A2A Serverの基本URLを指定します。",
+                    description_en="Specify the base URL for the A2A Server."),
+                dict(opt="a2asv_delegated_auth", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
+                    description_ja="A2A Serverの認証を現在のログインユーザーのAPI Keyを使用して行います。",
+                    description_en="Authenticate the A2A Server using the API Key of the currently logged-in user.",),
+                dict(opt="a2asv_apikey", type=Options.T_PASSWD, default=None, required=False, multi=False, hide=False, choice=None,
+                    description_ja="A2A Server起動時のAPI Keyを指定します。 また`a2asv_delegated_auth` が無効な場合は、Agent実行時に使用も使用されます。",
+                    description_en="Specify the API Key when starting the A2A Server. Additionally, if `a2asv_delegated_auth` is disabled, it will also be used when running the Agent.",),
                 dict(opt="llm", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=[],
                     callcmd="async () => {await cmdbox.callcmd('agent','llm_list',{},(res)=>{"
                             + "const val = $(\"[name='llm']\").val();"
@@ -190,15 +196,17 @@ class CmdAgentAgentSave(feature.OneshotResultEdgeFeature):
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, msg, None
         elif args.agent_type == 'remote':
-            if not hasattr(args, 'agent_card') or args.agent_card is None:
-                msg = dict(warn="Please specify --agent_card for remote agent")
+            if not hasattr(args, 'a2asv_baseurl') or args.a2asv_baseurl is None:
+                msg = dict(warn="Please specify --a2asv_baseurl for remote agent")
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, msg, None
 
         configure = dict(
             agent_name=args.agent_name,
             agent_type=args.agent_type,
-            agent_card=args.agent_card if hasattr(args, 'agent_card') else None,
+            a2asv_baseurl=args.a2asv_baseurl if hasattr(args, 'a2asv_baseurl') else None,
+            a2asv_delegated_auth=args.a2asv_delegated_auth if hasattr(args, 'a2asv_delegated_auth') else False,
+            a2asv_apikey=args.a2asv_apikey if hasattr(args, 'a2asv_apikey') else None,
             llm=args.llm if hasattr(args, 'llm') else None,
             mcpservers=list(set(args.mcpservers)) if hasattr(args, 'mcpservers') and args.mcpservers is not None else None,
             subagents=list(set(args.subagents)) if hasattr(args, 'subagents') and args.subagents is not None else None,
@@ -223,8 +231,6 @@ class CmdAgentAgentSave(feature.OneshotResultEdgeFeature):
               sessions:Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
         try:
-            if logger.level == logging.DEBUG:
-                logger.debug(f"{self.get_mode()}_{self.get_cmd()} msg: {msg}")
             configure = json.loads(convert.b64str2str(msg[2]))
 
             if configure['agent_type'] == 'local':

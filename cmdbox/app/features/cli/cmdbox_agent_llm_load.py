@@ -9,7 +9,7 @@ import json
 import re
 
 
-class CmdAgentLLMLoad(feature.OneshotResultEdgeFeature):
+class AgentLLMLoad(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
 
@@ -101,8 +101,6 @@ class CmdAgentLLMLoad(feature.OneshotResultEdgeFeature):
         """
         reskey = msg[1]
         try:
-            if logger.level == logging.DEBUG:
-                logger.debug(f"{self.get_mode()}_{self.get_cmd()} msg: {msg}")
             payload = json.loads(convert.b64str2str(msg[2]))
 
             llmname = payload.get('llmname')

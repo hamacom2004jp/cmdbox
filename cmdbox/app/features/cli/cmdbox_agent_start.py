@@ -11,7 +11,11 @@ import re
 import platform
 
 
-class CmdAgentStart(feature.OneshotResultEdgeFeature):
+class AgentStart(feature.OneshotResultEdgeFeature):
+
+    def __init__(self, appcls, ver):
+        super().__init__(appcls, ver)
+        self.call_a2asv_start:bool = False
 
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
@@ -121,25 +125,23 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
                     mcpsv_confs.append(mcpsv_conf)
         return mcpsv_confs
 
-    def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
-              sessions:Dict[str, Dict[str, Any]]) -> int:
+    async def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
+                    sessions:Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
         try:
-            if logger.level == logging.DEBUG:
-                logger.debug(f"{self.get_mode()}_{self.get_cmd()} msg: {msg}")
             if 'agents' not in sessions:
                 sessions['agents'] = {}
 
             payload = json.loads(convert.b64str2str(msg[2]))
             name = payload.get('runner_name')
             if name in sessions['agents']:
-                msg = dict(warn=f"Runner '{name}' is already running.")
+                msg = dict(warn=f"Runner '{name}' is already running.", end=True)
                 redis_cli.rpush(reskey, msg)
                 return self.RESP_WARN
 
             runner_conf_path = data_dir / ".agent" / f"runner-{name}.json"
             if not runner_conf_path.exists():
-                msg = dict(warn=f"Specified runner configuration '{name}' not found on server at '{str(runner_conf_path)}'.")
+                msg = dict(warn=f"Specified runner configuration '{name}' not found on server at '{str(runner_conf_path)}'.", end=True)
                 redis_cli.rpush(reskey, msg)
                 return self.RESP_WARN
             with runner_conf_path.open('r', encoding='utf-8') as f:
@@ -148,7 +150,7 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
             try:
                 agent_conf = self._load_agent_config(data_dir, runner_conf['agent'])
             except Exception as e:
-                msg = dict(warn=str(e))
+                msg = dict(warn=str(e), end=True)
                 redis_cli.rpush(reskey, msg)
                 return self.RESP_WARN
 
@@ -158,7 +160,7 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
                 else:
                     llm_conf = {}
             except Exception as e:
-                msg = dict(warn=str(e))
+                msg = dict(warn=str(e), end=True)
                 redis_cli.rpush(reskey, msg)
                 return self.RESP_WARN
 
@@ -168,11 +170,11 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
                 else:
                     mcpsv_confs = []
             except Exception as e:
-                msg = dict(warn=str(e))
+                msg = dict(warn=str(e), end=True)
                 redis_cli.rpush(reskey, msg)
                 return self.RESP_WARN
 
-            agent = self.create_agent(logger, data_dir, agent_conf, llm_conf, mcpsv_confs)
+            agent = self.create_agent(logger, data_dir, False, agent_conf, llm_conf, mcpsv_confs)
             from google.adk.runners import Runner
             runner = Runner(
                 app_name=runner_conf.get('runner_name', self.ver.__appid__),
@@ -183,18 +185,17 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
                 name=name,
                 runner=runner
             )
-            msg = dict(success=f"Runner '{name}' started successfully.")
+            msg = dict(success=f"Runner '{name}' started successfully.", end=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_SUCCESS
 
         except Exception as e:
-            msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
+            msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}", end=True)
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
 
-
-    def create_agent(self, logger:logging.Logger, data_dir:Path,
+    def create_agent(self, logger:logging.Logger, data_dir:Path, disable_remote_agent:bool,
                      agent_conf:Dict[str, Any], llm_conf:Dict[str, Any], mcpsv_confs:List[Dict[str, Any]]) -> Any:
         """
         エージェントを作成します
@@ -202,6 +203,7 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
         Args:
             logger (logging.Logger): ロガー
             data_dir (Path): データディレクトリパス
+            disable_remote_agent (bool): リモートエージェントを無効化するかどうか
             agent_conf (Dict[str, Any]): エージェント設定
             llm_conf (Dict[str, Any]): LLM設定
             mcpsv_confs (List[Dict[str, Any]]): MCPサーバー設定リスト
@@ -240,7 +242,9 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
         # 各種設定値の取得
         agent_name = agent_conf.get('agent_name', None)
         agent_type = agent_conf.get('agent_type', None)
-        agent_card = agent_conf.get('agent_card', None)
+        a2asv_baseurl = agent_conf.get('a2asv_baseurl', "http://localhost:8071/a2a")
+        a2asv_delegated_auth = agent_conf.get('a2asv_delegated_auth', False)
+        a2asv_apikey = agent_conf.get('a2asv_apikey', None)
         agent_subagents = agent_conf.get('subagents', None)
         llmprov = llm_conf.get('llmprov', None)
         llmprojectid = llm_conf.get('llmprojectid', None)
@@ -265,20 +269,40 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
                 mcpsv_confs = self._load_mcpsv_config(data_dir, agent_conf['mcpservers'])
             else:
                 mcpsv_confs = []
-            return self.create_agent(logger, data_dir, agent_conf, llm_conf, mcpsv_confs)
+            return self.create_agent(logger, data_dir, disable_remote_agent, agent_conf, llm_conf, mcpsv_confs)
 
         agent_subagents = agent_subagents if agent_subagents is not None else []
         subagents = []
         if 'subagents' in agent_conf and isinstance(agent_subagents, list):
             for subagent_name in agent_subagents:
-                subagents.append(create_subagent(data_dir, subagent_name))
+                subagent_obj = create_subagent(data_dir, subagent_name)
+                if subagent_obj is not None:
+                    subagents.append(subagent_obj)
 
-        if agent_type == 'remote':
-            from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+        if agent_type == 'remote' and not disable_remote_agent:
+            from google.adk.agents.remote_a2a_agent import RemoteA2aAgent, AGENT_CARD_WELL_KNOWN_PATH
+            from a2a.client.client_factory import ClientConfig, ClientFactory
+            import httpx
+
+            def _create_dynamic_header_provider():
+                async def add_auth_headers(request):
+                    scope = signin.get_request_scope()
+                    if scope is not None and a2asv_delegated_auth:
+                        apikey = scope["a2asv_apikey"] if scope["a2asv_apikey"] is not None else a2asv_apikey
+                        request.headers['Authorization'] = f'Bearer {apikey}'
+                    if a2asv_apikey is not None:
+                        request.headers['Authorization'] = f'Bearer {a2asv_apikey}'
+                return add_auth_headers
+            custom_httpx_client = httpx.AsyncClient(
+                timeout=httpx.Timeout(600.0),
+                event_hooks={'request': [_create_dynamic_header_provider()]}
+            )
+            config = ClientConfig(httpx_client=custom_httpx_client)
+            factory = ClientFactory(config=config)
             agent = RemoteA2aAgent(
                 name=agent_name,
-                agent_card=agent_card,
-                description=description
+                agent_card=a2asv_baseurl + AGENT_CARD_WELL_KNOWN_PATH,
+                a2a_client_factory=factory,
             )
             if logger.level == logging.DEBUG:
                 logger.debug(f"create_agent complate.")
@@ -367,6 +391,8 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs),
                 sub_agents=subagents
             )
+        elif disable_remote_agent:
+            return None
         else:
             raise ValueError("llmprov is required.")
         if logger.level == logging.DEBUG:
@@ -396,8 +422,7 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
             mcpserver_apikey = mcpsv_conf.get('mcpserver_apikey', None)
             mcpserver_delegated_auth = mcpsv_conf.get('mcpserver_delegated_auth', False)
             mcpserver_transport = mcpsv_conf.get('mcpserver_transport', 'streamable-http')  # sse
-            auth_cred = AuthCredential(auth_type=AuthCredentialTypes.HTTP,
-                                       http=dict(scheme="bearer", credentials=dict(token=mcpserver_apikey)))
+            auth_cred = AuthCredential(auth_type=AuthCredentialTypes.HTTP)
             if mcpserver_transport == 'sse':
                 conn_params = SseConnectionParams(
                     url=mcpserver_url,
@@ -410,13 +435,17 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
                     timeout=120,
                     sse_read_timeout=600,
                 )
+            if self.call_a2asv_start and mcpserver_apikey is not None:
+                conn_params.headers = dict(Authorization=f"Bearer {mcpserver_apikey}")
             def _warp(mcpserver_apikey:str, mcpserver_delegated_auth:bool):
+                # mcpserver_delegated_auth=Trueの場合、chatコマンド実行時に、
+                # Signin情報からapikeyを取得してMCPサーバーに転送するためのヘッダープロバイダー
                 def header_provider(readonly_context:ReadonlyContext) -> Dict[str, str]:
                     scope = signin.get_request_scope()
-                    if scope is not None and mcpserver_delegated_auth:
-                        apikey = scope["mcpserver_apikey"] if scope["mcpserver_apikey"] is not None else mcpserver_apikey
-                        return dict(Authorization=f"Bearer {apikey}")
-                    if mcpserver_apikey is not None:
+                    if scope is not None and mcpserver_delegated_auth and scope.get("mcpserver_apikey") is not None:
+                        return dict(Authorization=f"Bearer {scope['mcpserver_apikey']}")
+                    elif not mcpserver_delegated_auth and mcpserver_apikey is not None:
+                        # コンテキストが存在しない場合またはdelegated_authが無効な場合、設定済みのAPIKeyを使用
                         return dict(Authorization=f"Bearer {mcpserver_apikey}")
                     return {}
                 return header_provider
@@ -450,7 +479,8 @@ class CmdAgentStart(feature.OneshotResultEdgeFeature):
             runner_conf['agent_session_dburl'] = f"postgresql+psycopg://{runner_conf['session_store_pguser']}:{runner_conf['session_store_pgpass']}@{runner_conf['session_store_pghost']}:{runner_conf['session_store_pgport']}/{runner_conf['session_store_pgdbname']}"
         else:
             runner_conf['agent_session_dburl'] = None
-        from google.adk.sessions import DatabaseSessionService, InMemorySessionService
+        from google.adk.sessions import InMemorySessionService
+        from google.adk.sessions.database_session_service import DatabaseSessionService
         #from typing_extensions import override
         if runner_conf['agent_session_dburl'] is not None:
             logger.info(f"Using DatabaseSessionService: {runner_conf['agent_session_dburl']}")

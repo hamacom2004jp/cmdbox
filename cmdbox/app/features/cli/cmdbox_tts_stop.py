@@ -43,8 +43,6 @@ class TtsStop(cmdbox_tts_start.TtsStart):
         Returns:
             int: 終了コード
         """
-        if logger.level == logging.DEBUG:
-            logger.debug(f"audit write svrun msg: {msg}")
         tts_engine = convert.b64str2str(msg[2])
         voicevox_model = convert.b64str2str(msg[3])
         st = self.stop(msg[1], data_dir, tts_engine, voicevox_model, logger, redis_cli, sessions)

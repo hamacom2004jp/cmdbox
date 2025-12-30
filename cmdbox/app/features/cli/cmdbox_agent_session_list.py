@@ -10,7 +10,7 @@ import json
 import re
 
 
-class CmdAgentSessionList(feature.ResultEdgeFeature):
+class AgentSessionList(feature.ResultEdgeFeature):
 
     def get_mode(self) -> str:
         return 'agent'
@@ -106,8 +106,6 @@ class CmdAgentSessionList(feature.ResultEdgeFeature):
                     sessions:Dict[str, Dict[str, Any]]):
         reskey = msg[1]
         try:
-            if logger.level == logging.DEBUG:
-                logger.debug(f"{self.get_mode()}_{self.get_cmd()} msg: {msg}")
             if 'agents' not in sessions:
                 sessions['agents'] = {}
 
@@ -130,7 +128,7 @@ class CmdAgentSessionList(feature.ResultEdgeFeature):
                     ss = await session_service.get_session(app_name=name, user_id=user_name, session_id=s.id)
                     row['events'] = []
                     for ev in ss.events:
-                        msg = cmdbox_agent_chat.CmdAgentChat.gen_msg(ev)
+                        msg = cmdbox_agent_chat.AgentChat.gen_msg(ev)
                         row['events'].append(dict(author=ev.author, text=msg))
                     data.append(row)
                 data.sort(key=lambda x: (x['last_update_time'],))
@@ -145,7 +143,7 @@ class CmdAgentSessionList(feature.ResultEdgeFeature):
                     row = dict(runner_name=s.app_name, session_id=s.id, user_name=s.user_id, last_update_time=s.last_update_time)
                     row['events'] = []
                     for ev in s.events:
-                        msg = cmdbox_agent_chat.CmdAgentChat.gen_msg(ev)
+                        msg = cmdbox_agent_chat.AgentChat.gen_msg(ev)
                         row['events'].append(dict(author=ev.author, text=msg))
                     out = dict(success=[row], end=True)
                 redis_cli.rpush(reskey, out)

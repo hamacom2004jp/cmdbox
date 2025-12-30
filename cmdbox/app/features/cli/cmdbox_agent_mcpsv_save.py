@@ -9,7 +9,7 @@ import json
 import re
 
 
-class CmdAgentMcpSave(feature.OneshotResultEdgeFeature):
+class AgentMcpSave(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
 
@@ -46,15 +46,15 @@ class CmdAgentMcpSave(feature.OneshotResultEdgeFeature):
                 dict(opt="mcpserver_name", type=Options.T_STR, default='mcpserver', required=True, multi=False, hide=False, choice=None,
                     description_ja="リモートMCPサーバーの名前を指定します。省略した場合は`mcpserver`となります。",
                     description_en="Specify the name of the MCP server. If omitted, it will be `mcpserver`.",),
-                dict(opt="mcpserver_url", type=Options.T_STR, default='http://localhost:8082/mcp', required=True, multi=False, hide=False, choice=None,
-                    description_ja="リモートMCPサーバーのURLを指定します。省略した場合は`http://localhost:8082/mcp`となります。",
-                    description_en="Specifies the URL of the remote MCP server. If omitted, it will be `http://localhost:8082/mcp`.",),
+                dict(opt="mcpserver_url", type=Options.T_STR, default='http://localhost:8091/mcp', required=True, multi=False, hide=False, choice=None,
+                    description_ja="リモートMCPサーバーのURLを指定します。省略した場合は`http://localhost:8091/mcp`となります。",
+                    description_en="Specifies the URL of the remote MCP server. If omitted, it will be `http://localhost:8091/mcp`.",),
                 dict(opt="mcpserver_delegated_auth", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
-                    description_ja="Agentが受信したAPI Keyを使用して、MCPサーバーに認証要求します。",
-                    description_en="The Agent uses the received API Key to send an authentication request to the MCP server.",),
+                    description_ja="リモートMCPサーバーの認証を現在のログインユーザーのAPI Keyを使用して行います。",
+                    description_en="Authenticate with the remote MCP server using the API key of the currently logged-in user.",),
                 dict(opt="mcpserver_apikey", type=Options.T_PASSWD, default=None, required=False, multi=False, hide=False, choice=None,
-                    description_ja="リモートMCPサーバーのAPI Keyを指定します。",
-                    description_en="Specify the API Key of the remote MCP server.",),
+                    description_ja="A2A Server起動時のリモートMCPサーバーのAPI Keyを指定します。 `mcpserver_delegated_auth` が無効な場合は、MCP実行時に使用も使用されます。",
+                    description_en="Specifies the API Key for the remote MCP server when starting the A2A Server. If `mcpserver_delegated_auth` is disabled, it is also used when running MCP.",),
                 dict(opt="mcpserver_transport", type=Options.T_STR, default='streamable-http', required=True, multi=False, hide=False, choice=['', 'streamable-http', 'sse'],
                     description_ja="リモートMCPサーバーのトランスポートを指定します。省略した場合は`streamable-http`となります。",
                     description_en="Specifies the transport of the remote MCP server. If omitted, it is `streamable-http`.",),
@@ -137,8 +137,6 @@ class CmdAgentMcpSave(feature.OneshotResultEdgeFeature):
               sessions:Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
         try:
-            if logger.level == logging.DEBUG:
-                logger.debug(f"{self.get_mode()}_{self.get_cmd()} msg: {msg}")
             configure = json.loads(convert.b64str2str(msg[2]))
 
             name = configure.get('mcpserver_name')

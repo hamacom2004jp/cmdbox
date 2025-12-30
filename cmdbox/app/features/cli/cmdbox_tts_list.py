@@ -119,8 +119,6 @@ class TtsList(feature.UnsupportEdgeFeature):
         Returns:
             int: 終了コード
         """
-        if logger.level == logging.DEBUG:
-            logger.debug(f"tts start svrun msg: {msg}")
         tts_engine = convert.b64str2str(msg[2])
         try:
             if tts_engine == 'voicevox':

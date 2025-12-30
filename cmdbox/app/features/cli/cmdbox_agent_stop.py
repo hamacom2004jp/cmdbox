@@ -10,7 +10,7 @@ import re
 import time
 
 
-class CmdAgentStop(feature.OneshotResultEdgeFeature):
+class AgentStop(feature.OneshotResultEdgeFeature):
 
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
@@ -92,31 +92,32 @@ class CmdAgentStop(feature.OneshotResultEdgeFeature):
     def is_cluster_redirect(self):
         return True
 
-    def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
-              sessions:Dict[str, Dict[str, Any]]) -> int:
+    async def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
+                    sessions:Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
         try:
-            if logger.level == logging.DEBUG:
-                logger.debug(f"{self.get_mode()}_{self.get_cmd()} msg: {msg}")
             if 'agents' not in sessions:
                 sessions['agents'] = {}
 
             payload = json.loads(convert.b64str2str(msg[2]))
             name = payload.get('runner_name')
             if name not in sessions['agents']:
-                msg = dict(warn=f"Runner '{name}' is not running.")
+                msg = dict(warn=f"Runner '{name}' is not running.", end=True)
                 redis_cli.rpush(reskey, msg)
                 return self.RESP_WARN
 
             from google.adk.runners import Runner
             runner:Runner = sessions['agents'][name]['runner']
             del sessions['agents'][name]
-            msg = dict(success=f"Runner '{name}' stopped successfully.")
+            if hasattr(runner.session_service, 'db_engine'):
+                await runner.session_service.db_engine.dispose()
+            runner.close()
+            msg = dict(success=f"Runner '{name}' stopped successfully.", end=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_SUCCESS
 
         except Exception as e:
-            msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
+            msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}", end=True)
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN

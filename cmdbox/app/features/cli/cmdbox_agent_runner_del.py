@@ -9,7 +9,7 @@ import json
 import re
 
 
-class CmdAgentRunnerDel(feature.OneshotResultEdgeFeature):
+class AgentRunnerDel(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
 
@@ -94,8 +94,6 @@ class CmdAgentRunnerDel(feature.OneshotResultEdgeFeature):
               sessions:Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
         try:
-            if logger.level == logging.DEBUG:
-                logger.debug(f"{self.get_mode()}_{self.get_cmd()} msg: {msg}")
             payload = json.loads(convert.b64str2str(msg[2]))
             name = payload.get('runner_name')
 

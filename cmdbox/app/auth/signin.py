@@ -152,6 +152,10 @@ class Signin(object):
             path_jadge = Signin._check_path(req, req.url.path, signin_file_data, logger)
             if path_jadge is not None:
                 return path_jadge
+            name = req.session['signin']['name']
+            user = Signin._find_user_by_name(name, signin_file_data)
+            if user is not None:
+                req.session['signin']['apikeys'] = user.get('apikeys', None)
             return None
         if logger.level == logging.DEBUG:
             logger.debug(f"Not found siginin session. Try check_apikey. path={req.url.path}")
@@ -199,8 +203,8 @@ class Signin(object):
             #self.logger.warning(f"Bearer not found. headers={req.headers}")
             return RedirectResponse(url=f'/signin{req.url.path}?error=apikeyfail')
         apikey = auth.replace('Bearer ', '').strip()
-        if logger.level == logging.DEBUG:
-            logger.debug(f"received apikey: {apikey}")
+        #if logger.level == logging.DEBUG:
+        #    logger.debug(f"received apikey: {apikey}")
         find_user = None
         jwt_enabled = signin_file_data['apikey']['verify_jwt']['enabled']
         for user in signin_file_data['users']:
@@ -256,6 +260,21 @@ class Signin(object):
             return None
         logger.warning(f"Unauthorized site. user={find_user['name']}, path={req.url.path}")
         return RedirectResponse(url=f'/signin{req.url.path}?error=unauthorizedsite')
+
+    @classmethod
+    def _find_user_by_name(cls, name:str, signin_file_data:Dict[str, Any]) -> Dict[str, Any]:
+        """
+        ユーザー名からユーザーデータを取得する
+
+        Args:
+            name (str): ユーザー名
+
+        Returns:
+            Dict[str, Any]: ユーザーデータ
+        """
+        copy_signin_data = copy.deepcopy(signin_file_data)
+        users = [u for u in copy_signin_data['users'] if u['name'] == name]
+        return users[0] if len(users) > 0 else None
 
     @classmethod
     def load_pem_private_key(cls, data:bytes, passphrase:str=None):

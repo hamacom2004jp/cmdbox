@@ -12,7 +12,7 @@ import re
 import time
 
 
-class CmdAgentChat(feature.ResultEdgeFeature):
+class AgentChat(feature.ResultEdgeFeature):
 
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
@@ -58,6 +58,9 @@ class CmdAgentChat(feature.ResultEdgeFeature):
                 dict(opt="session_id", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                     description_ja="Runnerに送信するセッションIDを指定します。",
                     description_en="Specify the session ID to send to the Runner."),
+                dict(opt="a2asv_apikey", type=Options.T_PASSWD, default=None, required=False, multi=False, hide=False, choice=None,
+                    description_ja="A2A ServerのAPI Keyを指定します。",
+                    description_en="Specify the API Key of the A2A Server.",),
                 dict(opt="mcpserver_apikey", type=Options.T_PASSWD, default=None, required=False, multi=False, hide=False, choice=None,
                     description_ja="リモートMCPサーバーのAPI Keyを指定します。",
                     description_en="Specify the API Key of the remote MCP server.",),
@@ -97,7 +100,7 @@ class CmdAgentChat(feature.ResultEdgeFeature):
             return self.RESP_WARN, msg, None
 
         payload = dict(runner_name=args.runner_name, user_name=args.user_name, session_id=args.session_id,
-                       mcpserver_apikey=args.mcpserver_apikey, message=args.message)
+                       a2asv_apikey=args.a2asv_apikey, mcpserver_apikey=args.mcpserver_apikey, message=args.message)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -124,31 +127,14 @@ class CmdAgentChat(feature.ResultEdgeFeature):
                     sessions:Dict[str, Dict[str, Any]]):
         reskey = msg[1]
         try:
-            if logger.level == logging.DEBUG:
-                logger.debug(f"{self.get_mode()}_{self.get_cmd()} msg: {msg}")
             if 'agents' not in sessions:
                 sessions['agents'] = {}
-
-            # イベントループポリシー設定
-            try:
-                asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
-            except Exception as e:
-                if logger.level == logging.DEBUG:
-                    logger.debug(f"Failed to set event loop policy: {e}")
-            import platform
-            if platform.system() != "Windows":
-                # LiteLLMのロギングワーカーがイベントループをリセットするのを防ぐため、
-                # 既存のイベントループを再利用する
-                try:
-                    loop = asyncio.get_running_loop()
-                except:
-                    loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
 
             payload = json.loads(convert.b64str2str(msg[2]))
             name = payload.get('runner_name')
             user_name = payload.get('user_name')
             session_id = payload.get('session_id')
+            a2asv_apikey = payload.get('a2asv_apikey')
             mcpserver_apikey = payload.get('mcpserver_apikey')
             message = payload.get('message')
             if name not in sessions['agents']:
@@ -195,7 +181,7 @@ class CmdAgentChat(feature.ResultEdgeFeature):
             # セッションを作成する
             agent_session = await create_agent_session(runner.session_service, name, user_name, session_id=session_id)
             # チャットを実行する
-            signin.set_request_scope(dict(mcpserver_apikey=mcpserver_apikey))
+            signin.set_request_scope(dict(mcpserver_apikey=mcpserver_apikey, a2asv_apikey=a2asv_apikey))
             run_config = RunConfig(streaming_mode=StreamingMode.NONE)
             run_iter = runner.run_async(user_id=user_name, session_id=agent_session.id, new_message=content, run_config=run_config)
             async for event in run_iter:

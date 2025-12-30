@@ -114,8 +114,6 @@ class TtsSay(cmdbox_tts_start.TtsStart):
         Returns:
             int: 終了コード
         """
-        if logger.level == logging.DEBUG:
-            logger.debug(f"audit write svrun msg: {msg}")
         tts_engine = convert.b64str2str(msg[2])
         voicevox_model = convert.b64str2str(msg[3])
         tts_text = convert.b64str2str(msg[4])

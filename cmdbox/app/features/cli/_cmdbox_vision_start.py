@@ -162,8 +162,6 @@ class VisionStart(feature.UnsupportEdgeFeature):
         Returns:
             int: 終了コード
         """
-        if logger.level == logging.DEBUG:
-            logger.debug(f"audit write svrun msg: {msg}")
         vision_engine = convert.b64str2str(msg[2])
         sam2_model = convert.b64str2str(msg[3])
         st = self.start(msg[1], vision_engine, sam2_model, data_dir, logger, redis_cli, sessions)

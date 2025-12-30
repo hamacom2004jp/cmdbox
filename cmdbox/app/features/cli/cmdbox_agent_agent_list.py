@@ -8,7 +8,7 @@ import logging
 import json
 
 
-class CmdAgentAgentList(feature.OneshotResultEdgeFeature):
+class AgentAgentList(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
 
@@ -91,8 +91,6 @@ class CmdAgentAgentList(feature.OneshotResultEdgeFeature):
         """
         reskey = msg[1]
         try:
-            if logger.level == logging.DEBUG:
-                logger.debug(f"{self.get_mode()}_{self.get_cmd()} msg: {msg}")
             payload = json.loads(convert.b64str2str(msg[2]))
 
             kwd = payload.get('kwd')

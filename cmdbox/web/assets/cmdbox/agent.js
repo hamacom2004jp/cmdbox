@@ -9,6 +9,9 @@ agent.create_user_message = (messages, msg) => {
         +`<use href="#svg_signin_ico"></use></svg></a>`).appendTo(user_msg_row);
 };
 agent.create_agent_message = (messages, message_id) => {
+    if ($(`#${message_id}`).length > 0) {
+        return $(`#${message_id}`);
+    }
     const bot_message = $(`<div class="message bot-message"></div>`).appendTo(messages);
     $(`<img class="icon-logo align-top me-3" src="${cmdbox.logoicon_src}" width="32" height="32"/>`).appendTo(bot_message);
     const txt = $(`<div id="${message_id}" class="d-inline-block" style="width:calc(100% - 48px);"></div>`).appendTo(bot_message);
@@ -322,13 +325,7 @@ agent.init_form = async () => {
                 return;
             }
             console.log(packet);
-            let txt;
-            if ($(`#${agent.message_id}`).length <= 0) {
-                // エージェント側の表示枠が無かったら追加
-                txt = agent.create_agent_message(messages, agent.message_id);
-            } else {
-                txt = $(`#${agent.message_id}`);
-            }
+            let txt = agent.create_agent_message(messages, agent.message_id);
             await agent.format_agent_message(container, messages, txt, packet.message);
             agent.message_id = null;
         };
@@ -552,7 +549,18 @@ agent.list_llm = async () => {
 
         list.forEach(async item => {
             const res = await agent.exec_cmd('agent', 'llm_load', { llmname: item.name });
-            if (!res || !res.success) return;
+            if (!res || !res.success) {
+                const itemEl = $(`
+                    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="cursor: pointer;">
+                        <div>
+                            <h6 class="mb-1">${item.name}</h6>
+                            <small class="text-danger">${JSON.stringify(res)}</small>
+                        </div>
+                    </div>
+                `);
+                container.append(itemEl);
+                return;
+            }
             const config = res.success || {};
             const itemEl = $(`
                 <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="cursor: pointer;">
@@ -659,7 +667,18 @@ agent.list_mcpsv = async () => {
 
         list.forEach(async item => {
             const res = await agent.exec_cmd('agent', 'mcpsv_load', { mcpserver_name: item.name });
-            if (!res || !res.success) return;
+            if (!res || !res.success) {
+                const itemEl = $(`
+                    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="cursor: pointer;">
+                        <div>
+                            <h6 class="mb-1">${item.name}</h6>
+                            <small class="text-danger">${JSON.stringify(res)}</small>
+                        </div>
+                    </div>
+                `);
+                container.append(itemEl);
+                return;
+            }
             const config = res.success || {};
             const itemEl = $(`
                 <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="cursor: pointer;">
@@ -749,8 +768,10 @@ agent.save_mcpsv = async () => {
 
 agent.get_agent_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('agent', 'agent_save');
-    const vform_names = ['agent_name', 'agent_type', 'agent_card', 'llm', 'mcpservers', 'subagents',
-        'agent_description', 'agent_instruction'];
+    const vform_names = ['agent_name', 'agent_type',
+                         'a2asv_baseurl', 'a2asv_delegated_auth', 'a2asv_apikey',
+                         'llm', 'mcpservers', 'subagents',
+                         'agent_description', 'agent_instruction'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };
@@ -785,7 +806,18 @@ agent.list_agent = async () => {
 
         list.forEach(async item => {
             const res = await agent.exec_cmd('agent', 'agent_load', { agent_name: item.name });
-            if (!res || !res.success) return;
+            if (!res || !res.success) {
+                const itemEl = $(`
+                    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="cursor: pointer;">
+                        <div>
+                            <h6 class="mb-1">${item.name}</h6>
+                            <small class="text-danger">${JSON.stringify(res)}</small>
+                        </div>
+                    </div>
+                `);
+                container.append(itemEl);
+                return;
+            };
             const config = res.success || {};
             const itemEl = $(`
                 <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="cursor: pointer;">
@@ -808,8 +840,11 @@ agent.list_agent = async () => {
                     const input = form.find(`[name="${key}"]`);
                     if (input.length > 0) {
                         if (config[key]) {
-                            if (Array.isArray(config[key])) {
-                                input.val(config[key]);
+                            if (Array.isArray(config[key]) && config[key].length > 1) {
+                                config[key].slice(0,-1).forEach((v, i) => {
+                                    const e = form.find(`[name="${key}"]`).parent().find('.add_buton')[i];
+                                    $(e).click();
+                                });
                             } else {
                                 input.val(`${config[key]}`);
                             }
@@ -842,17 +877,22 @@ agent.list_agent = async () => {
                     const val = $("[name='mcpservers']").val();
                     $("[name='mcpservers']").empty().append('<option></option>');
                     res['data'].map(elm=>{$('[name="mcpservers"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                    form.find('[name="mcpservers"]').val(config.mcpservers);
+                    config.mcpservers.forEach((v, i) => {
+                        const e = form.find('[name="mcpservers"]')[i];
+                        $(e).val(v);
+                    });
                 },$('[name="title"]').val(),'mcpservers');
                 // SubAgentリストをロード
                 await cmdbox.callcmd('agent','agent_list',{},(res)=>{
-                    const val = $("[name='subagents']").val();
                     $("[name='subagents']").empty().append('<option></option>');
                     res['data'].map(elm=>{
                         if (elm["name"] === $('[name="agent_name"]').val()) return;
                         $('[name="subagents"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');
                     });
-                    form.find('[name="subagents"]').val(config.subagents);
+                    config.subagents.forEach((v, i) => {
+                        const e = form.find('[name="subagents"]')[i];
+                        $(e).val(v);
+                    });
                 },$('[name="title"]').val(),'subagents');
             });
             container.append(itemEl);
@@ -940,7 +980,18 @@ agent.list_runner = async () => {
 
         list.forEach(async item => {
             const res = await agent.exec_cmd('agent', 'runner_load', { runner_name: item.name });
-            if (!res || !res.success) return;
+            if (!res || !res.success) {
+                const itemEl = $(`
+                    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="cursor: pointer;">
+                        <div>
+                            <h6 class="mb-1">${item.name}</h6>
+                            <small class="text-danger">${JSON.stringify(res)}</small>
+                        </div>
+                    </div>
+                `);
+                container.append(itemEl);
+                return;
+            }
             const config = res.success || {};
             const itemEl = $(`
                 <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="cursor: pointer;">
@@ -1653,6 +1704,10 @@ agent.update_runner_list = async () => {
                 const li = $(`<li><a class="dropdown-item" href="#" data-runner="${item.name}">${item.name}</a></li>`);
                 li.find('a').off('click').on('click', async (e) => {
                     e.preventDefault();
+                    const current_runner = $('#runner_name_input').val();
+                    if (current_runner && item.name != current_runner && !confirm(`Switching runners will start a new chat. Continue?`)) {
+                        return;
+                    }
                     const promises = [];
                     cmdbox.show_loading();
                     $('#runner_menu a').each(async (i, a_elem) => {
@@ -1661,6 +1716,7 @@ agent.update_runner_list = async () => {
                             promises.push(agent.exec_cmd('agent', 'stop', { runner_name: rn }, null, false));
                         }
                     });
+                    if (agent.say.isStart()) $('#btn_say').click();
                     await Promise.all(promises);
                     agent.select_runner(item.name);
                     const item_data = await agent.exec_cmd('agent', 'runner_load', { runner_name: item.name }, null, false);
@@ -1671,7 +1727,8 @@ agent.update_runner_list = async () => {
                     await agent.exec_cmd('agent', 'start', { runner_name: item.name }, null, false);
                     cmdbox.show_loading();
                     await agent.list_sessions();
-                    agent.chat(cmdbox.random_string(16));
+                    const btn_newchat = $('#btn_newchat');
+                    btn_newchat.click();
                 });
                 menu.append(li);
             });

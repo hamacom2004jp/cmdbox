@@ -136,8 +136,6 @@ class VisionInstall(cmdbox_vision_start.VisionStart):
         Returns:
             int: 終了コード
         """
-        if logger.level == logging.DEBUG:
-            logger.debug(f"audit write svrun msg: {msg}")
         vision_engine = convert.b64str2str(msg[2])
         ret = self.install(msg[1], vision_engine, logger)
 

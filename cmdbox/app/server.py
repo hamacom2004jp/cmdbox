@@ -169,6 +169,8 @@ class Server(filer.Filer):
                         continue
                     if msg[0] == 'stop_server':
                         self.is_running = False
+                    if self.logger.level == logging.DEBUG:
+                        self.logger.debug(f"svname:{self.svname}, msg: {msg}")
                     st = common.exec_svrun_sync(svcmd_feature.svrun, self.data_dir, self.logger, self.redis_cli, msg, self.sessions)
                 else:
                     self.logger.warning(f"Unknown command {msg}")

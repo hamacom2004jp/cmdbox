@@ -932,14 +932,29 @@ class ThreadedASGI:
 
     def start(self):
         if self.force_single:
+            self.thread.start()
             if platform.system() == "Windows":
                 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-                self.thread.start()
+            # スレッド内で新しいイベントループを作成して待機
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    # 既に実行中のイベントループがある場合は、別スレッドで待機
+                    import concurrent.futures
+                    def wait_in_thread():
+                        new_loop = asyncio.new_event_loop()
+                        asyncio.set_event_loop(new_loop)
+                        try:
+                            new_loop.run_until_complete(self.wait_for_started())
+                        finally:
+                            new_loop.close()
+                    with concurrent.futures.ThreadPoolExecutor() as executor:
+                        executor.submit(wait_in_thread)
+                else:
+                    asyncio.run(self.wait_for_started())
+            except RuntimeError:
+                # イベントループがない場合は新規作成
                 asyncio.run(self.wait_for_started())
-            else:
-                self.thread.start()
-                task = asyncio.get_event_loop().create_task(self.wait_for_started())
-                # task.result()
         else:
             async def run():
                 self.server.run()

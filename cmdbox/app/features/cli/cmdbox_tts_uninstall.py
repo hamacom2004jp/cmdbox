@@ -139,8 +139,6 @@ class TtsUninstall(feature.UnsupportEdgeFeature):
         Returns:
             int: 終了コード
         """
-        if logger.level == logging.DEBUG:
-            logger.debug(f"audit write svrun msg: {msg}")
         tts_engine = convert.b64str2str(msg[2])
         ret = self.uninstall(msg[1], data_dir, tts_engine, logger)
 

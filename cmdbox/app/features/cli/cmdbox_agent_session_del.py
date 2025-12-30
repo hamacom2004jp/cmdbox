@@ -8,7 +8,7 @@ import logging
 import json
 
 
-class CmdAgentSessionDel(feature.ResultEdgeFeature):
+class AgentSessionDel(feature.ResultEdgeFeature):
 
     def get_mode(self) -> str:
         return 'agent'
@@ -104,8 +104,6 @@ class CmdAgentSessionDel(feature.ResultEdgeFeature):
                     sessions:Dict[str, Dict[str, Any]]):
         reskey = msg[1]
         try:
-            if logger.level == logging.DEBUG:
-                logger.debug(f"{self.get_mode()}_{self.get_cmd()} msg: {msg}")
             if 'agents' not in sessions:
                 sessions['agents'] = {}
 

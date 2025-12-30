@@ -2,6 +2,7 @@ from cmdbox import version
 from cmdbox.app import feature, options
 from cmdbox.app.commons import convert, module, loghandler
 from cryptography.fernet import Fernet
+from fastapi.responses import RedirectResponse
 from pathlib import Path
 from rich.console import Console
 from tabulate import tabulate
@@ -645,6 +646,8 @@ def to_str(o, slise=-1):
         ret = json.dumps(o, default=default_json_enc)
     elif type(o) == list and len(o) > 0 and type(o[0]) == dict:
         ret = json.dumps(o, default=default_json_enc)
+    elif type(o) == RedirectResponse:
+        ret = o.headers.get('location', str(o))
     else:
         ret = str(o)
     if slise < 0:
@@ -832,12 +835,12 @@ def exec_sync(apprun, logger:logging.Logger, args:argparse.Namespace, tm:float, 
         return asyncio.run(apprun(logger, args, tm, pf))
     return apprun(logger, args, tm, pf)
 
-def exec_svrun_sync(svran, data_dir, logger:logging.Logger, redis_cli, msg, sessions) -> int:
+def exec_svrun_sync(svrun, data_dir, logger:logging.Logger, redis_cli, msg, sessions) -> int:
     """"
     指定された関数が非同期関数であっても同期的に実行します。
 
     Args:
-        svran (function): 関数
+        svrun (function): 関数
         data_dir (Path): データディレクトリ
         logger (logging.Logger): ロガー
         redis_cli: Redisクライアント
@@ -847,18 +850,18 @@ def exec_svrun_sync(svran, data_dir, logger:logging.Logger, redis_cli, msg, sess
     Returns:
         int: 戻り値のタプル。0は成功、1は失敗、2はキャンセル
     """
-    if inspect.iscoroutinefunction(svran):
+    if inspect.iscoroutinefunction(svrun):
         if is_event_loop_running():
             def _run(svran, ctx, data_dir, logger, redis_cli, msg, sessions):
                 ctx.append(asyncio.run(svran(data_dir, logger, redis_cli, msg, sessions)))
             ctx = []
-            th = threading.Thread(target=_run, args=(svran, ctx, data_dir, logger, redis_cli, msg, sessions))
+            th = threading.Thread(target=_run, args=(svrun, ctx, data_dir, logger, redis_cli, msg, sessions))
             th.start()
             th.join()
             result = ctx[0] if ctx else None
             return result
-        return asyncio.run(svran(data_dir, logger, redis_cli, msg, sessions))
-    return svran(data_dir, logger, redis_cli, msg, sessions)
+        return asyncio.run(svrun(data_dir, logger, redis_cli, msg, sessions))
+    return svrun(data_dir, logger, redis_cli, msg, sessions)
 
 def get_tzoffset_str() -> str:
     """

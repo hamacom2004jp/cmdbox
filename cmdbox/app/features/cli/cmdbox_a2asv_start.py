@@ -1,8 +1,9 @@
 from cmdbox.app import common, feature, web
 from cmdbox.app.options import Options
-from cmdbox.app import mcp as mcp_mod
+from cmdbox.app import a2a as a2a_mod
 from cmdbox.app.auth import signin
 from cmdbox.app.web import ThreadedASGI
+from fastapi import FastAPI
 from uvicorn.config import Config
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -12,7 +13,7 @@ import multiprocessing
 import os
 
 
-class McpsvStart(feature.UnsupportEdgeFeature):
+class A2aSvStart(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -20,7 +21,7 @@ class McpsvStart(feature.UnsupportEdgeFeature):
         Returns:
             Union[str, List[str]]: モード
         """
-        return 'mcpsv'
+        return 'a2asv'
 
     def get_cmd(self) -> str:
         """
@@ -40,8 +41,8 @@ class McpsvStart(feature.UnsupportEdgeFeature):
         """
         return dict(
             use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
-            description_ja="MCP サーバーを起動します。",
-            description_en="Start MCP server.",
+            description_ja="A2A サーバーを起動します。",
+            description_en="Start A2A server.",
             choice=[
                 dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
                     description_ja="Redisサーバーのサービスホストを指定します。",
@@ -61,12 +62,12 @@ class McpsvStart(feature.UnsupportEdgeFeature):
                 dict(opt="allow_host", type=Options.T_STR, default="0.0.0.0", required=False, multi=False, hide=False, choice=None,
                      description_ja="省略した時は `0.0.0.0` を使用します。",
                      description_en="If omitted, `0.0.0.0` is used."),
-                dict(opt="listen_port", type=Options.T_INT, default="8091", required=False, multi=False, hide=False, choice=None,
-                     description_ja="省略した時は `8091` を使用します。",
-                     description_en="If omitted, `8091` is used."),
-                dict(opt="ssl_listen_port", type=Options.T_INT, default="8453", required=False, multi=False, hide=False, choice=None,
-                     description_ja="省略した時は `8453` を使用します。",
-                     description_en="If omitted, `8453` is used."),
+                dict(opt="listen_port", type=Options.T_INT, default="8071", required=False, multi=False, hide=False, choice=None,
+                     description_ja="省略した時は `8071` を使用します。",
+                     description_en="If omitted, `8071` is used."),
+                dict(opt="ssl_listen_port", type=Options.T_INT, default="8423", required=False, multi=False, hide=False, choice=None,
+                     description_ja="省略した時は `8423` を使用します。",
+                     description_en="If omitted, `8423` is used."),
                 dict(opt="ssl_cert", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="in",
                      description_ja="SSLサーバー証明書ファイルを指定します。",
                      description_en="Specify the SSL server certificate file."),
@@ -106,7 +107,7 @@ class McpsvStart(feature.UnsupportEdgeFeature):
             ]
         )
 
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+    async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
         """
@@ -123,46 +124,33 @@ class McpsvStart(feature.UnsupportEdgeFeature):
                                        redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                                        signin_file=args.signin_file)
 
-            from fastmcp import FastMCP
             sign = signin.Signin(logger, signin_file, signin_data, _web.redis_cli, self.appcls, self.ver)
-            self.mcp = mcp_mod.Mcp(logger, Path(args.data), sign, self.appcls, self.ver)
-            fastmcp:FastMCP = self.mcp.create_mcpserver(logger, args, self.mcp.create_tools(logger, args, False))
+            self.a2a = a2a_mod.A2a(logger, Path(args.data), sign, self.appcls, self.ver)
+            a2a_app:FastAPI = await self.a2a.create_a2aserver(logger, args, _web)
 
             # SSL/paths を Path に揃える
             args.ssl_cert = None if args.ssl_cert is None else Path(args.ssl_cert)
             args.ssl_key = None if args.ssl_key is None else Path(args.ssl_key)
             args.ssl_ca_certs = None if args.ssl_ca_certs is None else Path(args.ssl_ca_certs)
 
-            # FastMCP の ASGI アプリを取得して起動
-            mcp_app = fastmcp.http_app() if fastmcp is not None else None
-            if mcp_app is None:
-                msg = dict(warn="MCP app is not created.")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                return self.RESP_WARN, msg, None
-
-            # mcpsvはセッションを使用しないが、signinミドルウェアでセッションが必要なため追加する
-            from starlette.middleware.sessions import SessionMiddleware
-            mwparam = dict(path='/mcp', max_age=900, secret_key=common.random_string())
-            mcp_app.add_middleware(SessionMiddleware, **mwparam)
-
             # スタート
             if args.ssl_cert is not None and args.ssl_key is not None:
-                https_config = Config(app=mcp_app, host=args.allow_host, port=args.ssl_listen_port,
+                https_config = Config(app=a2a_app, host=args.allow_host, port=args.ssl_listen_port,
                                       ssl_certfile=args.ssl_cert, ssl_keyfile=args.ssl_key,
                                       ssl_keyfile_password=args.ssl_keypass, ssl_ca_certs=args.ssl_ca_certs)
-                th = ThreadedASGI(mcp_app, logger, config=https_config,
+                th = ThreadedASGI(a2a_app, logger, config=https_config,
                                   gunicorn_config=dict(workers=args.gunicorn_workers, timeout=args.gunicorn_timeout))
                 th.start()
             else:
-                http_config = Config(app=mcp_app, host=args.allow_host, port=args.listen_port)
-                th = ThreadedASGI(mcp_app, logger, config=http_config,
+                http_config = Config(app=a2a_app, host=args.allow_host, port=args.listen_port)
+                th = ThreadedASGI(a2a_app, logger, config=http_config,
                                   gunicorn_config=dict(workers=args.gunicorn_workers, timeout=args.gunicorn_timeout))
                 th.start()
 
             try:
                 def _w(f):
                     f.write(str(os.getpid()))
-                common.save_file("mcpsv.pid", _w)
+                common.save_file("a2a.pid", _w)
                 # ブロッキングで稼働
                 import gevent
                 while True:
@@ -171,11 +159,11 @@ class McpsvStart(feature.UnsupportEdgeFeature):
                 if th is not None:
                     th.stop()
 
-            msg = dict(success="mcpsv complate.")
+            msg = dict(success="a2a complate.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_SUCCESS, msg, fastmcp
+            return self.RESP_SUCCESS, msg, a2a_app
         except Exception as e:
-            logger.error(f"MCP server start error. {e}", exc_info=True)
-            msg = dict(warn=f"MCP server start error. {e}")
+            logger.error(f"A2A server start error. {e}", exc_info=True)
+            msg = dict(warn=f"A2A server start error. {e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None

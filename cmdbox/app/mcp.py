@@ -61,10 +61,10 @@ class Mcp:
                 issuer=issuer,
                 audience=audience
             )
-            mcp = FastMCP(name=self.ver.__appid__, auth=auth, tools=tools, stateless_http=True)
+            mcp = FastMCP(name=self.ver.__appid__, auth=auth, tools=tools)
         else:
             self.logger.info(f"Using JWTVerifier without public key, issuer, or audience.")
-            mcp = FastMCP(name=self.ver.__appid__, stateless_http=True)
+            mcp = FastMCP(name=self.ver.__appid__)
         mcp.add_middleware(self.create_mw_logging(self.logger, args))
         mcp.add_middleware(self.create_mw_reqscope(self.logger, args))
         mcp.add_middleware(self.create_mw_toollist(self.logger, args, tools))
@@ -106,145 +106,6 @@ class Mcp:
             return dss
         else:
             return InMemorySessionService()
-
-    def create_agent(self, logger:logging.Logger, args:argparse.Namespace, tools:List[Callable]) -> Any:
-        """
-        エージェントを作成します
-
-        Args:
-            logger (logging.Logger): ロガー
-            args (argparse.Namespace): 引数
-            tools (List[Callable]): 関数
-
-        Returns:
-            Agent: エージェント
-        """
-        if logger.level == logging.DEBUG:
-            logger.debug(f"create_agent processing..")
-        is_japan = common.is_japan()
-        description = f"{self.ver.__appid__}に登録されているコマンド提供"
-        instruction = f"あなたはコマンドの意味を熟知しているエキスパートです。" + \
-                      f"ユーザーがコマンドを実行したいとき、あなたは以下の手順に従ってコマンドを確実に実行してください。\n" + \
-                      f"1. ユーザーのクエリからが実行したいコマンドを特定します。\n" + \
-                      f"2. コマンド実行に必要なパラメータのなかで、ユーザーのクエリから取得できないものは、コマンド定義にあるデフォルト値を指定して実行してください。\n" + \
-                      f"3. もしエラーが発生した場合は、ユーザーにコマンド名とパラメータとエラー内容を提示してください。\n" \
-                      f"4. コマンドの実行結果は、json文字列で出力するようにしてください。この時json文字列は「```json」と「```」で囲んだ文字列にしてください。\n"
-
-        description = description if is_japan else \
-                      f"Command offer registered in {self.ver.__appid__}."
-        instruction = instruction if is_japan else \
-                      f"You are the expert who knows what the commands mean." + \
-                      f"When a user wants to execute a command, you follow these steps to ensure that the command is executed.\n" + \
-                      f"1. Identify the command you want to execute from the user's query.\n" + \
-                      f"2. Any parameters required to execute the command that cannot be obtained from the user's query should be executed with the default values provided in the command definition.\n" + \
-                      f"3. If an error occurs, provide the user with the command name, parameters, and error description.\n" \
-                      f"4. The result of the command execution should be output as a json string. The json string should be a string enclosed in '```json' and '```'."
-
-        description = args.agent_description if args.agent_description else description
-        instruction = args.agent_instruction if args.agent_instruction else instruction
-        if logger.level == logging.DEBUG:
-            logger.debug(f"google-adk loading..")
-        from google.adk.agents import Agent
-        if logger.level == logging.DEBUG:
-            logger.debug(f"litellm loading..")
-        from google.adk.models.lite_llm import LiteLlm
-        # loggerの初期化
-        common.reset_logger("LiteLLM Proxy")
-        common.reset_logger("LiteLLM Router")
-        common.reset_logger("LiteLLM")
-        if args.llmprov == 'openai':
-            if args.llmmodel is None: raise ValueError("llmmodel is required.")
-            if args.llmapikey is None: raise ValueError("llmapikey is required.")
-            agent = Agent(
-                name=args.agent_name,
-                model=LiteLlm(
-                    model=args.llmmodel,
-                    api_key=args.llmapikey,
-                    endpoint=args.llmendpoint,
-                ),
-                description=description,
-                instruction=instruction,
-                tools=tools,
-            )
-        elif args.llmprov == 'azureopenai':
-            if args.llmmodel is None: raise ValueError("llmmodel is required.")
-            if args.llmendpoint is None: raise ValueError("llmendpoint is required.")
-            if args.llmapikey is None: raise ValueError("llmapikey is required.")
-            if args.llmapiversion is None: raise ValueError("llmapiversion is required.")
-            agent = Agent(
-                name=args.agent_name,
-                model=LiteLlm(
-                    model=args.llmmodel,
-                    api_key=args.llmapikey,
-                    endpoint=args.llmendpoint,
-                    api_version=args.llmapiversion,
-                ),
-                description=description,
-                instruction=instruction,
-                tools=tools,
-            )
-        elif args.llmprov == 'vertexai':
-            if args.llmmodel is None: raise ValueError("llmmodel is required.")
-            if args.llmlocation is None: raise ValueError("llmlocation is required.")
-            if args.llmsvaccountfile is not None: 
-                def _r(f):
-                    return json.load(f)
-                vertex_credentials = common.load_file(Path(args.llmsvaccountfile), _r, mode='r')
-            elif args.llmprojectid is None: raise ValueError("llmprojectid is required.")
-            agent = Agent(
-                name=args.agent_name,
-                model=LiteLlm(
-                    model=args.llmmodel,
-                    #vertex_project=args.llmprojectid,
-                    vertex_credentials=vertex_credentials,
-                    vertex_location=args.llmlocation,
-                    #seed=args.llmseed,
-                    #temperature=args.llmtemperature,
-                ),
-                description=description,
-                instruction=instruction,
-                tools=tools,
-            )
-        elif args.llmprov == 'ollama':
-            if args.llmmodel is None: raise ValueError("llmmodel is required.")
-            if args.llmendpoint is None: raise ValueError("llmendpoint is required.")
-            agent = Agent(
-                name=args.agent_name,
-                model=LiteLlm(
-                    model=f"ollama/{args.llmmodel}",
-                    api_base=args.llmendpoint,
-                    temperature=args.llmtemperature,
-                    stream=True
-                ),
-                description=description,
-                instruction=instruction,
-                tools=tools,
-            )
-        else:
-            raise ValueError("llmprov is required.")
-        if logger.level == logging.DEBUG:
-            logger.debug(f"create_agent complate.")
-        return agent
-
-    def create_runner(self, logger:logging.Logger, args:argparse.Namespace, session_service, agent) -> Any:
-        """
-        ランナーを作成します
-
-        Args:
-            logger (logging.Logger): ロガー
-            args (argparse.Namespace): 引数
-            session_service (BaseSessionService): セッションサービス
-            agent (Agent): エージェント
-
-        Returns:
-            Runner: ランナー
-        """
-        from google.adk.runners import Runner
-        return Runner(
-            app_name=self.ver.__appid__,
-            agent=agent,
-            session_service=session_service,
-        )
 
     def create_tools(self, logger:logging.Logger, args:argparse.Namespace, extract_callable:bool) -> Any:
         """
@@ -680,16 +541,17 @@ class ToolList(object):
         func_txt += f'    req = scope["req"] if scope["req"] is not None else scope["websocket"]\n'
         func_txt += f'    sign = signin.Signin._check_signin(req, scope["res"], signin_data, logger)\n'
         func_txt += f'    if sign is not None or "signin" not in req.session or "groups" not in req.session["signin"]:\n'
-        func_txt += f'        logger.warning("Unable to execute command because authentication information cannot be obtained")\n'
-        func_txt += f'        logger.warning("mode={mode}, cmd={cmd}, sign="+str(sign)+", req.session="+str(req.session))\n'
-        func_txt += f'        logger.warning("mode={mode}, cmd={cmd}, signin_file="+str(args.signin_file)+", signin_data="+str(signin_data))\n'
-        func_txt += f'        return dict(warn="Unable to execute command because authentication information cannot be obtained")\n'
+        func_txt += f'        logger.warning("The command could not be executed due to an authentication error. check="+common.to_str(sign))\n'
+        func_txt += f'        logger.warning("mode={mode}, cmd={cmd}, sign="+common.to_str(sign)+", req.session="+common.to_str(req.session))\n'
+        func_txt += f'        logger.warning("mode={mode}, cmd={cmd}, signin_file="+common.to_str(args.signin_file))\n'
+        func_txt += f'        return dict(warn="The command could not be executed due to an authentication error. check="+common.to_str(sign))\n'
         func_txt += f'    groups = req.session["signin"]["groups"]\n'
-        func_txt += f'    if not signin.Signin._check_cmd(signin_data, groups, "{mode}", "{cmd}", logger):\n'
-        func_txt += f'        logger.warning("You do not have permission to execute this command.")\n'
-        func_txt += f'        logger.warning("mode={mode}, cmd={cmd}, groups="+str(groups))\n'
-        func_txt += f'        logger.warning("mode={mode}, cmd={cmd}, signin_file="+str(args.signin_file)+", signin_data="+str(signin_data))\n'
-        func_txt += f'        return dict(warn="You do not have permission to execute this command.")\n'
+        func_txt += f'    sign = signin.Signin._check_cmd(signin_data, groups, "{mode}", "{cmd}", logger)\n'
+        func_txt += f'    if not sign:\n'
+        func_txt += f'        logger.warning("You do not have permission to execute this command. check="+common.to_str(sign))\n'
+        func_txt += f'        logger.warning("mode={mode}, cmd={cmd}, sign="+common.to_str(sign)+", groups="+common.to_str(groups))\n'
+        func_txt += f'        logger.warning("mode={mode}, cmd={cmd}, signin_file="+common.to_str(args.signin_file))\n'
+        func_txt += f'        return dict(warn="You do not have permission to execute this command. check="+common.to_str(sign))\n'
         func_txt += f'    feat = options.get_cmd_attr("{mode}", "{cmd}", "feature")\n'
         func_txt += f'    args.groups = groups\n'
         func_txt += f'    try:\n'

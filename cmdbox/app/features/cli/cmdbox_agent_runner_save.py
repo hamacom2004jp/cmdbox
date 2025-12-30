@@ -10,7 +10,7 @@ import json
 import re
 
 
-class CmdAgentRunnerSave(feature.OneshotResultEdgeFeature):
+class AgentRunnerSave(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
 
@@ -178,8 +178,6 @@ class CmdAgentRunnerSave(feature.OneshotResultEdgeFeature):
               sessions:Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
         try:
-            if logger.level == logging.DEBUG:
-                logger.debug(f"{self.get_mode()}_{self.get_cmd()} msg: {msg}")
             configure = json.loads(convert.b64str2str(msg[2]))
 
             if configure['agent'] not in self.list_agents(data_dir):
