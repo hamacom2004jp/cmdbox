@@ -23,6 +23,8 @@ psycopg[binary]
 pyjwt
 pystray           # For system tray icon
 #pyobjus          # Mac OS only
+pytest
+pytest-mock
 pyyaml
 questionary
 redis
