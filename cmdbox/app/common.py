@@ -619,7 +619,7 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
             performance = data["success"]["performance"]
             performance.append(dict(key="app_proc", val=f"{time.perf_counter() - tm:.03f}s"))
         try:
-            if is_data_dict:
+            if is_data_dict or is_data_list:
                 txt = json.dumps(data, default=default_json_enc, ensure_ascii=False)
             else:
                 txt = data
