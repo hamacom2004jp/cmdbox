@@ -956,9 +956,10 @@ class ThreadedASGI:
                 # イベントループがない場合は新規作成
                 asyncio.run(self.wait_for_started())
         else:
-            async def run():
-                self.server.run()
-            asyncio.run(run())
+            self.server.run()
+            #async def run():
+            #    self.server.run()
+            #asyncio.run(run())
 
     async def wait_for_started(self):
         while not self.server.started:
