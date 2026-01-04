@@ -98,16 +98,20 @@ class AgentMcpSave(feature.OneshotResultEdgeFeature):
         )
 
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        if not getattr(args, 'mcpserver_name', None) or args.mcpserver_name is None:
+        if not hasattr(args, 'mcpserver_name') or args.mcpserver_name is None:
             msg = dict(warn="Please specify --mcpserver_name")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
-        if not getattr(args, 'mcpserver_url', None) or args.mcpserver_url is None:
+        if not hasattr(args, 'mcpserver_url') or args.mcpserver_url is None:
             msg = dict(warn="Please specify --mcpserver_url")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
         if not re.match(r'^[\w\-]+$', args.mcpserver_name):
             msg = dict(warn="MCP server name can only contain alphanumeric characters, underscores, and hyphens.")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
+        if not args.mcpserver_delegated_auth and (not hasattr(args, 'mcpserver_apikey') or args.mcpserver_apikey is None):
+            msg = dict(warn="Please specify --mcpserver_apikey or enable --mcpserver_delegated_auth")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
 

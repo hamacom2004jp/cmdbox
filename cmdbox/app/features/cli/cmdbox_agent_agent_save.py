@@ -200,6 +200,10 @@ class AgentAgentSave(feature.OneshotResultEdgeFeature):
                 msg = dict(warn="Please specify --a2asv_baseurl for remote agent")
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, msg, None
+        if not args.a2asv_delegated_auth and args.agent_type == 'remote' and (not getattr(args, 'a2asv_apikey', None) or args.a2asv_apikey is None):
+            msg = dict(warn="Please specify --a2asv_apikey or enable --a2asv_delegated_auth")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
 
         configure = dict(
             agent_name=args.agent_name,

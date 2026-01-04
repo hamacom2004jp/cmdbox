@@ -10,6 +10,7 @@ See below for available options for the various commands.
    :maxdepth: 2
 
    Common Options <cmd_common.rst>
+   A2AServer <cmd_a2asv.rst>
    Agent <cmd_agent.rst>
    Audit <cmd_audit.rst>
    Client <cmd_client.rst>

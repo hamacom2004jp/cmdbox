@@ -62,10 +62,10 @@ class A2aSvStart(feature.UnsupportEdgeFeature):
                 dict(opt="allow_host", type=Options.T_STR, default="0.0.0.0", required=False, multi=False, hide=False, choice=None,
                      description_ja="省略した時は `0.0.0.0` を使用します。",
                      description_en="If omitted, `0.0.0.0` is used."),
-                dict(opt="listen_port", type=Options.T_INT, default="8071", required=False, multi=False, hide=False, choice=None,
+                dict(opt="a2asv_listen_port", type=Options.T_INT, default="8071", required=False, multi=False, hide=False, choice=None,
                      description_ja="省略した時は `8071` を使用します。",
                      description_en="If omitted, `8071` is used."),
-                dict(opt="ssl_listen_port", type=Options.T_INT, default="8423", required=False, multi=False, hide=False, choice=None,
+                dict(opt="ssl_a2asv_listen_port", type=Options.T_INT, default="8423", required=False, multi=False, hide=False, choice=None,
                      description_ja="省略した時は `8423` を使用します。",
                      description_en="If omitted, `8423` is used."),
                 dict(opt="ssl_cert", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="in",
@@ -135,14 +135,14 @@ class A2aSvStart(feature.UnsupportEdgeFeature):
 
             # スタート
             if args.ssl_cert is not None and args.ssl_key is not None:
-                https_config = Config(app=a2a_app, host=args.allow_host, port=args.ssl_listen_port,
+                https_config = Config(app=a2a_app, host=args.allow_host, port=args.ssl_a2asv_listen_port,
                                       ssl_certfile=args.ssl_cert, ssl_keyfile=args.ssl_key,
                                       ssl_keyfile_password=args.ssl_keypass, ssl_ca_certs=args.ssl_ca_certs)
                 th = ThreadedASGI(a2a_app, logger, config=https_config,
                                   gunicorn_config=dict(workers=args.gunicorn_workers, timeout=args.gunicorn_timeout))
                 th.start()
             else:
-                http_config = Config(app=a2a_app, host=args.allow_host, port=args.listen_port)
+                http_config = Config(app=a2a_app, host=args.allow_host, port=args.a2asv_listen_port)
                 th = ThreadedASGI(a2a_app, logger, config=http_config,
                                   gunicorn_config=dict(workers=args.gunicorn_workers, timeout=args.gunicorn_timeout))
                 th.start()

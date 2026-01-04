@@ -1,5 +1,4 @@
 from cmdbox.app import common, feature
-from cmdbox.app.auth import signin
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -109,7 +108,7 @@ class AgentMcpClient(feature.UnsupportEdgeFeature):
         if not hasattr(args, 'mcpserver_name'):
             args.mcpserver_name = 'mcpserver'
         if not hasattr(args, 'mcpserver_url'):
-            args.mcpserver_url = 'http://localhost:8082/mcp'
+            args.mcpserver_url = 'http://localhost:8091/mcp'
         if not hasattr(args, 'mcpserver_transport'):
             args.mcpserver_transport = 'streamable-http'
         if not hasattr(args, 'mcpserver_apikey'):
@@ -127,15 +126,7 @@ class AgentMcpClient(feature.UnsupportEdgeFeature):
         )
         try:
             common.reset_logger('FastMCP.fastmcp.server.server')
-            scope = signin.get_request_scope()
-            webexec_and_selfreq = (scope is not None and scope['web'] is not None)
-            if webexec_and_selfreq:
-                web = scope['web']
-                url1 = f"http://localhost:{web.listen_port}/mcp"
-                url2 = f"https://localhost:{web.ssl_listen_port}/mcp"
-                if url1 != args.mcpserver_url and url2 != args.mcpserver_url:
-                    webexec_and_selfreq = False
-            client = Client(config if not webexec_and_selfreq or scope['web'].mcp is None else scope['web'].mcp)
+            client = Client(transport=config)
             if logger.level == logging.DEBUG:
                 logger.debug(f"Starting MCP client: {config}")
             async with client:

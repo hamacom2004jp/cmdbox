@@ -294,6 +294,7 @@ class AgentStart(feature.OneshotResultEdgeFeature):
                         request.headers['Authorization'] = f'Bearer {a2asv_apikey}'
                 return add_auth_headers
             custom_httpx_client = httpx.AsyncClient(
+                follow_redirects=True,
                 timeout=httpx.Timeout(600.0),
                 event_hooks={'request': [_create_dynamic_header_provider()]}
             )
@@ -442,11 +443,17 @@ class AgentStart(feature.OneshotResultEdgeFeature):
                 # Signin情報からapikeyを取得してMCPサーバーに転送するためのヘッダープロバイダー
                 def header_provider(readonly_context:ReadonlyContext) -> Dict[str, str]:
                     scope = signin.get_request_scope()
-                    if scope is not None and mcpserver_delegated_auth and scope.get("mcpserver_apikey") is not None:
+                    # delegated_authが有効な場合、Signin情報からapikeyを取得して使用
+                    if scope is not None and mcpserver_delegated_auth and scope.get("mcpserver_apikey", None) is not None:
                         return dict(Authorization=f"Bearer {scope['mcpserver_apikey']}")
+                    # delegated_authが無効な場合、設定済みのAPIKeyを使用
                     elif not mcpserver_delegated_auth and mcpserver_apikey is not None:
-                        # コンテキストが存在しない場合またはdelegated_authが無効な場合、設定済みのAPIKeyを使用
                         return dict(Authorization=f"Bearer {mcpserver_apikey}")
+                    # fastmcp経由で来たときはreqヘッダーからAuthorizationを取得して転送
+                    elif mcpserver_delegated_auth and 'req' in scope and 'headers' in scope['req']:
+                        req_headers = scope['req'].headers
+                        if 'authorization' in req_headers:
+                            return dict(Authorization=req_headers['authorization'])
                     return {}
                 return header_provider
             toolset = MCPToolset(
