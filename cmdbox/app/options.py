@@ -398,7 +398,7 @@ class Options:
             logger.debug(f"load features.yml: {features_yml}, is_file={features_yml.is_file()}")
         if features_yml.exists() and features_yml.is_file():
             if self.features_yml_data is None:
-                self.features_yml_data = yml = common.load_yml(features_yml)
+                self.features_yml_data = yml = common.load_yml(features_yml, nolock=True)
                 if logger.level == logging.DEBUG:
                     logger.debug(f"features.yml data: {yml}")
             else:

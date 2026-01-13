@@ -22,7 +22,7 @@ VERSION = get_info('cmdbox/version.py')
 class CustomInstallCommand(install):
     def run(self):
         super().run()
-        if platform.system() != 'Linux':
+        if platform.system() == 'Windows':
             return
         bashrc = Path.home() / '.bashrc'
         if not bashrc.exists():

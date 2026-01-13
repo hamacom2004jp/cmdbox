@@ -2,6 +2,7 @@ from cmdbox.app import common, client, feature, options
 from cmdbox.app.auth import signin
 from cmdbox.app.commons import convert, redis_client
 from cmdbox.app.options import Options
+from contextlib import aclosing
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import asyncio
@@ -183,21 +184,21 @@ class AgentChat(feature.ResultEdgeFeature):
             # チャットを実行する
             signin.set_request_scope(dict(mcpserver_apikey=mcpserver_apikey, a2asv_apikey=a2asv_apikey))
             run_config = RunConfig(streaming_mode=StreamingMode.NONE)
-            run_iter = runner.run_async(user_id=user_name, session_id=agent_session.id, new_message=content, run_config=run_config)
-            async for event in run_iter:
-                outputs = dict(success=dict(agent_session_id=agent_session.id))
-                if event.turn_complete:
-                    outputs['success']['turn_complete'] = True
-                if event.interrupted:
-                    outputs['success']['interrupted'] = True
-                msg = self.__class__.gen_msg(event)
-                if msg:
-                    outputs['success']['message'] = msg
-                    options.Options.getInstance().audit_exec(body=dict(agent_session=agent_session.id, result=msg),
-                                                                audit_type=options.Options.AT_USER, user=user_name)
-                    redis_cli.rpush(reskey, outputs)
-                    if event.is_final_response():
-                        break
+            async with aclosing(runner.run_async(user_id=user_name, session_id=agent_session.id, new_message=content, run_config=run_config)) as run_iter:
+                async for event in run_iter:
+                    outputs = dict(success=dict(agent_session_id=agent_session.id))
+                    if event.turn_complete:
+                        outputs['success']['turn_complete'] = True
+                    if event.interrupted:
+                        outputs['success']['interrupted'] = True
+                    msg = self.__class__.gen_msg(event)
+                    if msg:
+                        outputs['success']['message'] = msg
+                        options.Options.getInstance().audit_exec(body=dict(agent_session=agent_session.id, result=msg),
+                                                                    audit_type=options.Options.AT_USER, user=user_name)
+                        redis_cli.rpush(reskey, outputs)
+                        if event.is_final_response():
+                            break
             msg = dict(success=f"Chat '{name}' successfully.", end=True)
             redis_cli.rpush(reskey, msg)
             await run_iter.aclose()

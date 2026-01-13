@@ -72,33 +72,35 @@ def mklogdir(data:Path) -> Path:
         return mkdirs(logdir)
     return logdir
 
-def load_yml(yml_path:Path) -> dict:
+def load_yml(yml_path:Path, nolock=False) -> dict:
     """
     YAMLファイルを読み込みます。
 
     Args:
         yml_path (Path): YAMLファイルのパス
+        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to False.
 
     Returns:
         dict: 読み込んだYAMLファイルの内容
     """
     def _r(f):
         return yaml.safe_load(f)
-    return load_file(yml_path, _r)
+    return load_file(yml_path, _r, nolock=nolock)
 
-def save_yml(yml_path:Path, data:dict) -> None:
+def save_yml(yml_path:Path, data:dict, nolock=False) -> None:
     """
     YAMLファイルに書き込みます。
 
     Args:
         yml_path (Path): YAMLファイルのパス
         data (dict): 書き込むデータ
+        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to False.
     """
     def _w(f):
         yaml.dump(data, f, default_flow_style=False, sort_keys=False)
-    save_file(yml_path, _w)
+    save_file(yml_path, _w, nolock=nolock)
 
-def load_file(file_path:Path, func, mode='r', encoding='utf-8') -> None:
+def load_file(file_path:Path, func, mode='r', encoding='utf-8', nolock=False) -> None:
     """
     ファイルを読み込みます。読み込み時に排他ロックします。
 
@@ -107,7 +109,17 @@ def load_file(file_path:Path, func, mode='r', encoding='utf-8') -> None:
         func: 読み込んだデータを処理する関数
         mode (str, optional): ファイルモード. Defaults to 'r'.
         encoding (str, optional): エンコーディング. Defaults to 'utf-8'.
+        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to False.
     """
+    def _load(file_path, func, mode, encoding):
+        if 'b' in mode:
+            with open(file_path, mode) as f:
+                return func(f)
+        else:
+            with open(file_path, mode, encoding=encoding) as f:
+                return func(f)
+    if nolock:
+        return _load(file_path, func, mode, encoding)
     lock_file = f'{file_path}.lock'
     try:
         with open(lock_file, 'w') as fd:
@@ -118,12 +130,7 @@ def load_file(file_path:Path, func, mode='r', encoding='utf-8') -> None:
                 else:
                     import fcntl
                     fcntl.lockf(fd, fcntl.LOCK_EX)
-                if 'b' in mode:
-                    with open(file_path, mode) as f:
-                        return func(f)
-                else:
-                    with open(file_path, mode, encoding=encoding) as f:
-                        return func(f)
+                return _load(file_path, func, mode, encoding)
             finally:
                 if sys.platform == 'win32':
                     msvcrt.locking(fd.fileno(), msvcrt.LK_UNLCK, 0)
@@ -135,7 +142,7 @@ def load_file(file_path:Path, func, mode='r', encoding='utf-8') -> None:
         except:
             pass
 
-def save_file(file_path:Path, func, mode='w', encoding='utf-8') -> None:
+def save_file(file_path:Path, func, mode='w', encoding='utf-8', nolock=False) -> None:
     """
     ファイルに書き込みます。書き込み時に排他ロックします。
 
@@ -144,7 +151,18 @@ def save_file(file_path:Path, func, mode='w', encoding='utf-8') -> None:
         func: 書き込む関数
         mode (str, optional): ファイルモード. Defaults to 'w'.
         encoding (str, optional): エンコーディング. Defaults to 'utf-8'.
+        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to False.
     """
+    def _save(file_path, func, mode, encoding):
+        if 'b' in mode:
+            with open(file_path, mode) as f:
+                func(f)
+        else:
+            with open(file_path, mode, encoding=encoding) as f:
+                func(f)
+    if nolock:
+        _save(file_path, func, mode, encoding)
+        return
     lock_file = f'{file_path}.lock'
     try:
         with open(lock_file, 'w') as fd:
@@ -155,12 +173,7 @@ def save_file(file_path:Path, func, mode='w', encoding='utf-8') -> None:
                 else:
                     import fcntl
                     fcntl.lockf(fd, fcntl.LOCK_EX)
-                if 'b' in mode:
-                    with open(file_path, mode) as f:
-                        func(f)
-                else:
-                    with open(file_path, mode, encoding=encoding) as f:
-                        func(f)
+                _save(file_path, func, mode, encoding)
             finally:
                 if sys.platform == 'win32':
                     msvcrt.locking(fd.fileno(), msvcrt.LK_UNLCK, 0)
@@ -329,7 +342,7 @@ def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False, v
     if not log_conf_path.exists():
         log_conf_path = Path(version.__file__).parent / f"logconf_{ver.__appid__}.yml"
         log_name = mode
-    log_config = load_yml(log_conf_path)
+    log_config = load_yml(log_conf_path, nolock=True)
     std_key = None
     set_common_value('webcall', webcall)
     for k, h in log_config['handlers'].items():
@@ -820,19 +833,17 @@ def exec_sync(apprun, logger:logging.Logger, args:argparse.Namespace, tm:float, 
         Tuple[int, Dict[str, Any], Any]: 戻り値のタプル。0は成功、1は失敗、2はキャンセル
     """
     if inspect.iscoroutinefunction(apprun):
-        if is_event_loop_running():
-            def _run(apprun, ctx, logger, args, scope, tm, pf):
-                signin.set_request_scope(scope)
-                ctx.append(asyncio.run(apprun(logger, args, tm, pf)))
-            ctx = []
-            from cmdbox.app.auth import signin
-            scope = signin.get_request_scope()
-            th = threading.Thread(target=_run, args=(apprun, ctx, logger, args, scope, tm, pf))
-            th.start()
-            th.join()
-            result = ctx[0] if ctx else None
-            return result
-        return asyncio.run(apprun(logger, args, tm, pf))
+        def _run(apprun, ctx, logger, args, scope, tm, pf):
+            signin.set_request_scope(scope)
+            ctx.append(asyncio.run(apprun(logger, args, tm, pf)))
+        ctx = []
+        from cmdbox.app.auth import signin
+        scope = signin.get_request_scope()
+        th = threading.Thread(target=_run, args=(apprun, ctx, logger, args, scope, tm, pf))
+        th.start()
+        th.join()
+        result = ctx[0] if ctx else None
+        return result
     return apprun(logger, args, tm, pf)
 
 def exec_svrun_sync(svrun, data_dir, logger:logging.Logger, redis_cli, msg, sessions) -> int:
@@ -851,16 +862,14 @@ def exec_svrun_sync(svrun, data_dir, logger:logging.Logger, redis_cli, msg, sess
         int: 戻り値のタプル。0は成功、1は失敗、2はキャンセル
     """
     if inspect.iscoroutinefunction(svrun):
-        if is_event_loop_running():
-            def _run(svran, ctx, data_dir, logger, redis_cli, msg, sessions):
-                ctx.append(asyncio.run(svran(data_dir, logger, redis_cli, msg, sessions)))
-            ctx = []
-            th = threading.Thread(target=_run, args=(svrun, ctx, data_dir, logger, redis_cli, msg, sessions))
-            th.start()
-            th.join()
-            result = ctx[0] if ctx else None
-            return result
-        return asyncio.run(svrun(data_dir, logger, redis_cli, msg, sessions))
+        def _run(svran, ctx, data_dir, logger, redis_cli, msg, sessions):
+            ctx.append(asyncio.run(svran(data_dir, logger, redis_cli, msg, sessions)))
+        ctx = []
+        th = threading.Thread(target=_run, args=(svrun, ctx, data_dir, logger, redis_cli, msg, sessions))
+        th.start()
+        th.join()
+        result = ctx[0] if ctx else None
+        return result
     return svrun(data_dir, logger, redis_cli, msg, sessions)
 
 def get_tzoffset_str() -> str:

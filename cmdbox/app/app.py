@@ -59,6 +59,7 @@ class CmdBoxApp:
 
         # プラグイン読込み
         sfeatureloadtime = time.perf_counter()
+        common.copy_sample(Path.cwd(), ver=self.ver)
         self.options._load_features_yml(self.ver, logger=self.default_logger)
         self.options.load_features_agentrule(self.default_logger)
         self.options.load_svcmd('cmdbox.app.features.cli', prefix="cmdbox_", excludes=[], appcls=self.appcls, ver=self.ver, logger=self.default_logger,
@@ -137,8 +138,6 @@ class CmdBoxApp:
 
         smakesampletime = time.perf_counter()
         common.mklogdir(args.data)
-        #common.copy_sample(args.data, ver=self.ver)
-        common.copy_sample(Path.cwd(), ver=self.ver)
         emakesampletime = time.perf_counter()
 
         if args.version:

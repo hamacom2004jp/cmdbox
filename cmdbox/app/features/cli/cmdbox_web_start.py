@@ -75,7 +75,7 @@ class WebStart(feature.UnsupportEdgeFeature):
                 dict(opt="ssl_ca_certs", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="in",
                      description_ja="SSLサーバーCA証明書ファイルを指定します。",
                      description_en="Specify the SSL server CA certificate file."),
-                dict(opt="signin_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
+                dict(opt="signin_file", type=Options.T_FILE, default=f'.{self.ver.__appid__}/user_list.yml', required=False, multi=False, hide=False, choice=None, fileio="in",
                      description_ja=f"サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.{self.ver.__appid__}/user_list.yml' を指定します。",
                      description_en=f"Specify a file containing users and passwords with which they can signin.Typically, specify '.{self.ver.__appid__}/user_list.yml'."),
                 dict(opt="session_domain", type=Options.T_STR, default=None, required=False, multi=False, hide=True, choice=None,
@@ -150,6 +150,15 @@ class WebStart(feature.UnsupportEdgeFeature):
         """
         if args.data is None:
             msg = dict(warn=f"Please specify the --data option.")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
+        if args.signin_file is None:
+            msg = dict(warn=f"Please specify the --signin_file option.")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
+        signin_file = Path(args.signin_file)
+        if signin_file is not None and not signin_file.is_file():
+            msg = dict(warn=f"Signin file '{signin_file}' is not found.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
         w = None

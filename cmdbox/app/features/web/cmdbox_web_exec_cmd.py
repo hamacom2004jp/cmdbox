@@ -7,11 +7,12 @@ from cmdbox.app.web import Web
 from fastapi import FastAPI, Depends, Request, Response, HTTPException
 from fastapi.responses import PlainTextResponse
 from starlette.datastructures import UploadFile
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 import asyncio
 import html
 import io
 import json
+import threading
 import traceback
 import sys
 
@@ -152,7 +153,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         ap.sv = None
         ap.cl = None
         ap.web = None
-        async def _exec_cmd(cmdbox_app:app.CmdBoxApp, title, opt, nothread=False):
+        async def _exec_cmd(cmdbox_app:app.CmdBoxApp, title, opt, nothread=False) -> Any:
             _stdin_body = None
             if '_stdin_body' in opt:
                 _stdin_body = opt['_stdin_body']
@@ -162,27 +163,51 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
             if ret:
                 if nothread: return output
                 self.callback_return_pipe_exec_func(web, title, output)
-                return
+                return output
 
             opt_list, file_dict = web.options.mk_opt_list(opt)
             old_stdout = sys.stdout
+            old_stdin = sys.stdin
             if 'capture_stdout' in opt and opt['capture_stdout'] and 'stdin' in opt and opt['stdin'] and _stdin_body is None:
                 output = dict(warn=f'The "stdin" and "capture_stdout" options cannot be enabled at the same time. This is because it may cause a memory squeeze.')
                 if nothread: return output
                 self.callback_return_pipe_exec_func(web, title, output)
-                return
-            old_stdin = sys.stdin
-            if _stdin_body is not None:
-                sys.stdin = io.BytesIO(_stdin_body)
-            if 'capture_stdout' in opt and opt['capture_stdout']:
-                sys.stdout = captured_output = io.StringIO()
+                return output
             ret_main = {}
             logsize = 1024
             console = common.create_console(file=old_stdout)
 
             try:
-                common.console_log(console, message=f'EXEC  - {opt_list}\n'[:logsize], highlight=(len(opt_list)<logsize-10))
-                status, ret_main, obj = cmdbox_app.main(args_list=[common.chopdq(o) for o in opt_list], file_dict=file_dict, webcall=True)
+                if _stdin_body is not None:
+                    sys.stdin = io.BytesIO(_stdin_body)
+                if 'capture_stdout' in opt and opt['capture_stdout']:
+                    sys.stdout = captured_output = io.StringIO()
+                capture_maxsize = opt['capture_maxsize'] if 'capture_maxsize' in opt else self.DEFAULT_CAPTURE_MAXSIZE
+                def to_json(o):
+                    res_json = json.loads(o)
+                    if 'output_image' in res_json and 'output_image_shape' in res_json:
+                        img_npy = convert.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
+                        img_bytes = convert.npy2imgfile(img_npy, image_type='png')
+                        res_json["output_image"] = convert.bytes2b64str(img_bytes)
+                        res_json['output_image_name'] = f"{res_json['output_image_name'].strip()}.png"
+                    return res_json
+                def _main(args_list:List[str], file_dict:Dict[str, Any]=None, webcall:bool=False, ret:List=[]):
+                    common.console_log(console, message=f'EXEC  - {opt_list}\n'[:logsize], highlight=(len(opt_list)<logsize-10))
+                    try:
+                        status, ret_main, obj = cmdbox_app.main(args_list=[common.chopdq(o) for o in opt_list], file_dict=file_dict, webcall=True)
+                        ret += [status, ret_main, obj, None]
+                    except Exception as e:
+                        ret += [1, dict(warn=f'<pre>{html.escape(traceback.format_exc())}</pre>'), None, e]
+                _ret = []
+                _th_main = threading.Thread(target=_main, args=(opt_list, file_dict, True, _ret))
+                _th_main.start()
+                _th_main.join()
+                web.logger.disabled = False # ログ出力を有効にする
+                status, ret_main, obj, _err = _ret
+                if _err is not None:
+                    output = msg = ret_main
+                    common.console_log(console, message=f'EXEC  - {msg}'[:logsize], highlight=(len(msg)<logsize-10))
+                    web.logger.warning(msg)
                 if isinstance(obj, server.Server):
                     cmdbox_app.sv = obj
                 elif isinstance(obj, client.Client):
@@ -190,10 +215,8 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 elif isinstance(obj, Web):
                     cmdbox_app.web = obj
 
-                web.logger.disabled = False # ログ出力を有効にする
-                capture_maxsize = opt['capture_maxsize'] if 'capture_maxsize' in opt else self.DEFAULT_CAPTURE_MAXSIZE
+                output = captured_output.getvalue().strip()
                 if 'capture_stdout' in opt and opt['capture_stdout']:
-                    output = captured_output.getvalue().strip()
                     output_size = len(output)
                     if output_size > capture_maxsize:
                         o = output.split('\n')
@@ -210,24 +233,17 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     output = [dict(warn='capture_stdout is off.')]
                 old_stdout.write(f'EXEC OUTPUT => {output}'[:logsize]+'\n') # コマンド実行時のアウトプットはカラーリングしない
             except Exception as e:
-                web.logger.disabled = False # ログ出力を有効にする
                 msg = f'exec_cmd error. {traceback.format_exc()}'
                 common.console_log(console, message=f'EXEC  - {msg}'[:logsize], highlight=(len(msg)<logsize-10))
                 web.logger.warning(msg)
                 output = [dict(warn=f'<pre>{html.escape(traceback.format_exc())}</pre>')]
-            sys.stdout = old_stdout
-            sys.stdin = old_stdin
+            finally:
+                web.logger.disabled = False # ログ出力を有効にする
+                sys.stdout = old_stdout
+                sys.stdin = old_stdin
             if 'stdout_log' in opt and opt['stdout_log']:
                 self.callback_console_modal_log_func(web, output)
             try:
-                def to_json(o):
-                    res_json = json.loads(o)
-                    if 'output_image' in res_json and 'output_image_shape' in res_json:
-                        img_npy = convert.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
-                        img_bytes = convert.npy2imgfile(img_npy, image_type='png')
-                        res_json["output_image"] = convert.bytes2b64str(img_bytes)
-                        res_json['output_image_name'] = f"{res_json['output_image_name'].strip()}.png"
-                    return res_json
                 try:
                     ret = [to_json(o) for o in output.split('\n') if o.strip() != '']
                 except:

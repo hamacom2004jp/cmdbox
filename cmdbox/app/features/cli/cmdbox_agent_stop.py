@@ -111,7 +111,7 @@ class AgentStop(feature.OneshotResultEdgeFeature):
             del sessions['agents'][name]
             if hasattr(runner.session_service, 'db_engine'):
                 await runner.session_service.db_engine.dispose()
-            runner.close()
+            await runner.close()
             msg = dict(success=f"Runner '{name}' stopped successfully.", end=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_SUCCESS
