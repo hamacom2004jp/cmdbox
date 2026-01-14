@@ -1,8 +1,9 @@
-from cmdbox.app import common, feature, install
+from cmdbox.app import common, feature
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import platform
 
 
 class CmdboxRedisInstall(feature.OneshotEdgeFeature):
@@ -67,10 +68,31 @@ class CmdboxRedisInstall(feature.OneshotEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        inst = install.Install(logger, self.appcls, self.ver)
-        ret = inst.redis()
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.set_debug(logger, True)
+        try:
+            ret = self.redis_install(logger)
+            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
-        if 'success' not in ret:
-            return self.RESP_WARN, ret, None
-        return self.RESP_SUCCESS, ret, None
+            if 'success' not in ret:
+                return self.RESP_WARN, ret, None
+            return self.RESP_SUCCESS, ret, None
+        finally:
+            common.set_debug(logger, False)
+
+    def redis_install(self, logger:logging.Logger) -> Dict[str, str]:
+        """
+        redisサーバーをインストールします
+
+        Args:
+            logger (logging.Logger): ロガー
+        Returns:
+            Dict[str, str]: 結果
+        """
+        if platform.system() == 'Windows':
+            return {"warn": f"install redis command is Unsupported in windows platform."}
+        cmd = f"docker pull ubuntu/redis:latest"
+        returncode, _, _cmd = common.cmd(f"{cmd}", logger, slise=-1)
+        if returncode != 0:
+            logger.warning(f"Failed to install redis-server. cmd:{_cmd}")
+            return {"error": f"Failed to install redis-server. cmd:{_cmd}"}
+        return {"success": f"Success to install redis-server. cmd:{_cmd}"}

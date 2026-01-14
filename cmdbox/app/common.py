@@ -818,7 +818,7 @@ def is_event_loop_running() -> bool:
     except RuntimeError:
         return False
 
-def exec_sync(apprun, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]) -> Tuple[int, Dict[str, Any], Any]:
+def exec_sync(apprun, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]], webcall:bool=False) -> Tuple[int, Dict[str, Any], Any]:
     """"
     指定された関数が非同期関数であっても同期的に実行します。
 
@@ -828,6 +828,7 @@ def exec_sync(apprun, logger:logging.Logger, args:argparse.Namespace, tm:float, 
         args (argparse.Namespace): コマンドライン引数
         tm (float): 処理時間
         pf (List[Dict[str, float]]): パフォーマンス情報
+        webcall (bool, optional): WebAPIからの呼出しの場合はTrue. Defaults to False.
 
     Returns:
         Tuple[int, Dict[str, Any], Any]: 戻り値のタプル。0は成功、1は失敗、2はキャンセル
@@ -839,6 +840,8 @@ def exec_sync(apprun, logger:logging.Logger, args:argparse.Namespace, tm:float, 
         ctx = []
         from cmdbox.app.auth import signin
         scope = signin.get_request_scope()
+        if not webcall:
+            return asyncio.run(apprun(logger, args, tm, pf))
         th = threading.Thread(target=_run, args=(apprun, ctx, logger, args, scope, tm, pf))
         th.start()
         th.join()

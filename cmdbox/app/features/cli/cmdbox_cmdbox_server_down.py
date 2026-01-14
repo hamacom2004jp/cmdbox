@@ -1,11 +1,12 @@
-from cmdbox.app import common, feature, install
+from cmdbox.app import common, feature
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import platform
 
 
-class CmdboxServerDown(feature.OneshotEdgeFeature):
+class CmdboxServerDown(feature.OneshotNotifyEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -67,10 +68,30 @@ class CmdboxServerDown(feature.OneshotEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        inst = install.Install(logger, self.appcls, self.ver)
-        ret = inst.server_down()
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+        common.set_debug(logger, True)
+        try:
+            ret = self.server_down(logger)
+            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
-        if 'success' not in ret:
-            return self.RESP_WARN, ret, None
-        return self.RESP_SUCCESS, ret, None
+            if 'success' not in ret:
+                return self.RESP_WARN, ret, None
+            return self.RESP_SUCCESS, ret, None
+        finally:
+            common.set_debug(logger, False)
+
+    def server_down(self, logger:logging.Logger) -> Dict[str, Any]:
+        """
+        cmdboxサーバーを停止します。
+
+        Returns:
+            dict: 処理結果
+        """
+        if platform.system() == 'Windows':
+            return {"warn": f"Up server command is Unsupported in windows platform."}
+        cmd = f"docker compose down {self.ver.__appid__}"
+        returncode, _, _cmd = common.cmd(f"{cmd}", logger, slise=-1)
+        if returncode != 0:
+            logger.warning(f"Failed to down {self.ver.__appid__}-server. cmd:{_cmd}")
+            return {"error": f"Failed to down {self.ver.__appid__}-server. cmd:{_cmd}"}
+
+        return {"success": f"Success to down {self.ver.__appid__}-server. cmd:{_cmd}"}

@@ -1,11 +1,14 @@
-from cmdbox.app import common, feature, install
+from cmdbox.app import common, feature
 from cmdbox.app.options import Options
+from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import platform
+import yaml
 
 
-class CmdboxServerUninstall(feature.OneshotEdgeFeature):
+class CmdboxServerUninstall(feature.OneshotNotifyEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -70,10 +73,50 @@ class CmdboxServerUninstall(feature.OneshotEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        inst = install.Install(logger, self.appcls, self.ver)
-        ret = inst.server_uninstall(install_tag=args.install_tag)
+        ret = self.server_uninstall(logger, install_tag=args.install_tag)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:
             return self.RESP_WARN, ret, None
         return self.RESP_SUCCESS, ret, None
+
+    def server_uninstall(self, logger:logging.Logger, install_tag:str=None):
+        """
+        cmdboxサーバーをアンインストールします。
+
+        Args:
+            logger (logging.Logger): ロガー
+            install_tag (str): インストールタグ
+
+        Returns:
+            dict: 処理結果
+        """
+        common.set_debug(logger, True)
+        try:
+            if platform.system() == 'Windows':
+                return {"warn": f"Uninstall server command is Unsupported in windows platform."}
+            install_tag = f"_{install_tag}" if install_tag is not None else ''
+            cmd = f"docker compose down {self.ver.__appid__}{install_tag}"
+            returncode, _, _cmd = common.cmd(f"{cmd}", logger, slise=-1)
+            if returncode != 0:
+                logger.warning(f"Failed to down {self.ver.__appid__}-server. cmd:{_cmd}")
+                return {"error": f"Failed to down {self.ver.__appid__}-server. cmd:{_cmd}"}
+            cmd = f"docker rmi hamacom/{self.ver.__appid__}:{self.ver.__version__}{install_tag}"
+            returncode, _, _cmd = common.cmd(f"{cmd}", logger, slise=-1)
+            if returncode != 0:
+                logger.warning(f"Failed to uninstall {self.ver.__appid__}-server. cmd:{_cmd}")
+                return {"error": f"Failed to uninstall {self.ver.__appid__}-server. cmd:{_cmd}"}
+
+            docker_compose_path = Path('docker-compose.yml')
+            if docker_compose_path.exists():
+                with open(f'docker-compose.yml', 'r+', encoding='utf-8') as fp:
+                    comp = yaml.safe_load(fp)
+                    services:dict = comp['services']
+                    services.pop(f'{self.ver.__appid__}{install_tag}', None)
+                    fp.seek(0)
+                    yaml.dump(comp, fp)
+                    fp.truncate()
+
+            return {"success": f"Success to uninstall {self.ver.__appid__}-server. cmd:{_cmd}"}
+        finally:
+            common.set_debug(logger, False)

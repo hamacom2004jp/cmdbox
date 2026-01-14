@@ -1,12 +1,17 @@
 from cmdbox.app import common, feature
 from cmdbox.app.options import Options
+from cmdbox.app.features.cli import cmdbox_cmdbox_server_down, cmdbox_cmdbox_server_up
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
-import platform
 
 
-class CmdboxServerUp(feature.OneshotNotifyEdgeFeature):
+class CmdboxServerReboot(feature.OneshotNotifyEdgeFeature):
+    def __init__(self, appcls, ver):
+        super().__init__(appcls, ver)
+        self.down = cmdbox_cmdbox_server_down.CmdboxServerDown(appcls, ver)
+        self.up = cmdbox_cmdbox_server_up.CmdboxServerUp(appcls, ver)
+
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -23,7 +28,7 @@ class CmdboxServerUp(feature.OneshotNotifyEdgeFeature):
         Returns:
             str: コマンド
         """
-        return 'server_up'
+        return 'server_reboot'
 
     def get_option(self):
         """
@@ -34,8 +39,8 @@ class CmdboxServerUp(feature.OneshotNotifyEdgeFeature):
         """
         return dict(
             use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
-            description_ja="cmdboxサーバーを起動します。",
-            description_en="Starts the cmdbox server.",
+            description_ja="cmdboxサーバーを停止します。",
+            description_en="Stops the cmdbox server.",
             choice=[
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                      description_ja="処理結果jsonの保存先ファイルを指定。",
@@ -68,33 +73,16 @@ class CmdboxServerUp(feature.OneshotNotifyEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        ret = self.server_up(logger)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-
-        if 'success' not in ret:
-            return self.RESP_WARN, ret, None
-        return self.RESP_SUCCESS, ret, None
-
-    def server_up(self, logger:logging.Logger) -> Dict[str, Any]:
-        """
-        cmdboxサーバーを起動します。
-
-        Args:
-            logger (logging.Logger): ロガー
-
-        Returns:
-            dict: 処理結果
-        """
         common.set_debug(logger, True)
         try:
-            if platform.system() == 'Windows':
-                return {"warn": f"Up server command is Unsupported in windows platform."}
-
-            cmd = f"docker compose up -d {self.ver.__appid__}"
-            returncode, _, _cmd = common.cmd(f"{cmd}", logger, slise=-1)
-            if returncode != 0:
-                logger.warning(f"Failed to up {self.ver.__appid__}-server. cmd:{_cmd}")
-                return {"error": f"Failed to up {self.ver.__appid__}-server. cmd:{_cmd}"}
-            return {"success": f"Success to up {self.ver.__appid__}-server. cmd:{_cmd}"}
+            down_ret = self.down.server_down(logger)
+            common.print_format(down_ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            if 'success' not in down_ret:
+                return self.RESP_WARN, down_ret, None
+            up_ret = self.up.server_up(logger)
+            common.print_format(up_ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            if 'success' not in up_ret:
+                return self.RESP_WARN, up_ret, None
+            return self.RESP_SUCCESS, up_ret, None
         finally:
             common.set_debug(logger, False)
