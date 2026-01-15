@@ -220,8 +220,8 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 elif isinstance(obj, Web):
                     cmdbox_app.web = obj
 
-                output = captured_output.getvalue().strip()
                 if 'capture_stdout' in opt and opt['capture_stdout']:
+                    output = captured_output.getvalue().strip()
                     output_size = len(output)
                     if output_size > capture_maxsize:
                         o = output.split('\n')
