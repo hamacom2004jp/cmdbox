@@ -191,6 +191,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                         res_json["output_image"] = convert.bytes2b64str(img_bytes)
                         res_json['output_image_name'] = f"{res_json['output_image_name'].strip()}.png"
                     return res_json
+                """
                 def _main(args_list:List[str], file_dict:Dict[str, Any]=None, webcall:bool=False, ret:List=[]):
                     common.console_log(console, message=f'EXEC  - {opt_list}\n'[:logsize], highlight=(len(opt_list)<logsize-10))
                     try:
@@ -202,12 +203,16 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 _th_main = threading.Thread(target=_main, args=(opt_list, file_dict, True, _ret))
                 _th_main.start()
                 _th_main.join()
+                """
+                status, ret_main, obj = cmdbox_app.main(args_list=[common.chopdq(o) for o in opt_list], file_dict=file_dict, webcall=True)
                 web.logger.disabled = False # ログ出力を有効にする
+                """
                 status, ret_main, obj, _err = _ret
                 if _err is not None:
                     output = msg = ret_main
                     common.console_log(console, message=f'EXEC  - {msg}'[:logsize], highlight=(len(msg)<logsize-10))
                     web.logger.warning(msg)
+                """
                 if isinstance(obj, server.Server):
                     cmdbox_app.sv = obj
                 elif isinstance(obj, client.Client):

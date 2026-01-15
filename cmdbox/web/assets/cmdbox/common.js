@@ -1278,7 +1278,7 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
         // 選択肢がある場合
         let select_html = `<select class="form-select row_content_template_select"${row.type=='mlist'?' multiple':''}></select>`;
         if (row.choice_edit){
-            select_html = `<input type="text" class="form-control row_content_key row_content_template_input">`;
+            select_html = `<input type="text" class="form-control row_content_key row_content_template_input"/>`;
             select_html+= `<datalist class="row_content_template_select"></datalist>`;
         }
         if(row.type=='dict') {
@@ -1286,7 +1286,7 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
                 elem = $(`<div class="col-${lcolsize} mb-3">` // row_content_template_dict_choice
                         +'<div class="input-group">'
                         +'<label class="input-group-text row_content_template_title">title</label>'
-                        +'<input type="text" class="form-control row_content_key row_content_template_input">'
+                        +'<input type="text" class="form-control row_content_key row_content_template_input"/>'
                         +'<label class="input-group-text">=</label>'
                         + select_html
                         +'</div></div>');

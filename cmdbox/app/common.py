@@ -865,14 +865,21 @@ def exec_svrun_sync(svrun, data_dir, logger:logging.Logger, redis_cli, msg, sess
         int: 戻り値のタプル。0は成功、1は失敗、2はキャンセル
     """
     if inspect.iscoroutinefunction(svrun):
-        def _run(svran, ctx, data_dir, logger, redis_cli, msg, sessions):
-            ctx.append(asyncio.run(svran(data_dir, logger, redis_cli, msg, sessions)))
+        if not is_event_loop_running():
+            return asyncio.run(svrun(data_dir, logger, redis_cli, msg, sessions))
+        loop = asyncio.get_running_loop()
+        task = loop.create_task(svrun(data_dir, logger, redis_cli, msg, sessions))
+        return loop.run_until_complete(task)
+        """
+        def _run(svrun, ctx, data_dir, logger, redis_cli, msg, sessions):
+            ctx.append(asyncio.run(svrun(data_dir, logger, redis_cli, msg, sessions)))
         ctx = []
         th = threading.Thread(target=_run, args=(svrun, ctx, data_dir, logger, redis_cli, msg, sessions))
         th.start()
         th.join()
         result = ctx[0] if ctx else None
         return result
+        """
     return svrun(data_dir, logger, redis_cli, msg, sessions)
 
 def get_tzoffset_str() -> str:

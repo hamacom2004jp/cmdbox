@@ -173,7 +173,7 @@ class CmdBoxApp:
                 pf.append(dict(key="app_makesample", val=f"{emakesampletime-smakesampletime:.03f}s"))
                 pf.append(dict(key="app_loggerinit", val=f"{eloggerinittime-sloggerinittime:.03f}s"))
                 self.options.audit_exec(args, logger, feat, audit_type=options.Options.AT_EVENT)
-                status, ret, obj = common.exec_sync(feat.apprun, logger, args, smaintime, pf)
+                status, ret, obj = common.exec_sync(feat.apprun, logger, args, smaintime, pf, webcall)
                 return status, ret, obj
             else:
                 msg = dict(warn=f"Unkown mode or cmd. mode={args.mode}, cmd={args.cmd}")

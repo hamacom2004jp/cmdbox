@@ -877,7 +877,7 @@ agent.list_agent = async () => {
                     const val = $("[name='mcpservers']").val();
                     $("[name='mcpservers']").empty().append('<option></option>');
                     res['data'].map(elm=>{$('[name="mcpservers"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                    config.mcpservers.forEach((v, i) => {
+                    config.mcpservers && config.mcpservers.forEach((v, i) => {
                         const e = form.find('[name="mcpservers"]')[i];
                         $(e).val(v);
                     });
@@ -889,7 +889,7 @@ agent.list_agent = async () => {
                         if (elm["name"] === $('[name="agent_name"]').val()) return;
                         $('[name="subagents"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');
                     });
-                    config.subagents.forEach((v, i) => {
+                    config.subagents && config.subagents.forEach((v, i) => {
                         const e = form.find('[name="subagents"]')[i];
                         $(e).val(v);
                     });
