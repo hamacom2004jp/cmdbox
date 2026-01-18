@@ -43,7 +43,7 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     rule: allow
   - groups: [user]             # Specify the groups to which the rule applies.
     mode: client               # Specify the "mode" as the condition for applying the rule.
-    cmds: [file_download, file_list, server_info] # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
+    cmds: [file_download, file_list, server_info, time] # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
     rule: allow                # Specifies whether or not the specified command is allowed for the specified group. The value can be allow or deny.
   - groups: [user]
     mode: agent

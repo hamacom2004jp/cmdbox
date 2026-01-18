@@ -228,3 +228,16 @@ client ( Http ) : `cmdbox -m client -c http <Option>`
     "--send_data <data>","","Specifies the data to be sent."
     "--send_verify","","Specifies the timeout before a response is received."
     "--send_timeout <time-out>","","Specifies the timeout before a response is received."
+
+client ( Time ) : `cmdbox -m client -c time <Option>`
+========================================================================================
+
+- Displays the current time at the client side.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--timedelta <tz>","","Specify the number of hours of time difference."
+
