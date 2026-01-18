@@ -518,3 +518,90 @@
     --bs-table-bg: var(--bs-tertiary-bg);
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
 }
+
+/* スペースシップモード (Agent UI) */
+[data-bs-theme="spaceship"] {
+    --bg-slate-950: #020617;
+    --bg-panel-dark: rgba(15, 23, 42, 0.9);
+    --bg-panel-translucent: rgba(15, 23, 42, 0.6);
+    --text-white-50: rgba(226, 232, 240, 0.5);
+    --accent-cyan: #00f7ff;
+    --accent-magenta: #ff00e6;
+    --accent-green: #39ff14;
+    --text-primary: #e2e8f0;
+    --font-header: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+    --area-border-color: rgba(0, 247, 255, 0.3);
+    --item-border-color: rgba(0, 247, 255, 0.2);
+    --item-border-danger-color: rgba(255, 0, 230, 0.3);
+    --item-bg-color: rgba(0, 247, 255, 0.05);
+    --item-bg-danger-color: rgba(255, 0, 230, 0.05);
+    --bs-border-radius: 0rem;
+
+    --bs-body-bg: #020617; /* ダークスレート */
+    --bs-body-color: var(--text-primary);
+    --bs-emphasis-color: #00f7ff; /* シアン */
+    --bs-secondary-color: #0f172a; /* ディープスレート */
+    --bs-secondary-bg: #0a0e27;
+    --bs-tertiary-color: #1e293b; /* ブルーグレー */
+    --bs-tertiary-bg: var(--item-bg-color);
+    --bs-link-color: #00f7ff; /* シアン */
+    --bs-link-hover-color: #39ff14; /* ライムグリーン */
+    --bs-code-color: #ff00e6; /* マゼンタ */
+    --bs-highlight-bg: #1e293b;
+    --bs-highlight-border-color: #020617;
+
+    --bs-primary: #00f7ff; /* シアン */
+    --bs-primary-rgb: 0, 247, 255;
+    --bs-primary-text: #000;
+    --bs-primary-bg-subtle: #0a3b4a;
+    --bs-primary-border-subtle: #052734;
+    --bs-secondary: #0f172a; /* ディープスレート */
+    --bs-secondary-rgb: 15, 23, 42;
+    --bs-secondary-text: #fff;
+    --bs-secondary-bg-subtle: #050811;
+    --bs-secondary-border-subtle: #020408;
+    --bs-success: #39ff14; /* ライムグリーン */
+    --bs-success-rgb: 57, 255, 20;
+    --bs-success-text: #000;
+    --bs-success-bg-subtle: #1a3d0a;
+    --bs-success-border-subtle: #0f2606;
+    --bs-info: #64b5f6; /* ライトブルー */
+    --bs-info-rgb: 100, 181, 246;
+    --bs-info-text: #000;
+    --bs-info-bg-subtle: #0d1f47;
+    --bs-info-border-subtle: #07132e;
+    --bs-warning: #ffd700; /* ゴールド */
+    --bs-warning-rgb: 255, 215, 0;
+    --bs-warning-text: #000;
+    --bs-warning-bg-subtle: #4d4300;
+    --bs-warning-border-subtle: #332b00;
+    --bs-danger: #ff6b6b; /* ライトレッド */
+    --bs-danger-rgb: 255, 107, 107;
+    --bs-danger-text: #fff;
+    --bs-danger-bg-subtle: #4d1515;
+    --bs-danger-border-subtle: #330c0c;
+    --bs-light: #1e293b; /* ブルーグレー */
+    --bs-light-rgb: 30, 41, 59;
+    --bs-light-text: #fff;
+    --bs-light-bg-subtle: #0f172a;
+    --bs-light-border-subtle: #0a0e27;
+    --bs-dark: #0f172a; /* ディープスレート */
+    --bs-dark-rgb: 15, 23, 42;
+    --bs-dark-text: #fff;
+    --bs-dark-bg-subtle: #050811;
+    --bs-dark-border-subtle: #020408;
+
+    --bs-gradient: linear-gradient(180deg, rgba(0, 247, 255, 0.1), rgba(255, 0, 230, 0.05));
+    --bs-border-width: 1px;
+    --bs-border-style: solid;
+    --bs-border-color: var(--item-border-color);
+    --bs-border-color-translucent: var(--item-border-color);
+
+    --bs-emphasis-color-rgb: var(--bs-card-title-color);
+    --bs-warning-text-emphasis: var(--bs-code-color);
+    --bs-body-color-rgb: var(--bs-body-color);
+    --bs-secondary-rgb: var(--bs-btn-color);
+    --bs-table-bg: var(--bs-tertiary-bg);
+    --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
+}

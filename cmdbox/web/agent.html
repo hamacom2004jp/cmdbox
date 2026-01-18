@@ -1,245 +1,471 @@
-<html>
+<!DOCTYPE html>
+<html lang="ja" data-bs-theme="spaceship">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style type="text/css">
-    .card-hover:hover {
-        box-shadow: 0 0 8px gray;
-    }
-    .filer-pane-divider {
-        border: 1px solid var(--bs-border-color-translucent) !important;
-        /**background-color: #F0F0F0 !important;*/
-        border-radius: 1px;
-        /*left: 50%;*/
-    }
-    .chat-container {
-        overflow-y: auto;
-        background-color: var(--bs-body-bg);
-    }
-    .message {
-        padding: 10px;
-        /**border: 1px solid var(--bs-border-color-translucent);*/
-        margin-bottom: 10px;
-        border-radius: 5px;
-        clear: both;
-    }
-    .user-message {
-        background-color: var(--bs-tertiary-bg);
-        color: var(--bs-body-color);
-        /**float: right;*/
-        border-bottom-left-radius: 24px;
-        border-bottom-right-radius: 24px;
-        border-top-left-radius: 24px;
-        border-top-right-radius: 4px;
-    }
-    .bot-message {
-        background-color: var(--bs-body-bg);
-        color: var(--bs-body-color);
-        float: left;
-    }
-    .chat-input {
-        border-radius: 16px;
-        border: 1px solid var(--bs-border-color);
-    }
-    :root {
-        --cmdbox-width: 800px;
-    }
-    pre {
-        width: var(--cmdbox-width);
-        overflow-wrap: break-all;
-    }
-    .btn_hover {
-        border-radius: 24px !important;
-    }
-    .btn_hover:hover {
-        background-color: var(--bs-tertiary-bg) !important;
-    }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- Agent CSS -->
+    <link href="assets/cmdbox/color_mode.css" rel="stylesheet">
+    <link href="assets/agent/agent.css" rel="stylesheet">
 </head>
-<body lang="ja" class="overflow-hidden p-2" style="background-color:rgb(33, 37, 41)">
-    <script type="text/javascript" src="assets/cmdbox/svgicon.js"></script>
-    <!-- ナビゲーションバー -->
-    <nav class="navbar navbar-expand-sm fixed-top p-2">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">cmdbox</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav me-auto">
-                    <!--li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="toolMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Tool
-                        </a>
-                        <ul class="dropdown-menu toolmenu" aria-labelledby="toolMenuLink">
-                            <li><a class="dropdown-item" href="#" onclick="agent.llmsetting();">LLM Setting</a></li>
-                        </ul>
-                    </li-->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="viewMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            View
-                        </a>
-                        <ul class="dropdown-menu viewmenu">
-                            <li class="nav-item dropdown">
-                                <span class="dropdown-item">
-                                    Change Dark Mode
-                                    <select class="d-inline-block change_color_mode" onchange="cmdbox.change_color_mode($(this).val());">
-                                        <option value="dark" selected>Dark</option>
-                                        <option value="midnight">midnight</option>
-                                        <option value="deepsea">deepsea</option>
-                                        <option value="verdant">verdant</option>
-                                        <option value="bumblebee">bumblebee</option>
-                                        <option value="crimson">crimson</option>
-                                        <option value="light">light</option>
-                                    </select>
-                                </span>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="aboutMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            About
-                        </a>
-                        <ul class="dropdown-menu aboutmenu" aria-labelledby="aboutMenuLink">
-                            <li><a class="dropdown-item" href="#" onclick="$(`#versions_modal`).modal(`show`);">Versions</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <div class="d-none dropdown user_info">
-                    <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle show" data-bs-toggle="dropdown" aria-expanded="true" style="fill:gray;">
-                        <svg class="m-1" width="24" height="24" viewBox="0 0 16 16">
-                            <use href="#svg_signin_ico"></use>
-                        </svg>
-                        <span class="username">UserName</span>
-                    </a>
-                    <ul class="dropdown-menu text-small shadow" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);" data-popper-placement="bottom-end">
-                        <div class="user_info_note ps-3 pe-3"></div>
-                        <li><hr class="dropdown-divider"></li>
-                    </ul>
-                </div>
+<body>
+
+<div class="layout-grid split-pane fixed-left">
+    
+    <!-- LEFT PANEL: Console / Chat Interface -->
+    <aside class="console-panel split-pane-component">
+        <div class="d-flex align-items-center console-header justify-content-between">
+            <h5 class="d-inline-block m-0 glow-text-cyan system-font">
+                <span class="d-flex align-items-center">
+                    <i class="fas fa-terminal me-2"></i>
+                    <span id="logo_title">LOG_INTERFACE</span>
+                </span>
+            </h5>
+            <div class="d-inline-block" style="font-size: 0.8rem;">
+                <span class="text-white-50">USER: <span class="glow-text-magenta" id="currentUserId">PILOT_404</span></span>
+                <br/>
+                <span class="text-white-50">STATUS: <span style="color:var(--accent-green)">ONLINE</span></span>
             </div>
         </div>
-    </nav>
-    <!-- メインコンテナ -->
-    <div id="main_container" class="container-fluid overflow-auto split-pane fixed-left" style="margin-top:66px;height:calc(100vh - 120px);">
-        <!-- 履歴側ペイン -->
-        <div id="left_container" class="split-pane-component filer-pane-left" style="width:15%;">
-            <div id="newchat_container" class="w-100 d-flex justify-content-center">
-                <button id="btn_newchat" class="btn_hover btn me-3 p-2" type="button" style="border:0px;">
-                    <svg class="bi bi-plus" width="24" height="24" fill="currentColor"><use href="#btn_plus"></use></svg>
-                    <span class="btn_text">New Chat&nbsp;</span>
+
+        <div class="chat-history" id="chatContainer">
+            <div id="messages"></div>
+        </div>
+
+        <div class="console-footer">
+            <div class="input-group input-group-sf">
+                <button id="btn_rec" class="btn btn-sf-icon" type="button" title="音声入力">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <textarea id="user_msg" class="form-control form-control-sf" placeholder="Command..." rows="1" style="border:0px;box-shadow:none;resize:none;field-sizing:content;"></textarea>
+                <button id="btn_say" class="btn btn-sf-icon" type="button" title="読み上げ切替">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <button id="btn_user_msg" class="btn btn-sf-icon" type="button">
+                    <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
-            <h6 style="float:left;">
-                Histories
-            </h6>
-            <div id="history_container" class="w-100 d-flex justify-content-center" style="height:calc(100% - 80px);overflow-y:auto;">
-                <div id="histories" class="w-100 p-2">
+
+            <div class="footer-controls">
+                <button id="btn_histories" class="btn btn-footer-action btn-footer-action-ps0" data-bs-toggle="modal" data-bs-target="#sessionModal">
+                    <i class="fas fa-history fa-lg"></i>
+                    <span>HISTORIES</span>
+                </button>
+                <button class="btn btn-footer-action btn-footer-action-ps0" data-bs-toggle="modal" data-bs-target="#memoryModal">
+                    <i class="fas fa-brain fa-lg"></i>
+                    <span>MEMORY</span>
+                </button>
+                <button class="btn btn-footer-action btn-footer-action-ps0" data-bs-toggle="modal" data-bs-target="#agent_settings_modal">
+                    <i class="fas fa-cog fa-lg"></i>
+                    <span>CONFIG</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 左右のスプリッター -->
+    <div class="split-pane-divider split-pane-divider-left"></div>
+
+    <!-- AI Core and System Info Overlay -->
+    <div class="system-location-container" style="position: absolute; top: 20px; right: 20px; text-align: right; z-index:5;" class="system-font text-white-50">
+        <div id="current_time">--:--:--</div>
+        <div id="appid_version">cmdbox</div>
+    </div>
+    <!-- Center AI Core (Default View) -->
+    <div class="ai-core-container" id="aiCoreContainer">
+        <div class="ai-core text-nowrap">
+            <span id="display_runner_name" class="core-text" style="cursor: pointer;" title="Click to select runner">
+                Click Here
+            </span>
+        </div>
+        <div class="ai-core-msg text-nowrap">
+            <span id="display_runner_msg" class="glow-text-cyan system-font" style="font-size: 0.8rem; letter-spacing: 5px; white-space:nowrap;">
+                PLEASE SELECT A AGENT RUNNER
+            </span>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: Visualizer / AI Monitor -->
+    <main class="visualizer-panel split-pane-component split-pane-right-width">
+        <!-- Document Viewer Overlay (Hidden by default) -->
+        <div class="doc-viewer-overlay" id="documentViewer">
+            <div class="doc-card">
+                <div class="doc-header">
+                    <h5 class="m-0 glow-text-cyan system-font">
+                        <i class="fas fa-database me-2"></i>
+                        <span id="docViewerTitle">DOCUMENT_TITLE</span>
+                    </h5>
+                    <button class="btn btn-sm btn-sf-icon" onclick="agentView.closeDocument()">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="doc-body" id="docViewerContent">
+                    <!-- Dynamic Content -->
+                </div>
+                <div class="p-3 border-top border-secondary bg-black bg-opacity-25 text-end">
+                     <span class="badge border border-cyan text-cyan bg-transparent system-font">SOURCE: R.A.G. DATABASE</span>
                 </div>
             </div>
         </div>
-        <!-- 左右のスプリッター -->
-        <div class="split-pane-divider filer-pane-divider" style="left:15%;"></div>
-        <!-- チャット側ペイン -->
-        <div id="right_container" class="split-pane-component chat-container " style="left:15%;">
-            <div id="message_container" class="w-100 d-flex justify-content-center" style="height:calc(100% - 80px);overflow-y:auto;">
-                <div id="messages" class="ps-2 pe-2" style="width:var(--cmdbox-width);">
-                </div>
+    </main>
+</div>
+
+<!--
+<div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content sf-modal">
+            <div class="modal-header">
+                <h5 class="modal-title glow-text-cyan system-font">EXTERNAL LINK SETUP</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="w-100 d-flex justify-content-center">
-                <div class="chat-input mt-2" style="width:800px;">
-                    <div class="chat-group w-100 p-2">
-                        <button id="btn_say" class="btn btn_hover p-1" type="button" style="border:0px;" disabled="disabled">
-                            <svg class="bi bi-say" width="24" height="24" fill="currentColor"><use href="#btn_megaphone"></use></svg>
-                        </button>
-                        <textarea id="user_msg" class="form-control d-inline-block align-middle" rows="1" style="width:calc(100% - 120px);border:0px;box-shadow:none;resize:none;field-sizing:content;"></textarea>
-                        <button id="btn_user_msg" class="btn btn_hover p-1" type="button" style="border:0px;" disabled="disabled">
-                            <svg class="bi bi-send" width="24" height="24" fill="currentColor"><use href="#btn_send"></use></svg>
-                        </button>
-                        <button id="btn_rec" class="btn btn_hover p-1" type="button" style="border:0px;" disabled="disabled">
-                            <svg class="bi bi-mic" width="24" height="24" fill="currentColor"><use href="#btn_mic"></use></svg>
-                        </button>
+            <div class="modal-body">
+                <form id="connectionForm">
+                    <div class="mb-3">
+                        <label class="form-label">API ENDPOINT</label>
+                        <input type="url" class="form-control form-control-modal" placeholder="https://api.openai.com/v1/..." id="apiEndpoint">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">AUTH KEY</label>
+                        <input type="password" class="form-control form-control-modal" placeholder="sk-..." id="apiKey">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">MODEL ID</label>
+                        <select class="form-select form-control-modal" style="background-color: var(--bg-slate-950); color: white;">
+                            <option>gpt-4-turbo</option>
+                            <option>gpt-3.5-turbo</option>
+                            <option>claude-3-opus</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">ABORT</button>
+                <button type="button" class="btn btn-outline-info btn-sm" id="saveSettingsBtn">ESTABLISH LINK</button>
+            </div>
+        </div>
+    </div>
+</div>
+-->
+
+<!-- 設定モーダル -->
+<div id="agent_settings_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content sf-modal doc-card h-100">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan system-font">Settings</h5>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body p-0 h-100 overflow-hidden">
+                <div id="settings_split_pane" class="split-pane fixed-left h-100 w-100">
+                    <!-- 左側ペイン: 設定項目リスト -->
+                    <div class="split-pane-component" style="width:200px;">
+                        <div class="list-group list-group-flush">
+                            <a href="#" class="list-group-item list-group-item-action active" data-bs-target="#agent_settings">Agent Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#llm_settings">LLM Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#mcpsv_settings">MCPSV Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#runner_settings">Runner Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#tts_settings">TTS Settings</a>
+                        </div>
+                    </div>
+                    <!-- スプリッター -->
+                    <div class="split-pane-divider" style="left:200px; border: 1px solid var(--area-border-color);"></div>
+                    <!-- 右側ペイン: 設定内容 -->
+                    <div class="split-pane-component" style="left:200px;">
+                        <div class="p-3 h-100 overflow-auto">
+                            <div id="agent_settings" class="settings-content">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">Agent Settings</h6>
+                                    <button id="btn_add_agent" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        Add Setting
+                                    </button>
+                                </div>
+                                <div id="agent_list_container" class="list-group">
+                                    <!-- Agent List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="llm_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">LLM Settings</h6>
+                                    <button id="btn_add_llm" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        Add Setting
+                                    </button>
+                                </div>
+                                <div id="llm_list_container" class="list-group">
+                                    <!-- LLM List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="mcpsv_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">MCPSV Settings</h6>
+                                    <button id="btn_add_mcpsv" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        Add Setting
+                                    </button>
+                                </div>
+                                <div id="mcpsv_list_container" class="list-group">
+                                    <!-- MCPSV List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="runner_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">Runner Settings</h6>
+                                    <button id="btn_add_runner" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        Add Setting
+                                    </button>
+                                </div>
+                                <div id="runner_list_container" class="list-group">
+                                    <!-- Runner List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="tts_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">TTS Settings</h6>
+                                </div>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Install TTS Engine</h6>
+                                        <form id="form_tts_install" class="row"></form>
+                                        <div class="mt-3 text-end">
+                                            <button id="btn_install_tts" class="btn btn-sf">Install</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card mt-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Uninstall TTS Engine</h6>
+                                        <form id="form_tts_uninstall" class="row"></form>
+                                        <div class="mt-3 text-end">
+                                            <button id="btn_uninstall_tts" class="btn btn-sf-danger">Uninstall</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <form id="filter_form" class="d-none filer_form">
-            <input name="filer_host" type="hidden" class="filer_host">
-            <input name="filer_port" type="hidden" class="filer_port">
-            <input name="filer_password" type="hidden" class="filer_password">
-            <input name="filer_svname" type="hidden" class="filer_svname">
-            <input name="filer_scope" type="hidden" class="filer_scope">
-            <input name="filer_client_data" type="hidden" class="filer_client_data">
-        </form>
-    </div>
-    <!-- versionsモーダル -->
-    <div id="versions_modal" class="modal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <form id="version_form" class="modal-content novalidate">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        Versions
-                    </h5>
-                    <button type="button" class="btn btn_window_stack">
-                        <svg width="16" height="16" fill="currentColor" class="bi bi-window-stack">
-                            <use href="#btn_window_stack"></use>
-                        </svg>
-                    </button>
-                    <button type="button" class="btn btn_window">
-                        <svg width="16" height="16" fill="currentColor" class="bi bi-window">
-                            <use href="#btn_window"></use>
-                        </svg>
-                    </button>
-                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">
-                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <ul class="nav nav-tabs version-tabs" role="tablist"></ul>
-                    <div class="tab-content version-content"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <!-- ローディングマスク -->
-    <div id="loading" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(0, 0, 0, 0.3);z-index:10000;">
-        <div class="text-center position-absolute top-50 start-50 w-100 translate-middle">
-            <div class="spinner-border text-light" role="status">
-                <span class="sr-only"></span>
-            </div>
-            <div>
-                <button type="button" class="btn btn-outline-danger mt-3 bbforce">Back by force</button>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
             </div>
         </div>
     </div>
-    <!-- フッター -->
-    <footer class="fixed-bottom text-center p-2 copyright"></footer>
-</body>
+</div>
+
+<!-- LLM追加/編集モーダル -->
+<div id="llm_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content sf-modal doc-card" style="height:auto;">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan system-font">Add/Edit LLM</h5>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form_llm_edit" class="row"></form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger me-auto" id="btn_del_llm" style="display:none;">DELETE</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_llm">SAVE</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MCPSV追加/編集モーダル -->
+<div id="mcpsv_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content sf-modal doc-card" style="height:auto;">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan system-font">Add/Edit MCPSV</h5>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form_mcpsv_edit" class="row"></form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger me-auto" id="btn_del_mcpsv" style="display:none;">DELETE</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_mcpsv">SAVE</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Agent追加/編集モーダル -->
+<div id="agent_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content sf-modal doc-card" style="height:auto;">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan system-font">Add/Edit Agent</h5>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form_agent_edit" class="row"></form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger me-auto" id="btn_del_agent" style="display:none;">DELETE</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_agent">SAVE</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Runner選択モーダル -->
+<div id="runner_select_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content sf-modal doc-card" style="height:auto;">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan system-font">Select Runner</h5>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="runner_select_list" class="list-group">
+                    <!-- Runner List Items will be injected here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Runner追加/編集モーダル -->
+<div id="runner_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content sf-modal doc-card" style="height:auto;">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan system-font">Add/Edit Runner</h5>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form_runner_edit" class="row"></form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger me-auto" id="btn_del_runner" style="display:none;">DELETE</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_runner">SAVE</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- セッションモーダル -->
+<div id="sessionModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content sf-modal doc-card" style="height:auto;">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan system-font">SESSION ARCHIVES</h5>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="sf-list-group">
+                    <!--
+                    <li class="sf-list-item">
+                        <div>
+                            <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">LOG_ID: #404-ALPHA</span>
+                            <span class="text-white-50">初期化シーケンスと役割配分テスト</span>
+                        </div>
+                        <span class="badge border border-info text-info bg-transparent">204X-05-20</span>
+                    </li>
+                    <li class="sf-list-item">
+                        <div>
+                            <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">LOG_ID: #404-BETA</span>
+                            <span class="text-white-50">異常信号の検出および緊急停止プロトコル</span>
+                        </div>
+                        <span class="badge border border-info text-info bg-transparent">204X-05-21</span>
+                    </li>
+                    -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- メモリーモーダル -->
+<div id="memoryModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content sf-modal doc-card">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-magenta system-font">MEMORY SYNC STATUS</h5>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="sf-param-grid mb-3">
+                    <div class="sf-param-box">
+                        <span class="d-block text-white-50" style="font-size: 0.8rem;">TRUST_LEVEL</span>
+                        <div class="display-6 system-font glow-text-cyan">87%</div>
+                    </div>
+                    <div class="sf-param-box">
+                        <span class="d-block text-white-50" style="font-size: 0.8rem;">SYNC_RATE</span>
+                        <div class="display-6 system-font glow-text-magenta">94.2%</div>
+                    </div>
+                </div>
+                <h6 class="glow-text-cyan system-font mt-4 mb-2"><i class="fas fa-file-alt me-2"></i>USER_PROFILE_ANALYSIS</h6>
+                <div class="p-3 border border-secondary bg-black bg-opacity-25" style="font-family: var(--font-body);">
+                    <p class="mb-2"><strong>[PREDICTION]:</strong> ユーザーは論理的な整合性よりも、直感的な判断を優先する傾向が強い。</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ローディングマスク -->
+<div id="loading" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(0, 0, 0, 0.3);z-index:10000;">
+    <div class="text-center position-absolute top-50 start-50 w-100 translate-middle">
+        <div class="spinner-border text-light" role="status">
+            <span class="sr-only"></span>
+        </div>
+        <div>
+            <button type="button" class="btn btn-danger mt-3 bbforce">Back by force</button>
+        </div>
+    </div>
+</div>
+<!-- フッター -->
+<footer class="copyright"></footer>
 <script type="text/javascript">
-    // jqueryの読込み完了までbodyの背景色を設定
-    document.querySelector(`body`).style.setProperty(`--bs-body-bg`, `#212529`);
-    document.querySelector(`body`).style.setProperty(`--bs-tertiary-bg`, `#2b3035`);
-    document.querySelector(`body`).style.setProperty(`--bs-tertiary-bg-rgb`, `43,48,53`);
-    document.querySelector(`body`).style.setProperty(`--bs-secondary-bg`, `#343a40`);
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelector(`body`).style.setProperty(`--bs-body-bg`, null);
-        document.querySelector(`body`).style.setProperty(`--bs-tertiary-bg`, null);
-        document.querySelector(`body`).style.setProperty(`--bs-tertiary-bg-rgb`, null);
-        document.querySelector(`body`).style.setProperty(`--bs-secondary-bg`, null);
-    });
+    document.getElementById('loading').classList.remove('d-none');
 </script>
-<link rel="stylesheet" href="assets/bootstrap/bootstrap.min.5.3.0.css">
-<link rel="stylesheet" href="assets/cmdbox/color_mode.css">
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Agent Logic Script -->
 <link rel="stylesheet" href="assets/split-pane/split-pane.css">
-<script type="text/javascript" src="assets/bootstrap/bootstrap.bundle.min.5.3.0.js"></script>
 <script type="text/javascript" src="assets/jquery/jquery.min.3.2.0.js"></script>
 <script type="text/javascript" src="assets/jquery-ui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="assets/jquery-resizable/jquery-resizable.min.js"></script>
 <script type="text/javascript" src="assets/split-pane/split-pane.js"></script>
+<script type="text/javascript" src="assets/cmdbox/svgicon.js"></script>
 <script type="text/javascript" src="assets/cmdbox/common.js"></script>
-<script type="text/javascript" src="assets/cmdbox/view_result.js"></script>
-<script type="text/javascript" src="assets/cmdbox/agent.js"></script>
+<script type="text/javascript" src="assets/agent/agent.js"></script>
+<script type="text/javascript" src="assets/agent/main.js"></script>
+</body>
 </html>

@@ -3,6 +3,7 @@ from cmdbox.app.auth import signin
 from cmdbox.app.features.web import cmdbox_web_exec_cmd
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Depends, HTTPException, Request, Response, WebSocket
+from fastapi.responses import HTMLResponse
 from starlette.websockets import WebSocketDisconnect
 from typing import Dict, Any, Tuple, List, Union
 import logging
@@ -13,6 +14,37 @@ import traceback
 
 class Agent(cmdbox_web_exec_cmd.ExecCmd):
     def route(self, web:Web, app:FastAPI) -> None:
+        """
+        webモードのルーティングを設定します
+
+        Args:
+            web (Web): Webオブジェクト
+            app (FastAPI): FastAPIオブジェクト
+        """
+        ondemand_load = web.logger.level == logging.DEBUG
+        if not ondemand_load:
+            if web.agent_html is not None:
+                if not web.agent_html.is_file():
+                    raise FileNotFoundError(f'agent_html is not found. ({web.agent_html})')
+                with open(web.agent_html, 'r', encoding='utf-8') as f:
+                    web.agent_html_data = f.read()
+
+        @app.get('/agent', response_class=HTMLResponse)
+        @app.post('/agent', response_class=HTMLResponse)
+        async def agent(req:Request, res:Response):
+            signin = web.signin.check_signin(req, res)
+            if signin is not None:
+                return signin
+            res.headers['Access-Control-Allow-Origin'] = '*'
+            if ondemand_load:
+                if not web.agent_html.is_file():
+                    raise HTTPException(status_code=404, detail=f'agent_html is not found. ({web.agent_html})')
+                with open(web.agent_html, 'r', encoding='utf-8') as f:
+                    web.options.audit_exec(req, res, web)
+                    return HTMLResponse(f.read())
+            else:
+                web.options.audit_exec(req, res, web)
+                return HTMLResponse(web.agent_html_data)
 
         @app.websocket('/{webapp}/chat/ws/{runner_name}')
         @app.websocket('/{webapp}/chat/ws/{runner_name}/{session_id}')
@@ -100,3 +132,26 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
         SSEの切断を示す例外クラス
         """
         pass
+
+    def toolmenu(self, web:Web) -> Dict[str, Any]:
+        """
+        ツールメニューの情報を返します
+
+        Args:
+            web (Web): Webオブジェクト
+        
+        Returns:
+            Dict[str, Any]: ツールメニュー情報
+        
+        Sample:
+            {
+                'filer': {
+                    'html': 'Filer',
+                    'href': 'filer',
+                    'target': '_blank',
+                    'css_class': 'dropdown-item'
+                    'onclick': 'alert("filer")'
+                }
+            }
+        """
+        return dict(agent=dict(html='Agent', href='agent', target='_blank', css_class='dropdown-item'))

@@ -62,7 +62,8 @@ class Web:
 
     def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None,
                  redis_host:str="localhost", redis_port:int=6379, redis_password:str=None, svname:str='server',
-                 client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None, result_html:str=None, users_html:str=None,
+                 client_only:bool=False, doc_root:Path=None, gui_html:str=None,
+                 filer_html:str=None, result_html:str=None, users_html:str=None, agent_html:str=None,
                  audit_html:str=None, assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
                  web_features_packages:List[str]=None, web_features_prefix:List[str]=[]):
         """
@@ -83,6 +84,7 @@ class Web:
             filer_html (str, optional): ファイラーのHTMLファイル. Defaults to None.
             result_html (str, optional): 結果のHTMLファイル. Defaults to None.
             users_html (str, optional): ユーザーのHTMLファイル. Defaults to None.
+            agent_html (str, optional): エージェントのHTMLファイル. Defaults to None.
             audit_html (str, optional): 監査のHTMLファイル. Defaults to None.
             assets (List[str], optional): 静的ファイルのリスト. Defaults to None.
             signin_html (str, optional): ログイン画面のHTMLファイル. Defaults to None.
@@ -115,6 +117,7 @@ class Web:
         self.result_html = Path(result_html) if result_html is not None else Path(__file__).parent.parent / 'web' / 'result.html'
         self.users_html = Path(users_html) if users_html is not None else Path(__file__).parent.parent / 'web' / 'users.html'
         self.audit_html = Path(audit_html) if audit_html is not None else Path(__file__).parent.parent / 'web' / 'audit.html'
+        self.agent_html = Path(agent_html) if agent_html is not None else Path(__file__).parent.parent / 'web' / 'agent.html'
         self.assets = []
         if assets is not None:
             if not isinstance(assets, list):
@@ -135,6 +138,7 @@ class Web:
         self.users_html_data = None
         self.audit_html_data = None
         self.assets_data = None
+        self.agent_html_data = None
         self.signin_html_data = None
         self.gui_mode = gui_mode
         self.web_features_packages = web_features_packages
@@ -173,6 +177,7 @@ class Web:
             self.logger.debug(f"web init parameter: result_html={self.result_html} -> {self.result_html.absolute() if self.result_html is not None else None}")
             self.logger.debug(f"web init parameter: users_html={self.users_html} -> {self.users_html.absolute() if self.users_html is not None else None}")
             self.logger.debug(f"web init parameter: audit_html={self.audit_html} -> {self.audit_html.absolute() if self.audit_html is not None else None}")
+            self.logger.debug(f"web init parameter: agent_html={self.agent_html} -> {self.agent_html.absolute() if self.agent_html is not None else None}")
             self.logger.debug(f"web init parameter: assets={self.assets} -> {[a.absolute() for a in self.assets] if self.assets is not None else None}")
             self.logger.debug(f"web init parameter: signin_html={self.signin_html} -> {self.signin_html.absolute() if self.signin_html is not None else None}")
             self.logger.debug(f"web init parameter: signin_file={self.signin_file} -> {self.signin_file.absolute() if self.signin_file is not None else None}")

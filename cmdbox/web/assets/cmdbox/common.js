@@ -19,6 +19,7 @@ cmdbox.change_color_mode = (color_mode) => {
     else if(color_mode == 'verdant') html.attr('data-bs-theme','verdant');
     else if(color_mode == 'bumblebee') html.attr('data-bs-theme','bumblebee');
     else if(color_mode == 'crimson') html.attr('data-bs-theme','crimson');
+    else if(color_mode == 'spaceship') html.attr('data-bs-theme','spaceship');
     else html.attr('data-bs-theme','dark');
     localStorage.setItem('color_mode', color_mode);
     if (color_mode) {
@@ -113,6 +114,15 @@ cmdbox.copyright = async () => {
     const res = await fetch('copyright', {method: 'GET'});
     if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     $('.copyright').text(await res.text());
+};
+/**
+ * バージョン情報取得
+ * @returns {object} - バージョン情報
+ */
+cmdbox.versions = async () => {
+    const res = await fetch('versions', {method: 'GET'});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+    return await res.json();
 };
 /**
  * appid表示
@@ -755,6 +765,33 @@ cmdbox.deploy_list = (target, error_func=undefined) => {
     opt['mode'] = 'client';
     opt['cmd'] = 'deploy_list';
     opt['capture_stdout'] = true;
+    cmdbox.show_loading();
+    return cmdbox.sv_exec_cmd(opt).then(res => {
+        if(!res[0] || !res[0]['success']) {
+            if (error_func) {
+                error_func(res);
+                return;
+            }
+            cmdbox.hide_loading();
+            cmdbox.message(res);
+            return;
+        }
+        if (!res[0]['success']['data']) {
+            cmdbox.hide_loading();
+            return
+        }
+        return res[0]['success'];
+    });
+};
+/**
+ * 現在時刻取得
+ * @param {function} error_func - エラー時のコールバック関数
+ * @returns {Promise} - レスポンス
+ **/
+cmdbox.current_time = (error_func=undefined) => {
+    const opt = {};
+    opt['mode'] = 'client';
+    opt['cmd'] = 'time';
     cmdbox.show_loading();
     return cmdbox.sv_exec_cmd(opt).then(res => {
         if(!res[0] || !res[0]['success']) {
