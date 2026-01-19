@@ -13,7 +13,9 @@
     --font-body: 'Rajdhani', sans-serif;
     --console-panel-width: 450px;
     --area-border-color: rgba(0, 247, 255, 0.3);
+    --area-bg-color-50: rgba(0, 247, 255, 0.5);
     --area-bg-color-10: rgba(0, 247, 255, 0.1);
+    --area-bg-color-danger-50: rgba(255, 0, 230, 0.5);
     --area-bg-color-danger-10: rgba(255, 0, 230, 0.1);
     --item-border-color: rgba(0, 247, 255, 0.2);
     --item-border-danger-color: rgba(255, 0, 230, 0.3);
@@ -145,6 +147,8 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     justify-content: center;
     text-align: center;
     box-shadow: 0 0 50px var(--area-bg-color-10);
+    transition: 1.0s;
+
 }
 .ai-core::before { /* Inner spinning ring */
     content: '';
@@ -154,6 +158,7 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     border: 4px dashed var(--accent-magenta);
     border-radius: 50%;
     animation: spin-right 10s linear infinite;
+    box-shadow: 0 0 50px var(--area-bg-color-danger-10);
 }
 .ai-core::after { /* Outer spinning ring */
     content: '';
@@ -165,6 +170,7 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     border-top: 1px solid var(--accent-cyan);
     border-bottom: 1px solid var(--accent-cyan);
     animation: spin-left 15s linear infinite;
+    box-shadow: 0 0 50px var(--area-bg-color-10);
 }
 .ai-core-msg {
     width: 300px;

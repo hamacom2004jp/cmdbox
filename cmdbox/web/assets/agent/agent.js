@@ -689,12 +689,13 @@ agentView.list_agent = async () => {
         container.html('');
         if (!res || !res.success) {
             container.html('<div class="text-danger p-3">Failed to load Agent list.</div>');
+            console.warn(res);
             return;
         }
         
         const list = res.success['data'] || [];
         if (list.length === 0) {
-            container.html('<div class="text-muted p-3">No Agent configurations found.</div>');
+            container.html('<div class="p-3">No Agent configurations found.</div>');
             return;
         }
 
@@ -862,12 +863,13 @@ agentView.list_llm = async () => {
         container.html('');
         if (!res || !res.success) {
             container.html('<div class="text-danger p-3">Failed to load LLM list.</div>');
+            console.warn(res);
             return;
         }
         
         const list = res.success['data'] || [];
         if (list.length === 0) {
-            container.html('<div class="text-muted p-3">No LLM configurations found.</div>');
+            container.html('<div class="p-3">No LLM configurations found.</div>');
             return;
         }
         const container_ul = $(`<ul class="sf-list-group"/>`).appendTo(container);
@@ -979,12 +981,13 @@ agentView.list_mcpsv = async () => {
         container.html('');
         if (!res || !res.success) {
             container.html('<div class="text-danger p-3">Failed to load MCPSV list.</div>');
+            console.warn(res);
             return;
         }
         
         const list = res.success['data'] || [];
         if (list.length === 0) {
-            container.html('<div class="text-muted p-3">No MCPSV connections found.</div>');
+            container.html('<div class="p-3">No MCPSV connections found.</div>');
             return;
         }
         const container_ul = $(`<ul class="sf-list-group"/>`).appendTo(container);
@@ -1116,12 +1119,13 @@ agentView.list_runner = async () => {
         container.html('');
         if (!res || !res.success) {
             container.html('<div class="text-danger p-3">Failed to load Runner list.</div>');
+            console.warn(res);
             return;
         }
         
         const list = res.success['data'] || [];
         if (list.length === 0) {
-            container.html('<div class="text-muted p-3">No Runner connections found.</div>');
+            container.html('<div class="p-3">No Runner connections found.</div>');
             return;
         }
 
@@ -1241,11 +1245,12 @@ agentView.show_runner_select_modal = async () => {
         container.html('');
         if (!res || !res.success) {
             container.html('<div class="text-danger p-3">Failed to load Runner list.</div>');
+            console.warn(res);
             return;
         }
         const list = res.success['data'] || [];
         if (list.length === 0) {
-            container.html('<div class="text-muted p-3">No Runner connections found.</div>');
+            container.html('<div class="p-3">No Runner connections found.</div>');
             return;
         }
         const ul = $(`<ul class="sf-list-group"/>`).appendTo(container);
@@ -1273,15 +1278,15 @@ agentView.show_runner_select_modal = async () => {
             // リストアイテムクリックでrunner選択
             li.on('click', async () => { agentView.select_runner(config.runner_name); });
         });
-        $('#runner_select_modal').modal('show');
     } catch (e) {
         console.error(e);
         container.html(`<div class="text-danger p-3">Error: ${e.message}</div>`);
+    } finally {
+        $('#runner_select_modal').modal('show');
     }
 };
 agentView.select_runner = async (runner_name) => {
     try {
-        $('.ai-core').css('box-shadow', '0 0 50px var(--area-bg-color-danger-10)');
         // display_runner_nameに選択されたrunnerの名前を表示
         $('#display_runner_name').html(`${runner_name}`);
         $('#display_runner_msg').html(`STARTING AGENT RUNNER ...`);
@@ -1293,9 +1298,9 @@ agentView.select_runner = async (runner_name) => {
         agentView.agent_runner = item_data.success;
         // TTSエンジンの起動
         await agentView.say.start();
+        cmdbox.show_loading();
         // Runnerの起動
         await agentView.exec_cmd('agent', 'start', { runner_name: runner_name }, null, false);
-        cmdbox.hide_loading();
         $('#display_runner_msg').html(`AGENT RUNNER IS READY`);
         // 送信ボタンを有効化
         agentView.btn_user_msg.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
@@ -1309,7 +1314,7 @@ agentView.select_runner = async (runner_name) => {
         agentView.ws && agentView.ws.close();
         agentView.chat(cmdbox.random_string(16));
     } finally {
-        $('.ai-core').css('box-shadow', '0 0 50px var(--area-bg-color-10)');
+        cmdbox.hide_loading();
     }
 };
 agentView.get_tts_form_def = async () => {
@@ -1435,7 +1440,7 @@ agentView.list_sessions = async (session_id) => {
     const data = res['success']['data'];
     if (session_id) return data;
     agentView.chatHistories.html('');
-    data.forEach(async (row) => {
+    data.reverse().forEach(async (row) => {
         if (!row['events'] || row['events'].length <= 0) return;
         const runner_name = row['runner_name'];
         const session_id = row['session_id'];
@@ -1522,13 +1527,6 @@ agentView.delete_session = async (session_id) => {
     });
 }
 
-
-
-
-
-//====================================================================================
-
-
 agentView.say = {};
 agentView.say.model = 'ずんだもんノーマル';
 agentView.say.start = async ()=> {
@@ -1577,6 +1575,9 @@ agentView.say.say = (tts_text) => {
         'tts_text': tts_text.replace(/<br\s*\/?>/g, '\n') // <br>タグを改行に変換
     }).then(async (data) => {
         if (!data['success']) throw data;
+        const aicore = $('.ai-core');
+        aicore.css('box-shadow', '0 0 200px var(--area-bg-color-50)');
+        aicore.css('animation', 'pulse 1.3s ease-in-out infinite');
         // 音声データを再生
         const binary_string = window.atob(data['success']['data']);
         const bytesArray  = new Uint8Array(binary_string.length);
@@ -1588,6 +1589,11 @@ agentView.say.say = (tts_text) => {
         const source = audioContext.createBufferSource();
         source.buffer = audioBuffer;
         source.connect(audioContext.destination);
+        source.onended = () => {
+            audioContext.close();
+            aicore.css('box-shadow', '');
+            aicore.css('animation', '');
+        }
         source.start(0);
     });
 };
