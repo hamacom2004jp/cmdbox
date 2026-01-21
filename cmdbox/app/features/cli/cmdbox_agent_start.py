@@ -183,7 +183,9 @@ class AgentStart(feature.OneshotResultEdgeFeature):
             )
             sessions['agents'][name] = dict(
                 name=name,
-                runner=runner
+                runner=runner,
+                tts_engine=runner_conf.get('tts_engine', None),
+                voicevox_model=runner_conf.get('voicevox_model', None)
             )
             msg = dict(success=f"Runner '{name}' started successfully.", end=True)
             redis_cli.rpush(reskey, msg)

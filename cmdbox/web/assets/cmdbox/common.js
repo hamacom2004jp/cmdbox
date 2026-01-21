@@ -794,20 +794,21 @@ cmdbox.current_time = (error_func=undefined) => {
     opt['cmd'] = 'time';
     cmdbox.show_loading();
     return cmdbox.sv_exec_cmd(opt).then(res => {
-        if(!res[0] || !res[0]['success']) {
+        const result = Array.isArray(res) ? res : [res];
+        if(!result[0] || !result[0]['success']) {
             if (error_func) {
-                error_func(res);
+                error_func(result);
                 return;
             }
             cmdbox.hide_loading();
-            cmdbox.message(res);
+            cmdbox.message(result);
             return;
         }
-        if (!res[0]['success']['data']) {
+        if (!result[0]['success']['data']) {
             cmdbox.hide_loading();
             return
         }
-        return res[0]['success'];
+        return result[0]['success'];
     });
 };
 /**

@@ -26,10 +26,23 @@
                     <span id="logo_title">LOG_INTERFACE</span>
                 </span>
             </h5>
-            <div class="d-inline-block" style="font-size: 0.8rem;">
-                <span class="text-white-50">USER: <span class="glow-text-magenta" id="currentUserId">PILOT_404</span></span>
-                <br/>
-                <span class="text-white-50">STATUS: <span style="color:var(--accent-green)">ONLINE</span></span>
+            <div class="d-none dropdown user_info" style="font-size: 0.8rem;">
+                <a href="#" class="d-block text-decoration-none dropdown-toggle show" data-bs-toggle="dropdown" aria-expanded="true">
+                    <div class="d-inline-block me-1">
+                        <svg width="24" height="24" viewBox="0 0 16 16" style="fill:var(--accent-cyan);vertical-align:inherit;">
+                            <use href="#svg_signin_ico"></use>
+                        </svg>
+                    </div>
+                    <div class="d-inline-block">
+                        <span class="text-white-50">USER: <span class="username glow-text-magenta">UserName</span></span>
+                        <br/>
+                        <span class="text-white-50">STATUS: <span style="color:var(--accent-green)">ONLINE</span></span>
+                    </div>
+                </a>
+                <ul class="dropdown-menu text-small shadow" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);" data-popper-placement="bottom-end">
+                    <div class="user_info_note ps-3 pe-3"></div>
+                    <li><hr class="dropdown-divider"></li>
+                </ul>
             </div>
         </div>
 
@@ -465,6 +478,7 @@
 <script type="text/javascript" src="assets/split-pane/split-pane.js"></script>
 <script type="text/javascript" src="assets/cmdbox/svgicon.js"></script>
 <script type="text/javascript" src="assets/cmdbox/common.js"></script>
+<script type="text/javascript" src="assets/cmdbox/view_result.js"></script>
 <script type="text/javascript" src="assets/agent/agent.js"></script>
 <script type="text/javascript" src="assets/agent/main.js"></script>
 </body>

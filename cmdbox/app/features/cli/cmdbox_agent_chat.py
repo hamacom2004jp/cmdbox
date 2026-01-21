@@ -1,6 +1,7 @@
 from cmdbox.app import common, client, feature, options
 from cmdbox.app.auth import signin
 from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.features.cli import cmdbox_tts_say
 from cmdbox.app.options import Options
 from contextlib import aclosing
 from pathlib import Path
@@ -68,6 +69,9 @@ class AgentChat(feature.ResultEdgeFeature):
                 dict(opt="message", type=Options.T_TEXT, default=None, required=True, multi=False, hide=False, choice=None,
                     description_ja="Runnerに送信するメッセージを指定します。",
                     description_en="Specify the message to send to the Runner."),
+                dict(opt="call_tts", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
+                    description_ja="TTS(Text-to-Speech)機能を実行するかどうかを指定します。",
+                    description_en="Specify whether to execute the TTS (Text-to-Speech) feature."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                     description_ja="処理結果jsonの保存先ファイルを指定。",
                     description_en="Specify the destination file for saving the processing result json."),
@@ -101,7 +105,8 @@ class AgentChat(feature.ResultEdgeFeature):
             return self.RESP_WARN, msg, None
 
         payload = dict(runner_name=args.runner_name, user_name=args.user_name, session_id=args.session_id,
-                       a2asv_apikey=args.a2asv_apikey, mcpserver_apikey=args.mcpserver_apikey, message=args.message)
+                       a2asv_apikey=args.a2asv_apikey, mcpserver_apikey=args.mcpserver_apikey, message=args.message,
+                       call_tts=args.call_tts)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -127,6 +132,7 @@ class AgentChat(feature.ResultEdgeFeature):
     async def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
                     sessions:Dict[str, Dict[str, Any]]):
         reskey = msg[1]
+        tts_engine_obj = None
         try:
             if 'agents' not in sessions:
                 sessions['agents'] = {}
@@ -138,6 +144,7 @@ class AgentChat(feature.ResultEdgeFeature):
             a2asv_apikey = payload.get('a2asv_apikey')
             mcpserver_apikey = payload.get('mcpserver_apikey')
             message = payload.get('message')
+            call_tts = payload.get('call_tts')
             if name not in sessions['agents']:
                 msg = dict(warn=f"Runner '{name}' is not running.", end=True)
                 redis_cli.rpush(reskey, msg)
@@ -179,6 +186,17 @@ class AgentChat(feature.ResultEdgeFeature):
 
             runner:Runner = sessions['agents'][name]['runner']
             content = types.Content(role='user', parts=[types.Part(text=message)])
+            tts_engine = sessions['agents'][name].get('tts_engine', None)
+            voicevox_model = sessions['agents'][name].get('voicevox_model', None)
+            enable_tts = call_tts and tts_engine and voicevox_model
+            if enable_tts:
+                try:
+                    # TTSモデルの準備
+                    tts_engine_obj = cmdbox_tts_say.TtsSay.tts_start(data_dir, tts_engine, voicevox_model)
+                except Exception as e:
+                    logger.warning(f"Failed to prepare TTS model: {e}", exc_info=True)
+                    enable_tts = False
+
             # セッションを作成する
             agent_session = await create_agent_session(runner.session_service, name, user_name, session_id=session_id)
             # チャットを実行する
@@ -186,18 +204,32 @@ class AgentChat(feature.ResultEdgeFeature):
             run_config = RunConfig(streaming_mode=StreamingMode.NONE)
             async with aclosing(runner.run_async(user_id=user_name, session_id=agent_session.id, new_message=content, run_config=run_config)) as run_iter:
                 async for event in run_iter:
-                    outputs = dict(success=dict(agent_session_id=agent_session.id))
+                    outputs = dict(success=dict(),)
+                    success = outputs['success']
+                    ids = outputs['success']['ids'] = dict()
+                    ids['agent_session_id'] = agent_session.id
+                    ids['event_id'] = event.id
+                    ids['invocation_id'] = event.invocation_id
+                    flags = outputs['success']['flags'] = dict()
                     if event.turn_complete:
-                        outputs['success']['turn_complete'] = True
+                        flags['turn_complete'] = True
                     if event.interrupted:
-                        outputs['success']['interrupted'] = True
-                    msg = self.__class__.gen_msg(event)
+                        flags['interrupted'] = True
+                    msg, is_func_call, is_func_response = self.__class__.gen_msg(event)
+                    flags['final_response'] = event.is_final_response()
+                    flags['function_call'] = is_func_call
+                    flags['function_response'] = is_func_response
                     if msg:
-                        outputs['success']['message'] = msg
+                        success['message'] = msg
                         options.Options.getInstance().audit_exec(body=dict(agent_session=agent_session.id, result=msg),
                                                                     audit_type=options.Options.AT_USER, user=user_name)
+                        if enable_tts and tts_engine_obj and not is_func_call and not is_func_response:
+                            tts_msg = re.sub(r'```json.*?```', '', msg, flags=re.DOTALL) # json表現部分を除去
+                            wav_b64 = cmdbox_tts_say.TtsSay.tts_say(tts_engine_obj, tts_msg)
+                            success['wav_b64'] = wav_b64
+
                         redis_cli.rpush(reskey, outputs)
-                        if event.is_final_response():
+                        if flags['final_response']:
                             break
             msg = dict(success=f"Chat '{name}' successfully.", end=True)
             redis_cli.rpush(reskey, msg)
@@ -209,6 +241,13 @@ class AgentChat(feature.ResultEdgeFeature):
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
+        finally:
+            if enable_tts:
+                try:
+                    # TTSモデルの停止
+                    cmdbox_tts_say.TtsSay.tts_stop(tts_engine_obj)
+                except Exception as e:
+                    logger.warning(f"Failed to stop TTS model: {e}", exc_info=True)
 
     @classmethod
     def _replace_match(cls, match_obj):
@@ -223,16 +262,20 @@ class AgentChat(feature.ResultEdgeFeature):
     def gen_msg(cls, event:Any) -> str:
         json_pattern = re.compile(r'\{.*?\}')
         msg = None
+        is_func_call = False
+        is_func_response = False
         if event.content and event.content.parts:
             msg = "\n".join([p.text for p in event.content.parts if p and p.text])
             calls = event.get_function_calls()
             if calls:
+                is_func_call = True
                 msg += '\n```json{"function_calls":'+common.to_str([dict(fn=c.name,args=c.args) for c in calls])+'}```'
             responses = event.get_function_responses()
             if responses:
+                is_func_response = True
                 msg += '\n```json{"function_responses":'+common.to_str([dict(fn=r.name, res=r.response) for r in responses])+'}```'
         elif event.actions and event.actions.escalate:
             msg = f"Agent escalated: {event.error_message or 'No specific message.'}"
         if msg:
             msg = json_pattern.sub(cls._replace_match, msg)
-        return msg
+        return msg, is_func_call, is_func_response

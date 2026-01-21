@@ -94,25 +94,33 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
             from google.genai import types
             while True:
                 outputs = None
+                call_tts = True
                 try:
                     query = await receive_text()
                     if query is None or query == '' or query == 'ping':
                         time.sleep(0.5)
                         continue
+                    if query=='call_tts_on':
+                        call_tts = True
+                        continue
+                    elif query=='call_tts_off':
+                        call_tts = False
+                        continue
 
                     web.options.audit_exec(sock, web, body=dict(agent_session=session_id, user=user_name, groups=groups, query=query))
                     opt = dict(mode='agent', cmd='chat', runner_name=runner_name, user_name=user_name,
-                            session_id=session_id, mcpserver_apikey=mcpserver_apikey, a2asv_apikey=a2asv_apikey, message=query)
+                            session_id=session_id, mcpserver_apikey=mcpserver_apikey, a2asv_apikey=a2asv_apikey,
+                            message=query, call_tts=call_tts)
                     ret = await self.exec_cmd(sock, res, web, '', opt, True, self.appcls)
                     if 'success' not in ret:
                         yield common.to_str(ret)
                         continue
                     for result in ret['success']:
-                        agent_session_id = result.get('agent_session_id', None)
+                        agent_session_id = result.get('ids', {}).get('agent_session_id', None)
                         msg = result.get('message', '')
-                        outputs = dict(message=msg)
+                        #outputs = dict(message=msg, wav_b64=result.get('wav_b64', None))
                         web.options.audit_exec(sock, web, body=dict(agent_session=agent_session_id, result=msg))
-                        yield common.to_str(outputs)
+                        yield common.to_str(result)
                 except WebSocketDisconnect:
                     web.logger.warning('chat: websocket disconnected.')
                     break

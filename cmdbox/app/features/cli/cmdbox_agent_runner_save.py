@@ -1,6 +1,6 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, redis_client
-from cmdbox.app.features.cli import cmdbox_tts_start
+from cmdbox.app.features.cli import cmdbox_tts_say
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -83,7 +83,7 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature):
                      description_ja="使用するTTSエンジンを指定します。",
                      description_en="Specify the TTS engine to use."),
                 dict(opt="voicevox_model", type=Options.T_STR, default=None, required=False, multi=False, hide=False,
-                     choice=sorted([v['select'] for v in cmdbox_tts_start.TtsStart.VOICEVOX_STYLE.values()]),
+                     choice=sorted([v['select'] for v in cmdbox_tts_say.TtsSay.VOICEVOX_STYLE.values()]),
                      choice_edit=True,
                      description_ja="使用するTTSエンジンのモデルを指定します。",
                      description_en="Specify the model of the TTS engine to use."),

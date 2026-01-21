@@ -528,6 +528,43 @@ a.list-group-item.active {
     background: var(--item-bg-danger-color);
 }
 
+/* Message Thinking State */
+.message-thinking {
+    opacity: 0.7;
+    font-size: 0.9em;
+}
+
+.message-thinking .msg-content {
+    color: var(--text-white-50);
+    font-style: italic;
+    animation: thinking-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes thinking-pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+/* Message Toggle Button */
+.btn-toggle-message {
+    background: none;
+    border: none;
+    color: var(--accent-cyan);
+    padding: 0 8px 0 0;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: color 0.2s;
+    font-weight: bold;
+}
+
+.btn-toggle-message:hover {
+    color: var(--accent-magenta);
+}
+
+.msg-content.collapsed {
+    display: none;
+}
+
 /* Mobile adjustment */
 @media (max-width: 768px) {
     .layout-grid { flex-direction: column; height: auto; overflow: visible; }

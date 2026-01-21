@@ -1,7 +1,7 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, redis_client
 from cmdbox.app.options import Options
-from cmdbox.app.features.cli import cmdbox_tts_start
+from cmdbox.app.features.cli import cmdbox_tts_say
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -124,7 +124,7 @@ class TtsList(feature.UnsupportEdgeFeature):
             if tts_engine == 'voicevox':
                 from voicevox_core.blocking import Onnxruntime, OpenJtalk, Synthesizer, VoiceModelFile
                 result = []
-                for key, val in cmdbox_tts_start.TtsStart.VOICEVOX_STYLE.items():
+                for key, val in cmdbox_tts_say.TtsSay.VOICEVOX_STYLE.items():
                     result.append(dict(
                         engine='voicevox',
                         model=val['select'],

@@ -49,13 +49,6 @@ agentView.initView = () => {
     agentView.btn_histories = $('#btn_histories');
     agentView.chat_reconnect_count = 0;
 
-    // ユーザー情報の取得と表示
-    cmdbox.user_info().then(async (user) => {
-        if (user) {
-            $('#currentUserId').text(user['name']);
-            agentView.user = user;
-        }
-    });
     // バージョン情報の取得と表示
     cmdbox.versions().then((versions) => {
         const version_html = `${versions['appid']}-${versions['version']}`;
@@ -238,20 +231,22 @@ agentView.initView = () => {
         agentView.uninstall_tts();
     });
 
-    /**
-    // 設定保存ボタン
-    agentView.saveSettingsBtn.off('click').on('click', () => {
-        const modalEl = $('#settingsModal');
-        const modal = bootstrap.Modal.getInstance(modalEl);
-        modal.hide();
-        agentView.addMessage("接続設定が更新されました。再同期中...", "agent");
-    });*/
-    $('.modal-dialog').draggable({cursor:'move',cancel:'button, .modal-body, .modal-footer'});
-    const txt = agentView.create_agent_message(cmdbox.random_string(16));
+    // ユーザー情報の取得
+    cmdbox.user_info().then((user) => {
+        agentView.user = user;
+    });
+
+    // 初期メッセージ表示
+    const message_id = cmdbox.random_string(16);
+    const txt = agentView.create_agent_message(message_id);
     agentView.format_agent_message(txt,
         `インターフェースの初期化完了。<br/>` +
         `右側エリアの「Click Here」をクリックしてAgent Runnerを選択してください。<br/>` + 
         `Agent Runnerが登録されていない場合は「CONFIG」をクリックして設定を追加してください。`);
+    $(`#${message_id} .btn-toggle-message`).remove();
+
+    // モーダルのドラッグ対応
+    $('.modal-dialog').draggable({cursor:'move',cancel:'button, .modal-body, .modal-footer'});
     agentView.scrollToBottom();
 }
 
@@ -426,7 +421,8 @@ agentView.chat = (session_id) => {
     // エージェントからのメッセージ受信時の処理
     agentView.ws.onmessage = async (event) => {
         const packet = JSON.parse(event.data);
-        if (!agentView.message_id || $(`#${agentView.message_id}`).length <= 0) {
+        let msg_container = $(`#${agentView.message_id}`);
+        if (!agentView.message_id || msg_container.length <= 0) {
             // エージェント側の表示枠が無かったら追加
             agentView.message_id = cmdbox.random_string(16);
         }
@@ -445,9 +441,41 @@ agentView.chat = (session_id) => {
             return;
         }
         console.log(packet);
-        let txt = agentView.create_agent_message(agentView.message_id);
-        await agentView.format_agent_message(txt, packet.message);
-        agentView.say.say(packet.message);
+        if (packet.flags && !packet.flags['final_response']) {
+            // 「考え中」を表示
+            if (!agentView.message_id) {
+                agentView.message_id = cmdbox.random_string(16);
+                msg_container = $(`#${agentView.message_id}`);
+            }
+            let msg_content = agentView.create_agent_message(agentView.message_id);
+            msg_container = $(`#${agentView.message_id}`);
+            msg_content.addClass('message-thinking');
+            if (msg_content.children().length > 0) {
+                msg_container.append('<div class="msg-content message-thinking"></div>');
+                msg_content = agentView.create_agent_message(agentView.message_id);
+                msg_container = $(`#${agentView.message_id}`);
+            }
+            if (!msg_content.hasClass('collapsed')) {
+                msg_content.addClass('collapsed');
+                msg_container.find('.btn-toggle-message').text('▶');
+            }
+            await agentView.format_agent_message(msg_content, packet.message);
+            agentView.scrollToBottom();
+            return;
+        }
+        let msg_content = agentView.create_agent_message(agentView.message_id);
+        msg_container = $(`#${agentView.message_id}`);
+        if (msg_content.children().length > 0) {
+            msg_container.append('<div class="msg-content"></div>');
+            msg_content = agentView.create_agent_message(agentView.message_id);
+            msg_container = $(`#${agentView.message_id}`);
+        }
+        await agentView.format_agent_message(msg_content, packet.message);
+        if (msg_container.find('.message-thinking').length <= 0) {
+            msg_container.find('.btn-toggle-message').remove();
+        }
+        msg_container.find('.spinner-grow').remove();
+        await agentView.say.play(packet.wav_b64);
         agentView.message_id = null;
     };
     agentView.ws.onopen = () => {
@@ -489,21 +517,40 @@ agentView.create_user_message = (msg) => {
     agentView.scrollToBottom();
 };
 agentView.create_agent_message = (message_id) => {
-    if ($(`#${message_id}`).length > 0) {
-        return $(`#${message_id}`);
+    const msg_content = $(`#${message_id} .msg-content`);
+    if (msg_content.length > 0) {
+        return msg_content.last();
     }
-    const msgDiv = $(`<div id="${message_id}"/>`).appendTo(agentView.chatMessages);
-    msgDiv.addClass(`message message-agent`);
+    if ($(`#${message_id}`).length <= 0) {
+        $(`<div id="${message_id}"/>`).appendTo(agentView.chatMessages);
+    }
+    const msgDiv = $(`#${message_id}`).addClass(`message message-agent`);
     msgDiv.html(`
-        <span class="msg-label msg-label-agent">${agentView.agent_runner ? agentView.agent_runner['agent'] : 'SYSTEM'}</span>
+        <span class="msg-label msg-label-agent">
+            <button class="btn-toggle-message" title="Toggle message">▼</button>
+            ${agentView.agent_runner ? agentView.agent_runner['agent'] : 'SYSTEM'}
+        </span>
         <div class="msg-content"></div>
     `);
+    msgDiv.find('.btn-toggle-message').off('click').on('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const content = msgDiv.find('.message-thinking');
+        const btn = msgDiv.find('.btn-toggle-message');
+        if (content.hasClass('collapsed')) {
+            content.removeClass('collapsed');
+            btn.text('▼');
+        } else {
+            content.addClass('collapsed');
+            btn.text('▶');
+        }
+    });
     agentView.aiCoreText.css("textShadow", "0 0 30px #fff");
     setTimeout(() => {
         agentView.aiCoreText.css("textShadow", "0 0 20px var(--accent-cyan)");
     }, 500);
     agentView.scrollToBottom();
-    return $(`#${message_id} .msg-content`);
+    return $(`#${message_id} .msg-content`).last();
 }
 agentView.format_agent_message =  async (txt, message) => {
     // メッセージが空の場合は何もしない
@@ -629,8 +676,7 @@ agentView.handleSend = () => {
 
 agentView.disabled = false;
 agentView.exec_cmd = async (mode, cmd, opt={}, error_func=null, loading=true) => {
-    const user = await cmdbox.user_info();
-    if(!user) {
+    if(!agentView.user) {
         if (!agentView.disabled) {
             cmdbox.message({'error':'User information could not be retrieved. AI features are unavailable.'});
             agentView.disabled = true;
@@ -639,7 +685,7 @@ agentView.exec_cmd = async (mode, cmd, opt={}, error_func=null, loading=true) =>
         return;
     }
     const opt_def = cmdbox.get_server_opt(false, $('#filer_form'));
-    opt = {...opt_def, ...opt, 'mode':mode, 'cmd':cmd, 'user_name':user['name'], 'capture_stdout':true};
+    opt = {...opt_def, ...opt, 'mode':mode, 'cmd':cmd, 'user_name':agentView.user['name'], 'capture_stdout':true};
     if (loading) cmdbox.show_loading();
     return cmdbox.sv_exec_cmd(opt).then(res => {
         if(res && Array.isArray(res) && res.length <=0) {
@@ -1148,7 +1194,11 @@ agentView.list_runner = async () => {
                 <li class="sf-list-item">
                     <div>
                         <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.runner_name}</span>
-                        <span class="text-white-50">Agent: ${config.agent || 'None'}</span>
+                        <span class="text-white-50">
+                            Agent: ${config.agent || 'None'},
+                            Session Store: ${config.session_store_type || 'None'},
+                            VOICEVOX: ${config.voicevox_model || 'N/A'}
+                        </span>
                     </div>
                 </li>
             `).appendTo(container_ul);
@@ -1274,7 +1324,7 @@ agentView.show_runner_select_modal = async () => {
             const body = $(`<span class="text-white-50"></span>`).appendTo(div1);
             body.html(`Agent: ${config.agent || 'None'},
                        Session Store: ${config.session_store_type || 'None'},
-                       voicevox_model: ${config.voicevox_model || 'None'}`);
+                       VOICEVOX: ${config.voicevox_model || 'None'}`);
             // リストアイテムクリックでrunner選択
             li.on('click', async () => { agentView.select_runner(config.runner_name); });
         });
@@ -1292,12 +1342,12 @@ agentView.select_runner = async (runner_name) => {
         $('#display_runner_msg').html(`STARTING AGENT RUNNER ...`);
         cmdbox.show_loading();
         const item_data = await agentView.exec_cmd('agent', 'runner_load',{ runner_name: runner_name }, null, false);
-        if (item_data && item_data.success) {
+        /*if (item_data && item_data.success) {
             agentView.say.model = item_data.success.voicevox_model || 'ずんだもんノーマル';
-        }
+        }*/
         agentView.agent_runner = item_data.success;
         // TTSエンジンの起動
-        await agentView.say.start();
+        //await agentView.say.start();
         cmdbox.show_loading();
         // Runnerの起動
         await agentView.exec_cmd('agent', 'start', { runner_name: runner_name }, null, false);
@@ -1575,25 +1625,30 @@ agentView.say.say = (tts_text) => {
         'tts_text': tts_text.replace(/<br\s*\/?>/g, '\n') // <br>タグを改行に変換
     }).then(async (data) => {
         if (!data['success']) throw data;
-        const aicore = $('.ai-core');
-        aicore.css('box-shadow', '0 0 200px var(--area-bg-color-50)');
-        aicore.css('animation', 'pulse 1.3s ease-in-out infinite');
-        // 音声データを再生
-        const binary_string = window.atob(data['success']['data']);
-        const bytesArray  = new Uint8Array(binary_string.length);
-        for (let i = 0; i < binary_string.length; i++) {
-            bytesArray[i] = binary_string.charCodeAt(i);
-        }
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const audioBuffer = await audioContext.decodeAudioData(bytesArray.buffer);
-        const source = audioContext.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(audioContext.destination);
-        source.onended = () => {
-            audioContext.close();
-            aicore.css('box-shadow', '');
-            aicore.css('animation', '');
-        }
-        source.start(0);
+        await agentView.say.play(data['success']['data']);
     });
+};
+agentView.say.play = async (wav_b64) => {
+    if (!wav_b64 || wav_b64.length <= 0) return;
+    // 発話中のエフェクトを表示
+    const aicore = $('.ai-core');
+    aicore.css('box-shadow', '0 0 200px var(--area-bg-color-50)');
+    aicore.css('animation', 'pulse 1.3s ease-in-out infinite');
+    // 音声データを再生
+    const binary_string = window.atob(wav_b64);
+    const bytesArray  = new Uint8Array(binary_string.length);
+    for (let i = 0; i < binary_string.length; i++) {
+        bytesArray[i] = binary_string.charCodeAt(i);
+    }
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const audioBuffer = await audioContext.decodeAudioData(bytesArray.buffer);
+    const source = audioContext.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(audioContext.destination);
+    source.onended = () => {
+        audioContext.close();
+        aicore.css('box-shadow', '');
+        aicore.css('animation', '');
+    }
+    source.start(0);
 };
