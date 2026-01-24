@@ -10,7 +10,7 @@ import json
 import re
 
 
-class AgentSessionList(feature.ResultEdgeFeature):
+class AgentSessionList(cmdbox_agent_chat.AgentChat):
 
     def get_mode(self) -> str:
         return 'agent'
@@ -113,12 +113,13 @@ class AgentSessionList(feature.ResultEdgeFeature):
             name = payload.get('runner_name')
             session_id = payload.get('session_id')
             user_name = payload.get('user_name')
-            if name not in sessions['agents']:
-                out = dict(warn=f"Runner '{name}' is not running.", end=True)
-                redis_cli.rpush(reskey, out)
-                return self.RESP_WARN
-            runner = sessions['agents'][name]['runner']
-            session_service = runner.session_service
+            #if name not in sessions['agents']:
+            #    out = dict(warn=f"Runner '{name}' is not running.", end=True)
+            #    redis_cli.rpush(reskey, out)
+            #    return self.RESP_WARN
+            #runner = sessions['agents'][name]['runner']
+            runner_conf, agent_conf, llm_conf, mcpsv_confs = self.load_conf(name, data_dir, logger)
+            session_service = self.create_session_service(data_dir, logger, runner_conf)
             if session_id is None:
                 sessions = await session_service.list_sessions(app_name=name, user_id=user_name)
                 data = []

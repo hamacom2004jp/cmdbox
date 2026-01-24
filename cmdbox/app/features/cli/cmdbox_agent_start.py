@@ -125,6 +125,25 @@ class AgentStart(feature.OneshotResultEdgeFeature):
                     mcpsv_confs.append(mcpsv_conf)
         return mcpsv_confs
 
+    def load_conf(self, runner_name:str, data_dir:Path, logger:logging.Logger):
+        runner_conf_path = data_dir / ".agent" / f"runner-{runner_name}.json"
+        if not runner_conf_path.exists():
+            raise FileNotFoundError(f"Specified runner configuration '{runner_name}' not found on server at '{str(runner_conf_path)}'.")
+        with runner_conf_path.open('r', encoding='utf-8') as f:
+            runner_conf = json.load(f)
+
+        agent_conf = self._load_agent_config(data_dir, runner_conf['agent'])
+        if agent_conf.get('llm', None) is not None:
+            llm_conf = self._load_llm_config(data_dir, agent_conf['llm'])
+        else:
+            llm_conf = {}
+
+        if agent_conf.get('mcpservers', None) is not None:
+            mcpsv_confs = self._load_mcpsv_config(data_dir, agent_conf['mcpservers'])
+        else:
+            mcpsv_confs = []
+        return runner_conf, agent_conf, llm_conf, mcpsv_confs
+
     async def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
                     sessions:Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
@@ -139,40 +158,7 @@ class AgentStart(feature.OneshotResultEdgeFeature):
                 redis_cli.rpush(reskey, msg)
                 return self.RESP_WARN
 
-            runner_conf_path = data_dir / ".agent" / f"runner-{name}.json"
-            if not runner_conf_path.exists():
-                msg = dict(warn=f"Specified runner configuration '{name}' not found on server at '{str(runner_conf_path)}'.", end=True)
-                redis_cli.rpush(reskey, msg)
-                return self.RESP_WARN
-            with runner_conf_path.open('r', encoding='utf-8') as f:
-                runner_conf = json.load(f)
-
-            try:
-                agent_conf = self._load_agent_config(data_dir, runner_conf['agent'])
-            except Exception as e:
-                msg = dict(warn=str(e), end=True)
-                redis_cli.rpush(reskey, msg)
-                return self.RESP_WARN
-
-            try:
-                if agent_conf.get('llm', None) is not None:
-                    llm_conf = self._load_llm_config(data_dir, agent_conf['llm'])
-                else:
-                    llm_conf = {}
-            except Exception as e:
-                msg = dict(warn=str(e), end=True)
-                redis_cli.rpush(reskey, msg)
-                return self.RESP_WARN
-
-            try:
-                if agent_conf.get('mcpservers', None) is not None:
-                    mcpsv_confs = self._load_mcpsv_config(data_dir, agent_conf['mcpservers'])
-                else:
-                    mcpsv_confs = []
-            except Exception as e:
-                msg = dict(warn=str(e), end=True)
-                redis_cli.rpush(reskey, msg)
-                return self.RESP_WARN
+            runner_conf, agent_conf, llm_conf, mcpsv_confs = self.load_conf(name, data_dir, logger)
 
             agent = self.create_agent(logger, data_dir, False, agent_conf, llm_conf, mcpsv_confs)
             from google.adk.runners import Runner

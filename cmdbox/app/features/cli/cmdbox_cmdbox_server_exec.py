@@ -7,7 +7,7 @@ import logging
 import platform
 
 
-class CmdboxServerDown(feature.OneshotNotifyEdgeFeature):
+class CmdboxServerExec(feature.OneshotNotifyEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -24,7 +24,7 @@ class CmdboxServerDown(feature.OneshotNotifyEdgeFeature):
         Returns:
             str: コマンド
         """
-        return 'server_down'
+        return 'server_exec'
 
     def get_option(self):
         """
@@ -35,9 +35,15 @@ class CmdboxServerDown(feature.OneshotNotifyEdgeFeature):
         """
         return dict(
             use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
-            description_ja="cmdboxサーバーを停止します。",
-            description_en="Stops the cmdbox server.",
+            description_ja="cmdboxサーバーコンテナ内で任意のコマンドを実行します。",
+            description_en="Execute any command within the cmdbox server container.",
             choice=[
+                dict(opt="command", type=Options.T_STR, default=False, required=True, multi=False, hide=False, choice=None,
+                     description_ja="実行するコマンドを指定します。",
+                     description_en="Specify the command to execute."),
+                dict(opt="compose_path", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="in",
+                     description_ja="`docker-compose.yml` ファイルを指定します。",
+                     description_en="Specify the `docker-compose.yml` file."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                      description_ja="処理結果jsonの保存先ファイルを指定。",
                      description_en="Specify the destination file for saving the processing result json."),
@@ -71,7 +77,7 @@ class CmdboxServerDown(feature.OneshotNotifyEdgeFeature):
         """
         common.set_debug(logger, True)
         try:
-            ret = self.server_down(logger)
+            ret = self.server_exec(logger, args.command, args.compose_path)
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
             if 'success' not in ret:
@@ -80,38 +86,45 @@ class CmdboxServerDown(feature.OneshotNotifyEdgeFeature):
         finally:
             common.set_debug(logger, False)
 
-    def server_down(self, logger:logging.Logger, compose_path:str=None) -> Dict[str, Any]:
+    def server_exec(self, logger:logging.Logger, command:str=None, compose_path:str=None) -> Dict[str, Any]:
         """
-        cmdboxサーバーを停止します。
+        cmdboxサーバーコンテナ内で任意のコマンドを実行します。
 
         Args:
-            logger (logging.Logger): ロガー
+            command (str): 実行するコマンド
             compose_path (str): docker-compose.ymlファイルパス
+            logger (logging.Logger): ロガー
+
         Returns:
             dict: 処理結果
         """
         common.set_debug(logger, True)
         try:
             if platform.system() == 'Windows':
-                return {"warn": f"Down server command is Unsupported in windows platform."}
+                return {"warn": f"Server exec command is Unsupported in windows platform."}
 
             container = self.ver.__appid__
             newenv = common.newenv(container, self.ver)
-            if Path(f'{newenv["CWD"]}{container}/scripts/down.sh').exists():
-                returncode, _, cmd = common.cmd(f'bash {newenv["CWD"]}{container}/scripts/down.sh', logger=logger, newenv=newenv)
+            if Path(f'{newenv["CWD"]}{container}/scripts/exec.sh').exists():
+                if not compose_path:
+                    logger.warning("compose_path is specified but not used because down.sh exists.")
+                returncode, _, cmd = common.cmd(f'bash {newenv["CWD"]}{container}/scripts/exec.sh {command}', logger=logger, newenv=newenv)
                 if returncode != 0:
-                    logger.error(f"Failed to down {container}. command: {cmd}")
-                    return {"error": f"Failed to down {container}. command: {cmd}"}
-                return {"success": f"Success to down {container}. cmd:{cmd}"}
+                    logger.error(f"Failed to exec {container}. command: {cmd}")
+                    return {"error": f"Failed to exec {container}. command: {cmd}"}
+                return {"success": f"Success to exec {container}. cmd:{cmd}"}
             else:
-                returncode, _, cmd = common.cmd(f"docker stop {container}", logger=logger, slise=-1)
+                if not compose_path:
+                    compose_path = 'docker-compose.yml'
+                docker_compose_path = Path(compose_path)
+                if not docker_compose_path.exists():
+                    logger.error(f"compose_path file not found: {docker_compose_path}")
+                    return {"error": f"compose_path file not found: {docker_compose_path}"}
+                cmd = f'docker compose -f {docker_compose_path} exec {container} {command}'
+                returncode, _, cmd = common.cmd(cmd, logger=logger, slise=-1)
                 if returncode != 0:
-                    logger.warning(f"Failed to stop {container}. cmd:{cmd}")
-                    return {"error": f"Failed to stop {container}. cmd:{cmd}"}
-                returncode, _, cmd = common.cmd(f"docker rm -f {container}", logger=logger, slise=-1)
-                if returncode != 0:
-                    logger.warning(f"Failed to rm {container}. cmd:{cmd}")
-                    return {"error": f"Failed to rm {container}. cmd:{cmd}"}
-                return {"success": f"Success to down {container}. cmd:{cmd}"}
+                    logger.warning(f"Failed to exec {container}. cmd:{cmd}")
+                    return {"error": f"Failed to exec {container}. cmd:{cmd}"}
+                return {"success": f"Success to exec {container}. cmd:{cmd}"}
         finally:
             common.set_debug(logger, False)

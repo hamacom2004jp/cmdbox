@@ -383,8 +383,11 @@ class TtsSay(feature.ResultEdgeFeature):
         Args:
             tts_engine_obj (Dict): TTSエンジンオブジェクト
         """
-        from voicevox_core.blocking import Synthesizer
-        if tts_engine_obj is None:
-            raise ValueError("tts_engine_obj is required.")
-        synthesizer:Synthesizer = tts_engine_obj['synthesizer']
-        synthesizer.unload_voice_model(tts_engine_obj['model_id'])
+        try:
+            from voicevox_core.blocking import Synthesizer
+            if tts_engine_obj is None:
+                raise ValueError("tts_engine_obj is required.")
+            synthesizer:Synthesizer = tts_engine_obj['synthesizer']
+            synthesizer.unload_voice_model(tts_engine_obj['model_id'])
+        except Exception:
+            pass

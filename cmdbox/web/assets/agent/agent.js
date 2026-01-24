@@ -1,32 +1,3 @@
-// Define mock documents database
-const ragDatabase = {
-    'doc_01': {
-        title: 'SHIP_LOG_7882.txt',
-        content: `
-            <h6 class="text-info mb-3">日付: 204X-05-22 // 記録者: LeVi</h6>
-            <p>機関室のメインパワーラインにて、意図的な切断痕を発見。手口から見て、この船の構造を熟知している者の犯行と思われる。</p>
-            <p>容疑者候補として、以下の3名が挙げられる。</p>
-            <ul>
-                <li>エンジニア: Setsu</li>
-                <li>ドクター: Jonas</li>
-                <li>客員: SQ</li>
-            </ul>
-            <p class="text-warning">警告: このログは一部破損しており、信頼性は80%程度である。</p>
-        `
-    },
-    'doc_02': {
-        title: 'GNOSIA_SCAN_RESULT_ALPHA.dat',
-        content: `
-            <h6 class="text-info mb-3">スキャン対象: 居住区画B</h6>
-            <p>バックグラウンドノイズに微細な歪みを検知。これはグノーシア特有の精神汚染波長と一致する。</p>
-            <div class="alert alert-dark border border-danger text-danger mt-3">
-                <i class="fas fa-exclamation-triangle me-2"></i>HIGH RISK ALERT
-            </div>
-            <p>当該区画に最後に立ち入ったのは「ラキオ」である記録が残っている。</p>
-        `
-    }
-};
-
 const agentView = {};
 agentView.initView = () => {
     // --- 各コンテナのエレメント取得 ---
@@ -251,17 +222,14 @@ agentView.initView = () => {
 }
 
 // Function to open document viewer
-agentView.showDocument = (docId) => {
-    const doc = ragDatabase[docId];
-    if (doc) {
-        // Update content
-        agentView.docViewerTitle.text(doc.title);
-        agentView.docViewerContent.html(doc.content);
+agentView.showDocument = (title, content) => {
+    // Update content
+    agentView.docViewerTitle.text(title);
+    agentView.docViewerContent.html(content);
 
-        // Animate Transitions
-        agentView.aiCoreContainer.addClass('dimmed');
-        agentView.documentViewer.addClass('active');
-    }
+    // Animate Transitions
+    agentView.aiCoreContainer.addClass('dimmed');
+    agentView.documentViewer.addClass('active');
 };
 
 // Function to close document viewer
@@ -591,9 +559,23 @@ agentView.format_agent_message =  async (txt, message) => {
             txt.append(`<span id="${rand}"/>`);
             agentView.recursive_json_parse(jobj);
             render_result_func(txt.find(`#${rand}`), jobj, 256);
+            const th = txt.find(`.table .th:first`);
+            if (th.length > 0) {
+                const title = th.html();
+                const content = th.parents('.table').parent().html();
+                const span = $(`<span class="doc-link ms-1"></span>`).prependTo(th);
+                span.html('<i class="fas fa-file-code me-1"></i>');
+                span.off('click').on('click', () => {
+                    agentView.showDocument(title, content);
+                });
+            }
         } catch (e) {
-            const msg = message.replace(/\n/g, '<br/>');
-            txt.append(msg);
+            try {
+                const msg = message.replace(/\n/g, '<br/>');
+                txt.append(msg);
+            } catch (e) {
+                txt.append(`${e}`);
+            }
             break;
         }
     }
@@ -632,46 +614,6 @@ agentView.recursive_json_parse = (jobj) => {
             agentView.recursive_json_parse(jobj[key]);
         }
     });
-};
-/**
- * チャットメッセージの送信処理
- * @returns 
- */
-agentView.handleSend = () => {
-    // agent_runnerが設定されていない場合は実行しない
-    if (!agentView.agent_runner) {
-        cmdbox.message({'warn': 'Agent runner is not started. Please select a runner first.'});
-        return;
-    }
-    const text = agentView.user_msg.val().trim();
-    if (!text) return;
-    
-    agentView.addMessage(text, 'user');
-    agentView.user_msg.val('');
-    
-    // Mock Response Logic
-    setTimeout(() => {
-        // Demo Trigger: If user asks for report, show RAG link
-        if (text.includes("報告") || text.includes("report") || text.includes("現状")) {
-            const responseHtml = `
-                データベースを検索しました。関連する重要文書が見つかりました。<br>
-                以下のリンクを参照してください。<br><br>
-                <span class="doc-link" onclick="agentView.showDocument('doc_01')"><i class="fas fa-file-code me-1"></i> [参照: SHIP_LOG_7882.txt]</span><br>
-                <span class="doc-link" onclick="agentView.showDocument('doc_02')"><i class="fas fa-file-waveform me-1"></i> [参照: SCAN_RESULT_ALPHA.dat]</span>
-            `;
-            agentView.addMessage(responseHtml, 'agent', true);
-        } else {
-            const responses = [
-                "承知しました。処理を開始します。",
-                "そのコマンドは現在承認されていません。",
-                "データの整合性を確認中...完了。",
-                "興味深い提案です。記録します。",
-                "警告：外部からの不明なアクセスを検知。"
-            ];
-            const randomRes = responses[Math.floor(Math.random() * responses.length)];
-            agentView.addMessage(randomRes, 'agent');
-        }
-    }, 1000);
 };
 
 agentView.disabled = false;
@@ -1349,8 +1291,6 @@ agentView.select_runner = async (runner_name) => {
         // TTSエンジンの起動
         //await agentView.say.start();
         cmdbox.show_loading();
-        // Runnerの起動
-        await agentView.exec_cmd('agent', 'start', { runner_name: runner_name }, null, false);
         $('#display_runner_msg').html(`AGENT RUNNER IS READY`);
         // 送信ボタンを有効化
         agentView.btn_user_msg.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
@@ -1578,41 +1518,6 @@ agentView.delete_session = async (session_id) => {
 }
 
 agentView.say = {};
-agentView.say.model = 'ずんだもんノーマル';
-agentView.say.start = async ()=> {
-    const runner_name = agentView.agent_runner ? agentView.agent_runner['runner_name'] : null;
-    if (!runner_name || runner_name.length <= 0) {
-        const msg = 'No runner selected. Please select a runner first.';
-        agentView.btn_say.removeClass('say_on');
-        cmdbox.message(msg);
-        return msg;
-    }
-    const data = await agentView.exec_cmd('agent', 'runner_load', {'runner_name': runner_name});
-    if (data && data.success) {
-        agentView.say.model = data.success.voicevox_model || 'ずんだもんノーマル';
-    }
-    const ret = await agentView.exec_cmd('tts', 'start', {'tts_engine': 'voicevox', 'voicevox_model': agentView.say.model});
-    if (!ret['success']) {
-        const err = ret['warn'] || ret;
-        const msg = err && err[0] && err[0]['warn'] || `TTS engine start failed. ${err}`;
-        if (!msg.startsWith('VoiceVox model is already running:')) {
-            agentView.btn_say.removeClass('say_on');
-            cmdbox.message(msg);
-            return msg;
-        }
-        agentView.btn_say.addClass('say_on');
-        return msg;
-    }
-    agentView.btn_say.addClass('say_on');
-    return ret['success'];
-};
-agentView.say.stop = async () => {
-    return agentView.exec_cmd('tts', 'stop', {'tts_engine': 'voicevox', 'voicevox_model': agentView.say.model}).then((data) => {
-        if (!data['success']) throw data['warn'] || data;
-        agentView.btn_say.removeClass('say_on');
-        return data['success'];
-    });
-};
 agentView.say.isStart = () => {
     const icon = agentView.btn_say.find('i');
     return agentView.btn_say.hasClass('say_on') && icon.hasClass('fa-volume-up');
@@ -1621,7 +1526,7 @@ agentView.say.say = (tts_text) => {
     if (!agentView.say.isStart()) return;
     return agentView.exec_cmd('tts', 'say', {
         'tts_engine': 'voicevox',
-        'voicevox_model': agentView.say.model,
+        'voicevox_model': agentView.agent_runner.voicevox_model || 'ずんだもんノーマル',
         'tts_text': tts_text.replace(/<br\s*\/?>/g, '\n') // <br>タグを改行に変換
     }).then(async (data) => {
         if (!data['success']) throw data;

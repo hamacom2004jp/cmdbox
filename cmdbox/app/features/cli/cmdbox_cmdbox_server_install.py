@@ -47,9 +47,9 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                 dict(opt="data", type=Options.T_DIR, default=self.default_data, required=False, multi=False, hide=False, choice=None,
                      description_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
                      description_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
-                dict(opt="install_cmdbox", type=Options.T_STR, default='cmdbox', required=False, multi=False, hide=True, choice=None,
-                     description_ja=f"省略した時は `cmdbox` を使用します。 `cmdbox=={version.__version__}` といった指定も可能です。",
-                     description_en=f"When omitted, `cmdbox` is used. You can also specify `cmdbox=={version.__version__}`."),
+                dict(opt="install_cmdbox", type=Options.T_STR, default=f'cmdbox=={version.__version__}', required=False, multi=False, hide=True, choice=None,
+                     description_ja=f"省略した時は `cmdbox=={version.__version__}` を使用します。",
+                     description_en=f"When omitted, `cmdbox=={version.__version__}` is used."),
                 dict(opt="install_from", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="作成するdockerイメージの元となるFROMイメージを指定します。",
                      description_en="Specify the FROM image that will be the source of the docker image to be created."),
@@ -87,6 +87,9 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                      choice_edit=True,
                      description_ja="使用するVOICEVOXのホイールファイルを指定します。",
                      description_en="Specify the VOICEVOX wheel file to use."),
+                dict(opt="compose_path", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="in",
+                     description_ja="`docker-compose.yml` ファイルを指定します。",
+                     description_en="Specify the `docker-compose.yml` file."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                      description_ja="処理結果jsonの保存先ファイルを指定。",
                      description_en="Specify the destination file for saving the processing result json."),
@@ -131,7 +134,8 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                                   install_use_gpu=args.install_use_gpu,
                                   tts_engine=args.tts_engine,
                                   voicevox_ver=args.voicevox_ver,
-                                  voicevox_whl=args.voicevox_whl)
+                                  voicevox_whl=args.voicevox_whl,
+                                  compose_path=args.compose_path)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:
@@ -139,10 +143,11 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
         return self.RESP_SUCCESS, ret, None
 
     def server_install(self, logger:logging.Logger,
-                       data:Path, install_cmdbox_tgt:str='cmdbox', install_from:str=None,
+                       data:Path, install_cmdbox_tgt:str=None, install_from:str=None,
                        install_no_python:bool=False, install_compile_python:bool=False,
                        install_tag:str=None, install_use_gpu:bool=False,
-                       tts_engine:str=None, voicevox_ver:str=None, voicevox_whl:str=None):
+                       tts_engine:str=None, voicevox_ver:str=None, voicevox_whl:str=None,
+                       compose_path:str=None) -> Dict[str, Any]:
         """
         cmdboxが含まれるdockerイメージをインストールします。
 
@@ -158,6 +163,7 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
             tts_engine (str): TTSエンジンの指定
             voicevox_ver (str): VoiceVoxのバージョン
             voicevox_whl (str): VoiceVoxのwhlファイルの名前
+            compose_path (str): docker-compose.ymlファイルパス
 
         Returns:
             dict: 処理結果
@@ -173,6 +179,8 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
             with open('Dockerfile', 'w', encoding='utf-8') as fp:
                 text = resources.read_text(f'{self.ver.__appid__}.docker', 'Dockerfile')
                 # cmdboxのインストール設定
+                if install_cmdbox_tgt is None:
+                    install_cmdbox_tgt = f'cmdbox=={self.ver.__version__}'
                 wheel_cmdbox = Path(install_cmdbox_tgt)
                 if wheel_cmdbox.exists() and wheel_cmdbox.suffix == '.whl':
                     shutil.copy(wheel_cmdbox, Path('.').resolve() / wheel_cmdbox.name)
@@ -217,12 +225,14 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                 text = text.replace('#{INSTALL_CMDBOX}', install_cmdbox_tgt)
                 text = text.replace('#{INSTALL_VOICEVOX}', install_voicevox)
                 fp.write(text)
-            docker_compose_path = Path('docker-compose.yml')
+            if not compose_path:
+                compose_path = 'docker-compose.yml'
+            docker_compose_path = Path(compose_path)
             if not docker_compose_path.exists():
                 with open(docker_compose_path, 'w', encoding='utf-8') as fp:
                     text = resources.read_text(f'{self.ver.__appid__}.docker', 'docker-compose.yml')
                     fp.write(text)
-            with open(f'docker-compose.yml', 'r+', encoding='utf-8') as fp:
+            with open(docker_compose_path, 'r+', encoding='utf-8') as fp:
                 comp = yaml.safe_load(fp)
                 services = comp['services']
                 services[f'{self.ver.__appid__}{install_tag}'] = dict(

@@ -1,5 +1,6 @@
 from cmdbox.app import common, feature
 from cmdbox.app.options import Options
+from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
@@ -37,6 +38,9 @@ class CmdboxServerUp(feature.OneshotNotifyEdgeFeature):
             description_ja="cmdboxサーバーを起動します。",
             description_en="Starts the cmdbox server.",
             choice=[
+                dict(opt="compose_path", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="in",
+                     description_ja="`docker-compose.yml` ファイルを指定します。",
+                     description_en="Specify the `docker-compose.yml` file."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                      description_ja="処理結果jsonの保存先ファイルを指定。",
                      description_en="Specify the destination file for saving the processing result json."),
@@ -68,19 +72,20 @@ class CmdboxServerUp(feature.OneshotNotifyEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        ret = self.server_up(logger)
+        ret = self.server_up(logger, args.compose_path)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:
             return self.RESP_WARN, ret, None
         return self.RESP_SUCCESS, ret, None
 
-    def server_up(self, logger:logging.Logger) -> Dict[str, Any]:
+    def server_up(self, logger:logging.Logger, compose_path:str=None) -> Dict[str, Any]:
         """
         cmdboxサーバーを起動します。
 
         Args:
             logger (logging.Logger): ロガー
+            compose_path (str): docker-compose.ymlファイルパス
 
         Returns:
             dict: 処理結果
@@ -90,11 +95,27 @@ class CmdboxServerUp(feature.OneshotNotifyEdgeFeature):
             if platform.system() == 'Windows':
                 return {"warn": f"Up server command is Unsupported in windows platform."}
 
-            cmd = f"docker compose up -d {self.ver.__appid__}"
-            returncode, _, _cmd = common.cmd(f"{cmd}", logger, slise=-1)
-            if returncode != 0:
-                logger.warning(f"Failed to up {self.ver.__appid__}-server. cmd:{_cmd}")
-                return {"error": f"Failed to up {self.ver.__appid__}-server. cmd:{_cmd}"}
-            return {"success": f"Success to up {self.ver.__appid__}-server. cmd:{_cmd}"}
+            container = self.ver.__appid__
+            newenv = common.newenv(container, self.ver)
+            if Path(f'{newenv["CWD"]}{container}/scripts/up.sh').exists():
+                if not compose_path:
+                    logger.warning("compose_path is specified but not used because up.sh exists.")
+                returncode, _, cmd = common.cmd(f'bash {newenv["CWD"]}{container}/scripts/up.sh', logger=logger, newenv=newenv)
+                if returncode != 0:
+                    logger.error(f"Failed to up {container}. command: {cmd}")
+                    return {"error": f"Failed to up {container}. command: {cmd}"}
+                return {"success": f"Success to up {container}. cmd:{cmd}"}
+            else:
+                if not compose_path:
+                    compose_path = 'docker-compose.yml'
+                docker_compose_path = Path(compose_path)
+                if not docker_compose_path.exists():
+                    logger.error(f"compose_path file not found: {docker_compose_path}")
+                    return {"error": f"compose_path file not found: {docker_compose_path}"}
+                returncode, _, cmd = common.cmd(f"docker compose -f {docker_compose_path} up -d {container}", logger=logger, slise=-1)
+                if returncode != 0:
+                    logger.warning(f"Failed to up {container}. cmd:{cmd}")
+                    return {"error": f"Failed to up {container}. cmd:{cmd}"}
+                return {"success": f"Success to up {container}. cmd:{cmd}"}
         finally:
             common.set_debug(logger, False)

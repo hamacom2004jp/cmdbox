@@ -7,7 +7,7 @@ import logging
 import platform
 
 
-class CmdboxServerDown(feature.OneshotNotifyEdgeFeature):
+class CmdboxServerLogs(feature.OneshotNotifyEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -24,7 +24,7 @@ class CmdboxServerDown(feature.OneshotNotifyEdgeFeature):
         Returns:
             str: コマンド
         """
-        return 'server_down'
+        return 'server_logs'
 
     def get_option(self):
         """
@@ -35,9 +35,18 @@ class CmdboxServerDown(feature.OneshotNotifyEdgeFeature):
         """
         return dict(
             use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
-            description_ja="cmdboxサーバーを停止します。",
-            description_en="Stops the cmdbox server.",
+            description_ja="cmdboxサーバーのログを表示します。",
+            description_en="Displays the logs of the cmdbox server.",
             choice=[
+                dict(short="F", opt="follow", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
+                     description_ja="ログ出力をフォローします。",
+                     description_en="Follow log output."),
+                dict(opt="number", type=Options.T_INT, default=20, required=False, multi=False, hide=True, choice=None,
+                     description_ja="ログの最後から指定行数出力します。",
+                     description_en="Outputs the specified number of lines from the end of the log."),
+                dict(opt="compose_path", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="in",
+                     description_ja="`docker-compose.yml` ファイルを指定します。",
+                     description_en="Specify the `docker-compose.yml` file."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                      description_ja="処理結果jsonの保存先ファイルを指定。",
                      description_en="Specify the destination file for saving the processing result json."),
@@ -71,7 +80,7 @@ class CmdboxServerDown(feature.OneshotNotifyEdgeFeature):
         """
         common.set_debug(logger, True)
         try:
-            ret = self.server_down(logger)
+            ret = self.server_logs(follow=args.follow, number=args.number, compose_path=args.compose_path, logger=logger)
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
             if 'success' not in ret:
@@ -80,38 +89,46 @@ class CmdboxServerDown(feature.OneshotNotifyEdgeFeature):
         finally:
             common.set_debug(logger, False)
 
-    def server_down(self, logger:logging.Logger, compose_path:str=None) -> Dict[str, Any]:
+    def server_logs(self, follow:bool=False, number:int=20, compose_path:str=None, logger:logging.Logger=None) -> Dict[str, Any]:
         """
-        cmdboxサーバーを停止します。
+        cmdboxサーバーのログを表示します。
 
         Args:
-            logger (logging.Logger): ロガー
+            follow (bool): ログ出力をフォローするかどうか
+            number (int): ログの最後から指定行数出力する
             compose_path (str): docker-compose.ymlファイルパス
+            logger (logging.Logger): ロガー
+
         Returns:
             dict: 処理結果
         """
         common.set_debug(logger, True)
         try:
             if platform.system() == 'Windows':
-                return {"warn": f"Down server command is Unsupported in windows platform."}
+                return {"warn": f"Logs server command is Unsupported in windows platform."}
 
             container = self.ver.__appid__
             newenv = common.newenv(container, self.ver)
-            if Path(f'{newenv["CWD"]}{container}/scripts/down.sh').exists():
-                returncode, _, cmd = common.cmd(f'bash {newenv["CWD"]}{container}/scripts/down.sh', logger=logger, newenv=newenv)
+            if Path(f'{newenv["CWD"]}{container}/scripts/logs.sh').exists():
+                if not compose_path:
+                    logger.warning("compose_path is specified but not used because logs.sh exists.")
+                returncode, _, cmd = common.cmd(f'bash {newenv["CWD"]}{container}/scripts/logs.sh', logger=logger, newenv=newenv)
                 if returncode != 0:
-                    logger.error(f"Failed to down {container}. command: {cmd}")
-                    return {"error": f"Failed to down {container}. command: {cmd}"}
-                return {"success": f"Success to down {container}. cmd:{cmd}"}
+                    logger.error(f"Failed to logs {container}. command: {cmd}")
+                    return {"error": f"Failed to logs {container}. command: {cmd}"}
+                return {"success": f"Success to logs {container}. cmd:{cmd}"}
             else:
-                returncode, _, cmd = common.cmd(f"docker stop {container}", logger=logger, slise=-1)
+                if not compose_path:
+                    compose_path = 'docker-compose.yml'
+                docker_compose_path = Path(compose_path)
+                if not docker_compose_path.exists():
+                    logger.error(f"compose_path file not found: {docker_compose_path}")
+                    return {"error": f"compose_path file not found: {docker_compose_path}"}
+                cmd = f'docker compose -f {docker_compose_path} logs {container} {"-f" if follow else ""} {f"-n {number}" if number > 0 else ""}'
+                returncode, _, cmd = common.cmd(cmd, logger=logger, slise=-1)
                 if returncode != 0:
-                    logger.warning(f"Failed to stop {container}. cmd:{cmd}")
-                    return {"error": f"Failed to stop {container}. cmd:{cmd}"}
-                returncode, _, cmd = common.cmd(f"docker rm -f {container}", logger=logger, slise=-1)
-                if returncode != 0:
-                    logger.warning(f"Failed to rm {container}. cmd:{cmd}")
-                    return {"error": f"Failed to rm {container}. cmd:{cmd}"}
-                return {"success": f"Success to down {container}. cmd:{cmd}"}
+                    logger.warning(f"Failed to logs {container}. cmd:{cmd}")
+                    return {"error": f"Failed to logs {container}. cmd:{cmd}"}
+                return {"success": f"Success to logs {container}. cmd:{cmd}"}
         finally:
             common.set_debug(logger, False)

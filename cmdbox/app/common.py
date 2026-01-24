@@ -3,6 +3,7 @@ from cmdbox.app import feature, options
 from cmdbox.app.commons import convert, module, loghandler
 from cryptography.fernet import Fernet
 from fastapi.responses import RedirectResponse
+from importlib import resources
 from pathlib import Path
 from rich.console import Console
 from tabulate import tabulate
@@ -14,6 +15,7 @@ import logging
 import logging.config
 import locale
 import hashlib
+import io
 import inspect
 import json
 import numpy as np
@@ -684,6 +686,26 @@ def download_file(url:str, save_path:Path) -> Path:
         f.write(r.content)
     save_file(Path(save_path), _w)
     return save_path
+
+def newenv(container:str, ver:Any) -> Dict[str, str]:
+    """
+    コンテナの環境変数を生成します。
+    Args:
+        container (str): コンテナ名
+        ver (Any): バージョン情報
+    Returns:
+        Dict[str, str]: 環境変数の辞書
+    """
+    try:
+        ref_text = resources.read_text(f'{ver.__appid__}.docker.{container}', 'docker-compose.yml')
+        ref_yml = yaml.safe_load(io.StringIO(ref_text))
+        return dict(CWD=os.getcwd()+'/',
+                    CONTAINER=container,
+                    IMAGENAME=ref_yml['services'][container]['image'])
+    except:
+        return dict(CWD=os.getcwd()+'/',
+                    CONTAINER=container,
+                    IMAGENAME='')
 
 def cmd(cmd:str, logger:logging.Logger, slise:int=100, newenv:Dict=None) -> Tuple[int, str, str]:
     """

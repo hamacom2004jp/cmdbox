@@ -42,6 +42,9 @@ class CmdboxServerReboot(feature.OneshotNotifyEdgeFeature):
             description_ja="cmdboxサーバーを停止します。",
             description_en="Stops the cmdbox server.",
             choice=[
+                dict(opt="compose_path", type=Options.T_FILE, default="docker-compose.yml", required=False, multi=False, hide=True, choice=None, fileio="in",
+                     description_ja="`docker-compose.yml` ファイルを指定します。",
+                     description_en="Specify the `docker-compose.yml` file."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                      description_ja="処理結果jsonの保存先ファイルを指定。",
                      description_en="Specify the destination file for saving the processing result json."),
@@ -75,11 +78,11 @@ class CmdboxServerReboot(feature.OneshotNotifyEdgeFeature):
         """
         common.set_debug(logger, True)
         try:
-            down_ret = self.down.server_down(logger)
+            down_ret = self.down.server_down(logger, args.compose_path)
             common.print_format(down_ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             if 'success' not in down_ret:
                 return self.RESP_WARN, down_ret, None
-            up_ret = self.up.server_up(logger)
+            up_ret = self.up.server_up(logger, args.compose_path)
             common.print_format(up_ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             if 'success' not in up_ret:
                 return self.RESP_WARN, up_ret, None

@@ -2,8 +2,6 @@
 
 ARG MKUSER
 
-#{COPY_CMDBOX}
-
 RUN groupadd ${MKUSER} && \
     useradd -m -g ${MKUSER} -s /usr/bin/bash ${MKUSER} && \
     cp /etc/skel/.bash_logout /home/${MKUSER}/ && \
@@ -23,8 +21,10 @@ RUN pip install --upgrade pip && \
     pip install 'fastmcp>=2.14.0' 'mcp>=1.10.0,<2.0.0' && \
     pip install 'google-adk>=1.21.0' litellm && \
     pip install 'a2a-sdk>=0.3.4,<0.4.0' && \
-    pip install backoff cryptography orjson apscheduler litellm-enterprise email-validator fastapi-sso && \
-    pip install #{INSTALL_CMDBOX} && cmdbox --version
+    pip install backoff cryptography orjson apscheduler litellm-enterprise email-validator fastapi-sso
+
+#{COPY_CMDBOX}
+RUN pip install #{INSTALL_CMDBOX} && cmdbox --version
 
 #{INSTALL_VOICEVOX}
 RUN pip install rich==14.2.0

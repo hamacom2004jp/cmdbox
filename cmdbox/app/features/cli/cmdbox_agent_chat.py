@@ -1,7 +1,7 @@
 from cmdbox.app import common, client, feature, options
 from cmdbox.app.auth import signin
 from cmdbox.app.commons import convert, redis_client
-from cmdbox.app.features.cli import cmdbox_tts_say
+from cmdbox.app.features.cli import cmdbox_tts_say, cmdbox_agent_start
 from cmdbox.app.options import Options
 from contextlib import aclosing
 from pathlib import Path
@@ -14,7 +14,7 @@ import re
 import time
 
 
-class AgentChat(feature.ResultEdgeFeature):
+class AgentChat(cmdbox_agent_start.AgentStart):
 
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
@@ -132,11 +132,10 @@ class AgentChat(feature.ResultEdgeFeature):
     async def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
                     sessions:Dict[str, Dict[str, Any]]):
         reskey = msg[1]
+        runner = None
         tts_engine_obj = None
+        enable_tts = True
         try:
-            if 'agents' not in sessions:
-                sessions['agents'] = {}
-
             payload = json.loads(convert.b64str2str(msg[2]))
             name = payload.get('runner_name')
             user_name = payload.get('user_name')
@@ -145,10 +144,6 @@ class AgentChat(feature.ResultEdgeFeature):
             mcpserver_apikey = payload.get('mcpserver_apikey')
             message = payload.get('message')
             call_tts = payload.get('call_tts')
-            if name not in sessions['agents']:
-                msg = dict(warn=f"Runner '{name}' is not running.", end=True)
-                redis_cli.rpush(reskey, msg)
-                return self.RESP_WARN
 
             from google.adk.agents.run_config import RunConfig, StreamingMode
             from google.adk.events import Event
@@ -183,11 +178,17 @@ class AgentChat(feature.ResultEdgeFeature):
                     return session
 
             json_pattern = re.compile(r'\{.*?\}')
-
-            runner:Runner = sessions['agents'][name]['runner']
+            runner_conf, agent_conf, llm_conf, mcpsv_confs = self.load_conf(name, data_dir, logger)
+            agent = self.create_agent(logger, data_dir, False, agent_conf, llm_conf, mcpsv_confs)
+            from google.adk.runners import Runner
+            runner = Runner(
+                app_name=runner_conf.get('runner_name', self.ver.__appid__),
+                agent=agent,
+                session_service=self.create_session_service(data_dir, logger, runner_conf),
+            )
             content = types.Content(role='user', parts=[types.Part(text=message)])
-            tts_engine = sessions['agents'][name].get('tts_engine', None)
-            voicevox_model = sessions['agents'][name].get('voicevox_model', None)
+            tts_engine = runner_conf.get('tts_engine', None)
+            voicevox_model = runner_conf.get('voicevox_model', None)
             enable_tts = call_tts and tts_engine and voicevox_model
             if enable_tts:
                 try:
@@ -225,8 +226,11 @@ class AgentChat(feature.ResultEdgeFeature):
                                                                     audit_type=options.Options.AT_USER, user=user_name)
                         if enable_tts and tts_engine_obj and not is_func_call and not is_func_response:
                             tts_msg = re.sub(r'```json.*?```', '', msg, flags=re.DOTALL) # json表現部分を除去
-                            wav_b64 = cmdbox_tts_say.TtsSay.tts_say(tts_engine_obj, tts_msg)
-                            success['wav_b64'] = wav_b64
+                            try:
+                                wav_b64 = cmdbox_tts_say.TtsSay.tts_say(tts_engine_obj, tts_msg)
+                                success['wav_b64'] = wav_b64
+                            except Exception as e:
+                                success['wav_b64'] = None
 
                         redis_cli.rpush(reskey, outputs)
                         if flags['final_response']:
@@ -243,11 +247,12 @@ class AgentChat(feature.ResultEdgeFeature):
             return self.RESP_WARN
         finally:
             if enable_tts:
-                try:
-                    # TTSモデルの停止
-                    cmdbox_tts_say.TtsSay.tts_stop(tts_engine_obj)
-                except Exception as e:
-                    logger.warning(f"Failed to stop TTS model: {e}", exc_info=True)
+                # TTSモデルの停止
+                cmdbox_tts_say.TtsSay.tts_stop(tts_engine_obj)
+            if runner:
+                if hasattr(runner.session_service, 'db_engine'):
+                    await runner.session_service.db_engine.dispose()
+                await runner.close()
 
     @classmethod
     def _replace_match(cls, match_obj):
