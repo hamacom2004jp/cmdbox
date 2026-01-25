@@ -211,7 +211,7 @@ class Filer(object):
                 if mime_type is not None and mime_type != 'image/svg+xml' and mime_type.startswith('image') and img_thumbnail > 0:
                     img = convert.imgbytes2thumbnail(fd, (img_thumbnail, img_thumbnail))
                     fd = convert.img2byte(img, "jpeg")
-                    fname = f"{fname}.thumbnail.jpg"
+                    #fname = f"{fname}.thumbnail.jpg"
                 data = convert.bytes2b64str(fd)
                 return data
             data = common.load_file(abspath, _r, mode='rb')
