@@ -39,8 +39,8 @@ class CmdboxServerReboot(feature.OneshotNotifyEdgeFeature):
         """
         return dict(
             use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
-            description_ja="cmdboxサーバーを停止します。",
-            description_en="Stops the cmdbox server.",
+            description_ja="cmdboxサーバーを再起動します。",
+            description_en="Reboots the cmdbox server.",
             choice=[
                 dict(opt="compose_path", type=Options.T_FILE, default="docker-compose.yml", required=False, multi=False, hide=True, choice=None, fileio="in",
                      description_ja="`docker-compose.yml` ファイルを指定します。",

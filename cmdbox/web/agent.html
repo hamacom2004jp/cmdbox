@@ -13,10 +13,9 @@
     <link href="assets/cmdbox/color_mode.css" rel="stylesheet">
     <link href="assets/agent/agent.css" rel="stylesheet">
 </head>
-<body>
 
+<body>
 <div class="layout-grid split-pane fixed-left">
-    
     <!-- LEFT PANEL: Console / Chat Interface -->
     <aside class="console-panel split-pane-component">
         <div class="d-flex align-items-center console-header justify-content-between">
@@ -128,43 +127,6 @@
     </main>
 </div>
 
-<!--
-<div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content sf-modal">
-            <div class="modal-header">
-                <h5 class="modal-title glow-text-cyan system-font">EXTERNAL LINK SETUP</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="connectionForm">
-                    <div class="mb-3">
-                        <label class="form-label">API ENDPOINT</label>
-                        <input type="url" class="form-control form-control-modal" placeholder="https://api.openai.com/v1/..." id="apiEndpoint">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">AUTH KEY</label>
-                        <input type="password" class="form-control form-control-modal" placeholder="sk-..." id="apiKey">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">MODEL ID</label>
-                        <select class="form-select form-control-modal" style="background-color: var(--bg-slate-950); color: white;">
-                            <option>gpt-4-turbo</option>
-                            <option>gpt-3.5-turbo</option>
-                            <option>claude-3-opus</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">ABORT</button>
-                <button type="button" class="btn btn-outline-info btn-sm" id="saveSettingsBtn">ESTABLISH LINK</button>
-            </div>
-        </div>
-    </div>
-</div>
--->
-
 <!-- 設定モーダル -->
 <div id="agent_settings_modal" class="modal fade" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
@@ -268,7 +230,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
             </div>
         </div>
     </div>
@@ -288,8 +250,8 @@
                 <form id="form_llm_edit" class="row"></form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger me-auto" id="btn_del_llm" style="display:none;">DELETE</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_llm" style="display:none;">DELETE</button>
                 <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_llm">SAVE</button>
             </div>
         </div>
@@ -310,8 +272,8 @@
                 <form id="form_mcpsv_edit" class="row"></form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger me-auto" id="btn_del_mcpsv" style="display:none;">DELETE</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_mcpsv" style="display:none;">DELETE</button>
                 <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_mcpsv">SAVE</button>
             </div>
         </div>
@@ -332,8 +294,8 @@
                 <form id="form_agent_edit" class="row"></form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger me-auto" id="btn_del_agent" style="display:none;">DELETE</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_agent" style="display:none;">DELETE</button>
                 <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_agent">SAVE</button>
             </div>
         </div>
@@ -356,7 +318,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
             </div>
         </div>
     </div>
@@ -376,8 +338,8 @@
                 <form id="form_runner_edit" class="row"></form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger me-auto" id="btn_del_runner" style="display:none;">DELETE</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_runner" style="display:none;">DELETE</button>
                 <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_runner">SAVE</button>
             </div>
         </div>
@@ -396,26 +358,10 @@
             </div>
             <div class="modal-body">
                 <ul class="sf-list-group">
-                    <!--
-                    <li class="sf-list-item">
-                        <div>
-                            <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">LOG_ID: #404-ALPHA</span>
-                            <span class="text-white-50">初期化シーケンスと役割配分テスト</span>
-                        </div>
-                        <span class="badge border border-info text-info bg-transparent">204X-05-20</span>
-                    </li>
-                    <li class="sf-list-item">
-                        <div>
-                            <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">LOG_ID: #404-BETA</span>
-                            <span class="text-white-50">異常信号の検出および緊急停止プロトコル</span>
-                        </div>
-                        <span class="badge border border-info text-info bg-transparent">204X-05-21</span>
-                    </li>
-                    -->
                 </ul>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
             </div>
         </div>
     </div>
@@ -448,7 +394,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
             </div>
         </div>
     </div>
@@ -460,7 +406,7 @@
             <span class="sr-only"></span>
         </div>
         <div>
-            <button type="button" class="btn btn-danger mt-3 bbforce">Back by force</button>
+            <button type="button" class="btn btn-outline-danger mt-3 bbforce">Back by force</button>
         </div>
     </div>
 </div>

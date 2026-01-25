@@ -13,13 +13,13 @@
 <body lang="ja" class="overflow-hidden p-2" style="background-color:rgb(33, 37, 41)">
     <script type="text/javascript" src="assets/cmdbox/svgicon.js"></script>
     <!-- ナビゲーションバー -->
-    <nav class="navbar navbar-expand-sm fixed-top p-2">
+    <nav class="navbar navbar-expand-sm console-header fixed-top p-2">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">cmdbox</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown" style="background-color: var(--bs-body-bg);">
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="fileMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -45,13 +45,6 @@
                                 <span class="dropdown-item">
                                     Change Dark Mode
                                     <select class="d-inline-block change_color_mode" onchange="cmdbox.change_color_mode($(this).val());">
-                                        <option value="dark" selected>Dark</option>
-                                        <option value="midnight">midnight</option>
-                                        <option value="deepsea">deepsea</option>
-                                        <option value="verdant">verdant</option>
-                                        <option value="bumblebee">bumblebee</option>
-                                        <option value="crimson">crimson</option>
-                                        <option value="light">light</option>
                                     </select>
                                 </span>
                             </li>
@@ -155,7 +148,7 @@
                     <button type="button" class="btn btn_pin_fill ps-1 pt-0 pb-0">
                         <svg class="bi bi-pin-fill" width="24" height="24" fill="currentColor"><use href="#btn_pin_fill"></use></svg>
                     </button>
-                    <h5 class="modal-title">Modal title</h5>
+                    <h5 class="modal-title glow-text-cyan">Modal title</h5>
                     <button type="button" class="btn btn_window_stack">
                         <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
                     </button>
@@ -206,12 +199,12 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button id="cmd_raw" type="button" class="btn btn-secondary">Raw</button>
-                    <button id="cmd_copy" type="button" class="btn btn-info">Copy</button>
-                    <button id="cmd_save" type="button" class="btn btn-success">Save</button>
-                    <button id="cmd_del" type="button" class="btn btn-danger">Delete</button>
-                    <button id="cmd_exec" type="button" class="btn btn-primary">Execute</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="cmd_raw" type="button" class="btn btn-outline-secondary">Raw</button>
+                    <button id="cmd_copy" type="button" class="btn btn-outline-info">Copy</button>
+                    <button id="cmd_save" type="button" class="btn btn-outline-success">Save</button>
+                    <button id="cmd_del" type="button" class="btn btn-outline-danger">Delete</button>
+                    <button id="cmd_exec" type="button" class="btn btn-outline-primary">Execute</button>
                 </div>
             </form>
         </div>
@@ -227,7 +220,7 @@
                     <button type="button" class="btn btn_pin_fill ps-1 pt-0 pb-0">
                         <svg class="bi bi-pin-fill" width="24" height="24" fill="currentColor"><use href="#btn_pin_fill"></use></svg>
                     </button>
-                    <h5 class="modal-title">Modal title</h5>
+                    <h5 class="modal-title glow-text-cyan">Modal title</h5>
                     <button type="button" class="btn btn_window_stack">
                         <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
                     </button>
@@ -278,11 +271,11 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button id="pipe_raw" type="button" class="btn btn-secondary">Raw</button>
-                    <button id="pipe_save" type="button" class="btn btn-success">Save</button>
-                    <button id="pipe_del" type="button" class="btn btn-danger">Delete</button>
-                    <button id="pipe_exec" type="button" class="btn btn-primary">Execute</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="pipe_raw" type="button" class="btn btn-outline-secondary">Raw</button>
+                    <button id="pipe_save" type="button" class="btn btn-outline-success">Save</button>
+                    <button id="pipe_del" type="button" class="btn btn-outline-danger">Delete</button>
+                    <button id="pipe_exec" type="button" class="btn btn-outline-primary">Execute</button>
                 </div>
             </form>
         </div>
@@ -292,7 +285,7 @@
         <div class="modal-dialog modal-lg">
             <form id="result_form" class="modal-content novalidate">
                 <div class="modal-header">
-                    <h5 class="modal-title">Modal title</h5>
+                    <h5 class="modal-title glow-text-cyan">Modal title</h5>
                     <button type="button" class="btn btn_window_stack">
                         <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
                     </button>
@@ -305,7 +298,7 @@
                 </div>
                 <div class="modal-body overflow-auto"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>
@@ -315,7 +308,7 @@
         <div class="modal-dialog modal-lg">
             <form id="filer_form" class="modal-content novalidate">
                 <div class="modal-header">
-                    <h5 class="modal-title text-nowrap">Modal title</h5>
+                    <h5 class="modal-title glow-text-cyan text-nowrap">Modal title</h5>
                     <div class="input-group p-1">
                         <button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Current</button>'
                         <input name="filer_host" type="hidden" class="filer_host">
@@ -343,7 +336,7 @@
                 <div class="modal-body row">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>
@@ -353,7 +346,7 @@
         <div class="modal-dialog modal-lg">
             <form id="console_form" class="modal-content novalidate">
                 <div class="modal-header">
-                    <h5 class="modal-title">Console log</h5>
+                    <h5 class="modal-title glow-text-cyan">Console log</h5>
                     <button type="button" class="btn btn_window_stack">
                         <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
                     </button>
@@ -368,8 +361,8 @@
                     <textarea id="console_modal_log" class="form-control overflow-auto w-100" rows="10"></textarea>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" onclick="$(`#console_modal_log`).val(``);">Clear</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-success" onclick="$(`#console_modal_log`).val(``);">Clear</button>
                 </div>
             </form>
         </div>
@@ -379,7 +372,7 @@
         <div class="modal-dialog modal-lg">
             <form id="version_form" class="modal-content novalidate">
                 <div class="modal-header">
-                    <h5 class="modal-title">
+                    <h5 class="modal-title glow-text-cyan glow-text-cyan">
                         Versions
                     </h5>
                     <button type="button" class="btn btn_window_stack">
@@ -397,7 +390,7 @@
                     <div class="tab-content version-content"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>
@@ -447,6 +440,5 @@
 <script type="text/javascript" src="assets/cmdbox/open_output_json.js"></script>
 <script type="text/javascript" src="assets/cmdbox/open_capture.js"></script>
 <script type="text/javascript" src="assets/cmdbox/list_pipe.js"></script>
-<script type="text/javascript" src="assets/cmdbox/agent.js"></script>
 <script type="text/javascript" src="assets/cmdbox/main.js"></script>
 </html>

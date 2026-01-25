@@ -242,31 +242,6 @@ agentView.closeDocument = () => {
 agentView.scrollToBottom = () => {
     agentView.chatContainer.scrollTop(agentView.chatContainer.prop("scrollHeight"));
 };
-
-agentView.addMessage = (text, sender, isHtml = false) => {
-    const msgDiv = $('<div/>');
-    msgDiv.addClass(`message message-${sender}`);
-    
-    const label = sender === 'agent' ? (agentView.agent_runner ? agentView.agent_runner['agent'] : 'SYSTEM') : (agentView.user ? agentView.user['name'] : 'USER');
-    const labelClass = sender === 'agent' ? 'msg-label-agent' : 'msg-label-user';
-    
-    msgDiv.html(`
-        <span class="msg-label ${labelClass}">${label}</span>
-        <div class="msg-content">${text}</div>
-    `);
-    
-    agentView.chatContainer.append(msgDiv);
-    agentView.scrollToBottom();
-
-    // Animate AI Core slightly on message
-    if (sender === 'agent') {
-        agentView.aiCoreText.css("textShadow", "0 0 30px #fff");
-        setTimeout(() => {
-            agentView.aiCoreText.css("textShadow", "0 0 20px var(--accent-cyan)");
-        }, 500);
-    }
-    return msgDiv;
-};
 agentView.chat = (session_id) => {
     const ping_interval = 5000; // pingの間隔
     const max_reconnect_count = 60000/ping_interval*1; // 最大再接続回数
@@ -1284,9 +1259,6 @@ agentView.select_runner = async (runner_name) => {
         $('#display_runner_msg').html(`STARTING AGENT RUNNER ...`);
         cmdbox.show_loading();
         const item_data = await agentView.exec_cmd('agent', 'runner_load',{ runner_name: runner_name }, null, false);
-        /*if (item_data && item_data.success) {
-            agentView.say.model = item_data.success.voicevox_model || 'ずんだもんノーマル';
-        }*/
         agentView.agent_runner = item_data.success;
         // TTSエンジンの起動
         //await agentView.say.start();

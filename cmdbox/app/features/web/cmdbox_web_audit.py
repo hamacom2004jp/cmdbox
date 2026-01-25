@@ -1,9 +1,10 @@
 from cmdbox.app import common, feature
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import HTMLResponse
 from typing import Dict, Any
 import argparse
+import logging
 import time
 
 
@@ -17,11 +18,13 @@ class Audit(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        if web.audit_html is not None:
-            if not web.audit_html.is_file():
-                raise FileNotFoundError(f'audit_html is not found. ({web.audit_html})')
-            with open(web.audit_html, 'r', encoding='utf-8') as f:
-                web.audit_html_data = f.read()
+        ondemand_load = web.logger.level == logging.DEBUG
+        if not ondemand_load:
+            if web.audit_html is not None:
+                if not web.audit_html.is_file():
+                    raise FileNotFoundError(f'audit_html is not found. ({web.audit_html})')
+                with open(web.audit_html, 'r', encoding='utf-8') as f:
+                    web.audit_html_data = f.read()
 
         @app.get('/audit', response_class=HTMLResponse)
         @app.post('/audit', response_class=HTMLResponse)
@@ -30,8 +33,15 @@ class Audit(feature.WebFeature):
             if signin is not None:
                 return signin
             res.headers['Access-Control-Allow-Origin'] = '*'
-            web.options.audit_exec(req, res, web)
-            return web.audit_html_data
+            if ondemand_load:
+                if not web.audit_html.is_file():
+                    raise HTTPException(status_code=404, detail=f'audit_html is not found. ({web.audit_html})')
+                with open(web.audit_html, 'r', encoding='utf-8') as f:
+                    web.options.audit_exec(req, res, web)
+                    return HTMLResponse(f.read())
+            else:
+                web.options.audit_exec(req, res, web)
+                return HTMLResponse(web.audit_html_data)
 
         @app.post('/audit/rawlog')
         async def audit_rawlog(req:Request, res:Response):

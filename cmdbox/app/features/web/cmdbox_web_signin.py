@@ -3,6 +3,7 @@ from cmdbox.app.auth import signin
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
+import logging
 import urllib
 import urllib.parse
 
@@ -17,18 +18,28 @@ class Signin(feature.WebFeature):
             app (FastAPI): FastAPIオブジェクト
         """
         web.signin.signin_file_data = web.signin.load_signin_file(web.signin_file, web.signin.signin_file_data, self=self)
-        if web.signin_html is not None:
-            if not web.signin_html.is_file():
-                raise HTTPException(status_code=500, detail=f'signin_html is not found. ({web.signin_html})')
-            with open(web.signin_html, 'r', encoding='utf-8') as f:
-                web.signin_html_data = f.read()
+        ondemand_load = web.logger.level == logging.DEBUG
+        if not ondemand_load:
+            if web.signin_html is not None:
+                if not web.signin_html.is_file():
+                    raise HTTPException(status_code=500, detail=f'signin_html is not found. ({web.signin_html})')
+                with open(web.signin_html, 'r', encoding='utf-8') as f:
+                    web.signin_html_data = f.read()
 
         @app.api_route('/signin/{next}', methods=['GET', 'POST'], response_class=HTMLResponse)
         @app.api_route('/{full_path:path}/signin/{next}', methods=['GET', 'POST'], response_class=HTMLResponse)
         async def _signin(next:str, req:Request, res:Response, full_path:str=None):
             signin.Signin._enable_cors(req, res)
             res.headers['Access-Control-Allow-Origin'] = '*'
-            return web.signin_html_data
+            if ondemand_load:
+                if not web.signin_html.is_file():
+                    raise HTTPException(status_code=404, detail=f'signin_html is not found. ({web.signin_html})')
+                with open(web.signin_html, 'r', encoding='utf-8') as f:
+                    web.options.audit_exec(req, res, web)
+                    return HTMLResponse(f.read())
+            else:
+                web.options.audit_exec(req, res, web)
+                return HTMLResponse(web.signin_html_data)
 
         # https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest
         @app.get('/oauth2/google/{next}')

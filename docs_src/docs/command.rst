@@ -15,6 +15,7 @@ See below for available options for the various commands.
    Audit <cmd_audit.rst>
    Client <cmd_client.rst>
    Cmd <cmd_cmd.rst>
+   Cmdbox <cmd_cmdbox.rst>
    Edge <cmd_edge.rst>
    Excel <cmd_excel.rst>
    GUI <cmd_gui.rst>

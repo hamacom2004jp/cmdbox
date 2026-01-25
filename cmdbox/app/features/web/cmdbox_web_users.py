@@ -1,8 +1,9 @@
 from cmdbox.app import feature
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import HTMLResponse
 from typing import Dict, Any
+import logging
 
 
 class Users(feature.WebFeature):
@@ -15,11 +16,13 @@ class Users(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        if web.users_html is not None:
-            if not web.users_html.is_file():
-                raise FileNotFoundError(f'users_html is not found. ({web.users_html})')
-            with open(web.users_html, 'r', encoding='utf-8') as f:
-                web.users_html_data = f.read()
+        ondemand_load = web.logger.level == logging.DEBUG
+        if not ondemand_load:
+            if web.users_html is not None:
+                if not web.users_html.is_file():
+                    raise FileNotFoundError(f'users_html is not found. ({web.users_html})')
+                with open(web.users_html, 'r', encoding='utf-8') as f:
+                    web.users_html_data = f.read()
 
         @app.get('/users', response_class=HTMLResponse)
         @app.post('/users', response_class=HTMLResponse)
@@ -28,8 +31,15 @@ class Users(feature.WebFeature):
             if signin is not None:
                 return signin
             res.headers['Access-Control-Allow-Origin'] = '*'
-            web.options.audit_exec(req, res, web)
-            return web.users_html_data
+            if ondemand_load:
+                if not web.users_html.is_file():
+                    raise HTTPException(status_code=404, detail=f'users_html is not found. ({web.users_html})')
+                with open(web.users_html, 'r', encoding='utf-8') as f:
+                    web.options.audit_exec(req, res, web)
+                    return HTMLResponse(f.read())
+            else:
+                web.options.audit_exec(req, res, web)
+                return HTMLResponse(web.users_html_data)
 
         @app.get('/users/list')
         async def users_list(req:Request, res:Response):

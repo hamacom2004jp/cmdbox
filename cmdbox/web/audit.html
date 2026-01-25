@@ -12,7 +12,7 @@
 <body lang="ja" class="overflow-hidden p-2" style="background-color:rgb(33, 37, 41)">
     <script type="text/javascript" src="assets/cmdbox/svgicon.js"></script>
     <!-- ナビゲーションバー -->
-    <nav class="navbar navbar-expand-sm fixed-top p-2">
+    <nav class="navbar navbar-expand-sm console-header fixed-top p-2">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">cmdbox</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,13 +29,6 @@
                                 <span class="dropdown-item">
                                     Change Dark Mode
                                     <select class="d-inline-block change_color_mode" onchange="cmdbox.change_color_mode($(this).val());">
-                                        <option value="dark" selected>Dark</option>
-                                        <option value="midnight">midnight</option>
-                                        <option value="deepsea">deepsea</option>
-                                        <option value="verdant">verdant</option>
-                                        <option value="bumblebee">bumblebee</option>
-                                        <option value="crimson">crimson</option>
-                                        <option value="light">light</option>
                                     </select>
                                 </span>
                             </li>
@@ -106,7 +99,7 @@
         <div class="modal-dialog modal-lg">
             <div id="search_form" class="modal-content novalidate">
                 <div class="modal-header">
-                    <h5 class="modal-title">Search Condition</h5>
+                    <h5 class="modal-title glow-text-cyan">Search Condition</h5>
                     <button type="button" class="btn btn_window_stack">
                         <svg width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
                             <use href="#btn_window_stack"></use>
@@ -133,8 +126,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button id="do_search" type="button" class="btn btn-success">Search</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="do_search" type="button" class="btn btn-outline-success">Search</button>
                 </div>
             </div>
         </div>
@@ -144,7 +137,7 @@
         <div class="modal-dialog modal-lg">
             <div id="metrics_form" class="modal-content novalidate">
                 <div class="modal-header">
-                    <h5 class="modal-title"></h5>
+                    <h5 class="modal-title glow-text-cyan"></h5>
                     <button type="button" class="btn btn_window_stack">
                         <svg width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
                             <use href="#btn_window_stack"></use>
@@ -163,9 +156,9 @@
                     <div class="row row_content"></div>
                 </div>
                 <div class="modal-footer">
-                    <button id="metrics_save" type="button" class="btn btn-success">Save</button>
-                    <button id="metrics_del" type="button" class="btn btn-danger">Delete</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="metrics_del" type="button" class="btn btn-outline-danger">Delete</button>
+                    <button id="metrics_save" type="button" class="btn btn-outline-success">Save</button>
                 </div>
             </div>
         </div>
@@ -175,7 +168,7 @@
         <div class="modal-dialog modal-lg">
             <form id="version_form" class="modal-content novalidate">
                 <div class="modal-header">
-                    <h5 class="modal-title">
+                    <h5 class="modal-title glow-text-cyan">
                         Versions
                     </h5>
                     <button type="button" class="btn btn_window_stack">
@@ -197,7 +190,7 @@
                     <div class="tab-content version-content"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>

@@ -12,6 +12,16 @@ cmdbox.change_dark_mode = (dark_mode) => {
 };
 cmdbox.change_color_mode = (color_mode) => {
     const html = $('html');
+    const select_elem = $('.change_color_mode');
+    select_elem.html('');
+    select_elem.append('<option value="dark" selected>Dark</option>');
+    select_elem.append('<option value="midnight">Midnight</option>');
+    select_elem.append('<option value="deepsea">Deepsea</option>');
+    select_elem.append('<option value="verdant">Verdant</option>');
+    select_elem.append('<option value="bumblebee">Bumblebee</option>');
+    select_elem.append('<option value="crimson">Crimson</option>');
+    select_elem.append('<option value="light">Light</option>');
+    select_elem.append('<option value="spaceship">Spaceship</option>');
     color_mode = !color_mode ? localStorage.getItem('color_mode') : color_mode;
     if(color_mode == 'light') html.attr('data-bs-theme','light');
     else if(color_mode == 'midnight') html.attr('data-bs-theme','midnight');
@@ -174,7 +184,7 @@ cmdbox.editapikey = async () => {
     const daialog = $(`<div class="modal-dialog modal-lg ui-draggable ui-draggable-handle"/>`).appendTo(editapikey_modal);
     const form = $(`<form id="editapikey_form" class="modal-content novalidate"/>`).appendTo(daialog);
     const header = $(`<div class="modal-header"/>`).appendTo(form);
-    header.append('<h5 class="modal-title">Edit ApiKey</h5>');
+    header.append('<h5 class="modal-title glow-text-cyan">Edit ApiKey</h5>');
     header.append('<button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">'
                  +'<svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>'
                  +'</button>');
@@ -233,24 +243,8 @@ cmdbox.editapikey = async () => {
         const exp = user['apikeys'][name];
     });*/
     const footer = $(`<div class="modal-footer"/>`).appendTo(form);
-    const addapikey_btn = $(`<button type="button" class="btn btn-info">Add apikey</button>`).appendTo(footer);
-    addapikey_btn.off('click').on('click', async (event) => {
-        const apikey_name = window.prompt('Please enter the apikey name.');
-        if (!apikey_name) return;
-        const res = await fetch('gui/apikey/add', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({'name': user['name'], 'apikey_name': apikey_name})
-        });
-        if (res.status != 200) {
-            cmdbox.message({'error':`${res.status}: ${res.statusText}`});
-            return;
-        }
-        cmdbox.message(await res.json());
-        editapikey_modal.modal('hide');
-        cmdbox.editapikey();
-    });
-    const delapikey_btn = $(`<button type="button" class="btn btn-warning">Del apikey</button>`).appendTo(footer);
+    $('<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>').appendTo(footer);
+    const delapikey_btn = $(`<button type="button" class="btn btn-outline-danger">Del apikey</button>`).appendTo(footer);
     delapikey_btn.off('click').on('click', async (event) => {
         const apikey_name = window.prompt('Please enter the apikey name.');
         if (!apikey_name) return;
@@ -267,7 +261,23 @@ cmdbox.editapikey = async () => {
         editapikey_modal.modal('hide');
         cmdbox.editapikey();
     });
-    const close_btn = $('<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>').appendTo(footer);
+    const addapikey_btn = $(`<button type="button" class="btn btn-outline-primary">Add apikey</button>`).appendTo(footer);
+    addapikey_btn.off('click').on('click', async (event) => {
+        const apikey_name = window.prompt('Please enter the apikey name.');
+        if (!apikey_name) return;
+        const res = await fetch('gui/apikey/add', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({'name': user['name'], 'apikey_name': apikey_name})
+        });
+        if (res.status != 200) {
+            cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+            return;
+        }
+        cmdbox.message(await res.json());
+        editapikey_modal.modal('hide');
+        cmdbox.editapikey();
+    });
     editapikey_modal.appendTo('body');
     daialog.draggable({cursor:'move',cancel:'.modal-body'});
     editapikey_modal.modal('show');
@@ -294,7 +304,7 @@ cmdbox.passchange = async () => {
     const daialog = $(`<div class="modal-dialog ui-draggable ui-draggable-handle"/>`).appendTo(chpass_modal);
     const form = $(`<form id="chpass_form" class="modal-content novalidate"/>`).appendTo(daialog);
     const header = $(`<div class="modal-header"/>`).appendTo(form);
-    header.append('<h5 class="modal-title">Change Password</h5>');
+    header.append('<h5 class="modal-title glow-text-cyan">Change Password</h5>');
     header.append('<button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">'
                  +'<svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>'
                  +'</button>');
@@ -359,8 +369,8 @@ cmdbox.passchange = async () => {
         });
     });
     const footer = $(`<div class="modal-footer"/>`).appendTo(form);
-    footer.append('<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>');
-    const change = $(`<button type="button" class="btn btn-success">Change</button>`).appendTo(footer);
+    footer.append('<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>');
+    const change = $(`<button type="button" class="btn btn-outline-success">Change</button>`).appendTo(footer);
     change.off('click').on('click', async (event) => {
         cmdbox.show_loading();
         const res = await fetch('password/change', {

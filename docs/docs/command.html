@@ -6,17 +6,17 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference &mdash; cmdbox 2026/01/04 documentation</title>
+  <title>Command Reference &mdash; cmdbox 2026/01/25 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=ca1e38aa"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/documentation_options.js?v=a7f91c3b"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -53,6 +53,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_audit.html">Audit</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
@@ -118,8 +119,8 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#lists-saved-llm-configurations-cmdbox-m-agent-c-llm-list-option">Lists saved LLM configurations. : <cite>cmdbox -m agent -c llm_list &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#loads-llm-configuration-cmdbox-m-agent-c-llm-load-option">Loads LLM configuration. : <cite>cmdbox -m agent -c llm_load &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#saves-llm-configuration-cmdbox-m-agent-c-llm-save-option">Saves LLM configuration. : <cite>cmdbox -m agent -c llm_save &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#agent-client-start-cmdbox-m-agent-c-mcp-client-option">Agent client start : <cite>cmdbox -m agent -c mcp_client &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#agent-stdio-to-transport-proxy-start-cmdbox-m-agent-c-mcp-proxy-option">Agent stdio to transport proxy start : <cite>cmdbox -m agent -c mcp_proxy &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#mcp-client-cmdbox-m-agent-c-mcp-client-option">MCP client : <cite>cmdbox -m agent -c mcp_client &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#proxy-to-transport-mcp-cmdbox-m-agent-c-mcp-proxy-option">Proxy to transport MCP : <cite>cmdbox -m agent -c mcp_proxy &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#delete-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-del-option">Delete MCP server configuration. : <cite>cmdbox -m agent -c mcpsv_del &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#lists-mcp-server-configurations-cmdbox-m-agent-c-mcpsv-list-option">Lists MCP server configurations. : <cite>cmdbox -m agent -c mcpsv_list &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#loads-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-load-option">Loads MCP server configuration. : <cite>cmdbox -m agent -c mcpsv_load &lt;Option&gt;</cite></a></li>
@@ -128,8 +129,6 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#list-runner-configuration-cmdbox-m-agent-c-runner-list-option">List runner configuration. : <cite>cmdbox -m agent -c runner_list &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#load-runner-configuration-cmdbox-m-agent-c-runner-load-option">Load runner configuration. : <cite>cmdbox -m agent -c runner_load &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#save-runner-configuration-cmdbox-m-agent-c-runner-save-option">Save runner configuration. : <cite>cmdbox -m agent -c runner_save &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#starts-a-runner-cmdbox-m-agent-c-start-option">Starts a runner. : <cite>cmdbox -m agent -c start &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#stops-a-runner-cmdbox-m-agent-c-stop-option">Stops a runner. : <cite>cmdbox -m agent -c stop &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#chat-with-the-agent-cmdbox-m-agent-c-chat-option">Chat with the agent. : <cite>cmdbox -m agent -c chat &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#list-sessions-for-the-agent-cmdbox-m-agent-c-session-list-option">List sessions for the agent. : <cite>cmdbox -m agent -c session_list &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#delete-sessions-for-the-agent-cmdbox-m-agent-c-session-del-option">Delete sessions for the agent. : <cite>cmdbox -m agent -c session_del &lt;Option&gt;</cite></a></li>
@@ -153,11 +152,23 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html#client-upload-file-cmdbox-m-client-c-file-upload-option">client ( Upload File ) : <cite>cmdbox -m client -c file_upload &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html#client-server-info-cmdbox-m-client-c-server-info-option">client ( Server Info ) : <cite>cmdbox -m client -c server_info &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html#client-http-cmdbox-m-client-c-http-option">client ( Http ) : <cite>cmdbox -m client -c http &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#client-time-cmdbox-m-client-c-time-option">client ( Time ) : <cite>cmdbox -m client -c time &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_cmd.html">Cmd</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html#cmd-list-cmdbox-m-cmd-c-list-option">cmd ( list ) : <cite>cmdbox -m cmd -c list &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html#cmd-load-cmdbox-m-cmd-c-load-option">cmd ( load ) : <cite>cmdbox -m cmd -c load &lt;Option&gt;</cite></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-redis-install-cmdbox-m-cmdbox-c-redis-install-option">cmdbox ( redis_install ) : <cite>cmdbox -m cmdbox -c redis_install &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-server-down-cmdbox-m-cmdbox-c-server-down-option">cmdbox ( server_down ) : <cite>cmdbox -m cmdbox -c server_down &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-server-exec-cmdbox-m-cmdbox-c-server-exec-option">cmdbox ( server_exec ) : <cite>cmdbox -m cmdbox -c server_exec &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-server-install-cmdbox-m-cmdbox-c-server-install-option">cmdbox ( server_install ) : <cite>cmdbox -m cmdbox -c server_install &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-server-logs-cmdbox-m-cmdbox-c-server-logs-option">cmdbox ( server_logs ) : <cite>cmdbox -m cmdbox -c server_logs &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-server-reboot-cmdbox-m-cmdbox-c-server-reboot-option">cmdbox ( server_reboot ) : <cite>cmdbox -m cmdbox -c server_reboot &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-server-uninstall-cmdbox-m-cmdbox-c-server-uninstall-option">cmdbox ( server_uninstall ) : <cite>cmdbox -m cmdbox -c server_uninstall &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-server-up-cmdbox-m-cmdbox-c-server-up-option">cmdbox ( server_up ) : <cite>cmdbox -m cmdbox -c server_up &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_edge.html">Edge</a><ul>
@@ -189,8 +200,6 @@
 <li class="toctree-l1"><a class="reference internal" href="cmd_tts.html">TTS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html#installs-the-text-to-speech-tts-engine-cmdbox-m-tts-c-install-option">Installs the Text-to-Speech (TTS) engine : <cite>cmdbox -m tts -c install &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html#lists-the-text-to-speech-tts-engine-cmdbox-m-tts-c-list-option">Lists the Text-to-Speech (TTS) engine : <cite>cmdbox -m tts -c list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_tts.html#starts-the-text-to-speech-tts-engine-cmdbox-m-tts-c-start-option">Starts the Text-to-Speech (TTS) engine : <cite>cmdbox -m tts -c start &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_tts.html#stops-the-text-to-speech-tts-engine-cmdbox-m-tts-c-stop-option">Stops the Text-to-Speech (TTS) engine : <cite>cmdbox -m tts -c stop &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html#exec-the-text-to-speech-tts-engine-cmdbox-m-tts-c-say-option">Exec the Text-to-Speech (TTS) engine : <cite>cmdbox -m tts -c say &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html#uninstalls-the-text-to-speech-tts-engine-cmdbox-m-tts-c-uninstall-option">Uninstalls the Text-to-Speech (TTS) engine : <cite>cmdbox -m tts -c uninstall &lt;Option&gt;</cite></a></li>
 </ul>

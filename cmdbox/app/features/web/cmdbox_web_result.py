@@ -1,9 +1,10 @@
 from cmdbox.app import feature
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import HTMLResponse
 from typing import Dict, Any
 import json
+import logging
 
 
 class Result(feature.WebFeature):
@@ -15,6 +16,7 @@ class Result(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
+        ondemand_load = web.logger.level == logging.DEBUG
         if web.result_html is not None:
             if not web.result_html.is_file():
                 raise FileNotFoundError(f'result_html is not found. ({web.result_html})')
@@ -43,7 +45,15 @@ class Result(feature.WebFeature):
             if signin is not None:
                 return signin
             res.headers['Access-Control-Allow-Origin'] = '*'
-            return web.result_html_data
+            if ondemand_load:
+                if not web.result_html.is_file():
+                    raise HTTPException(status_code=404, detail=f'result_html is not found. ({web.result_html})')
+                with open(web.result_html, 'r', encoding='utf-8') as f:
+                    web.options.audit_exec(req, res, web)
+                    return HTMLResponse(f.read())
+            else:
+                web.options.audit_exec(req, res, web)
+                return HTMLResponse(web.result_html_data)
 
     def toolmenu(self, web:Web) -> Dict[str, Any]:
         """

@@ -22,11 +22,13 @@ class Gui(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        if web.gui_html is not None:
-            if not web.gui_html.is_file():
-                raise FileNotFoundError(f'gui_html is not found. ({web.gui_html})')
-            with open(web.gui_html, 'r', encoding='utf-8') as f:
-                web.gui_html_data = f.read()
+        ondemand_load = web.logger.level == logging.DEBUG
+        if not ondemand_load:
+            if web.gui_html is not None:
+                if not web.gui_html.is_file():
+                    raise FileNotFoundError(f'gui_html is not found. ({web.gui_html})')
+                with open(web.gui_html, 'r', encoding='utf-8') as f:
+                    web.gui_html_data = f.read()
 
         @app.get('/', response_class=HTMLResponse)
         async def index(req:Request, res:Response):
@@ -39,8 +41,15 @@ class Gui(feature.WebFeature):
             if signin is not None:
                 return signin
             res.headers['Access-Control-Allow-Origin'] = '*'
-            web.options.audit_exec(req, res, web)
-            return web.gui_html_data
+            if ondemand_load:
+                if not web.gui_html.is_file():
+                    raise HTTPException(status_code=404, detail=f'gui_html is not found. ({web.gui_html})')
+                with open(web.gui_html, 'r', encoding='utf-8') as f:
+                    web.options.audit_exec(req, res, web)
+                    return HTMLResponse(f.read())
+            else:
+                web.options.audit_exec(req, res, web)
+                return HTMLResponse(web.gui_html_data)
 
         @app.get('/signin/gui/appid', response_class=PlainTextResponse)
         @app.get('/gui/appid', response_class=PlainTextResponse)

@@ -528,6 +528,7 @@
     --accent-cyan: #00f7ff;
     --accent-magenta: #ff00e6;
     --accent-green: #39ff14;
+    --accent-blue: #1439ff;
     --text-primary: #e2e8f0;
     --font-header: 'Orbitron', sans-serif;
     --font-body: 'Rajdhani', sans-serif;
@@ -536,6 +537,8 @@
     --item-border-danger-color: rgba(255, 0, 230, 0.3);
     --item-bg-color: rgba(0, 247, 255, 0.05);
     --item-bg-danger-color: rgba(255, 0, 230, 0.05);
+    --item-bg-success-color: rgba(57, 255, 20, 0.05);
+    --item-bg-info-color: rgba(100, 181, 246, 0.05);
     --bs-border-radius: 0rem;
 
     --bs-body-bg: #020617; /* ダークスレート */
@@ -574,7 +577,7 @@
     --bs-warning: #ffd700; /* ゴールド */
     --bs-warning-rgb: 255, 215, 0;
     --bs-warning-text: #000;
-    --bs-warning-bg-subtle: #4d4300;
+    --bs-warning-bg-subtle: var(--bs-warning);
     --bs-warning-border-subtle: #332b00;
     --bs-danger: #ff6b6b; /* ライトレッド */
     --bs-danger-rgb: 255, 107, 107;
@@ -599,9 +602,169 @@
     --bs-border-color-translucent: var(--item-border-color);
 
     --bs-emphasis-color-rgb: var(--bs-card-title-color);
-    --bs-warning-text-emphasis: var(--bs-code-color);
+    --bs-warning-text-emphasis: var(--bg-slate-950);
     --bs-body-color-rgb: var(--bs-body-color);
     --bs-secondary-rgb: var(--bs-btn-color);
     --bs-table-bg: var(--bs-tertiary-bg);
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
+}
+[data-bs-theme="spaceship"] .btn-primary,
+[data-bs-theme="spaceship"] .btn-outline-primary {
+    --bs-btn-color: var(--accent-cyan);
+    --bs-btn-bg: var(--item-bg-color);
+    --bs-btn-border-color: var(--accent-cyan);
+    --bs-btn-hover-color: var(--bg-slate-950);
+    --bs-btn-hover-bg: var(--accent-cyan);
+    --bs-btn-hover-border-color: var(--accent-cyan);
+    --bs-btn-focus-shadow-rgb: 0 0 20px var(--accent-cyan);
+    --bs-btn-active-color: var(--text-white);
+    --bs-btn-active-bg: var(--item-bg-color);
+    --bs-btn-active-border-color: var(--item-border-color);
+    --bs-btn-active-shadow: 0 0 20px var(--accent-cyan);
+    --bs-btn-disabled-color: var(--text-white);
+    --bs-btn-disabled-bg: var(--item-bg-color);
+    --bs-btn-disabled-border-color: var(--item-border-color);
+}
+[data-bs-theme="spaceship"] .btn-primary:hover,
+[data-bs-theme="spaceship"] .btn-outline-primary:hover {
+    box-shadow: 0 0 20px var(--accent-cyan);
+    font-weight: bold;
+}
+[data-bs-theme="spaceship"] .btn-secondary {
+    --bs-btn-color: var(--text-white);
+    --bs-btn-bg: var(--item-border-color);
+    --bs-btn-border-color: var(--item-border-color);
+    --bs-btn-hover-color: var(--text-white);
+    --bs-btn-hover-bg: var(--item-bg-color-hover);
+    --bs-btn-hover-border-color: var(--accent-cyan);
+    --bs-btn-focus-shadow-rgb: to-rgb(mix(var(--bs-btn-color), var(--bs-btn-border-color), 15%));
+    --bs-btn-active-color: var(--text-white);
+    --bs-btn-active-bg: var(--item-border-color);
+    --bs-btn-active-border-color: var(--item-border-color);
+    --bs-btn-active-shadow: to-rgb(mix(var(--bs-btn-color), var(--bs-btn-border-color), 15%));
+    --bs-btn-disabled-color: var(--text-white);
+    --bs-btn-disabled-bg: var(--item-border-color);
+    --bs-btn-disabled-border-color: var(--item-border-color);
+}
+[data-bs-theme="spaceship"] .btn-outline-secondary {
+    --bs-btn-color: var(--text-white);
+    --bs-btn-bg: var(--item-bg-color);
+    --bs-btn-border-color: var(--item-border-color);
+    --bs-btn-hover-color: var(--text-white);
+    --bs-btn-hover-bg: var(--item-bg-color-hover);
+    --bs-btn-hover-border-color: var(--accent-cyan);
+    --bs-btn-focus-shadow-rgb: to-rgb(mix(var(--bs-btn-color), var(--bs-btn-border-color), 15%));
+    --bs-btn-active-color: var(--text-white);
+    --bs-btn-active-bg: var(--item-bg-color);
+    --bs-btn-active-border-color: var(--item-border-color);
+    --bs-btn-active-shadow: to-rgb(mix(var(--bs-btn-color), var(--bs-btn-border-color), 15%));
+    --bs-btn-disabled-color: var(--text-white);
+    --bs-btn-disabled-bg: var(--item-bg-color);
+    --bs-btn-disabled-border-color: var(--item-border-color);
+}
+[data-bs-theme="spaceship"] .btn-success,
+[data-bs-theme="spaceship"] .btn-outline-success {
+    --bs-btn-color: var(--accent-green);
+    --bs-btn-bg: var(--item-bg-success-color);
+    --bs-btn-border-color: var(--item-border-color);
+    --bs-btn-hover-color: var(--bg-slate-950);
+    --bs-btn-hover-bg: var(--accent-green);
+    --bs-btn-hover-border-color: var(--accent-green);
+    --bs-btn-focus-shadow-rgb: to-rgb(mix(var(--bs-btn-color), var(--bs-btn-border-color), 15%));
+    --bs-btn-active-color: var(--text-white);
+    --bs-btn-active-bg: var(--item-bg-success-color);
+    --bs-btn-active-border-color: var(--item-border-color);
+    --bs-btn-active-shadow: to-rgb(mix(var(--bs-btn-color), var(--bs-btn-border-color), 15%));
+    --bs-btn-disabled-color: var(--text-white);
+    --bs-btn-disabled-bg: var(--item-bg-success-color);
+    --bs-btn-disabled-border-color: var(--item-border-color);
+}
+[data-bs-theme="spaceship"] .btn-success:hover,
+[data-bs-theme="spaceship"] .btn-outline-success:hover {
+    box-shadow: 0 0 20px var(--accent-green);
+    font-weight: bold;
+}
+[data-bs-theme="spaceship"] .btn-info,
+[data-bs-theme="spaceship"] .btn-outline-info {
+    --bs-btn-color: var(--accent-blue);
+    --bs-btn-bg: var(--item-bg-info-color);
+    --bs-btn-border-color: var(--item-border-color);
+    --bs-btn-hover-color: var(--bg-slate-950);
+    --bs-btn-hover-bg: var(--accent-blue);
+    --bs-btn-hover-border-color: var(--accent-blue);
+    --bs-btn-focus-shadow-rgb: to-rgb(mix(var(--bs-btn-color), var(--bs-btn-border-color), 15%));
+    --bs-btn-active-color: var(--text-white);
+    --bs-btn-active-bg: var(--item-bg-info-color);
+    --bs-btn-active-border-color: var(--item-border-color);
+    --bs-btn-active-shadow: to-rgb(mix(var(--bs-btn-color), var(--bs-btn-border-color), 15%));
+    --bs-btn-disabled-color: var(--text-white);
+    --bs-btn-disabled-bg: var(--item-bg-info-color);
+    --bs-btn-disabled-border-color: var(--item-border-color);
+}
+[data-bs-theme="spaceship"] .btn-info:hover,
+[data-bs-theme="spaceship"] .btn-outline-info:hover {
+    box-shadow: 0 0 20px var(--accent-blue);
+    font-weight: bold;
+}
+[data-bs-theme="spaceship"] .btn-danger,
+[data-bs-theme="spaceship"] .btn-outline-danger {
+    --bs-btn-color: var(--accent-magenta);
+    --bs-btn-bg: var(--item-bg-danger-color);
+    --bs-btn-border-color: var(--accent-magenta);
+    --bs-btn-hover-color: var(--bg-slate-950);
+    --bs-btn-hover-bg: var(--accent-magenta);
+    --bs-btn-hover-border-color: var(--accent-magenta);
+    --bs-btn-focus-shadow-rgb: to-rgb(mix(var(--bs-btn-color), var(--bs-btn-border-color), 15%));
+    --bs-btn-active-color: var(--accent-magenta);
+    --bs-btn-active-bg: var(--item-bg-danger-color);
+    --bs-btn-active-border-color: var(--accent-magenta);
+    --bs-btn-active-shadow: to-rgb(mix(var(--bs-btn-color), var(--bs-btn-border-color), 15%));
+    --bs-btn-disabled-color: var(--accent-magenta);
+    --bs-btn-disabled-bg: var(--item-bg-danger-color);
+    --bs-btn-disabled-border-color: var(--accent-magenta);
+}
+[data-bs-theme="spaceship"] .btn-danger:hover,
+[data-bs-theme="spaceship"] .btn-outline-danger:hover {
+    box-shadow: 0 0 20px var(--accent-magenta);
+    font-weight: bold;
+}
+[data-bs-theme="spaceship"] .console-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--area-border-color);
+    background: linear-gradient(90deg, var(--item-border-color), transparent);
+}
+[data-bs-theme="spaceship"] h1,
+[data-bs-theme="spaceship"] h2,
+[data-bs-theme="spaceship"] h3,
+[data-bs-theme="spaceship"] h4,
+[data-bs-theme="spaceship"] h5,
+[data-bs-theme="spaceship"] .system-font {
+    font-family: var(--font-header);
+}
+[data-bs-theme="spaceship"] .glow-text-cyan {
+    text-shadow: 0 0 10px var(--accent-cyan);
+    color: var(--accent-cyan);
+}
+
+[data-bs-theme="spaceship"] .modal-content {
+    background: var(--bg-slate-950);
+    border: 1px solid var(--accent-cyan);
+    box-shadow: 0 0 50px var(--item-border-color);
+    border-radius: 0px;
+}
+[data-bs-theme="spaceship"] .modal-content::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 20px; height: 20px;
+    border-top: 2px solid var(--accent-cyan); border-left: 2px solid var(--accent-cyan);
+}
+[data-bs-theme="spaceship"] .modal-content::after {
+    content: ''; position: absolute; bottom: 0; right: 0; width: 20px; height: 20px;
+    border-bottom: 2px solid var(--accent-cyan); border-right: 2px solid var(--accent-cyan);
+}
+
+[data-bs-theme="spaceship"] .modal-header {
+    border-color: var(--area-border-color);
+    background: linear-gradient(90deg, var(--item-border-color), transparent);
+}
+[data-bs-theme="spaceship"] .modal-footer {
+    border-color: var(--area-border-color);
 }

@@ -29,7 +29,7 @@ LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
 OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
  
-===== brotli-1.1.0 ===== 
+===== brotli-1.2.0 ===== 
  
 Copyright (c) 2009, 2010, 2013-2016 by the Brotli Authors.
 
@@ -610,7 +610,7 @@ consider it more useful to permit linking proprietary applications with the
 library.  If this is what you want to do, use the GNU Library General
 Public License instead of this License.
  
-===== harfbuzz-12.1.0 ===== 
+===== harfbuzz-12.3.0 ===== 
  
 HarfBuzz is licensed under the so-called "Old MIT" license.  Details follow.
 For parts of HarfBuzz that are licensed under different licenses see individual
@@ -1070,7 +1070,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
-===== libjpeg-turbo-3.1.2 ===== 
+===== libjpeg-turbo-3.1.3 ===== 
  
 LEGAL ISSUES
 ============
@@ -1257,7 +1257,7 @@ attribution and endorsement protections to other entities.  Thus, it was
 desirable to choose a license that granted us the same protections for new code
 that were granted to the IJG for code derived from their software.
  
-===== libpng-1.6.50 ===== 
+===== libpng-1.6.53 ===== 
  
 COPYRIGHT NOTICE, DISCLAIMER, and LICENSE
 =========================================
@@ -1521,7 +1521,7 @@ THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
 IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  
-===== xz-5.8.1 ===== 
+===== xz-5.8.2 ===== 
  
 
 XZ Utils Licensing
@@ -1594,7 +1594,7 @@ XZ Utils Licensing
     The contact information is in the README file.
 
  
-===== zlib-ng-2.2.5 ===== 
+===== zlib-ng-2.3.2 ===== 
  
 (C) 1995-2024 Jean-loup Gailly and Mark Adler
 

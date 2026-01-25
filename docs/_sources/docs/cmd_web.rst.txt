@@ -162,6 +162,7 @@ Web Service Launch : `cmdbox -m web -c start <Option>`
     "--filer_html <filer.html file path>","","Specify `filer.html`. If omitted, the cmdbox built-in HTML file is used."
     "--result_html <result.html file path>","","Specify `result.html`. If omitted, the cmdbox built-in HTML file is used."
     "--users_html <users.html file path>","","Specify `users.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--agent_html <agent.html file path>","","Specify `agent.html`. If omitted, the cmdbox built-in HTML file is used."
     "--assets <Path to js and css files>","","Specify the asset file required when using html files."
     "--signin_html <signin.html file path>","","Specify `signin.html`. If omitted, the cmdbox built-in HTML file is used."
 

@@ -26,9 +26,10 @@
     --item-bg-danger-color-hover: rgba(255, 0, 230, 0.15);
     --item-bg-warning-color: rgba(255, 140, 0, 0.05);
     --item-bg-warning-color-hover: rgba(255, 140, 0, 0.15);
+    --bs-warning: #ffd700; /* ゴールド */
     --bs-warning-text-emphasis: var(--bg-slate-950);
     --bs-warning-border-subtle: var(--accent-orange);
-    --bs-warning-bg-subtle: var(--accent-orange);
+    --bs-warning-bg-subtle: var(--bs-warning);
 }
 
 /* --- Base Styles --- */
@@ -457,7 +458,7 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
 }
 
 /* --- Modal Custom --- */
-.modal-content.sf-modal {
+.modal-content .sf-modal {
     background: var(--bg-slate-950);
     border: 1px solid var(--accent-cyan);
     box-shadow: 0 0 50px var(--item-border-color);

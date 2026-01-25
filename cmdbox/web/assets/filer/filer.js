@@ -732,7 +732,7 @@ fsapi.editer = (svpath, data, mime, is_local) => {
     textarea.html(unicodeString.replace(/\r/g, ''));
     const view_footer = viewer.find('.modal-footer');
     if (view_footer.find('.btn-save').length <= 0) {
-      const btn_save = $('<button type="button" class="btn btn-success btn-save">Save</button>');
+      const btn_save = $('<button type="button" class="btn btn-outline-success btn-save">Save</button>');
       view_footer.append(btn_save);
       btn_save.off('click').on('click', async () => {
         if (!window.confirm('Do you want to save the changes?')) return;

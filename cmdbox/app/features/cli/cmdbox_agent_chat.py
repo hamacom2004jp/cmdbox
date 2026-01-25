@@ -1,20 +1,23 @@
 from cmdbox.app import common, client, feature, options
 from cmdbox.app.auth import signin
 from cmdbox.app.commons import convert, redis_client
-from cmdbox.app.features.cli import cmdbox_tts_say, cmdbox_agent_start
+from cmdbox.app.features.cli import cmdbox_tts_say
 from cmdbox.app.options import Options
 from contextlib import aclosing
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
-import asyncio
 import argparse
 import logging
 import json
+import platform
 import re
-import time
 
 
-class AgentChat(cmdbox_agent_start.AgentStart):
+class AgentChat(feature.ResultEdgeFeature):
+
+    def __init__(self, appcls, ver):
+        super().__init__(appcls, ver)
+        self.call_a2asv_start:bool = False
 
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
@@ -113,7 +116,7 @@ class AgentChat(cmdbox_agent_start.AgentStart):
         msg = dict(success=[], warn=[])
         for res in cl.redis_cli.send_cmd_sse(self.get_svcmd(), [payload_b64],
                                              retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False):
-            common.print_format(res, False, tm, None, False, pf=pf)
+            #common.print_format(res, False, tm, None, False, pf=pf)
             if 'success' in res:
                 msg['success'].append(res['success'])
             elif 'warn' in res:
@@ -129,6 +132,354 @@ class AgentChat(cmdbox_agent_start.AgentStart):
     def is_cluster_redirect(self):
         return False
 
+    def _load_agent_config(self, data_dir:Path, agent_name:str) -> Dict[str, Any]:
+        agent_conf_path = data_dir / ".agent" / f"agent-{agent_name}.json"
+        if not agent_conf_path.exists():
+            raise FileNotFoundError(f"Specified agent configuration '{agent_name}' not found on server at '{str(agent_conf_path)}'.")
+        with agent_conf_path.open('r', encoding='utf-8') as f:
+            agent_conf = json.load(f)
+        return agent_conf
+
+    def _load_llm_config(self, data_dir:Path, llm_name:str) -> Dict[str, Any]:
+        llm_conf_path = data_dir / ".agent" / f"llm-{llm_name}.json"
+        if not llm_conf_path.exists():
+            raise FileNotFoundError(f"Specified llm configuration '{llm_name}' not found on server at '{str(llm_conf_path)}'.")
+        with llm_conf_path.open('r', encoding='utf-8') as f:
+            llm_conf = json.load(f)
+        return llm_conf
+
+    def _load_mcpsv_config(self, data_dir:Path, mcpservers:List[str]) -> List[Dict[str, Any]]:
+        mcpsv_confs = []
+        if isinstance(mcpservers, list):
+            for mcpsv_name in mcpservers:
+                mcpsv_conf_path = data_dir / ".agent" / f"mcpsv-{mcpsv_name}.json"
+                if not mcpsv_conf_path.exists():
+                    raise FileNotFoundError(f"Specified MCP server configuration '{mcpsv_name}' not found on server at '{str(mcpsv_conf_path)}'.")
+                with mcpsv_conf_path.open('r', encoding='utf-8') as f:
+                    mcpsv_conf = json.load(f)
+                    mcpsv_confs.append(mcpsv_conf)
+        return mcpsv_confs
+
+    def load_conf(self, runner_name:str, data_dir:Path, logger:logging.Logger):
+        runner_conf_path = data_dir / ".agent" / f"runner-{runner_name}.json"
+        if not runner_conf_path.exists():
+            raise FileNotFoundError(f"Specified runner configuration '{runner_name}' not found on server at '{str(runner_conf_path)}'.")
+        with runner_conf_path.open('r', encoding='utf-8') as f:
+            runner_conf = json.load(f)
+
+        agent_conf = self._load_agent_config(data_dir, runner_conf['agent'])
+        if agent_conf.get('llm', None) is not None:
+            llm_conf = self._load_llm_config(data_dir, agent_conf['llm'])
+        else:
+            llm_conf = {}
+
+        if agent_conf.get('mcpservers', None) is not None:
+            mcpsv_confs = self._load_mcpsv_config(data_dir, agent_conf['mcpservers'])
+        else:
+            mcpsv_confs = []
+        return runner_conf, agent_conf, llm_conf, mcpsv_confs
+
+    def create_agent(self, logger:logging.Logger, data_dir:Path, disable_remote_agent:bool,
+                     agent_conf:Dict[str, Any], llm_conf:Dict[str, Any], mcpsv_confs:List[Dict[str, Any]]) -> Any:
+        """
+        エージェントを作成します
+
+        Args:
+            logger (logging.Logger): ロガー
+            data_dir (Path): データディレクトリパス
+            disable_remote_agent (bool): リモートエージェントを無効化するかどうか
+            agent_conf (Dict[str, Any]): エージェント設定
+            llm_conf (Dict[str, Any]): LLM設定
+            mcpsv_confs (List[Dict[str, Any]]): MCPサーバー設定リスト
+
+        Returns:
+            Agent: エージェント
+        """
+        if logger.level == logging.DEBUG:
+            logger.debug(f"create_agent processing..")
+        description = agent_conf.get("agent_description", f"{self.ver.__appid__}に登録されているコマンド提供")
+        instruction = agent_conf.get("agent_instruction", f"あなたはコマンドの意味を熟知しているエキスパートです。" + \
+                      f"ユーザーがコマンドを実行したいとき、あなたは以下の手順に従ってコマンドを確実に実行してください。\n" + \
+                      f"1. ユーザーのクエリからが実行したいコマンドを特定します。\n" + \
+                      f"2. コマンド実行に必要なパラメータのなかで、ユーザーのクエリから取得できないものは、コマンド定義にあるデフォルト値を指定して実行してください。\n" + \
+                      f"3. もしエラーが発生した場合は、ユーザーにコマンド名とパラメータとエラー内容を提示してください。\n" \
+                      f"4. コマンドの実行結果は、json文字列で出力するようにしてください。この時json文字列は「```json」と「```」で囲んだ文字列にしてください。\n")
+
+        if logger.level == logging.DEBUG:
+            logger.debug(f"google-adk loading..")
+        from google.adk.agents import Agent as AdkAgent
+
+        # App name mismatch警告を回避するためのラッパークラス
+        class Agent(AdkAgent):
+            pass
+
+        if logger.level == logging.DEBUG:
+            logger.debug(f"litellm loading..")
+        from google.adk.models import lite_llm
+        from litellm import _logging
+        _logging._turn_on_debug()
+
+        # loggerの初期化
+        common.reset_logger("LiteLLM Proxy")
+        common.reset_logger("LiteLLM Router")
+        common.reset_logger("LiteLLM")
+        # 各種設定値の取得
+        agent_name = agent_conf.get('agent_name', None)
+        agent_type = agent_conf.get('agent_type', None)
+        a2asv_baseurl = agent_conf.get('a2asv_baseurl', "http://localhost:8071/a2a")
+        a2asv_delegated_auth = agent_conf.get('a2asv_delegated_auth', False)
+        a2asv_apikey = agent_conf.get('a2asv_apikey', None)
+        agent_subagents = agent_conf.get('subagents', None)
+        llmprov = llm_conf.get('llmprov', None)
+        llmprojectid = llm_conf.get('llmprojectid', None)
+        llmsvaccountfile = llm_conf.get('llmsvaccountfile', None)
+        llmsvaccountfile_data = llm_conf.get('llmsvaccountfile_data', {})
+        llmlocation = llm_conf.get('llmlocation', None)
+        llmapikey = llm_conf.get('llmapikey', None)
+        llmapiversion = llm_conf.get('llmapiversion', None)
+        llmendpoint = llm_conf.get('llmendpoint', None)
+        llmmodel = llm_conf.get('llmmodel', None)
+        llmseed = llm_conf.get('llmseed', None)
+        llmtemperature = llm_conf.get('llmtemperature', None)
+
+        def create_subagent(data_dir:Path, agent_name:str) -> Any:
+            agent_conf = self._load_agent_config(data_dir, agent_name)
+            if agent_conf.get('llm', None) is not None:
+                llm_conf = self._load_llm_config(data_dir, agent_conf['llm'])
+            else:
+                llm_conf = {}
+
+            if agent_conf.get('mcpservers', None) is not None:
+                mcpsv_confs = self._load_mcpsv_config(data_dir, agent_conf['mcpservers'])
+            else:
+                mcpsv_confs = []
+            return self.create_agent(logger, data_dir, disable_remote_agent, agent_conf, llm_conf, mcpsv_confs)
+
+        agent_subagents = agent_subagents if agent_subagents is not None else []
+        subagents = []
+        if 'subagents' in agent_conf and isinstance(agent_subagents, list):
+            for subagent_name in agent_subagents:
+                subagent_obj = create_subagent(data_dir, subagent_name)
+                if subagent_obj is not None:
+                    subagents.append(subagent_obj)
+
+        if agent_type == 'remote' and not disable_remote_agent:
+            from google.adk.agents.remote_a2a_agent import RemoteA2aAgent, AGENT_CARD_WELL_KNOWN_PATH
+            from a2a.client.client_factory import ClientConfig, ClientFactory
+            import httpx
+
+            def _create_dynamic_header_provider():
+                async def add_auth_headers(request):
+                    scope = signin.get_request_scope()
+                    if scope is not None and a2asv_delegated_auth:
+                        apikey = scope["a2asv_apikey"] if scope["a2asv_apikey"] is not None else a2asv_apikey
+                        request.headers['Authorization'] = f'Bearer {apikey}'
+                    if a2asv_apikey is not None:
+                        request.headers['Authorization'] = f'Bearer {a2asv_apikey}'
+                return add_auth_headers
+            custom_httpx_client = httpx.AsyncClient(
+                follow_redirects=True,
+                timeout=httpx.Timeout(600.0),
+                event_hooks={'request': [_create_dynamic_header_provider()]}
+            )
+            config = ClientConfig(httpx_client=custom_httpx_client)
+            factory = ClientFactory(config=config)
+            agent = RemoteA2aAgent(
+                name=agent_name,
+                agent_card=a2asv_baseurl + AGENT_CARD_WELL_KNOWN_PATH,
+                a2a_client_factory=factory,
+            )
+            if logger.level == logging.DEBUG:
+                logger.debug(f"create_agent complate.")
+            return agent
+        elif llmprov == 'openai':
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmapikey is None: raise ValueError("llmapikey is required.")
+            from google.adk.planners import PlanReActPlanner
+            agent = Agent(
+                name=agent_name,
+                model=lite_llm.LiteLlm(
+                    model=llmmodel,
+                    api_key=llmapikey,
+                    endpoint=llmendpoint,
+                ),
+                description=description,
+                instruction=instruction,
+                planner=PlanReActPlanner(),
+                tools=self.create_tool_mcpsv(logger, mcpsv_confs),
+                sub_agents=subagents
+            )
+        elif llmprov == 'azureopenai':
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmendpoint is None: raise ValueError("llmendpoint is required.")
+            if "/openai/deployments" in llmendpoint:
+                llmendpoint = llmendpoint.split("/openai/deployments")[0]
+            if llmapikey is None: raise ValueError("llmapikey is required.")
+            if llmapiversion is None: raise ValueError("llmapiversion is required.")
+            from google.adk.planners import PlanReActPlanner
+            if not llmmodel.startswith("azure/"):
+                llmmodel = f"azure/{llmmodel}"
+            agent = Agent(
+                name=agent_name,
+                model=lite_llm.LiteLlm(
+                    model=llmmodel,
+                    api_key=llmapikey,
+                    api_base=llmendpoint,
+                    api_version=llmapiversion,
+                ),
+                description=description,
+                instruction=instruction,
+                planner=PlanReActPlanner(),
+                tools=self.create_tool_mcpsv(logger, mcpsv_confs),
+                sub_agents=subagents
+            )
+        elif llmprov == 'vertexai':
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmlocation is None: raise ValueError("llmlocation is required.")
+            if llmsvaccountfile_data is None: raise ValueError("llmsvaccountfile_data is required.")
+            from google.adk.planners import BuiltInPlanner
+            from google.genai import types
+            agent = Agent(
+                name=agent_name,
+                model=lite_llm.LiteLlm(
+                    model=llmmodel,
+                    #vertex_project=llmprojectid,
+                    vertex_credentials=llmsvaccountfile_data,
+                    vertex_location=llmlocation,
+                    seed=llmseed,
+                    temperature=llmtemperature,
+                ),
+                description=description,
+                instruction=instruction,
+                planner=BuiltInPlanner(thinking_config=types.ThinkingConfig(
+                    include_thoughts=True,
+                    thinking_budget=1024,
+                )),
+                tools=self.create_tool_mcpsv(logger, mcpsv_confs),
+                sub_agents=subagents
+            )
+        elif llmprov == 'ollama':
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmendpoint is None: raise ValueError("llmendpoint is required.")
+            from google.adk.planners import PlanReActPlanner
+            agent = Agent(
+                name=agent_name,
+                model=lite_llm.LiteLlm(
+                    model=f"ollama/{llmmodel}",
+                    api_base=llmendpoint,
+                    temperature=llmtemperature,
+                    stream=True
+                ),
+                description=description,
+                instruction=instruction,
+                planner=PlanReActPlanner(),
+                tools=self.create_tool_mcpsv(logger, mcpsv_confs),
+                sub_agents=subagents
+            )
+        elif disable_remote_agent:
+            return None
+        else:
+            raise ValueError("llmprov is required.")
+        if logger.level == logging.DEBUG:
+            logger.debug(f"create_agent complate.")
+        return agent
+
+    def create_tool_mcpsv(self, logger:logging.Logger, mcpsv_confs:List[Dict[str, Any]]) -> List[Any]:
+        """
+        MCPサーバーツールを作成します
+        Args:
+            logger (logging.Logger): ロガー
+            mcpsv_confs (List[Dict[str, Any]]): MCPサーバー設定リスト
+        Returns:
+            List[MCPToolset]: MCPToolsetのリスト
+        """
+        from fastapi.openapi.models import HTTPBearer, SecuritySchemeType
+        from google.adk.auth.auth_credential import AuthCredential, AuthCredentialTypes
+        from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset
+        from google.adk.tools.mcp_tool.mcp_session_manager import SseConnectionParams, StreamableHTTPConnectionParams
+        from google.adk.agents.readonly_context import ReadonlyContext
+
+        auth_scheme = HTTPBearer()
+        tools = []
+        for mcpsv_conf in mcpsv_confs:
+            mcpserver_url = mcpsv_conf.get('mcpserver_url', None)
+            mcpserver_apikey = mcpsv_conf.get('mcpserver_apikey', None)
+            mcpserver_delegated_auth = mcpsv_conf.get('mcpserver_delegated_auth', False)
+            mcpserver_transport = mcpsv_conf.get('mcpserver_transport', 'streamable-http')  # sse
+            auth_cred = AuthCredential(auth_type=AuthCredentialTypes.HTTP)
+            if mcpserver_transport == 'sse':
+                conn_params = SseConnectionParams(
+                    url=mcpserver_url,
+                    timeout=120,
+                    sse_read_timeout=600,
+                )
+            else:
+                conn_params = StreamableHTTPConnectionParams(
+                    url=mcpserver_url,
+                    timeout=120,
+                    sse_read_timeout=600,
+                )
+            if self.call_a2asv_start and mcpserver_apikey is not None:
+                conn_params.headers = dict(Authorization=f"Bearer {mcpserver_apikey}")
+            def _warp(mcpserver_apikey:str, mcpserver_delegated_auth:bool):
+                # mcpserver_delegated_auth=Trueの場合、chatコマンド実行時に、
+                # Signin情報からapikeyを取得してMCPサーバーに転送するためのヘッダープロバイダー
+                def header_provider(readonly_context:ReadonlyContext) -> Dict[str, str]:
+                    scope = signin.get_request_scope()
+                    # delegated_authが有効な場合、Signin情報からapikeyを取得して使用
+                    if scope is not None and mcpserver_delegated_auth and scope.get("mcpserver_apikey", None) is not None:
+                        return dict(Authorization=f"Bearer {scope['mcpserver_apikey']}")
+                    # delegated_authが無効な場合、設定済みのAPIKeyを使用
+                    elif not mcpserver_delegated_auth and mcpserver_apikey is not None:
+                        return dict(Authorization=f"Bearer {mcpserver_apikey}")
+                    # fastmcp経由で来たときはreqヘッダーからAuthorizationを取得して転送
+                    elif mcpserver_delegated_auth and 'req' in scope and 'headers' in scope['req']:
+                        req_headers = scope['req'].headers
+                        if 'authorization' in req_headers:
+                            return dict(Authorization=req_headers['authorization'])
+                    return {}
+                return header_provider
+            toolset = MCPToolset(
+                connection_params=conn_params,
+                tool_filter=mcpsv_conf.get('mcpserver_mcp_tools', []),
+                auth_scheme=auth_scheme,
+                auth_credential=auth_cred,
+                header_provider=_warp(mcpserver_apikey, mcpserver_delegated_auth),
+            )
+            tools.append(toolset)
+        return tools
+
+    def create_session_service(self, data_dir:Path, logger:logging.Logger, runner_conf:Dict[str, Any]) -> Any:
+        """
+        セッションサービスを作成します
+
+        Args:
+            runner_conf (Dict[str, Any]): Runnerの設定
+
+        Returns:
+            BaseSessionService: セッションサービス
+        """
+        if runner_conf.get('session_store_type') == 'sqlite':
+            uri = (data_dir / '.agent' / 'session.db').as_uri()
+            if platform.system() == 'Windows':
+                runner_conf['agent_session_dburl'] = f"sqlite+aiosqlite:{uri.replace('file:///', '///')}"
+            else:
+                runner_conf['agent_session_dburl'] = f"sqlite+aiosqlite:{uri.replace('file:///', '////')}"
+        elif runner_conf.get('session_store_type') == 'postgresql':
+            runner_conf['agent_session_dburl'] = f"postgresql+psycopg://{runner_conf['session_store_pguser']}:{runner_conf['session_store_pgpass']}@{runner_conf['session_store_pghost']}:{runner_conf['session_store_pgport']}/{runner_conf['session_store_pgdbname']}"
+        else:
+            runner_conf['agent_session_dburl'] = None
+        from google.adk.sessions import InMemorySessionService
+        from google.adk.sessions.database_session_service import DatabaseSessionService
+        #from typing_extensions import override
+        if runner_conf['agent_session_dburl'] is not None:
+            logger.info(f"Using DatabaseSessionService: {runner_conf['agent_session_dburl']}")
+            dss = DatabaseSessionService(db_url=runner_conf['agent_session_dburl'])
+            return dss
+        else:
+            logger.info(f"Using InMemorySessionService")
+            return InMemorySessionService()
+    
     async def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
                     sessions:Dict[str, Dict[str, Any]]):
         reskey = msg[1]
@@ -158,7 +509,7 @@ class AgentChat(cmdbox_agent_start.AgentStart):
 
                 Args:
                     session_service (BaseSessionService): セッションサービス
-                    app_name (str): アプリケーション名
+                    runner_name (str): ランナー名
                     user_name (str): ユーザー名
                     session_id (str): セッションID
 
@@ -204,37 +555,43 @@ class AgentChat(cmdbox_agent_start.AgentStart):
             signin.set_request_scope(dict(mcpserver_apikey=mcpserver_apikey, a2asv_apikey=a2asv_apikey))
             run_config = RunConfig(streaming_mode=StreamingMode.NONE)
             async with aclosing(runner.run_async(user_id=user_name, session_id=agent_session.id, new_message=content, run_config=run_config)) as run_iter:
-                async for event in run_iter:
-                    outputs = dict(success=dict(),)
-                    success = outputs['success']
-                    ids = outputs['success']['ids'] = dict()
-                    ids['agent_session_id'] = agent_session.id
-                    ids['event_id'] = event.id
-                    ids['invocation_id'] = event.invocation_id
-                    flags = outputs['success']['flags'] = dict()
-                    if event.turn_complete:
-                        flags['turn_complete'] = True
-                    if event.interrupted:
-                        flags['interrupted'] = True
-                    msg, is_func_call, is_func_response = self.__class__.gen_msg(event)
-                    flags['final_response'] = event.is_final_response()
-                    flags['function_call'] = is_func_call
-                    flags['function_response'] = is_func_response
-                    if msg:
-                        success['message'] = msg
-                        options.Options.getInstance().audit_exec(body=dict(agent_session=agent_session.id, result=msg),
-                                                                    audit_type=options.Options.AT_USER, user=user_name)
-                        if enable_tts and tts_engine_obj and not is_func_call and not is_func_response:
-                            tts_msg = re.sub(r'```json.*?```', '', msg, flags=re.DOTALL) # json表現部分を除去
-                            try:
-                                wav_b64 = cmdbox_tts_say.TtsSay.tts_say(tts_engine_obj, tts_msg)
-                                success['wav_b64'] = wav_b64
-                            except Exception as e:
-                                success['wav_b64'] = None
-
-                        redis_cli.rpush(reskey, outputs)
-                        if flags['final_response']:
-                            break
+                try:
+                    async for event in run_iter:
+                        outputs = dict(success=dict(),)
+                        success = outputs['success']
+                        ids = outputs['success']['ids'] = dict()
+                        ids['agent_session_id'] = agent_session.id
+                        ids['event_id'] = event.id
+                        ids['invocation_id'] = event.invocation_id
+                        flags = outputs['success']['flags'] = dict()
+                        if event.turn_complete:
+                            flags['turn_complete'] = True
+                        if event.interrupted:
+                            flags['interrupted'] = True
+                        msg, is_func_call, is_func_response = self.__class__.gen_msg(event)
+                        flags['final_response'] = event.is_final_response()
+                        flags['function_call'] = is_func_call
+                        flags['function_response'] = is_func_response
+                        if msg:
+                            success['message'] = msg
+                            options.Options.getInstance().audit_exec(body=dict(agent_session=agent_session.id, result=msg),
+                                                                        audit_type=options.Options.AT_USER, user=user_name)
+                            if enable_tts and tts_engine_obj and not is_func_call and not is_func_response:
+                                tts_msg = re.sub(r'```json.*?```', '', msg, flags=re.DOTALL) # json表現部分を除去
+                                try:
+                                    wav_b64 = cmdbox_tts_say.TtsSay.tts_say(tts_engine_obj, tts_msg)
+                                    success['wav_b64'] = wav_b64
+                                except Exception as e:
+                                    success['wav_b64'] = None
+                            redis_cli.rpush(reskey, outputs)
+                            if flags['final_response']:
+                                break
+                except Exception as e:
+                    outputs = dict(success=dict(flags=dict(final_response=True, function_call=False, function_response=False),
+                                                message=str(e),
+                                                ids=dict(agent_session_id=agent_session.id)),)
+                    redis_cli.rpush(reskey, outputs)
+                    raise e
             msg = dict(success=f"Chat '{name}' successfully.", end=True)
             redis_cli.rpush(reskey, msg)
             await run_iter.aclose()

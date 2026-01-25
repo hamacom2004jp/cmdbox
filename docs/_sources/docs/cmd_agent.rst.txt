@@ -182,7 +182,7 @@ Saves LLM configuration. : `cmdbox -m agent -c llm_save <Option>`
     "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
 
 
-Agent client start : `cmdbox -m agent -c mcp_client <Option>`
+MCP client : `cmdbox -m agent -c mcp_client <Option>`
 ==============================================================================
 - Starts an MCP client that makes requests to a remote MCP server.
 
@@ -204,10 +204,10 @@ Agent client start : `cmdbox -m agent -c mcp_client <Option>`
     "--prompt_args <dict>","","Specifies prompt arguments to be retrieved from the remote MCP server."
 
 
-Agent stdio to transport proxy start : `cmdbox -m agent -c mcp_proxy <Option>`
+Proxy to transport MCP : `cmdbox -m agent -c mcp_proxy <Option>`
 ==============================================================================
 
-- This command invokes a proxy to forward MCP standard input/output via TCP/IP.
+- Starts a Proxy server that accepts standard input and makes requests to a remote MCP server.
 
 .. csv-table::
     :widths: 20, 10, 70
@@ -391,46 +391,6 @@ Save runner configuration. : `cmdbox -m agent -c runner_save <Option>`
     "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
 
 
-Starts a runner. : `cmdbox -m agent -c start <Option>`
-==============================================================================
-
-- Starts a runner.
-
-.. csv-table::
-    :widths: 30, 10, 60
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--runner_name <name>","Yes","Specify the name of the Runner configuration."
-    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
-    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
-
-
-Stops a runner. : `cmdbox -m agent -c stop <Option>`
-==============================================================================
-
-- Stops a runner.
-
-.. csv-table::
-    :widths: 30, 10, 60
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--runner_name <name>","Yes","Specify the name of the Runner configuration."
-    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
-    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
-
-
 Chat with the agent. : `cmdbox -m agent -c chat <Option>`
 ==============================================================================
 
@@ -451,6 +411,7 @@ Chat with the agent. : `cmdbox -m agent -c chat <Option>`
     "--a2asv_apikey <apikey>","","Specify the API Key of the A2A Server."
     "--mcpserver_apikey <apikey>","","Specify the API Key of the remote MCP server."
     "--message <text>","Yes","Specify the message to send to the Runner."
+    "--call_tts","","Specify whether to execute the TTS (Text-to-Speech) feature."
     "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
     "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
