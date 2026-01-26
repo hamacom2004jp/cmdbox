@@ -61,10 +61,10 @@ class Mcp:
                 issuer=issuer,
                 audience=audience
             )
-            mcp = FastMCP(name=self.ver.__appid__, auth=auth, tools=tools)
+            mcp = FastMCP(name=self.ver.__appid__, auth=auth, tools=tools, stateless_http=True)
         else:
             self.logger.info(f"Using JWTVerifier without public key, issuer, or audience.")
-            mcp = FastMCP(name=self.ver.__appid__)
+            mcp = FastMCP(name=self.ver.__appid__, stateless_http=True)
         mcp.add_middleware(self.create_mw_logging(self.logger, args))
         mcp.add_middleware(self.create_mw_reqscope(self.logger, args))
         mcp.add_middleware(self.create_mw_toollist(self.logger, args, tools))
