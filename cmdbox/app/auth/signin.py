@@ -292,13 +292,16 @@ class Signin(object):
         return x509.load_pem_x509_certificate(data, backend=default_backend())
 
     @classmethod
-    def load_signin_file(cls, signin_file:Path, signin_file_data:Dict[str, Any]=None, self=None) -> Dict[str, Any]:
+    def load_signin_file(cls, signin_file:Path, signin_file_data:Dict[str, Any]=None,
+                         self=None, logger=None) -> Dict[str, Any]:
         """
         サインインファイルを読み込む
 
         Args:
             signin_file (Path): サインインファイル
             signin_file_data (Dict[str, Any]): サインインファイルデータ
+            self: 呼び出し元インスタンス（省略可）
+            logger: ロガー（省略可）
 
         Raises:
             HTTPException: サインインファイルのフォーマットエラー
@@ -510,7 +513,7 @@ class Signin(object):
                            output_pkey=yml['apikey']['gen_cert']['publickey'], output_pkey_format='PEM',
                            output_key=yml['apikey']['gen_cert']['privatekey'], output_key_format='PEM',)
                 args = argparse.Namespace(**opt)
-                status, res, _ = gencert.apprun(self.logger, args, 0, [])
+                status, res, _ = gencert.apprun(self.logger if hasattr(self, 'logger') else logger, args, 0, [])
                 if status != 0:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. "gen_cert" generate error in "apikey.gen_cert". ({signin_file}) {res}')
         if 'gen_jwt' not in yml['apikey']:

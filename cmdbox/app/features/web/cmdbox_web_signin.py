@@ -17,7 +17,8 @@ class Signin(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        web.signin.signin_file_data = web.signin.load_signin_file(web.signin_file, web.signin.signin_file_data, self=self)
+        web.signin.signin_file_data = web.signin.load_signin_file(web.signin_file, web.signin.signin_file_data,
+                                                                  self=self, logger=web.logger)
         ondemand_load = web.logger.level == logging.DEBUG
         if not ondemand_load:
             if web.signin_html is not None:

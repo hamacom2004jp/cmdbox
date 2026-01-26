@@ -125,7 +125,7 @@ class McpsvStart(feature.UnsupportEdgeFeature):
                 msg = dict(warn=f"Signin file '{signin_file}' is not found.")
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, msg, None
-            signin_data = signin.Signin.load_signin_file(signin_file) if signin_file is not None else None
+            signin_data = signin.Signin.load_signin_file(signin_file, None, self=self, logger=logger) if signin_file is not None else None
             # ツール側で参照できるようにするためにインスタンス化
             _web = web.Web.getInstance(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
                                        redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
