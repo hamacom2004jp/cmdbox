@@ -1,5 +1,6 @@
-from cmdbox.app import common
+from cmdbox.app import common, options
 from cmdbox.app.auth import signin
+from cmdbox.app.features.cli import cmdbox_agent_chat
 from cmdbox.app.features.web import cmdbox_web_exec_cmd
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Depends, HTTPException, Request, Response, WebSocket
@@ -89,7 +90,12 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
                     return json.dumps(data, ensure_ascii=False, default=common.default_json_enc)
                 except json.JSONDecodeError:
                     return json_str
-            json_pattern = re.compile(r'\{.*?\}')
+
+            agent_chat = cmdbox_agent_chat.AgentChat(self.appcls, self.ver)
+            _options = options.Options.getInstance(self.appcls, self.ver)
+            retry_interval = _options.get_cmd_opt('agent', 'chat', 'retry_interval').get('default', 3)
+            retry_count = _options.get_cmd_opt('agent', 'chat', 'retry_count').get('default', 5)
+            timeout = _options.get_cmd_opt('agent', 'chat', 'timeout').get('default', 120)
 
             from google.genai import types
             while True:
@@ -108,19 +114,20 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
                         continue
 
                     web.options.audit_exec(sock, web, body=dict(agent_session=session_id, user=user_name, groups=groups, query=query))
-                    opt = dict(mode='agent', cmd='chat', runner_name=runner_name, user_name=user_name,
-                            session_id=session_id, mcpserver_apikey=mcpserver_apikey, a2asv_apikey=a2asv_apikey,
-                            message=query, call_tts=call_tts)
-                    ret = await self.exec_cmd(sock, res, web, '', opt, True, self.appcls)
-                    if 'success' not in ret:
-                        yield common.to_str(ret)
-                        continue
-                    for result in ret['success']:
-                        agent_session_id = result.get('ids', {}).get('agent_session_id', None)
-                        msg = result.get('message', '')
-                        #outputs = dict(message=msg, wav_b64=result.get('wav_b64', None))
-                        web.options.audit_exec(sock, web, body=dict(agent_session=agent_session_id, result=msg))
-                        yield common.to_str(result)
+                    for st, result in agent_chat.apprun_generate(web.logger, host=web.redis_host, port=web.redis_port, password=web.redis_password, svname=web.svname,
+                                                              retry_interval=retry_interval, retry_count=retry_count, timeout=timeout,
+                                                              runner_name=runner_name, user_name=user_name, session_id=session_id,
+                                                              mcpserver_apikey=mcpserver_apikey, a2asv_apikey=a2asv_apikey,
+                                                              message=query, call_tts=call_tts):
+
+                        if st != cmdbox_agent_chat.AgentChat.RESP_SUCCESS:
+                            yield common.to_str(result)
+                        else:
+                            agent_session_id = result.get('ids', {}).get('agent_session_id', None)
+                            msg = result.get('message', '')
+                            #outputs = dict(message=msg, wav_b64=result.get('wav_b64', None))
+                            web.options.audit_exec(sock, web, body=dict(agent_session=agent_session_id, result=msg))
+                            yield common.to_str(result)
                 except WebSocketDisconnect:
                     web.logger.warning('chat: websocket disconnected.')
                     break

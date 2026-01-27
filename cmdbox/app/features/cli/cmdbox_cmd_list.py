@@ -97,7 +97,7 @@ class CmdList(feature.OneshotResultEdgeFeature):
         is_japan = common.is_japan()
         options = Options.getInstance()
         cmd_list = [dict(title=r.get('title',''), mode=r['mode'], cmd=r['cmd'],
-                    description=r.get('description','') + options.get_cmd_attr(r['mode'], r['cmd'], 'description_ja' if is_japan else 'description_en'),
+                    description=r.get('description','') + str(options.get_cmd_attr(r['mode'], r['cmd'], 'description_ja' if is_japan else 'description_en')),
                     tag=r.get('tag','')) for r in cmd_list \
                     if signin.Signin._check_cmd(self.signin_file_data, args.groups, r['mode'], r['cmd'], logger)]
         ret = dict(success=cmd_list)

@@ -371,7 +371,7 @@ class ToolList(object):
             # ユーザーコマンドリストの取得(すべてのコマンドを取得するためにgroupsをadminに設定)
             # 実行時にはユーザーのグループに応じて認可する
             cmd_list = [dict(title=r.get('title',''), mode=r['mode'], cmd=r['cmd'],
-                        description=r.get('description','') + options.get_cmd_attr(r['mode'], r['cmd'], 'description_ja' if is_japan else 'description_en'),
+                        description=r.get('description','') + str(options.get_cmd_attr(r['mode'], r['cmd'], 'description_ja' if is_japan else 'description_en')),
                         tag=r.get('tag','')) for r in cmd_list \
                        if signin.Signin._check_cmd(data, ['admin'], r['mode'], r['cmd'], self.logger)]
 
@@ -391,7 +391,7 @@ class ToolList(object):
             #if not options.get_cmd_attr(mode, cmd, 'use_agent'):
             #    continue
             choices = options.get_cmd_choices(mode, cmd, False)
-            description += '\n' + options.get_cmd_attr(mode, cmd, 'description_ja' if is_japan else 'description_en')
+            description += '\n' + str(options.get_cmd_attr(mode, cmd, 'description_ja' if is_japan else 'description_en'))
             # 関数の定義を生成
             func_txt  = self._create_func_txt(func_name, mode, cmd, is_japan, options, title=opt['title'])
             if self.logger.level == logging.DEBUG:

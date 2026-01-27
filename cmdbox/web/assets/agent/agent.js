@@ -230,10 +230,10 @@ agentView.showDocument = (title, content, message_id) => {
                 <div class="modal-content sf-modal doc-card" style="height:auto;">
                     <div class="modal-header doc-header">
                         <h5 class="modal-title glow-text-cyan system-font"><i class="fas fa-database me-2"></i>${title}</h5>
-                        <button type="button" class="btn btn_window_stack">
+                        <button type="button" class="btn btn-sf-icon btn_window_stack">
                             <i class="fa-regular fa-window-restore"></i>
                         </button>
-                        <button type="button" class="btn btn_window">
+                        <button type="button" class="btn btn-sf-icon btn_window">
                             <i class="fa-regular fa-window-maximize"></i>
                         </button>
                         <button type="button" class="btn btn-sf-icon btn_window_close" data-bs-dismiss="modal" aria-label="Close">
@@ -408,7 +408,13 @@ agentView.chat = (session_id) => {
     agentView.ws = new WebSocket(`${protocol}://${host}:${port}${path}/chat/ws/${runner_name}/${session_id}`);
     // エージェントからのメッセージ受信時の処理
     agentView.ws.onmessage = async (event) => {
-        const packet = JSON.parse(event.data);
+        let packet;
+        try {
+            packet = JSON.parse(event.data);
+        } catch (error) {
+            console.warn('JSON parse error:', error);
+            return;
+        }
         let msg_container = $(`#${agentView.message_id}`);
         if (!agentView.message_id || msg_container.length <= 0) {
             // エージェント側の表示枠が無かったら追加
@@ -1103,8 +1109,9 @@ agentView.save_mcpsv = async () => {
 agentView.get_runner_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('agent', 'runner_save');
     const vform_names = ['runner_name', 'agent', 'session_store_type', 'session_store_pghost',
-                        'session_store_pgport', 'session_store_pguser', 'session_store_pgpass',
-                        'session_store_pgdbname', 'tts_engine', 'voicevox_model'];
+                        'session_store_pgport', 'session_store_pguser', 'session_store_pgpass', 'session_store_pgdbname',
+                        'memory_type', 'memory_vertexai_project', 'memory_vertexai_location', 'memory_vertexai_agent_engine_id',
+                        'tts_engine', 'voicevox_model'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };

@@ -51,7 +51,7 @@ class AgentChat(feature.ResultEdgeFeature):
                 dict(opt="retry_interval", type=Options.T_INT, default=5, required=False, multi=False, hide=True, choice=None,
                      description_ja="Redisサーバーに再接続までの秒数を指定します。",
                      description_en="Specifies the number of seconds before reconnecting to the Redis server."),
-                dict(opt="timeout", type=Options.T_INT, default="120", required=False, multi=False, hide=True, choice=None,
+                dict(opt="timeout", type=Options.T_INT, default=120, required=False, multi=False, hide=True, choice=None,
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                      description_en="Specify the maximum waiting time until the server responds."),
                 dict(opt="runner_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
@@ -114,20 +114,60 @@ class AgentChat(feature.ResultEdgeFeature):
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         msg = dict(success=[], warn=[])
-        for res in cl.redis_cli.send_cmd_sse(self.get_svcmd(), [payload_b64],
-                                             retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False):
-            #common.print_format(res, False, tm, None, False, pf=pf)
-            if 'success' in res:
-                msg['success'].append(res['success'])
-            elif 'warn' in res:
-                msg['warn'].append(res['warn'])
+        for st, res in self.apprun_generate(logger, host=args.host, port=args.port, password=args.password, svname=args.svname,
+                                            retry_interval=args.retry_interval, retry_count=args.retry_count, timeout=args.timeout,
+                                            runner_name=args.runner_name, user_name=args.user_name, session_id=args.session_id,
+                                            a2asv_apikey=args.a2asv_apikey, mcpserver_apikey=args.mcpserver_apikey, message=args.message, call_tts=args.call_tts):
+            if st == self.RESP_SUCCESS:
+                msg['success'].append(res)
             else:
                 msg['warn'].append(res)
+            
         if len(msg['success']) <= 0:
             del msg['success']
         if len(msg['warn']) > 0:
             return self.RESP_WARN, msg, cl
         return self.RESP_SUCCESS, msg, cl
+
+    def apprun_generate(self, logger:logging.Logger, host:str, port:int, password:str, svname:str, retry_interval:int, retry_count:int, timeout:int,
+                        runner_name:str, user_name:str, session_id:str, a2asv_apikey:str, mcpserver_apikey:str, message:str, call_tts:bool):
+        """
+        Agentチャットを実行します
+        
+        Args:
+            logger (logging.Logger): ロガー
+            host (str): Redisホスト
+            port (int): Redisポート
+            password (str): Redisパスワード
+            svname (str): サービス名
+            retry_interval (int): 再接続インターバル秒数
+            retry_count (int): 再接続回数
+            timeout (int): タイムアウト秒数
+            runner_name (str): Runner設定名
+            user_name (str): ユーザー名
+            session_id (str): セッションID
+            a2asv_apikey (str): A2A Server API Key
+            mcpserver_apikey (str): MCPサーバーAPI Key
+            message (str): メッセージ
+            call_tts (bool): TTS機能を呼び出すかどうか
+        Yields:
+            Tuple[int, Any]: 処理結果ステータスと内容
+        """
+        payload = dict(runner_name=runner_name, user_name=user_name, session_id=session_id,
+                       a2asv_apikey=a2asv_apikey, mcpserver_apikey=mcpserver_apikey, message=message,
+                       call_tts=call_tts)
+        payload_b64 = convert.str2b64str(common.to_str(payload))
+
+        cl = client.Client(logger, redis_host=host, redis_port=port, redis_password=password, svname=svname)
+        msg = dict(success=[], warn=[])
+        for res in cl.redis_cli.send_cmd_sse(self.get_svcmd(), [payload_b64],
+                                             retry_count=retry_count, retry_interval=retry_interval, timeout=timeout, nowait=False):
+            if 'success' in res:
+                yield self.RESP_SUCCESS, res['success']
+            elif 'warn' in res:
+                yield self.RESP_WARN, res['warn']
+            else:
+                yield self.RESP_WARN, res
 
     def is_cluster_redirect(self):
         return False
@@ -242,6 +282,10 @@ class AgentChat(feature.ResultEdgeFeature):
         llmseed = llm_conf.get('llmseed', None)
         llmtemperature = llm_conf.get('llmtemperature', None)
 
+        async def auto_save_session_to_memory_callback(callback_context):
+            await callback_context._invocation_context.memory_service.add_session_to_memory(
+                callback_context._invocation_context.session)
+
         def create_subagent(data_dir:Path, agent_name:str) -> Any:
             agent_conf = self._load_agent_config(data_dir, agent_name)
             if agent_conf.get('llm', None) is not None:
@@ -307,7 +351,8 @@ class AgentChat(feature.ResultEdgeFeature):
                 instruction=instruction,
                 planner=PlanReActPlanner(),
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs),
-                sub_agents=subagents
+                sub_agents=subagents,
+                after_agent_callback=auto_save_session_to_memory_callback
             )
         elif llmprov == 'azureopenai':
             if llmmodel is None: raise ValueError("llmmodel is required.")
@@ -331,7 +376,8 @@ class AgentChat(feature.ResultEdgeFeature):
                 instruction=instruction,
                 planner=PlanReActPlanner(),
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs),
-                sub_agents=subagents
+                sub_agents=subagents,
+                after_agent_callback=auto_save_session_to_memory_callback
             )
         elif llmprov == 'vertexai':
             if llmmodel is None: raise ValueError("llmmodel is required.")
@@ -356,7 +402,8 @@ class AgentChat(feature.ResultEdgeFeature):
                     thinking_budget=1024,
                 )),
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs),
-                sub_agents=subagents
+                sub_agents=subagents,
+                after_agent_callback=auto_save_session_to_memory_callback
             )
         elif llmprov == 'ollama':
             if llmmodel is None: raise ValueError("llmmodel is required.")
@@ -374,7 +421,8 @@ class AgentChat(feature.ResultEdgeFeature):
                 instruction=instruction,
                 planner=PlanReActPlanner(),
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs),
-                sub_agents=subagents
+                sub_agents=subagents,
+                after_agent_callback=auto_save_session_to_memory_callback
             )
         elif disable_remote_agent:
             return None
@@ -398,9 +446,10 @@ class AgentChat(feature.ResultEdgeFeature):
         from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset
         from google.adk.tools.mcp_tool.mcp_session_manager import SseConnectionParams, StreamableHTTPConnectionParams
         from google.adk.agents.readonly_context import ReadonlyContext
+        from google.adk.tools.preload_memory_tool import PreloadMemoryTool
 
         auth_scheme = HTTPBearer()
-        tools = []
+        tools = [PreloadMemoryTool()]
         for mcpsv_conf in mcpsv_confs:
             mcpserver_url = mcpsv_conf.get('mcpserver_url', None)
             mcpserver_apikey = mcpsv_conf.get('mcpserver_apikey', None)
@@ -471,7 +520,6 @@ class AgentChat(feature.ResultEdgeFeature):
             runner_conf['agent_session_dburl'] = None
         from google.adk.sessions import InMemorySessionService
         from google.adk.sessions.database_session_service import DatabaseSessionService
-        #from typing_extensions import override
         if runner_conf['agent_session_dburl'] is not None:
             logger.info(f"Using DatabaseSessionService: {runner_conf['agent_session_dburl']}")
             dss = DatabaseSessionService(db_url=runner_conf['agent_session_dburl'])
@@ -480,6 +528,30 @@ class AgentChat(feature.ResultEdgeFeature):
             logger.info(f"Using InMemorySessionService")
             return InMemorySessionService()
     
+    def create_memory_service(self, data_dir:Path, logger:logging.Logger, runner_conf:Dict[str, Any]) -> Any:
+        """
+        メモリーサービスを作成します
+
+        Args:
+            runner_conf (Dict[str, Any]): Runnerの設定
+
+        Returns:
+            BaseMemoryService: メモリーサービス
+        """
+        from google.adk.memory import InMemoryMemoryService, VertexAiMemoryBankService
+        memsv = None
+        if runner_conf.get('memory_type') == 'memory':
+            memsv = InMemoryMemoryService()
+        elif runner_conf.get('memory_type') == 'vertexai_memorybank':
+            memsv = VertexAiMemoryBankService(
+                project_id=runner_conf.get('vertexai_memorybank_projectid', None),
+                location=runner_conf.get('vertexai_memorybank_location', None),
+                agent_engine_id=runner_conf.get('memory_vertexai_agent_engine_id', None),
+            )
+        else:
+            logger.info(f"Using InMemoryMemoryService")
+            return InMemoryMemoryService()
+
     async def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
                     sessions:Dict[str, Dict[str, Any]]):
         reskey = msg[1]
@@ -536,6 +608,7 @@ class AgentChat(feature.ResultEdgeFeature):
                 app_name=runner_conf.get('runner_name', self.ver.__appid__),
                 agent=agent,
                 session_service=self.create_session_service(data_dir, logger, runner_conf),
+                memory_service=self.create_memory_service(data_dir, logger, runner_conf),
             )
             content = types.Content(role='user', parts=[types.Part(text=message)])
             tts_engine = runner_conf.get('tts_engine', None)
