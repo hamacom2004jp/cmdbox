@@ -589,8 +589,8 @@ agentView.format_agent_message =  async (txt, message) => {
             if (th.length > 0) {
                 const title = th.html();
                 const content = th.parents('.table').parent().html();
-                const span = $(`<span class="doc-link ms-1"></span>`).prependTo(th);
-                span.html('<i class="fas fa-file-code me-1"></i>');
+                const th_txt = th.text();
+                const span = $(`<span class="doc-link ms-1"><i class="fas fa-file-code me-1"></i>${th_txt}</span>`).prependTo(th.text(''));
                 span.off('click').on('click', () => {
                     const message_id = txt.parents('.message').attr('id');
                     agentView.showDocument(title, content, message_id);
@@ -1111,6 +1111,7 @@ agentView.get_runner_form_def = async () => {
     const vform_names = ['runner_name', 'agent', 'session_store_type', 'session_store_pghost',
                         'session_store_pgport', 'session_store_pguser', 'session_store_pgpass', 'session_store_pgdbname',
                         'memory_type', 'memory_vertexai_project', 'memory_vertexai_location', 'memory_vertexai_agent_engine_id',
+                        'memory_store_pghost', 'memory_store_pgport', 'memory_store_pguser', 'memory_store_pgpass', 'memory_store_pgdbname',
                         'tts_engine', 'voicevox_model'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;

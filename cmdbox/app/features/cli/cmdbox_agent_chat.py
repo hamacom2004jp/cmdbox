@@ -371,6 +371,7 @@ class AgentChat(feature.ResultEdgeFeature):
                     api_key=llmapikey,
                     api_base=llmendpoint,
                     api_version=llmapiversion,
+                    base_url=llmendpoint,
                 ),
                 description=description,
                 instruction=instruction,
@@ -539,17 +540,44 @@ class AgentChat(feature.ResultEdgeFeature):
             BaseMemoryService: メモリーサービス
         """
         from google.adk.memory import InMemoryMemoryService, VertexAiMemoryBankService
-        memsv = None
-        if runner_conf.get('memory_type') == 'memory':
-            memsv = InMemoryMemoryService()
-        elif runner_conf.get('memory_type') == 'vertexai_memorybank':
-            memsv = VertexAiMemoryBankService(
+        from cmdbox.app.features.cli.agent import SqliteMemoryService, PostgresqlMemoryService
+        
+        memory_type = runner_conf.get('memory_type', 'memory')
+        
+        if memory_type == 'memory':
+            logger.info("Using InMemoryMemoryService")
+            return InMemoryMemoryService()
+        elif memory_type == 'vertexai_memorybank':
+            logger.info("Using VertexAiMemoryBankService")
+            return VertexAiMemoryBankService(
                 project_id=runner_conf.get('vertexai_memorybank_projectid', None),
                 location=runner_conf.get('vertexai_memorybank_location', None),
                 agent_engine_id=runner_conf.get('memory_vertexai_agent_engine_id', None),
             )
+        elif memory_type == 'sqlite':
+            logger.info("Using SqliteMemoryService")
+            memory_dburl = runner_conf.get('memory_dburl', None)
+            memory_dbpath = str(data_dir / '.agent' / 'memory.db').replace('\\', '/')
+            memory_dburl = f"sqlite+aiosqlite:///{memory_dbpath}"
+            return SqliteMemoryService(db_url=memory_dburl, logger=logger)
+        elif memory_type == 'postgresql':
+            logger.info("Using PostgresqlMemoryService")
+            memory_dburl = runner_conf.get('memory_dburl', None)
+            if memory_dburl is None:
+                # Build PostgreSQL URL from individual configuration parameters
+                pg_host = runner_conf.get('memory_store_pghost')
+                pg_port = runner_conf.get('memory_store_pgport')
+                pg_user = runner_conf.get('memory_store_pguser')
+                pg_pass = runner_conf.get('memory_store_pgpass')
+                pg_dbname = runner_conf.get('memory_store_pgdbname')
+                
+                if pg_host and pg_port and pg_user and pg_pass and pg_dbname:
+                    memory_dburl = f"postgresql+psycopg://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_dbname}"
+                else:
+                    raise ValueError("memory_dburl or PostgreSQL connection parameters (memory_store_pghost, memory_store_pgport, memory_store_pguser, memory_store_pgpass, memory_store_pgdbname) are required for postgresql memory_type")
+            return PostgresqlMemoryService(db_url=memory_dburl, logger=logger)
         else:
-            logger.info(f"Using InMemoryMemoryService")
+            logger.info(f"Using InMemoryMemoryService (unknown memory_type: {memory_type})")
             return InMemoryMemoryService()
 
     async def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
