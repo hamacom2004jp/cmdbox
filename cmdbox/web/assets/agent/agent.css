@@ -161,6 +161,10 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     animation: spin-right 10s linear infinite;
     box-shadow: 0 0 50px var(--area-bg-color-danger-10);
 }
+.ai-core2::before {
+    animation: spin-left 5s linear infinite !important;
+    box-shadow: 0 0 150px var(--area-bg-color-danger-50);
+}
 .ai-core::after { /* Outer spinning ring */
     content: '';
     position: absolute;
@@ -172,6 +176,10 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     border-bottom: 1px solid var(--accent-cyan);
     animation: spin-left 15s linear infinite;
     box-shadow: 0 0 50px var(--area-bg-color-10);
+}
+.ai-core2::after {
+    animation: spin-right 3s linear infinite !important;
+    box-shadow: 0 0 150px var(--area-bg-color-50);
 }
 .ai-core-msg {
     width: 300px;

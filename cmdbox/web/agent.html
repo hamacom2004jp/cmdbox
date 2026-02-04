@@ -68,7 +68,7 @@
                     <i class="fas fa-history fa-lg"></i>
                     <span>HISTORIES</span>
                 </button>
-                <button class="btn btn-footer-action btn-footer-action-ps0" data-bs-toggle="modal" data-bs-target="#memoryModal">
+                <button id="btn_memories" class="btn btn-footer-action btn-footer-action-ps0" data-bs-toggle="modal" data-bs-target="#memoryModal">
                     <i class="fas fa-brain fa-lg"></i>
                     <span>MEMORY</span>
                 </button>
@@ -124,6 +124,8 @@
                         <div class="list-group list-group-flush">
                             <a href="#" class="list-group-item list-group-item-action active" data-bs-target="#agent_settings">Agent Settings</a>
                             <a href="#" class="list-group-item list-group-item-action" data-bs-target="#llm_settings">LLM Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#embedding_settings">Embedding Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#memory_settings">Memory Settings</a>
                             <a href="#" class="list-group-item list-group-item-action" data-bs-target="#mcpsv_settings">MCPSV Settings</a>
                             <a href="#" class="list-group-item list-group-item-action" data-bs-target="#runner_settings">Runner Settings</a>
                             <a href="#" class="list-group-item list-group-item-action" data-bs-target="#tts_settings">TTS Settings</a>
@@ -180,6 +182,30 @@
                                 </div>
                                 <div id="runner_list_container" class="list-group">
                                     <!-- Runner List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="embedding_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">Embedding Settings</h6>
+                                    <button id="btn_add_embedding" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        Add Setting
+                                    </button>
+                                </div>
+                                <div id="embedding_list_container" class="list-group">
+                                    <!-- Embedding List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="memory_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">Memory Settings</h6>
+                                    <button id="btn_add_memory" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        Add Setting
+                                    </button>
+                                </div>
+                                <div id="memory_list_container" class="list-group">
+                                    <!-- Memory List Items will be injected here -->
                                 </div>
                             </div>
                             <div id="tts_settings" class="settings-content d-none">
@@ -282,6 +308,50 @@
     </div>
 </div>
 
+<!-- Embed追加/編集モーダル -->
+<div id="embedding_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content sf-modal doc-card" style="height:auto;">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan system-font">Add/Edit Embedding</h5>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form_embedding_edit" class="row"></form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_embedding" style="display:none;">DELETE</button>
+                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_embedding">SAVE</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Memory追加/編集モーダル -->
+<div id="memory_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content sf-modal doc-card" style="height:auto;">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan system-font">Add/Edit Memory</h5>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form_memory_edit" class="row"></form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_memory" style="display:none;">DELETE</button>
+                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_memory">SAVE</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Runner選択モーダル -->
 <div id="runner_select_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
@@ -349,8 +419,8 @@
 
 <!-- メモリーモーダル -->
 <div id="memoryModal" class="modal fade" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content sf-modal doc-card">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content sf-modal doc-card" style="height:auto;">
             <div class="modal-header doc-header">
                 <h5 class="modal-title glow-text-magenta system-font">MEMORY SYNC STATUS</h5>
                 <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
@@ -370,7 +440,7 @@
                 </div>
                 <h6 class="glow-text-cyan system-font mt-4 mb-2"><i class="fas fa-file-alt me-2"></i>USER_PROFILE_ANALYSIS</h6>
                 <div class="p-3 border border-secondary bg-black bg-opacity-25" style="font-family: var(--font-body);">
-                    <p class="mb-2"><strong>[PREDICTION]:</strong> ユーザーは論理的な整合性よりも、直感的な判断を優先する傾向が強い。</p>
+                    <p id="memory_content" class="mb-2"><strong>Loading..</strong></p>
                 </div>
             </div>
             <div class="modal-footer">

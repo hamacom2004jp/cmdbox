@@ -1,39 +1,45 @@
-"""
-PostgreSQL-backed Memory Service for Google ADK
-
-This module provides a memory service that persists memory entries to PostgreSQL.
-"""
-
+from cmdbox.app.features.cli import cmdbox_agent_embedding
 from google.adk.memory import BaseMemoryService
 from google.adk.memory.base_memory_service import SearchMemoryResponse
 from google.adk.memory.memory_entry import MemoryEntry
 from google.genai import types
-import json
-import asyncio
 from datetime import datetime
 from typing import List, Dict, Any, Optional
+import json
+import asyncio
 import logging
 
 
 class PostgresqlMemoryService(BaseMemoryService):
     """
-    PostgreSQL-backed Memory Service that stores memory entries in a PostgreSQL database.
+    PostgreSQLベースドメモリサービス
     """
-    
-    def __init__(self, db_url: str, logger: Optional[logging.Logger] = None):
+    def __init__(self, db_url:str, embed_name:str, embed_model:Any,
+                 memory_fetch_offset:int = 0, memory_fetch_count:int = 10, memory_fetch_summary:bool = False,
+                 logger:Optional[logging.Logger] = None):
         """
-        Initialize the PostgresqlMemoryService.
+        コンストラクタ
         
         Args:
-            db_url: PostgreSQL database connection URL
+            db_url: PostgreSQLデータベース接続URL
                    - postgresql+psycopg://user:pass@host:port/dbname
                    - postgresql://user:pass@host:port/dbname
-            logger: Optional logger instance
+            embed_name: 埋め込みモデル名
+            embed_model: 埋め込みモデル
+            memory_fetch_offset: メモリ取得開始位置
+            memory_fetch_count: メモリ取得件数
+            memory_fetch_summary: メモリ取得内容の要約有無
+            logger: オプションのロガーインスタンス
         """
         self.db_url = db_url
+        self.embed_name = embed_name
+        self.embed_model = embed_model
+        self.memory_fetch_offset = memory_fetch_offset
+        self.memory_fetch_count = memory_fetch_count
+        self.memory_fetch_summary = memory_fetch_summary
         self.logger = logger or logging.getLogger(__name__)
         self._init_db()
-    
+
     async def _init_db(self):
         """Initialize PostgreSQL database schema."""
         try:
@@ -47,6 +53,7 @@ class PostgresqlMemoryService(BaseMemoryService):
                     app_name TEXT NOT NULL,
                     user_id TEXT NOT NULL,
                     session_id TEXT,
+                    embed_name TEXT,
                     content TEXT NOT NULL,
                     custom_metadata TEXT,
                     author TEXT,
@@ -92,43 +99,41 @@ class PostgresqlMemoryService(BaseMemoryService):
             raise
     
     async def _add_session_to_memory_postgresql(self, session: 'Session'):
-        """Add session to PostgreSQL memory."""
-        import uuid
         import asyncpg
-        
-        entry_id = str(uuid.uuid4())
-        timestamp = datetime.utcnow().isoformat()
-        
-        content_data = {
-            'role': 'user',
-            'history': self._extract_session_history(session),
-            'metadata': {
-                'session_id': session.id,
-                'user_id': session.user_id,
-                'app_name': session.app_name,
-            }
-        }
+
+        final_event = session.events[-1] if session.events else None
+        if final_event is None:
+            self.logger.warning(f"Session {session.id} has no events to add to memory")
+            return
+        final_msg = final_event.content.parts[0].text if final_event.content.parts else ''
+        if not final_msg:
+            self.logger.warning(f"Session {session.id} final event has no content to add to memory")
+            return
+        st, _, final_vec = cmdbox_agent_embedding.AgentEmbedding._embedding(self.embed_model, [final_msg])
+        if st != cmdbox_agent_embedding.AgentEmbedding.RESP_SUCCESS:
+            self.logger.warning(f"Failed to generate embedding for session {session.id}")
+            return
         
         try:
-            conn = await asyncpg.connect(self._parse_db_url())
+            async with asyncpg.connect(self._parse_db_url()) as conn:
+
+                await conn.execute('''
+                    INSERT INTO memory_entries 
+                    (id, app_name, user_id, session_id, embed_name, content, custom_metadata, author, timestamp)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                ''', 
+                    final_event.id,
+                    session.app_name,
+                    session.user_id,
+                    session.id,
+                    self.embed_name,
+                    final_msg,
+                    json.dumps({}),
+                    'system',
+                    datetime.utcnow().isoformat()
+                )
             
-            await conn.execute('''
-                INSERT INTO memory_entries 
-                (id, app_name, user_id, session_id, content, custom_metadata, author, timestamp)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-            ''', 
-                entry_id,
-                session.app_name,
-                session.user_id,
-                session.id,
-                json.dumps(content_data, default=str),
-                json.dumps({'source': 'session_save'}),
-                'system',
-                timestamp
-            )
-            
-            await conn.close()
-            self.logger.info(f"Session {session.id} added to PostgreSQL memory")
+                self.logger.info(f"Session {session.id} added to PostgreSQL memory")
         except Exception as e:
             self.logger.error(f"PostgreSQL error: {e}", exc_info=True)
             raise

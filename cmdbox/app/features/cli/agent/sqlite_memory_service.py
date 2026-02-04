@@ -1,42 +1,50 @@
-"""
-SQLite-backed Memory Service for Google ADK
-
-This module provides a memory service that persists memory entries to SQLite.
-"""
-
+from cmdbox.app.features.cli import cmdbox_agent_embedding
 from google.adk.memory import BaseMemoryService
 from google.adk.memory.base_memory_service import SearchMemoryResponse
 from google.adk.memory.memory_entry import MemoryEntry
 from google.genai import types
-import json
-import sqlite3
-import asyncio
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Any, Optional
+import json
+import sqlite3
+import sqlite_vec
+import asyncio
 import logging
 
 
 class SqliteMemoryService(BaseMemoryService):
     """
-    SQLite-backed Memory Service that stores memory entries in a SQLite database.
+    SQLiteベースドメモリサービス
     """
     
-    def __init__(self, db_url: str, logger: Optional[logging.Logger] = None):
+    def __init__(self, db_url:str, embed_name:str, embed_model:Any,
+                 memory_fetch_offset:int = 0, memory_fetch_count:int = 10, memory_fetch_summary:bool = False,
+                 logger:Optional[logging.Logger] = None):
         """
-        Initialize the SqliteMemoryService.
-        
+        コンストラクタ
+
         Args:
-            db_url: SQLite database connection URL
-                   - sqlite:///path/to/db.db
-                   - sqlite+aiosqlite:///path/to/db.db
-            logger: Optional logger instance
+            db_url: SQLiteデータベース接続URL
+                    - sqlite:///path/to/db.db
+                    - sqlite+aiosqlite:///path/to/db.db
+            embed_name: 埋め込みモデル名
+            embed_model: 埋め込みモデル
+            memory_fetch_offset: メモリ取得開始位置
+            memory_fetch_count: メモリ取得件数
+            memory_fetch_summary: メモリ取得内容の要約有無
+            logger: オプションのロガーインスタンス
         """
         self.db_url = db_url
+        self.embed_name = embed_name
+        self.embed_model = embed_model
         self.logger = logger or logging.getLogger(__name__)
         self.db_path = self._get_db_path()
+        self.memory_fetch_offset = memory_fetch_offset
+        self.memory_fetch_count = memory_fetch_count
+        self.memory_fetch_summary = memory_fetch_summary
         self._init_db()
-    
+
     def _get_db_path(self) -> str:
         """Extract database file path from SQLite URL."""
         # Parse sqlite:///path/to/db.db or sqlite+aiosqlite:///path/to/db.db
@@ -56,6 +64,9 @@ class SqliteMemoryService(BaseMemoryService):
         Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
         
         with sqlite3.connect(self.db_path) as conn:
+            conn.enable_load_extension(True)
+            sqlite_vec.load(conn)
+            conn.enable_load_extension(False)
             cursor = conn.cursor()
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS memory_entries (
@@ -63,11 +74,18 @@ class SqliteMemoryService(BaseMemoryService):
                     app_name TEXT NOT NULL,
                     user_id TEXT NOT NULL,
                     session_id TEXT,
+                    embed_name TEXT,
                     content TEXT NOT NULL,
                     custom_metadata TEXT,
                     author TEXT,
                     timestamp TEXT NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            cursor.execute('''
+                CREATE VIRTUAL TABLE IF NOT EXISTS memory_entries_vec USING vec0(
+                    id TEXT PRIMARY KEY,
+                    embedding float[256]
                 )
             ''')
             
@@ -96,42 +114,52 @@ class SqliteMemoryService(BaseMemoryService):
         except Exception as e:
             self.logger.error(f"Error adding session to memory: {e}", exc_info=True)
             raise
-    
-    async def _add_session_to_memory_sqlite(self, session: 'Session'):
-        """Add session to SQLite memory."""
-        import uuid
-        
-        entry_id = str(uuid.uuid4())
-        timestamp = datetime.utcnow().isoformat()
-        
-        # Prepare memory entry data
-        content_data = {
-            'role': 'user',
-            'history': self._extract_session_history(session),
-            'metadata': {
-                'session_id': session.id,
-                'user_id': session.user_id,
-                'app_name': session.app_name,
-            }
-        }
-        
+
+    from google.adk.sessions import Session
+    async def _add_session_to_memory_sqlite(self, session:Session):
+
+        final_event = session.events[-1] if session.events else None
+        if final_event is None:
+            self.logger.warning(f"Session {session.id} has no events to add to memory")
+            return
+        final_msg = final_event.content.parts[0].text if final_event.content.parts else ''
+        if not final_msg:
+            self.logger.warning(f"Session {session.id} final event has no content to add to memory")
+            return
+        st, _, final_vec = cmdbox_agent_embedding.AgentEmbedding._embedding(self.embed_model, [final_msg])
+        if st != cmdbox_agent_embedding.AgentEmbedding.RESP_SUCCESS:
+            self.logger.warning(f"Failed to generate embedding for session {session.id}")
+            return
+
         def run_in_executor():
             with sqlite3.connect(self.db_path) as conn:
+                conn.enable_load_extension(True)
+                sqlite_vec.load(conn)
                 cursor = conn.cursor()
                 cursor.execute('''
                     INSERT INTO memory_entries 
-                    (id, app_name, user_id, session_id, content, custom_metadata, author, timestamp)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    (id, app_name, user_id, session_id, embed_name, content, custom_metadata, author, timestamp)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
-                    entry_id,
+                    final_event.id,
                     session.app_name,
                     session.user_id,
                     session.id,
-                    json.dumps(content_data, default=str),
-                    json.dumps({'source': 'session_save'}),
+                    self.embed_name,
+                    final_msg,
+                    json.dumps({}),
                     'system',
-                    timestamp
+                    datetime.utcnow().isoformat()
                 ))
+
+                cursor.execute('''
+                    INSERT INTO memory_entries_vec (id, embedding)
+                    VALUES (?, ?)
+                ''', (
+                    final_event.id,
+                    final_vec[0]
+                ))
+                conn.enable_load_extension(False)
                 conn.commit()
         
         # Run in executor to avoid blocking
@@ -158,68 +186,66 @@ class SqliteMemoryService(BaseMemoryService):
             return SearchMemoryResponse(memories=[])
     
     async def _search_memory_sqlite(self, app_name: str, user_id: str, query: str) -> SearchMemoryResponse:
-        """Search memory in SQLite."""
-        results = []
-        
-        def run_in_executor():
+
+        if query is not None and query.strip() != '':
+            st, _, final_vec = cmdbox_agent_embedding.AgentEmbedding._embedding(self.embed_model, [query])
+            if st != cmdbox_agent_embedding.AgentEmbedding.RESP_SUCCESS:
+                self.logger.warning(f"Failed to generate embedding for search query")
+                return SearchMemoryResponse(memories=[])
+        else:
+            final_vec = None
+        def run_in_executor(app_name, user_id, final_vec):
+            results = []
             with sqlite3.connect(self.db_path) as conn:
+                conn.enable_load_extension(True)
+                sqlite_vec.load(conn)
                 cursor = conn.cursor()
-                
-                # Search with full-text matching
-                search_query = f"%{query}%"
-                cursor.execute('''
-                    SELECT id, content, custom_metadata, author, timestamp
-                    FROM memory_entries
-                    WHERE app_name = ? AND user_id = ?
-                    AND (content LIKE ? OR custom_metadata LIKE ?)
-                    ORDER BY timestamp DESC
-                    LIMIT 10
-                ''', (app_name, user_id, search_query, search_query))
-                
+                sql ='SELECT m.id, m.app_name, m.user_id, m.session_id, m.embed_name, m.content, m.custom_metadata, m.author, m.timestamp '
+                if final_vec is not None:
+                    sql += ',vec_distance_cosine(v.embedding, ?) AS distance '
+                else:
+                    sql += ',0 AS distance '
+                sql += '''
+                    FROM memory_entries m inner join memory_entries_vec v on m.id = v.id
+                    WHERE m.app_name = ? AND m.user_id = ?
+                '''
+                if final_vec is not None:
+                    sql += 'ORDER BY distance DESC '
+                else:
+                    sql += 'ORDER BY m.created_at DESC '
+                sql += 'LIMIT ? OFFSET ?'
+                param = []
+                if final_vec is not None:
+                    param.append(final_vec[0])
+                param += [app_name, user_id, self.memory_fetch_count, self.memory_fetch_offset]
+                cursor.execute(sql, tuple(param))
+
                 rows = cursor.fetchall()
+                conn.enable_load_extension(False)
                 for row in rows:
-                    entry_id, content, metadata, author, timestamp = row
+                    entry_id, aid, uid, session_id, embed_name, content, metadata, author, timestamp, distance = row
                     try:
-                        content_dict = json.loads(content)
                         # Create MemoryEntry object
                         content_obj = types.Content(
-                            role=content_dict.get('role', 'user'),
-                            parts=[types.Part(text=json.dumps(content_dict))]
+                            role='user',
+                            parts=[types.Part(text=content)]
                         )
-                        
+                        metadata = json.loads(metadata) if metadata else {}
+                        metadata['session_id'] = session_id
+                        metadata['embed_name'] = embed_name
+                        metadata['score'] = distance
                         entry = MemoryEntry(
                             id=entry_id,
                             content=content_obj,
-                            custom_metadata=json.loads(metadata) if metadata else {},
+                            custom_metadata=metadata,
                             author=author,
                             timestamp=timestamp
                         )
                         results.append(entry)
                     except Exception as e:
                         self.logger.warning(f"Error parsing memory entry {entry_id}: {e}")
-                
                 return results
         
         loop = asyncio.get_event_loop()
-        memories = await loop.run_in_executor(None, run_in_executor)
+        memories = await loop.run_in_executor(None, run_in_executor, app_name, user_id, final_vec)
         return SearchMemoryResponse(memories=memories)
-    
-    @staticmethod
-    def _extract_session_history(session: 'Session') -> List[Dict[str, Any]]:
-        """Extract conversation history from session."""
-        history = []
-        
-        if hasattr(session, 'history') and session.history:
-            for item in session.history:
-                try:
-                    if hasattr(item, 'content') and hasattr(item.content, 'parts'):
-                        text_parts = [p.text for p in item.content.parts if hasattr(p, 'text') and p.text]
-                        if text_parts:
-                            history.append({
-                                'role': getattr(item.content, 'role', 'unknown'),
-                                'text': ' '.join(text_parts)
-                            })
-                except Exception as e:
-                    pass
-        
-        return history

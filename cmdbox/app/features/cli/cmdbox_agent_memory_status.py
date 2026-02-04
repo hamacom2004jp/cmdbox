@@ -10,21 +10,21 @@ import json
 import re
 
 
-class AgentSessionList(cmdbox_agent_chat.AgentChat):
+class AgentMemoryStatus(cmdbox_agent_chat.AgentChat):
 
     def get_mode(self) -> str:
         return 'agent'
 
     def get_cmd(self) -> str:
-        return 'session_list'
+        return 'memory_status'
 
     def get_option(self) -> Dict[str, Any]:
         return dict(
             use_redis=self.USE_REDIS_FALSE,
             nouse_webmode=False,
             use_agent=True,
-            description_ja="Agentのセッション一覧を取得します。",
-            description_en="List sessions for the agent.",
+            description_ja="Agentのメモリステータスを取得します。",
+            description_en="Get the memory status for the agent.",
             choice=[
                 dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
                      description_ja="Redisサーバーのサービスホストを指定します。",
@@ -53,9 +53,18 @@ class AgentSessionList(cmdbox_agent_chat.AgentChat):
                 dict(opt="user_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="ユーザー名を指定します。",
                      description_en="Specify a user name."),
-                dict(opt="session_id", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                    description_ja="Runnerに送信するセッションIDを指定します。",
-                    description_en="Specify the session ID to send to the Runner."),
+                dict(opt="memory_query", type=Options.T_TEXT, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja="メモリ内容を検索するクエリを指定します。意味検索を行います。",
+                     description_en="Specify a query to search memory contents. Perform semantic search."),
+                dict(opt="memory_fetch_offset", type=Options.T_INT, default=0, required=False, multi=False, hide=False, choice=None,
+                     description_ja="メモリ内容を取得する時の開始位置を指定します。",
+                     description_en="Specify the starting position when retrieving memory contents."),
+                dict(opt="memory_fetch_count", type=Options.T_INT, default=10, required=False, multi=False, hide=False, choice=None,
+                     description_ja="メモリ内容を取得する件数を指定します。",
+                     description_en="Specify the number of memory contents to retrieve."),
+                dict(opt="memory_fetch_summary", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[False, True],
+                     description_ja="取得したメモリ内容を要約するかどうかを指定します。",
+                     description_en="Specify whether to summarize the retrieved memory contents."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                     description_ja="処理結果jsonの保存先ファイルを指定。",
                     description_en="Specify the destination file for saving the processing result json."),
@@ -88,7 +97,9 @@ class AgentSessionList(cmdbox_agent_chat.AgentChat):
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
 
-        payload = dict(runner_name=args.runner_name, session_id=args.session_id, user_name=args.user_name)
+        payload = dict(runner_name=args.runner_name, user_name=args.user_name, memory_query=args.memory_query,
+                       memory_fetch_offset=args.memory_fetch_offset, memory_fetch_count=args.memory_fetch_count,
+                       memory_fetch_summary=args.memory_fetch_summary)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -110,48 +121,47 @@ class AgentSessionList(cmdbox_agent_chat.AgentChat):
                 sessions['agents'] = {}
 
             payload = json.loads(convert.b64str2str(msg[2]))
-            name = payload.get('runner_name')
-            session_id = payload.get('session_id')
+            runner_name = payload.get('runner_name')
             user_name = payload.get('user_name')
-            runner_conf, agent_conf, llm_conf, memory_conf, memory_llm_conf, memory_embed_conf, mcpsv_confs = self.load_conf(name, data_dir, logger)
-            session_service = self.create_session_service(data_dir, logger, runner_conf)
-            if session_id is None:
-                sessions = await session_service.list_sessions(app_name=name, user_id=user_name)
-                data = []
-                for s in sessions.sessions:
-                    if not s: continue
-                    row = dict(runner_name=s.app_name, session_id=s.id, user_name=s.user_id, last_update_time=s.last_update_time)
-                    ss = await session_service.get_session(app_name=name, user_id=user_name, session_id=s.id)
-                    row['events'] = []
-                    for ev in ss.events:
-                        msg = cmdbox_agent_chat.AgentChat.gen_msg(ev)
-                        row['events'].append(dict(author=ev.author, text=msg))
-                    data.append(row)
-                data.sort(key=lambda x: (x['last_update_time'],))
-                out = dict(success=data, end=True)
-                redis_cli.rpush(reskey, out)
-                return self.RESP_SUCCESS
-            else:
-                s = await session_service.get_session(app_name=name, user_id=user_name, session_id=session_id)
-                if s is None:
-                    out = dict(success=[], end=True)
-                else:
-                    row = dict(runner_name=s.app_name, session_id=s.id, user_name=s.user_id, last_update_time=s.last_update_time)
-                    row['events'] = []
-                    for ev in s.events:
-                        msg = cmdbox_agent_chat.AgentChat.gen_msg(ev)
-                        row['events'].append(dict(author=ev.author, text=msg))
-                    out = dict(success=[row], end=True)
-                redis_cli.rpush(reskey, out)
-                return self.RESP_SUCCESS
-        except NotImplementedError as e:
-            logger.warning(f"Session listing is not implemented for this Runner: {e}", exc_info=True)
-            out = dict(warn="Session listing is not implemented for this Runner.", end=True)
+            memory_query = payload.get('memory_query')
+            memory_fetch_offset = payload.get('memory_fetch_offset', 0)
+            memory_fetch_count = payload.get('memory_fetch_count', 10)
+            memory_fetch_summary = payload.get('memory_fetch_summary', False)
+            runner_conf, agent_conf, llm_conf, memory_conf, memory_llm_conf, memory_embed_conf, mcpsv_confs = self.load_conf(runner_name, data_dir, logger)
+            memory_conf["memory_fetch_offset"] = memory_fetch_offset
+            memory_conf["memory_fetch_count"] = memory_fetch_count
+            memory_conf["memory_fetch_summary"] = memory_fetch_summary
+
+            from google.adk.memory import BaseMemoryService
+            memory_service:BaseMemoryService = self.create_memory_service(
+                data_dir, logger, memory_conf, memory_llm_conf, memory_embed_conf, sessions)
+            memory_agent_name = f"{memory_conf.get('memory_name', 'memory_agent')}_runner"
+            responce = await memory_service.search_memory(app_name=memory_agent_name, user_id=user_name, query=memory_query)
+            responce.memories.sort(key=lambda m: m.custom_metadata.get('score', 0), reverse=True)
+            # Build status information
+            res = responce.model_dump()
+            res = [dict(event_id=content.get('id', ''),
+                        score=content.get('custom_metadata', {}).get('score', 0),
+                        role=content.get('content', {}).get('role', ''),
+                        text="\n\n".join([part.get('text', '') for part in content.get('content', {}).get('parts', [])])
+                        ) for content in res.get('memories', [])]
+
+            out = dict(success=res, end=True)
+            redis_cli.rpush(reskey, out)
+            return self.RESP_SUCCESS
+        except FileNotFoundError as e:
+            logger.warning(f"Memory configuration file not found: {e}", exc_info=True)
+            out = dict(warn=f"Memory configuration file not found: {e}", end=True)
+            redis_cli.rpush(reskey, out)
+            return self.RESP_WARN
+        except json.JSONDecodeError as e:
+            logger.warning(f"Failed to parse memory configuration: {e}", exc_info=True)
+            out = dict(warn=f"Failed to parse memory configuration: {e}", end=True)
             redis_cli.rpush(reskey, out)
             return self.RESP_WARN
         except Exception as e:
-            # それ以外のエラーが発生した時はログに出力して空リストを返す
-            logger.warning(f"list_agent_sessions warning: {e}", exc_info=True)
-            out = dict(success=[], end=True)
+            # その他のエラーが発生した時はログに出力してエラーを返す
+            logger.warning(f"get_memory_status warning: {e}", exc_info=True)
+            out = dict(warn=str(e), end=True)
             redis_cli.rpush(reskey, out)
             return self.RESP_WARN

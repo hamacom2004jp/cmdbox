@@ -72,7 +72,7 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature):
                             + "},$(\"[name='title']\").val(),'agent');"
                             + "}",
                     description_ja="Runnerが参照するAgent設定名を指定します。",
-                    description_en="Agent configuration name or reference."),
+                    description_en="Specify the Agent configuration name referenced by the Runner."),
                 dict(opt="session_store_type", type=Options.T_STR, default='memory', required=False, multi=False, hide=False, choice=['memory', 'sqlite', 'postgresql'],
                     description_ja="セッションの保存方法を指定します。",
                     description_en="Specify how the bot's session is stored.",
@@ -82,6 +82,16 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature):
                      choice_show=dict(voicevox=["voicevox_ver", "voicevox_os", "voicevox_arc", "voicevox_device", "voicevox_whl"]),
                      description_ja="使用するTTSエンジンを指定します。",
                      description_en="Specify the TTS engine to use."),
+                dict(opt="memory", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
+                    callcmd="async () => {await cmdbox.callcmd('agent','memory_list',{},(res)=>{"
+                            + "const val = $(\"[name='memory']\").val();"
+                            + "$(\"[name='memory']\").empty().append('<option></option>');"
+                            + "res['data'].map(elm=>{$(\"[name='memory']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
+                            + "$(\"[name='memory']\").val(val);"
+                            + "},$(\"[name='title']\").val(),'memory');"
+                            + "}",
+                    description_ja="Runnerが参照するメモリー設定名を指定します。",
+                    description_en="Specify the Memory configuration name referenced by the Runner."),
                 dict(opt="voicevox_model", type=Options.T_STR, default=None, required=False, multi=False, hide=False,
                      choice=sorted([v['select'] for v in cmdbox_tts_say.TtsSay.VOICEVOX_STYLE.values()]),
                      choice_edit=True,
@@ -102,46 +112,6 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature):
                 dict(opt="session_store_pgdbname", type=Options.T_STR, default='runner', required=False, multi=False, hide=False, choice=None,
                     description_ja="セッション保存用PostgreSQLのデータベース名を指定します。",
                     description_en="Specify the postgresql database name for session store."),
-                dict(opt="memory_type", type=Options.T_STR, default='memory', required=False, multi=False, hide=False,
-                    choice=['memory', 'sqlite', 'postgresql', 'vertexai_memorybank'],
-                    description_ja="メモリサービスの種類を指定します。",
-                    description_en="Specify the type of memory service.",
-                    choice_show=dict(
-                        sqlite=[],
-                        postgresql=[
-                            "memory_store_pghost",
-                            "memory_store_pgport",
-                            "memory_store_pguser",
-                            "memory_store_pgpass",
-                            "memory_store_pgdbname"],
-                        vertexai_memorybank=[
-                            "memory_vertexai_project",
-                            "memory_vertexai_location",
-                            "memory_vertexai_agent_engine_id"]),),
-                dict(opt="memory_store_pghost", type=Options.T_STR, default='localhost', required=False, multi=False, hide=False, choice=None,
-                    description_ja="メモリサービス用PostgreSQLホストを指定します。",
-                    description_en="Specify the postgresql host for memory service."),
-                dict(opt="memory_store_pgport", type=Options.T_INT, default=5432, required=False, multi=False, hide=False, choice=None,
-                    description_ja="メモリサービス用PostgreSQLポートを指定します。",
-                    description_en="Specify the postgresql port for memory service."),
-                dict(opt="memory_store_pguser", type=Options.T_STR, default='postgres', required=False, multi=False, hide=False, choice=None,
-                    description_ja="メモリサービス用PostgreSQLのユーザー名を指定します。",
-                    description_en="Specify the postgresql user name for memory service."),
-                dict(opt="memory_store_pgpass", type=Options.T_PASSWD, default='postgres', required=False, multi=False, hide=False, choice=None,
-                    description_ja="メモリサービス用PostgreSQLのパスワードを指定します。",
-                    description_en="Specify the postgresql password for memory service."),
-                dict(opt="memory_store_pgdbname", type=Options.T_STR, default='memory', required=False, multi=False, hide=False, choice=None,
-                    description_ja="メモリサービス用PostgreSQLのデータベース名を指定します。",
-                    description_en="Specify the postgresql database name for memory service."),
-                dict(opt="memory_vertexai_project", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                    description_ja="メモリサービスのVertex AIプロジェクトを指定します。",
-                    description_en="Specify the Vertex AI project for the memory service."),
-                dict(opt="memory_vertexai_location", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                    description_ja="メモリサービスのVertex AIロケーションを指定します。",
-                    description_en="Specify the Vertex AI location for the memory service."),
-                dict(opt="memory_vertexai_agent_engine_id", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                    description_ja="メモリサービスのVertex AIエージェントエンジンIDを指定します。",
-                    description_en="Specify the Vertex AI agent engine ID for the memory service."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                     description_ja="処理結果jsonの保存先ファイルを指定。",
                     description_en="Specify the destination file for saving the processing result json."),
@@ -187,27 +157,23 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature):
             msg = dict(warn="Please specify --agent")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
+        if not hasattr(args, 'memory') or args.memory is None:
+            msg = dict(warn="Please specify --memory")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
 
         configure = dict(
             runner_name=args.runner_name,
             agent=args.agent if hasattr(args, 'agent') else None,
             tts_engine=args.tts_engine if hasattr(args, 'tts_engine') else None,
             voicevox_model=args.voicevox_model if hasattr(args, 'voicevox_model') else None,
+            memory=args.memory if hasattr(args, 'memory') else None,
             session_store_type=args.session_store_type if hasattr(args, 'session_store_type') else None,
             session_store_pghost=args.session_store_pghost if hasattr(args, 'session_store_pghost') else None,
             session_store_pgport=args.session_store_pgport if hasattr(args, 'session_store_pgport') else None,
             session_store_pguser=args.session_store_pguser if hasattr(args, 'session_store_pguser') else None,
             session_store_pgpass=args.session_store_pgpass if hasattr(args, 'session_store_pgpass') else None,
             session_store_pgdbname=args.session_store_pgdbname if hasattr(args, 'session_store_pgdbname') else None,
-            memory_type=args.memory_type if hasattr(args, 'memory_type') else None,
-            memory_store_pghost=args.memory_store_pghost if hasattr(args, 'memory_store_pghost') else None,
-            memory_store_pgport=args.memory_store_pgport if hasattr(args, 'memory_store_pgport') else None,
-            memory_store_pguser=args.memory_store_pguser if hasattr(args, 'memory_store_pguser') else None,
-            memory_store_pgpass=args.memory_store_pgpass if hasattr(args, 'memory_store_pgpass') else None,
-            memory_store_pgdbname=args.memory_store_pgdbname if hasattr(args, 'memory_store_pgdbname') else None,
-            memory_vertexai_project=args.memory_vertexai_project if hasattr(args, 'memory_vertexai_project') else None,
-            memory_vertexai_location=args.memory_vertexai_location if hasattr(args, 'memory_vertexai_location') else None,
-            memory_vertexai_agent_engine_id=args.memory_vertexai_agent_engine_id if hasattr(args, 'memory_vertexai_agent_engine_id') else None,
         )
 
         payload_b64 = convert.str2b64str(common.to_str(configure))

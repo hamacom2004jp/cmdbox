@@ -199,6 +199,8 @@ class Options:
                         opt['choices'] += [c]
             else:
                 opt['choices'] = None
+            if 'choice_edit' in val:
+                opt['choice_edit'] = val['choice_edit']
             ret[key] = opt
         ret = dict()
         for k, v in self._options.items():
