@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.app &mdash; cmdbox 2026/01/25 documentation</title>
+  <title>cmdbox.app.app &mdash; cmdbox 2026/02/04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=a7f91c3b"></script>
+      <script src="../../../_static/documentation_options.js?v=fd547c84"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -173,6 +173,8 @@
             <span class="n">default</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;action&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">choices</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="s2">&quot;choice_edit&quot;</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;choice_edit&quot;</span><span class="p">]:</span>
+                    <span class="n">choices</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="o">*</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;opts&quot;</span><span class="p">],</span> <span class="n">help</span><span class="o">=</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;help&quot;</span><span class="p">],</span> <span class="nb">type</span><span class="o">=</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">choices</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="o">*</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;opts&quot;</span><span class="p">],</span> <span class="n">help</span><span class="o">=</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;help&quot;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;action&quot;</span><span class="p">])</span>

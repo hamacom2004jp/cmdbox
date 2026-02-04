@@ -5,17 +5,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.filer &mdash; cmdbox 2025/09/15 documentation</title>
+  <title>cmdbox.app.filer &mdash; cmdbox 2026/02/04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=ac57c575"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/documentation_options.js?v=fd547c84"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -304,7 +304,7 @@
                 <span class="k">if</span> <span class="n">mime_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">mime_type</span> <span class="o">!=</span> <span class="s1">&#39;image/svg+xml&#39;</span> <span class="ow">and</span> <span class="n">mime_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">img_thumbnail</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">img</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">imgbytes2thumbnail</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="p">(</span><span class="n">img_thumbnail</span><span class="p">,</span> <span class="n">img_thumbnail</span><span class="p">))</span>
                     <span class="n">fd</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">img2byte</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="s2">&quot;jpeg&quot;</span><span class="p">)</span>
-                    <span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2">.thumbnail.jpg&quot;</span>
+                    <span class="c1">#fname = f&quot;{fname}.thumbnail.jpg&quot;</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">data</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="n">abspath</span><span class="p">,</span> <span class="n">_r</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span>
@@ -468,7 +468,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright Copyright (c) 2023-2025 hamacom2004jp All Rights Reserved..</p>
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -92,6 +92,149 @@ Save Agent configuration. : `cmdbox -m agent -c agent_save <Option>`
     "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
 
 
+Deletes Embed configuration. : `cmdbox -m agent -c embed_del <Option>`
+==============================================================================
+
+- Delete the embed model configuration that generates feature data from input information.
+
+.. csv-table::
+    :widths: 30, 10, 60
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--embed_name <name>","Yes","Specify the registration name of the embed model to delete."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+
+Lists Embed configurations. : `cmdbox -m agent -c embed_list <Option>`
+==============================================================================
+
+- Display a list of saved embedding model settings.
+
+.. csv-table::
+    :widths: 30, 10, 60
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--kwd <keyword>","","Specify a partial match keyword to filter saved LLMs."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+
+Loads Embed configuration. : `cmdbox -m agent -c embed_load <Option>`
+==============================================================================
+
+- Loads the settings for the embedding model that generates feature data from input information.
+
+.. csv-table::
+    :widths: 30, 10, 60
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--embed_name <name>","Yes","Specify the registration name of the embed model to load."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+
+Saves Embed configuration. : `cmdbox -m agent -c embed_save <Option>`
+===============================================================================
+
+- Saves the settings for the embedding model that generates feature data from input information.
+
+.. csv-table::
+    :widths: 30, 10, 60
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--embed_name <name>","Yes","Specify the registration name of the embed model."
+    "--embed_device <device>","Yes","Specify the execution device of the embed model."
+    "--embed_model <model>","","Specify the name of the huggingface embed model."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+
+Start Embed configuration. : `cmdbox -m agent -c embed_start <Option>`
+==============================================================================
+
+- Start the embedding model that generates feature data from the input information.
+
+.. csv-table::
+    :widths: 30, 10, 60
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--embed_name <name>","Yes","Specify the registration name of the embed model to load."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+
+Stop Embed configuration. : `cmdbox -m agent -c embed_stop <Option>`
+==============================================================================
+
+- Stop the embedding model that generates feature data from input information.
+
+.. csv-table::
+    :widths: 30, 10, 60
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--embed_name <name>","Yes","Specify the registration name of the embed model to load."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+
+Embedding Embed configuration. : `cmdbox -m agent -c embedding <Option>`
+==============================================================================
+
+- Stop the embedding model that generates feature data from input information.
+
+.. csv-table::
+    :widths: 30, 10, 60
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--embed_name <name>","Yes","Specify the registration name of the embed model to load."
+    "--original_data <data>","Yes","Specify the original data to generate feature vectors."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+
 Deletes LLM configuration. : `cmdbox -m agent -c llm_del <Option>`
 ==============================================================================
 
@@ -112,10 +255,10 @@ Deletes LLM configuration. : `cmdbox -m agent -c llm_del <Option>`
     "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
 
 
-Lists saved LLM configurations. : `cmdbox -m agent -c llm_list <Option>`
+Lists LLM configurations. : `cmdbox -m agent -c llm_list <Option>`
 ==============================================================================
 
-- Lists saved LLM configurations. Sends a list request to the agent and receives matching LLM names.
+- Lists LLM configurations. Sends a list request to the agent and receives matching LLM names.
 
 .. csv-table::
     :widths: 30, 10, 60
@@ -304,6 +447,121 @@ Saves MCP server configuration. : `cmdbox -m agent -c mcpsv_save <Option>`
     "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
 
 
+Delete Memory configuration. : `cmdbox -m agent -c memory_del <Option>`
+==============================================================================
+
+- Delete the memory configuration.
+
+.. csv-table::
+    :widths: 30, 10, 60
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--memory_name <name>","Yes","Specify the registration name of the memory to delete."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+
+List Memory configuration. : `cmdbox -m agent -c memory_list <Option>`
+==============================================================================
+
+- Display a list of saved memory configurations.
+
+.. csv-table::
+    :widths: 30, 10, 60
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--kwd <keyword>","","Partial match filter for memory names."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+
+Load Memory configuration. : `cmdbox -m agent -c memory_load <Option>`
+==============================================================================
+
+- Loads the memory configuration.
+
+.. csv-table::
+    :widths: 30, 10, 60
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--memory_name <name>","Yes","Specify the registration name of the memory to load."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+
+Save Memory configuration. : `cmdbox -m agent -c memory_save <Option>`
+==============================================================================
+
+- Saves memory configuration.
+
+.. csv-table::
+    :widths: 30, 10, 60
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--memory_name <name>","Yes","Specify the name of the Memory setting."
+    "--memory_type <type>","Yes","Specify the type of memory service."
+    "--llm <name>","","Specify the LLM configuration name to use for summarization processing."
+    "--embed <name>","","Specify the Embedding setting name to use for embedding processing."
+    "--memory_store_pghost <host>","","Specify the postgresql host for memory service."
+    "--memory_store_pgport <port>","","Specify the postgresql port for memory service."
+    "--memory_store_pguser <user>","","Specify the postgresql user name for memory service."
+    "--memory_store_pgpass <pass>","","Specify the postgresql password for memory service."
+    "--memory_store_pgdbname <name>","","Specify the postgresql database name for memory service."
+    "--memory_description <desc>","","Specify a description of the agent's memory capabilities. The model uses this to determine whether to delegate control to the agent. A single line description is sufficient and recommended."
+    "--memory_instruction <inst>","","Specify instructions for the LLM model used by the memory. These will guide the memory's behavior."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+
+Status Memory configuration. : `cmdbox -m agent -c memory_save <Option>`
+==============================================================================
+
+- Get the memory status for the agent.
+
+.. csv-table::
+    :widths: 30, 10, 60
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <IP address or host name>","","Specify the service host of the Redis server."
+    "--port <port number>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--runner_name <name>","Yes","Specify the name of the Runner configuration."
+    "--user_name <name>","Yes","Specify a user name."
+    "--memory_query <query>","","Specify a query to search memory contents. Perform semantic search."
+    "--memory_fetch_offset <offset>","","Specify the starting position when retrieving memory contents."
+    "--memory_fetch_count <count>","","Specify the number of memory contents to retrieve."
+    "--memory_fetch_summary","","Specify whether to summarize the retrieved memory contents."
+    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+
+
 Delete runner configuration. : `cmdbox -m agent -c runner_del <Option>`
 ==============================================================================
 
@@ -379,6 +637,7 @@ Save runner configuration. : `cmdbox -m agent -c runner_save <Option>`
     "--runner_name <name>","Yes","Specify the name of the runner configuration to save."
     "--agent <name>","Yes","Agent configuration name or reference."
     "--tts_engine <engine>","","Specify the TTS engine to use."
+    "--memory <name>","","Specify the Memory configuration name referenced by the Runner."
     "--voicevox_model <model>","","Specify the model of the TTS engine to use."
     "--session_store_type <type>","","Specify how the bot's session is stored."
     "--session_store_pghost <host>","","Specify the postgresql host for session store."

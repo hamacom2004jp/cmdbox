@@ -93,8 +93,8 @@ class AgentMemorySave(feature.OneshotResultEdgeFeature):
                             + "$(\"[name='embed']\").val(val);"
                             + "},$(\"[name='title']\").val(),'embedding');"
                             + "}",
-                    description_ja="要約処理で使用するEmbedding設定名を指定します。",
-                    description_en="Specify the embedding configuration name to use for summarization processing."),
+                    description_ja="埋込処理で使用するEmbedding設定名を指定します。",
+                    description_en="Specify the Embedding setting name to use for embedding processing."),
                 dict(opt="memory_store_pghost", type=Options.T_STR, default='localhost', required=False, multi=False, hide=False, choice=None,
                     description_ja="メモリサービス用PostgreSQLホストを指定します。",
                     description_en="Specify the postgresql host for memory service."),

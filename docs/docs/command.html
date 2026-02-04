@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference &mdash; cmdbox 2026/01/25 documentation</title>
+  <title>Command Reference &mdash; cmdbox 2026/02/04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=a7f91c3b"></script>
+      <script src="../_static/documentation_options.js?v=fd547c84"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -115,8 +115,15 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#list-agent-configuration-cmdbox-m-agent-c-agent-list-option">List Agent configuration. : <cite>cmdbox -m agent -c agent_list &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#load-agent-configuration-cmdbox-m-agent-c-agent-load-option">Load Agent configuration. : <cite>cmdbox -m agent -c agent_load &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#save-agent-configuration-cmdbox-m-agent-c-agent-save-option">Save Agent configuration. : <cite>cmdbox -m agent -c agent_save &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#deletes-embed-configuration-cmdbox-m-agent-c-embed-del-option">Deletes Embed configuration. : <cite>cmdbox -m agent -c embed_del &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#lists-embed-configurations-cmdbox-m-agent-c-embed-list-option">Lists Embed configurations. : <cite>cmdbox -m agent -c embed_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#loads-embed-configuration-cmdbox-m-agent-c-embed-load-option">Loads Embed configuration. : <cite>cmdbox -m agent -c embed_load &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#saves-embed-configuration-cmdbox-m-agent-c-embed-save-option">Saves Embed configuration. : <cite>cmdbox -m agent -c embed_save &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#start-embed-configuration-cmdbox-m-agent-c-embed-start-option">Start Embed configuration. : <cite>cmdbox -m agent -c embed_start &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#stop-embed-configuration-cmdbox-m-agent-c-embed-stop-option">Stop Embed configuration. : <cite>cmdbox -m agent -c embed_stop &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#embedding-embed-configuration-cmdbox-m-agent-c-embedding-option">Embedding Embed configuration. : <cite>cmdbox -m agent -c embedding &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#deletes-llm-configuration-cmdbox-m-agent-c-llm-del-option">Deletes LLM configuration. : <cite>cmdbox -m agent -c llm_del &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#lists-saved-llm-configurations-cmdbox-m-agent-c-llm-list-option">Lists saved LLM configurations. : <cite>cmdbox -m agent -c llm_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#lists-llm-configurations-cmdbox-m-agent-c-llm-list-option">Lists LLM configurations. : <cite>cmdbox -m agent -c llm_list &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#loads-llm-configuration-cmdbox-m-agent-c-llm-load-option">Loads LLM configuration. : <cite>cmdbox -m agent -c llm_load &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#saves-llm-configuration-cmdbox-m-agent-c-llm-save-option">Saves LLM configuration. : <cite>cmdbox -m agent -c llm_save &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#mcp-client-cmdbox-m-agent-c-mcp-client-option">MCP client : <cite>cmdbox -m agent -c mcp_client &lt;Option&gt;</cite></a></li>
@@ -125,6 +132,11 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#lists-mcp-server-configurations-cmdbox-m-agent-c-mcpsv-list-option">Lists MCP server configurations. : <cite>cmdbox -m agent -c mcpsv_list &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#loads-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-load-option">Loads MCP server configuration. : <cite>cmdbox -m agent -c mcpsv_load &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#saves-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-save-option">Saves MCP server configuration. : <cite>cmdbox -m agent -c mcpsv_save &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#delete-memory-configuration-cmdbox-m-agent-c-memory-del-option">Delete Memory configuration. : <cite>cmdbox -m agent -c memory_del &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#list-memory-configuration-cmdbox-m-agent-c-memory-list-option">List Memory configuration. : <cite>cmdbox -m agent -c memory_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#load-memory-configuration-cmdbox-m-agent-c-memory-load-option">Load Memory configuration. : <cite>cmdbox -m agent -c memory_load &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#save-memory-configuration-cmdbox-m-agent-c-memory-save-option">Save Memory configuration. : <cite>cmdbox -m agent -c memory_save &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#status-memory-configuration-cmdbox-m-agent-c-memory-save-option">Status Memory configuration. : <cite>cmdbox -m agent -c memory_save &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#delete-runner-configuration-cmdbox-m-agent-c-runner-del-option">Delete runner configuration. : <cite>cmdbox -m agent -c runner_del &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#list-runner-configuration-cmdbox-m-agent-c-runner-list-option">List runner configuration. : <cite>cmdbox -m agent -c runner_list &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#load-runner-configuration-cmdbox-m-agent-c-runner-load-option">Load runner configuration. : <cite>cmdbox -m agent -c runner_load &lt;Option&gt;</cite></a></li>
