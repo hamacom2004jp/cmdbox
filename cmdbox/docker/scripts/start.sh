@@ -1,4 +1,3 @@
-
 if [[ "${CMDBOX_DEBUG}" = "true" ]]; then
     DEBUG="--debug"
 else
@@ -18,7 +17,7 @@ cmdbox -m a2asv -c start --host ${REDIS_HOST} --port ${REDIS_PORT} --password ${
        --signin_file .cmdbox/user_list.yml ${DEBUG} &
 if [[ -z "${SVCOUNT}" || "${SVCOUNT}" =~ ^[^0-9]+$ ]]; then
     echo "SVCOUNT is not a number. SVCOUNT=${SVCOUNT}"
-    exit 1
+    SVCOUNT=3
 fi
 for ((i=1; i<${SVCOUNT}; i++))
 do

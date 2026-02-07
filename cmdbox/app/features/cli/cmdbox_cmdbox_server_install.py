@@ -183,7 +183,10 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                     install_cmdbox_tgt = f'cmdbox=={self.ver.__version__}'
                 wheel_cmdbox = Path(install_cmdbox_tgt)
                 if wheel_cmdbox.exists() and wheel_cmdbox.suffix == '.whl':
-                    shutil.copy(wheel_cmdbox, Path('.').resolve() / wheel_cmdbox.name)
+                    try:
+                        shutil.copy(wheel_cmdbox, Path('.').resolve() / wheel_cmdbox.name)
+                    except shutil.SameFileError:
+                        pass
                     install_cmdbox_tgt = f'/home/{user}/{wheel_cmdbox.name}'
                     text = text.replace('#{COPY_CMDBOX}', f'COPY {wheel_cmdbox.name} {install_cmdbox_tgt}')
                 else:
