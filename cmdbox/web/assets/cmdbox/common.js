@@ -282,13 +282,17 @@ cmdbox.editapikey = async () => {
     daialog.draggable({cursor:'move',cancel:'.modal-body'});
     editapikey_modal.modal('show');
 };
+cmdbox.getUserLanguage = async () => {
+    const res = await cmdbox.load_user_data('language', 'default');
+    let language = 'ja_JP';
+    if (res && res.success) language = res.success;
+    return language;
+};
 /**
  * ユーザーの言語設定を編集
  */
 cmdbox.editUserLanguage = async () => {
-    const res = await cmdbox.load_user_data('language', 'default');
-    let language = '';
-    if (res && res.success) language = res.success;
+    const language = await cmdbox.getUserLanguage();
     const editlang_modal = $('#editlang_modal').length?$('#editlang_modal'):$(`<div id="editlang_modal" class="modal" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
     editlang_modal.html('');
     const daialog = $(`<div class="modal-dialog ui-draggable ui-draggable-handle"/>`).appendTo(editlang_modal);
@@ -691,9 +695,7 @@ cmdbox.load_img_sync = (url) => {
  */
 cmdbox.sv_exec_cmd = async (opt) => {
     try {
-        const res = await cmdbox.load_user_data('language', 'default');
-        let language = '';
-        if (res && res.success) language = res.success;
+        const language = await cmdbox.getUserLanguage();
         opt = {...opt, 'language': language};
     } catch (e) {
         console.warn(e);
@@ -1649,6 +1651,7 @@ cmdbox.get_cmd_choices = async (mode, cmd) => {
     const formData = new FormData();
     formData.append('mode', mode);
     formData.append('cmd', cmd);
+    formData.append('language', await cmdbox.getUserLanguage());
     const res = await fetch('gui/get_cmd_choices', {method: 'POST', body: formData});
     if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();

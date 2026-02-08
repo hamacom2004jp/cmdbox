@@ -135,7 +135,8 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                                   tts_engine=args.tts_engine,
                                   voicevox_ver=args.voicevox_ver,
                                   voicevox_whl=args.voicevox_whl,
-                                  compose_path=args.compose_path)
+                                  compose_path=args.compose_path,
+                                  language=args.language)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:
@@ -147,7 +148,7 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                        install_no_python:bool=False, install_compile_python:bool=False,
                        install_tag:str=None, install_use_gpu:bool=False,
                        tts_engine:str=None, voicevox_ver:str=None, voicevox_whl:str=None,
-                       compose_path:str=None) -> Dict[str, Any]:
+                       compose_path:str=None, language:str=None) -> Dict[str, Any]:
         """
         cmdboxが含まれるdockerイメージをインストールします。
 
@@ -164,6 +165,7 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
             voicevox_ver (str): VoiceVoxのバージョン
             voicevox_whl (str): VoiceVoxのwhlファイルの名前
             compose_path (str): docker-compose.ymlファイルパス
+            language (str): 言語コード
 
         Returns:
             dict: 処理結果
@@ -252,6 +254,7 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                         MCPSV_LISTEN_PORT='${MCPSV_LISTEN_PORT:-8091}',
                         A2ASV_LISTEN_PORT='${A2ASV_LISTEN_PORT:-8071}',
                         SVCOUNT='${SVCOUNT:-2}',
+                        LANGUAGE='${LANGUAGE:-'+(language if language else 'ja_JP')+'}'
                     ),
                     user=user,
                     ports=['${LISTEN_PORT:-8081}:${LISTEN_PORT:-8081}',

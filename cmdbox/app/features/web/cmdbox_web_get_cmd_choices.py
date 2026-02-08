@@ -20,9 +20,10 @@ class GetCmdChoices(feature.WebFeature):
             form = await req.form()
             mode = form.get('mode')
             cmd = form.get('cmd')
+            language = form.get('language')
             ret = web.options.get_cmd_choices(mode, cmd, True).copy()
             fobj = web.options.get_cmd_attr(mode, cmd, 'feature')
-            desc = web.options.get_cmd_attr(mode, cmd, 'description_en' if not common.is_japan(language=web.language) else 'description_ja')
+            desc = web.options.get_cmd_attr(mode, cmd, 'description_en' if not common.is_japan(language=language) else 'description_ja')
             desc_nouse_webmode = '\U00002B55 Web' if not web.options.get_cmd_attr(mode, cmd, 'nouse_webmode') else '\U0000274C Web'
             desc_use_agent = '\U00002B55 Agent' if web.options.get_cmd_attr(mode, cmd, 'use_agent') else '\U0000274C Agent'
             desc_edge = '\U00002B55 Edge' if not isinstance(fobj, feature.UnsupportEdgeFeature) else '\U0000274C Edge'

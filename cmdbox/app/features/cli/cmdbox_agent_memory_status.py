@@ -206,7 +206,8 @@ class AgentMemoryStatus(agant_base.AgentBase):
             BaseMemoryService: メモリーサービス
         """
         from google.adk.memory import InMemoryMemoryService
-        from cmdbox.app.features.cli.agent import SqliteMemoryService, PostgresqlMemoryService
+        from cmdbox.app.features.cli.agent.sqlite_memory_service import SqliteMemoryService
+        from cmdbox.app.features.cli.agent.postgresql_memory_service import PostgresqlMemoryService
         
         memory_type = memory_conf.get('memory_type', 'memory')
         device = memory_embed_conf.get('embed_device', 'cpu')

@@ -17,7 +17,7 @@
 <body>
 <div class="layout-grid split-pane fixed-left">
     <!-- LEFT PANEL: Console / Chat Interface -->
-    <aside class="console-panel split-pane-component">
+    <aside class="console-panel split-pane-component" style="z-index:52;">
         <div class="d-flex align-items-center console-header justify-content-between">
             <h5 class="d-inline-block m-0 glow-text-cyan system-font">
                 <span class="d-flex align-items-center">
@@ -81,7 +81,7 @@
     </aside>
 
     <!-- 左右のスプリッター -->
-    <div class="split-pane-divider split-pane-divider-left"></div>
+    <div class="split-pane-divider split-pane-divider-left" style="z-index: 52;"></div>
 
     <!-- AI Core and System Info Overlay -->
     <div class="system-location-container" style="position: absolute; top: 20px; right: 20px; text-align: right; z-index:5;" class="system-font text-white-50">
@@ -431,9 +431,9 @@
                 <div class="sf-param-grid mb-3">
                     <div class="sf-param-box">
                         <div class="text-white-50" style="font-size: 0.8rem;">REFERENCE_RANGE</div>
-                        <div class="d-flex fs-5 system-font glow-text-cyan m-2">
+                        <div class="d-flex fs-5 system-font glow-text-cyan mt-2">
                             <div id="memory_range_start">---</div>
-                            <div class="mx-3">~</div>
+                            <div class="mx-1">~</div>
                             <div id="memory_range_end">---</div>
                         </div>
                     </div>
