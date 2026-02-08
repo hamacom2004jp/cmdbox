@@ -23,9 +23,10 @@ class Feature(object):
     default_pass:str = os.environ.get('REDIS_PASSWORD', 'password')
     default_svname:str = os.environ.get('SVNAME', 'server')
 
-    def __init__(self, appcls, ver):
+    def __init__(self, appcls, ver, language:str=None):
         self.ver = ver
         self.appcls = appcls
+        self.language = language
         self.default_svname:str = ver.__appid__
         self.default_data:Path = os.environ.get('DATA_DIR', common.HOME_DIR / f".{self.ver.__appid__}")
 

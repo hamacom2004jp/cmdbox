@@ -149,7 +149,6 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     text-align: center;
     box-shadow: 0 0 50px var(--area-bg-color-10);
     transition: 1.0s;
-
 }
 .ai-core::before { /* Inner spinning ring */
     content: '';
@@ -158,10 +157,12 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     height: 80%;
     border: 4px dashed var(--accent-magenta);
     border-radius: 50%;
+    transition: all 1.0s;
     animation: spin-right 10s linear infinite;
     box-shadow: 0 0 50px var(--area-bg-color-danger-10);
 }
 .ai-core2::before {
+    transition: all 2.0s;
     animation: spin-left 5s linear infinite !important;
     box-shadow: 0 0 150px var(--area-bg-color-danger-50);
 }
@@ -174,10 +175,12 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     border-radius: 50%;
     border-top: 1px solid var(--accent-cyan);
     border-bottom: 1px solid var(--accent-cyan);
+    transition: all 1.0s;
     animation: spin-left 15s linear infinite;
     box-shadow: 0 0 50px var(--area-bg-color-10);
 }
 .ai-core2::after {
+    transition: all 2.0s;
     animation: spin-right 3s linear infinite !important;
     box-shadow: 0 0 150px var(--area-bg-color-50);
 }
@@ -530,7 +533,7 @@ a.list-group-item.active {
     font-family: var(--font-body);
 }
 .sf-list-danger-item:hover { background: rgba(255, 0, 230, 0.15); border-color: var(--accent-magenta); }
-.sf-param-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.sf-param-grid { display: grid; grid-template-columns: 15fr 5fr; gap: 15px; }
 .sf-param-box {
     border: 1px solid var(--item-border-danger-color);
     padding: 10px;

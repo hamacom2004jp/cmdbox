@@ -512,7 +512,7 @@ agent.exec_cmd = async (mode, cmd, opt={}, error_func=null, loading=true) => {
     });
 }
 agent.get_llm_form_def = async () => {
-    const opts = await cmdbox.get_cmd_choices('agent', 'llm_save');
+    const opts = await cmdbox.get_cmd_choices('llm', 'save');
     const vform_names = ['llmname', 'llmprov', 'llmapikey', 'llmendpoint', 'llmmodel', 'llmapiversion',
                         'llmprojectid', 'llmsvaccountfile', 'llmlocation', 'llmtemperature', 'llmseed'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
@@ -534,7 +534,7 @@ agent.list_llm = async () => {
     container.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
     
     try {
-        const res = await agent.exec_cmd('agent', 'llm_list');
+        const res = await agent.exec_cmd('llm', 'list');
         container.html('');
         if (!res || !res.success) {
             container.html('<div class="text-danger p-3">Failed to load LLM list.</div>');
@@ -548,7 +548,7 @@ agent.list_llm = async () => {
         }
 
         list.forEach(async item => {
-            const res = await agent.exec_cmd('agent', 'llm_load', { llmname: item.name });
+            const res = await agent.exec_cmd('llm', 'load', { llmname: item.name });
             if (!res || !res.success) {
                 const itemEl = $(`
                     <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="cursor: pointer;">
@@ -593,7 +593,7 @@ agent.list_llm = async () => {
                 // Delete button handler
                 $('#btn_del_llm').show().off('click').on('click', async () => {
                     if (!confirm(`Are you sure you want to delete '${config.llmname}'?`)) return;
-                    await agent.exec_cmd('agent', 'llm_del', { llmname: config.llmname });
+                    await agent.exec_cmd('llm', 'del', { llmname: config.llmname });
                     $('#llm_edit_modal').modal('hide');
                     agent.list_llm();
                 });
@@ -617,7 +617,7 @@ agent.save_llm = async () => {
     });
 
     try {
-        const res = await agent.exec_cmd('agent', 'llm_save', data);
+        const res = await agent.exec_cmd('llm', 'save', data);
         if (res && res.success) {
             $('#llm_edit_modal').modal('hide');
             agent.list_llm();
@@ -866,7 +866,7 @@ agent.list_agent = async () => {
 
                 $('#agent_edit_modal').modal('show');
                 // LLMリストをロード
-                await cmdbox.callcmd('agent','llm_list',{},(res)=>{
+                await cmdbox.callcmd('llm','list',{},(res)=>{
                     const val = $("[name='llm']").val();
                     $("[name='llm']").empty().append('<option></option>');
                     res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
@@ -1637,7 +1637,7 @@ agent.init = async () => {
         $('[name="agent_type"]').trigger('change');
         $('#agent_edit_modal').modal('show');
         // LLMリストをロード
-        await cmdbox.callcmd('agent','llm_list',{},(res)=>{
+        await cmdbox.callcmd('llm','list',{},(res)=>{
             $("[name='llm']").empty().append('<option></option>');
             res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
         },$('[name="title"]').val(),'llm');

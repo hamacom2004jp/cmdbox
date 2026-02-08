@@ -36,6 +36,7 @@ dependencies = [
     "argcomplete",
     "aiosqlite",
     "async-timeout",
+    "asyncpg",
     "cffi",
     "cryptography",
     "fastapi",
@@ -65,18 +66,21 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-agent = [
-#    "fastmcp",
-#    "google-adk",
-#    "litellm",
-#    "mcp",
+agent_mcp = [
     "pydantic>=2.0.0,<3.0.0",
     "fastmcp>=2.14.4",
     "mcp>=1.23.0,<2.0.0",
+]
+agent_adk = [
     "google-adk>=1.23.0",
     "a2a-sdk>=0.3.4,<0.4.0",
     "litellm>=1.75.5,<1.80.17",
+]
+agent_mem = [
+    "sentence-transformers",
     "sqlite_vec",
+    "transformers>=4.48.0",
+    "torch",
 ]
 saml = [
     "python3-saml",
@@ -102,6 +106,7 @@ packages = [
     "cmdbox.app.auth",
     "cmdbox.app.commons",
     "cmdbox.app.features.cli",
+    "cmdbox.app.features.cli.agent",
     "cmdbox.app.features.web",
     "cmdbox.extensions"
 ]

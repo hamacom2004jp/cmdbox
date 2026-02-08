@@ -167,7 +167,7 @@ cmdbox.set_logoicon = async (sel) => {
  * サインアウト
  * @param {string} sitepath - サイトパス
  **/
-cmdbox.singout = (sitepath) => {
+cmdbox.signout = (sitepath) => {
     if (confirm('Sign out ok ?')) {
         const rand = cmdbox.random_string(8);
         location.href = `dosignout/${sitepath}?r=${rand}`;
@@ -281,6 +281,51 @@ cmdbox.editapikey = async () => {
     editapikey_modal.appendTo('body');
     daialog.draggable({cursor:'move',cancel:'.modal-body'});
     editapikey_modal.modal('show');
+};
+/**
+ * ユーザーの言語設定を編集
+ */
+cmdbox.editUserLanguage = async () => {
+    const res = await cmdbox.load_user_data('language', 'default');
+    let language = '';
+    if (res && res.success) language = res.success;
+    const editlang_modal = $('#editlang_modal').length?$('#editlang_modal'):$(`<div id="editlang_modal" class="modal" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
+    editlang_modal.html('');
+    const daialog = $(`<div class="modal-dialog ui-draggable ui-draggable-handle"/>`).appendTo(editlang_modal);
+    const form = $(`<form id="editlang_form" class="modal-content novalidate"/>`).appendTo(daialog);
+    const header = $(`<div class="modal-header"/>`).appendTo(form);
+    header.append('<h5 class="modal-title glow-text-cyan">Edit Language</h5>');
+    header.append('<button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">'
+                 +'<svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>'
+                 +'</button>');
+    const body = $(`<div class="modal-body"/>`).appendTo(form);
+    const row_content = $(`<div class="row row_content"/>`).appendTo(body);
+    
+    // 言語選択ドロップダウン
+    const lang_select = $(`<div class="col-12 mb-3"><div class="input-group">`+
+        `<label class="input-group-text">Language</label>`+
+        `<select class="form-select" name="language">`+
+        `<option value=""></option>`+
+        `<option value="ja_JP" ${language === 'ja_JP' ? 'selected' : ''}>日本語</option>`+
+        `<option value="en_US" ${language === 'en_US' ? 'selected' : ''}>English</option>`+
+        `</select>`+
+        `</div>`).appendTo(row_content);
+    
+    const footer = $(`<div class="modal-footer"/>`).appendTo(form);
+    footer.append('<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>');
+    const save_btn = $(`<button type="button" class="btn btn-outline-primary">Save</button>`).appendTo(footer);
+    
+    save_btn.off('click').on('click', async (event) => {
+        cmdbox.show_loading();
+        const selectedLang = lang_select.find('select').val();
+        const result = await cmdbox.save_user_data('language', 'default', selectedLang);
+        cmdbox.message(result);
+        cmdbox.hide_loading();
+        editlang_modal.modal('hide');
+    });
+    editlang_modal.appendTo('body');
+    daialog.draggable({cursor:'move',cancel:'.modal-body'});
+    editlang_modal.modal('show');
 };
 /**
  * 現在のユーザーのパスワード変更
@@ -407,6 +452,10 @@ $(()=>{
                 const changepass_item = $(`<li><a class="dropdown-item changepass-menu-item" href="#" onclick="cmdbox.passchange();">Change Password</a></li>`);
                 user_info_menu.find('.dropdown-menu').append(changepass_item);
             }
+            if (!user_info_menu.find('.dropdown-menu .edituserlanguage-menu-item').length) {
+                const edituserlanguage_item = $(`<li><a class="dropdown-item edituserlanguage-menu-item" href="#" onclick="cmdbox.editUserLanguage();">Change Language</a></li>`);
+                user_info_menu.find('.dropdown-menu').append(edituserlanguage_item);
+            }
             if (!user_info_menu.find('.dropdown-menu .editapikey-menu-item').length) {
                 const editapikey_item = $(`<li><a class="dropdown-item editapikey-menu-item" href="#" onclick="cmdbox.editapikey();">Edit ApiKey</a></li>`);
                 user_info_menu.find('.dropdown-menu').append(editapikey_item);
@@ -414,7 +463,7 @@ $(()=>{
             if (!user_info_menu.find('.dropdown-menu .signout-menu-item').length) {
                 const parts = location.pathname.split('/');
                 const sitepath = parts[parts.length-1];
-                const signout_item = $(`<li><a class="dropdown-item signout-menu-item" href="#" onclick="cmdbox.singout('${sitepath}');">Sign out</a></li>`);
+                const signout_item = $(`<li><a class="dropdown-item signout-menu-item" href="#" onclick="cmdbox.signout('${sitepath}');">Sign out</a></li>`);
                 user_info_menu.find('.dropdown-menu').append(`<li><hr class="dropdown-divider"></li>`).append(signout_item);
             }
             user_info_menu.find('.user_info_note').html(`Groups: ${user['groups'].join(', ')}`);
@@ -641,6 +690,14 @@ cmdbox.load_img_sync = (url) => {
  * @returns {Promise} - レスポンス
  */
 cmdbox.sv_exec_cmd = async (opt) => {
+    try {
+        const res = await cmdbox.load_user_data('language', 'default');
+        let language = '';
+        if (res && res.success) language = res.success;
+        opt = {...opt, 'language': language};
+    } catch (e) {
+        console.warn(e);
+    }
     return fetch('exec_cmd', {
         method: 'POST',
         headers: {
@@ -648,7 +705,7 @@ cmdbox.sv_exec_cmd = async (opt) => {
         },
         body: JSON.stringify(opt)
     }).then(response => response.json()).catch((e) => {
-        console.log(e);
+        console.warn(e);
     });
 };
 /**

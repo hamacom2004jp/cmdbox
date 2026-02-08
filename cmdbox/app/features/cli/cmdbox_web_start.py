@@ -192,7 +192,7 @@ class WebStart(feature.UnsupportEdgeFeature):
         Returns:
             web.Web: Webオブジェクト
         """
-        w = web.Web.getInstance(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
+        w = web.Web.getInstance(logger, Path(args.data), appcls=self.appcls, ver=self.ver, language=args.language,
                     redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                     client_only=args.client_only, doc_root=args.doc_root, gui_html=args.gui_html, filer_html=args.filer_html,
                     result_html=args.result_html, users_html=args.users_html, agent_html=args.agent_html,

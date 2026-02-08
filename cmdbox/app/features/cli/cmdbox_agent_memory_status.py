@@ -1,6 +1,8 @@
+from contextlib import aclosing
 from cmdbox.app import common, client, feature, options
 from cmdbox.app.commons import convert, redis_client
-from cmdbox.app.features.cli import cmdbox_agent_chat
+from cmdbox.app.features.cli import cmdbox_embed_start
+from cmdbox.app.features.cli.agent import agant_base
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List
@@ -10,7 +12,7 @@ import json
 import re
 
 
-class AgentMemoryStatus(cmdbox_agent_chat.AgentChat):
+class AgentMemoryStatus(agant_base.AgentBase):
 
     def get_mode(self) -> str:
         return 'agent'
@@ -128,23 +130,43 @@ class AgentMemoryStatus(cmdbox_agent_chat.AgentChat):
             memory_fetch_count = payload.get('memory_fetch_count', 10)
             memory_fetch_summary = payload.get('memory_fetch_summary', False)
             runner_conf, agent_conf, llm_conf, memory_conf, memory_llm_conf, memory_embed_conf, mcpsv_confs = self.load_conf(runner_name, data_dir, logger)
+
+            # memory_queryが指定されていない場合は新しいもの順で取得する
             memory_conf["memory_fetch_offset"] = memory_fetch_offset
             memory_conf["memory_fetch_count"] = memory_fetch_count
             memory_conf["memory_fetch_summary"] = memory_fetch_summary
-
             from google.adk.memory import BaseMemoryService
             memory_service:BaseMemoryService = self.create_memory_service(
                 data_dir, logger, memory_conf, memory_llm_conf, memory_embed_conf, sessions)
-            memory_agent_name = f"{memory_conf.get('memory_name', 'memory_agent')}_runner"
-            responce = await memory_service.search_memory(app_name=memory_agent_name, user_id=user_name, query=memory_query)
-            responce.memories.sort(key=lambda m: m.custom_metadata.get('score', 0), reverse=True)
+            memory_runner_name = f"{memory_conf.get('memory_name', 'memory_agent')}_runner"
+            responce = await memory_service.search_memory(app_name=memory_runner_name, user_id=user_name, query=memory_query)
+            responce.memories.sort(key=lambda m: m.custom_metadata.get('distance', 0), reverse=True)
             # Build status information
             res = responce.model_dump()
             res = [dict(event_id=content.get('id', ''),
-                        score=content.get('custom_metadata', {}).get('score', 0),
+                        distance=content.get('custom_metadata', {}).get('distance', 0),
                         role=content.get('content', {}).get('role', ''),
+                        my_cnt=1,
+                        ts_start=content.get('timestamp', ''),
+                        ts_end=content.get('timestamp', ''),
+                        all_cnt=content.get('custom_metadata', {}).get('all_cnt', 1),
                         text="\n\n".join([part.get('text', '') for part in content.get('content', {}).get('parts', [])])
                         ) for content in res.get('memories', [])]
+            if memory_fetch_summary and len(res) > 0:
+                # 取得したメモリーを要約する
+                all_text = "---\n".join([f"{r['text']}" for r in res])
+                agent = self.create_memory_agent(logger, data_dir, memory_conf, memory_llm_conf)
+                runner = self.create_memory_runner(agent)
+                sess = await self.create_memory_session(runner, user_name)
+                all_text = await self.summary(runner, user_name, sess, all_text)
+                res = [dict(event_id=common.random_string(),
+                            score=1,
+                            role='system',
+                            my_cnt=len(res),
+                            ts_start=res[-1]['ts_start'],
+                            ts_end=res[0]['ts_end'],
+                            all_cnt=res[0]['all_cnt'],
+                            text=all_text)]
 
             out = dict(success=res, end=True)
             redis_cli.rpush(reskey, out)
@@ -165,3 +187,213 @@ class AgentMemoryStatus(cmdbox_agent_chat.AgentChat):
             out = dict(warn=str(e), end=True)
             redis_cli.rpush(reskey, out)
             return self.RESP_WARN
+
+    def create_memory_service(self, data_dir:Path, logger:logging.Logger,
+                              memory_conf:Dict[str, Any], memory_llm_conf:Dict[str, Any], memory_embed_conf:Dict[str, Any],
+                              sessions:Dict[str, Dict[str, Any]]) -> Any:
+        """
+        メモリーサービスを作成します
+
+        Args:
+            data_dir (Path): データディレクトリパス
+            logger (logging.Logger): ロガー
+            memory_conf (Dict[str, Any]): メモリー設定
+            memory_llm_conf (Dict[str, Any]): メモリー用LLM設定
+            memory_embed_conf (Dict[str, Any]): メモリー用埋め込みモデル設定
+            sessions (Dict[str, Dict[str, Any]]): セッション情報辞書
+
+        Returns:
+            BaseMemoryService: メモリーサービス
+        """
+        from google.adk.memory import InMemoryMemoryService
+        from cmdbox.app.features.cli.agent import SqliteMemoryService, PostgresqlMemoryService
+        
+        memory_type = memory_conf.get('memory_type', 'memory')
+        device = memory_embed_conf.get('embed_device', 'cpu')
+        embed_name = memory_embed_conf.get('embed_name', None)
+        embed_model = memory_embed_conf.get('embed_model', None)
+
+        if memory_type == 'memory':
+            logger.info("Using InMemoryMemoryService")
+            return InMemoryMemoryService()
+        elif memory_type == 'sqlite':
+            logger.info("Using SqliteMemoryService")
+            memory_dbpath = str(data_dir / '.agent' / 'memory.db').replace('\\', '/')
+            memory_dburl = f"sqlite+aiosqlite:///{memory_dbpath}"
+            ebcls = cmdbox_embed_start.EmbedStart
+            model = ebcls._start_embed_model(data_dir, sessions,
+                                             device, embed_name, embed_model, logger)
+            return SqliteMemoryService(db_url=memory_dburl, embed_name=embed_name, embed_model=model,
+                                       memory_fetch_offset=memory_conf.get('memory_fetch_offset', 0),
+                                       memory_fetch_count=memory_conf.get('memory_fetch_count', 10),
+                                       memory_fetch_summary=memory_conf.get('memory_fetch_summary', False),
+                                       logger=logger)
+        elif memory_type == 'postgresql':
+            logger.info("Using PostgresqlMemoryService")
+            memory_dburl = memory_conf.get('memory_dburl', None)
+            if memory_dburl is None:
+                # Build PostgreSQL URL from individual configuration parameters
+                pg_host = memory_conf.get('memory_store_pghost')
+                pg_port = memory_conf.get('memory_store_pgport')
+                pg_user = memory_conf.get('memory_store_pguser')
+                pg_pass = memory_conf.get('memory_store_pgpass')
+                pg_dbname = memory_conf.get('memory_store_pgdbname')
+
+                if pg_host and pg_port and pg_user and pg_pass and pg_dbname:
+                    memory_dburl = f"postgresql://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_dbname}"
+                else:
+                    raise ValueError("memory_dburl or PostgreSQL connection parameters (memory_store_pghost, memory_store_pgport, memory_store_pguser, memory_store_pgpass, memory_store_pgdbname) are required for postgresql memory_type")
+            ebcls = cmdbox_embed_start.EmbedStart
+            model = ebcls._start_embed_model(data_dir, sessions,
+                                             device, embed_name, embed_model, logger)
+            return PostgresqlMemoryService(db_url=memory_dburl, embed_name=embed_name, embed_model=model,
+                                           memory_fetch_offset=memory_conf.get('memory_fetch_offset', 0),
+                                           memory_fetch_count=memory_conf.get('memory_fetch_count', 10),
+                                           memory_fetch_summary=memory_conf.get('memory_fetch_summary', False),
+                                           logger=logger)
+        else:
+            logger.info(f"Using InMemoryMemoryService (unknown memory_type: {memory_type})")
+            return InMemoryMemoryService()
+
+    def create_memory_agent(self, logger:logging.Logger, data_dir:Path,
+                            memory_conf:Dict[str, Any], llm_conf:Dict[str, Any]) -> Any:
+        if logger.level == logging.DEBUG:
+            logger.debug(f"google-adk loading..")
+        from google.adk.agents import Agent as AdkAgent
+        if logger.level == logging.DEBUG:
+            logger.debug(f"litellm loading..")
+        from google.adk.models import lite_llm
+        from litellm import _logging
+        _logging._turn_on_debug()
+        # App name mismatch警告を回避するためのラッパークラス
+        class Agent(AdkAgent):
+            pass
+        agent_name = memory_conf.get('memory_name', 'memory_agent')
+        description = memory_conf.get('memory_description', '')
+        instruction = memory_conf.get('memory_instruction', '')
+        llmprov = llm_conf.get('llmprov', None)
+        if llmprov == 'openai':
+            llmmodel = llm_conf.get('llmmodel', None)
+            llmapikey = llm_conf.get('llmapikey', None)
+            llmendpoint = llm_conf.get('llmendpoint', None)
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmapikey is None: raise ValueError("llmapikey is required.")
+            agent = Agent(
+                name=agent_name,
+                model=lite_llm.LiteLlm(
+                    model=llmmodel,
+                    api_key=llmapikey,
+                    endpoint=llmendpoint,
+                ),
+                description=description,
+                instruction=instruction,
+            )
+        elif llmprov == 'azureopenai':
+            llmmodel = llm_conf.get('llmmodel', None)
+            llmapikey = llm_conf.get('llmapikey', None)
+            llmendpoint = llm_conf.get('llmendpoint', None)
+            llmapiversion = llm_conf.get('llmapiversion', None)
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmendpoint is None: raise ValueError("llmendpoint is required.")
+            if "/openai/deployments" in llmendpoint:
+                llmendpoint = llmendpoint.split("/openai/deployments")[0]
+            if llmapikey is None: raise ValueError("llmapikey is required.")
+            if llmapiversion is None: raise ValueError("llmapiversion is required.")
+            if not llmmodel.startswith("azure/"):
+                llmmodel = f"azure/{llmmodel}"
+            agent = Agent(
+                name=agent_name,
+                model=lite_llm.LiteLlm(
+                    model=llmmodel,
+                    api_key=llmapikey,
+                    api_base=llmendpoint,
+                    api_version=llmapiversion,
+                    base_url=llmendpoint,
+                ),
+                description=description,
+                instruction=instruction,
+            )
+        elif llmprov == 'vertexai':
+            llmprojectid = llm_conf.get('llmprojectid', None)
+            llmsvaccountfile = llm_conf.get('llmsvaccountfile', None)
+            llmmodel = llm_conf.get('llmmodel', None)
+            llmlocation = llm_conf.get('llmlocation', None)
+            llmsvaccountfile_data = llm_conf.get('llmsvaccountfile_data', {})
+            llmtemperature = llm_conf.get('llmtemperature', None)
+            llmseed = llm_conf.get('llmseed', None)
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmlocation is None: raise ValueError("llmlocation is required.")
+            if llmsvaccountfile_data is None: raise ValueError("llmsvaccountfile_data is required.")
+            agent = Agent(
+                name=agent_name,
+                model=lite_llm.LiteLlm(
+                    model=llmmodel,
+                    #vertex_project=llmprojectid,
+                    vertex_credentials=llmsvaccountfile_data,
+                    vertex_location=llmlocation,
+                    seed=llmseed,
+                    temperature=llmtemperature,
+                ),
+                description=description,
+                instruction=instruction,
+            )
+        elif llmprov == 'ollama':
+            llmmodel = llm_conf.get('llmmodel', None)
+            llmendpoint = llm_conf.get('llmendpoint', None)
+            llmtemperature = llm_conf.get('llmtemperature', None)
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmendpoint is None: raise ValueError("llmendpoint is required.")
+            agent = Agent(
+                name=agent_name,
+                model=lite_llm.LiteLlm(
+                    model=f"ollama/{llmmodel}",
+                    api_base=llmendpoint,
+                    temperature=llmtemperature,
+                    stream=True
+                ),
+                description=description,
+                instruction=instruction,
+            )
+        else:
+            raise ValueError("llmprov is required.")
+        if logger.level == logging.DEBUG:
+            logger.debug(f"create_memory_agent complate.")
+        return agent
+
+    def create_memory_runner(self, memory_agent: Any) -> Any:
+        from google.adk.runners import Runner
+        from google.adk.sessions import InMemorySessionService
+        memory_runner = Runner(
+            app_name=f"{memory_agent.name}_runner",
+            agent=memory_agent,
+            session_service=InMemorySessionService(),
+        )
+        return memory_runner
+    
+    async def create_memory_session(self, memory_runner:Any, user_name:str) -> Any:
+        memory_session = await self.create_agent_session(memory_runner.session_service, memory_runner.app_name,
+                                                    user_name, session_id=None)
+        return memory_session
+
+    async def summary(self, memory_runner, user_name, memory_session, short_mem_msg:str):
+        from google.genai import types
+        from google.adk.runners import Runner
+        runner:Runner = memory_runner
+        memory_content = types.Content(role='user', parts=[types.Part(text=short_mem_msg)])
+        async with aclosing(runner.run_async(user_id=user_name, session_id=memory_session.id, new_message=memory_content)) as mem_iter:
+            async for event in mem_iter:
+                msg, _, _ = self.gen_msg(event)
+                if event.is_final_response():
+                    return msg
+        return None
+
+    async def add_memory(self, memory_service, memory_session, sammary_msg):
+        from google.adk.events import Event
+        from google.genai import types
+        memory_session.events.append(Event(
+            id=common.random_string(32),
+            author='system',
+            content=types.Content(role='system', parts=[types.Part(text=sammary_msg)]),
+        ))
+        # メモリーにセッションを保存する
+        await memory_service.add_session_to_memory(memory_session)

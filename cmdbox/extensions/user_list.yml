@@ -47,8 +47,16 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     rule: allow                # Specifies whether or not the specified command is allowed for the specified group. The value can be allow or deny.
   - groups: [user]
     mode: agent
-    cmds: [chat, agent_list, llm_list, mcp_client, mcpsv_list, runner_list,
+    cmds: [chat, agent_list, mcp_client, mcpsv_list, runner_list,
            session_list, session_del, start, stop]
+    rule: allow
+  - groups: [user]
+    mode: embed
+    cmds: [list]
+    rule: allow
+  - groups: [user]
+    mode: llm
+    cmds: [list]
     rule: allow
   - groups: [user]
     mode: server
@@ -72,9 +80,17 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     rule: allow
   - groups: [editor]
     mode: agent
-    cmds: [agent_del, llm_del, mcpsv_del, runner_del,
-           agent_load, llm_load, mcpsv_load, runner_load,
-           agent_save, llm_save, mcpsv_save, runner_save,]
+    cmds: [agent_del, mcpsv_del, runner_del,
+           agent_load, mcpsv_load, runner_load,
+           agent_save, mcpsv_save, runner_save,]
+    rule: allow
+  - groups: [editor]
+    mode: llm
+    cmds: [del, load, save]
+    rule: allow
+  - groups: [editor]
+    mode: embed
+    cmds: [del, load, save, start, stop]
     rule: allow
 pathrule:                      # List of RESTAPI rules, rules that determine whether or not a RESTAPI can be executed when a user in web mode accesses it.
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.

@@ -153,7 +153,7 @@ agentView.initView = () => {
         $('[name="agent_type"]').trigger('change');
         $('#agent_edit_modal').modal('show');
         // LLMリストをロード
-        await cmdbox.callcmd('agent','llm_list',{},(res)=>{
+        await cmdbox.callcmd('llm','list',{},(res)=>{
             $("[name='llm']").empty().append('<option></option>');
             res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
         },$('[name="title"]').val(),'llm');
@@ -219,12 +219,12 @@ agentView.initView = () => {
         $('#btn_del_memory').hide();
         $('#memory_edit_modal').modal('show');
         // LLMリストをロード
-        await cmdbox.callcmd('agent','llm_list',{},(res)=>{
+        await cmdbox.callcmd('llm','list',{},(res)=>{
             $("[name='llm']").empty().append('<option></option>');
             res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
         },$('[name="title"]').val(),'llm');
         // Embedリストをロード
-        await cmdbox.callcmd('agent','embed_list',{},(res)=>{
+        await cmdbox.callcmd('embed','list',{},(res)=>{
             $("[name='embed']").empty().append('<option></option>');
             res['data'].map(elm=>{$('[name="embed"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
         },$('[name="title"]').val(),'embed');
@@ -832,7 +832,7 @@ agentView.list_agent = async () => {
 
                 $('#agent_edit_modal').modal('show');
                 // LLMリストをロード
-                await cmdbox.callcmd('agent','llm_list',{},(res)=>{
+                await cmdbox.callcmd('llm','list',{},(res)=>{
                     const val = $("[name='llm']").val();
                     $("[name='llm']").empty().append('<option></option>');
                     res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
@@ -908,7 +908,7 @@ agentView.save_agent = async () => {
 };
 
 agentView.get_llm_form_def = async () => {
-    const opts = await cmdbox.get_cmd_choices('agent', 'llm_save');
+    const opts = await cmdbox.get_cmd_choices('llm', 'save');
     const vform_names = ['llmname', 'llmprov', 'llmapikey', 'llmendpoint', 'llmmodel', 'llmapiversion',
                         'llmprojectid', 'llmsvaccountfile', 'llmlocation', 'llmtemperature', 'llmseed'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
@@ -930,7 +930,7 @@ agentView.list_llm = async () => {
     container.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
 
     try {
-        const res = await agentView.exec_cmd('agent', 'llm_list');
+        const res = await agentView.exec_cmd('llm', 'list');
         container.html('');
         if (!res || !res.success) {
             container.html('<div class="text-danger p-3">Failed to load LLM list.</div>');
@@ -945,7 +945,7 @@ agentView.list_llm = async () => {
         }
         const container_ul = $(`<ul class="sf-list-group"/>`).appendTo(container);
         list.forEach(async item => {
-            const res = await agentView.exec_cmd('agent', 'llm_load', { llmname: item.name });
+            const res = await agentView.exec_cmd('llm', 'load', { llmname: item.name });
             if (!res || !res.success) {
                 $(`
                     <li class="sf-list-danger-item">
@@ -989,7 +989,7 @@ agentView.list_llm = async () => {
                 // Delete button handler
                 $('#btn_del_llm').show().off('click').on('click', async () => {
                     if (!confirm(`Are you sure you want to delete '${config.llmname}'?`)) return;
-                    await agentView.exec_cmd('agent', 'llm_del', { llmname: config.llmname });
+                    await agentView.exec_cmd('llm', 'del', { llmname: config.llmname });
                     $('#llm_edit_modal').modal('hide');
                     agentView.list_llm();
                 });
@@ -1013,7 +1013,7 @@ agentView.save_llm = async () => {
     });
 
     try {
-        const res = await agentView.exec_cmd('agent', 'llm_save', data);
+        const res = await agentView.exec_cmd('llm', 'save', data);
         if (res && res.success) {
             $('#llm_edit_modal').modal('hide');
             agentView.list_llm();
@@ -1027,7 +1027,7 @@ agentView.save_llm = async () => {
 };
 
 agentView.get_embedding_form_def = async () => {
-    const opts = await cmdbox.get_cmd_choices('agent', 'embed_save');
+    const opts = await cmdbox.get_cmd_choices('embed', 'save');
     const vform_names = ['embed_name', 'embed_device', 'embed_model'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
@@ -1048,7 +1048,7 @@ agentView.list_embedding = async () => {
     container.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
 
     try {
-        const res = await agentView.exec_cmd('agent', 'embed_list');
+        const res = await agentView.exec_cmd('embed', 'list');
         container.html('');
         if (!res || !res.success) {
             container.html('<div class="text-danger p-3">Failed to load Embedding list.</div>');
@@ -1063,7 +1063,7 @@ agentView.list_embedding = async () => {
         }
         const container_ul = $(`<ul class="sf-list-group"/>`).appendTo(container);
         list.forEach(async item => {
-            const res = await agentView.exec_cmd('agent', 'embed_load', { embed_name: item.name });
+            const res = await agentView.exec_cmd('embed', 'load', { embed_name: item.name });
             if (!res || !res.success) {
                 $(`
                     <li class="sf-list-danger-item">
@@ -1108,7 +1108,7 @@ agentView.list_embedding = async () => {
                 // Delete button handler
                 $('#btn_del_embedding').show().off('click').on('click', async () => {
                     if (!confirm(`Are you sure you want to delete '${config.embed_name}'?`)) return;
-                    await agentView.exec_cmd('agent', 'embed_del', { embed_name: config.embed_name });
+                    await agentView.exec_cmd('embed', 'del', { embed_name: config.embed_name });
                     $('#embedding_edit_modal').modal('hide');
                     agentView.list_embedding();
                 });
@@ -1132,7 +1132,7 @@ agentView.save_embedding = async () => {
     });
 
     try {
-        const res = await agentView.exec_cmd('agent', 'embed_save', data);
+        const res = await agentView.exec_cmd('embed', 'save', data);
         if (res && res.success) {
             $('#embedding_edit_modal').modal('hide');
             agentView.list_embedding();
@@ -1241,16 +1241,16 @@ agentView.list_memory = async () => {
 
                 $('#memory_edit_modal').modal('show');
                 // コマンド実行
-                await cmdbox.callcmd('agent','llm_list',{},(res)=>{
+                await cmdbox.callcmd('llm','list',{},(res)=>{
                     $("[name='llm']").empty().append('<option></option>');
                     res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
                     form.find('[name="llm"]').val(config.llm);
-                },$('[name="title"]').val(),'agent');
-                await cmdbox.callcmd('agent','embed_list',{},(res)=>{
+                },$('[name="title"]').val(),'llm');
+                await cmdbox.callcmd('embed','list',{},(res)=>{
                     $("[name='embed']").empty().append('<option></option>');
                     res['data'].map(elm=>{$('[name="embed"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
                     form.find('[name="embed"]').val(config.embed);
-                },$('[name="title"]').val(),'agent');
+                },$('[name="title"]').val(),'embed');
             });
 
             container.append(itemEl);
@@ -1284,27 +1284,53 @@ agentView.save_memory = async () => {
 
 agentView.show_memories = async () => {
     const runner_name = agentView.agent_runner ? agentView.agent_runner['runner_name'] : null;
-    const memory_name = agentView.agent_runner ? agentView.agent_runner['memory'] : null;
-    if (!runner_name || runner_name.length <= 0 || !memory_name || memory_name.length <= 0) {
-        cmdbox.message({'error':'Runner name or Memory name is not available.'});
-        console.log('Runner name or Memory name is not available.');
+    if (!runner_name || runner_name.length <= 0) {
+        cmdbox.message({'error':'Runner name is not available.'});
+        console.log('Runner name is not available.');
         return;
     }
-
+    cmdbox.show_loading();
     try {
         const res = await agentView.exec_cmd('agent', 'memory_status', {
-            runner_name: runner_name, memory_name: memory_name }, null, false);
-        if (!res || !res['success'] || !res['success']['data'] || res['success']['data'].length <= 0) {
+            runner_name:runner_name,
+            memory_fetch_offset:0,
+            memory_fetch_count:100,
+            memory_fetch_summary:true,
+        }, null, false);
+        const memoryContent = $('#memory_content');
+        const memory_performance = $('#memory_performance');
+        if (!res || !res['success'] || !res['success']['data']) {
             cmdbox.message({'error':'Failed to load memory status.'});
             console.log('Failed to load memory status.', res);
+            memoryContent.html('Failed to load memory status.');
+            return;
         };
+        const data = res['success']['data'];
+        if (data.length <= 0) {
+            memoryContent.html('No memory status data available.');
+            return;
+        }
         
         // メモリーステータス情報を表示用に構築
-        const memoryContent = $('#memory_content');
-        const statusHtml = res['success']['data'][0]['text'];
+        const timeOptions = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        };
+        const statusHtml = data[0]['text'];
         memoryContent.html(statusHtml.replace(/\n/g, '<br/>'));
+        const start = data[0]['ts_start'] ? Intl.DateTimeFormat('ja-JP', timeOptions).format(new Date(data[0]['ts_start'])) : null;
+        const end = data[0]['ts_end'] ? Intl.DateTimeFormat('ja-JP', timeOptions).format(new Date(data[0]['ts_end'])) : null;
+        $('#memory_range_start').text(start || '---');
+        $('#memory_range_end').text(end || '---');
+        memory_performance.text(`${(data[0]['my_cnt'] / data[0]['all_cnt'] * 100).toFixed(2)} %` || '---');
     } catch (e) {
         console.error('Error loading memory status:', e);
+    } finally {
+        cmdbox.hide_loading();
     }
 };
 

@@ -18,7 +18,7 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature):
         return 'runner_save'
 
     def get_option(self) -> Dict[str, Any]:
-        is_japan = common.is_japan()
+        is_japan = common.is_japan(language=self.language)
         description = f"{self.ver.__appid__}に登録されているコマンド提供"
         description = description if is_japan else f"Provides commands registered in {self.ver.__appid__}"
         instruction = f"あなたはコマンドの意味を熟知しているエキスパートです。" + \

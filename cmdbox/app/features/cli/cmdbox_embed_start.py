@@ -9,7 +9,7 @@ import json
 import re
 
 
-class AgentEmbedStop(feature.OneshotResultEdgeFeature):
+class EmbedStart(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -17,7 +17,7 @@ class AgentEmbedStop(feature.OneshotResultEdgeFeature):
         Returns:
             Union[str, List[str]]: モード
         """
-        return 'agent'
+        return 'embed'
 
     def get_cmd(self) -> str:
         """
@@ -26,7 +26,7 @@ class AgentEmbedStop(feature.OneshotResultEdgeFeature):
         Returns:
             str: コマンド
         """
-        return 'embed_stop'
+        return 'start'
 
     def get_option(self) -> Dict[str, Any]:
         """
@@ -37,8 +37,8 @@ class AgentEmbedStop(feature.OneshotResultEdgeFeature):
         """
         return dict(
             use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
-            description_ja="入力情報の特徴量データを生成するエンベッドモデルを停止します。",
-            description_en="Stop the embedding model that generates feature data from input information.",
+            description_ja="入力情報の特徴量データを生成するエンベッドモデルを開始します。",
+            description_en="Start the embedding model that generates feature data from the input information.",
             choice=[
                 dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
                      description_ja="Redisサーバーのサービスホストを指定します。",
@@ -107,18 +107,18 @@ class AgentEmbedStop(feature.OneshotResultEdgeFeature):
             payload = json.loads(convert.b64str2str(msg[2]))
             embed_name = payload.get('embed_name')
 
-            if 'agent' not in sessions:
-                sessions['agent'] = {}
-            if 'embed_model' not in sessions['agent']:
-                sessions['agent']['embed_model'] = {}
-            if embed_name in sessions['agent']['embed_model']:
-                del sessions['agent']['embed_model'][embed_name]
-            else:
-                msg = dict(warn=f"Embed model '{embed_name}' is not loaded.")
+            configure_path = data_dir / ".agent" / f"embed-{embed_name}.json"
+            if not configure_path.exists():
+                msg = dict(warn=f"Specified embed configuration '{embed_name}' not found on server at '{str(configure_path)}'.")
                 redis_cli.rpush(reskey, msg)
                 return self.RESP_WARN
+            with configure_path.open('r', encoding='utf-8') as f:
+                configure = json.load(f)
+            device = configure.get('embed_device', 'cpu')
+            embed_model = configure.get('embed_model', 'cl-nagoya/ruri-v3-30m')
+            self.__class__._start_embed_model(data_dir, sessions, device, embed_name, embed_model, logger)
 
-            msg = dict(success=f"Embed model '{embed_name}' unloaded successfully.")
+            msg = dict(success=f"Embed model '{embed_name}' loaded successfully on {device}.")
             redis_cli.rpush(reskey, msg)
             return self.RESP_SUCCESS
 
@@ -127,3 +127,27 @@ class AgentEmbedStop(feature.OneshotResultEdgeFeature):
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
+
+    @classmethod
+    def _start_embed_model(cls, data_dir:Path, sessions:Dict[str, Dict[str, Any]],
+                           device:str, embed_name:str, embed_model:str, logger:logging.Logger):
+        if 'agent' in sessions and 'embed_model' in sessions['agent']:
+            eb = sessions['agent']['embed_model']
+            if embed_name in eb and eb[embed_name] is not None:
+                return eb[embed_name]
+
+        if logger.level == logging.DEBUG:
+            logger.debug(f"Loading library torch and sentence_transformers.")
+        import torch
+        from sentence_transformers import SentenceTransformer
+        device = "cuda" if torch.cuda.is_available() and device else "cpu"
+        cache_folder = str(data_dir / '.agent' / 'embed_cache')
+        if logger.level == logging.DEBUG:
+            logger.debug(f"Loading model '{embed_model}' for embed_name '{embed_name}'. cache_folder='{cache_folder}', device='{device}'")
+        model = SentenceTransformer(embed_model, device=device, cache_folder=cache_folder)
+        if 'agent' not in sessions:
+            sessions['agent'] = {}
+        if 'embed_model' not in sessions['agent']:
+            sessions['agent']['embed_model'] = {}
+        sessions['agent']['embed_model'][embed_name] = model
+        return model

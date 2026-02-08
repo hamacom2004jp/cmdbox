@@ -17,7 +17,7 @@ class AgentAgentSave(feature.OneshotResultEdgeFeature):
         return 'agent_save'
 
     def get_option(self) -> Dict[str, Any]:
-        is_japan = common.is_japan()
+        is_japan = common.is_japan(language=self.language)
         description = f"{self.ver.__appid__}に登録されているコマンド提供"
         description = description if is_japan else f"Provides commands registered in {self.ver.__appid__}"
         instruction = f"あなたはコマンドの意味を熟知しているエキスパートです。" + \
@@ -78,7 +78,7 @@ class AgentAgentSave(feature.OneshotResultEdgeFeature):
                     description_ja="A2A Server起動時のAPI Keyを指定します。 また`a2asv_delegated_auth` が無効な場合は、Agent実行時に使用も使用されます。",
                     description_en="Specify the API Key when starting the A2A Server. Additionally, if `a2asv_delegated_auth` is disabled, it will also be used when running the Agent.",),
                 dict(opt="llm", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=[],
-                    callcmd="async () => {await cmdbox.callcmd('agent','llm_list',{},(res)=>{"
+                    callcmd="async () => {await cmdbox.callcmd('llm','list',{},(res)=>{"
                             + "const val = $(\"[name='llm']\").val();"
                             + "$(\"[name='llm']\").empty().append('<option></option>');"
                             + "res['data'].map(elm=>{$(\"[name='llm']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"

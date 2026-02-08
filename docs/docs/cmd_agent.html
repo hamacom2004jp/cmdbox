@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/02/04 documentation</title>
+  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/02/08 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=fd547c84"></script>
+      <script src="../_static/documentation_options.js?v=22b6552c"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -54,17 +54,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#list-agent-configuration-cmdbox-m-agent-c-agent-list-option">List Agent configuration. : <cite>cmdbox -m agent -c agent_list &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#load-agent-configuration-cmdbox-m-agent-c-agent-load-option">Load Agent configuration. : <cite>cmdbox -m agent -c agent_load &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#save-agent-configuration-cmdbox-m-agent-c-agent-save-option">Save Agent configuration. : <cite>cmdbox -m agent -c agent_save &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#deletes-embed-configuration-cmdbox-m-agent-c-embed-del-option">Deletes Embed configuration. : <cite>cmdbox -m agent -c embed_del &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#lists-embed-configurations-cmdbox-m-agent-c-embed-list-option">Lists Embed configurations. : <cite>cmdbox -m agent -c embed_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#loads-embed-configuration-cmdbox-m-agent-c-embed-load-option">Loads Embed configuration. : <cite>cmdbox -m agent -c embed_load &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#saves-embed-configuration-cmdbox-m-agent-c-embed-save-option">Saves Embed configuration. : <cite>cmdbox -m agent -c embed_save &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#start-embed-configuration-cmdbox-m-agent-c-embed-start-option">Start Embed configuration. : <cite>cmdbox -m agent -c embed_start &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#stop-embed-configuration-cmdbox-m-agent-c-embed-stop-option">Stop Embed configuration. : <cite>cmdbox -m agent -c embed_stop &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#embedding-embed-configuration-cmdbox-m-agent-c-embedding-option">Embedding Embed configuration. : <cite>cmdbox -m agent -c embedding &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#deletes-llm-configuration-cmdbox-m-agent-c-llm-del-option">Deletes LLM configuration. : <cite>cmdbox -m agent -c llm_del &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#lists-llm-configurations-cmdbox-m-agent-c-llm-list-option">Lists LLM configurations. : <cite>cmdbox -m agent -c llm_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#loads-llm-configuration-cmdbox-m-agent-c-llm-load-option">Loads LLM configuration. : <cite>cmdbox -m agent -c llm_load &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#saves-llm-configuration-cmdbox-m-agent-c-llm-save-option">Saves LLM configuration. : <cite>cmdbox -m agent -c llm_save &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mcp-client-cmdbox-m-agent-c-mcp-client-option">MCP client : <cite>cmdbox -m agent -c mcp_client &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#proxy-to-transport-mcp-cmdbox-m-agent-c-mcp-proxy-option">Proxy to transport MCP : <cite>cmdbox -m agent -c mcp_proxy &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#delete-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-del-option">Delete MCP server configuration. : <cite>cmdbox -m agent -c mcpsv_del &lt;Option&gt;</cite></a></li>
@@ -76,6 +65,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#load-memory-configuration-cmdbox-m-agent-c-memory-load-option">Load Memory configuration. : <cite>cmdbox -m agent -c memory_load &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#save-memory-configuration-cmdbox-m-agent-c-memory-save-option">Save Memory configuration. : <cite>cmdbox -m agent -c memory_save &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#status-memory-configuration-cmdbox-m-agent-c-memory-save-option">Status Memory configuration. : <cite>cmdbox -m agent -c memory_save &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#status-memory-configuration-cmdbox-m-agent-c-memory-status-option">Status Memory configuration. : <cite>cmdbox -m agent -c memory_status &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#delete-runner-configuration-cmdbox-m-agent-c-runner-del-option">Delete runner configuration. : <cite>cmdbox -m agent -c runner_del &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#list-runner-configuration-cmdbox-m-agent-c-runner-list-option">List runner configuration. : <cite>cmdbox -m agent -c runner_list &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#load-runner-configuration-cmdbox-m-agent-c-runner-load-option">Load runner configuration. : <cite>cmdbox -m agent -c runner_load &lt;Option&gt;</cite></a></li>
@@ -90,8 +80,10 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_embed.html">Embed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_llm.html">LLM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
@@ -368,641 +360,6 @@
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
-<td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="deletes-embed-configuration-cmdbox-m-agent-c-embed-del-option">
-<h2>Deletes Embed configuration. : <cite>cmdbox -m agent -c embed_del &lt;Option&gt;</cite><a class="headerlink" href="#deletes-embed-configuration-cmdbox-m-agent-c-embed-del-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Delete the embed model configuration that generates feature data from input information.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--embed_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the registration name of the embed model to delete.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
-<td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="lists-embed-configurations-cmdbox-m-agent-c-embed-list-option">
-<h2>Lists Embed configurations. : <cite>cmdbox -m agent -c embed_list &lt;Option&gt;</cite><a class="headerlink" href="#lists-embed-configurations-cmdbox-m-agent-c-embed-list-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Display a list of saved embedding model settings.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--kwd &lt;keyword&gt;</p></td>
-<td></td>
-<td><p>Specify a partial match keyword to filter saved LLMs.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
-<td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="loads-embed-configuration-cmdbox-m-agent-c-embed-load-option">
-<h2>Loads Embed configuration. : <cite>cmdbox -m agent -c embed_load &lt;Option&gt;</cite><a class="headerlink" href="#loads-embed-configuration-cmdbox-m-agent-c-embed-load-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Loads the settings for the embedding model that generates feature data from input information.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--embed_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the registration name of the embed model to load.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
-<td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="saves-embed-configuration-cmdbox-m-agent-c-embed-save-option">
-<h2>Saves Embed configuration. : <cite>cmdbox -m agent -c embed_save &lt;Option&gt;</cite><a class="headerlink" href="#saves-embed-configuration-cmdbox-m-agent-c-embed-save-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Saves the settings for the embedding model that generates feature data from input information.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--embed_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the registration name of the embed model.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--embed_device &lt;device&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the execution device of the embed model.</p></td>
-</tr>
-<tr class="row-even"><td><p>--embed_model &lt;model&gt;</p></td>
-<td></td>
-<td><p>Specify the name of the huggingface embed model.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
-<td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="start-embed-configuration-cmdbox-m-agent-c-embed-start-option">
-<h2>Start Embed configuration. : <cite>cmdbox -m agent -c embed_start &lt;Option&gt;</cite><a class="headerlink" href="#start-embed-configuration-cmdbox-m-agent-c-embed-start-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Start the embedding model that generates feature data from the input information.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--embed_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the registration name of the embed model to load.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
-<td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="stop-embed-configuration-cmdbox-m-agent-c-embed-stop-option">
-<h2>Stop Embed configuration. : <cite>cmdbox -m agent -c embed_stop &lt;Option&gt;</cite><a class="headerlink" href="#stop-embed-configuration-cmdbox-m-agent-c-embed-stop-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Stop the embedding model that generates feature data from input information.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--embed_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the registration name of the embed model to load.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
-<td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="embedding-embed-configuration-cmdbox-m-agent-c-embedding-option">
-<h2>Embedding Embed configuration. : <cite>cmdbox -m agent -c embedding &lt;Option&gt;</cite><a class="headerlink" href="#embedding-embed-configuration-cmdbox-m-agent-c-embedding-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Stop the embedding model that generates feature data from input information.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--embed_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the registration name of the embed model to load.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--original_data &lt;data&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the original data to generate feature vectors.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
-<td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="deletes-llm-configuration-cmdbox-m-agent-c-llm-del-option">
-<h2>Deletes LLM configuration. : <cite>cmdbox -m agent -c llm_del &lt;Option&gt;</cite><a class="headerlink" href="#deletes-llm-configuration-cmdbox-m-agent-c-llm-del-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Deletes LLM configuration. This command sends a delete request to the agent via Redis.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--llmname &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the LLM configuration to delete.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
-<td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="lists-llm-configurations-cmdbox-m-agent-c-llm-list-option">
-<h2>Lists LLM configurations. : <cite>cmdbox -m agent -c llm_list &lt;Option&gt;</cite><a class="headerlink" href="#lists-llm-configurations-cmdbox-m-agent-c-llm-list-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Lists LLM configurations. Sends a list request to the agent and receives matching LLM names.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--kwd &lt;keyword&gt;</p></td>
-<td></td>
-<td><p>Specify a partial match keyword to filter saved LLMs.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
-<td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="loads-llm-configuration-cmdbox-m-agent-c-llm-load-option">
-<h2>Loads LLM configuration. : <cite>cmdbox -m agent -c llm_load &lt;Option&gt;</cite><a class="headerlink" href="#loads-llm-configuration-cmdbox-m-agent-c-llm-load-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Loads LLM configuration from the agent.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--llmname &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the LLM configuration to load.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
-<td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="saves-llm-configuration-cmdbox-m-agent-c-llm-save-option">
-<h2>Saves LLM configuration. : <cite>cmdbox -m agent -c llm_save &lt;Option&gt;</cite><a class="headerlink" href="#saves-llm-configuration-cmdbox-m-agent-c-llm-save-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Saves LLM configuration via the agent.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--llmname &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the LLM configuration to save.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--llmprov &lt;provider&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify llm provider.</p></td>
-</tr>
-<tr class="row-even"><td><p>--llmprojectid &lt;id&gt;</p></td>
-<td></td>
-<td><p>Project ID for provider connection.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--llmsvaccountfile &lt;file&gt;</p></td>
-<td></td>
-<td><p>Service account file for provider connection.</p></td>
-</tr>
-<tr class="row-even"><td><p>--llmlocation &lt;location&gt;</p></td>
-<td></td>
-<td><p>Provider location.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--llmapikey &lt;key&gt;</p></td>
-<td></td>
-<td><p>API key for provider connection.</p></td>
-</tr>
-<tr class="row-even"><td><p>--llmapiversion &lt;version&gt;</p></td>
-<td></td>
-<td><p>Specifies the API version for llm provider connections.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--llmendpoint &lt;endpoint&gt;</p></td>
-<td></td>
-<td><p>Provider endpoint.</p></td>
-</tr>
-<tr class="row-even"><td><p>--llmmodel &lt;model&gt;</p></td>
-<td></td>
-<td><p>LLM model name.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--llmseed &lt;int&gt;</p></td>
-<td></td>
-<td><p>Seed for model sampling.</p></td>
-</tr>
-<tr class="row-even"><td><p>--llmtemperature &lt;float&gt;</p></td>
-<td></td>
-<td><p>Temperature for model sampling.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
@@ -1597,6 +954,79 @@
 </section>
 <section id="status-memory-configuration-cmdbox-m-agent-c-memory-save-option">
 <h2>Status Memory configuration. : <cite>cmdbox -m agent -c memory_save &lt;Option&gt;</cite><a class="headerlink" href="#status-memory-configuration-cmdbox-m-agent-c-memory-save-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Get the memory status for the agent.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 10.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--runner_name &lt;name&gt;</p></td>
+<td><p>Yes</p></td>
+<td><p>Specify the name of the Runner configuration.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--user_name &lt;name&gt;</p></td>
+<td><p>Yes</p></td>
+<td><p>Specify a user name.</p></td>
+</tr>
+<tr class="row-even"><td><p>--memory_query &lt;query&gt;</p></td>
+<td></td>
+<td><p>Specify a query to search memory contents. Perform semantic search.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--memory_fetch_offset &lt;offset&gt;</p></td>
+<td></td>
+<td><p>Specify the starting position when retrieving memory contents.</p></td>
+</tr>
+<tr class="row-even"><td><p>--memory_fetch_count &lt;count&gt;</p></td>
+<td></td>
+<td><p>Specify the number of memory contents to retrieve.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--memory_fetch_summary</p></td>
+<td></td>
+<td><p>Specify whether to summarize the retrieved memory contents.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="status-memory-configuration-cmdbox-m-agent-c-memory-status-option">
+<h2>Status Memory configuration. : <cite>cmdbox -m agent -c memory_status &lt;Option&gt;</cite><a class="headerlink" href="#status-memory-configuration-cmdbox-m-agent-c-memory-status-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Get the memory status for the agent.</p></li>
 </ul>

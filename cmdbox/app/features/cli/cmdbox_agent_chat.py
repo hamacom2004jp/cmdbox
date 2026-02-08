@@ -1,7 +1,8 @@
 from cmdbox.app import common, client, feature, options
 from cmdbox.app.auth import signin
 from cmdbox.app.commons import convert, redis_client
-from cmdbox.app.features.cli import cmdbox_tts_say, cmdbox_agent_embed_start
+from cmdbox.app.features.cli import cmdbox_agent_memory_status, cmdbox_tts_say
+from cmdbox.app.features.cli.agent import agant_base
 from cmdbox.app.options import Options
 from contextlib import aclosing
 from pathlib import Path
@@ -13,10 +14,11 @@ import platform
 import re
 
 
-class AgentChat(feature.ResultEdgeFeature):
+class AgentChat(agant_base.AgentBase):
 
-    def __init__(self, appcls, ver):
-        super().__init__(appcls, ver)
+    def __init__(self, appcls, ver, language:str=None):
+        super().__init__(appcls, ver, language=language)
+        self.memory = cmdbox_agent_memory_status.AgentMemoryStatus(appcls, ver, language=language)
         self.call_a2asv_start:bool = False
 
     def get_mode(self) -> Union[str, List[str]]:
@@ -172,81 +174,6 @@ class AgentChat(feature.ResultEdgeFeature):
     def is_cluster_redirect(self):
         return False
 
-    def _load_agent_config(self, data_dir:Path, agent_name:str) -> Dict[str, Any]:
-        agent_conf_path = data_dir / ".agent" / f"agent-{agent_name}.json"
-        if not agent_conf_path.exists():
-            raise FileNotFoundError(f"Specified agent configuration '{agent_name}' not found on server at '{str(agent_conf_path)}'.")
-        with agent_conf_path.open('r', encoding='utf-8') as f:
-            agent_conf = json.load(f)
-        return agent_conf
-
-    def _load_llm_config(self, data_dir:Path, llm_name:str) -> Dict[str, Any]:
-        llm_conf_path = data_dir / ".agent" / f"llm-{llm_name}.json"
-        if not llm_conf_path.exists():
-            raise FileNotFoundError(f"Specified llm configuration '{llm_name}' not found on server at '{str(llm_conf_path)}'.")
-        with llm_conf_path.open('r', encoding='utf-8') as f:
-            llm_conf = json.load(f)
-        return llm_conf
-
-    def _load_mcpsv_config(self, data_dir:Path, mcpservers:List[str]) -> List[Dict[str, Any]]:
-        mcpsv_confs = []
-        if isinstance(mcpservers, list):
-            for mcpsv_name in mcpservers:
-                mcpsv_conf_path = data_dir / ".agent" / f"mcpsv-{mcpsv_name}.json"
-                if not mcpsv_conf_path.exists():
-                    raise FileNotFoundError(f"Specified MCP server configuration '{mcpsv_name}' not found on server at '{str(mcpsv_conf_path)}'.")
-                with mcpsv_conf_path.open('r', encoding='utf-8') as f:
-                    mcpsv_conf = json.load(f)
-                    mcpsv_confs.append(mcpsv_conf)
-        return mcpsv_confs
-
-    def _load_embed_config(self, data_dir:Path, embed_name:str) -> Dict[str, Any]:
-        embed_conf_path = data_dir / ".agent" / f"embed-{embed_name}.json"
-        if not embed_conf_path.exists():
-            raise FileNotFoundError(f"Specified embed configuration '{embed_name}' not found on server at '{str(embed_conf_path)}'.")
-        with embed_conf_path.open('r', encoding='utf-8') as f:
-            embed_conf = json.load(f)
-        return embed_conf
-
-    def _load_memory_config(self, data_dir:Path, memory_name:str) -> Dict[str, Any]:
-        memory_conf_path = data_dir / ".agent" / f"memory-{memory_name}.json"
-        if not memory_conf_path.exists():
-            raise FileNotFoundError(f"Specified memory configuration '{memory_name}' not found on server at '{str(memory_conf_path)}'.")
-        with memory_conf_path.open('r', encoding='utf-8') as f:
-            memory_conf = json.load(f)
-        return memory_conf
-
-    def load_conf(self, runner_name:str, data_dir:Path, logger:logging.Logger):
-        runner_conf_path = data_dir / ".agent" / f"runner-{runner_name}.json"
-        if not runner_conf_path.exists():
-            raise FileNotFoundError(f"Specified runner configuration '{runner_name}' not found on server at '{str(runner_conf_path)}'.")
-        with runner_conf_path.open('r', encoding='utf-8') as f:
-            runner_conf = json.load(f)
-
-        agent_conf = self._load_agent_config(data_dir, runner_conf['agent'])
-        if agent_conf.get('llm', None) is not None:
-            llm_conf = self._load_llm_config(data_dir, agent_conf['llm'])
-        else:
-            llm_conf = {}
-
-        if agent_conf.get('mcpservers', None) is not None:
-            mcpsv_confs = self._load_mcpsv_config(data_dir, agent_conf['mcpservers'])
-        else:
-            mcpsv_confs = []
-
-        memory_conf = self._load_memory_config(data_dir, runner_conf['memory'])
-        if memory_conf.get('llm', None) is not None:
-            memory_llm_conf = self._load_llm_config(data_dir, memory_conf['llm'])
-        else:
-            memory_llm_conf = {}
-
-        if memory_conf.get('embed', None) is not None:
-            memory_embed_conf = self._load_embed_config(data_dir, memory_conf['embed'])
-        else:
-            memory_embed_conf = {}
-
-        return runner_conf, agent_conf, llm_conf, memory_conf, memory_llm_conf, memory_embed_conf, mcpsv_confs
-
     def create_agent(self, logger:logging.Logger, data_dir:Path, disable_remote_agent:bool,
                      agent_conf:Dict[str, Any], llm_conf:Dict[str, Any], mcpsv_confs:List[Dict[str, Any]]) -> Any:
         """
@@ -283,8 +210,8 @@ class AgentChat(feature.ResultEdgeFeature):
         if logger.level == logging.DEBUG:
             logger.debug(f"litellm loading..")
         from google.adk.models import lite_llm
-        from litellm import _logging
-        _logging._turn_on_debug()
+        #from litellm import _logging
+        #_logging._turn_on_debug()
 
         # loggerの初期化
         common.reset_logger("LiteLLM Proxy")
@@ -459,111 +386,6 @@ class AgentChat(feature.ResultEdgeFeature):
             logger.debug(f"create_agent complate.")
         return agent
 
-    def create_memory_agent(self, logger:logging.Logger, data_dir:Path,
-                            memory_conf:Dict[str, Any], llm_conf:Dict[str, Any]) -> Any:
-        if logger.level == logging.DEBUG:
-            logger.debug(f"google-adk loading..")
-        from google.adk.agents import Agent as AdkAgent
-        if logger.level == logging.DEBUG:
-            logger.debug(f"litellm loading..")
-        from google.adk.models import lite_llm
-        from litellm import _logging
-        _logging._turn_on_debug()
-        # App name mismatch警告を回避するためのラッパークラス
-        class Agent(AdkAgent):
-            pass
-        agent_name = memory_conf.get('memory_name', 'memory_agent')
-        description = memory_conf.get('memory_description', '')
-        instruction = memory_conf.get('memory_instruction', '')
-        llmprov = llm_conf.get('llmprov', None)
-        if llmprov == 'openai':
-            llmmodel = llm_conf.get('llmmodel', None)
-            llmapikey = llm_conf.get('llmapikey', None)
-            llmendpoint = llm_conf.get('llmendpoint', None)
-            if llmmodel is None: raise ValueError("llmmodel is required.")
-            if llmapikey is None: raise ValueError("llmapikey is required.")
-            agent = Agent(
-                name=agent_name,
-                model=lite_llm.LiteLlm(
-                    model=llmmodel,
-                    api_key=llmapikey,
-                    endpoint=llmendpoint,
-                ),
-                description=description,
-                instruction=instruction,
-            )
-        elif llmprov == 'azureopenai':
-            llmmodel = llm_conf.get('llmmodel', None)
-            llmapikey = llm_conf.get('llmapikey', None)
-            llmendpoint = llm_conf.get('llmendpoint', None)
-            llmapiversion = llm_conf.get('llmapiversion', None)
-            if llmmodel is None: raise ValueError("llmmodel is required.")
-            if llmendpoint is None: raise ValueError("llmendpoint is required.")
-            if "/openai/deployments" in llmendpoint:
-                llmendpoint = llmendpoint.split("/openai/deployments")[0]
-            if llmapikey is None: raise ValueError("llmapikey is required.")
-            if llmapiversion is None: raise ValueError("llmapiversion is required.")
-            if not llmmodel.startswith("azure/"):
-                llmmodel = f"azure/{llmmodel}"
-            agent = Agent(
-                name=agent_name,
-                model=lite_llm.LiteLlm(
-                    model=llmmodel,
-                    api_key=llmapikey,
-                    api_base=llmendpoint,
-                    api_version=llmapiversion,
-                    base_url=llmendpoint,
-                ),
-                description=description,
-                instruction=instruction,
-            )
-        elif llmprov == 'vertexai':
-            llmprojectid = llm_conf.get('llmprojectid', None)
-            llmsvaccountfile = llm_conf.get('llmsvaccountfile', None)
-            llmmodel = llm_conf.get('llmmodel', None)
-            llmlocation = llm_conf.get('llmlocation', None)
-            llmsvaccountfile_data = llm_conf.get('llmsvaccountfile_data', {})
-            llmtemperature = llm_conf.get('llmtemperature', None)
-            llmseed = llm_conf.get('llmseed', None)
-            if llmmodel is None: raise ValueError("llmmodel is required.")
-            if llmlocation is None: raise ValueError("llmlocation is required.")
-            if llmsvaccountfile_data is None: raise ValueError("llmsvaccountfile_data is required.")
-            agent = Agent(
-                name=agent_name,
-                model=lite_llm.LiteLlm(
-                    model=llmmodel,
-                    #vertex_project=llmprojectid,
-                    vertex_credentials=llmsvaccountfile_data,
-                    vertex_location=llmlocation,
-                    seed=llmseed,
-                    temperature=llmtemperature,
-                ),
-                description=description,
-                instruction=instruction,
-            )
-        elif llmprov == 'ollama':
-            llmmodel = llm_conf.get('llmmodel', None)
-            llmendpoint = llm_conf.get('llmendpoint', None)
-            llmtemperature = llm_conf.get('llmtemperature', None)
-            if llmmodel is None: raise ValueError("llmmodel is required.")
-            if llmendpoint is None: raise ValueError("llmendpoint is required.")
-            agent = Agent(
-                name=agent_name,
-                model=lite_llm.LiteLlm(
-                    model=f"ollama/{llmmodel}",
-                    api_base=llmendpoint,
-                    temperature=llmtemperature,
-                    stream=True
-                ),
-                description=description,
-                instruction=instruction,
-            )
-        else:
-            raise ValueError("llmprov is required.")
-        if logger.level == logging.DEBUG:
-            logger.debug(f"create_memory_agent complate.")
-        return agent
-
     def create_tool_mcpsv(self, logger:logging.Logger, mcpsv_confs:List[Dict[str, Any]]) -> List[Any]:
         """
         MCPサーバーツールを作成します
@@ -659,73 +481,6 @@ class AgentChat(feature.ResultEdgeFeature):
         else:
             logger.info(f"Using InMemorySessionService")
             return InMemorySessionService()
-    
-    def create_memory_service(self, data_dir:Path, logger:logging.Logger,
-                              memory_conf:Dict[str, Any], memory_llm_conf:Dict[str, Any], memory_embed_conf:Dict[str, Any],
-                              sessions:Dict[str, Dict[str, Any]]) -> Any:
-        """
-        メモリーサービスを作成します
-
-        Args:
-            data_dir (Path): データディレクトリパス
-            logger (logging.Logger): ロガー
-            memory_conf (Dict[str, Any]): メモリー設定
-            memory_llm_conf (Dict[str, Any]): メモリー用LLM設定
-            memory_embed_conf (Dict[str, Any]): メモリー用埋め込みモデル設定
-            sessions (Dict[str, Dict[str, Any]]): セッション情報辞書
-
-        Returns:
-            BaseMemoryService: メモリーサービス
-        """
-        from google.adk.memory import InMemoryMemoryService, VertexAiMemoryBankService
-        from cmdbox.app.features.cli.agent import SqliteMemoryService, PostgresqlMemoryService
-        
-        memory_type = memory_conf.get('memory_type', 'memory')
-        device = memory_embed_conf.get('embed_device', 'cpu')
-        embed_name = memory_embed_conf.get('embed_name', None)
-        embed_model = memory_embed_conf.get('embed_model', None)
-
-        if memory_type == 'memory':
-            logger.info("Using InMemoryMemoryService")
-            return InMemoryMemoryService()
-        elif memory_type == 'sqlite':
-            logger.info("Using SqliteMemoryService")
-            memory_dbpath = str(data_dir / '.agent' / 'memory.db').replace('\\', '/')
-            memory_dburl = f"sqlite+aiosqlite:///{memory_dbpath}"
-            ebcls = cmdbox_agent_embed_start.AgentEmbedStart
-            model = ebcls._start_embed_model(data_dir, sessions,
-                                             device, embed_name, embed_model, logger)
-            return SqliteMemoryService(db_url=memory_dburl, embed_name=embed_name, embed_model=model,
-                                       memory_fetch_offset=memory_conf.get('memory_fetch_offset', 0),
-                                       memory_fetch_count=memory_conf.get('memory_fetch_count', 10),
-                                       memory_fetch_summary=memory_conf.get('memory_fetch_summary', False),
-                                       logger=logger)
-        elif memory_type == 'postgresql':
-            logger.info("Using PostgresqlMemoryService")
-            memory_dburl = memory_conf.get('memory_dburl', None)
-            if memory_dburl is None:
-                # Build PostgreSQL URL from individual configuration parameters
-                pg_host = memory_conf.get('memory_store_pghost')
-                pg_port = memory_conf.get('memory_store_pgport')
-                pg_user = memory_conf.get('memory_store_pguser')
-                pg_pass = memory_conf.get('memory_store_pgpass')
-                pg_dbname = memory_conf.get('memory_store_pgdbname')
-
-                if pg_host and pg_port and pg_user and pg_pass and pg_dbname:
-                    memory_dburl = f"postgresql+psycopg://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_dbname}"
-                else:
-                    raise ValueError("memory_dburl or PostgreSQL connection parameters (memory_store_pghost, memory_store_pgport, memory_store_pguser, memory_store_pgpass, memory_store_pgdbname) are required for postgresql memory_type")
-            ebcls = cmdbox_agent_embed_start.AgentEmbedStart
-            model = ebcls._start_embed_model(data_dir, sessions,
-                                             device, embed_name, embed_model, logger)
-            return PostgresqlMemoryService(db_url=memory_dburl, embed_name=embed_name, embed_model=model,
-                                           memory_fetch_offset=memory_conf.get('memory_fetch_offset', 0),
-                                           memory_fetch_count=memory_conf.get('memory_fetch_count', 10),
-                                           memory_fetch_summary=memory_conf.get('memory_fetch_summary', False),
-                                           logger=logger)
-        else:
-            logger.info(f"Using InMemoryMemoryService (unknown memory_type: {memory_type})")
-            return InMemoryMemoryService()
 
     async def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
                     sessions:Dict[str, Dict[str, Any]]):
@@ -744,46 +499,18 @@ class AgentChat(feature.ResultEdgeFeature):
             call_tts = payload.get('call_tts')
 
             from google.adk.agents.run_config import RunConfig, StreamingMode
-            from google.adk.events import Event
             from google.adk.runners import Runner
-            from google.adk.sessions import BaseSessionService, Session
             from google.genai import types
-
-            async def create_agent_session(session_service:BaseSessionService, runner_name:str, 
-                                           user_name:str, session_id:str=None) -> Session:
-                """
-                セッションを作成します
-
-                Args:
-                    session_service (BaseSessionService): セッションサービス
-                    runner_name (str): ランナー名
-                    user_name (str): ユーザー名
-                    session_id (str): セッションID
-
-                Returns:
-                    Any: セッション
-                """
-                if session_id is None:
-                    session_id = common.random_string(32)
-                try:
-                    session = await session_service.get_session(app_name=runner_name, user_id=user_name, session_id=session_id)
-                    if session is None:
-                        session = await session_service.create_session(app_name=runner_name, user_id=user_name, session_id=session_id)
-                    return session
-                except NotImplementedError:
-                    # セッションが１件もない場合はNotImplementedErrorが発生することがある
-                    session = await session_service.create_session(app_name=runner_name, user_id=user_name, session_id=session_id)
-                    return session
 
             json_pattern = re.compile(r'\{.*?\}')
             runner_conf, agent_conf, llm_conf, memory_conf, memory_llm_conf, memory_embed_conf, mcpsv_confs = self.load_conf(name, data_dir, logger)
             agent = self.create_agent(logger, data_dir, False, agent_conf, llm_conf, mcpsv_confs)
-
+            memory_service = self.memory.create_memory_service(data_dir, logger, memory_conf, memory_llm_conf, memory_embed_conf, sessions)
             runner = Runner(
                 app_name=runner_conf.get('runner_name', self.ver.__appid__),
                 agent=agent,
                 session_service=self.create_session_service(data_dir, logger, runner_conf),
-                memory_service=self.create_memory_service(data_dir, logger, memory_conf, memory_llm_conf, memory_embed_conf, sessions),
+                memory_service=memory_service,
             )
             content = types.Content(role='user', parts=[types.Part(text=message)])
             tts_engine = runner_conf.get('tts_engine', None)
@@ -798,19 +525,13 @@ class AgentChat(feature.ResultEdgeFeature):
                     enable_tts = False
 
             # メモリーエージェントを作成
-            from google.adk.sessions import InMemorySessionService
-            memory_agent = self.create_memory_agent(logger, data_dir, memory_conf, memory_llm_conf)
-            memory_runner = Runner(
-                app_name=f"{memory_agent.name}_runner",
-                agent=memory_agent,
-                session_service=InMemorySessionService(),
-            )
+            memory_agent = self.memory.create_memory_agent(logger, data_dir, memory_conf, memory_llm_conf)
+            memory_runner = self.memory.create_memory_runner(memory_agent)
             short_mem_msg = f"The following is an instruction from {user_name}: {message}\n\n=====\n\n"
             # セッションを作成する
-            agent_session = await create_agent_session(runner.session_service, runner.app_name,
+            agent_session = await self.create_agent_session(runner.session_service, runner.app_name,
                                                        user_name, session_id=session_id)
-            memory_session = await create_agent_session(memory_runner.session_service, memory_runner.app_name,
-                                                        user_name, session_id=None)
+            memory_session = await self.memory.create_memory_session(memory_runner, user_name)
             # チャットを実行する
             signin.set_request_scope(dict(mcpserver_apikey=mcpserver_apikey, a2asv_apikey=a2asv_apikey))
             run_config = RunConfig(streaming_mode=StreamingMode.NONE)
@@ -828,7 +549,7 @@ class AgentChat(feature.ResultEdgeFeature):
                             flags['turn_complete'] = True
                         if event.interrupted:
                             flags['interrupted'] = True
-                        msg, is_func_call, is_func_response = self.__class__.gen_msg(event)
+                        msg, is_func_call, is_func_response = self.gen_msg(event)
                         flags['final_response'] = event.is_final_response()
                         flags['function_call'] = is_func_call
                         flags['function_response'] = is_func_response
@@ -851,14 +572,9 @@ class AgentChat(feature.ResultEdgeFeature):
                             redis_cli.rpush(reskey, outputs)
                             if flags['final_response']:
                                 # 要約文生成
-                                sammary_msg = await self._summary(memory_runner, user_name, memory_session, short_mem_msg)
-                                memory_session.events.append(Event(
-                                    id=common.random_string(32),
-                                    author='system',
-                                    content=types.Content(role='system', parts=[types.Part(text=sammary_msg)]),
-                                ))
+                                sammary_msg = await self.memory.summary(memory_runner, user_name, memory_session, short_mem_msg)
                                 # メモリーにセッションを保存する
-                                await runner.memory_service.add_session_to_memory(memory_session)
+                                await self.memory.add_memory(memory_service, memory_session, sammary_msg)
                                 break
 
                 except Exception as e:
@@ -885,46 +601,3 @@ class AgentChat(feature.ResultEdgeFeature):
                 if hasattr(runner.session_service, 'db_engine'):
                     await runner.session_service.db_engine.dispose()
                 await runner.close()
-
-    async def _summary(self, memory_runner, user_name, memory_session, short_mem_msg:str):
-        from google.genai import types
-        from google.adk.runners import Runner
-        runner:Runner = memory_runner
-        memory_content = types.Content(role='user', parts=[types.Part(text=short_mem_msg)])
-        async with aclosing(runner.run_async(user_id=user_name, session_id=memory_session.id, new_message=memory_content)) as mem_iter:
-            async for event in mem_iter:
-                msg, _, _ = self.__class__.gen_msg(event)
-                if event.is_final_response():
-                    return msg
-        return None
-
-    @classmethod
-    def _replace_match(cls, match_obj):
-        json_str = match_obj.group(0)
-        try:
-            data = json.loads(json_str) # ユニコード文字列をエンコード
-            return json.dumps(data, ensure_ascii=False, default=common.default_json_enc)
-        except json.JSONDecodeError:
-            return json_str
-
-    @classmethod
-    def gen_msg(cls, event:Any) -> Tuple[str, bool, bool]:
-        json_pattern = re.compile(r'\{.*?\}')
-        msg = None
-        is_func_call = False
-        is_func_response = False
-        if event.content and event.content.parts:
-            msg = "\n".join([p.text for p in event.content.parts if p and p.text])
-            calls = event.get_function_calls()
-            if calls:
-                is_func_call = True
-                msg += '\n```json{"function_calls":'+common.to_str([dict(fn=c.name,args=c.args) for c in calls])+'}```'
-            responses = event.get_function_responses()
-            if responses:
-                is_func_response = True
-                msg += '\n```json{"function_responses":'+common.to_str([dict(fn=r.name, res=r.response) for r in responses])+'}```'
-        elif event.actions and event.actions.escalate:
-            msg = f"Agent escalated: {event.error_message or 'No specific message.'}"
-        if msg:
-            msg = json_pattern.sub(cls._replace_match, msg)
-        return msg, is_func_call, is_func_response

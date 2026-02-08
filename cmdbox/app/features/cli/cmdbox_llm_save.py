@@ -9,12 +9,12 @@ import json
 import re
 
 
-class AgentLLMSave(feature.OneshotResultEdgeFeature):
+class LLMSave(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
-        return 'agent'
+        return 'llm'
 
     def get_cmd(self) -> str:
-        return 'llm_save'
+        return 'save'
 
     def get_option(self) -> Dict[str, Any]:
         return dict(

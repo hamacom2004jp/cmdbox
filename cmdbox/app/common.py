@@ -816,14 +816,24 @@ def chopdq(target:str):
         return target
     return target[1:-1] if target.startswith('"') and target.endswith('"') else target
 
-def is_japan() -> bool:
+def is_japan(*, language:str=None, opt:Dict[str, Any]=None, args:argparse.Namespace=None) -> bool:
     """
     日本語環境かどうかを判定します
+
+    Args:
+        language (str, optional): 言語コード. Defaults to None.
+        opt (Dict[str, Any], optional): コマンドラインオプション. Defaults to None.
+        args (argparse.Namespace, optional): コマンドライン引数. Defaults to None.
 
     Returns:
         bool: 日本語環境ならTrue、そうでなければFalse
     """
-    language, _ = locale.getlocale()
+    lang = language
+    if lang is None and opt is not None and 'language' in opt:
+        lang = opt.get('language', None)
+    if lang is None and args is not None and hasattr(args, 'language'):
+        lang = getattr(args, 'language', None)
+    language, _ = locale.getlocale() if lang is None else (lang, None)
     is_japan = language.find('Japan') >= 0 or language.find('ja_JP') >= 0
     return is_japan
 

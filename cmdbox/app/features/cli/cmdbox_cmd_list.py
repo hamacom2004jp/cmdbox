@@ -94,7 +94,7 @@ class CmdList(feature.OneshotResultEdgeFeature):
         paths = glob.glob(str(Path(args.data) / ".cmds" / f"cmd-{kwd}.json"))
         cmd_list = [common.loadopt(path, True) for path in paths]
         cmd_list = sorted(cmd_list, key=lambda cmd: cmd["title"])
-        is_japan = common.is_japan()
+        is_japan = common.is_japan(args=args)
         options = Options.getInstance()
         cmd_list = [dict(title=r.get('title',''), mode=r['mode'], cmd=r['cmd'],
                     description=r.get('description','') + str(options.get_cmd_attr(r['mode'], r['cmd'], 'description_ja' if is_japan else 'description_en')),

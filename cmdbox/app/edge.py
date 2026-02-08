@@ -94,7 +94,7 @@ class Edge(object):
             default = str(default) if isinstance(default, int) or isinstance(default, float) else default
             description_ja = r['description_ja'] if 'description_ja' in r else None
             description_en = r['description_en'] if 'description_en' in r else None
-            help = description_en if not common.is_japan() else description_ja
+            help = description_en if not common.is_japan(args=args) else description_ja
             choice = r['choice'] if 'choice' in r else None
             choice = [str(c) for c in choice] if choice is not None else None
             required = r['required'] if 'required' in r else False

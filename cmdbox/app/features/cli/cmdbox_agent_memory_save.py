@@ -17,22 +17,22 @@ class AgentMemorySave(feature.OneshotResultEdgeFeature):
         return 'memory_save'
 
     def get_option(self) -> Dict[str, Any]:
-        is_japan = common.is_japan()
+        is_japan = common.is_japan(language=self.language)
         description = f"Memory configuration for {self.ver.__appid__}"
         description = description if not is_japan else f"{self.ver.__appid__}のメモリ設定"
         instruction = f"あなたはユーザーの期待値を推測することが出来るメモリ管理のエキスパートです。" + \
-                      f"ユーザーとエージェントとの会話の内容を以下の項目にそれぞれ２００文字以内にまとめてください。\n" + \
-                      f"1. ユーザーが知りたかった内容の要約。\n" + \
-                      f"2. ユーザーが期待している回答の要約。\n" + \
-                      f"3. ユーザーの期待にエージェントが答えたかどうか。また答えられた場合の回答の要約。\n" + \
-                      f"4. ユーザーが何故そのような期待を持ったのかの要約。\n"
+                      f"ユーザーとエージェントとの会話の内容を以下を考慮して500文字以内にまとめてください。\n" + \
+                      f"・ユーザーが知りたかった内容の要約。\n" + \
+                      f"・ユーザーが期待している回答の要約。\n" + \
+                      f"・ユーザーの期待にエージェントが答えたかどうか。また答えられた場合の回答の要約。\n" + \
+                      f"・ユーザーが何故そのような期待を持ったのかの要約。\n"
         instruction = instruction if is_japan else \
                       f"You are a memory management expert capable of anticipating user expectations." + \
-                      f"Please summarize the conversation between the user and the agent into the following items, each within 200 characters.\n" + \
-                      f"1. A summary of the information the user wanted to know.\n" + \
-                      f"2. A summary of the response the user expects.\n" + \
-                      f"3. Whether the agent met the user's expectations. And if so, a summary of the response.\n" + \
-                      f"4. Summary of why the user had such expectations.\n"
+                      f"Please summarize the conversation between the user and the agent within 500 characters, taking the following points into consideration.\n" + \
+                      f"・A summary of the information the user wanted to know.\n" + \
+                      f"・A summary of the response the user expects.\n" + \
+                      f"・Whether the agent met the user's expectations. And if so, a summary of the response.\n" + \
+                      f"・Summary of why the user had such expectations.\n"
         return dict(
             use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
             description_ja="Memory 設定を保存します。",
@@ -76,7 +76,7 @@ class AgentMemorySave(feature.OneshotResultEdgeFeature):
                     description_ja="メモリサービスの種類を指定します。",
                     description_en="Specify the type of memory service."),
                 dict(opt="llm", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=[],
-                    callcmd="async () => {await cmdbox.callcmd('agent','llm_list',{},(res)=>{"
+                    callcmd="async () => {await cmdbox.callcmd('llm','list',{},(res)=>{"
                             + "const val = $(\"[name='llm']\").val();"
                             + "$(\"[name='llm']\").empty().append('<option></option>');"
                             + "res['data'].map(elm=>{$(\"[name='llm']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
@@ -86,7 +86,7 @@ class AgentMemorySave(feature.OneshotResultEdgeFeature):
                     description_ja="要約処理で使用するLLM設定名を指定します。",
                     description_en="Specify the LLM configuration name to use for summarization processing."),
                 dict(opt="embed", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=[],
-                    callcmd="async () => {await cmdbox.callcmd('agent','embed_list',{},(res)=>{"
+                    callcmd="async () => {await cmdbox.callcmd('embed','list',{},(res)=>{"
                             + "const val = $(\"[name='embed']\").val();"
                             + "$(\"[name='embed']\").empty().append('<option></option>');"
                             + "res['data'].map(elm=>{$(\"[name='embed']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"

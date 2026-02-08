@@ -6,11 +6,10 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
-import numpy as np
 import re
 
 
-class AgentEmbedding(feature.OneshotResultEdgeFeature):
+class EmbedSave(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -18,7 +17,7 @@ class AgentEmbedding(feature.OneshotResultEdgeFeature):
         Returns:
             Union[str, List[str]]: モード
         """
-        return 'agent'
+        return 'embed'
 
     def get_cmd(self) -> str:
         """
@@ -27,7 +26,7 @@ class AgentEmbedding(feature.OneshotResultEdgeFeature):
         Returns:
             str: コマンド
         """
-        return 'embedding'
+        return 'save'
 
     def get_option(self) -> Dict[str, Any]:
         """
@@ -38,8 +37,8 @@ class AgentEmbedding(feature.OneshotResultEdgeFeature):
         """
         return dict(
             use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
-            description_ja="入力情報の特徴量データを生成します。",
-            description_en="Generates feature data from input information.",
+            description_ja="入力情報の特徴量データを生成するエンベッドモデルの設定を保存します。",
+            description_en="Saves the settings for the embedding model that generates feature data from input information.",
             choice=[
                 dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
                      description_ja="Redisサーバーのサービスホストを指定します。",
@@ -62,12 +61,18 @@ class AgentEmbedding(feature.OneshotResultEdgeFeature):
                 dict(opt="timeout", type=Options.T_INT, default=120, required=False, multi=False, hide=True, choice=None,
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                      description_en="Specify the maximum waiting time until the server responds."),
-                dict(opt="embed_name", type=Options.T_STR, default="cl-nagoya/ruri-v3-30m", required=True, multi=False, hide=False, choice=None,
+                dict(opt="embed_name", type=Options.T_STR, default="ruri-v3-30m", required=True, multi=False, hide=False, choice=None,
                      description_ja="エンベッドモデルの登録名を指定します。",
                      description_en="Specify the registration name of the embed model."),
-                 dict(opt="original_data", type=Options.T_TEXT, default=None, required=True, multi=True, hide=False, choice=None,
-                    description_ja="特徴量を生成する元のデータを指定します。",
-                    description_en="Specify the original data to generate feature vectors."),
+                dict(opt="embed_device", type=Options.T_STR, default="cpu", required=False, multi=False, hide=False,
+                     choice=["cpu", "cuda"],
+                     description_ja="エンベッドモデルの実行デバイスを指定します。",
+                     description_en="Specify the execution device of the embed model."),
+                dict(opt="embed_model", type=Options.T_STR, default="cl-nagoya/ruri-v3-30m", required=True, multi=False, hide=False,
+                    choice=["cl-nagoya/ruri-v3-30m", "cl-nagoya/ruri-v3-70m", "cl-nagoya/ruri-v3-130m", "cl-nagoya/ruri-v3-310m"],
+                    choice_edit=True,
+                    description_ja="huggingfaceのエンベッドモデル名を指定します。",
+                    description_en="Specify the name of the huggingface embed model."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                     description_ja="処理結果jsonの保存先ファイルを指定。",
                     description_en="Specify the destination file for saving the processing result json."),
@@ -89,12 +94,14 @@ class AgentEmbedding(feature.OneshotResultEdgeFeature):
             msg = dict(warn="Embed name can only contain alphanumeric characters, underscores, and hyphens.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
-        if not hasattr(args, 'original_data') or args.original_data is None or len(args.original_data) == 0:
-            msg = dict(warn="Please specify --original_data")
+        if not hasattr(args, 'embed_model') or args.embed_model is None:
+            msg = dict(warn="Please specify --embed_model")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
 
-        payload = dict(embed_name=args.embed_name, original_data=args.original_data)
+        payload = dict(embed_name=args.embed_name,
+                       embed_device=args.embed_device,
+                       embed_model=args.embed_model)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -112,25 +119,14 @@ class AgentEmbedding(feature.OneshotResultEdgeFeature):
               sessions:Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
         try:
-            payload = json.loads(convert.b64str2str(msg[2]))
-            embed_name = payload.get('embed_name', 'None')
-            original_data = payload.get('original_data', [])
+            configure = json.loads(convert.b64str2str(msg[2]))
 
-            if 'agent' not in sessions:
-                sessions['agent'] = {}
-            if 'embed_model' not in sessions['agent']:
-                sessions['agent']['embed_model'] = {}
-            if embed_name not in sessions['agent']['embed_model']:
-                msg = dict(warn=f"Embed model '{embed_name}' is not loaded.")
-                redis_cli.rpush(reskey, msg)
-                return self.RESP_WARN
-
-            from sentence_transformers import SentenceTransformer
-            model:SentenceTransformer = sessions['agent']['embed_model'][embed_name]
-            st, msg, _ = self.__class__._embedding(model, original_data)
+            configure_path = data_dir / ".agent" / f"embed-{configure['embed_name']}.json"
+            configure_path.parent.mkdir(parents=True, exist_ok=True)
+            with configure_path.open('w', encoding='utf-8') as f:
+                json.dump(configure, f, indent=4)
+            msg = dict(success=f"Embed configuration saved to '{str(configure_path)}'.")
             redis_cli.rpush(reskey, msg)
-            if st != self.RESP_SUCCESS:
-                return self.RESP_WARN
             return self.RESP_SUCCESS
 
         except Exception as e:
@@ -138,15 +134,3 @@ class AgentEmbedding(feature.OneshotResultEdgeFeature):
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
-
-    @classmethod
-    def _embedding(cls, model, original_data:List[str]) -> Tuple[int, Dict[str, Any], List[str]]:
-        embeddings:np.ndarray = model.encode(original_data, convert_to_numpy=True)
-        list_data = []
-        list_str = []
-        for i,eb in enumerate(embeddings):
-            b64str = convert.npy2b64str(eb)
-            list_data.append(dict(data=original_data[i], embed=b64str, type=str(eb.dtype), shape=eb.shape))
-            list_str.append(str(eb.tolist()))
-        msg = dict(success=list_data)
-        return cls.RESP_SUCCESS, msg, list_str

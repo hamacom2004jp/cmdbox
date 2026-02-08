@@ -158,7 +158,7 @@ class Options:
                 return o
         return None
 
-    def list_options(self):
+    def list_options(self, language:str=None) -> Dict[str, Any]:
         def _list(ret, key, val):
             if type(val) != dict or 'type' not in val:
                 return
@@ -185,7 +185,7 @@ class Options:
                 opt['action'] = 'append' if val['multi'] else None
             o = [f'-{val["short"]}'] if "short" in val else []
             o += [f'--{key}']
-            opt['help'] = val['description_en'] if not common.is_japan() else val['description_ja']
+            opt['help'] = val['description_en'] if not common.is_japan(language=language) else val['description_ja']
             opt['default'] = val['default']
             if val['multi'] and val['default'] is not None:
                 raise ValueError(f'list_options: The default value must be None if multi is True. key={key}, val={val}')
@@ -310,6 +310,11 @@ class Options:
             description_ja="クライアントのメッセージIDを指定します。省略した場合はuuid4で生成されます。",
             description_en="Specifies the message ID of the client. If omitted, uuid4 will be generated.",
             choice=None)
+        self._options["language"] = dict(
+            type=Options.T_STR, default="ja_JP", required=False, multi=False, hide=True,
+            description_ja="コマンド実行時の言語を指定します。",
+            description_en="Specify the language at the time of command execution.",
+            choice=["ja_JP", "en_US"])
         self._options["description"] = dict(
             type=Options.T_TEXT, default=None, required=False, multi=False, hide=True,
             description_ja="このコマンド登録の説明文を指定します。Agentがこのコマンドの用途を理解するのに使用します。",
@@ -325,6 +330,7 @@ class Options:
         # デバックオプションを追加
         self._options["debug"]["opt"] = "debug"
         self._options["tag"]["opt"] = "tag"
+        self._options["language"]["opt"] = "language"
         self._options["clmsg_id"]["opt"] = "clmsg_id"
         self._options["description"]["opt"] = "description"
         for key, mode in self._options["cmd"].items():
@@ -343,6 +349,8 @@ class Options:
                     c["choice"].append(self._options["clmsg_id"])
                 if "description" not in [_o['opt'] for _o in c["choice"]]:
                     c["choice"].append(self._options["description"])
+                if "language" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["language"])
                 if c["opt"] not in [_o['opt'] for _o in self._options["cmd"]["choice"]]:
                     self._options["cmd"]["choice"] += [c]
             self._options["mode"][key] = mode

@@ -220,8 +220,6 @@ class ToolList(object):
             ver ([type], optional): バージョン. Defaults to None.
         """
         from fastmcp.tools import FunctionTool
-        options = Options.getInstance()
-        is_japan = common.is_japan()
 
         self.tools = []
         self.logger = logger
@@ -230,6 +228,8 @@ class ToolList(object):
         self.appcls = appcls
         self.ver = ver
         """ すべてのモードとコマンドから、エージェント用のツールを生成する場合のコード ---
+        options = Options.getInstance()
+        is_japan = common.is_japan()
         for mode in options.get_mode_keys():
             for cmd in options.get_cmd_keys(mode):
                 if not options.get_cmd_attr(mode, cmd, 'use_agent'):
@@ -353,9 +353,9 @@ class ToolList(object):
         from cmdbox.app.web import Web
         from fastmcp.tools import FunctionTool
         options = Options.getInstance()
-        is_japan = common.is_japan()
         ret_tools = self.tools.copy()
         web = Web.getInstance(self.logger, self.data)
+        is_japan = common.is_japan(language=web.language)
         data = web.signin.signin_file_data
         if data is None:
             # サインインファイルが読み込まれていない場合は登録済みのリストを返す

@@ -81,7 +81,7 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
                         mcpserver_apikey = apikeys.values().__iter__().__next__()
                         a2asv_apikey = mcpserver_apikey
 
-            startmsg = "こんにちは！何かお手伝いできることはありますか？" if common.is_japan() else "Hello! Is there anything I can help you with?"
+            startmsg = "こんにちは！何かお手伝いできることはありますか？" if common.is_japan(language=web.language) else "Hello! Is there anything I can help you with?"
             yield json.dumps(dict(message=startmsg), default=common.default_json_enc)
             def _replace_match(match_obj):
                 json_str = match_obj.group(0)

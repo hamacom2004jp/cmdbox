@@ -19,7 +19,7 @@ def get_module_list(package_name) -> List[str]:
     package = __import__(package_name, fromlist=[''])
     return [name for _, name, _ in pkgutil.iter_modules(package.__path__)]
 
-def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], appcls=None, ver=None) -> Dict[str, Any]:
+def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], appcls=None, ver=None, language:str=None) -> Dict[str, Any]:
     """
     フィーチャーを読み込みます。
 
@@ -29,6 +29,7 @@ def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], appc
         excludes (list, optional): 除外するモジュール名のリスト. Defaults to [].
         appcls ([type], optional): アプリケーションクラス. Defaults to None.
         ver ([type], optional): バージョンモジュール. Defaults to None.
+        language (str, optional): 言語設定. Defaults to None.
     Returns:
         Dict[str, Any]: フィーチャーのリスト
     """
@@ -43,7 +44,7 @@ def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], appc
             for name, cls in members:
                 if cls is feature.Feature or not issubclass(cls, feature.Feature):
                     continue
-                fobj = cls(appcls, ver)
+                fobj = cls(appcls, ver, language=language)
                 mode = fobj.get_mode()
                 if type(mode) is str:
                     cmd = fobj.get_cmd()

@@ -60,7 +60,7 @@ class Web:
             cls._instance = cls(*args, **kwargs)
         return cls._instance
 
-    def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None,
+    def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None, language:str=None,
                  redis_host:str="localhost", redis_port:int=6379, redis_password:str=None, svname:str='server',
                  client_only:bool=False, doc_root:Path=None, gui_html:str=None,
                  filer_html:str=None, result_html:str=None, users_html:str=None, agent_html:str=None,
@@ -74,6 +74,7 @@ class Web:
             data (Path): コマンドやパイプラインの設定ファイルを保存するディレクトリ
             appcls ([type], optional): アプリケーションクラス. Defaults to None.
             ver ([type], optional): バージョン. Defaults to None.
+            language (str, optional): 言語. Defaults to None.
             redis_host (str, optional): Redisサーバーのホスト名. Defaults to "localhost".
             redis_port (int, optional): Redisサーバーのポート番号. Defaults to 6379.
             redis_password (str, optional): Redisサーバーのパスワード. Defaults to None.
@@ -98,6 +99,7 @@ class Web:
         self.data = data
         self.appcls = appcls
         self.ver = ver
+        self.language = language
         self.container = dict()
         self.redis_host = redis_host
         self.redis_port = redis_port

@@ -1,6 +1,7 @@
 argcomplete
 aiosqlite
 async-timeout
+asyncpg
 build
 collectlicense
 cffi

@@ -127,7 +127,7 @@ class McpsvStart(feature.UnsupportEdgeFeature):
                 return self.RESP_WARN, msg, None
             signin_data = signin.Signin.load_signin_file(signin_file, None, self=self, logger=logger) if signin_file is not None else None
             # ツール側で参照できるようにするためにインスタンス化
-            _web = web.Web.getInstance(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
+            _web = web.Web.getInstance(logger, Path(args.data), appcls=self.appcls, ver=self.ver, language=args.language,
                                        redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                                        signin_file=args.signin_file)
 

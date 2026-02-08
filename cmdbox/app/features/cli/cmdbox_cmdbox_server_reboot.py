@@ -7,10 +7,10 @@ import logging
 
 
 class CmdboxServerReboot(feature.OneshotNotifyEdgeFeature):
-    def __init__(self, appcls, ver):
-        super().__init__(appcls, ver)
-        self.down = cmdbox_cmdbox_server_down.CmdboxServerDown(appcls, ver)
-        self.up = cmdbox_cmdbox_server_up.CmdboxServerUp(appcls, ver)
+    def __init__(self, appcls, ver, language:str=None):
+        super().__init__(appcls, ver, language=language)
+        self.down = cmdbox_cmdbox_server_down.CmdboxServerDown(appcls, ver, language=language)
+        self.up = cmdbox_cmdbox_server_up.CmdboxServerUp(appcls, ver, language=language)
 
     def get_mode(self) -> Union[str, List[str]]:
         """

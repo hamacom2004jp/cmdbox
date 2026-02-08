@@ -3,11 +3,11 @@ from cmdbox.app.auth import signin
 from cmdbox.app.features.cli import (
     cmdbox_agent_agent_list,
     cmdbox_agent_agent_load,
-    cmdbox_agent_llm_list,
-    cmdbox_agent_llm_load,
     cmdbox_agent_mcpsv_list,
     cmdbox_agent_mcpsv_load,
     cmdbox_agent_chat,
+    cmdbox_llm_list,
+    cmdbox_llm_load,
 )
 from fastapi import FastAPI, Depends, HTTPException, Request, Response
 from pathlib import Path
@@ -32,8 +32,8 @@ class A2a(mcp.Mcp):
         self.agent_load = cmdbox_agent_agent_load.AgentAgentLoad(self.appcls, self.ver)
         self.agent_chat = cmdbox_agent_chat.AgentChat(self.appcls, self.ver)
         self.agent_chat.call_a2asv_start = True
-        self.llm_list = cmdbox_agent_llm_list.AgentLLMList(self.appcls, self.ver)
-        self.llm_load = cmdbox_agent_llm_load.AgentLLMLoad(self.appcls, self.ver)
+        self.llm_list = cmdbox_llm_list.LLMList(self.appcls, self.ver)
+        self.llm_load = cmdbox_llm_load.LLMLoad(self.appcls, self.ver)
         self.mcpsv_list = cmdbox_agent_mcpsv_list.AgentMcpList(self.appcls, self.ver)
         self.mcpsv_load = cmdbox_agent_mcpsv_load.AgentMcpLoad(self.appcls, self.ver)
         self.agent_apps:Dict[str, Starlette] = {}

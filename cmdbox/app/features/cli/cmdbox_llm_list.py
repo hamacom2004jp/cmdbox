@@ -6,21 +6,20 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
-import re
 
 
-class AgentLLMLoad(feature.OneshotResultEdgeFeature):
+class LLMList(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
-        return 'agent'
+        return 'llm'
 
     def get_cmd(self) -> str:
-        return 'llm_load'
+        return 'list'
 
     def get_option(self) -> Dict[str, Any]:
         return dict(
             use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
-            description_ja="LLM 設定を読み込みます。",
-            description_en="Loads LLM configuration.",
+            description_ja="保存されているLLM設定を一覧表示します。",
+            description_en="Lists saved LLM configurations.",
             choice=[
                 dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
                     description_ja="Redisサーバーのサービスホストを指定します。",
@@ -43,9 +42,9 @@ class AgentLLMLoad(feature.OneshotResultEdgeFeature):
                 dict(opt="timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=True, choice=None,
                     description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                     description_en="Specify the maximum waiting time until the server responds."),
-                dict(opt="llmname", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
-                    description_ja="読み込むLLM設定の名前を指定します。",
-                    description_en="Specify the name of the LLM configuration to load."),
+                dict(opt="kwd", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                    description_ja=f"検索したい名前を指定します。中間マッチで検索します。",
+                    description_en=f"Specify the name you want to search for. Searches for partial matches."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                     description_ja="処理結果jsonの保存先ファイルを指定。",
                     description_en="Specify the destination file for saving the processing result json."),
@@ -65,16 +64,7 @@ class AgentLLMLoad(feature.OneshotResultEdgeFeature):
         )
 
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        if not args.llmname:
-            msg = dict(warn="Please specify --llmname")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if not re.match(r'^[\w\-]+$', args.llmname):
-            msg = dict(warn="LLM name can only contain alphanumeric characters, underscores, and hyphens.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-
-        payload = dict(llmname=args.llmname)
+        payload = dict(kwd=args.kwd)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -97,23 +87,26 @@ class AgentLLMLoad(feature.OneshotResultEdgeFeature):
     def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
               sessions:Dict[str, Dict[str, Any]]) -> int:
         """
-        サーバー側で受け取ったloadコマンドを処理します。
+        サーバー側で受け取ったlistコマンドを処理します。
         """
         reskey = msg[1]
         try:
             payload = json.loads(convert.b64str2str(msg[2]))
 
-            llmname = payload.get('llmname')
-            configure_path = data_dir / ".agent" / f"llm-{llmname}.json"
-            if not configure_path.exists():
-                msg = dict(warn=f"Specified LLM configuration '{llmname}' not found on server at '{str(configure_path)}'.")
-                redis_cli.rpush(reskey, msg)
-                return self.RESP_WARN
+            kwd = payload.get('kwd')
+            if kwd is None or kwd == '':
+                kwd = '*'
+            agent_dir = data_dir / '.agent'
+            results: List[Dict[str, Any]] = []
+            if agent_dir.exists() and agent_dir.is_dir():
+                paths = agent_dir.glob(f"llm-{kwd}.json")
+                for p in sorted(paths):
+                    name = p.name
+                    if not name.startswith('llm-') or not name.endswith('.json'):
+                        continue
+                    results.append(dict(name=name[4:-5], path=str(p)))
 
-            with configure_path.open('r', encoding='utf-8') as f:
-                configure = json.load(f)
-
-            msg = dict(success=configure)
+            msg = dict(success=results)
             redis_cli.rpush(reskey, msg)
             return self.RESP_SUCCESS
 

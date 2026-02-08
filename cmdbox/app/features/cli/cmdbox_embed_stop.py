@@ -9,7 +9,7 @@ import json
 import re
 
 
-class AgentEmbedSave(feature.OneshotResultEdgeFeature):
+class EmbedStop(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -17,7 +17,7 @@ class AgentEmbedSave(feature.OneshotResultEdgeFeature):
         Returns:
             Union[str, List[str]]: モード
         """
-        return 'agent'
+        return 'embed'
 
     def get_cmd(self) -> str:
         """
@@ -26,7 +26,7 @@ class AgentEmbedSave(feature.OneshotResultEdgeFeature):
         Returns:
             str: コマンド
         """
-        return 'embed_save'
+        return 'stop'
 
     def get_option(self) -> Dict[str, Any]:
         """
@@ -36,9 +36,9 @@ class AgentEmbedSave(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
-            description_ja="入力情報の特徴量データを生成するエンベッドモデルの設定を保存します。",
-            description_en="Saves the settings for the embedding model that generates feature data from input information.",
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
+            description_ja="入力情報の特徴量データを生成するエンベッドモデルを停止します。",
+            description_en="Stop the embedding model that generates feature data from input information.",
             choice=[
                 dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
                      description_ja="Redisサーバーのサービスホストを指定します。",
@@ -61,18 +61,9 @@ class AgentEmbedSave(feature.OneshotResultEdgeFeature):
                 dict(opt="timeout", type=Options.T_INT, default=120, required=False, multi=False, hide=True, choice=None,
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                      description_en="Specify the maximum waiting time until the server responds."),
-                dict(opt="embed_name", type=Options.T_STR, default="ruri-v3-30m", required=True, multi=False, hide=False, choice=None,
+                dict(opt="embed_name", type=Options.T_STR, default="cl-nagoya/ruri-v3-30m", required=True, multi=False, hide=False, choice=None,
                      description_ja="エンベッドモデルの登録名を指定します。",
                      description_en="Specify the registration name of the embed model."),
-                dict(opt="embed_device", type=Options.T_STR, default="cpu", required=False, multi=False, hide=False,
-                     choice=["cpu", "cuda"],
-                     description_ja="エンベッドモデルの実行デバイスを指定します。",
-                     description_en="Specify the execution device of the embed model."),
-                dict(opt="embed_model", type=Options.T_STR, default="cl-nagoya/ruri-v3-30m", required=True, multi=False, hide=False,
-                    choice=["cl-nagoya/ruri-v3-30m", "cl-nagoya/ruri-v3-70m", "cl-nagoya/ruri-v3-130m", "cl-nagoya/ruri-v3-310m"],
-                    choice_edit=True,
-                    description_ja="huggingfaceのエンベッドモデル名を指定します。",
-                    description_en="Specify the name of the huggingface embed model."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                     description_ja="処理結果jsonの保存先ファイルを指定。",
                     description_en="Specify the destination file for saving the processing result json."),
@@ -94,14 +85,8 @@ class AgentEmbedSave(feature.OneshotResultEdgeFeature):
             msg = dict(warn="Embed name can only contain alphanumeric characters, underscores, and hyphens.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
-        if not hasattr(args, 'embed_model') or args.embed_model is None:
-            msg = dict(warn="Please specify --embed_model")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
 
-        payload = dict(embed_name=args.embed_name,
-                       embed_device=args.embed_device,
-                       embed_model=args.embed_model)
+        payload = dict(embed_name=args.embed_name)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -113,19 +98,27 @@ class AgentEmbedSave(feature.OneshotResultEdgeFeature):
         return self.RESP_SUCCESS, ret, cl
 
     def is_cluster_redirect(self):
-        return False
+        return True
 
     def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
               sessions:Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
         try:
-            configure = json.loads(convert.b64str2str(msg[2]))
+            payload = json.loads(convert.b64str2str(msg[2]))
+            embed_name = payload.get('embed_name')
 
-            configure_path = data_dir / ".agent" / f"embed-{configure['embed_name']}.json"
-            configure_path.parent.mkdir(parents=True, exist_ok=True)
-            with configure_path.open('w', encoding='utf-8') as f:
-                json.dump(configure, f, indent=4)
-            msg = dict(success=f"Embed configuration saved to '{str(configure_path)}'.")
+            if 'agent' not in sessions:
+                sessions['agent'] = {}
+            if 'embed_model' not in sessions['agent']:
+                sessions['agent']['embed_model'] = {}
+            if embed_name in sessions['agent']['embed_model']:
+                del sessions['agent']['embed_model'][embed_name]
+            else:
+                msg = dict(warn=f"Embed model '{embed_name}' is not loaded.")
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
+
+            msg = dict(success=f"Embed model '{embed_name}' unloaded successfully.")
             redis_cli.rpush(reskey, msg)
             return self.RESP_SUCCESS
 

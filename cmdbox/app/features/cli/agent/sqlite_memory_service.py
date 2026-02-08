@@ -1,4 +1,4 @@
-from cmdbox.app.features.cli import cmdbox_agent_embedding
+from cmdbox.app.features.cli import cmdbox_embed_embedding
 from google.adk.memory import BaseMemoryService
 from google.adk.memory.base_memory_service import SearchMemoryResponse
 from google.adk.memory.memory_entry import MemoryEntry
@@ -126,8 +126,8 @@ class SqliteMemoryService(BaseMemoryService):
         if not final_msg:
             self.logger.warning(f"Session {session.id} final event has no content to add to memory")
             return
-        st, _, final_vec = cmdbox_agent_embedding.AgentEmbedding._embedding(self.embed_model, [final_msg])
-        if st != cmdbox_agent_embedding.AgentEmbedding.RESP_SUCCESS:
+        st, _, final_vec = cmdbox_embed_embedding.EmbedEmbedding._embedding(self.embed_model, [final_msg])
+        if st != cmdbox_embed_embedding.EmbedEmbedding.RESP_SUCCESS:
             self.logger.warning(f"Failed to generate embedding for session {session.id}")
             return
 
@@ -188,8 +188,8 @@ class SqliteMemoryService(BaseMemoryService):
     async def _search_memory_sqlite(self, app_name: str, user_id: str, query: str) -> SearchMemoryResponse:
 
         if query is not None and query.strip() != '':
-            st, _, final_vec = cmdbox_agent_embedding.AgentEmbedding._embedding(self.embed_model, [query])
-            if st != cmdbox_agent_embedding.AgentEmbedding.RESP_SUCCESS:
+            st, _, final_vec = cmdbox_embed_embedding.EmbedEmbedding._embedding(self.embed_model, [query])
+            if st != cmdbox_embed_embedding.EmbedEmbedding.RESP_SUCCESS:
                 self.logger.warning(f"Failed to generate embedding for search query")
                 return SearchMemoryResponse(memories=[])
         else:
@@ -200,13 +200,17 @@ class SqliteMemoryService(BaseMemoryService):
                 conn.enable_load_extension(True)
                 sqlite_vec.load(conn)
                 cursor = conn.cursor()
-                sql ='SELECT m.id, m.app_name, m.user_id, m.session_id, m.embed_name, m.content, m.custom_metadata, m.author, m.timestamp '
+                sql ='''
+                    SELECT m.id, m.app_name, m.user_id, m.session_id, m.embed_name, m.content,
+                    m.custom_metadata, m.author, m.timestamp, t.all_cnt
+                '''
                 if final_vec is not None:
                     sql += ',vec_distance_cosine(v.embedding, ?) AS distance '
                 else:
                     sql += ',0 AS distance '
                 sql += '''
-                    FROM memory_entries m inner join memory_entries_vec v on m.id = v.id
+                    FROM (memory_entries m inner join memory_entries_vec v on m.id = v.id),
+                        (SELECT count(*) AS all_cnt FROM memory_entries WHERE app_name = ?) AS t
                     WHERE m.app_name = ? AND m.user_id = ?
                 '''
                 if final_vec is not None:
@@ -217,13 +221,13 @@ class SqliteMemoryService(BaseMemoryService):
                 param = []
                 if final_vec is not None:
                     param.append(final_vec[0])
-                param += [app_name, user_id, self.memory_fetch_count, self.memory_fetch_offset]
+                param += [app_name, app_name, user_id, self.memory_fetch_count, self.memory_fetch_offset]
                 cursor.execute(sql, tuple(param))
 
                 rows = cursor.fetchall()
                 conn.enable_load_extension(False)
                 for row in rows:
-                    entry_id, aid, uid, session_id, embed_name, content, metadata, author, timestamp, distance = row
+                    entry_id, aid, uid, session_id, embed_name, content, metadata, author, timestamp, all_cnt, distance = row
                     try:
                         # Create MemoryEntry object
                         content_obj = types.Content(
@@ -233,13 +237,14 @@ class SqliteMemoryService(BaseMemoryService):
                         metadata = json.loads(metadata) if metadata else {}
                         metadata['session_id'] = session_id
                         metadata['embed_name'] = embed_name
-                        metadata['score'] = distance
+                        metadata['distance'] = distance
+                        metadata['all_cnt'] = all_cnt
                         entry = MemoryEntry(
                             id=entry_id,
                             content=content_obj,
                             custom_metadata=metadata,
                             author=author,
-                            timestamp=timestamp
+                            timestamp=timestamp,
                         )
                         results.append(entry)
                     except Exception as e:

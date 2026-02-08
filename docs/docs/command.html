@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference &mdash; cmdbox 2026/02/04 documentation</title>
+  <title>Command Reference &mdash; cmdbox 2026/02/08 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=fd547c84"></script>
+      <script src="../_static/documentation_options.js?v=22b6552c"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -55,8 +55,10 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_embed.html">Embed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_llm.html">LLM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
@@ -115,17 +117,6 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#list-agent-configuration-cmdbox-m-agent-c-agent-list-option">List Agent configuration. : <cite>cmdbox -m agent -c agent_list &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#load-agent-configuration-cmdbox-m-agent-c-agent-load-option">Load Agent configuration. : <cite>cmdbox -m agent -c agent_load &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#save-agent-configuration-cmdbox-m-agent-c-agent-save-option">Save Agent configuration. : <cite>cmdbox -m agent -c agent_save &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#deletes-embed-configuration-cmdbox-m-agent-c-embed-del-option">Deletes Embed configuration. : <cite>cmdbox -m agent -c embed_del &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#lists-embed-configurations-cmdbox-m-agent-c-embed-list-option">Lists Embed configurations. : <cite>cmdbox -m agent -c embed_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#loads-embed-configuration-cmdbox-m-agent-c-embed-load-option">Loads Embed configuration. : <cite>cmdbox -m agent -c embed_load &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#saves-embed-configuration-cmdbox-m-agent-c-embed-save-option">Saves Embed configuration. : <cite>cmdbox -m agent -c embed_save &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#start-embed-configuration-cmdbox-m-agent-c-embed-start-option">Start Embed configuration. : <cite>cmdbox -m agent -c embed_start &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#stop-embed-configuration-cmdbox-m-agent-c-embed-stop-option">Stop Embed configuration. : <cite>cmdbox -m agent -c embed_stop &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#embedding-embed-configuration-cmdbox-m-agent-c-embedding-option">Embedding Embed configuration. : <cite>cmdbox -m agent -c embedding &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#deletes-llm-configuration-cmdbox-m-agent-c-llm-del-option">Deletes LLM configuration. : <cite>cmdbox -m agent -c llm_del &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#lists-llm-configurations-cmdbox-m-agent-c-llm-list-option">Lists LLM configurations. : <cite>cmdbox -m agent -c llm_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#loads-llm-configuration-cmdbox-m-agent-c-llm-load-option">Loads LLM configuration. : <cite>cmdbox -m agent -c llm_load &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#saves-llm-configuration-cmdbox-m-agent-c-llm-save-option">Saves LLM configuration. : <cite>cmdbox -m agent -c llm_save &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#mcp-client-cmdbox-m-agent-c-mcp-client-option">MCP client : <cite>cmdbox -m agent -c mcp_client &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#proxy-to-transport-mcp-cmdbox-m-agent-c-mcp-proxy-option">Proxy to transport MCP : <cite>cmdbox -m agent -c mcp_proxy &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#delete-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-del-option">Delete MCP server configuration. : <cite>cmdbox -m agent -c mcpsv_del &lt;Option&gt;</cite></a></li>
@@ -137,6 +128,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#load-memory-configuration-cmdbox-m-agent-c-memory-load-option">Load Memory configuration. : <cite>cmdbox -m agent -c memory_load &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#save-memory-configuration-cmdbox-m-agent-c-memory-save-option">Save Memory configuration. : <cite>cmdbox -m agent -c memory_save &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#status-memory-configuration-cmdbox-m-agent-c-memory-save-option">Status Memory configuration. : <cite>cmdbox -m agent -c memory_save &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#status-memory-configuration-cmdbox-m-agent-c-memory-status-option">Status Memory configuration. : <cite>cmdbox -m agent -c memory_status &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#delete-runner-configuration-cmdbox-m-agent-c-runner-del-option">Delete runner configuration. : <cite>cmdbox -m agent -c runner_del &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#list-runner-configuration-cmdbox-m-agent-c-runner-list-option">List runner configuration. : <cite>cmdbox -m agent -c runner_list &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html#load-runner-configuration-cmdbox-m-agent-c-runner-load-option">Load runner configuration. : <cite>cmdbox -m agent -c runner_load &lt;Option&gt;</cite></a></li>
@@ -188,6 +180,16 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html#start-edge-mode-cmdbox-m-edge-c-start-option">Start Edge mode. : <cite>cmdbox -m edge -c start &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="cmd_embed.html">Embed</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cmd_embed.html#deletes-embed-configuration-cmdbox-m-embed-c-del-option">Deletes Embed configuration. : <cite>cmdbox -m embed -c del &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_embed.html#lists-embed-configurations-cmdbox-m-embed-c-list-option">Lists Embed configurations. : <cite>cmdbox -m embed -c list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_embed.html#loads-embed-configuration-cmdbox-m-embed-c-load-option">Loads Embed configuration. : <cite>cmdbox -m embed -c load &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_embed.html#saves-embed-configuration-cmdbox-m-embed-c-save-option">Saves Embed configuration. : <cite>cmdbox -m embed -c save &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_embed.html#start-embed-configuration-cmdbox-m-embed-c-start-option">Start Embed configuration. : <cite>cmdbox -m embed -c start &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_embed.html#stop-embed-configuration-cmdbox-m-embed-c-stop-option">Stop Embed configuration. : <cite>cmdbox -m embed -c stop &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_embed.html#embedding-embed-configuration-cmdbox-m-embed-c-embedding-option">Embedding Embed configuration. : <cite>cmdbox -m embed -c embedding &lt;Option&gt;</cite></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_excel.html">Excel</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html#excel-cell-details-cmdbox-m-excel-c-cell-details-option">excel ( Cell Details ) : <cite>cmdbox -m excel -c cell_details &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html#excel-cell-search-cmdbox-m-excel-c-cell-search-option">excel ( Cell Search ) : <cite>cmdbox -m excel -c cell_search &lt;Option&gt;</cite></a></li>
@@ -196,6 +198,13 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_gui.html">GUI</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html#management-screen-startup-cmdbox-m-gui-c-start-option">Management screen startup : <cite>cmdbox -m gui -c start &lt;Option&gt;</cite></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cmd_llm.html">LLM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cmd_llm.html#deletes-llm-configuration-cmdbox-m-llm-c-del-option">Deletes LLM configuration. : <cite>cmdbox -m llm -c del &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_llm.html#lists-llm-configurations-cmdbox-m-llm-c-list-option">Lists LLM configurations. : <cite>cmdbox -m llm -c list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_llm.html#loads-llm-configuration-cmdbox-m-llm-c-load-option">Loads LLM configuration. : <cite>cmdbox -m llm -c load &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_llm.html#saves-llm-configuration-cmdbox-m-llm-c-save-option">Saves LLM configuration. : <cite>cmdbox -m llm -c save &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a><ul>

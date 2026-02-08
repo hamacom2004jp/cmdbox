@@ -430,15 +430,33 @@
             <div class="modal-body">
                 <div class="sf-param-grid mb-3">
                     <div class="sf-param-box">
-                        <span class="d-block text-white-50" style="font-size: 0.8rem;">TRUST_LEVEL</span>
-                        <div class="display-6 system-font glow-text-cyan">87%</div>
+                        <div class="text-white-50" style="font-size: 0.8rem;">REFERENCE_RANGE</div>
+                        <div class="d-flex fs-5 system-font glow-text-cyan m-2">
+                            <div id="memory_range_start">---</div>
+                            <div class="mx-3">~</div>
+                            <div id="memory_range_end">---</div>
+                        </div>
                     </div>
                     <div class="sf-param-box">
-                        <span class="d-block text-white-50" style="font-size: 0.8rem;">SYNC_RATE</span>
-                        <div class="display-6 system-font glow-text-magenta">94.2%</div>
+                        <div class="text-white-50" style="font-size: 0.8rem;">USAGE_RATIO</div>
+                        <div class="fs-2 text-end system-font glow-text-magenta d-flex">
+                            <!--<div class="fs-6 text-white-50 me-auto">
+                                <div class="form-check">
+                                    <input class="form-check-input" name="memory_performance" type="radio" id="memory_performance_coverage" checked/>
+                                    <label class="form-check-label" for="memory_performance_coverage" style="font-size: 0.8rem;">COVERAGE</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" name="memory_performance" type="radio" id="memory_performance_accuracy" />
+                                    <label class="form-check-label" for="memory_performance_accuracy" style="font-size: 0.8rem;">ACCURACY</label>
+                                </div>
+                            </div>-->
+                            <div id="memory_performance">---</div>
+                        </div>
                     </div>
                 </div>
-                <h6 class="glow-text-cyan system-font mt-4 mb-2"><i class="fas fa-file-alt me-2"></i>USER_PROFILE_ANALYSIS</h6>
+                <h6 class="glow-text-cyan system-font mt-4 mb-2">
+                    <i class="fas fa-file-alt me-2"></i>USER_PROFILE_ANALYSIS
+                </h6>
                 <div class="p-3 border border-secondary bg-black bg-opacity-25" style="font-family: var(--font-body);">
                     <p id="memory_content" class="mb-2"><strong>Loading..</strong></p>
                 </div>

@@ -56,6 +56,15 @@ class CmdBoxApp:
             self.default_logger = common.default_logger(True, ver=self.ver, webcall=webcall)
         else:
             self.default_logger = common.default_logger(False, ver=self.ver, webcall=webcall)
+        try:
+            if args_list is not None and '--language' in args_list:
+                self.default_language = args_list[args_list.index('--language') + 1]
+            elif sys.argv is not None and '--language' in sys.argv:
+                self.default_language = sys.argv[sys.argv.index('--language') + 1]
+            else:
+                self.default_language = 'ja_JP' if common.is_japan() else 'en_US'
+        except Exception:
+            self.default_language = 'en_US'
 
         # プラグイン読込み
         sfeatureloadtime = time.perf_counter()
@@ -78,7 +87,7 @@ class CmdBoxApp:
 
         # コマンド引数の生成
         sargsparsetime = time.perf_counter()
-        opts = self.options.list_options()
+        opts = self.options.list_options(language=self.default_language)
         for opt in opts.values():
             default = opt["default"] if opt["default"] is not None and opt["default"] != "" else None
             if opt["action"] is None:

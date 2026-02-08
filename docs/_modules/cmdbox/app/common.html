@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.common &mdash; cmdbox 2026/01/25 documentation</title>
+  <title>cmdbox.app.common &mdash; cmdbox 2026/02/08 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=a7f91c3b"></script>
+      <script src="../../../_static/documentation_options.js?v=22b6552c"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -1006,14 +1006,24 @@
 
 <div class="viewcode-block" id="is_japan">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.is_japan">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">is_japan</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_japan</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    日本語環境かどうかを判定します</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        language (str, optional): 言語コード. Defaults to None.</span>
+<span class="sd">        opt (Dict[str, Any], optional): コマンドラインオプション. Defaults to None.</span>
+<span class="sd">        args (argparse.Namespace, optional): コマンドライン引数. Defaults to None.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        bool: 日本語環境ならTrue、そうでなければFalse</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">language</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">locale</span><span class="o">.</span><span class="n">getlocale</span><span class="p">()</span>
+    <span class="n">lang</span> <span class="o">=</span> <span class="n">language</span>
+    <span class="k">if</span> <span class="n">lang</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">opt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;language&#39;</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span>
+        <span class="n">lang</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">lang</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">):</span>
+        <span class="n">lang</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">language</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">locale</span><span class="o">.</span><span class="n">getlocale</span><span class="p">()</span> <span class="k">if</span> <span class="n">lang</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">is_japan</span> <span class="o">=</span> <span class="n">language</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;Japan&#39;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">language</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;ja_JP&#39;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span>
     <span class="k">return</span> <span class="n">is_japan</span></div>
 

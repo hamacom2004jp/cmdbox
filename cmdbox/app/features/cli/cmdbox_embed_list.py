@@ -8,7 +8,7 @@ import logging
 import json
 
 
-class AgentEmbedList(feature.OneshotResultEdgeFeature):
+class EmbedList(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -16,7 +16,7 @@ class AgentEmbedList(feature.OneshotResultEdgeFeature):
         Returns:
             Union[str, List[str]]: モード
         """
-        return 'agent'
+        return 'embed'
 
     def get_cmd(self) -> str:
         """
@@ -25,7 +25,7 @@ class AgentEmbedList(feature.OneshotResultEdgeFeature):
         Returns:
             str: コマンド
         """
-        return 'embed_list'
+        return 'list'
 
     def get_option(self) -> Dict[str, Any]:
         """
