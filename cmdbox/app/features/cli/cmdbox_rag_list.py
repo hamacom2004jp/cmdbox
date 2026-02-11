@@ -6,10 +6,9 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
-import re
 
 
-class EmbedStop(feature.OneshotResultEdgeFeature):
+class RagList(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -17,7 +16,7 @@ class EmbedStop(feature.OneshotResultEdgeFeature):
         Returns:
             Union[str, List[str]]: モード
         """
-        return 'embed'
+        return 'rag'
 
     def get_cmd(self) -> str:
         """
@@ -26,7 +25,7 @@ class EmbedStop(feature.OneshotResultEdgeFeature):
         Returns:
             str: コマンド
         """
-        return 'stop'
+        return 'list'
 
     def get_option(self) -> Dict[str, Any]:
         """
@@ -36,34 +35,34 @@ class EmbedStop(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
-            description_ja="入力情報の特徴量データを生成するエンベッドモデルを停止します。",
-            description_en="Stop the embedding model that generates feature data from input information.",
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
+            description_ja="保存されているRAG設定を一覧表示します。",
+            description_en="Display a list of saved RAG settings.",
             choice=[
                 dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
-                     description_ja="Redisサーバーのサービスホストを指定します。",
-                     description_en="Specify the service host of the Redis server."),
+                    description_ja="Redisサーバーのサービスホストを指定します。",
+                    description_en="Specify the service host of the Redis server."),
                 dict(opt="port", type=Options.T_INT, default=self.default_port, required=True, multi=False, hide=True, choice=None, web="mask",
-                     description_ja="Redisサーバーのサービスポートを指定します。",
-                     description_en="Specify the service port of the Redis server."),
+                    description_ja="Redisサーバーのサービスポートを指定します。",
+                    description_en="Specify the service port of the Redis server."),
                 dict(opt="password", type=Options.T_PASSWD, default=self.default_pass, required=True, multi=False, hide=True, choice=None, web="mask",
-                     description_ja=f"Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `{self.default_pass}` を使用します。",
-                     description_en=f"Specify the access password of the Redis server (optional). If omitted, `{self.default_pass}` is used."),
+                    description_ja=f"Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `{self.default_pass}` を使用します。",
+                    description_en=f"Specify the access password of the Redis server (optional). If omitted, `{self.default_pass}` is used."),
                 dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",
-                     description_ja="サーバーのサービス名を指定します。",
-                     description_en="Specify the service name of the inference server."),
+                    description_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
+                    description_en="Specify the service name of the inference server. If omitted, `server` is used."),
                 dict(opt="retry_count", type=Options.T_INT, default=3, required=False, multi=False, hide=True, choice=None,
-                     description_ja="Redisサーバーへの再接続回数を指定します。",
-                     description_en="Specifies the number of reconnections to the Redis server."),
+                    description_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",
+                    description_en="Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."),
                 dict(opt="retry_interval", type=Options.T_INT, default=5, required=False, multi=False, hide=True, choice=None,
-                     description_ja="Redisサーバーに再接続までの秒数を指定します。",
-                     description_en="Specifies the number of seconds before reconnecting to the Redis server."),
-                dict(opt="timeout", type=Options.T_INT, default=120, required=False, multi=False, hide=True, choice=None,
-                     description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
-                     description_en="Specify the maximum waiting time until the server responds."),
-                dict(opt="embed_name", type=Options.T_STR, default="cl-nagoya/ruri-v3-30m", required=True, multi=False, hide=False, choice=None,
-                     description_ja="エンベッドモデルの登録名を指定します。",
-                     description_en="Specify the registration name of the embed model."),
+                    description_ja="Redisサーバーに再接続までの秒数を指定します。",
+                    description_en="Specifies the number of seconds before reconnecting to the Redis server."),
+                dict(opt="timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=True, choice=None,
+                    description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
+                    description_en="Specify the maximum waiting time until the server responds."),
+                dict(opt="kwd", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                    description_ja=f"検索したい名前を指定します。中間マッチで検索します。",
+                    description_en=f"Specify the name you want to search for. Searches for partial matches."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                     description_ja="処理結果jsonの保存先ファイルを指定。",
                     description_en="Specify the destination file for saving the processing result json."),
@@ -73,20 +72,17 @@ class EmbedStop(feature.OneshotResultEdgeFeature):
                 dict(opt="stdout_log", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
                     description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
                     description_en="Available only in GUI mode. Outputs standard output during command execution to Console log."),
+                dict(opt="capture_stdout", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
+                    description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
+                    description_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                dict(opt="capture_maxsize", type=Options.T_INT, default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choice=None,
+                    description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                    description_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
             ]
         )
 
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        if not hasattr(args, 'embed_name') or args.embed_name is None:
-            msg = dict(warn="Please specify --embed_name")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if not re.match(r'^[\w\-]+$', args.embed_name):
-            msg = dict(warn="Embed name can only contain alphanumeric characters, underscores, and hyphens.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-
-        payload = dict(embed_name=args.embed_name)
+        payload = dict(kwd=args.kwd)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -98,39 +94,33 @@ class EmbedStop(feature.OneshotResultEdgeFeature):
         return self.RESP_SUCCESS, ret, cl
 
     def is_cluster_redirect(self):
-        return True
+        return False
 
     def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
               sessions:Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
         try:
             payload = json.loads(convert.b64str2str(msg[2]))
-            embed_name = payload.get('embed_name')
 
-            if self._stop_embed_model(sessions, embed_name):
-                msg = dict(success=f"Embed model '{embed_name}' unloaded successfully.")
-                redis_cli.rpush(reskey, msg)
-                return self.RESP_SUCCESS
-            
-            msg = dict(warn=f"Embed model '{embed_name}' is not loaded.")
+            kwd = payload.get('kwd')
+            if kwd is None or kwd == '':
+                kwd = '*'
+            agent_dir = data_dir / '.agent'
+            results: List[Dict[str, Any]] = []
+            if agent_dir.exists() and agent_dir.is_dir():
+                paths = agent_dir.glob(f"rag-{kwd}.json")
+                for p in sorted(paths):
+                    name = p.name
+                    if not name.startswith('rag-') or not name.endswith('.json'):
+                        continue
+                    results.append(dict(name=name[4:-5], path=str(p)))
+
+            msg = dict(success=results)
             redis_cli.rpush(reskey, msg)
-            return self.RESP_WARN
+            return self.RESP_SUCCESS
 
         except Exception as e:
             msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
-
-    @classmethod
-    def _stop_embed_model(cls, sessions:Dict[str, Dict[str, Any]], embed_name:str):
-        if 'agent' not in sessions:
-            sessions['agent'] = {}
-        if 'embed_model' not in sessions['agent']:
-            sessions['agent']['embed_model'] = {}
-        if embed_name in sessions['agent']['embed_model']:
-            model = sessions['agent']['embed_model'][embed_name]
-            del model
-            del sessions['agent']['embed_model'][embed_name]
-            return True
-        return False

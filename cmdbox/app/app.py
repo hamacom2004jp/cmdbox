@@ -5,6 +5,7 @@ from typing import List
 import argparse
 import argcomplete
 import logging
+import os
 import time
 import threading
 import sys
@@ -22,6 +23,7 @@ class CmdBoxApp:
             _self = appcls.__new__(appcls)
             _self.__init__(appcls=appcls, ver=ver, cli_features_packages=cli_features_packages, cli_features_prefix=cli_features_prefix)
             CmdBoxApp._instance = _self
+            os.environ['SETUPTOOLS_USE_DISTUTILS'] = 'stdlib'
         return CmdBoxApp._instance
 
     def __init__(self, appcls=None, ver=version, cli_features_packages:List[str]=None, cli_features_prefix:List[str]=None):

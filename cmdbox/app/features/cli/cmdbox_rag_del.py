@@ -9,7 +9,7 @@ import json
 import re
 
 
-class EmbedStop(feature.OneshotResultEdgeFeature):
+class RagDel(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -17,7 +17,7 @@ class EmbedStop(feature.OneshotResultEdgeFeature):
         Returns:
             Union[str, List[str]]: モード
         """
-        return 'embed'
+        return 'rag'
 
     def get_cmd(self) -> str:
         """
@@ -26,7 +26,7 @@ class EmbedStop(feature.OneshotResultEdgeFeature):
         Returns:
             str: コマンド
         """
-        return 'stop'
+        return 'del'
 
     def get_option(self) -> Dict[str, Any]:
         """
@@ -36,9 +36,9 @@ class EmbedStop(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
-            description_ja="入力情報の特徴量データを生成するエンベッドモデルを停止します。",
-            description_en="Stop the embedding model that generates feature data from input information.",
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
+            description_ja="RAG（検索拡張生成）の設定を削除します。",
+            description_en="Delete the RAG (Retrieval-Augmented Generation) configuration.",
             choice=[
                 dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
                      description_ja="Redisサーバーのサービスホストを指定します。",
@@ -61,9 +61,9 @@ class EmbedStop(feature.OneshotResultEdgeFeature):
                 dict(opt="timeout", type=Options.T_INT, default=120, required=False, multi=False, hide=True, choice=None,
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                      description_en="Specify the maximum waiting time until the server responds."),
-                dict(opt="embed_name", type=Options.T_STR, default="cl-nagoya/ruri-v3-30m", required=True, multi=False, hide=False, choice=None,
-                     description_ja="エンベッドモデルの登録名を指定します。",
-                     description_en="Specify the registration name of the embed model."),
+                dict(opt="rag_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                     description_ja="削除するRAG設定の名前を指定します。",
+                     description_en="Specify the name of the RAG configuration to delete."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                     description_ja="処理結果jsonの保存先ファイルを指定。",
                     description_en="Specify the destination file for saving the processing result json."),
@@ -77,16 +77,16 @@ class EmbedStop(feature.OneshotResultEdgeFeature):
         )
 
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        if not hasattr(args, 'embed_name') or args.embed_name is None:
-            msg = dict(warn="Please specify --embed_name")
+        if not hasattr(args, 'rag_name') or args.rag_name is None:
+            msg = dict(warn="Please specify --rag_name")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
-        if not re.match(r'^[\w\-]+$', args.embed_name):
-            msg = dict(warn="Embed name can only contain alphanumeric characters, underscores, and hyphens.")
+        if not re.match(r'^[\w\-]+$', args.rag_name):
+            msg = dict(warn="RAG name can only contain alphanumeric characters, underscores, and hyphens.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
 
-        payload = dict(embed_name=args.embed_name)
+        payload = dict(rag_name=args.rag_name)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -98,39 +98,28 @@ class EmbedStop(feature.OneshotResultEdgeFeature):
         return self.RESP_SUCCESS, ret, cl
 
     def is_cluster_redirect(self):
-        return True
+        return False
 
     def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
               sessions:Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
         try:
             payload = json.loads(convert.b64str2str(msg[2]))
-            embed_name = payload.get('embed_name')
+            rag_name = payload.get('rag_name')
 
-            if self._stop_embed_model(sessions, embed_name):
-                msg = dict(success=f"Embed model '{embed_name}' unloaded successfully.")
+            configure_path = data_dir / ".agent" / f"rag-{rag_name}.json"
+            if not configure_path.exists():
+                msg = dict(warn=f"Specified RAG configuration '{rag_name}' not found on server at '{str(configure_path)}'.")
                 redis_cli.rpush(reskey, msg)
-                return self.RESP_SUCCESS
-            
-            msg = dict(warn=f"Embed model '{embed_name}' is not loaded.")
+                return self.RESP_WARN
+
+            configure_path.unlink()
+            msg = dict(success=f"RAG configuration '{rag_name}' deleted from '{str(configure_path)}'.")
             redis_cli.rpush(reskey, msg)
-            return self.RESP_WARN
+            return self.RESP_SUCCESS
 
         except Exception as e:
             msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
-
-    @classmethod
-    def _stop_embed_model(cls, sessions:Dict[str, Dict[str, Any]], embed_name:str):
-        if 'agent' not in sessions:
-            sessions['agent'] = {}
-        if 'embed_model' not in sessions['agent']:
-            sessions['agent']['embed_model'] = {}
-        if embed_name in sessions['agent']['embed_model']:
-            model = sessions['agent']['embed_model'][embed_name]
-            del model
-            del sessions['agent']['embed_model'][embed_name]
-            return True
-        return False

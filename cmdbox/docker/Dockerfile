@@ -20,6 +20,7 @@ RUN pip install --upgrade pip && \
     pip install 'google-adk>=1.21.0' litellm && \
     pip install 'a2a-sdk>=0.3.4,<0.4.0' && \
     pip install "transformers>=4.48.0" "sentence-transformers" "sqlite_vec" "torch" && \
+    pip install 'pdfplumber' && \
     pip install backoff cryptography orjson apscheduler litellm-enterprise email-validator fastapi-sso
 #{COPY_CMDBOX}
 RUN pip install #{INSTALL_CMDBOX} && cmdbox --version

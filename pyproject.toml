@@ -82,6 +82,9 @@ agent_mem = [
     "transformers>=4.48.0",
     "torch",
 ]
+agent_rag = [
+    "pdfplumber",
+]
 saml = [
     "python3-saml",
     "xmlsec==1.3.13",

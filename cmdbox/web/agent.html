@@ -128,6 +128,7 @@
                             <a href="#" class="list-group-item list-group-item-action" data-bs-target="#memory_settings">Memory Settings</a>
                             <a href="#" class="list-group-item list-group-item-action" data-bs-target="#mcpsv_settings">MCPSV Settings</a>
                             <a href="#" class="list-group-item list-group-item-action" data-bs-target="#runner_settings">Runner Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#rag_settings">RAG Settings</a>
                             <a href="#" class="list-group-item list-group-item-action" data-bs-target="#tts_settings">TTS Settings</a>
                         </div>
                     </div>
@@ -194,6 +195,18 @@
                                 </div>
                                 <div id="embedding_list_container" class="list-group">
                                     <!-- Embedding List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="rag_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">RAG Settings</h6>
+                                    <button id="btn_add_rag" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        Add Setting
+                                    </button>
+                                </div>
+                                <div id="rag_list_container" class="list-group">
+                                    <!-- RAG List Items will be injected here -->
                                 </div>
                             </div>
                             <div id="memory_settings" class="settings-content d-none">
@@ -352,6 +365,28 @@
     </div>
 </div>
 
+<!-- RAG追加/編集モーダル -->
+<div id="rag_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content sf-modal doc-card" style="height:auto;">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan system-font">Add/Edit RAG</h5>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form_rag_edit" class="row"></form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_rag" style="display:none;">DELETE</button>
+                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_rag">SAVE</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Runner選択モーダル -->
 <div id="runner_select_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
@@ -467,6 +502,44 @@
         </div>
     </div>
 </div>
+<!-- ファイラーモーダル -->
+<div id="filer_modal" class="modal" style="z-index: 2000;" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <form id="filer_form" class="modal-content novalidate">
+            <div class="modal-header">
+                <h5 class="modal-title glow-text-cyan text-nowrap">Modal title</h5>
+                <div class="input-group p-1">
+                    <button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Current</button>'
+                    <input name="filer_host" type="hidden" class="filer_host">
+                    <input name="filer_port" type="hidden" class="filer_port">
+                    <input name="filer_password" type="hidden" class="filer_password">
+                    <input name="filer_svname" type="hidden" class="filer_svname">
+                    <input name="filer_scope" type="hidden" class="filer_scope">
+                    <input name="filer_client_data" type="hidden" class="filer_client_data">
+                    <ul class="dropdown-menu filer_server"></ul>
+                    <input type="text" class="form-control filer_address" aria-describedby="button-addon2">
+                    <button class="btn btn-outline-secondary filer_address_bot" type="button" id="button-addon2">
+                        <svg class="bi bi-arrow-right-circle" width="16" height="16" fill="currentColor"><use href="#btn_arrow_right_circle"></use></svg>
+                    </button>
+                </div>
+                <button type="button" class="btn btn_window_stack">
+                    <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
+                </button>
+                <button type="button" class="btn btn_window">
+                    <svg class="bi bi-window" width="16" height="16" fill="currentColor"><use href="#btn_window"></use></svg>
+                </button>
+                <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">
+                    <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                </button>
+            </div>
+            <div class="modal-body row">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </form>
+    </div>
+</div>
 <!-- ローディングマスク -->
 <div id="loading" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(0, 0, 0, 0.3);z-index:10000;">
     <div class="text-center position-absolute top-50 start-50 w-100 translate-middle">
@@ -492,6 +565,7 @@
 <script type="text/javascript" src="assets/split-pane/split-pane.js"></script>
 <script type="text/javascript" src="assets/cmdbox/svgicon.js"></script>
 <script type="text/javascript" src="assets/cmdbox/common.js"></script>
+<script type="text/javascript" src="assets/cmdbox/filer_modal.js"></script>
 <script type="text/javascript" src="assets/cmdbox/view_result.js"></script>
 <script type="text/javascript" src="assets/agent/agent.js"></script>
 <script type="text/javascript" src="assets/agent/main.js"></script>

@@ -210,6 +210,7 @@ class AgentChat(agant_base.AgentBase):
         if logger.level == logging.DEBUG:
             logger.debug(f"litellm loading..")
         from google.adk.models import lite_llm
+        import litellm
         #from litellm import _logging
         #_logging._turn_on_debug()
 
@@ -217,6 +218,7 @@ class AgentChat(agant_base.AgentBase):
         common.reset_logger("LiteLLM Proxy")
         common.reset_logger("LiteLLM Router")
         common.reset_logger("LiteLLM")
+        litellm.suppress_debug_info = True
         # 各種設定値の取得
         agent_name = agent_conf.get('agent_name', None)
         agent_type = agent_conf.get('agent_type', None)

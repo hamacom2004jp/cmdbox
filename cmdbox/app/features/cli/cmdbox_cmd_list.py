@@ -45,6 +45,12 @@ class CmdList(feature.OneshotResultEdgeFeature):
                 dict(opt="kwd", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja=f"検索したい名前を指定します。中間マッチで検索します。",
                      description_en=f"Specify the name you want to search for. Searches for partial matches."),
+                dict(opt="match_mode", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja=f"検索したいmodeを指定します。中間マッチで検索します。",
+                     description_en=f"Specify the mode you want to search in. Searches for partial matches."),
+                dict(opt="match_cmd", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja=f"検索したいcmdを指定します。中間マッチで検索します。",
+                     description_en=f"Specify the cmd you want to search in. Searches for partial matches."),
                 dict(opt="signin_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
                      description_ja=f"サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.{self.ver.__appid__}/user_list.yml' を指定します。",
                      description_en=f"Specify a file containing users and passwords with which they can signin.Typically, specify '.{self.ver.__appid__}/user_list.yml'."),
@@ -96,11 +102,21 @@ class CmdList(feature.OneshotResultEdgeFeature):
         cmd_list = sorted(cmd_list, key=lambda cmd: cmd["title"])
         is_japan = common.is_japan(args=args)
         options = Options.getInstance()
-        cmd_list = [dict(title=r.get('title',''), mode=r['mode'], cmd=r['cmd'],
-                    description=r.get('description','') + str(options.get_cmd_attr(r['mode'], r['cmd'], 'description_ja' if is_japan else 'description_en')),
-                    tag=r.get('tag','')) for r in cmd_list \
-                    if signin.Signin._check_cmd(self.signin_file_data, args.groups, r['mode'], r['cmd'], logger)]
-        ret = dict(success=cmd_list)
+        ret_list = []
+        for r in cmd_list:
+            if args.match_mode is not None and args.match_mode != '' and args.match_mode not in r['mode']:
+                continue
+            if args.match_cmd is not None and args.match_cmd != '' and args.match_cmd not in r['cmd']:
+                continue
+            if not signin.Signin._check_cmd(self.signin_file_data, args.groups, r['mode'], r['cmd'], logger):
+                continue
+            row = dict(title=r.get('title',''),
+                       mode=r['mode'],
+                       cmd=r['cmd'],
+                       description=r.get('description','') + str(options.get_cmd_attr(r['mode'], r['cmd'], 'description_ja' if is_japan else 'description_en')),
+                       tag=r.get('tag',''))
+            ret_list.append(row)
+        ret = dict(success=ret_list)
 
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 

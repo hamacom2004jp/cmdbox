@@ -91,7 +91,7 @@ class AgentMemorySave(feature.OneshotResultEdgeFeature):
                             + "$(\"[name='embed']\").empty().append('<option></option>');"
                             + "res['data'].map(elm=>{$(\"[name='embed']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
                             + "$(\"[name='embed']\").val(val);"
-                            + "},$(\"[name='title']\").val(),'embedding');"
+                            + "},$(\"[name='title']\").val(),'embed');"
                             + "}",
                     description_ja="埋込処理で使用するEmbedding設定名を指定します。",
                     description_en="Specify the Embedding setting name to use for embedding processing."),
