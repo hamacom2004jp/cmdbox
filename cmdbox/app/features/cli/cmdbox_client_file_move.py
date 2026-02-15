@@ -62,6 +62,12 @@ class ClientFileMove(feature.UnsupportEdgeFeature):
                      test_true={"server":"/file_server/upload/dog3.jpg",
                                 "client":"/file_client/upload/dog3.jpg",
                                 "current":"/file_current/upload/dog3.jpg"}),
+                dict(opt="from_fwpath", type=Options.T_STR, default=None, required=True, multi=True, hide=False, choice=None,
+                     description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合エラーにします。",
+                     description_en="Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.",),
+                dict(opt="to_fwpath", type=Options.T_STR, default=None, required=True, multi=True, hide=False, choice=None,
+                     description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合エラーにします。",
+                     description_en="Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.",),
                 dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="参照先スコープを指定します。指定可能な画像タイプは `client` , `current` , `server` です。",
                      description_en="Specifies the scope to be referenced. When omitted, 'client' is used.",
@@ -131,9 +137,12 @@ class ClientFileMove(feature.UnsupportEdgeFeature):
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
         client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
+        from_fwpaths = [p.replace('"','') for p in args.from_fwpath] if args.from_fwpath is not None else ["/"]
+        to_fwpaths = [p.replace('"','') for p in args.to_fwpath] if args.to_fwpath is not None else ["/"]
         ret = cl.file_move(args.from_path.replace('"',''), args.to_path.replace('"',''),
-                                scope=args.scope, client_data=client_data,
-                                retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
+                           from_fwpaths=from_fwpaths, to_fwpaths=to_fwpaths,
+                           scope=args.scope, client_data=client_data,
+                           retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:
@@ -165,12 +174,15 @@ class ClientFileMove(feature.UnsupportEdgeFeature):
         Returns:
             int: 終了コード
         """
-        from_path = convert.b64str2str(msg[2])
-        to_path = convert.b64str2str(msg[3])
-        st = self.file_move(msg[1], from_path, to_path, data_dir, logger, redis_cli, sessions)
+        payload = convert.b64str2str(msg[2])
+        from_path = payload.get("from_path")
+        to_path = payload.get("to_path")
+        from_fwpaths = payload.get("from_fwpaths")
+        to_fwpaths = payload.get("to_fwpaths")
+        st = self.file_move(msg[1], from_path, to_path, from_fwpaths, to_fwpaths, data_dir, logger, redis_cli, sessions)
         return st
 
-    def file_move(self, reskey:str, from_path:str, to_path:str,
+    def file_move(self, reskey:str, from_path:str, to_path:str, from_fwpaths:List[str], to_fwpaths:List[str],
                   data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ファイルを移動する
@@ -179,6 +191,8 @@ class ClientFileMove(feature.UnsupportEdgeFeature):
             reskey (str): レスポンスキー
             from_path (str): 移動元ファイルパス
             to_path (str): 移動先ファイルパス
+            from_fwpaths (List[str], optional): 移動元の範囲外パスのリスト.
+            to_fwpaths (List[str], optional): 移動先の範囲外パスのリスト.
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
@@ -189,7 +203,7 @@ class ClientFileMove(feature.UnsupportEdgeFeature):
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_move(from_path, to_path)
+            rescode, msg = f.file_move(from_path, to_path, from_fwpaths, to_fwpaths)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

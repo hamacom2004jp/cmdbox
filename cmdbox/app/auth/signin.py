@@ -13,6 +13,7 @@ import contextvars
 import logging
 import json
 import jwt
+import re
 import string
 
 
@@ -346,6 +347,10 @@ class Signin(object):
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "groups" not found or not list type. ({signin_file})')
             if len([ug for ug in user['groups'] if ug not in groups]) > 0:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. Group not found. ({signin_file}). {user["groups"]}')
+            if 'home' not in user or user['home'] is None:
+                user['home'] = f'/users/{user["name"]}'
+            if user['home'] != '/':
+                user['home'] = re.sub(r'^/+', '', user['home'])
             uids.add(user['uid'])
             unames.add(user['name'])
         # groupsのフォーマットチェック
@@ -365,6 +370,10 @@ class Signin(object):
             if 'parent' in group:
                 if group['parent'] not in groups:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. Parent group not found. ({signin_file}). parent={group["parent"]}')
+            if 'home' not in group or group['home'] is None:
+                group['home'] = f'/groups/{group["name"]}'
+            if group['home'] != '/':
+                group['home'] = re.sub(r'^/+', '', group['home'])
             gids.add(group['gid'])
             gnames.add(group['name'])
         # cmdruleのフォーマットチェック
@@ -392,6 +401,8 @@ class Signin(object):
                 rule['mode'] = None
             if 'cmds' not in rule:
                 rule['cmds'] = []
+            if 'coercion' not in rule:
+                rule['coercion'] = {}
             if rule['mode'] is None and len(rule['cmds']) > 0:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. When “cmds” is specified, “mode” must be specified. ({signin_file})')
             if type(rule['cmds']) is not list:
@@ -676,6 +687,20 @@ class Signin(object):
             gns += cls.correct_group(copy_signin_data, gns, master_groups)
         return group_names + gns
 
+    @classmethod
+    def group_home(cls, signin_file_data:Dict[str, Any], group_names:List[str]) -> List[str]:
+        """
+        グループ名のホームを取得します
+
+        Args:
+            signin_file_data (Dict[str, Any]): サインインファイルデータ
+            group_names (List[str]): グループ名リスト
+        """
+        ghs = []
+        for gn in group_names.copy():
+            ghs += [gr['home'] for gr in signin_file_data['groups'] if 'home' in gr and gr['name']==gn]
+        return ghs
+
     def check_path(self, req:Request, path:str) -> Union[None, RedirectResponse]:
         """
         パスの認可をチェックします
@@ -725,7 +750,7 @@ class Signin(object):
             logger.warning(f"Unauthorized site. user={req.session['signin']['name']}, path={path}")
             return RedirectResponse(url=f'/signin{path}?error=unauthorizedsite')
 
-    def check_cmd(self, req:Request, res:Response, mode:str, cmd:str):
+    def check_cmd(self, req:Request, res:Response, mode:str, cmd:str, opt:Dict[str, Any]):
         """
         コマンドの認可をチェックします
 
@@ -734,6 +759,7 @@ class Signin(object):
             res (Response): レスポンス
             mode (str): モード
             cmd (str): コマンド
+            opt (Dict[str, Any], optional): オプション. Defaults to {}.
 
         Returns:
             bool: 認可されたかどうか
@@ -743,7 +769,7 @@ class Signin(object):
             return True
         if 'signin' not in req.session or 'groups' not in req.session['signin']:
             return False
-        return Signin._check_cmd(data, req.session['signin']['groups'], mode, cmd, self.logger)
+        return Signin._check_cmd(data, req.session['signin']['groups'], mode, cmd, opt, req.session['signin']['name'], self.logger)
 
     @classmethod
     def load_groups(cls, signin_file_data:Dict[str, Any], apikey:str, logger:logging.Logger):
@@ -774,7 +800,8 @@ class Signin(object):
         return dict(success=group_names)
 
     @classmethod
-    def _check_cmd(cls, signin_file_data:Dict[str, Any], user_groups:List[str], mode:str, cmd:str, logger:logging.Logger) -> bool:
+    def _check_cmd(cls, signin_file_data:Dict[str, Any], user_groups:List[str], mode:str, cmd:str,
+                   opt:Dict[str, Any], user_name:str, logger:logging.Logger) -> bool:
         """
         コマンドの認可をチェックします
 
@@ -783,6 +810,7 @@ class Signin(object):
             user_groups (List[str]): ユーザグループ
             mode (str): モード
             cmd (str): コマンド
+            opt (Dict[str, Any]): オプション
 
         Returns:
             bool: 認可されたかどうか
@@ -801,6 +829,10 @@ class Signin(object):
                     continue
                 if len([c for c in rule['cmds'] if cmd == c]) <= 0:
                     continue
+            # コマンドオプションの強制設定
+            if 'coercion' in rule:
+                for key, value in rule['coercion'].items():
+                    opt[key] = eval(value, {}, dict(user_name=user_name, groups=user_groups, mode=mode, cmd=cmd))
             jadge = rule['rule']
         if logger.level == logging.DEBUG:
             logger.debug(f"cmd rule: mode={mode}, cmd={cmd}: {jadge}")

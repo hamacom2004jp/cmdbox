@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( client mode ) &mdash; cmdbox 2026/02/08 documentation</title>
+  <title>Command Reference ( client mode ) &mdash; cmdbox 2026/02/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=22b6552c"></script>
+      <script src="../_static/documentation_options.js?v=3de328d9"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -157,6 +157,14 @@
 <td></td>
 <td><p>Specify the path to copy under the data folder of the inference server.</p></td>
 </tr>
+<tr class="row-even"><td><p>--from_fwpath &lt;source fwpath&gt;</p></td>
+<td></td>
+<td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--to_fwpath &lt;destination fwpath&gt;</p></td>
+<td></td>
+<td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
+</tr>
 <tr class="row-even"><td><p>--orverwrite</p></td>
 <td></td>
 <td><p>Overwrites the file even if it exists at the copy destination.</p></td>
@@ -223,35 +231,39 @@
 <td></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;reference scope&gt;</p></td>
+<tr class="row-odd"><td><p>--fwpath &lt;server-side fwpath&gt;</p></td>
+<td></td>
+<td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
+</tr>
+<tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
 <td></td>
 <td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--rpath &lt;client-request path&gt;</p></td>
+<tr class="row-odd"><td><p>--rpath &lt;client-request path&gt;</p></td>
 <td></td>
 <td><p>Specifies the request path. This value is returned in the response without any modification.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--download_file &lt;client-side path&gt;</p></td>
+<tr class="row-even"><td><p>--download_file &lt;client-side path&gt;</p></td>
 <td></td>
 <td><p>Specify the destination path of the client.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-odd"><td><p>--client_data &lt;data folder&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--img_thumbnail &lt;Thumbnail size&gt;</p></td>
+<tr class="row-even"><td><p>--img_thumbnail &lt;Thumbnail size&gt;</p></td>
 <td></td>
 <td><p>Specifies the size in pixels of the thumbnail if the subject is an image.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
@@ -297,27 +309,31 @@
 <td></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;reference scope&gt;</p></td>
+<tr class="row-odd"><td><p>--fwpath &lt;server-side fwpath&gt;</p></td>
+<td></td>
+<td><p>Specify a path to determine whether the specified path is out of bounds. If it is not under this path, it is interpreted as having specified this path.</p></td>
+</tr>
+<tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
 <td></td>
 <td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--recursive</p></td>
+<tr class="row-odd"><td><p>--recursive</p></td>
 <td></td>
 <td><p>Get a list of files recursively for a folder contained in the specified path.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
@@ -363,23 +379,27 @@
 <td></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;reference scope&gt;</p></td>
+<tr class="row-odd"><td><p>--fwpath &lt;server-side fwpath&gt;</p></td>
+<td></td>
+<td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
+</tr>
+<tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
 <td></td>
 <td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-odd"><td><p>--client_data &lt;data folder&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
@@ -427,6 +447,14 @@
 <tr class="row-odd"><td><p>--to_path &lt;destination path&gt;</p></td>
 <td></td>
 <td><p>Specify the destination path under the data folder.</p></td>
+</tr>
+<tr class="row-even"><td><p>--from_fwpath &lt;source fwpath&gt;</p></td>
+<td></td>
+<td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--to_fwpath &lt;destination fwpath&gt;</p></td>
+<td></td>
+<td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
 </tr>
 <tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
 <td></td>
@@ -490,23 +518,27 @@
 <td></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;reference scope&gt;</p></td>
+<tr class="row-odd"><td><p>--fwpath &lt;server-side fwpath&gt;</p></td>
+<td></td>
+<td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
+</tr>
+<tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
 <td></td>
 <td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-odd"><td><p>--client_data &lt;data folder&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
@@ -552,23 +584,27 @@
 <td></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;reference scope&gt;</p></td>
+<tr class="row-odd"><td><p>--fwpath &lt;server-side fwpath&gt;</p></td>
+<td></td>
+<td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
+</tr>
+<tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
 <td></td>
 <td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-odd"><td><p>--client_data &lt;data folder&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
@@ -614,35 +650,39 @@
 <td></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;reference scope&gt;</p></td>
+<tr class="row-odd"><td><p>--fwpath &lt;server-side fwpath&gt;</p></td>
+<td></td>
+<td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
+</tr>
+<tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
 <td></td>
 <td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--upload_file &lt;client-side path&gt;</p></td>
+<tr class="row-odd"><td><p>--upload_file &lt;client-side path&gt;</p></td>
 <td></td>
 <td><p>Specify the source path of the client.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-even"><td><p>--mkdir</p></td>
+<tr class="row-odd"><td><p>--mkdir</p></td>
 <td></td>
 <td><p>If there is no in between folder, create one.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--orverwrite</p></td>
+<tr class="row-even"><td><p>--orverwrite</p></td>
 <td></td>
 <td><p>Overwrites the file even if it exists at the upload destination.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>

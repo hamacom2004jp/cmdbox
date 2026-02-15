@@ -14,10 +14,10 @@ agentView.initView = () => {
     agentView.settingsModal = $('#agent_settings_modal');
     agentView.chatMessages = $('#messages');
     agentView.chatContainer = $('#chatContainer');
-    agentView.sessionModal = $('#sessionModal');
     agentView.memoryModal = $('#memoryModal');
-    agentView.chatHistories = $('#sessionModal .modal-body ul.sf-list-group');
-    agentView.btn_histories = $('#btn_histories');
+    agentView.chatHistories = $('#session_tab ul.sf-list-group');
+    agentView.fileTranceferModal = $('#fileTranceferModal');
+    agentView.btn_filetrancefer = $('#btn_filetrancefer');
     agentView.btn_memories = $('#btn_memories');
     agentView.chat_reconnect_count = 0;
 
@@ -44,13 +44,14 @@ agentView.initView = () => {
     agentView.settingsModal.off('shown.bs.modal').on('shown.bs.modal', async () => {
         await agentView.list_agent();
     });
-    // セッションモーダルの shown.bs.modal イベントハンドラ
-    agentView.sessionModal.off('shown.bs.modal').on('shown.bs.modal', async () => {
-        await agentView.list_sessions();
-    });
     // メモリーモーダルの shown.bs.modal イベントハンドラ
     agentView.memoryModal.off('shown.bs.modal').on('shown.bs.modal', async () => {
         await agentView.show_memories();
+        await agentView.list_sessions();
+    });
+    // ファイル転送モーダルの shown.bs.modal イベントハンドラ
+    agentView.fileTranceferModal.off('shown.bs.modal').on('shown.bs.modal', async () => {
+        fsapi.onload();
     });
     // --- 音声出力と録音の状態 ---
     agentView.isRecording = false;
@@ -58,8 +59,6 @@ agentView.initView = () => {
     // メッセージ送信ボタン
     // agent_runnerが設定されていない場合は送信ボタンを無効化
     agentView.btn_user_msg.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
-    // HISTORIESボタンも同様に無効化
-    agentView.btn_histories.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
     // MEMORYボタンも同様に無効化
     agentView.btn_memories.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
     agentView.user_msg.off('keydown').on('keydown', (e) => {
@@ -1352,7 +1351,7 @@ agentView.show_memories = async () => {
         const end = data[0]['ts_end'] ? Intl.DateTimeFormat('ja-JP', timeOptions).format(new Date(data[0]['ts_end'])) : null;
         $('#memory_range_start').text(start || '---');
         $('#memory_range_end').text(end || '---');
-        memory_performance.text(`${(data[0]['my_cnt'] / data[0]['all_cnt'] * 100).toFixed(2)} %` || '---');
+        memory_performance.text(`${(data[0]['my_cnt'] / data[0]['all_cnt'] * 100).toFixed(1)} %` || '---');
     } catch (e) {
         console.error('Error loading memory status:', e);
     } finally {
@@ -1713,8 +1712,6 @@ agentView.select_runner = async (runner_name) => {
         $('#display_runner_msg').html(`AGENT RUNNER IS READY`);
         // 送信ボタンを有効化
         agentView.btn_user_msg.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
-        // HISTORIESボタンも有効化
-        agentView.btn_histories.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
         // MEMORYボタンも有効化
         agentView.btn_memories.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
         // モーダルを閉じる
@@ -1787,7 +1784,7 @@ agentView.list_rag = async () => {
                 <li class="sf-list-item" style="cursor: pointer;">
                     <div>
                         <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.rag_name}</span>
-                        <span class="text-white-50">${config.rag_type} / ${config.vector_store_type}</span>
+                        <span class="text-white-50">${config.rag_type} / ${config.extract} / ${config.embed}</span>
                     </div>
                 </li>
             `).appendTo(container_ul);
@@ -1831,6 +1828,11 @@ agentView.list_rag = async () => {
                     res['data'].map(elm=>{$('[name="embed"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
                     form.find('[name="embed"]').val(config.embed);
                 },$('[name="title"]').val(),'embed');
+                await cmdbox.callcmd('cmd','list',{match_mode:'extract'},(res)=>{
+                    $("[name='extract']").empty().append('<option></option>');
+                    res.forEach(row=>{$("[name='extract']").append('<option value="'+row["title"]+'">'+row["title"]+'</option>');});
+                    form.find('[name="extract"]').val(config.extract);
+                },$('[name="title"]').val(),'extract');
 
                 $('#rag_edit_modal').modal('show');
             });

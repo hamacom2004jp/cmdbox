@@ -103,6 +103,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                     web.options.audit_exec(req, res, web, body=dict(msg='Wrong password.'), audit_type='auth', user=name)
                     return RedirectResponse(url=f'/signin/{next}?error=1')
             group_names = list(set(web.signin.__class__.correct_group(signin_data, user['groups'], None)))
+            group_homes = list(set(web.signin.__class__.group_home(signin_data, group_names)))
             gids = [g['gid'] for g in signin_data['groups'] if g['name'] in group_names]
             email = user.get('email', '')
             # パスワード最終更新日時取得
@@ -122,14 +123,14 @@ class DoSignin(cmdbox_web_signin.Signin):
                         return RedirectResponse(url=f'/signin/{next}?error=expirationofpassword')
                     if datetime.datetime.now() > last_update + datetime.timedelta(days=notify):
                         # セッションに保存
-                        _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None)),
-                                     email, passwd, None, group_names, gids)
+                        _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None), home=user.get('home', None)),
+                                     email, passwd, None, group_names, group_homes, gids)
                         next = f"../{next}" if token_ok else next
                         web.options.audit_exec(req, res, web, body=dict(msg='Signin succeeded. However, you should change your password.'), audit_type='auth', user=name)
                         return RedirectResponse(url=f'../{next}?warn=passchange', headers=dict(signin="success"))
             # セッションに保存
-            _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None)),
-                         email, passwd, None, group_names, gids)
+            _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None), home=user.get('home', None)),
+                         email, passwd, None, group_names, group_homes, gids)
             next = f"../{next}" if token_ok else next
             if notify_passchange:
                 web.options.audit_exec(req, res, web, body=dict(msg='Signin succeeded. However, you should change your password.'), audit_type='auth', user=name)
@@ -183,7 +184,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 sobj = _load_signin(web, signin_data['saml']['providers']['azure']['signin_module'], self.appcls, self.ver)
                 self.azure_saml_signin = sobj if sobj is not None else self.azure_saml_signin
 
-        def _set_session(req:Request, user:dict, email:str, hashed_password:str, access_token:str, group_names:list, gids:list):
+        def _set_session(req:Request, user:dict, email:str, hashed_password:str, access_token:str, group_names:list, group_homes:list, gids:list):
             """
             セッションに保存する
 
@@ -194,6 +195,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 hashed_password (str): パスワード
                 access_token (str): アクセストークン
                 group_names (list): グループ名リスト
+                group_homes (list): グループホームリスト
                 gids (list): グループIDリスト
             """
             # 最終サインイン日時更新
@@ -207,11 +209,20 @@ class DoSignin(cmdbox_web_signin.Signin):
                 # パスワード間違い回数削除
                 web.user_data(None, user['uid'], user['name'], 'password', 'pass_miss_count', 0, delkey=True)
             # セッションに保存
-            req.session['signin'] = dict(uid=user['uid'], name=user['name'],
+            req.session['signin'] = dict(uid=user['uid'], name=user['name'], home=user['home'],
                                          password=hashed_password, access_token=access_token, apikeys=user.get('apikeys', None),
-                                         gids=gids, groups=group_names, email=email)
+                                         gids=gids, groups=group_names, group_homes=group_homes, email=email)
+            # ユーザーフォルダチェック
+            user_dir = web.data / user['home']
+            if not user_dir.exists():
+                user_dir.mkdir(parents=True, exist_ok=True)
+            # グループフォルダチェック
+            for group_home in group_homes:
+                group_dir = web.data / group_home
+                if not group_dir.exists():
+                    group_dir.mkdir(parents=True, exist_ok=True)
             if web.logger.level == logging.DEBUG:
-                web.logger.debug(f'Set session, uid={user["uid"]}, name={user["name"]}, email={email}, gids={gids}, groups={group_names}')
+                web.logger.debug(f'Set session, uid={user["uid"]}, name={user["name"]}, home={user["home"]}, email={email}, gids={gids}, groups={group_names}, group_homes={group_homes}')
 
         @app.get('/oauth2/google/callback')
         async def oauth2_google_callback(req:Request, res:Response):
@@ -271,8 +282,9 @@ class DoSignin(cmdbox_web_signin.Signin):
                     return RedirectResponse(url=f'/signin/{next}?error=appdeny')
                 # グループ取得
                 group_names, gids = signin.get_groups(access_token, user)
+                group_homes = list(set(web.signin.__class__.group_home(signin_data, group_names)))
                 # セッションに保存
-                _set_session(req, user, email, None, access_token, group_names, gids)
+                _set_session(req, user, email, None, access_token, group_names, group_homes, gids)
                 return RedirectResponse(url=f'../../{next}', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス
             except Exception as e:
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
@@ -318,8 +330,9 @@ class DoSignin(cmdbox_web_signin.Signin):
                         return RedirectResponse(url=f'/signin/{next}?error=appdeny')
                     # グループ取得
                     group_names, gids = saml_signin.get_groups(None, user)
+                    group_homes = list(set(web.signin.__class__.group_home(signin_data, group_names)))
                     # セッションに保存
-                    _set_session(req, user, email, None, None, group_names, gids)
+                    _set_session(req, user, email, None, None, group_names, group_homes, gids)
                     # SAML場合、ブラウザ制限によりリダイレクトでセッションクッキーが消えるので、HTMLで移動する
                     html = """
                     <html><head><meta http-equiv="refresh" content="0;url=../../{next}"></head>

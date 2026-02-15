@@ -23,7 +23,7 @@ class ListCmd(feature.WebFeature):
             form = await req.form()
             kwd = form.get('kwd')
             ret = self.list_cmd(web, kwd)
-            ret = [r for r in ret if web.signin.check_cmd(req, res, r['mode'], r['cmd'])]
+            ret = [r for r in ret if web.signin.check_cmd(req, res, r['mode'], r['cmd'], r)]
             return ret
 
     def list_cmd(self, web:Web, kwd:str) -> List[Dict[str, Any]]:

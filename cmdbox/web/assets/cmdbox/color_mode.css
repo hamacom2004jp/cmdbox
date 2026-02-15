@@ -2,6 +2,12 @@
     background-color: var(--bs-tertiary-bg) !important;
     word-break:normal;
 }
+.editer_code {
+    background: var(--bs-modal-bg);
+    color: var(--bs-modal-color);
+    field-sizing: content;
+    min-height: min-content;
+}
 /* ライトモード (基本) - 必要に応じて調整 */
 [data-bs-theme="light"] {
     --bs-body-bg: #fff;

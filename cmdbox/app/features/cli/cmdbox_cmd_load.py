@@ -94,7 +94,7 @@ class CmdLoad(feature.OneshotResultEdgeFeature):
             self.signin_file_data = signin.Signin.load_signin_file(args.signin_file, None, self=self, logger=logger)
         opt_path = Path(args.data) / ".cmds" / f"cmd-{args.title}.json"
         opt = common.loadopt(opt_path, True)
-        if not signin.Signin._check_cmd(self.signin_file_data, args.groups, opt['mode'], opt['cmd'], logger):
+        if not signin.Signin._check_cmd(self.signin_file_data, args.groups, opt['mode'], opt['cmd'], args.__dict__, "unknown", logger):
             ret = dict(warn=f"You do not have permission to execute this command.")
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, ret, None

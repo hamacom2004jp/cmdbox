@@ -373,7 +373,7 @@ class ToolList(object):
             cmd_list = [dict(title=r.get('title',''), mode=r['mode'], cmd=r['cmd'],
                         description=r.get('description','') + str(options.get_cmd_attr(r['mode'], r['cmd'], 'description_ja' if is_japan else 'description_en')),
                         tag=r.get('tag','')) for r in cmd_list \
-                       if signin.Signin._check_cmd(data, ['admin'], r['mode'], r['cmd'], self.logger)]
+                       if signin.Signin._check_cmd(data, ['admin'], r['mode'], r['cmd'], r, "unknown", self.logger)]
 
         except Exception as e:
             # ユーザーコマンドの読み込みに失敗した場合は警告を出して登録済みのリストを返す
@@ -546,7 +546,8 @@ class ToolList(object):
         func_txt += f'        logger.warning("mode={mode}, cmd={cmd}, signin_file="+common.to_str(args.signin_file))\n'
         func_txt += f'        return dict(warn="The command could not be executed due to an authentication error. check="+common.to_str(sign))\n'
         func_txt += f'    groups = req.session["signin"]["groups"]\n'
-        func_txt += f'    sign = signin.Signin._check_cmd(signin_data, groups, "{mode}", "{cmd}", logger)\n'
+        func_txt += f'    user_name = req.session["signin"]["name"]\n'
+        func_txt += f'    sign = signin.Signin._check_cmd(signin_data, groups, "{mode}", "{cmd}", opt, user_name, logger)\n'
         func_txt += f'    if not sign:\n'
         func_txt += f'        logger.warning("You do not have permission to execute this command. check="+common.to_str(sign))\n'
         func_txt += f'        logger.warning("mode={mode}, cmd={cmd}, sign="+common.to_str(sign)+", groups="+common.to_str(groups))\n'

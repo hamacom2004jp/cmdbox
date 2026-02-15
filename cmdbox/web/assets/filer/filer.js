@@ -598,7 +598,10 @@ fsapi.file_list = async (target_path, current_path, dh) => {
 fsapi.opendir = async () => {
   try {
     fsapi.dh = await window.showDirectoryPicker();
-  } catch (e) {}
+  } catch (e) {
+    cmdbox.message('The local folder could not be opened.\nThis connection may not be protected by SSL or similar encryption.');
+    return;
+  }
   fsapi.filer("/", true);
 }
 fsapi.local_exec_cmd = async (opt) => {

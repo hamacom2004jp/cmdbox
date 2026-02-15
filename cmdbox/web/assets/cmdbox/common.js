@@ -581,15 +581,17 @@ cmdbox.init_modal_button = () => {
     // modal setting
     $('.modal-dialog').draggable({cursor:'move',cancel:'.modal-body'});
     $('#filer_modal .modal-dialog').draggable({cursor:'move',cancel:'.modal-body, .filer_address'});
-    $('.btn_window_stack').off('click').on('click', () => {
-        $('.btn_window_stack').css('margin-left', '0px').hide();
-        $('.btn_window').css('margin-left', 'auto').show();
-        $('.btn_window_stack').parents('.modal-dialog').removeClass('modal-fullscreen');
+    $('.btn_window_stack').off('click').on('click', (ev) => {
+        const modal_dialog = $(ev.currentTarget).parents('.modal-dialog');
+        modal_dialog.find('.btn_window_stack').css('margin-left', '0px').hide();
+        modal_dialog.find('.btn_window').css('margin-left', 'auto').show();
+        modal_dialog.removeClass('modal-fullscreen');
     });
-    $('.btn_window').off('click').on('click', () => {
-        $('.btn_window_stack').css('margin-left', 'auto').show();
-        $('.btn_window').css('margin-left', '0px').hide();
-        $('.btn_window_stack').parents('.modal-dialog').css('top', '').css('left', '').addClass('modal-fullscreen');
+    $('.btn_window').off('click').on('click', (ev) => {
+        const modal_dialog = $(ev.currentTarget).parents('.modal-dialog');
+        modal_dialog.find('.btn_window_stack').css('margin-left', 'auto').show();
+        modal_dialog.find('.btn_window').css('margin-left', '0px').hide();
+        modal_dialog.css('top', '').css('left', '').addClass('modal-fullscreen');
     });
     $('.btn_window_stack').css('margin-left', '0px').hide();
     $('.btn_window').css('margin-left', 'auto').show();

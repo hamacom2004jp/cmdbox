@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import json
 
 
 class ClientFileList(feature.OneshotResultEdgeFeature):
@@ -54,6 +55,9 @@ class ClientFileList(feature.OneshotResultEdgeFeature):
                      description_ja="サーバーのデータフォルダ以下のパスを指定します。省略時は `/` を使用します。",
                      description_en="Specify the directory path to get the list of files.",
                      test_true={"server":"/"}),
+                dict(opt="fwpath", type=Options.T_STR, default=None, required=True, multi=True, hide=False, choice=None,
+                     description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合、このパスを指定したと解釈します。",
+                     description_en="Specify a path to determine whether the specified path is out of bounds. If it is not under this path, it is interpreted as having specified this path.",),
                 dict(opt="recursive", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
                      description_ja="指定したパスに含まれるフォルダについて、再帰的にファイルリストを取得します。",
                      description_en="Get a list of files recursively for a folder contained in the specified path.",
@@ -127,8 +131,10 @@ class ClientFileList(feature.OneshotResultEdgeFeature):
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
         client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
-        ret = cl.file_list(args.svpath.replace('"',''), recursive=args.recursive, scope=args.scope, client_data=client_data,
-                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
+        fwpaths = [p.replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
+        ret = cl.file_list(svpath=args.svpath.replace('"',''), recursive=args.recursive, scope=args.scope,
+                           client_data=client_data, fwpaths=fwpaths,
+                           retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:
@@ -160,20 +166,23 @@ class ClientFileList(feature.OneshotResultEdgeFeature):
         Returns:
             int: 終了コード
         """
-        svpath = convert.b64str2str(msg[2])
-        recursive = True if msg[3] == 'True' else False
-        st = self.file_list(msg[1], svpath, recursive, data_dir, logger, redis_cli, sessions)
+        payload = json.loads(convert.b64str2str(msg[2]))
+        svpath = payload.get('svpath', '/')
+        recursive = payload.get('recursive', False)
+        fwpaths = payload.get('fwpaths', None)
+        st = self.file_list(msg[1], svpath, recursive, fwpaths, data_dir, logger, redis_cli, sessions)
         return st
 
-    def file_list(self, reskey:str, current_path:str, recursive:bool,
+    def file_list(self, reskey:str, current_path:str, recursive:bool, fwpaths:List[str],
                   data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ファイルリストを取得する
 
         Args:
             reskey (str): レスポンスキー
-            path (str): ファイルパス
+            current_path (str): ファイルパス
             recursive (bool): 再帰的に取得するかどうか
+            fwpaths (List[str]): 範囲内かどうかを示すパスのリスト
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
@@ -184,7 +193,7 @@ class ClientFileList(feature.OneshotResultEdgeFeature):
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_list(current_path, recursive)
+            rescode, msg = f.file_list(current_path, recursive, fwpaths)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

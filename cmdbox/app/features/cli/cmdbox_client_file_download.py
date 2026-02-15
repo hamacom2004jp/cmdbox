@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import json
 
 
 class ClientFileDownload(feature.OneshotEdgeFeature):
@@ -56,6 +57,9 @@ class ClientFileDownload(feature.OneshotEdgeFeature):
                      test_true={"server":"/file_server",
                                 "client":"/file_client",
                                 "current":"/file_current"}),
+                dict(opt="fwpath", type=Options.T_STR, default=None, required=True, multi=True, hide=False, choice=None,
+                     description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合エラーにします。",
+                     description_en="Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.",),
                 dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="参照先スコープを指定します。指定可能な画像タイプは `client` , `current` , `server` です。",
                      description_en="Specifies the scope to be referenced. When omitted, 'client' is used.",
@@ -136,7 +140,9 @@ class ClientFileDownload(feature.OneshotEdgeFeature):
 
         client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
         download_file = Path(args.download_file.replace('"','')) if args.download_file is not None else None
-        ret = cl.file_download(args.svpath.replace('"',''), download_file, scope=args.scope, client_data=client_data, rpath=args.rpath, img_thumbnail=args.img_thumbnail,
+        fwpaths = [p.replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
+        ret = cl.file_download(args.svpath.replace('"',''), download_file, scope=args.scope, client_data=client_data,
+                               fwpaths=fwpaths, rpath=args.rpath, img_thumbnail=args.img_thumbnail,
                                retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
@@ -169,15 +175,18 @@ class ClientFileDownload(feature.OneshotEdgeFeature):
         Returns:
             int: 終了コード
         """
-        svpath = convert.b64str2str(msg[2])
-        if msg[3] == 'None':
+        payload = json.loads(convert.b64str2str(msg[2]))
+        svpath = payload.get("svpath")
+        fwpaths = payload.get("fwpaths")
+        img_thumbnail = payload.get("img_thumbnail", 0.0)
+        if img_thumbnail == 'None':
             img_thumbnail = 0.0
         else:
-            img_thumbnail = float(msg[3])
-        st = self.file_download(msg[1], svpath, img_thumbnail, data_dir, logger, redis_cli, sessions)
+            img_thumbnail = float(img_thumbnail)
+        st = self.file_download(msg[1], svpath, img_thumbnail, fwpaths, data_dir, logger, redis_cli, sessions)
         return st
 
-    def file_download(self, reskey:str, current_path:str, img_thumbnail:float,
+    def file_download(self, reskey:str, current_path:str, img_thumbnail:float, fwpaths:List[str],
                       data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ファイルをダウンロードする
@@ -185,6 +194,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature):
         Args:
             reskey (str): レスポンスキー
             current_path (str): ファイルパス
+            fwpaths (List[str]): 範囲内かどうかを示すパスのリスト
             img_thumbnail (float, optional): サムネイルサイズ. Defaults to 0.0.
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
@@ -196,7 +206,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature):
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_download(current_path, img_thumbnail)
+            rescode, msg = f.file_download(current_path, img_thumbnail, fwpaths)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

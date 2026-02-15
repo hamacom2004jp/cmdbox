@@ -57,4 +57,4 @@ class ListPipe(feature.WebFeature):
         opt = common.loadopt(web.cmds_path / f'cmd-{title}.json', True)
         if 'mode' not in opt or 'cmd' not in opt:
             return False
-        return web.signin.check_cmd(req, res, opt['mode'], opt['cmd'])
+        return web.signin.check_cmd(req, res, opt['mode'], opt['cmd'], opt)

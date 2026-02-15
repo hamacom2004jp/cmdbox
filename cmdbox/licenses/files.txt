@@ -139,6 +139,8 @@ OpenTelemetry Authors <cncf-opentelemetry-contributors@lists.cncf.io>	Apache-2.0
 Donald Stufft <donald@stufft.io>	Apache-2.0 OR BSD-2-Clause	packaging	https://github.com/pypa/packaging	26.0	cmdbox\licenses\LICENSE_packaging_26_0_Apache-2_0_OR_BSD-2-Clause.txt
 Artur Maciag	Apache Software License	pathable	https://github.com/p1c2u/pathable	0.4.4	cmdbox\licenses\LICENSE_pathable_0_4_4_Apache_Software_License.txt
 Tsuyoshi Hombashi	MIT License	pathvalidate	https://github.com/thombashi/pathvalidate	3.3.1	cmdbox\licenses\LICENSE_pathvalidate_3_3_1_MIT_License.txt
+Yusuke Shinyama, Pieter Marsman	MIT	pdfminer.six	https://github.com/pdfminer/pdfminer.six	20251230	cmdbox\licenses\LICENSE_pdfminer_six_20251230_MIT.txt
+Jeremy Singer-Vine	MIT License	pdfplumber	https://github.com/jsvine/pdfplumber	0.11.9	cmdbox\licenses\LICENSE_pdfplumber_0_11_9_MIT_License.txt
 "Jeffrey A. Clark" <aclark@aclark.net>	MIT-CMU	pillow	https://python-pillow.github.io	12.1.0	cmdbox\licenses\LICENSE_pillow_12_1_0_MIT-CMU.txt
 The pip developers <distutils-sig@python.org>	MIT License	pip	https://pip.pypa.io/	24.0	cmdbox\licenses\LICENSE_pip_24_0_MIT_License.txt
 UNKNOWN	MIT	platformdirs	https://github.com/tox-dev/platformdirs	4.5.1	cmdbox\licenses\LICENSE_platformdirs_4_5_1_MIT.txt
@@ -164,6 +166,7 @@ Samuel Colvin <s@muelcolvin.com>, Eric Jolibois <em.jolibois@gmail.com>, Hasan R
 Samuel Colvin <s@muelcolvin.com>, Adrian Garcia Badaracco <1755071+adriangb@users.noreply.github.com>, David Montague <david@pydantic.dev>, David Hewitt <mail@davidhewitt.dev>, Sydney Runkle <sydneymarierunkle@gmail.com>, Victorien Plot <contact@vctrn.dev>	MIT	pydantic_core	https://github.com/pydantic/pydantic-core	2.41.5	cmdbox\licenses\LICENSE_pydantic_core_2_41_5_MIT.txt
 Chris Guidry <guid@omg.lol>	MIT License	pydocket	https://github.com/chrisguidry/docket	0.16.6	cmdbox\licenses\LICENSE_pydocket_0_16_6_MIT_License.txt
 Paul McGuire <ptmcg.gm+pyparsing@gmail.com>	MIT	pyparsing	https://github.com/pyparsing/pyparsing/	3.3.2	cmdbox\licenses\LICENSE_pyparsing_3_3_2_MIT.txt
+pypdfium2-team	BSD-3-Clause, Apache-2.0, dependency licenses	pypdfium2	https://github.com/pypdfium2-team/pypdfium2	5.4.0	cmdbox\licenses\LICENSE_pypdfium2_5_4_0_BSD-3-Clause-Apache-2_0-dependency_licenses.txt
 Al Sweigart <al@inventwithpython.com>	BSD License	pyperclip	https://github.com/asweigart/pyperclip	1.11.0	cmdbox\licenses\LICENSE_pyperclip_1_11_0_BSD_License.txt
 Thomas Kluyver <thomas@kluyver.me.uk>	MIT License	pyproject_hooks	https://github.com/pypa/pyproject-hooks	1.2.0	cmdbox\licenses\LICENSE_pyproject_hooks_1_2_0_MIT_License.txt
 Moses Palmér	GNU Lesser General Public License v3 (LGPLv3)	pystray	https://github.com/moses-palmer/pystray	0.19.5	cmdbox\licenses\LICENSE_pystray_0_19_5_GNU_Lesser_General_Public_License_v3-LGPLv3.txt

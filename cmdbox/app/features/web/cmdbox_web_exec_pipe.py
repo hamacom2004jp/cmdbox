@@ -71,7 +71,7 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                             msg = f'Command "{cmd_title}" failed. This command is not available in web mode.'
                             self.callback_return_pipe_exec_func(web, title, dict(warn=msg))
                             raise HTTPException(401, detail=msg)
-                        if not web.signin.check_cmd(req, res, cmd_opt['mode'], cmd_opt['cmd']):
+                        if not web.signin.check_cmd(req, res, cmd_opt['mode'], cmd_opt['cmd'], opt):
                             msg = f'Command "{cmd_title}" failed. Execute command denyed. mode={cmd_opt["mode"]}, cmd={cmd_opt["cmd"]}'
                             self.callback_return_pipe_exec_func(web, title, dict(warn=msg))
                             raise HTTPException(401, detail=msg)

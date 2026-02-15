@@ -64,9 +64,9 @@
             </div>
 
             <div class="footer-controls">
-                <button id="btn_histories" class="btn btn-footer-action btn-footer-action-ps0" data-bs-toggle="modal" data-bs-target="#sessionModal">
-                    <i class="fas fa-history fa-lg"></i>
-                    <span>HISTORIES</span>
+                <button id="btn_filetrancefer" class="btn btn-footer-action btn-footer-action-ps0" data-bs-toggle="modal" data-bs-target="#fileTranceferModal">
+                    <i class="fa-solid fa-folder-open fa-lg"></i>
+                    <span>Files</span>
                 </button>
                 <button id="btn_memories" class="btn btn-footer-action btn-footer-action-ps0" data-bs-toggle="modal" data-bs-target="#memoryModal">
                     <i class="fas fa-brain fa-lg"></i>
@@ -431,19 +431,61 @@
     </div>
 </div>
 
-<!-- セッションモーダル -->
-<div id="sessionModal" class="modal fade" tabindex="-1" aria-hidden="true">
+<!-- メモリーモーダル -->
+<div id="memoryModal" class="modal fade" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content sf-modal doc-card" style="height:auto;">
             <div class="modal-header doc-header">
-                <h5 class="modal-title glow-text-cyan system-font">SESSION ARCHIVES</h5>
+                <h5 class="modal-title glow-text-cyan system-font">MEMORY AND SESSIONS</h5>
                 <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
                     <i class="fas fa-times fa-lg"></i>
                 </button>
             </div>
             <div class="modal-body">
-                <ul class="sf-list-group">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#memory_tab" href="#">
+                            <i class="fas fa-brain fa-lg"></i>
+                            MEMORY
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#session_tab" href="#">
+                            <i class="fas fa-history fa-lg"></i>
+                            SESSIONS
+                        </a>
+                    </li>
                 </ul>
+                <div class="tab-content p-1">
+                    <div id="memory_tab" class="tab-pane active">
+                        <div class="sf-param-grid mb-3">
+                            <div class="sf-param-box">
+                                <div class="text-white-50" style="font-size: 0.8rem;">REFERENCE_RANGE</div>
+                                <div class="d-flex fs-5 system-font glow-text-cyan mt-2">
+                                    <div id="memory_range_start">---</div>
+                                    <div class="mx-1">~</div>
+                                    <div id="memory_range_end">---</div>
+                                </div>
+                            </div>
+                            <div class="sf-param-box">
+                                <div class="text-white-50" style="font-size: 0.8rem;">USAGE_RATIO</div>
+                                <div class="fs-2 text-end system-font glow-text-magenta d-flex">
+                                    <div id="memory_performance">---</div>
+                                </div>
+                            </div>
+                        </div>
+                        <h6 class="glow-text-cyan system-font mt-4 mb-2">
+                            <i class="fa-regular fa-address-card fa-lg mx-2"></i>USER_PROFILE_ANALYSIS
+                        </h6>
+                        <div class="p-3 border border-secondary bg-black bg-opacity-25" style="font-family: var(--font-body);">
+                            <p id="memory_content" class="mb-2"><strong>Loading..</strong></p>
+                        </div>
+                    </div>
+                    <div id="session_tab" class="tab-pane">
+                        <ul class="sf-list-group">
+                        </ul>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
@@ -452,57 +494,7 @@
     </div>
 </div>
 
-<!-- メモリーモーダル -->
-<div id="memoryModal" class="modal fade" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content sf-modal doc-card" style="height:auto;">
-            <div class="modal-header doc-header">
-                <h5 class="modal-title glow-text-magenta system-font">MEMORY SYNC STATUS</h5>
-                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="sf-param-grid mb-3">
-                    <div class="sf-param-box">
-                        <div class="text-white-50" style="font-size: 0.8rem;">REFERENCE_RANGE</div>
-                        <div class="d-flex fs-5 system-font glow-text-cyan mt-2">
-                            <div id="memory_range_start">---</div>
-                            <div class="mx-1">~</div>
-                            <div id="memory_range_end">---</div>
-                        </div>
-                    </div>
-                    <div class="sf-param-box">
-                        <div class="text-white-50" style="font-size: 0.8rem;">USAGE_RATIO</div>
-                        <div class="fs-2 text-end system-font glow-text-magenta d-flex">
-                            <!--<div class="fs-6 text-white-50 me-auto">
-                                <div class="form-check">
-                                    <input class="form-check-input" name="memory_performance" type="radio" id="memory_performance_coverage" checked/>
-                                    <label class="form-check-label" for="memory_performance_coverage" style="font-size: 0.8rem;">COVERAGE</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" name="memory_performance" type="radio" id="memory_performance_accuracy" />
-                                    <label class="form-check-label" for="memory_performance_accuracy" style="font-size: 0.8rem;">ACCURACY</label>
-                                </div>
-                            </div>-->
-                            <div id="memory_performance">---</div>
-                        </div>
-                    </div>
-                </div>
-                <h6 class="glow-text-cyan system-font mt-4 mb-2">
-                    <i class="fas fa-file-alt me-2"></i>USER_PROFILE_ANALYSIS
-                </h6>
-                <div class="p-3 border border-secondary bg-black bg-opacity-25" style="font-family: var(--font-body);">
-                    <p id="memory_content" class="mb-2"><strong>Loading..</strong></p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- ファイラーモーダル -->
+<!-- オプション選択用ファイラーモーダル -->
 <div id="filer_modal" class="modal" style="z-index: 2000;" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <form id="filer_form" class="modal-content novalidate">
@@ -540,6 +532,131 @@
         </form>
     </div>
 </div>
+
+<!-- ファイル転送モーダル -->
+<div id="fileTranceferModal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+        <div class="modal-content sf-modal doc-card">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan system-font">Files</h5>
+                <button type="button" class="btn btn-sf-icon btn_window_stack">
+                    <i class="fa-regular fa-window-restore"></i>
+                </button>
+                <button type="button" class="btn btn-sf-icon btn_window">
+                    <i class="fa-regular fa-window-maximize"></i>
+                </button>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="main_container" class="container-fluid overflow-auto split-pane fixed-left" style="height:100%;">
+                    <!-- ローカル側ペイン -->
+                    <div id="left_container" class="split-pane-component filer-pane-left" style="width:49%;">
+                        <div class="split-pane fixed-top">
+                            <div class="split-pane-component filer-pane-left-top" style="height:45%;">
+                                <!-- ローカル側アドレスバー -->
+                                <div class="input-group p-1" style="top:0%;">
+                                    <button class="btn btn-outline-secondary filer_local_bot" type="button">Local</button>'
+                                    <input type="text" class="form-control filer_address" readonly>
+                                </div>
+                                <!-- ローカル側ツリー -->
+                                <ul class="tree-menu tree_ul overflow-auto border w-100" style="height:calc(100% - 50px);"></ul>
+                            </div>
+                            <!-- 上下のスプリッター -->
+                            <div class="split-pane-divider filer-pane-divider" style="top:45%;"></div>
+                            <!-- ローカル側ファイルリスト -->
+                            <div class="split-pane-component filer-pane-left-bottom file-list drop-area overflow-auto p-1" style="top:45%;">
+                                <table class="table table-bordered table-hover table-sm">
+                                    <thead><tr>
+                                        <th class="th" scope="col">-</th>
+                                        <th class="th" scope="col">name</th>
+                                        <th class="th" scope="col">mime</th>
+                                        <th class="th" scope="col">size</th>
+                                        <th class="th" scope="col">last</th>
+                                    </tr></thead><tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 左右のスプリッター -->
+                    <div class="split-pane-divider filer-pane-divider" style="left:49%;"></div>
+                    <!-- サーバー側ペイン -->
+                    <div id="right_container" class="split-pane-component filer-pane-right" style="left:49%;">
+                        <div class="split-pane fixed-top">
+                            <div class="split-pane-component filer-pane-right-top" style="height:45%;">
+                                <!-- サーバー側アドレスバー -->
+                                <div class="input-group p-1" style="top:0%;">
+                                    <button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Server</button>
+                                    <input name="filer_host" type="hidden" class="filer_host">
+                                    <input name="filer_port" type="hidden" class="filer_port">
+                                    <input name="filer_password" type="hidden" class="filer_password">
+                                    <input name="filer_svname" type="hidden" class="filer_svname">
+                                    <input name="filer_scope" type="hidden" class="filer_scope">
+                                    <input name="filer_client_data" type="hidden" class="filer_client_data">
+                                    <ul class="dropdown-menu filer_server"></ul>
+                                    <input type="text" class="form-control filer_address" aria-describedby="button-addon2">
+                                    <button class="btn btn-outline-secondary filer_address_bot" type="button" id="button-addon2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <!-- サーバー側ツリー -->
+                                <ul class="tree-menu tree_ul overflow-auto border w-100" style="height:calc(100% - 50px);"></ul>
+                            </div>
+                            <!-- 上下のスプリッター -->
+                            <div class="split-pane-divider filer-pane-divider" style="top:45%;"></div>
+                            <!-- サーバー側ファイルリスト -->
+                            <div class="split-pane-component filer-pane-right-bottom file-list drop-area overflow-auto p-1" style="top:45%;">
+                                <table class="table table-bordered table-hover table-sm">
+                                    <thead><tr>
+                                        <th class="th" scope="col">-</th>
+                                        <th class="th" scope="col">name</th>
+                                        <th class="th" scope="col">mime</th>
+                                        <th class="th" scope="col">size</th>
+                                        <th class="th" scope="col">last</th>
+                                    </tr></thead><tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <a class="filer_download d-none" href="#">.</a>
+                </div>
+                <!-- プログレスバー -->
+                <div id="progress" class="progress p-0 d-none" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="align-items:center;width: 0%">
+                        <div class="progress-bar-text text-start w-50"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ビューアモーダル -->
+<div id="viewer_modal" class="modal" style="z-index:2000;" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <dic class="modal-content novalidate">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan system-font">Viwer</h5>
+                <button type="button" class="btn btn-sf-icon btn_window_stack">
+                    <i class="fa-regular fa-window-restore"></i>
+                </button>
+                <button type="button" class="btn btn-sf-icon btn_window">
+                    <i class="fa-regular fa-window-maximize"></i>
+                </button>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ローディングマスク -->
 <div id="loading" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(0, 0, 0, 0.3);z-index:10000;">
     <div class="text-center position-absolute top-50 start-50 w-100 translate-middle">
@@ -559,15 +676,25 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Agent Logic Script -->
+<link rel="stylesheet" href="assets/lightbox2/css/lightbox.min.css">
+<link rel="stylesheet" href="assets/tree-menu/css/tree-menu.css">
 <link rel="stylesheet" href="assets/split-pane/split-pane.css">
+<link rel="stylesheet" href="assets/highlight/styles/tokyo-night-dark.min.css">
+<link rel="stylesheet" href="assets/jquery-linedtextarea/jquery-linedtextarea.css">
+<script type="text/javascript" src="assets/encodingjs/encoding.js"></script>
 <script type="text/javascript" src="assets/jquery/jquery.min.3.2.0.js"></script>
 <script type="text/javascript" src="assets/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="assets/tree-menu/js/tree-menu.js"></script>
+<script type="text/javascript" src="assets/lightbox2/js/lightbox.min.js"></script>
 <script type="text/javascript" src="assets/split-pane/split-pane.js"></script>
+<script type="text/javascript" src="assets/highlight/highlight.min.js"></script>
+<script type="text/javascript" src="assets/jquery-linedtextarea/jquery-linedtextarea.js"></script>
 <script type="text/javascript" src="assets/cmdbox/svgicon.js"></script>
 <script type="text/javascript" src="assets/cmdbox/common.js"></script>
 <script type="text/javascript" src="assets/cmdbox/filer_modal.js"></script>
 <script type="text/javascript" src="assets/cmdbox/view_result.js"></script>
 <script type="text/javascript" src="assets/agent/agent.js"></script>
+<script type="text/javascript" src="assets/filer/filer.js"></script>
 <script type="text/javascript" src="assets/agent/main.js"></script>
 </body>
 </html>

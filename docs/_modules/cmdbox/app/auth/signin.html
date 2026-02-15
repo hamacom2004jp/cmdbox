@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.auth.signin &mdash; cmdbox 2026/02/04 documentation</title>
+  <title>cmdbox.app.auth.signin &mdash; cmdbox 2026/02/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=fd547c84"></script>
+      <script src="../../../../_static/documentation_options.js?v=3de328d9"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -93,6 +93,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jwt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">string</span>
 
 
@@ -457,6 +458,10 @@
                 <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;signin_file format error. &quot;groups&quot; not found or not list type. (</span><span class="si">{</span><span class="n">signin_file</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">ug</span> <span class="k">for</span> <span class="n">ug</span> <span class="ow">in</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">ug</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;signin_file format error. Group not found. (</span><span class="si">{</span><span class="n">signin_file</span><span class="si">}</span><span class="s1">). </span><span class="si">{</span><span class="n">user</span><span class="p">[</span><span class="s2">&quot;groups&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;home&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user</span> <span class="ow">or</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">user</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;/users/</span><span class="si">{</span><span class="n">user</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="k">if</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+                <span class="n">user</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^/+&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">])</span>
             <span class="n">uids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">])</span>
             <span class="n">unames</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
         <span class="c1"># groupsのフォーマットチェック</span>
@@ -476,6 +481,10 @@
             <span class="k">if</span> <span class="s1">&#39;parent&#39;</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;parent&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;signin_file format error. Parent group not found. (</span><span class="si">{</span><span class="n">signin_file</span><span class="si">}</span><span class="s1">). parent=</span><span class="si">{</span><span class="n">group</span><span class="p">[</span><span class="s2">&quot;parent&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;home&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">group</span> <span class="ow">or</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">group</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;/groups/</span><span class="si">{</span><span class="n">group</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="k">if</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+                <span class="n">group</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^/+&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">])</span>
             <span class="n">gids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;gid&#39;</span><span class="p">])</span>
             <span class="n">gnames</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
         <span class="c1"># cmdruleのフォーマットチェック</span>
@@ -503,6 +512,8 @@
                 <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="s1">&#39;cmds&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rule</span><span class="p">:</span>
                 <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;cmds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="s1">&#39;coercion&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rule</span><span class="p">:</span>
+                <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;coercion&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">if</span> <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">rule</span><span class="p">[</span><span class="s1">&#39;cmds&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;signin_file format error. When “cmds” is specified, “mode” must be specified. (</span><span class="si">{</span><span class="n">signin_file</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">rule</span><span class="p">[</span><span class="s1">&#39;cmds&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
@@ -791,6 +802,23 @@
         <span class="k">return</span> <span class="n">group_names</span> <span class="o">+</span> <span class="n">gns</span></div>
 
 
+<div class="viewcode-block" id="Signin.group_home">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.auth.html#cmdbox.app.auth.signin.Signin.group_home">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">group_home</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">signin_file_data</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">group_names</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        グループ名のホームを取得します</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            signin_file_data (Dict[str, Any]): サインインファイルデータ</span>
+<span class="sd">            group_names (List[str]): グループ名リスト</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ghs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">gn</span> <span class="ow">in</span> <span class="n">group_names</span><span class="o">.</span><span class="n">copy</span><span class="p">():</span>
+            <span class="n">ghs</span> <span class="o">+=</span> <span class="p">[</span><span class="n">gr</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">gr</span> <span class="ow">in</span> <span class="n">signin_file_data</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;home&#39;</span> <span class="ow">in</span> <span class="n">gr</span> <span class="ow">and</span> <span class="n">gr</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">gn</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">ghs</span></div>
+
+
 <div class="viewcode-block" id="Signin.check_path">
 <a class="viewcode-back" href="../../../../resources/cmdbox.app.auth.html#cmdbox.app.auth.signin.Signin.check_path">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">check_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">RedirectResponse</span><span class="p">]:</span>
@@ -845,7 +873,7 @@
 
 <div class="viewcode-block" id="Signin.check_cmd">
 <a class="viewcode-back" href="../../../../resources/cmdbox.app.auth.html#cmdbox.app.auth.signin.Signin.check_cmd">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">check_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        コマンドの認可をチェックします</span>
 
@@ -854,6 +882,7 @@
 <span class="sd">            res (Response): レスポンス</span>
 <span class="sd">            mode (str): モード</span>
 <span class="sd">            cmd (str): コマンド</span>
+<span class="sd">            opt (Dict[str, Any], optional): オプション. Defaults to {}.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: 認可されたかどうか</span>
@@ -863,7 +892,7 @@
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="s1">&#39;signin&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span> <span class="ow">or</span> <span class="s1">&#39;groups&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">]:</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="n">Signin</span><span class="o">.</span><span class="n">_check_cmd</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;groups&#39;</span><span class="p">],</span> <span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Signin</span><span class="o">.</span><span class="n">_check_cmd</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;groups&#39;</span><span class="p">],</span> <span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Signin.load_groups">
@@ -898,7 +927,8 @@
 
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_check_cmd</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">signin_file_data</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">user_groups</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_cmd</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">signin_file_data</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">user_groups</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+                   <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">user_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        コマンドの認可をチェックします</span>
 
@@ -907,6 +937,7 @@
 <span class="sd">            user_groups (List[str]): ユーザグループ</span>
 <span class="sd">            mode (str): モード</span>
 <span class="sd">            cmd (str): コマンド</span>
+<span class="sd">            opt (Dict[str, Any]): オプション</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: 認可されたかどうか</span>
@@ -925,6 +956,10 @@
                     <span class="k">continue</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;cmds&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">cmd</span> <span class="o">==</span> <span class="n">c</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">continue</span>
+            <span class="c1"># コマンドオプションの強制設定</span>
+            <span class="k">if</span> <span class="s1">&#39;coercion&#39;</span> <span class="ow">in</span> <span class="n">rule</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;coercion&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">opt</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">{},</span> <span class="nb">dict</span><span class="p">(</span><span class="n">user_name</span><span class="o">=</span><span class="n">user_name</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">user_groups</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="n">cmd</span><span class="p">))</span>
             <span class="n">jadge</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;rule&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cmd rule: mode=</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">, cmd=</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">jadge</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

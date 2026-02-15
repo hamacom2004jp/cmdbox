@@ -168,6 +168,7 @@ class RagSave(feature.OneshotResultEdgeFeature):
         payload = dict(
             rag_name=args.rag_name,
             rag_type=args.rag_type,
+            extract=list(set(args.extract)) if hasattr(args, 'extract') and args.extract is not None else None,
             embed=args.embed if hasattr(args, 'embed') else None,
             vector_store_pghost=args.vector_store_pghost if hasattr(args, 'vector_store_pghost') else None,
             vector_store_pgport=args.vector_store_pgport if hasattr(args, 'vector_store_pgport') else None,
