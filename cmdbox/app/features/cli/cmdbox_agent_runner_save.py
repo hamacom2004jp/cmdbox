@@ -92,6 +92,16 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature):
                             + "}",
                     description_ja="Runnerが参照するメモリー設定名を指定します。",
                     description_en="Specify the Memory configuration name referenced by the Runner."),
+                dict(opt="rag", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=[],
+                    callcmd="async () => {await cmdbox.callcmd('rag','list',{},(res)=>{"
+                            + "const val = $(\"[name='rag']\").val();"
+                            + "$(\"[name='rag']\").empty().append('<option></option>');"
+                            + "res['data'].map(elm=>{$(\"[name='rag']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
+                            + "$(\"[name='rag']\").val(val);"
+                            + "},$(\"[name='title']\").val(),'rag');"
+                            + "}",
+                    description_ja="Runnerが参照するRAG設定名を指定します。",
+                    description_en="Specify the RAG configuration name referenced by the Runner."),
                 dict(opt="voicevox_model", type=Options.T_STR, default=None, required=False, multi=False, hide=False,
                      choice=sorted([v['select'] for v in cmdbox_tts_say.TtsSay.VOICEVOX_STYLE.values()]),
                      choice_edit=True,
@@ -168,6 +178,7 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature):
             tts_engine=args.tts_engine if hasattr(args, 'tts_engine') else None,
             voicevox_model=args.voicevox_model if hasattr(args, 'voicevox_model') else None,
             memory=args.memory if hasattr(args, 'memory') else None,
+            rag=list(set(args.rag)) if hasattr(args, 'rag') and args.rag is not None else None,
             session_store_type=args.session_store_type if hasattr(args, 'session_store_type') else None,
             session_store_pghost=args.session_store_pghost if hasattr(args, 'session_store_pghost') else None,
             session_store_pgport=args.session_store_pgport if hasattr(args, 'session_store_pgport') else None,

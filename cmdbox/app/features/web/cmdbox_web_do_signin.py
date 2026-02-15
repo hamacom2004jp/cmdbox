@@ -102,7 +102,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                     web.logger.warning(f'Failed to signin. name={name}, pass_miss_count={pass_miss_count+1}')
                     web.options.audit_exec(req, res, web, body=dict(msg='Wrong password.'), audit_type='auth', user=name)
                     return RedirectResponse(url=f'/signin/{next}?error=1')
-            group_names = list(set(web.signin.__class__.correct_group(signin_data, user['groups'], None)))
+            group_names = list(set(web.signin.__class__.parent_group(signin_data, user['groups'])))
             group_homes = list(set(web.signin.__class__.group_home(signin_data, group_names)))
             gids = [g['gid'] for g in signin_data['groups'] if g['name'] in group_names]
             email = user.get('email', '')

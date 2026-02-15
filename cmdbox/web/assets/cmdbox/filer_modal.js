@@ -127,10 +127,8 @@ fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_di
     filer_modal.modal('show');
     cmdbox.get_server_opt(true, fmodal.left).then(() => {
         cmdbox.load_server_list(fmodal.left, (opt) => {
-            if (is_current) {
-                filer_modal.find('.filer_server_bot').attr('disabled', true).removeClass('dropdown-toggle');
-                current_path = current_path ? current_path : '.';
-            }
+            //filer_modal.find('.filer_server_bot').attr('disabled', is_current).removeClass('dropdown-toggle');
+            current_path = current_path ? current_path : '/';
             reload_tree(target_id, filer_modal.find('.tree-menu'), current_path, filer_modal.find('.file-list'), is_current);
         }, false, is_current);
     });

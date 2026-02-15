@@ -1510,7 +1510,9 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
             // tid, tnの値を残すためにクロージャーにする
             return () => {
                 const current_path = $(`[id="${tid}"]`).val();
-                fmodal.filer_modal_func(tid, tn, current_path, false, true);
+                const scope = cmd_modal.find(`[name*="scope"]`);
+                const is_current = scope.length<=0 || scope.val()=='current';
+                fmodal.filer_modal_func(tid, tn, current_path, false, is_current);
             }
         }
         btn.click(mk_func(input_elem.attr('id'), input_elem.attr('name')));
@@ -1523,7 +1525,9 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
             // tid, tnの値を残すためにクロージャーにする
             return () => {
                 const current_path = $(`[id="${tid}"]`).val();
-                fmodal.filer_modal_func(tid, tn, current_path, true, true);
+                const scope = cmd_modal.find(`[name*="scope"]`);
+                const is_current = scope.length<=0 || scope.val()=='current';
+                fmodal.filer_modal_func(tid, tn, current_path, true, is_current);
             }
         }
         btn.click(mk_func(input_elem.attr('id'), input_elem.attr('name')));

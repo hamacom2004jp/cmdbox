@@ -86,7 +86,7 @@ class Signin(object):
             Tuple[List[str], List[int]]: (グループ名, グループID)
         """
         copy_signin_data = copy.deepcopy(self.signin_file_data)
-        group_names = list(set(self.__class__.correct_group(copy_signin_data, user['groups'], None)))
+        group_names = list(set(self.__class__.parent_group(copy_signin_data, user['groups'])))
         gids = [g['gid'] for g in copy_signin_data['groups'] if g['name'] in group_names]
         return group_names, gids
 
@@ -239,7 +239,7 @@ class Signin(object):
             logger.warning(f"No matching user found for apikey.")
             return RedirectResponse(url=f'/signin{req.url.path}?error=apikeyfail')
 
-        group_names = list(set(Signin.correct_group(signin_file_data, find_user['groups'], None)))
+        group_names = list(set(Signin.parent_group(signin_file_data, find_user['groups'])))
         gids = [g['gid'] for g in signin_file_data['groups'] if g['name'] in group_names]
         req.session['signin'] = dict(uid=find_user['uid'], name=find_user['name'], password=find_user['password'],
                                      gids=gids, groups=group_names, apikeys=find_user.get('apikeys', None), apikey=apikey)
@@ -688,6 +688,24 @@ class Signin(object):
         return group_names + gns
 
     @classmethod
+    def parent_group(cls, signin_file_data:Dict[str, Any], group_names:List[str], master_groups:List[Dict[str, Any]]=None) -> List[str]:
+        """
+        指定されたグループ名が属する親グループ名を収集します
+
+        Args:
+            signin_file_data (Dict[str, Any]): サインインファイルデータ
+            group_names (List[str]): グループ名リスト
+            master_groups (List[Dict[str, Any]], optional): 親グループ名. Defaults to None.
+        """
+        copy_signin_data = copy.deepcopy(dict(groups=signin_file_data['groups']))
+        master_groups = copy_signin_data['groups'] if master_groups is None else master_groups
+        gns = []
+        for gn in group_names.copy():
+            gns = [gr['parent'] for gr in master_groups if 'parent' in gr and gr['name']==gn]
+            gns += cls.parent_group(copy_signin_data, gns, master_groups)
+        return group_names + gns
+
+    @classmethod
     def group_home(cls, signin_file_data:Dict[str, Any], group_names:List[str]) -> List[str]:
         """
         グループ名のホームを取得します
@@ -796,7 +814,7 @@ class Signin(object):
             logger.warning(f"No matching user found for apikey.")
             return dict(warn='No matching user found for apikey.')
 
-        group_names = list(set(Signin.correct_group(signin_file_data, find_user['groups'], None)))
+        group_names = list(set(Signin.parent_group(signin_file_data, find_user['groups'])))
         return dict(success=group_names)
 
     @classmethod

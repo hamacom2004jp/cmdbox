@@ -429,6 +429,7 @@ Save runner configuration. : `cmdbox -m agent -c runner_save <Option>`
     "--agent <name>","Yes","Agent configuration name or reference."
     "--tts_engine <engine>","","Specify the TTS engine to use."
     "--memory <name>","","Specify the Memory configuration name referenced by the Runner."
+    "--rag <name>","","Specify the RAG configuration name referenced by the Runner."
     "--voicevox_model <model>","","Specify the model of the TTS engine to use."
     "--session_store_type <type>","","Specify how the bot's session is stored."
     "--session_store_pghost <host>","","Specify the postgresql host for session store."

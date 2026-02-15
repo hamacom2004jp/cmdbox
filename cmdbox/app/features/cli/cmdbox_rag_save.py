@@ -89,10 +89,10 @@ class RagSave(feature.OneshotResultEdgeFeature):
                      description_ja="RAGの種類を指定します。",
                      description_en="Specify the type of RAG."),
                 dict(opt="extract", type=Options.T_STR, default=None, required=True, multi=True, hide=False, choice=[],
-                     callcmd="async () => {await cmdbox.callcmd('cmd','list',{match_mode:'extract'},(res)=>{"
+                     callcmd="async () => {await cmdbox.callcmd('extract','list',{},(res)=>{"
                              + "const val = $(\"[name='extract']\").val();"
                              + "$(\"[name='extract']\").empty().append('<option></option>');"
-                             + "res.forEach(row=>{$(\"[name='extract']\").append('<option value=\"'+row[\"title\"]+'\">'+row[\"title\"]+'</option>');});"
+                             + "res['data'].map(elm=>{$(\"[name='extract']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
                              + "$(\"[name='extract']\").val(val);"
                              + "},$(\"[name='title']\").val(),'extract');"
                              + "}",

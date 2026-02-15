@@ -310,6 +310,7 @@ class Web:
                         u['apikeys'][an] = (ak, '-', str(e))
                     except Exception as e:
                         u['apikeys'][an] = (ak, '-', '-')
+            u['groups'] = list(set(self.signin.parent_group(signin_data, u['groups'])))
             if u['name'] == name:
                 return [u]
             signin_last = self.user_data(None, u['uid'], u['name'], 'signin', 'last_update')

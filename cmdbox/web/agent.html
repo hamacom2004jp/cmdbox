@@ -22,7 +22,9 @@
             <h5 class="d-inline-block m-0 glow-text-cyan system-font">
                 <span class="d-flex align-items-center">
                     <i class="fas fa-terminal me-2"></i>
-                    <span id="logo_title">LOG_INTERFACE</span>
+                    <span id="display_runner_name" style="cursor: pointer;" title="Click to select runner">
+                        Click Here
+                    </span>
                 </span>
             </h5>
             <div class="d-none dropdown user_info" style="font-size: 0.8rem;">
@@ -91,9 +93,7 @@
     <!-- Center AI Core (Default View) -->
     <div class="ai-core-container" id="aiCoreContainer">
         <div class="ai-core text-nowrap">
-            <span id="display_runner_name" class="core-text" style="cursor: pointer;" title="Click to select runner">
-                Click Here
-            </span>
+            <span id="logo_title" class="core-text">---</span>
         </div>
         <div class="ai-core-msg text-nowrap">
             <span id="display_runner_msg" class="glow-text-cyan system-font" style="font-size: 0.8rem; letter-spacing: 5px; white-space:nowrap;">
@@ -127,8 +127,9 @@
                             <a href="#" class="list-group-item list-group-item-action" data-bs-target="#embedding_settings">Embedding Settings</a>
                             <a href="#" class="list-group-item list-group-item-action" data-bs-target="#memory_settings">Memory Settings</a>
                             <a href="#" class="list-group-item list-group-item-action" data-bs-target="#mcpsv_settings">MCPSV Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#runner_settings">Runner Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#extract_settings">Extract Settings</a>
                             <a href="#" class="list-group-item list-group-item-action" data-bs-target="#rag_settings">RAG Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#runner_settings">Runner Settings</a>
                             <a href="#" class="list-group-item list-group-item-action" data-bs-target="#tts_settings">TTS Settings</a>
                         </div>
                     </div>
@@ -207,6 +208,18 @@
                                 </div>
                                 <div id="rag_list_container" class="list-group">
                                     <!-- RAG List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="extract_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">Extract Settings</h6>
+                                    <button id="btn_add_extract" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        Add Setting
+                                    </button>
+                                </div>
+                                <div id="extract_list_container" class="list-group">
+                                    <!-- Extract List Items will be injected here -->
                                 </div>
                             </div>
                             <div id="memory_settings" class="settings-content d-none">
@@ -382,6 +395,28 @@
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
                 <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_rag" style="display:none;">DELETE</button>
                 <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_rag">SAVE</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Extract追加/編集モーダル -->
+<div id="extract_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content sf-modal doc-card" style="height:auto;">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan system-font">Add/Edit Extract</h5>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form_extract_edit" class="row"></form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_extract" style="display:none;">DELETE</button>
+                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_extract">SAVE</button>
             </div>
         </div>
     </div>
@@ -630,6 +665,10 @@
                     </div>
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_regist_rag">Start registering files to RAG</button>
+            </div>
         </div>
     </div>
 </div>
@@ -694,6 +733,18 @@
 <script type="text/javascript" src="assets/cmdbox/filer_modal.js"></script>
 <script type="text/javascript" src="assets/cmdbox/view_result.js"></script>
 <script type="text/javascript" src="assets/agent/agent.js"></script>
+<script type="text/javascript" src="assets/agent/agent_chat.js"></script>
+<script type="text/javascript" src="assets/agent/agent_document.js"></script>
+<script type="text/javascript" src="assets/agent/agent_history.js"></script>
+<script type="text/javascript" src="assets/agent/agent_settings_agent.js"></script>
+<script type="text/javascript" src="assets/agent/agent_settings_embed.js"></script>
+<script type="text/javascript" src="assets/agent/agent_settings_extract.js"></script>
+<script type="text/javascript" src="assets/agent/agent_settings_llm.js"></script>
+<script type="text/javascript" src="assets/agent/agent_settings_mcpsv.js"></script>
+<script type="text/javascript" src="assets/agent/agent_settings_memory.js"></script>
+<script type="text/javascript" src="assets/agent/agent_settings_rag.js"></script>
+<script type="text/javascript" src="assets/agent/agent_settings_runner.js"></script>
+<script type="text/javascript" src="assets/agent/agent_settings_tts.js"></script>
 <script type="text/javascript" src="assets/filer/filer.js"></script>
 <script type="text/javascript" src="assets/agent/main.js"></script>
 </body>

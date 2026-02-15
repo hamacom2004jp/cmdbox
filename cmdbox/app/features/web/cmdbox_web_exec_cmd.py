@@ -121,7 +121,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         web.container['cmdbox_app'] = ap = appcls.getInstance(appcls=appcls, ver=self.ver)
         if 'mode' in opt and 'cmd' in opt:
             if not web.signin.check_cmd(req, res, opt['mode'], opt['cmd'], opt):
-                return dict(warn=f'Command "{title}" failed. Execute command denyed. mode={opt["mode"]}, cmd={opt["cmd"]}')
+                return dict(warn=f'Execute command denyed. mode={opt["mode"]}, cmd={opt["cmd"]}, title={title}')
             _options = options.Options.getInstance()
             schema = _options.get_cmd_choices(opt['mode'], opt['cmd'], False)
             try:
