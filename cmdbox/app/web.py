@@ -914,7 +914,7 @@ class ThreadedASGI:
                 def load_config(self):
                     config = {k: v for k, v in self.options.items() if k in self.cfg.settings and v is not None}
                     for key, value in config.items():
-                        self.cfg.set(key.lower(), value)
+                        self.cfg.set(key.lower(), str(value))
                 def load(self):
                     return self.application
             opt = dict(bind=f"{config.host}:{config.port}",
