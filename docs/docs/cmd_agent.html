@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/02/15 documentation</title>
+  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/02/16 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=3de328d9"></script>
+      <script src="../_static/documentation_options.js?v=0a1ba2b3"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -1304,43 +1304,47 @@
 <td></td>
 <td><p>Specify the Memory configuration name referenced by the Runner.</p></td>
 </tr>
-<tr class="row-even"><td><p>--voicevox_model &lt;model&gt;</p></td>
+<tr class="row-even"><td><p>--rag &lt;name&gt;</p></td>
+<td></td>
+<td><p>Specify the RAG configuration name referenced by the Runner.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--voicevox_model &lt;model&gt;</p></td>
 <td></td>
 <td><p>Specify the model of the TTS engine to use.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--session_store_type &lt;type&gt;</p></td>
+<tr class="row-even"><td><p>--session_store_type &lt;type&gt;</p></td>
 <td></td>
 <td><p>Specify how the bot's session is stored.</p></td>
 </tr>
-<tr class="row-even"><td><p>--session_store_pghost &lt;host&gt;</p></td>
+<tr class="row-odd"><td><p>--session_store_pghost &lt;host&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql host for session store.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--session_store_pgport &lt;port&gt;</p></td>
+<tr class="row-even"><td><p>--session_store_pgport &lt;port&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql port for session store.</p></td>
 </tr>
-<tr class="row-even"><td><p>--session_store_pguser &lt;user&gt;</p></td>
+<tr class="row-odd"><td><p>--session_store_pguser &lt;user&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql user name for session store.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--session_store_pgpass &lt;pass&gt;</p></td>
+<tr class="row-even"><td><p>--session_store_pgpass &lt;pass&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql password for session store.</p></td>
 </tr>
-<tr class="row-even"><td><p>--session_store_pgdbname &lt;name&gt;</p></td>
+<tr class="row-odd"><td><p>--session_store_pgdbname &lt;name&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql database name for session store.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
