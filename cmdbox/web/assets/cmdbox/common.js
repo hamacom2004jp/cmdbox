@@ -148,7 +148,7 @@ cmdbox.appid = async (sel) => {
     head.append(`<link rel="icon" type="image/x-icon" href="assets/${appid}/favicon.ico">`);
 };
 /**
- * 指定のセレクタの前要素にロゴ画像を設定
+ * 指定のセレクタの前要素にロゴアイコンを設定
  * 
  * @param {string} sel - セレクタ
  **/

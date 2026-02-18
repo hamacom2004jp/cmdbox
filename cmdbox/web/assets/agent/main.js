@@ -1,8 +1,7 @@
 $(() => {
     try {
-        cmdbox.appid('#logo_title').then(() => {
-            $('#logo_title').text(`${document.title} Agent`);
-        });
+        // SVGロゴ初期化
+        init_svglogo();
         $('.split-pane').splitPane();
         // agent初期化
         agentView.initView();

@@ -348,7 +348,7 @@ class Signin(object):
             if len([ug for ug in user['groups'] if ug not in groups]) > 0:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. Group not found. ({signin_file}). {user["groups"]}')
             if 'home' not in user or user['home'] is None:
-                user['home'] = f'/users/{user["name"]}'
+                user['home'] = f'/.users/{user["name"]}'
             if user['home'] != '/':
                 user['home'] = re.sub(r'^/+', '', user['home'])
             uids.add(user['uid'])
@@ -371,7 +371,7 @@ class Signin(object):
                 if group['parent'] not in groups:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. Parent group not found. ({signin_file}). parent={group["parent"]}')
             if 'home' not in group or group['home'] is None:
-                group['home'] = f'/groups/{group["name"]}'
+                group['home'] = f'/.groups/{group["name"]}'
             if group['home'] != '/':
                 group['home'] = re.sub(r'^/+', '', group['home'])
             gids.add(group['gid'])

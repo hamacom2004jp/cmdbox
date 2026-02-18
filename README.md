@@ -27,10 +27,11 @@ apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl buil
 
 - When using agent mode, install the modules with dependencies.
 ```bash
-pip install cmdbox[agent_mcp]
-pip install cmdbox[agent_adk]
-pip install cmdbox[agent_mem]
-pip install cmdbox[agent_rag]
+pip install "pydantic>=2.0.0,<3.0.0"
+pip install "fastmcp>=2.14.0" "mcp>=1.10.0,<2.0.0"
+pip install "google-adk>=1.21.0" "litellm"
+pip install "a2a-sdk>=0.3.4,<0.4.0"
+pip install "transformers>=4.48.0" "sentence-transformers" "sqlite_vec" "torch" "pdfplumber"
 ```
 
 # Run
