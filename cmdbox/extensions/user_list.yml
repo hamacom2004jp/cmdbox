@@ -30,7 +30,7 @@ users:                         # A list of users, each of which is a map that co
 groups:                        # A list of groups, each of which is a map that contains the following fields.
 - gid: 1                       # An ID that identifies a group. No two groups can have the same ID.
   name: admin                  # A name that identifies the group. No two groups can have the same name.
-  home: /.groups               # The home directory of the group, used for file operations.
+  home: /.groups/admin         # The home directory of the group, used for file operations.
 - gid: 2
   name: guest
   home: /.groups/guest

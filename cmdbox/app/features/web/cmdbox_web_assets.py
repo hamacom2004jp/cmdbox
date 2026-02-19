@@ -53,4 +53,8 @@ class Assets(feature.WebFeature):
                         path = asset.relative_to(web.doc_root / 'assets')
                     except ValueError:
                         path = Path(str(asset)[str(asset).find('assets')+len('assets/'):])
+                    for r in app.routes.copy():
+                        p = str(path).replace('\\', '/')
+                        if r.path==f'/signin/assets/{p}' or r.path==f'/assets/{p}':
+                            app.routes.remove(r)
                     asset_func(f.read() if not ondemand_load else None, asset, str(path).replace('\\', '/'))

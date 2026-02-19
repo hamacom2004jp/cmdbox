@@ -142,7 +142,7 @@ class McpsvStart(feature.UnsupportEdgeFeature):
             args.ssl_ca_certs = None if args.ssl_ca_certs is None else Path(args.ssl_ca_certs)
 
             # FastMCP の ASGI アプリを取得して起動
-            mcp_app = fastmcp.http_app() if fastmcp is not None else None
+            mcp_app = fastmcp.http_app(stateless_http=True) if fastmcp is not None else None
             if mcp_app is None:
                 msg = dict(warn="MCP app is not created.")
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
