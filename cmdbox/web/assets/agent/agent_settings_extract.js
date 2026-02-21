@@ -1,6 +1,6 @@
 agentView.get_extract_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('extract', 'save');
-    const vform_names = ['extract_name', 'extract_type', 'extract_scope', 'loadpath', 'loadgrep'];
+    const vform_names = ['extract_name', 'extract_type', 'extract_cmd', 'scope', 'loadpath', 'loadgrep'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };
@@ -16,6 +16,27 @@ agentView.build_extract_form = async () => {
 };
 
 agentView.list_extract = async () => {
+    // Extract追加ボタンのクリックイベント
+    $('#btn_add_extract').off('click').on('click', async () => {
+        await agentView.build_extract_form();
+        $('#form_extract_edit [name="extract_name"]').prop('readonly', false);
+        $('#form_extract_edit [name="extract_type"]').trigger('change');
+        $('#btn_del_extract').hide();
+        $('#extract_edit_modal').modal('show');
+
+        // extract_cmdをロード
+        await cmdbox.callcmd('cmd','list', {match_opt:['scope','loadpath']},
+            (res)=>{
+                $("[name='extract_cmd']").empty().append('<option></option>');
+                res.forEach(elm=>{$('[name="extract_cmd"]').append('<option value="'+elm["title"]+'">'+elm["title"]+'</option>');});
+        },$('[name="title"]').val(),'extract_cmd');
+    });
+
+    // Extract保存ボタンのクリックイベント
+    $('#btn_save_extract').off('click').on('click', () => {
+        agentView.save_extract();
+    });
+
     const container = $('#extract_list_container');
     container.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
 
@@ -53,7 +74,7 @@ agentView.list_extract = async () => {
                 <li class="sf-list-item" style="cursor: pointer;">
                     <div>
                         <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.extract_name}</span>
-                        <span class="text-white-50">${config.extract_type} / ${config.extract_scope}</span>
+                        <span class="text-white-50">${config.extract_type} / ${config.extract_cmd}</span>
                     </div>
                 </li>
             `).appendTo(container_ul);
@@ -89,6 +110,13 @@ agentView.list_extract = async () => {
                     agentView.list_extract();
                 });
 
+                // extract_cmdをロード
+                await cmdbox.callcmd('cmd','list', {match_opt:['scope','loadpath']}, (res)=>{
+                    const val = $("[name='extract_cmd']").val();
+                    $("[name='extract_cmd']").empty().append('<option></option>');
+                    res.forEach(elm=>{$('[name="extract_cmd"]').append('<option value="'+elm["title"]+'">'+elm["title"]+'</option>');});
+                    form.find('[name="extract_cmd"]').val(config.extract_cmd);
+                },$('[name="title"]').val(),'extract_cmd');
                 $('#extract_edit_modal').modal('show');
             });
 

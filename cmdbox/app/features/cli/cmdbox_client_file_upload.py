@@ -71,7 +71,7 @@ class ClientFileUpload(feature.UnsupportEdgeFeature):
                      description_ja="クライアントのアップロード元パスを指定します。",
                      description_en="Specify the source path of the client.",
                      test_true={"server":"tests/dog.jpg"}),
-                dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None, web="mask",
                      description_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
                      description_en="Specify the path of the data folder when local is referenced.",
                      test_true={"server":None,

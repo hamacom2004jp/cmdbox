@@ -19,6 +19,35 @@ agentView.build_agent_form = async () => {
 };
 
 agentView.list_agent = async () => {
+    // Agent追加ボタンのクリックイベント
+    $('#btn_add_agent').off('click').on('click', async () => {
+        await agentView.build_agent_form();
+        $('#form_agent_edit [name="agent_name"]').prop('readonly', false);
+        $('#btn_del_agent').hide();
+        $('[name="agent_type"]').trigger('change');
+        $('#agent_edit_modal').modal('show');
+        // LLMリストをロード
+        await cmdbox.callcmd('llm','list',{},(res)=>{
+            $("[name='llm']").empty().append('<option></option>');
+            res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+        },$('[name="title"]').val(),'llm');
+        // MCPサーバーリストをロード
+        await cmdbox.callcmd('agent','mcpsv_list',{},(res)=>{
+            $("[name='mcpservers']").empty().append('<option></option>');
+            res['data'].map(elm=>{$('[name="mcpservers"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+        },$('[name="title"]').val(),'mcpservers');
+        // SubAgentリストをロード
+        await cmdbox.callcmd('agent','agent_list',{},(res)=>{
+            $("[name='subagents']").empty().append('<option></option>');
+            res['data'].map(elm=>{$('[name="subagents"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+        },$('[name="title"]').val(),'subagents');
+    });
+
+    // Agent保存ボタンのクリックイベント
+    $('#btn_save_agent').off('click').on('click', () => {
+        agentView.save_agent();
+    });
+
     const container = $('#agent_list_container');
     container.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
 

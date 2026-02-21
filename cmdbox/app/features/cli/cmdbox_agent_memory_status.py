@@ -264,8 +264,8 @@ class AgentMemoryStatus(agant_base.AgentBase):
         if logger.level == logging.DEBUG:
             logger.debug(f"litellm loading..")
         from google.adk.models import lite_llm
-        from litellm import _logging
-        _logging._turn_on_debug()
+        #from litellm import _logging
+        #_logging._turn_on_debug()
         # App name mismatch警告を回避するためのラッパークラス
         class Agent(AdkAgent):
             pass

@@ -15,7 +15,21 @@ agentView.build_mcpsv_form = async () => {
         cmdbox.add_form_func(i, model, form, row, null);
     });
 };
+
 agentView.list_mcpsv = async () => {
+    // MCPSV追加ボタンのクリックイベント
+    $('#btn_add_mcpsv').off('click').on('click', () => {
+        agentView.build_mcpsv_form();
+        $('#form_mcpsv_edit [name="mcpserver_name"]').prop('readonly', false);
+        $('#btn_del_mcpsv').hide();
+        $('#mcpsv_edit_modal').modal('show');
+    });
+
+    // MCPSV保存ボタンのクリックイベント
+    $('#btn_save_mcpsv').off('click').on('click', () => {
+        agentView.save_mcpsv();
+    });
+
     const container = $('#mcpsv_list_container');
     container.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
     

@@ -218,7 +218,11 @@ class AgentChat(agant_base.AgentBase):
         common.reset_logger("LiteLLM Proxy")
         common.reset_logger("LiteLLM Router")
         common.reset_logger("LiteLLM")
-        litellm.suppress_debug_info = True
+        common.reset_logger("litellm")
+        common.reset_logger("httpcore")
+        common.reset_logger("httpx")
+        common.reset_logger("openai")
+        #litellm.suppress_debug_info = True
         # 各種設定値の取得
         agent_name = agent_conf.get('agent_name', None)
         agent_type = agent_conf.get('agent_type', None)

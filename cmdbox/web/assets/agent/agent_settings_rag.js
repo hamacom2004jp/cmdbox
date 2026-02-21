@@ -19,6 +19,30 @@ agentView.build_rag_form = async () => {
 };
 
 agentView.list_rag = async () => {
+    // RAG追加ボタンのクリックイベント
+    $('#btn_add_rag').off('click').on('click', async () => {
+        await agentView.build_rag_form();
+        $('#form_rag_edit [name="rag_name"]').prop('readonly', false);
+        $('#form_rag_edit [name="rag_type"]').trigger('change');
+        $('#btn_del_rag').hide();
+        $('#rag_edit_modal').modal('show');
+        // Embedリストをロード
+        await cmdbox.callcmd('embed','list',{},(res)=>{
+            $("[name='embed']").empty().append('<option></option>');
+            res['data'].map(elm=>{$('[name="embed"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+        },$('[name="title"]').val(),'embed');
+        // Extractリストをロード
+        await cmdbox.callcmd('extract','list',{match_mode:'extract'},(res)=>{
+            $("[name='extract']").empty().append('<option></option>');
+            res['data'].map(elm=>{$("[name='extract']").append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+        },$('[name="title"]').val(),'extract');
+    });
+
+    // RAG保存ボタンのクリックイベント
+    $('#btn_save_rag').off('click').on('click', () => {
+        agentView.save_rag();
+    });
+
     const container = $('#rag_list_container');
     container.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
 

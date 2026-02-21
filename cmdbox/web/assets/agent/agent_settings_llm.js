@@ -17,6 +17,20 @@ agentView.build_llm_form = async () => {
 };
 
 agentView.list_llm = async () => {
+    // LLM追加ボタンのクリックイベント
+    $('#btn_add_llm').off('click').on('click', async () => {
+        await agentView.build_llm_form();
+        $('#form_llm_edit [name="llmname"]').prop('readonly', false);
+        $('#form_llm_edit [name="llmprov"]').trigger('change');
+        $('#btn_del_llm').hide();
+        $('#llm_edit_modal').modal('show');
+    });
+
+    // LLM保存ボタンのクリックイベント
+    $('#btn_save_llm').off('click').on('click', () => {
+        agentView.save_llm();
+    });
+
     const container = $('#llm_list_container');
     container.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
 

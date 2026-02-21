@@ -82,7 +82,7 @@ class ClientFileCopy(feature.UnsupportEdgeFeature):
                      test_true={"server":"server",
                                 "client":"client",
                                 "current":"current"}),
-                dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None, web="mask",
                      description_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
                      description_en="Specify the path of the data folder when local is referenced.",
                      test_true={"server":None,

@@ -85,7 +85,7 @@ class McpsvStart(feature.UnsupportEdgeFeature):
                 dict(opt="gunicorn_workers", type=Options.T_INT, default=multiprocessing.cpu_count(), required=False, multi=False, hide=True, choice=None,
                      description_ja="gunicornワーカー数を指定します。Linux環境でのみ有効です。-1又は未指定の場合はCPU数を使用します。",
                      description_en="Specifies the number of gunicorn workers, valid only in Linux environment. If -1 or unspecified, the number of CPUs is used."),
-                dict(opt="gunicorn_timeout", type=Options.T_INT, default=30, required=False, multi=False, hide=True, choice=None,
+                dict(opt="gunicorn_timeout", type=Options.T_INT, default=900, required=False, multi=False, hide=True, choice=None,
                      description_ja="gunicornワーカーのタイムアウトの時間を秒で指定します。",
                      description_en="Specify the timeout duration of the gunicorn worker in seconds."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",

@@ -16,6 +16,19 @@ agentView.build_embedding_form = async () => {
 };
 
 agentView.list_embedding = async () => {
+    // Embedding追加ボタンのクリックイベント
+    $('#btn_add_embedding').off('click').on('click', async () => {
+        await agentView.build_embedding_form();
+        $('#form_embedding_edit [name="embedding_name"]').prop('readonly', false);
+        $('#btn_del_embedding').hide();
+        $('#embedding_edit_modal').modal('show');
+    });
+
+    // Embedding保存ボタンのクリックイベント
+    $('#btn_save_embedding').off('click').on('click', () => {
+        agentView.save_embedding();
+    });
+
     const container = $('#embedding_list_container');
     container.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
 

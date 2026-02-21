@@ -18,6 +18,40 @@ agentView.build_runner_form = async () => {
 };
 
 agentView.list_runner = async () => {
+    // Runner追加ボタンのクリックイベント
+    $('#btn_add_runner').off('click').on('click', async () => {
+        await agentView.build_runner_form();
+        $('#form_runner_edit [name="runner_name"]').prop('readonly', false);
+        $('#form_runner_edit [name="session_store_type"]').trigger('change');
+        $('#btn_del_runner').hide();
+        $('#runner_edit_modal').modal('show');
+        // Agentリストをロード
+        await cmdbox.callcmd('agent','agent_list',{},(res)=>{
+            $("[name='agent']").empty().append('<option></option>');
+            res['data'].map(elm=>{$('[name="agent"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+        },$('[name="title"]').val(),'agent');
+        // メモリーリストをロード
+        await cmdbox.callcmd('agent','memory_list',{},(res)=>{
+            $("[name='memory']").empty().append('<option></option>');
+            res['data'].map(elm=>{$('[name="memory"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+        },$('[name="title"]').val(),'memory');
+    });
+
+    // Runner保存ボタンのクリックイベント
+    $('#btn_save_runner').off('click').on('click', () => {
+        agentView.save_runner();
+    });
+
+    // display_runner_name クリックイベント
+    $('#display_runner_name').off('click').on('click', async () => {
+        await agentView.show_runner_select_modal();
+    });
+
+    // Runner選択ボタンのクリックイベント
+    $('#btn_runner').off('click').on('click', async () => {
+        await agentView.update_runner_list();
+    });
+
     const container = $('#runner_list_container');
     container.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
 

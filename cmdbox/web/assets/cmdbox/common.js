@@ -702,15 +702,21 @@ cmdbox.sv_exec_cmd = async (opt) => {
     } catch (e) {
         console.warn(e);
     }
-    return fetch('exec_cmd', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(opt)
-    }).then(response => response.json()).catch((e) => {
+    try {
+        return fetch('exec_cmd', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(opt)
+        }).then(response => response.json()).catch((e) => {
+            console.warn(e);
+            return {'warn': e.toString()};
+        });
+    } catch (e) {
         console.warn(e);
-    });
+        return {'warn': e.toString()};
+    }
 };
 /**
  * 接続情報取得

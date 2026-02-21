@@ -262,7 +262,7 @@ class Client(object):
                 _, res_json = fi.file_upload(svpath, upload_file.name, f.read(), mkdir, orverwrite, fwpaths)
                 return res_json
             elif scope == "server":
-                payload = dict(svpath=svpath, filename=upload_file.name, file_data=convert.bytes2b64str(f.read()),
+                payload = dict(svpath=svpath, file_name=upload_file.name, file_data=convert.bytes2b64str(f.read()),
                                mkdir=mkdir, orverwrite=orverwrite, fwpaths=fwpaths)
                 payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
                 res_json = self.redis_cli.send_cmd('file_upload', [payload_b64,],

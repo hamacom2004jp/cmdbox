@@ -46,11 +46,14 @@ class CmdList(feature.OneshotResultEdgeFeature):
                      description_ja=f"検索したい名前を指定します。中間マッチで検索します。",
                      description_en=f"Specify the name you want to search for. Searches for partial matches."),
                 dict(opt="match_mode", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                     description_ja=f"検索したいmodeを指定します。中間マッチで検索します。",
-                     description_en=f"Specify the mode you want to search in. Searches for partial matches."),
+                     description_ja=f"検索したいコマンドのmode条件を指定します。中間マッチで検索します。",
+                     description_en=f"Specify the mode condition of the command you want to search in. Searches for partial matches."),
                 dict(opt="match_cmd", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                     description_ja=f"検索したいcmdを指定します。中間マッチで検索します。",
-                     description_en=f"Specify the cmd you want to search in. Searches for partial matches."),
+                     description_ja=f"検索したいコマンドのcmd条件を指定します。中間マッチで検索します。",
+                     description_en=f"Specify the cmd condition of the command you want to search in. Searches for partial matches."),
+                dict(opt="match_opt", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
+                     description_ja=f"検索したいコマンドのopt名を指定します。",
+                     description_en=f"Specify the opt name of the command you want to search in."),
                 dict(opt="signin_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
                      description_ja=f"サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.{self.ver.__appid__}/user_list.yml' を指定します。",
                      description_en=f"Specify a file containing users and passwords with which they can signin.Typically, specify '.{self.ver.__appid__}/user_list.yml'."),
@@ -107,6 +110,10 @@ class CmdList(feature.OneshotResultEdgeFeature):
             if args.match_mode is not None and args.match_mode != '' and args.match_mode not in r['mode']:
                 continue
             if args.match_cmd is not None and args.match_cmd != '' and args.match_cmd not in r['cmd']:
+                continue
+            if args.match_cmd is not None and args.match_cmd != '' and args.match_cmd not in r['cmd']:
+                continue
+            if args.match_opt is not None and isinstance(args.match_opt, list) and len([k for k in args.match_opt if k not in r]) > 0:
                 continue
             if not signin.Signin._check_cmd(self.signin_file_data, args.groups, r['mode'], r['cmd'], args.__dict__, "unknown", logger):
                 continue

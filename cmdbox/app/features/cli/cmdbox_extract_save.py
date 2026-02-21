@@ -64,17 +64,27 @@ class ExtractSave(feature.OneshotResultEdgeFeature):
                 dict(opt="extract_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="抽出設定の名前を指定します。",
                      description_en="Specify the name of the extraction configuration."),
-                dict(opt="extract_type", type=Options.T_STR, default='pdf_file', required=True, multi=False, hide=False,
-                     choice=['', 'pdf_file'],
+                dict(opt="extract_cmd", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
+                     callcmd="async () => {await cmdbox.callcmd('cmd','list',{match_opt:['scope','loadpath']},"
+                            + "(res)=>{const val = $(\"[name='extract_cmd']\").val();"
+                            + "$(\"[name='extract_cmd']\").empty().append('<option></option>');"
+                            + "res.forEach(elm=>{$(\"[name='extract_cmd']\").append('<option value=\"'+elm[\"title\"]+'\">'+elm[\"title\"]+'</option>');});"
+                            + "$(\"[name='extract_cmd']\").val(val);"
+                            + "},$(\"[name='title']\").val(),'extract_cmd');"
+                            + "}",
+                     description_ja="抽出コマンドの設定名を指定します。",
+                     description_en="Specify the name of the extraction command setting."),
+                dict(opt="extract_type", type=Options.T_STR, default='file', required=True, multi=False, hide=False,
+                     choice=['', 'file'],
                      choice_show=dict(
-                        pdf_file=["extract_scope", "client_data", "loadpath", "loadgrep", ],
+                        file=["scope", "client_data", "loadpath", "loadgrep", ],
                      ),
                      description_ja="抽出の種類を指定します。",
                      description_en="Specify the type of extraction."),
-                dict(opt="extract_scope", type=Options.T_STR, default="client", required=False, multi=False, hide=False, choice=["", "client", "server"],
+                dict(opt="scope", type=Options.T_STR, default="client", required=False, multi=False, hide=False, choice=["", "client", "server"],
                      description_ja="参照先スコープを指定します。指定可能な画像タイプは `client` , `server` です。",
                      description_en="Specify the reference scope. The available image types are `client` and `server`.",),
-                dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None, web="mask",
                      description_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
                      description_en="Specify the path of the data folder when local is referenced."),
                 dict(opt="loadpath", type=Options.T_DIR, default=None, required=True, multi=False, hide=False, choice=None,
@@ -113,7 +123,8 @@ class ExtractSave(feature.OneshotResultEdgeFeature):
         payload = dict(
             extract_name=args.extract_name,
             extract_type=args.extract_type,
-            extract_scope=args.extract_scope if hasattr(args, 'extract_scope') else None,
+            extract_cmd=args.extract_cmd,
+            scope=args.scope if hasattr(args, 'scope') else None,
             client_data=args.client_data if hasattr(args, 'client_data') else None,
             loadpath=args.loadpath if hasattr(args, 'loadpath') else None,
             loadgrep=args.loadgrep if hasattr(args, 'loadgrep') else None,

@@ -19,6 +19,30 @@ agentView.build_memory_form = async () => {
 };
 
 agentView.list_memory = async () => {
+    // Memory追加ボタンのクリックイベント
+    $('#btn_add_memory').off('click').on('click', async () => {
+        await agentView.build_memory_form();
+        $('#form_memory_edit [name="memory_name"]').prop('readonly', false);
+        $('#form_memory_edit [name="memory_type"]').trigger('change');
+        $('#btn_del_memory').hide();
+        $('#memory_edit_modal').modal('show');
+        // LLMリストをロード
+        await cmdbox.callcmd('llm','list',{},(res)=>{
+            $("[name='llm']").empty().append('<option></option>');
+            res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+        },$('[name="title"]').val(),'llm');
+        // Embedリストをロード
+        await cmdbox.callcmd('embed','list',{},(res)=>{
+            $("[name='embed']").empty().append('<option></option>');
+            res['data'].map(elm=>{$('[name="embed"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+        },$('[name="title"]').val(),'embed');
+    });
+
+    // Memory保存ボタンのクリックイベント
+    $('#btn_save_memory').off('click').on('click', () => {
+        agentView.save_memory();
+    });
+
     const container = $('#memory_list_container');
     container.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
 

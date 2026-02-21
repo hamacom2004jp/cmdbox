@@ -150,6 +150,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
             if req.session is not None and 'signin' in req.session and req.session['signin'] is not None:
                 if 'clmsg_id' in req.session['signin'] and req.session['signin']['clmsg_id'] is not None:
                     opt['clmsg_id'] = req.session['signin']['clmsg_id']
+        if 'client_data' in opt: opt['client_data'] = web.data
         ap.sv = None
         ap.cl = None
         ap.web = None

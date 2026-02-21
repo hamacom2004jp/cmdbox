@@ -83,6 +83,9 @@ agent_mem = [
     "torch",
 ]
 agent_rag = [
+    "chunklet-py[document]",
+    "langchain_community",
+    "markdown",
     "pdfplumber",
 ]
 saml = [
@@ -101,7 +104,6 @@ cmdbox = "cmdbox.app.app:main"
 # ----------------------------------------------------------------------
 # setuptools固有の設定 (setup.cfgに相当する内容をsetuptoolsテーブルで記述)
 # ----------------------------------------------------------------------
-
 [tool.setuptools]
 packages = [
     "cmdbox",
