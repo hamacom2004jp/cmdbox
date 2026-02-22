@@ -58,6 +58,9 @@ class ClientFileList(feature.OneshotResultEdgeFeature):
                 dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None,
                      description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合、このパスを指定したと解釈します。",
                      description_en="Specify a path to determine whether the specified path is out of bounds. If it is not under this path, it is interpreted as having specified this path.",),
+                dict(opt="listregs", type=Options.T_STR, default=".*", required=False, multi=False, hide=False, choice=None,
+                     description_ja="リストアップする条件を正規表現で指定します。",
+                     description_en="Specify the regular expression conditions to list."),
                 dict(opt="recursive", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
                      description_ja="指定したパスに含まれるフォルダについて、再帰的にファイルリストを取得します。",
                      description_en="Get a list of files recursively for a folder contained in the specified path.",
@@ -128,12 +131,27 @@ class ClientFileList(feature.OneshotResultEdgeFeature):
             msg = dict(warn=f"Please specify the --svname option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
+        if not hasattr(args, 'svpath') or args.svpath is None:
+            msg = dict(warn=f"Please specify the --svpath option.")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
+        if not hasattr(args, 'scope') or args.scope is None:
+            msg = dict(warn=f"Please specify the --scope option.")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
+        if not hasattr(args, 'listregs') or args.listregs is None:
+            args.listregs = ".*"
+        if not hasattr(args, 'recursive') or args.recursive is None:
+            args.recursive = False
+        if not hasattr(args, 'fwpath') or args.fwpath is None:
+            args.fwpath = ["/"]
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
         client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
-        fwpaths = [p.replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
+        fwpaths = [p.replace('"','') for p in args.fwpath]
+        listregs = args.listregs if args.listregs is not None else ".*"
         ret = cl.file_list(svpath=args.svpath.replace('"',''), recursive=args.recursive, scope=args.scope,
-                           client_data=client_data, fwpaths=fwpaths,
+                           client_data=client_data, fwpaths=fwpaths, listregs=listregs,
                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
@@ -170,10 +188,11 @@ class ClientFileList(feature.OneshotResultEdgeFeature):
         svpath = payload.get('svpath', '/')
         recursive = payload.get('recursive', False)
         fwpaths = payload.get('fwpaths', None)
-        st = self.file_list(msg[1], svpath, recursive, fwpaths, data_dir, logger, redis_cli, sessions)
+        listregs = payload.get('listregs', ".*")
+        st = self.file_list(msg[1], svpath, recursive, fwpaths, listregs, data_dir, logger, redis_cli, sessions)
         return st
 
-    def file_list(self, reskey:str, current_path:str, recursive:bool, fwpaths:List[str],
+    def file_list(self, reskey:str, current_path:str, recursive:bool, fwpaths:List[str], listregs:str,
                   data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ファイルリストを取得する
@@ -183,6 +202,7 @@ class ClientFileList(feature.OneshotResultEdgeFeature):
             current_path (str): ファイルパス
             recursive (bool): 再帰的に取得するかどうか
             fwpaths (List[str]): 範囲内かどうかを示すパスのリスト
+            listregs (str): リストアップする正規表現条件
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
@@ -193,7 +213,7 @@ class ClientFileList(feature.OneshotResultEdgeFeature):
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_list(current_path, recursive, fwpaths)
+            rescode, msg = f.file_list(current_path, recursive, fwpaths, listregs)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

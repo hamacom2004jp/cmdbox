@@ -5,6 +5,7 @@ from typing import Dict, List, Any, Tuple
 import logging
 import datetime
 import mimetypes
+import re
 import shutil
 
 class Filer(object):
@@ -66,7 +67,8 @@ class Filer(object):
             return False, dict(warn=f"The specified path ( {path} ) is out of bounds. Permitted path: {fwpaths}")
         return True, None
 
-    def file_list(self, current_path:str, recursive:bool=False, fwpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+    def file_list(self, current_path:str, recursive:bool=False,
+                  fwpaths:List[str]=None, listregs:str=".*") -> Tuple[int, Dict[str, Any]]:
         """
         ファイルリストを取得する
 
@@ -74,6 +76,7 @@ class Filer(object):
             path (str): ファイルパス
             recursive (bool, optional): 再帰的に取得するかどうか, by default False
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト, by default None
+            listregs (str, optional): リストアップするgrep条件, by default ".*"
     
         Returns:
             int: レスポンスコード
@@ -99,7 +102,7 @@ class Filer(object):
         path_tree = {}
         data_dir_len = len(str(self.data_dir))
 
-        def _path_tree(file_list:Path, cpart:str, i, recursive:bool=False):
+        def _path_tree(file_list:Path, cpart:str, i, listregs_pt:re.Pattern, recursive:bool=False):
             children = dict()
             if not file_list.is_dir():
                 tparts = str(file_list)[data_dir_len:].replace("\\","/").split("/")
@@ -128,7 +131,7 @@ class Filer(object):
                     continue
                 mime_type, encoding = mimetypes.guess_type(str(f))
                 if recursive and f.is_dir():
-                    _, path_tree = _path_tree(f, f.name, i+1, recursive)
+                    _, path_tree = _path_tree(f, f.name, i+1, listregs_pt, recursive)
                     if path_tree is None:
                         continue
                     children[key] = path_tree
@@ -136,6 +139,8 @@ class Filer(object):
                 if not f.exists():
                     continue
                 if any(fwpath.startswith(path) or path.startswith(fwpath) for fwpath in fwpaths):
+                    if not listregs_pt.match(f.name):
+                        continue
                     children[key] = dict(name=f.name,
                                         is_dir=f.is_dir(),
                                         path=path,
@@ -158,11 +163,11 @@ class Filer(object):
                                    size=0,
                                    last="",
                                    depth=len(tparts))
-    
+        listregs_pt = re.compile(listregs)
         for i, cpart in enumerate(current_path_parts):
             cpath = '/'.join(current_path_parts[1:i+1])
             file_list:Path = self.data_dir / cpath
-            tpath_key, pt = _path_tree(file_list, cpart, i, recursive if i+1==len(current_path_parts) else False)
+            tpath_key, pt = _path_tree(file_list, cpart, i, listregs_pt, recursive if i+1==len(current_path_parts) else False)
             if pt is None:
                 continue
             path_tree[tpath_key] = pt

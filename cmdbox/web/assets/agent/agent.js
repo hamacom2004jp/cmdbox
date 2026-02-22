@@ -124,15 +124,14 @@ agentView.initView = () => {
         }
     });
 
-
-    // TTSインストールボタンのクリックイベント
-    $('#btn_install_tts').off('click').on('click', () => {
-        agentView.install_tts();
+    // display_runner_name クリックイベント
+    $('#display_runner_name').off('click').on('click', async () => {
+        await agentView.show_runner_select_modal();
     });
 
-    // TTSアンインストールボタンのクリックイベント
-    $('#btn_uninstall_tts').off('click').on('click', () => {
-        agentView.uninstall_tts();
+    // RAGへの登録クリックイベント
+    $('#btn_regist_rag').off('click').on('click', async () => {
+        await agentView.regist_rag();
     });
 
     // ユーザー情報の取得
@@ -208,4 +207,30 @@ agentView.list_sessions = async (session_id) => {
         const msg = row['events'][0]['text'];
         const history = agentView.create_history(session_id, runner_name, user_name, update_time, msg);
     });
+}
+
+agentView.regist_rag = async () => {
+    if (!agentView.runner_conf || !agentView.runner_conf.rag) {
+        cmdbox.message({ 'error': 'Please select an Agent Runner first.' });
+        return false;
+    }
+    if (agentView.runner_conf.rag.length <= 0) {
+        cmdbox.message({ 'error': 'No RAGs are selected for registration.' });
+        return false;
+    }
+    if (!confirm(`Are you sure you want to register RAG '${agentView.runner_conf.rag}' to the system?`)){
+        return false;
+    }
+    const n = agentView.runner_conf.rag.length;
+    for (i=0; i<n; i++) {
+        const rag_name = agentView.runner_conf.rag[i];
+        cmdbox.show_loading();
+        cmdbox.progress(0, n, i, `Registering RAG '${rag_name}'...`, true, true);
+        const res = await agentView.exec_cmd('rag', 'regist', { rag_name: rag_name });
+        if (!res || !res.success) {
+            cmdbox.message(res);
+            console.warn(res);
+            return false;
+        }
+    }
 }

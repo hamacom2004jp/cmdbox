@@ -261,11 +261,9 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature):
                 raise IOError(f"File not found. {abspath}")
             if args.chunk_size is None: raise ValueError("chunk_size is required.")
             if args.chunk_overlap is None: raise ValueError("chunk_overlap is required.")
-            from langchain_core.documents import Document
             from langchain_text_splitters import (
                 MarkdownTextSplitter,
                 RecursiveCharacterTextSplitter,
-                TextSplitter
             )
             import pdfplumber
             chunk_separator = None if args.chunk_separator is None or len(args.chunk_separator)<=0 else args.chunk_separator

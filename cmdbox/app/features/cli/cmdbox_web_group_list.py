@@ -40,7 +40,7 @@ class WebGroupList(feature.UnsupportEdgeFeature):
                 dict(opt="group_name", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="グループ名を指定して取得します。省略した時は全てのグループを取得します。",
                      description_en="Retrieved by specifying a group name. If omitted, all groups are retrieved."),
-                dict(opt="signin_file", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None, fileio="in",
+                dict(opt="signin_file", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None, fileio="in", web="mask",
                      description_ja=f"サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.{self.ver.__appid__}/user_list.yml' を指定します。",
                      description_en=f"Specify a file containing users and passwords with which they can signin.Typically, specify '.{self.ver.__appid__}/user_list.yml'."),
                 dict(opt="stdout_log", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],

@@ -25,6 +25,7 @@ agentView.list_rag = async () => {
         $('#form_rag_edit [name="rag_name"]').prop('readonly', false);
         $('#form_rag_edit [name="rag_type"]').trigger('change');
         $('#btn_del_rag').hide();
+        $('#btn_build_rag').hide();
         $('#rag_edit_modal').modal('show');
         // Embedリストをロード
         await cmdbox.callcmd('embed','list',{},(res)=>{
@@ -118,6 +119,10 @@ agentView.list_rag = async () => {
                     $('#rag_edit_modal').modal('hide');
                     agentView.list_rag();
                 });
+                $('#btn_build_rag').show().off('click').on('click', async () => {
+                    if (!confirm(`Are you sure you want to build '${config.rag_name}'?`)) return;
+                    await agentView.build_rag();
+                });
                 // コマンド実行
                 await cmdbox.callcmd('embed','list',{},(res)=>{
                     $("[name='embed']").empty().append('<option></option>');
@@ -155,6 +160,27 @@ agentView.save_rag = async () => {
             agentView.list_rag();
         } else {
             alert('Failed to save RAG settings.');
+        }
+    } catch (e) {
+        console.error(e);
+        alert(`Error: ${e.message}`);
+    }
+};
+
+agentView.build_rag = async () => {
+    const form = $('#form_rag_edit');
+    const data = {};
+    form.serializeArray().forEach(item => {
+        if (item.value) data[item.name] = item.value;
+    });
+
+    try {
+        const res = await agentView.exec_cmd('rag', 'build', data);
+        if (res && res.success) {
+            $('#rag_edit_modal').modal('hide');
+            agentView.list_rag();
+        } else {
+            alert('Failed to build RAG settings.');
         }
     } catch (e) {
         console.error(e);

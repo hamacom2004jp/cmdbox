@@ -1,6 +1,6 @@
 agentView.get_extract_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('extract', 'save');
-    const vform_names = ['extract_name', 'extract_type', 'extract_cmd', 'scope', 'loadpath', 'loadgrep'];
+    const vform_names = ['extract_name', 'extract_type', 'extract_cmd', 'scope', 'loadpath', 'loadregs'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };

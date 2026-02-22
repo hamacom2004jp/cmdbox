@@ -41,7 +41,7 @@ class McpsvStop(feature.UnsupportEdgeFeature):
             description_ja="MCP サーバーを停止します。",
             description_en="Stop MCP server.",
             choice=[
-                dict(opt="data", type=Options.T_DIR, default=self.default_data, required=False, multi=False, hide=False, choice=None,
+                dict(opt="data", type=Options.T_DIR, default=self.default_data, required=False, multi=False, hide=False, choice=None, web="mask",
                      description_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
                      description_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",

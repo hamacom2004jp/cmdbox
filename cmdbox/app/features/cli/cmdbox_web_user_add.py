@@ -55,7 +55,7 @@ class WebUserAdd(feature.UnsupportEdgeFeature):
                 dict(opt="user_group", type=Options.T_STR, default=None, required=True, multi=True, hide=False, choice=None,
                      description_ja="ユーザーが所属するグループを指定します。",
                      description_en="Specifies the groups to which the user belongs."),
-                dict(opt="signin_file", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None, fileio="in",
+                dict(opt="signin_file", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None, fileio="in", web="mask",
                      description_ja=f"サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.{self.ver.__appid__}/user_list.yml' を指定します。",
                      description_en=f"Specify a file containing users and passwords with which they can signin.Typically, specify '.{self.ver.__appid__}/user_list.yml'."),
                 dict(opt="stdout_log", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],

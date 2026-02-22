@@ -142,15 +142,29 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                         opt[o] = _options.audit_search_args[o]
             except:
                 pass
-        if 'host' in opt: opt['host'] = web.redis_host
-        if 'port' in opt: opt['port'] = web.redis_port
-        if 'password' in opt: opt['password'] = web.redis_password
-        if 'svname' in opt: opt['svname'] = web.svname
+        # webモードで特定のオプションを自動的にセットする
+        if 'host' in opt and opt['host'] is not None or 'host' not in opt:
+            opt['host'] = web.redis_host
+        if 'port' in opt and opt['port'] is not None or 'port' not in opt:
+            opt['port'] = web.redis_port
+        if 'password' in opt and opt['password'] is not None or 'password' not in opt:
+            opt['password'] = web.redis_password
+        if 'svname' in opt and opt['svname'] is not None or 'svname' not in opt:
+            opt['svname'] = web.svname
         if not 'clmsg_id' in opt:  # optに含まれる場合は処理しない
             if req.session is not None and 'signin' in req.session and req.session['signin'] is not None:
                 if 'clmsg_id' in req.session['signin'] and req.session['signin']['clmsg_id'] is not None:
                     opt['clmsg_id'] = req.session['signin']['clmsg_id']
-        if 'client_data' in opt: opt['client_data'] = web.data
+        if 'data' in opt and opt['data'] is not None or 'data' not in opt:
+            opt['data'] = web.data
+        if 'client_data' in opt and opt['client_data'] is not None or 'client_data' not in opt:
+            opt['client_data'] = web.data
+        if 'signin_file' in opt and opt['signin_file'] is not None or 'signin_file' not in opt:
+            opt['signin_file'] = web.signin.signin_file
+        if 'groups' in opt and opt['groups'] is not None or 'groups' not in opt:
+            if req.session is not None and 'signin' in req.session and req.session['signin'] is not None:
+                if 'groups' in req.session['signin'] and req.session['signin']['groups'] is not None:
+                    opt['groups'] = req.session['signin']['groups']
         ap.sv = None
         ap.cl = None
         ap.web = None

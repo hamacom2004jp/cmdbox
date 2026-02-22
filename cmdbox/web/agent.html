@@ -394,6 +394,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
                 <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_rag" style="display:none;">DELETE</button>
+                <button type="button" class="btn btn-outline-danger me-auto" id="btn_build_rag" style="display:none;">BUILD</button>
                 <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_rag">SAVE</button>
             </div>
         </div>
@@ -585,7 +586,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div id="main_container" class="container-fluid overflow-auto split-pane fixed-left" style="height:100%;">
+                <div id="main_container" class="container-fluid overflow-auto split-pane fixed-left" style="height:calc(100% - 17px);">
                     <!-- ローカル側ペイン -->
                     <div id="left_container" class="split-pane-component filer-pane-left" style="width:49%;">
                         <div class="split-pane fixed-top">
@@ -596,7 +597,7 @@
                                     <input type="text" class="form-control filer_address" readonly>
                                 </div>
                                 <!-- ローカル側ツリー -->
-                                <ul class="tree-menu tree_ul overflow-auto border w-100" style="height:calc(100% - 50px);"></ul>
+                                <ul class="tree-menu tree_ul overflow-auto border w-100" style="min-height:auto; height:calc(100% - 50px);"></ul>
                             </div>
                             <!-- 上下のスプリッター -->
                             <div class="split-pane-divider filer-pane-divider" style="top:45%;"></div>
@@ -638,7 +639,7 @@
                                     </button>
                                 </div>
                                 <!-- サーバー側ツリー -->
-                                <ul class="tree-menu tree_ul overflow-auto border w-100" style="height:calc(100% - 50px);"></ul>
+                                <ul class="tree-menu tree_ul overflow-auto border w-100" style="min-height:auto; height:calc(100% - 50px)!important;"></ul>
                             </div>
                             <!-- 上下のスプリッター -->
                             <div class="split-pane-divider filer-pane-divider" style="top:45%;"></div>

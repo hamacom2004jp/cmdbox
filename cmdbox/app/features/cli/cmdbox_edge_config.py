@@ -94,7 +94,7 @@ class EdgeConfig(feature.UnsupportEdgeFeature):
                 dict(opt="saml_timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=False, choice=None,
                      description_ja="SAML認証が完了するまでのタイムアウト時間を指定します。",
                      description_en="Specify the timeout period before SAML authentication completes."),
-                dict(opt="data", type=Options.T_DIR, default=self.default_data, required=False, multi=False, hide=True, choice=None,
+                dict(opt="data", type=Options.T_DIR, default=self.default_data, required=False, multi=False, hide=True, choice=None, web="mask",
                      description_ja=f"省略した時は f`$HONE/.{self.ver.__appid__}` を使用します。",
                      description_en=f"When omitted, f`$HONE/.{self.ver.__appid__}` is used."),
                 dict(opt="svcert_no_verify", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[False, True],

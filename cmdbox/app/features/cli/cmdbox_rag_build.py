@@ -1,5 +1,6 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.features.cli.rag import rag_base, rag_store
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -9,7 +10,7 @@ import json
 import re
 
 
-class ExtractSave(feature.OneshotResultEdgeFeature):
+class RagBuild(rag_base.RAGBase):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -17,7 +18,7 @@ class ExtractSave(feature.OneshotResultEdgeFeature):
         Returns:
             Union[str, List[str]]: モード
         """
-        return 'extract'
+        return 'rag'
 
     def get_cmd(self) -> str:
         """
@@ -26,7 +27,7 @@ class ExtractSave(feature.OneshotResultEdgeFeature):
         Returns:
             str: コマンド
         """
-        return 'save'
+        return 'build'
 
     def get_option(self) -> Dict[str, Any]:
         """
@@ -36,9 +37,9 @@ class ExtractSave(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
-            description_ja="指定されたファイルからテキストを抽出する設定を保存します。",
-            description_en="Saves settings for extracting text from the specified file.",
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
+            description_ja="RAG（検索拡張生成）の設定を元にデータベースを構築します。",
+            description_en="We build the database based on the RAG (Retrieval-Augmented Generation) configuration.",
             choice=[
                 dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
                      description_ja="Redisサーバーのサービスホストを指定します。",
@@ -61,38 +62,9 @@ class ExtractSave(feature.OneshotResultEdgeFeature):
                 dict(opt="timeout", type=Options.T_INT, default=120, required=False, multi=False, hide=True, choice=None,
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                      description_en="Specify the maximum waiting time until the server responds."),
-                dict(opt="extract_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
-                     description_ja="抽出設定の名前を指定します。",
-                     description_en="Specify the name of the extraction configuration."),
-                dict(opt="extract_cmd", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
-                     callcmd="async () => {await cmdbox.callcmd('cmd','list',{match_opt:['scope','loadpath']},"
-                            + "(res)=>{const val = $(\"[name='extract_cmd']\").val();"
-                            + "$(\"[name='extract_cmd']\").empty().append('<option></option>');"
-                            + "res.forEach(elm=>{$(\"[name='extract_cmd']\").append('<option value=\"'+elm[\"title\"]+'\">'+elm[\"title\"]+'</option>');});"
-                            + "$(\"[name='extract_cmd']\").val(val);"
-                            + "},$(\"[name='title']\").val(),'extract_cmd');"
-                            + "}",
-                     description_ja="抽出コマンドの設定名を指定します。",
-                     description_en="Specify the name of the extraction command setting."),
-                dict(opt="extract_type", type=Options.T_STR, default='file', required=True, multi=False, hide=False,
-                     choice=['', 'file'],
-                     choice_show=dict(
-                        file=["scope", "client_data", "loadpath", "loadregs", ],
-                     ),
-                     description_ja="抽出の種類を指定します。",
-                     description_en="Specify the type of extraction."),
-                dict(opt="scope", type=Options.T_STR, default="client", required=False, multi=False, hide=False, choice=["", "client", "server"],
-                     description_ja="参照先スコープを指定します。指定可能な画像タイプは `client` , `server` です。",
-                     description_en="Specify the reference scope. The available image types are `client` and `server`.",),
-                dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None, web="mask",
-                     description_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
-                     description_en="Specify the path of the data folder when local is referenced."),
-                dict(opt="loadpath", type=Options.T_DIR, default=None, required=True, multi=False, hide=False, choice=None,
-                     description_ja="読み込み元パスを指定します。",
-                     description_en="Specify the source path."),
-                dict(opt="loadregs", type=Options.T_STR, default=".*", required=True, multi=False, hide=False, choice=None,
-                     description_ja="読込み正規表現パターンを指定します。",
-                     description_en="Specifies a load regular expression pattern."),
+                dict(opt="rag_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                     description_ja="構築するRAG設定の名前を指定します。",
+                     description_en="Specify the name of the RAG configuration to build."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                     description_ja="処理結果jsonの保存先ファイルを指定。",
                     description_en="Specify the destination file for saving the processing result json."),
@@ -106,33 +78,22 @@ class ExtractSave(feature.OneshotResultEdgeFeature):
         )
 
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        if not hasattr(args, 'extract_name') or args.extract_name is None:
-            msg = dict(warn="Please specify --extract_name")
+        if not hasattr(args, 'rag_name') or args.rag_name is None:
+            msg = dict(warn="Please specify --rag_name")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
-        if not re.match(r'^[\w\-]+$', args.extract_name):
-            msg = dict(warn="Extract name can only contain alphanumeric characters, underscores, and hyphens.")
+        if not re.match(r'^[\w\-]+$', args.rag_name):
+            msg = dict(warn="RAG name can only contain alphanumeric characters, underscores, and hyphens.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
-        if not hasattr(args, 'extract_type') or args.extract_type is None:
-            msg = dict(warn="Please specify --extract_type")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-
-        # Build payload
-        payload = dict(
-            extract_name=args.extract_name,
-            extract_type=args.extract_type,
-            extract_cmd=args.extract_cmd,
-            scope=args.scope if hasattr(args, 'scope') else None,
-            client_data=args.client_data if hasattr(args, 'client_data') else None,
-            loadpath=args.loadpath if hasattr(args, 'loadpath') else None,
-            loadregs=args.loadregs if hasattr(args, 'loadregs') else None,
-        )
-
-        payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
+        st, rag_conf, _ = self.load_rag_config(args, cl, tm, pf, logger)
+        if st != self.RESP_SUCCESS:
+            return st, rag_conf, cl
+        payload = dict(rag_conf=rag_conf)
+        payload_b64 = convert.str2b64str(common.to_str(payload))
+
         ret = cl.redis_cli.send_cmd(self.get_svcmd(), [payload_b64],
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -147,12 +108,15 @@ class ExtractSave(feature.OneshotResultEdgeFeature):
               sessions:Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
         try:
-            configure = json.loads(convert.b64str2str(msg[2]))
-            configure_path = data_dir / ".agent" / f"extract-{configure['extract_name']}.json"
-            configure_path.parent.mkdir(parents=True, exist_ok=True)
-            with configure_path.open('w', encoding='utf-8') as f:
-                json.dump(configure, f, indent=4)
-            msg = dict(success=f"Extract configuration saved to '{str(configure_path)}'.")
+            payload = json.loads(convert.b64str2str(msg[2]))
+            rag_conf = payload.get('rag_conf')
+            rag_name = rag_conf.get('rag_name')
+
+            store = rag_store.RagStore.create(rag_conf, logger)
+            store.install()
+            store.create_tables(rag_name)
+
+            msg = dict(success="RAG build completed successfully.")
             redis_cli.rpush(reskey, msg)
             return self.RESP_SUCCESS
 

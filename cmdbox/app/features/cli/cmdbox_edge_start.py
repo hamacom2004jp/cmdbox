@@ -36,7 +36,7 @@ class EdgeStart(feature.UnsupportEdgeFeature):
             description_ja="端末モードを起動します。",
             description_en="Start Edge mode.",
             choice=[
-                dict(opt="data", type=Options.T_DIR, default=self.default_data, required=True, multi=False, hide=True, choice=None,
+                dict(opt="data", type=Options.T_DIR, default=self.default_data, required=True, multi=False, hide=True, choice=None, web="mask",
                      description_ja=f"省略した時は f`$HONE/.{self.ver.__appid__}` を使用します。",
                      description_en=f"When omitted, f`$HONE/.{self.ver.__appid__}` is used."),
             ]

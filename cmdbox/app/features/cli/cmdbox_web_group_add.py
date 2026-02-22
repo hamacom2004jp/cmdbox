@@ -46,7 +46,7 @@ class WebGroupAdd(feature.UnsupportEdgeFeature):
                 dict(opt="group_parent", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="親グループ名を指定します。",
                      description_en="Specifies the parent group name."),
-                dict(opt="signin_file", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None, fileio="in",
+                dict(opt="signin_file", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None, fileio="in", web="mask",
                      description_ja=f"サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.{self.ver.__appid__}/user_list.yml' を指定します。",
                      description_en=f"Specify a file containing users and passwords with which they can signin.Typically, specify '.{self.ver.__appid__}/user_list.yml'."),
                 dict(opt="stdout_log", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],

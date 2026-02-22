@@ -19,6 +19,15 @@ agentView.build_tts_form = async () => {
         const input_elem = $(elem);
         input_elem.change();
     });
+    // TTSインストールボタンのクリックイベント
+    $('#btn_install_tts').off('click').on('click', () => {
+        agentView.install_tts();
+    });
+
+    // TTSアンインストールボタンのクリックイベント
+    $('#btn_uninstall_tts').off('click').on('click', () => {
+        agentView.uninstall_tts();
+    });
 };
 
 agentView.list_tts = async () => {

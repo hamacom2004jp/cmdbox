@@ -1,6 +1,6 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, redis_client
-from cmdbox.app.features.cli import audit_base
+from cmdbox.app.features.cli.audit import audit_base
 from cmdbox.app.options import Options
 from datetime import datetime
 from pathlib import Path

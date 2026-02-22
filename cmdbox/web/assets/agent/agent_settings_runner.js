@@ -2,7 +2,7 @@ agentView.get_runner_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('agent', 'runner_save');
     const vform_names = ['runner_name', 'agent', 'session_store_type', 'session_store_pghost',
                         'session_store_pgport', 'session_store_pguser', 'session_store_pgpass', 'session_store_pgdbname',
-                        'memory', 'tts_engine', 'voicevox_model'];
+                        'memory', 'rag', 'tts_engine', 'voicevox_model'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };
@@ -35,16 +35,16 @@ agentView.list_runner = async () => {
             $("[name='memory']").empty().append('<option></option>');
             res['data'].map(elm=>{$('[name="memory"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
         },$('[name="title"]').val(),'memory');
+        // RAGリストをロード
+        await cmdbox.callcmd('rag','list',{},(res)=>{
+            $("[name='rag']").empty().append('<option></option>');
+            res['data'].map(elm=>{$('[name="rag"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+        },$('[name="title"]').val(),'rag');
     });
 
     // Runner保存ボタンのクリックイベント
     $('#btn_save_runner').off('click').on('click', () => {
         agentView.save_runner();
-    });
-
-    // display_runner_name クリックイベント
-    $('#display_runner_name').off('click').on('click', async () => {
-        await agentView.show_runner_select_modal();
     });
 
     // Runner選択ボタンのクリックイベント
@@ -136,7 +136,12 @@ agentView.list_runner = async () => {
                     $("[name='memory']").empty().append('<option></option>');
                     res['data'].map(elm=>{$('[name="memory"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
                     form.find('[name="memory"]').val(config.memory);
-                },$('[name="title"]').val(),'agent');
+                },$('[name="title"]').val(),'memory');
+                await cmdbox.callcmd('rag','list',{},(res)=>{
+                    $("[name='rag']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="rag"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                    form.find('[name="rag"]').val(config.rag);
+                },$('[name="title"]').val(),'rag');
             });
 
             container.append(itemEl);
@@ -226,7 +231,10 @@ agentView.show_runner_select_modal = async () => {
                        Session Store: ${config.session_store_type || 'None'},
                        VOICEVOX: ${config.voicevox_model || 'None'}`);
             // リストアイテムクリックでrunner選択
-            li.on('click', async () => { agentView.select_runner(config.runner_name); });
+            li.on('click', async () => {
+                agentView.select_runner(config.runner_name);
+                agentView.runner_conf = config;
+            });
         });
     } catch (e) {
         console.error(e);
