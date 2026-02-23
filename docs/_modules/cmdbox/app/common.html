@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.common &mdash; cmdbox 2026/02/15 documentation</title>
+  <title>cmdbox.app.common &mdash; cmdbox 2026/02/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=3de328d9"></script>
+      <script src="../../../_static/documentation_options.js?v=ff424cc1"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -112,6 +112,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
 
 
 <span class="n">HOME_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">))</span>
@@ -140,6 +141,18 @@
         <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">src</span> <span class="o">/</span> <span class="s1">&#39;features.yml&#39;</span><span class="p">,</span> <span class="n">dst_config</span> <span class="o">/</span> <span class="s1">&#39;features.yml&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">dst_config</span> <span class="o">/</span> <span class="s1">&#39;user_list.yml&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">src</span> <span class="o">/</span> <span class="s1">&#39;user_list.yml&#39;</span><span class="p">,</span> <span class="n">dst_config</span> <span class="o">/</span> <span class="s1">&#39;user_list.yml&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="gen_uuid">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.gen_uuid">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">gen_uuid</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    UUIDを生成します。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: 生成したUUID</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="mklogdir">
