@@ -68,12 +68,13 @@ class RagPgvector(rag_store.RagStore):
                 for record in cur:
                     self.logger.info(f"extversion={record}")
 
-    def create_tables(self, servicename:str) -> None:
+    def create_tables(self, servicename:str, embed_vector_dim:int=256) -> None:
         """
         テーブルを作成します
 
         Args:
             servicename (str): サービス名
+            embed_vector_dim (int): 埋め込みベクトルの次元数
         """
         if servicename is None: raise ValueError("servicename is required.")
 
@@ -96,7 +97,7 @@ class RagPgvector(rag_store.RagStore):
                     "origin_url VARCHAR, " + \
                     "metadata JSONB, " + \
                     "vec_model VARCHAR NOT NULL, " + \
-                    "vec_data vector(1536) NOT NULL, " + \
+                    f"vec_data vector({embed_vector_dim}) NOT NULL, " + \
                     "update_dt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, " + \
                     "created_dt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP" + \
                     ")").format(I(table_name)))
@@ -122,7 +123,7 @@ class RagPgvector(rag_store.RagStore):
             connect_timeout=self.dbtimeout)
 
     def insert_doc(self, *, connection:Any=None, servicename:str=None,
-                   content_text:str=None, content_type:str=None, content_blob:bytes=None,
+                   vec_id:str=None, content_text:str=None, content_type:str=None, content_blob:bytes=None,
                    origin_name:str=None, origin_type:str=None, origin_url:str=None,
                    metadata:Dict[str, Any]=None, vec_model:str=None, vec_data:Any=None
                    ) -> None:
@@ -144,6 +145,7 @@ class RagPgvector(rag_store.RagStore):
         """
         if connection is None: raise ValueError("connection is required.")
         if servicename is None: raise ValueError("servicename is required.")
+        vec_id = vec_id if vec_id is not None else common.gen_uuid()
         if content_text is None: raise ValueError("content_text is required.")
         content_type = content_type if content_type is not None else metadata.get('content_type', 'text')
         content_blob = content_blob if content_blob is not None else b''
@@ -159,7 +161,8 @@ class RagPgvector(rag_store.RagStore):
             table_name = f"{self.dbuser}.{servicename}_embedding"
             I = sql.Identifier
             cur.execute(sql.SQL(
-                "INSERT INTO {} (" + \
+                "INSERT INTO {} ("
+                "vec_id, "
                 "content_text, "
                 "content_type, "
                 "content_blob, "
@@ -170,8 +173,9 @@ class RagPgvector(rag_store.RagStore):
                 "metadata, "
                 "vec_model, "
                 "vec_data) VALUES ("
-                "%(content_type)s,"
+                "%(vec_id)s,"
                 "%(content_text)s,"
+                "%(content_type)s,"
                 "%(content_blob)s,"
                 "%(content_size)s,"
                 "%(origin_name)s,"
@@ -180,18 +184,19 @@ class RagPgvector(rag_store.RagStore):
                 "%(metadata)s,"
                 "%(vec_model)s,"
                 "%(vec_data)s)"
-            ).format(
-                I(table_name),
-                I(content_type),
-                I(content_blob),
-                I(content_size),
-                I(origin_name),
-                I(origin_type),
-                I(origin_url),
-                I(common.to_str(metadata)),
-                I(vec_model),
-                I(common.to_str(vec_data))
-            ))
+            ).format(I(table_name)), {
+                'vec_id': vec_id,
+                'content_text': content_text,
+                'content_type': content_type,
+                'content_blob': content_blob,
+                'content_size': content_size,
+                'origin_name': origin_name,
+                'origin_type': origin_type,
+                'origin_url': origin_url,
+                'metadata': common.to_str(metadata),
+                'vec_model': vec_model,
+                'vec_data': common.to_str(vec_data)
+            })
 
     def select_docids(self, servicename:str, file:Path=None):
         """

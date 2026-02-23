@@ -42,12 +42,13 @@ class RagStore:
         """
         raise NotImplementedError("install method is not implemented.")
 
-    def create_tables(self, servicename:str) -> None:
+    def create_tables(self, servicename:str, embed_vector_dim:int=256) -> None:
         """
         テーブルを作成します
 
         Args:
             servicename (str): サービス名
+            embed_vector_dim (int): 埋め込みベクトルの次元数
         """
         raise NotImplementedError("create_tables method is not implemented.")
 

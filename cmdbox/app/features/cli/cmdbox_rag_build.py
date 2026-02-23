@@ -111,10 +111,11 @@ class RagBuild(rag_base.RAGBase):
             payload = json.loads(convert.b64str2str(msg[2]))
             rag_conf = payload.get('rag_conf')
             rag_name = rag_conf.get('rag_name')
+            embed_vector_dim = rag_conf.get('embed_vector_dim')
 
             store = rag_store.RagStore.create(rag_conf, logger)
             store.install()
-            store.create_tables(rag_name)
+            store.create_tables(rag_name, embed_vector_dim=embed_vector_dim)
 
             msg = dict(success="RAG build completed successfully.")
             redis_cli.rpush(reskey, msg)

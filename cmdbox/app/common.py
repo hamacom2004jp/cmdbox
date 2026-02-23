@@ -32,6 +32,7 @@ import yaml
 import sys
 import threading
 import types
+import uuid
 
 
 HOME_DIR = Path(os.path.expanduser("~"))
@@ -58,6 +59,15 @@ def copy_sample(data:Path, ver=version):
         shutil.copy2(src / 'features.yml', dst_config / 'features.yml')
     if not (dst_config / 'user_list.yml').exists():
         shutil.copy2(src / 'user_list.yml', dst_config / 'user_list.yml')
+
+def gen_uuid() -> str:
+    """
+    UUIDを生成します。
+
+    Returns:
+        str: 生成したUUID
+    """
+    return str(uuid.uuid4())
 
 def mklogdir(data:Path) -> Path:
     """
