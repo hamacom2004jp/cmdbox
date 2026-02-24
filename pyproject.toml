@@ -82,7 +82,7 @@ agent_mem = [
     "transformers>=4.48.0",
     "torch",
 ]
-agent_rag = [
+rag = [
     "chunklet-py[document]",
     "langchain_community",
     "markdown",
@@ -91,6 +91,18 @@ agent_rag = [
 saml = [
     "python3-saml",
     "xmlsec==1.3.13",
+]
+all = ["cmdbox[agent_mcp,agent_adk,agent_mem,rag,saml]"]
+dev = [
+    "build",
+    "collectlicense",
+    "sphinx",
+    "sphinx-rtd-theme",
+    "sphinx_fontawesome",
+    "sphinx-intl",
+    "sphinx-sitemap",
+    "twine",
+    "wheel",
 ]
 
 [project.urls]
@@ -112,6 +124,9 @@ packages = [
     "cmdbox.app.commons",
     "cmdbox.app.features.cli",
     "cmdbox.app.features.cli.agent",
+    "cmdbox.app.features.cli.audit",
+    "cmdbox.app.features.cli.excel",
+    "cmdbox.app.features.cli.rag",
     "cmdbox.app.features.web",
     "cmdbox.extensions"
 ]
