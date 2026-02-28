@@ -22,16 +22,28 @@ cmdbox -v
 - When using SAML in web mode, install the modules with dependencies.
 ```bash
 pip install cmdbox[saml]
-apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl build-essential libopencv-dev
+apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl build-essential
 ```
 
 - When using agent mode, install the modules with dependencies.
 ```bash
-pip install "pydantic>=2.0.0,<3.0.0"
-pip install "fastmcp>=2.14.0" "mcp>=1.10.0,<2.0.0"
-pip install "google-adk>=1.21.0" "litellm"
-pip install "a2a-sdk>=0.3.4,<0.4.0"
-pip install "transformers>=4.48.0" "sentence-transformers" "sqlite_vec" "torch" "pdfplumber"
+pip install cmdbox[agent_mcp]
+pip install cmdbox[agent_adk]
+pip install cmdbox[agent_mem]
+pip install cmdbox[rag]
+pip install cmdbox[omni]
+apt-get -y install ffmpeg
+```
+
+or..
+
+```bash
+pip install "pydantic>=2.0.0,<3.0.0" "fastmcp>=2.14.4" "mcp>=1.23.0,<2.0.0"
+pip install "google-adk>=1.23.0" "a2a-sdk>=0.3.4,<0.4.0" "litellm>=1.75.5,<1.80.17"
+pip install "sentence-transformers" "sqlite_vec" "transformers>=4.48.0" "torch"
+pip install "chunklet-py[document]" "langchain_community" "markdown" "pdfplumber"
+pip install "accelerate>=1.12.0" "qwen-omni-utils>=0.0.9" "torchvision>=0.25.0"
+apt-get -y install ffmpeg
 ```
 
 # Run
@@ -66,7 +78,8 @@ cmdbox -m mcpsv -c start --signin_file .cmdbox/user_list.yml &
 ```bash
 python -m venv .venv
 . .venv/bin/activate
-pip install -r requirements.txt
+pip install -e .[all]
+pip uninstall -y cmdbox
 ```
 
 - Run the project.

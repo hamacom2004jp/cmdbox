@@ -88,11 +88,16 @@ rag = [
     "markdown",
     "pdfplumber",
 ]
+omni = [
+    "accelerate>=1.12.0",
+    "qwen-omni-utils>=0.0.9",
+    "torchvision>=0.25.0",
+]
 saml = [
     "python3-saml",
     "xmlsec==1.3.13",
 ]
-all = ["cmdbox[agent_mcp,agent_adk,agent_mem,rag,saml]"]
+all = ["cmdbox[agent_mcp,agent_adk,agent_mem,rag,omni,saml]"]
 dev = [
     "build",
     "collectlicense",
