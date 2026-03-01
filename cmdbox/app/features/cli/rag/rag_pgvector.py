@@ -1,10 +1,10 @@
 from cmdbox.app import common
 from cmdbox.app.features.cli.rag import rag_store
 from pathlib import Path
-from typing import Dict, Any, Tuple, List, Union
+from typing import Dict, Any, Generator, Tuple, List, Union
 import logging
 import psycopg
-from psycopg import sql
+from psycopg import Connection, sql
 
 
 class RagPgvector(rag_store.RagStore):
@@ -122,7 +122,7 @@ class RagPgvector(rag_store.RagStore):
             password=self.dbpass,
             connect_timeout=self.dbtimeout)
 
-    def insert_doc(self, *, connection:Any=None, servicename:str=None,
+    def insert_doc(self, *, connection:Connection=None, servicename:str=None,
                    vec_id:str=None, content_text:str=None, content_type:str=None, content_blob:bytes=None,
                    origin_name:str=None, origin_type:str=None, origin_url:str=None,
                    metadata:Dict[str, Any]=None, vec_model:str=None, vec_data:Any=None
@@ -198,64 +198,111 @@ class RagPgvector(rag_store.RagStore):
                 'vec_data': common.to_str(vec_data)
             })
 
-    def select_docids(self, servicename:str, file:Path=None):
+    def delete_doc(self, *, connection:Connection=None, servicename:str=None,
+                   vec_id:str=None, content_text:str=None, content_type:str=None,
+                   origin_name:str=None, origin_type:str=None, origin_url:str=None,
+                   metadata:Dict[str, Any]=None, vec_model:str=None) -> None:
         """
-        ドキュメントIDを取得します
+        ドキュメントを削除します
 
         Args:
+            connection: データベース接続オブジェクト
             servicename (str): サービス名
-            file (Path): ファイル名
+            vec_id (str): ベクトルID
+            content_text (str): ドキュメントの内容
+            content_type (str): ドキュメントのタイプ
+            origin_name (str): ドキュメントの元の名前
+            origin_type (str): ドキュメントの元のタイプ
+            origin_url (str): ドキュメントの元のURL
+            metadata (dict): ドキュメントのメタデータ
+            vec_model (str): ベクトルモデルの名前
         """
-        with psycopg.connect(
-            host=self.dbhost,
-            port=self.dbport,
-            dbname=self.dbname,
-            user=self.dbuser,
-            password=self.dbpass,
-            connect_timeout=self.dbtimeout) as conn:
-            conn.autocommit = True
-            with conn.cursor() as cur:
-                where = None
-                if servicename is not None and file is not None:
-                    where = f"WHERE c.name = %(servicename)s AND e.cmetadata->>'source' = %(file)s"
-                elif servicename is not None:
-                    where = f"WHERE c.name = %(servicename)s"
-                else:
-                    raise ValueError(f"select_docids param invalid. savetype={savetype}, servicename={servicename}, file={file}")
-                cur.execute(f"SELECT e.id FROM langchain_pg_embedding e inner join langchain_pg_collection c " + \
-                            f"ON e.collection_id = c.uuid {where}",
-                            dict(servicename=servicename, file=str(file)))
-                return [record[0] for record in cur]
+        if connection is None: raise ValueError("connection is required.")
+        if servicename is None: raise ValueError("servicename is required.")
+        metadata_where = None
+        if metadata is not None and len(metadata) > 0:
+            metadata_where = " AND ".join([f"metadata->>'{k}' = %({k})s" for k in metadata.keys()])
+        with connection.cursor() as cur:
+            table_name = f"{self.dbuser}.{servicename}_embedding"
+            I = sql.Identifier
+            where_clauses = filter(None, [
+                ("vec_id = %(vec_id)s" if vec_id is not None else ""),
+                ("content_text like %(content_text)s" if content_text is not None else ""),
+                ("content_type = %(content_type)s" if content_type is not None else ""),
+                ("origin_name = %(origin_name)s" if origin_name is not None else ""),
+                ("origin_type = %(origin_type)s" if origin_type is not None else ""),
+                ("origin_url = %(origin_url)s" if origin_url is not None else ""),
+                (f"({metadata_where})" if metadata_where is not None else ""),
+                ("vec_model = %(vec_model)s" if vec_model is not None else "")
+            ])
+            params = {
+                'vec_id': vec_id if vec_id is not None else '',
+                'content_text': f'%{content_text}%' if content_text is not None else '',
+                'content_type': content_type if content_type is not None else '',
+                'origin_name': origin_name if origin_name is not None else '',
+                'origin_type': origin_type if origin_type is not None else '',
+                'origin_url': origin_url if origin_url is not None else '',
+                'vec_model': vec_model if vec_model is not None else '',
+            }
+            if metadata is not None:
+                params.update({k: common.to_str(v) for k, v in metadata.items()})
+            cur.execute(query=sql.SQL(
+                "DELETE FROM {} " + ("WHERE " + " AND ".join(where_clauses) if where_clauses else "")
+            ).format(I(table_name)), params=params)
 
-    def select_page_docids(self, servicename:str, file:Path=None, spage:int=0, epage=9999):
+    def select_doc(self, *, connection:Connection=None, servicename:str=None,
+                   vec_id:str=None, content_text:str=None, content_type:str=None,
+                   origin_name:str=None, origin_type:str=None, origin_url:str=None,
+                   metadata:Dict[str, Any]=None, vec_model:str=None) -> Generator[Any, Any, Any]:
         """
-        ページ範囲でドキュメントIDを取得します。
-        spage <= 対象ページ < epage の範囲で取得します。
+        ドキュメントを選択します
 
         Args:
+            connection: データベース接続オブジェクト
             servicename (str): サービス名
-            file (Path): ファイル名
-            spage (int): 開始ページ
-            epage (int): 終了ページ
+            vec_id (str): ベクトルID
+            content_text (str): ドキュメントの内容
+            content_type (str): ドキュメントのタイプ
+            origin_name (str): ドキュメントの元の名前
+            origin_type (str): ドキュメントの元のタイプ
+            origin_url (str): ドキュメントの元のURL
+            metadata (dict): ドキュメントのメタデータ
+            vec_model (str): ベクトルモデルの名前
+
+        Yields:
+            record: ドキュメントレコード
         """
-        with psycopg.connect(
-            host=self.dbhost,
-            port=self.dbport,
-            dbname=self.dbname,
-            user=self.dbuser,
-            password=self.dbpass,
-            connect_timeout=self.dbtimeout) as conn:
-            conn.autocommit = True
-            with conn.cursor() as cur:
-                where = None
-                if servicename is not None and file is not None:
-                    where = f"WHERE c.name = %(servicename)s AND e.cmetadata->>'source' = %(file)s "
-                elif servicename is not None:
-                    where = f"WHERE c.name = %(servicename)s "
-                else:
-                    raise ValueError(f"select_docids param invalid. savetype={savetype}, servicename={servicename}, file={file}")
-                where += f"AND CAST(e.cmetadata->>'page' AS INTEGER) >= %(spage)s AND CAST(e.cmetadata->>'page' AS INTEGER) <= %(epage)s "
-                cur.execute(f"SELECT e.id FROM langchain_pg_embedding e inner join langchain_pg_collection c " + \
-                            f"ON e.collection_id = c.uuid {where}",
-                            dict(servicename=servicename, file=str(file), spage=spage, epage=epage))
-                return [record[0] for record in cur]
+        if connection is None: raise ValueError("connection is required.")
+        if servicename is None: raise ValueError("servicename is required.")
+        metadata_where = None
+        if metadata is not None and len(metadata) > 0:
+            metadata_where = " AND ".join([f"metadata->>'{k}' = %({k})s" for k in metadata.keys()])
+        with connection.cursor() as cur:
+            table_name = f"{self.dbuser}.{servicename}_embedding"
+            I = sql.Identifier
+            where_clauses = filter(None, [
+                ("vec_id = %(vec_id)s" if vec_id is not None else ""),
+                ("content_text like %(content_text)s" if content_text is not None else ""),
+                ("content_type = %(content_type)s" if content_type is not None else ""),
+                ("origin_name = %(origin_name)s" if origin_name is not None else ""),
+                ("origin_type = %(origin_type)s" if origin_type is not None else ""),
+                ("origin_url = %(origin_url)s" if origin_url is not None else ""),
+                (f"({metadata_where})" if metadata_where is not None else ""),
+                ("vec_model = %(vec_model)s" if vec_model is not None else "")
+            ])
+            params = {
+                'vec_id': vec_id if vec_id is not None else '',
+                'content_text': f'%{content_text}%' if content_text is not None else '',
+                'content_type': content_type if content_type is not None else '',
+                'origin_name': origin_name if origin_name is not None else '',
+                'origin_type': origin_type if origin_type is not None else '',
+                'origin_url': origin_url if origin_url is not None else '',
+                'vec_model': vec_model if vec_model is not None else '',
+            }
+            if metadata is not None:
+                params.update({k: common.to_str(v) for k, v in metadata.items()})
+            cur.execute(query=sql.SQL(
+                "SELECT * FROM {} " + ("WHERE " + " AND ".join(where_clauses) if where_clauses else "")
+            ).format(I(table_name)), params=params)
+            for record in cur:
+                yield record

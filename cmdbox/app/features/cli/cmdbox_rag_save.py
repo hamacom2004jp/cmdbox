@@ -111,6 +111,9 @@ class RagSave(feature.OneshotResultEdgeFeature):
                 dict(opt="embed_vector_dim", type=Options.T_INT, default=256, required=False, multi=False, hide=False, choice=None,
                      description_ja="Embed時のベクトル次元数を指定します。",
                      description_en="Specify the vector dimension for embedding."),
+                dict(opt="savetype", type=Options.T_STR, default="per_doc", required=False, multi=False, hide=False, choice=["per_doc", "per_service", "add_only"],
+                    description_ja="保存パターンを指定します。 `per_doc` :ドキュメント単位、 `per_service` :サービス単位、 `add_only` :追加のみ",
+                    description_en="Specify the storage pattern. `per_doc` :per document, `per_service` :per service, `add_only` :add only",),
                 dict(opt="vector_store_pghost", type=Options.T_STR, default='localhost', required=False, multi=False, hide=False, choice=None,
                      description_ja="VecRAG保存先用PostgreSQLホストを指定します。",
                      description_en="Specify the postgresql host for VecRAG storage."),
@@ -166,11 +169,16 @@ class RagSave(feature.OneshotResultEdgeFeature):
             msg = dict(warn="Please specify --rag_type")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
+        if not hasattr(args,'savetype') or args.savetype not in ['per_doc', 'per_page', 'per_service', 'add_only']:
+            msg = dict(warn="Please specify --savetype with one of the following values: 'per_doc', 'per_page', 'per_service', 'add_only'")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
 
         # Build payload
         payload = dict(
             rag_name=args.rag_name,
             rag_type=args.rag_type,
+            savetype=args.savetype,
             extract=list(set(args.extract)) if hasattr(args, 'extract') and args.extract is not None else None,
             embed=args.embed if hasattr(args, 'embed') else None,
             embed_vector_dim=args.embed_vector_dim if hasattr(args, 'embed_vector_dim') else None,

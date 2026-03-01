@@ -81,64 +81,47 @@ class RagStore:
         """
         raise NotImplementedError("insert_doc method is not implemented.")
 
-    def select_docids(self, servicename:str, file:Path=None):
+    def delete_doc(self, *, connection:Any=None, servicename:str=None,
+                   vec_id:str=None, content_text:str=None, content_type:str=None,
+                   origin_name:str=None, origin_type:str=None, origin_url:str=None,
+                   metadata:Dict[str, Any]=None, vec_model:str=None) -> None:
         """
-        ドキュメントIDを取得します
+        ドキュメントを削除します
 
         Args:
+            connection: データベース接続オブジェクト
             servicename (str): サービス名
-            file (Path): ファイル名
+            vec_id (str): ベクトルID
+            content_text (str): ドキュメントの内容
+            content_type (str): ドキュメントのタイプ
+            origin_name (str): ドキュメントの元の名前
+            origin_type (str): ドキュメントの元のタイプ
+            origin_url (str): ドキュメントの元のURL
+            metadata (dict): ドキュメントのメタデータ
+            vec_model (str): ベクトルモデルの名前
         """
-        with psycopg.connect(
-            host=self.dbhost,
-            port=self.dbport,
-            dbname=self.dbname,
-            user=self.dbuser,
-            password=self.dbpass,
-            connect_timeout=self.dbtimeout) as conn:
-            conn.autocommit = True
-            with conn.cursor() as cur:
-                where = None
-                if servicename is not None and file is not None:
-                    where = f"WHERE c.name = %(servicename)s AND e.cmetadata->>'source' = %(file)s"
-                elif servicename is not None:
-                    where = f"WHERE c.name = %(servicename)s"
-                else:
-                    raise ValueError(f"select_docids param invalid. savetype={savetype}, servicename={servicename}, file={file}")
-                cur.execute(f"SELECT e.id FROM langchain_pg_embedding e inner join langchain_pg_collection c " + \
-                            f"ON e.collection_id = c.uuid {where}",
-                            dict(servicename=servicename, file=str(file)))
-                return [record[0] for record in cur]
+        raise NotImplementedError("delete_doc method is not implemented.")
 
-    def select_page_docids(self, servicename:str, file:Path=None, spage:int=0, epage=9999):
+    def select_doc(self, *, connection:Any=None, servicename:str=None,
+                   vec_id:str=None, content_text:str=None, content_type:str=None,
+                   origin_name:str=None, origin_type:str=None, origin_url:str=None,
+                   metadata:Dict[str, Any]=None, vec_model:str=None) -> None:
         """
-        ページ範囲でドキュメントIDを取得します。
-        spage <= 対象ページ < epage の範囲で取得します。
+        ドキュメントを選択します
 
         Args:
+            connection: データベース接続オブジェクト
             servicename (str): サービス名
-            file (Path): ファイル名
-            spage (int): 開始ページ
-            epage (int): 終了ページ
+            vec_id (str): ベクトルID
+            content_text (str): ドキュメントの内容
+            content_type (str): ドキュメントのタイプ
+            origin_name (str): ドキュメントの元の名前
+            origin_type (str): ドキュメントの元のタイプ
+            origin_url (str): ドキュメントの元のURL
+            metadata (dict): ドキュメントのメタデータ
+            vec_model (str): ベクトルモデルの名前
+
+        Yields:
+            record: ドキュメントレコード
         """
-        with psycopg.connect(
-            host=self.dbhost,
-            port=self.dbport,
-            dbname=self.dbname,
-            user=self.dbuser,
-            password=self.dbpass,
-            connect_timeout=self.dbtimeout) as conn:
-            conn.autocommit = True
-            with conn.cursor() as cur:
-                where = None
-                if servicename is not None and file is not None:
-                    where = f"WHERE c.name = %(servicename)s AND e.cmetadata->>'source' = %(file)s "
-                elif servicename is not None:
-                    where = f"WHERE c.name = %(servicename)s "
-                else:
-                    raise ValueError(f"select_docids param invalid. savetype={savetype}, servicename={servicename}, file={file}")
-                where += f"AND CAST(e.cmetadata->>'page' AS INTEGER) >= %(spage)s AND CAST(e.cmetadata->>'page' AS INTEGER) <= %(epage)s "
-                cur.execute(f"SELECT e.id FROM langchain_pg_embedding e inner join langchain_pg_collection c " + \
-                            f"ON e.collection_id = c.uuid {where}",
-                            dict(servicename=servicename, file=str(file), spage=spage, epage=epage))
-                return [record[0] for record in cur]
+        raise NotImplementedError("select_doc method is not implemented.")

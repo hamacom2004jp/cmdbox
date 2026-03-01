@@ -6,6 +6,7 @@ import argparse
 import argcomplete
 import logging
 import os
+import queue
 import time
 import threading
 import sys
@@ -41,7 +42,7 @@ class CmdBoxApp:
         self.cli_features_packages = cli_features_packages
         self.cli_features_prefix = cli_features_prefix
 
-    def main(self, args_list:list=None, file_dict:dict=dict(), webcall:bool=False):
+    def main(self, args_list:list=None, file_dict:dict=dict(), webcall:bool=False, resqueue:queue.Queue=None):
         """
         コマンドライン引数を処理し、サーバーまたはクライアントを起動し、コマンドを実行する。
         """
@@ -110,6 +111,7 @@ class CmdBoxApp:
         except argparse.ArgumentError as e:
             msg = dict(warn=f"ArgumentError: {e}")
             common.print_format(msg, False, 0, None, False)
+            if resqueue is not None: resqueue.put(msg)
             return feature.Feature.RESP_WARN, msg, None
         # 起動時引数で指定されたオプションをファイルから読み込んだオプションで上書きする
         args_dict = vars(args)
@@ -145,6 +147,7 @@ class CmdBoxApp:
             if args.useopt is None:
                 msg = dict(warn=f"Please specify the --useopt option.")
                 common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
+                if resqueue is not None: resqueue.put(msg)
                 return feature.Feature.RESP_WARN, msg, None
             common.saveopt(opt, args.useopt)
             ret = dict(success=f"Save options file. {args.useopt}")
@@ -161,6 +164,7 @@ class CmdBoxApp:
         if args.mode is None:
             msg = dict(warn=f"mode is None. Please specify the --help option.")
             common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
+            if resqueue is not None: resqueue.put(msg)
             return feature.Feature.RESP_WARN, msg, None
 
         sloggerinittime = time.perf_counter()
@@ -186,10 +190,12 @@ class CmdBoxApp:
                 pf.append(dict(key="app_makesample", val=f"{emakesampletime-smakesampletime:.03f}s"))
                 pf.append(dict(key="app_loggerinit", val=f"{eloggerinittime-sloggerinittime:.03f}s"))
                 self.options.audit_exec(args, logger, feat, audit_type=options.Options.AT_EVENT)
+                args._resqueue = resqueue # コマンド実行結果を格納するキューを引数に追加
                 status, ret, obj = common.exec_sync(feat.apprun, logger, args, smaintime, pf, webcall)
                 return status, ret, obj
             else:
                 msg = dict(warn=f"Unkown mode or cmd. mode={args.mode}, cmd={args.cmd}")
+                if resqueue is not None: resqueue.put(msg)
                 common.print_format(msg, args.format, smaintime, args.output_json, args.output_json_append)
                 return feature.Feature.RESP_WARN, msg, None
         finally:

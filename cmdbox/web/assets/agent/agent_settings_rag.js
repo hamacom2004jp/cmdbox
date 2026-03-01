@@ -1,6 +1,6 @@
 agentView.get_rag_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('rag', 'save');
-    const vform_names = ['rag_name', 'rag_type', 'source_dir', 'extract', 'embed', 'embed_vector_dim',
+    const vform_names = ['rag_name', 'rag_type', 'source_dir', 'extract', 'embed', 'embed_vector_dim', 'savetype',
                          'vector_store_pghost', 'vector_store_pgport', 'vector_store_pguser', 'vector_store_pgpass', 'vector_store_pgdbname',
                          'graph_store_pghost', 'graph_store_pgport', 'graph_store_pguser', 'graph_store_pgpass', 'graph_store_pgdbname',
                         ];

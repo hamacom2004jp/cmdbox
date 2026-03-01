@@ -106,6 +106,7 @@ class CmdList(feature.OneshotResultEdgeFeature):
         is_japan = common.is_japan(args=args)
         options = Options.getInstance()
         ret_list = []
+        args.match_opt = [opt for opt in args.match_opt if opt is not None and opt != ''] if args.match_opt is not None and isinstance(args.match_opt, list) else []
         for r in cmd_list:
             if args.match_mode is not None and args.match_mode != '' and args.match_mode not in r['mode']:
                 continue

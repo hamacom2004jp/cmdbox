@@ -153,7 +153,7 @@ agentView.initView = () => {
 }
 
 agentView.disabled = false;
-agentView.exec_cmd = async (mode, cmd, opt={}, error_func=null, loading=true) => {
+agentView.exec_cmd = async (mode, cmd, opt={}, error_func=null, loading=true, sse_cb=null) => {
     if(!agentView.user) {
         if (!agentView.disabled) {
             cmdbox.message({'error':'User information could not be retrieved. AI features are unavailable.'});
@@ -165,6 +165,29 @@ agentView.exec_cmd = async (mode, cmd, opt={}, error_func=null, loading=true) =>
     const opt_def = cmdbox.get_server_opt(false, $('#filer_form'));
     opt = {...opt_def, ...opt, 'mode':mode, 'cmd':cmd, 'user_name':agentView.user['name'], 'capture_stdout':true};
     if (loading) cmdbox.show_loading();
+    if (sse_cb) {
+        const queryString = new URLSearchParams(opt).toString();
+        const evtSource = new EventSource(`exec_sse_cmd?${queryString}`, {withCredentials: true,});
+        evtSource.onmessage = function(event) {
+            try {
+                const data = JSON.parse(event.data);
+                sse_cb(data);
+                if (data['success'] || data['error'] || data['warn']) {
+                    evtSource.close();
+                    if (loading) cmdbox.hide_loading();
+                }
+            } catch(e) {
+                console.error('Error parsing SSE data:', e);
+            }
+        };
+        evtSource.onerror = function(e) {
+            console.error('SSE error:', e);
+            evtSource.close();
+            if (loading) cmdbox.hide_loading();
+            if (error_func) error_func({'error': 'An error occurred during command execution.'});
+        };
+        return;
+    }
     return cmdbox.sv_exec_cmd(opt).then(res => {
         if(res && Array.isArray(res) && res.length <=0) {
             if (loading) cmdbox.hide_loading();
@@ -225,11 +248,13 @@ agentView.regist_rag = async () => {
         const rag_name = agentView.runner_conf.rag[i];
         cmdbox.show_loading();
         cmdbox.progress(0, n, i, `Registering RAG '${rag_name}'...`, true, true);
-        const res = await agentView.exec_cmd('rag', 'regist', { rag_name: rag_name });
-        if (!res || !res.success) {
-            cmdbox.message(res);
-            console.warn(res);
-            return false;
-        }
+        await agentView.exec_cmd('rag', 'regist', { rag_name: rag_name }, null, true, (data) => {
+            if (data['process']) {
+                const msg = data['process']['message'];
+                const count = data['process']['count'] || 1;
+                const index = data['process']['index'] || 1;
+                cmdbox.progress(0, count, index, `${msg}`, true, false);
+            }
+        });
     }
 }

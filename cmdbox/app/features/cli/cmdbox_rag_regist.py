@@ -112,114 +112,152 @@ class RagRegist(rag_base.RAGBase):
         options = Options.getInstance(appcls=self.appcls, ver=self.ver)
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
-        # RAG設定の読込み
-        st, rag_config, cl = self.load_rag_config(args, cl, tm, pf, logger)
-        if st != self.RESP_SUCCESS:
-            return st, rag_config, cl
+        try:
+            # RAG設定の読込み
+            self.put_resqueue(args, dict(process=dict(message="Loading RAG configuration...")))
+            st, rag_config, cl = self.load_rag_config(args, cl, tm, pf, logger)
+            if st != self.RESP_SUCCESS:
+                return st, rag_config, cl
 
-        # サインイン情報を取得
-        st, signin_res, _ = self.check_signin(args, tm, pf, logger)
-        if st != self.RESP_SUCCESS:
-            return st, signin_res, cl
-        user_name = signin_res['success']['user_name']
-        scope = signin_res['success']['scope']
-        signin_data = signin_res['success']['signin_data']
+            # サインイン情報を取得
+            self.put_resqueue(args, dict(process=dict(message="Checking signin information...")))
+            st, signin_res, _ = self.check_signin(args, tm, pf, logger)
+            if st != self.RESP_SUCCESS:
+                return st, signin_res, cl
+            user_name = signin_res['success']['user_name']
+            scope = signin_res['success']['scope']
+            signin_data = signin_res['success']['signin_data']
 
-        # Embeddingの起動
-        st, embedstart_res, cl = self.embedstart(rag_config, args, cl, tm, pf, logger)
-        if st != self.RESP_SUCCESS:
-            return st, embedstart_res, cl
+            # Embeddingの起動
+            self.put_resqueue(args, dict(process=dict(message="Starting embedding...")))
+            st, embedstart_res, cl = self.embedstart(rag_config, args, cl, tm, pf, logger)
+            if st != self.RESP_SUCCESS:
+                return st, embedstart_res, cl
 
-        # Extract設定の読込み
-        extract_names = rag_config.get('extract', [])
-        if not isinstance(extract_names, list) or len(extract_names) == 0:
-            msg = dict(warn=f"RAG configuration '{args.rag_name}' does not contain valid extract names.")
+            # Extract設定の読込み
+            self.put_resqueue(args, dict(process=dict(message="Loading extract configuration...")))
+            extract_names = rag_config.get('extract', [])
+            if not isinstance(extract_names, list) or len(extract_names) == 0:
+                msg = dict(warn=f"RAG configuration '{args.rag_name}' does not contain valid extract names.")
+                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, msg, cl
+
+            # RagStoreの作成
+            self.put_resqueue(args, dict(process=dict(message="Creating RAG store...")))
+            store = rag_store.RagStore.create(rag_config, logger)
+
+            # Extract結果のRAGストアへの登録
+            with store.connect() as conn:
+                conn.autocommit = False
+                if args.savetype == 'per_service':
+                    self.put_resqueue(args, dict(process=dict(message=f"Deleting existing RAG documents...servicename={args.rag_name}")))
+                    store.delete_doc(connection=conn, servicename=args.rag_name,)
+                for extract_name in extract_names:
+                    # Extract設定の取得
+                    self.put_resqueue(args, dict(process=dict(message=f"Loading extract configuration...extract_name={extract_name}")))
+                    st, extract_conf, cl = self.load_extract_config(extract_name, args, cl, tm, pf, logger)
+                    if st != self.RESP_SUCCESS:
+                        return st, extract_conf, cl
+
+                    # Extractコマンドの取得
+                    self.put_resqueue(args, dict(process=dict(message=f"Loading extract command...extract_name={extract_name}")))
+                    st, extract_cmd_res, cl = self.load_extract_cmd(extract_conf, options, args, cl, tm, pf, logger)
+                    if st != self.RESP_SUCCESS:
+                        return st, extract_cmd_res, cl
+                    extract_feat = extract_cmd_res['success']['extract_feat']
+                    extract_opt = extract_cmd_res['success']['extract_opt']
+                    extract_args = extract_cmd_res['success']['extract_args']
+
+                    # Extractコマンドの実行権限チェック
+                    self.put_resqueue(args, dict(process=dict(message=f"Checking permission for extract command...extract_name={extract_name}")))
+                    st, check_res, _ = self.check_cmd_permission(signin_data, user_name,
+                                                                extract_opt, extract_args, args, tm, pf, logger)
+                    if st != self.RESP_SUCCESS:
+                        return st, check_res, cl
+
+                    # Extract対象ファイル一覧を取得
+                    marge_opt = extract_opt.copy()
+                    marge_opt.update(extract_conf)
+                    self.put_resqueue(args, dict(process=dict(message=f"Listing target files for extract command...extract_name={extract_name}")))
+                    st, file_list, _ = self.list_file(marge_opt, options, args, tm, pf, logger)
+                    if st != self.RESP_SUCCESS:
+                        return st, file_list, cl
+
+                    # ファイル一覧に対してExtractコマンドの実行とRAGストアへの登録を実施
+                    for k, v in file_list.items():
+                        if not isinstance(v, dict) or v.get('children', None) is None:
+                            continue
+                        children_count = len(v['children'])
+                        children_index = 0
+                        for kc, kv in v['children'].items():
+                            children_index += 1
+                            if not isinstance(kv, dict) or kv.get('path', None) is None or kv.get('is_dir', None) is None:
+                                continue
+                            if kv['is_dir']:
+                                continue
+                            marge_opt['loadpath'] = kv['path']
+                            marge_args = argparse.Namespace(**marge_opt)
+                            # Extractコマンドの実行の実行
+                            self.put_resqueue(args, dict(process=dict(message=f"({children_index}/{children_count}) Executing extract command...file={kv['path']}",
+                                                                      count=children_count, index=children_index, filename=Path(kv['path']).name)))
+                            st, extract_res, _ = self.exec_extract_cmd(extract_feat, marge_args, options, args, tm, pf, logger)
+                            if st != self.RESP_SUCCESS:
+                                msg = dict(warn=f"Failed to execute extract command for file '{kv['path']}'. Skipping registration for this file. Warning: {extract_res.get('warn', 'Unknown error')}")
+                                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                                continue
+                            # save_typeの処理
+                            if args.savetype == 'per_doc':
+                                self.put_resqueue(args, dict(process=dict(message=f"Deleting existing documents for file '{marge_opt['loadpath']}'",
+                                                                          filename=Path(marge_opt['loadpath']).name)))
+                                store.delete_doc(connection=conn, servicename=args.rag_name, origin_name=marge_opt['loadpath'],)
+
+                            # チャンク毎に登録実施
+                            doc_count = len(extract_res)
+                            doc_index = 0
+                            doc_bcount = 50
+                            for i in range(0, len(extract_res), doc_bcount):
+                                docs = extract_res[i:i+doc_bcount]
+                                doc_index += len(docs)
+                                if len([doc for doc in docs if 'content' not in doc]) > 0:
+                                    msg = dict(warn=f"Extracted document does not contain 'content' field.")
+                                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                                    continue
+                                if len([doc for doc in docs if 'metadata' not in doc]) > 0:
+                                    msg = dict(warn=f"Extracted document does not contain 'metadata' field.")
+                                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                                    continue
+
+                                # Embeddingの実行
+                                self.put_resqueue(args, dict(process=dict(message=f"({doc_index}/{doc_count}) Executing embedding for extracted document...file={marge_opt['loadpath']}",
+                                                                          count=doc_count, index=doc_index, filename=Path(marge_opt['loadpath']).name)))
+                                st, embed_res, _ = self.embedding(rag_config, [doc['content'] for doc in docs], args, cl, tm, pf, logger)
+                                if st != self.RESP_SUCCESS:
+                                    return st, embed_res, cl
+                                # RAGストアへの登録
+                                self.put_resqueue(args, dict(process=dict(message=f"({doc_index}/{doc_count}) Registering extracted document to RAG store...file={marge_opt['loadpath']}",
+                                                                          count=doc_count, index=doc_index, filename=Path(marge_opt['loadpath']).name)))
+                                for embed_i, embed_data in enumerate(embed_res.get('data', [])):
+                                    vec_npy = convert.b64str2npy(embed_data['embed'], shape=embed_data['shape'], dtype=embed_data['type'])
+                                    vev_list = vec_npy.tolist()
+                                    store.insert_doc(connection=conn,
+                                                    servicename=args.rag_name,
+                                                    content_text=embed_data['data'],
+                                                    origin_name=marge_opt['loadpath'],
+                                                    metadata=docs[embed_i]['metadata'],
+                                                    vec_model=rag_config.get('embed'),
+                                                    vec_data=vev_list)
+                        conn.commit()
+
+            ret = dict(success="RAG registration completed successfully.")
+            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            if 'success' not in ret:
+                return self.RESP_WARN, ret, cl
+            return self.RESP_SUCCESS, ret, cl
+        except Exception as e:
+            msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
+            logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, cl
-
-        # RagStoreの作成
-        store = rag_store.RagStore.create(rag_config, logger)
-
-        # Extract結果のRAGストアへの登録
-        with store.connect() as conn:
-            conn.autocommit = False
-            for extract_name in extract_names:
-                # Extract設定の取得
-                st, extract_conf, cl = self.load_extract_config(extract_name, args, cl, tm, pf, logger)
-                if st != self.RESP_SUCCESS:
-                    return st, extract_conf, cl
-
-                # Extractコマンドの取得
-                st, extract_cmd_res, cl = self.load_extract_cmd(extract_conf, options, args, cl, tm, pf, logger)
-                if st != self.RESP_SUCCESS:
-                    return st, extract_cmd_res, cl
-                extract_feat = extract_cmd_res['success']['extract_feat']
-                extract_opt = extract_cmd_res['success']['extract_opt']
-                extract_args = extract_cmd_res['success']['extract_args']
-
-                # Extractコマンドの実行権限チェック
-                st, check_res, _ = self.check_cmd_permission(signin_data, user_name,
-                                                            extract_opt, extract_args, args, tm, pf, logger)
-                if st != self.RESP_SUCCESS:
-                    return st, check_res, cl
-
-                # Extract対象ファイル一覧を取得
-                marge_opt = extract_opt.copy()
-                marge_opt.update(extract_conf)
-                st, file_list, _ = self.list_file(marge_opt, options, args, tm, pf, logger)
-                if st != self.RESP_SUCCESS:
-                    return st, file_list, cl
-
-                # ファイル一覧に対してExtractコマンドの実行とRAGストアへの登録を実施
-                for k, v in file_list.items():
-                    if not isinstance(v, dict) or v.get('children', None) is None:
-                        continue
-                    for kc, kv in v['children'].items():
-                        if not isinstance(kv, dict) or kv.get('path', None) is None or kv.get('is_dir', None) is None:
-                            continue
-                        if kv['is_dir']:
-                            continue
-                        marge_opt['loadpath'] = kv['path']
-                        marge_args = argparse.Namespace(**marge_opt)
-                        # Extractコマンドの実行の実行
-                        st, extract_res, _ = self.exec_extract_cmd(extract_feat, marge_args, options, args, tm, pf, logger)
-                        if st != self.RESP_SUCCESS:
-                            msg = dict(warn=f"Failed to execute extract command for file '{kv['path']}'. Skipping registration for this file. Warning: {extract_res.get('warn', 'Unknown error')}")
-                            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                            continue
-
-                        # チャンク毎に登録実施
-                        for doc in extract_res:
-                            if 'content' not in doc:
-                                msg = dict(warn=f"Extracted document does not contain 'content' field: {doc}")
-                                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                                continue
-                            if 'metadata' not in doc:
-                                msg = dict(warn=f"Extracted document does not contain 'metadata' field: {doc}")
-                                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                                continue
-
-                            # Embeddingの実行
-                            st, embed_res, _ = self.embedding(rag_config, [doc['content']], args, cl, tm, pf, logger)
-                            if st != self.RESP_SUCCESS:
-                                return st, embed_res, cl
-                            # RAGストアへの登録
-                            embed_data = embed_res['data'][0]
-                            vec_npy = convert.b64str2npy(embed_data['embed'], shape=embed_data['shape'], dtype=embed_data['type'])
-                            vev_list = vec_npy.tolist()
-                            store.insert_doc(connection=conn,
-                                            servicename=args.rag_name,
-                                            content_text=embed_data['data'],
-                                            metadata=doc['metadata'],
-                                            vec_model=rag_config.get('embed'),
-                                            vec_data=vev_list)
-            conn.commit()
-
-        ret = dict(success="RAG registration completed successfully.")
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-        if 'success' not in ret:
-            return self.RESP_WARN, ret, cl
-        return self.RESP_SUCCESS, ret, cl
 
     def is_cluster_redirect(self):
         return False

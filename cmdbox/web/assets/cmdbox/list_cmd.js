@@ -198,6 +198,7 @@ const list_cmd_func_then = () => {
             await cmd_change();
             // フォームに値をセット
             Object.entries(py_load_cmd).forEach(([key, val]) => {
+                if (val === null || val === undefined) return;
                 if (typeof val === 'boolean') {
                     val = val.toString();
                 }

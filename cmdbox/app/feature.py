@@ -8,6 +8,7 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import os
+import queue
 
 
 class Feature(object):
@@ -150,6 +151,21 @@ class Feature(object):
         if hasattr(self, 'client_only') and self.client_only:
             return False
         return True
+
+    def put_resqueue(self, args:argparse.Namespace, msg:Dict[str, Any]):
+        """
+        コマンド実行結果を格納するキューに結果を格納します
+
+        Args:
+            resqueue (queue.Queue): 結果を格納するキュー
+            msg (Dict[str, Any]): 格納するメッセージ
+        """
+        try:
+            if hasattr(args, '_resqueue') and args._resqueue is not None:
+                q:queue.Queue = args._resqueue
+                q.put_nowait(msg)
+        except:
+            pass
 
 class OneshotEdgeFeature(Feature):
     """
