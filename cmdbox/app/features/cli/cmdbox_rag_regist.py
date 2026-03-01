@@ -214,7 +214,7 @@ class RagRegist(rag_base.RAGBase):
                             # チャンク毎に登録実施
                             doc_count = len(extract_res)
                             doc_index = 0
-                            doc_bcount = 50
+                            doc_bcount = 20
                             for i in range(0, len(extract_res), doc_bcount):
                                 docs = extract_res[i:i+doc_bcount]
                                 doc_index += len(docs)
