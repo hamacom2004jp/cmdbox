@@ -80,7 +80,7 @@ agentView.list_memory = async () => {
                 <li class="sf-list-item" style="cursor: pointer;">
                     <div>
                         <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.memory_name}</span>
-                        <span class="text-white-50">${config.memory_type} / ${config.llm} / ${config.embed}</span>
+                        <span>${config.memory_type} / ${config.llm} / ${config.embed}</span>
                     </div>
                 </li>
             `).appendTo(container_ul);

@@ -89,7 +89,7 @@ agentView.list_runner = async () => {
                 <li class="sf-list-item">
                     <div>
                         <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.runner_name}</span>
-                        <span class="text-white-50">
+                        <span>
                             Agent: ${config.agent || 'None'},
                             Session Store: ${config.session_store_type || 'None'},
                             VOICEVOX: ${config.voicevox_model || 'N/A'}
@@ -226,7 +226,7 @@ agentView.show_runner_select_modal = async () => {
             const div1 = $(`<div class="d-inline-block"/>`).appendTo(li);
             const head = $(`<span class="d-block glow-text-cyan system-font" style="font-size: 1em;"></span>`).appendTo(div1);
             head.html(`${config.runner_name}`);
-            const body = $(`<span class="text-white-50"></span>`).appendTo(div1);
+            const body = $(`<span></span>`).appendTo(div1);
             body.html(`Agent: ${config.agent || 'None'},
                        Session Store: ${config.session_store_type || 'None'},
                        VOICEVOX: ${config.voicevox_model || 'None'}`);

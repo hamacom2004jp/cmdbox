@@ -1,6 +1,4 @@
 $(() => {
-    // カラーモード対応
-    cmdbox.change_color_mode();
     // コマンド一覧の取得と表示
     list_cmd_func().then(list_cmd_func_then);
     // コマンド一覧の検索

@@ -464,6 +464,14 @@ $(()=>{
                 const editapikey_item = $(`<li><a class="dropdown-item editapikey-menu-item" href="#" onclick="cmdbox.editapikey();">Edit ApiKey</a></li>`);
                 user_info_menu.find('.dropdown-menu').append(editapikey_item);
             }
+            if (!user_info_menu.find('.dropdown-menu .changecolor-menu-item').length) {
+                const changecolor_item = $(`<li><span class="dropdown-item changecolor-menu-item">Change Color : `
+                    + `<select class="d-inline-block change_color_mode" onchange="cmdbox.change_color_mode($(this).val());"></select>`
+                    + `</span></li>`);
+                user_info_menu.find('.dropdown-menu').append(changecolor_item);
+                // カラーモード対応
+                cmdbox.change_color_mode();
+            }
             if (!user_info_menu.find('.dropdown-menu .signout-menu-item').length) {
                 const parts = location.pathname.split('/');
                 const sitepath = parts[parts.length-1];

@@ -74,7 +74,7 @@ agentView.list_agent = async () => {
                     <li class="sf-list-danger-item">
                         <div>
                             <span class="d-block glow-text-magenta system-font" style="font-size: 0.9em;">${item.name}</span>
-                            <span class="text-white-50">${JSON.stringify(res)}</span>
+                            <span class="text-danger">${JSON.stringify(res)}</span>
                         </div>
                     </li>
                 `).appendTo(container_ul);
@@ -85,7 +85,7 @@ agentView.list_agent = async () => {
                 <li class="sf-list-item" style="cursor: pointer;">
                     <div>
                         <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.agent_name}</span>
-                        <span class="text-white-50">${config.agent_description}</span>
+                        <span>${config.agent_description}</span>
                     </div>
                 </li>
             `).appendTo(container_ul);

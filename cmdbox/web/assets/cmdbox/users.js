@@ -562,8 +562,6 @@ users.passsetting_list = async () => {
     mk_card(passsetting_elem, 'Account Lockout', passsetting_root_data['lockout']);
 };
 $(() => {
-    // カラーモード対応
-    cmdbox.change_color_mode();
     // アイコンを表示
     cmdbox.set_logoicon('.navbar-brand');
     // copyright表示

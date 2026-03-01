@@ -14,7 +14,7 @@ agentView.create_history = (session_id, runner_name, user_name, update_time, msg
     const div1 = $(`<div class="d-inline-block"/>`).appendTo(li);
     const head = $(`<span class="d-block glow-text-cyan system-font" style="font-size: 1em;"></span>`).appendTo(div1);
     head.html(`${update_time instanceof Date ? update_time.toLocaleString() : update_time} - ${runner_name} - ${user_name}`);
-    const body = $(`<span class="text-white-50"></span>`).appendTo(div1);
+    const body = $(`<span></span>`).appendTo(div1);
     body.html(msg);
     const div2 = $(`<div class="d-inline-block"/>`).appendTo(li);
     const btn_del = $(`<button class="btn btn-danger ms-auto">Delete</button>`).appendTo(div2);

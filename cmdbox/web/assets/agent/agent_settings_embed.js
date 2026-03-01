@@ -66,7 +66,7 @@ agentView.list_embedding = async () => {
                 <li class="sf-list-item" style="cursor: pointer;">
                     <div>
                         <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.embed_name}</span>
-                        <span class="text-white-50">${config.embed_model} / ${config.embed_device}</span>
+                        <span>${config.embed_model} / ${config.embed_device}</span>
                     </div>
                 </li>
             `).appendTo(container_ul);

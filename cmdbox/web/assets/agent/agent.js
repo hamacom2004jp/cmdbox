@@ -31,8 +31,7 @@ agentView.initView = () => {
         if (time_info) {
             const update_time = () => {
                 const dt = new Date((time_info['timestamp'] * 1000 + (new Date().getTime() - time_info['timestamp'] * 1000)));
-                const formatted_time = dt.toISOString().slice(0, 19).replace('T', ' ');
-                $('#current_time').text(`${formatted_time} (${time_info['timezone']})`);
+                $('#current_time').text(`${dt.toLocaleString()} (${time_info['timezone']})`);
             };
             update_time();
             setInterval(update_time, 1000);

@@ -81,7 +81,7 @@ agentView.list_rag = async () => {
                 <li class="sf-list-item" style="cursor: pointer;">
                     <div>
                         <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.rag_name}</span>
-                        <span class="text-white-50">${config.rag_type} / ${config.extract} / ${config.embed}</span>
+                        <span>${config.rag_type} / ${config.extract} / ${config.embed}</span>
                     </div>
                 </li>
             `).appendTo(container_ul);
