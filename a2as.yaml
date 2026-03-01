@@ -1,0 +1,777 @@
+manifest:
+  version: "0.1.3"
+  schema: https://a2as.org/cert/schema
+  subject:
+    name: hamacom2004jp/cmdbox
+    source: https://github.com/hamacom2004jp/cmdbox
+    branch: main
+    commit: "029e2914"
+    scope: [cmdbox/__init__.py, cmdbox/app/__init__.py, cmdbox/app/a2a.py, cmdbox/app/auth/__init__.py, cmdbox/app/features/cli/agent/__init__.py,
+      cmdbox/app/features/cli/agent/agant_base.py, cmdbox/app/features/cli/agent/postgresql_memory_service.py, cmdbox/app/features/cli/agent/sqlite_memory_service.py,
+      cmdbox/app/features/cli/cmdbox_agent_agent_del.py, cmdbox/app/features/cli/cmdbox_agent_agent_load.py, cmdbox/app/features/cli/cmdbox_agent_agent_save.py,
+      cmdbox/app/features/cli/cmdbox_agent_chat.py, cmdbox/app/features/cli/cmdbox_agent_memory_status.py, cmdbox/app/options.py]
+  issued:
+    by: A2AS.org
+    at: '2026-02-11T16:42:44Z'
+    url: https://a2as.org/certified/agents/hamacom2004jp/cmdbox
+  signatures:
+    digest: sha256:DTyglBAeUWwQ4fT9OyJDC9luGyrM3JS-tmZufmqP6uY
+    key: ed25519:OIz3ZGFX9ELrL1Vn63aseMTqEuS7ylORDodfIdWLe7s
+    sig: ed25519:GuNOSrcxtPdWw83SyggizhbvYoq5OJScZSJ41y6oM-SkJbs0DLfvSM1ljozf3398aHpe_3SbsCdkXDBkzJgJDg
+
+agents:
+  agent.0:
+    type: instance
+    models: ['azure/{...}']
+    params:
+      name: agent_name
+      description: '{...}に登録されているコマンド提供'
+      instruction: instruction
+      function: create_memory_agent
+      instance: agent
+  agent.1:
+    type: instance
+    models: ['azure/azure/{...}']
+    params:
+      name: agent_name
+      description: '{...}に登録されているコマンド提供'
+      instruction: instruction
+      function: create_memory_agent
+      instance: agent
+  agent.2:
+    type: instance
+    models: ['azure/azure/{...}']
+    params:
+      name: agent_name
+      description: '{...}に登録されているコマンド提供'
+      instruction: instruction
+      function: create_memory_agent
+      instance: agent
+  agent.3:
+    type: instance
+    models: ['azure/azure/{...}']
+    tools: [create_tool_mcpsv]
+    params:
+      name: agent_name
+      description: '{...}に登録されているコマンド提供'
+      instruction: instruction
+      planner: PlanReActPlanner
+      function: create_agent
+      instance: agent
+      sub_agents: [subagents]
+  agent.4:
+    type: instance
+    models: ['azure/azure/azure/{...}']
+    tools: [create_tool_mcpsv]
+    params:
+      name: agent_name
+      description: '{...}に登録されているコマンド提供'
+      instruction: instruction
+      planner: PlanReActPlanner
+      function: create_agent
+      instance: agent
+      sub_agents: [subagents]
+  agent.5:
+    type: instance
+    models: ['azure/azure/azure/{...}']
+    tools: [create_tool_mcpsv]
+    params:
+      name: agent_name
+      description: '{...}に登録されているコマンド提供'
+      instruction: instruction
+      planner: BuiltInPlanner
+      function: create_agent
+      instance: agent
+      sub_agents: [subagents]
+  agent.create_agent:
+    type: factory
+    models: [LiteLlm]
+    tools: [create_tool_mcpsv]
+    params:
+      name: agent_name
+      description: '{...}に登録されているコマンド提供'
+      instruction: instruction
+      planner: PlanReActPlanner
+      function: create_agent
+      instance: agent
+      sub_agents: [subagents]
+  agent.create_memory_agent:
+    type: factory
+    models: [LiteLlm]
+    params:
+      name: agent_name
+      description: '{...}に登録されているコマンド提供'
+      instruction: instruction
+      function: create_memory_agent
+      instance: agent
+
+models:
+  LiteLlm:
+    type: function
+    agents: [agent.0, agent.3, agent.create_memory_agent, agent.create_agent]
+    params:
+      wrapper: LiteLlm
+      model: ollama/{llmmodel}
+      api_base: llmendpoint
+      temperature: llmtemperature
+      stream: "True"
+
+tools:
+  create_tool_mcpsv:
+    type: function
+    agents: [agent.3, agent.4, agent.5, agent.3]
+    params:
+      dynamic: "True"
+      source: call
+      description: |-
+        MCPサーバーツールを作成します
+        Args:
+            logger (logging.Logger): ロガー
+            mcpsv_confs (List[Dict[str, Any]]): MCPサーバー設定リスト
+        Returns:
+            List[MCPToolset]: MCPToolsetのリスト
+
+mcp:
+  MCPToolset:
+    type: network
+    url: mcpserver_url
+    params:
+      class: AgentChat
+      connection_type: StreamableHTTPConnectionParams
+      connection_variable: conn_params
+      timeout: "120"
+      sse_read_timeout: "600"
+      tool_filter: mcpsv_conf.get(mcpserver_mcp_tools, [])
+      auth_scheme: auth_scheme
+      auth_credential: auth_cred
+      header_provider: _warp(mcpserver_delegated_auth)
+      function: create_tool_mcpsv
+
+teams:
+  agent.3:
+    type: hierarchy
+    agents: [agent.3, subagents]
+  agent.4:
+    type: hierarchy
+    agents: [agent.4, subagents]
+  agent.5:
+    type: hierarchy
+    agents: [agent.5, subagents]
+  agent.6:
+    type: hierarchy
+    agents: [agent.6, subagents]
+
+imports:
+  __version__: cmdbox.version.__version__
+  _logging: litellm._logging
+  _web: cmdbox.app.web
+  a2a_mod: cmdbox.app.a2a
+  aclosing: contextlib.aclosing
+  AdkAgent: google.adk.agents.Agent
+  agant_base: cmdbox.app.features.cli.agent.agant_base
+  agent_card_builder: google.adk.a2a.utils.agent_card_builder
+  AGENT_CARD_WELL_KNOWN_PATH: google.adk.agents.remote_a2a_agent.AGENT_CARD_WELL_KNOWN_PATH
+  agent_to_a2a: google.adk.a2a.utils.agent_to_a2a
+  Any: typing.Any
+  APIRoute: fastapi.routing.APIRoute
+  argparse: argparse
+  asyncio: asyncio
+  asyncpg: asyncpg
+  AuthCredential: google.adk.auth.auth_credential.AuthCredential
+  AuthCredentialTypes: google.adk.auth.auth_credential.AuthCredentialTypes
+  BaseMemoryService: google.adk.memory.BaseMemoryService
+  BuiltInPlanner: google.adk.planners.BuiltInPlanner
+  Callable: typing.Callable
+  client: cmdbox.app.client
+  ClientConfig: a2a.client.client_factory.ClientConfig
+  ClientFactory: a2a.client.client_factory.ClientFactory
+  cmdbox_agent_agent_list: cmdbox.app.features.cli.cmdbox_agent_agent_list
+  cmdbox_agent_agent_load: cmdbox.app.features.cli.cmdbox_agent_agent_load
+  cmdbox_agent_chat: cmdbox.app.features.cli.cmdbox_agent_chat
+  cmdbox_agent_mcpsv_list: cmdbox.app.features.cli.cmdbox_agent_mcpsv_list
+  cmdbox_agent_mcpsv_load: cmdbox.app.features.cli.cmdbox_agent_mcpsv_load
+  cmdbox_agent_memory_status: cmdbox.app.features.cli.cmdbox_agent_memory_status
+  cmdbox_embed_embedding: cmdbox.app.features.cli.cmdbox_embed_embedding
+  cmdbox_embed_start: cmdbox.app.features.cli.cmdbox_embed_start
+  cmdbox_llm_list: cmdbox.app.features.cli.cmdbox_llm_list
+  cmdbox_llm_load: cmdbox.app.features.cli.cmdbox_llm_load
+  cmdbox_tts_say: cmdbox.app.features.cli.cmdbox_tts_say
+  cmdbox_web_exec_cmd: cmdbox.app.features.web.cmdbox_web_exec_cmd
+  common: cmdbox.app.common
+  Config: uvicorn.config.Config
+  convert: cmdbox.app.commons.convert
+  DatabaseSessionService: google.adk.sessions.database_session_service.DatabaseSessionService
+  datetime: datetime.datetime
+  Depends: fastapi.Depends
+  Dict: typing.Dict
+  Event: google.adk.events.Event
+  FastAPI: fastapi.FastAPI
+  feature: cmdbox.app.feature
+  functools: functools
+  gevent: gevent
+  glob: glob
+  HTMLResponse: fastapi.responses.HTMLResponse
+  HTTPBearer: fastapi.openapi.models.HTTPBearer
+  HTTPException: fastapi.HTTPException
+  httpx: httpx
+  InMemoryMemoryService: google.adk.memory.InMemoryMemoryService
+  InMemorySessionService: google.adk.sessions.InMemorySessionService
+  json: json
+  List: typing.List
+  lite_llm: google.adk.models.lite_llm
+  litellm: litellm
+  locale: locale
+  logging: logging
+  mcp: cmdbox.app.mcp
+  MCPToolset: google.adk.tools.mcp_tool.mcp_toolset.MCPToolset
+  MemoryEntry: google.adk.memory.memory_entry.MemoryEntry
+  module: cmdbox.app.commons.module
+  multiprocessing: multiprocessing
+  Optional: typing.Optional
+  options: cmdbox.app.options
+  Options: cmdbox.app.options.Options
+  os: os
+  Path: pathlib.Path
+  PlanReActPlanner: google.adk.planners.PlanReActPlanner
+  platform: platform
+  PostgresqlMemoryService: cmdbox.app.features.cli.agent.postgresql_memory_service.PostgresqlMemoryService
+  PreloadMemoryTool: google.adk.tools.preload_memory_tool.PreloadMemoryTool
+  re: re
+  ReadonlyContext: google.adk.agents.readonly_context.ReadonlyContext
+  redis_client: cmdbox.app.commons.redis_client
+  RemoteA2aAgent: google.adk.agents.remote_a2a_agent.RemoteA2aAgent
+  Request: fastapi.Request
+  Response: fastapi.Response
+  Route: starlette.routing.Route
+  RunConfig: google.adk.agents.run_config.RunConfig
+  Runner: google.adk.runners.Runner
+  SearchMemoryResponse: google.adk.memory.base_memory_service.SearchMemoryResponse
+  SecuritySchemeType: fastapi.openapi.models.SecuritySchemeType
+  Session: google.adk.sessions.Session
+  SessionMiddleware: starlette.middleware.sessions.SessionMiddleware
+  signin: cmdbox.app.auth.signin
+  sqlite3: sqlite3
+  sqlite_vec: sqlite_vec
+  SqliteMemoryService: cmdbox.app.features.cli.agent.sqlite_memory_service.SqliteMemoryService
+  SseConnectionParams: google.adk.tools.mcp_tool.mcp_session_manager.SseConnectionParams
+  Starlette: starlette.applications.Starlette
+  StreamableHTTPConnectionParams: google.adk.tools.mcp_tool.mcp_session_manager.StreamableHTTPConnectionParams
+  StreamingMode: google.adk.agents.run_config.StreamingMode
+  ThreadedASGI: cmdbox.app.web.ThreadedASGI
+  time: time
+  traceback: traceback
+  Tuple: typing.Tuple
+  types: google.genai.types
+  Union: typing.Union
+  uuid: uuid
+  web: cmdbox.app.web
+  Web: cmdbox.app.web.Web
+  WebSocket: fastapi.WebSocket
+  WebSocketDisconnect: starlette.websockets.WebSocketDisconnect
+
+functions:
+  __aenter__:
+    type: async
+    module: cmdbox.app.features.cli.agent.postgresql_memory_service
+    args: [self]
+  __aexit__:
+    type: async
+    module: cmdbox.app.features.cli.agent.postgresql_memory_service
+    args: [self, exc_type, exc_val, exc_tb]
+  __init__:
+    type: sync
+    module: cmdbox.app.features.cli.agent.agant_base
+    args: [self, appcls, ver, language]
+  __setattr__:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, name, value]
+  _add_session_to_memory_postgresql:
+    type: async
+    module: cmdbox.app.features.cli.agent.postgresql_memory_service
+    args: [self, session]
+  _add_session_to_memory_sqlite:
+    type: async
+    module: cmdbox.app.features.cli.agent.sqlite_memory_service
+    args: [self, session]
+  _audit_write:
+    type: sync
+    module: cmdbox.app.options
+    args: [func]
+  _cast:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, key, val]
+  _chat:
+    type: async
+    module: cmdbox.app.features.web.cmdbox_web_agent
+    args: [session, runner_name, session_id, sock, res, receive_text]
+  _create_dynamic_header_provider:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_chat
+  _get_db_path:
+    type: sync
+    module: cmdbox.app.features.cli.agent.sqlite_memory_service
+    args: [self]
+    params:
+      returns: str
+  _get_pool:
+    type: async
+    module: cmdbox.app.features.cli.agent.postgresql_memory_service
+    args: [self]
+  _init_db:
+    type: sync
+    module: cmdbox.app.features.cli.agent.sqlite_memory_service
+    args: [self]
+  _list:
+    type: sync
+    module: cmdbox.app.options
+    args: [ret, key, val]
+  _load_agent_config:
+    type: sync
+    module: cmdbox.app.features.cli.agent.agant_base
+    args: [self, data_dir, agent_name]
+    params:
+      returns: Dict
+  _load_embed_config:
+    type: sync
+    module: cmdbox.app.features.cli.agent.agant_base
+    args: [self, data_dir, embed_name]
+    params:
+      returns: Dict
+  _load_features_yml:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, ver, logger]
+  _load_llm_config:
+    type: sync
+    module: cmdbox.app.features.cli.agent.agant_base
+    args: [self, data_dir, llm_name]
+    params:
+      returns: Dict
+  _load_mcpsv_config:
+    type: sync
+    module: cmdbox.app.features.cli.agent.agant_base
+    args: [self, data_dir, mcpservers]
+    params:
+      returns: List[Dict]
+  _load_memory_config:
+    type: sync
+    module: cmdbox.app.features.cli.agent.agant_base
+    args: [self, data_dir, memory_name]
+    params:
+      returns: Dict
+  _replace_match:
+    type: sync
+    module: cmdbox.app.features.cli.agent.agant_base
+    args: [cls, match_obj]
+  _search_memory_postgresql:
+    type: async
+    module: cmdbox.app.features.cli.agent.postgresql_memory_service
+    args: [self, app_name, user_id, query]
+    params:
+      returns: SearchMemoryResponse
+  _search_memory_sqlite:
+    type: async
+    module: cmdbox.app.features.cli.agent.sqlite_memory_service
+    args: [self, app_name, user_id, query]
+    params:
+      returns: SearchMemoryResponse
+  _w:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_a2asv_start
+    args: [f]
+  _warp:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_chat
+    args: [mcpserver_apikey, mcpserver_delegated_auth]
+  _wrapper:
+    type: tool
+    module: cmdbox.app.options
+  a2a_proxy:
+    type: async
+    module: cmdbox.app.a2a
+    args: [agent_name, path, req, res, scope]
+  a2a_reload:
+    type: async
+    module: cmdbox.app.a2a
+    args: [req, res]
+  add_auth_headers:
+    type: async
+    module: cmdbox.app.features.cli.cmdbox_agent_chat
+    args: [request]
+  add_memory:
+    type: async
+    module: cmdbox.app.features.cli.cmdbox_agent_memory_status
+    args: [self, memory_service, memory_session, sammary_msg]
+  add_session_to_memory:
+    type: async
+    module: cmdbox.app.features.cli.agent.sqlite_memory_service
+    args: [self, session]
+  agent:
+    type: async
+    module: cmdbox.app.features.web.cmdbox_web_agent
+    args: [req, res]
+  apprun:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_chat
+    args: [self, logger, args, tm, pf]
+    params:
+      returns: Tuple
+  apprun_generate:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_chat
+    args: [self, logger, host, port, password, svname, retry_interval, retry_count, timeout, runner_name, user_name, session_id,
+      a2asv_apikey, mcpserver_apikey, message, call_tts]
+  audit:
+    type: sync
+    module: cmdbox.app.options
+    args: [body, audit_type, tags, src]
+    params:
+      returns: int
+  audit_exec:
+    type: sync
+    module: cmdbox.app.options
+    args: [self]
+    params:
+      returns: None
+  check_agentrule:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, mode, cmd, logger]
+    params:
+      returns: bool
+  close_pool:
+    type: async
+    module: cmdbox.app.features.cli.agent.postgresql_memory_service
+    args: [self]
+  create_a2aserver:
+    type: async
+    module: cmdbox.app.a2a
+    args: [self, logger, args, web]
+    params:
+      returns: Any
+  create_agent:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_chat
+    args: [self, logger, data_dir, disable_remote_agent, agent_conf, llm_conf, mcpsv_confs]
+    params:
+      returns: Any
+  create_agent_session:
+    type: async
+    module: cmdbox.app.features.cli.agent.agant_base
+    args: [self, session_service, runner_name, user_name, session_id]
+    params:
+      returns: Any
+  create_memory_agent:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_memory_status
+    args: [self, logger, data_dir, memory_conf, llm_conf]
+    params:
+      returns: Any
+  create_memory_runner:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_memory_status
+    args: [self, memory_agent]
+    params:
+      returns: Any
+  create_memory_service:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_memory_status
+    args: [self, data_dir, logger, memory_conf, memory_llm_conf, memory_embed_conf, sessions]
+    params:
+      returns: Any
+  create_memory_session:
+    type: async
+    module: cmdbox.app.features.cli.cmdbox_agent_memory_status
+    args: [self, memory_runner, user_name]
+    params:
+      returns: Any
+  create_session_service:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_chat
+    args: [self, data_dir, logger, runner_conf]
+    params:
+      returns: Any
+  create_subagent:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_chat
+    args: [data_dir, agent_name]
+    params:
+      returns: Any
+  create_tool_mcpsv:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_chat
+    args: [self, logger, mcpsv_confs]
+    params:
+      returns: List[Any]
+  gen_msg:
+    type: sync
+    module: cmdbox.app.features.cli.agent.agant_base
+    args: [cls, event]
+    params:
+      returns: Tuple
+  get_cmd:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_chat
+    args: [self]
+    params:
+      returns: str
+  get_cmd_attr:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, mode, cmd, attr]
+    params:
+      returns: Any
+  get_cmd_choices:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, mode, cmd, webmode, opt]
+    params:
+      returns: List[Dict]
+  get_cmd_keys:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, mode]
+    params:
+      returns: List[str]
+  get_cmd_opt:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, mode, cmd, opt, webmode]
+    params:
+      returns: Dict
+  get_cmds:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, mode]
+    params:
+      returns: List[Dict]
+  get_mode:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_chat
+    args: [self]
+    params:
+      returns: Union
+  get_mode_keys:
+    type: sync
+    module: cmdbox.app.options
+    args: [self]
+    params:
+      returns: List[str]
+  get_modes:
+    type: sync
+    module: cmdbox.app.options
+    args: [self]
+    params:
+      returns: List[Dict]
+  get_option:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_chat
+    args: [self]
+    params:
+      returns: Dict
+  get_svcmd_feature:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, svcmd]
+    params:
+      returns: Any
+  getInstance:
+    type: sync
+    module: cmdbox.app.options
+    args: [appcls, ver]
+  header_provider:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_chat
+    args: [readonly_context]
+    params:
+      returns: Dict
+  init_debugoption:
+    type: sync
+    module: cmdbox.app.options
+    args: [self]
+  init_options:
+    type: sync
+    module: cmdbox.app.options
+    args: [self]
+  is_cluster_redirect:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_chat
+    args: [self]
+  is_features_loaded:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, ftype]
+    params:
+      returns: bool
+  list_agents:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_agent_save
+    args: [self, data_dir]
+    params:
+      returns: List[str]
+  list_llms:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_agent_save
+    args: [self, data_dir]
+    params:
+      returns: List[str]
+  list_mcvpservers:
+    type: sync
+    module: cmdbox.app.features.cli.cmdbox_agent_agent_save
+    args: [self, data_dir]
+    params:
+      returns: List[str]
+  list_options:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, language]
+    params:
+      returns: Dict
+  load_conf:
+    type: sync
+    module: cmdbox.app.features.cli.agent.agant_base
+    args: [self, runner_name, data_dir, logger]
+  load_features_agentrule:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, logger]
+  load_features_aliases_cli:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, logger]
+  load_features_aliases_web:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, routes, logger]
+  load_features_args:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, args_dict]
+  load_features_audit:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, logger]
+  load_features_file:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, ftype, func, appcls, ver, logger]
+  load_svcmd:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, package_name, prefix, excludes, appcls, ver, logger, isloaded]
+  mk_opt_list:
+    type: sync
+    module: cmdbox.app.options
+    args: [self, opt, webmode]
+    params:
+      returns: List[str]
+  reload_a2aserver:
+    type: async
+    module: cmdbox.app.a2a
+    args: [self, logger, args]
+    params:
+      returns: None
+  route:
+    type: sync
+    module: cmdbox.app.features.web.cmdbox_web_agent
+    args: [self, web, app]
+    params:
+      returns: None
+  run_in_executor:
+    type: sync
+    module: cmdbox.app.features.cli.agent.sqlite_memory_service
+    args: [app_name, user_id, final_vec]
+  search_memory:
+    type: async
+    module: cmdbox.app.features.cli.agent.sqlite_memory_service
+    args: [self]
+    params:
+      returns: SearchMemoryResponse
+  set_allow_origin:
+    type: async
+    module: cmdbox.app.a2a
+    args: [req, call_next]
+  summary:
+    type: async
+    module: cmdbox.app.features.cli.cmdbox_agent_memory_status
+    args: [self, memory_runner, user_name, memory_session, short_mem_msg]
+  svrun:
+    type: async
+    module: cmdbox.app.features.cli.cmdbox_agent_chat
+    args: [self, data_dir, logger, redis_cli, msg, sessions]
+  toolmenu:
+    type: sync
+    module: cmdbox.app.features.web.cmdbox_web_agent
+    args: [self, web]
+    params:
+      returns: Dict
+  ws_chat:
+    type: async
+    module: cmdbox.app.features.web.cmdbox_web_agent
+    args: [runner_name, session_id, webapp, websocket, res, scope]
+
+files:
+  ./:
+    type: pattern
+    actions: [read]
+    params:
+      patterns: [mcpsv-*.json, llm-*.json, agent-*.json]
+      caller: [list_mcvpservers, list_llms, list_agents]
+  .agent:
+    type: literal
+    actions: [read]
+    params:
+      caller: [create_memory_service, list_mcvpservers, list_llms, list_agents, svrun, create_session_service, load_conf,
+        _load_agent_config, _load_llm_config, _load_mcpsv_config, _load_embed_config, _load_memory_config]
+      path: [data_dir]
+  agent_dir:
+    type: variable
+    actions: [read]
+    params:
+      caller: [agent_dir.glob]
+  args.signin_file:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  configure_path:
+    type: variable
+    actions: [write, delete]
+    params:
+      caller: [configure_path.parent.mkdir, configure_path.unlink]
+  data_dir:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  features.yml:
+    type: literal
+    actions: [read]
+    params:
+      caller: [_load_features_yml]
+      path: [Path.parent]
+  memory.db:
+    type: literal
+    actions: [read]
+    params:
+      caller: [create_memory_service]
+      path: [data_dir]
+  session.db:
+    type: literal
+    actions: [read]
+    params:
+      caller: [create_session_service]
+      path: [data_dir]
+
+networks:
+  localhost:
+    type: api
+    actions: [GET]
+    urls: [/a2a/<agent_name>]
+    protocols: [http]
+    ports: ["8071"]
+    params:
+      caller: [get_option]
+      links: [default]
