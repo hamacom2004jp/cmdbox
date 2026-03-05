@@ -36,7 +36,7 @@ class EmbedStop(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="入力情報の特徴量データを生成するエンベッドモデルを停止します。",
             description_en="Stop the embedding model that generates feature data from input information.",
             choice=[

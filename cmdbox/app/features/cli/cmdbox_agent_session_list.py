@@ -20,9 +20,7 @@ class AgentSessionList(cmdbox_agent_chat.AgentChat):
 
     def get_option(self) -> Dict[str, Any]:
         return dict(
-            use_redis=self.USE_REDIS_FALSE,
-            nouse_webmode=False,
-            use_agent=True,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="Agentのセッション一覧を取得します。",
             description_en="List sessions for the agent.",
             choice=[

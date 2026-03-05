@@ -36,7 +36,7 @@ class ClientHttp(feature.ResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False, use_agent=False,
             description_ja="HTTPサーバーに対してリクエストを送信し、レスポンスを取得します。",
             description_en="Sends a request to the HTTP server and gets a response.",
             choice=[

@@ -34,7 +34,7 @@ class CmdboxServerLogs(feature.OneshotNotifyEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True, use_agent=False,
             description_ja="cmdboxサーバーのログを表示します。",
             description_en="Displays the logs of the cmdbox server.",
             choice=[

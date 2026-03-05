@@ -34,7 +34,7 @@ class CmdboxServerExec(feature.OneshotNotifyEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True, use_agent=False,
             description_ja="cmdboxサーバーコンテナ内で任意のコマンドを実行します。",
             description_en="Execute any command within the cmdbox server container.",
             choice=[

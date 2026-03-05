@@ -34,7 +34,7 @@ class CmdboxServerUp(feature.OneshotNotifyEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True, use_agent=False,
             description_ja="cmdboxサーバーを起動します。",
             description_en="Starts the cmdbox server.",
             choice=[

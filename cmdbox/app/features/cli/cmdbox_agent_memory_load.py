@@ -36,7 +36,7 @@ class AgentMemoryLoad(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="Memory設定を読み込みます。",
             description_en="Loads the memory configuration.",
             choice=[

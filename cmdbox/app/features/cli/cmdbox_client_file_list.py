@@ -35,7 +35,7 @@ class ClientFileList(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False, use_agent=True,
             description_ja="データフォルダ配下のファイルリストを取得します。",
             description_en="Get a list of files under the data folder.",
             choice=[

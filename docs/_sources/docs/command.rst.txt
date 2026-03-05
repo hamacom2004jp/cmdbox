@@ -19,9 +19,11 @@ See below for available options for the various commands.
    Edge <cmd_edge.rst>
    Embed <cmd_embed.rst>
    Excel <cmd_excel.rst>
+   Extract <cmd_extract.rst>
    GUI <cmd_gui.rst>
    LLM <cmd_llm.rst>
    MCPServer <cmd_mcpsv.rst>
+   RAG <cmd_rag.rst>
    Server <cmd_server.rst>
    TTS <cmd_tts.rst>
    Web <cmd_web.rst>

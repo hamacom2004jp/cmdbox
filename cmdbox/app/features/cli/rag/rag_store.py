@@ -1,7 +1,5 @@
-from pathlib import Path
-from typing import Dict, Any, Tuple, List, Union
+from typing import Dict, Any, Generator, List
 import logging
-import psycopg
 
 
 class RagStore:
@@ -102,15 +100,17 @@ class RagStore:
         """
         raise NotImplementedError("delete_doc method is not implemented.")
 
-    def select_doc(self, *, connection:Any=None, servicename:str=None,
+    def select_doc(self, *, connection:Any=None, select:List[str]=None, servicename:str=None,
                    vec_id:str=None, content_text:str=None, content_type:str=None,
                    origin_name:str=None, origin_type:str=None, origin_url:str=None,
-                   metadata:Dict[str, Any]=None, vec_model:str=None) -> None:
+                   metadata:Dict[str, Any]=None, vec_model:str=None,
+                   vec_data:str=None, sort_dict:Dict[str, Any]=None, kcount:int=None,) -> Generator[Any, Any, Any]:
         """
         ドキュメントを選択します
 
         Args:
             connection: データベース接続オブジェクト
+            select (str): 取得する項目をカンマ区切りで指定します。未指定の場合はすべての項目を返します。
             servicename (str): サービス名
             vec_id (str): ベクトルID
             content_text (str): ドキュメントの内容
@@ -120,6 +120,9 @@ class RagStore:
             origin_url (str): ドキュメントの元のURL
             metadata (dict): ドキュメントのメタデータ
             vec_model (str): ベクトルモデルの名前
+            vec_data (str): ドキュメントのベクトル表現
+            sort_dict (dict): ソート条件を指定します。キーに項目名、値にソート順（ `ASC` (昇順) 又は `DESC` (降順)）を指定します。
+            kcount (int): 検索結果件数
 
         Yields:
             record: ドキュメントレコード

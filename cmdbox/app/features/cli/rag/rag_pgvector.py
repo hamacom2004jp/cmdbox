@@ -1,7 +1,6 @@
 from cmdbox.app import common
 from cmdbox.app.features.cli.rag import rag_store
-from pathlib import Path
-from typing import Dict, Any, Generator, Tuple, List, Union
+from typing import Dict, Any, Generator, List
 import logging
 import psycopg
 from psycopg import Connection, sql
@@ -225,7 +224,7 @@ class RagPgvector(rag_store.RagStore):
         with connection.cursor() as cur:
             table_name = f"{self.dbuser}.{servicename}_embedding"
             I = sql.Identifier
-            where_clauses = filter(None, [
+            where_clauses = list(filter(None, [
                 ("vec_id = %(vec_id)s" if vec_id is not None else ""),
                 ("content_text like %(content_text)s" if content_text is not None else ""),
                 ("content_type = %(content_type)s" if content_type is not None else ""),
@@ -234,7 +233,7 @@ class RagPgvector(rag_store.RagStore):
                 ("origin_url = %(origin_url)s" if origin_url is not None else ""),
                 (f"({metadata_where})" if metadata_where is not None else ""),
                 ("vec_model = %(vec_model)s" if vec_model is not None else "")
-            ])
+            ]))
             params = {
                 'vec_id': vec_id if vec_id is not None else '',
                 'content_text': f'%{content_text}%' if content_text is not None else '',
@@ -250,15 +249,17 @@ class RagPgvector(rag_store.RagStore):
                 "DELETE FROM {} " + ("WHERE " + " AND ".join(where_clauses) if where_clauses else "")
             ).format(I(table_name)), params=params)
 
-    def select_doc(self, *, connection:Connection=None, servicename:str=None,
+    def select_doc(self, *, connection:Any=None, select:List[str]=None, servicename:str=None,
                    vec_id:str=None, content_text:str=None, content_type:str=None,
                    origin_name:str=None, origin_type:str=None, origin_url:str=None,
-                   metadata:Dict[str, Any]=None, vec_model:str=None) -> Generator[Any, Any, Any]:
+                   metadata:Dict[str, Any]=None, vec_model:str=None,
+                   vec_data:str=None, sort_dict:Dict[str, Any]=None, kcount:int=None,) -> Generator[Any, Any, Any]:
         """
         ドキュメントを選択します
 
         Args:
             connection: データベース接続オブジェクト
+            select (str): 取得する項目をカンマ区切りで指定します。未指定の場合はすべての項目を返します。
             servicename (str): サービス名
             vec_id (str): ベクトルID
             content_text (str): ドキュメントの内容
@@ -268,6 +269,9 @@ class RagPgvector(rag_store.RagStore):
             origin_url (str): ドキュメントの元のURL
             metadata (dict): ドキュメントのメタデータ
             vec_model (str): ベクトルモデルの名前
+            vec_data (str): ドキュメントのベクトル表現
+            sort_dict (dict): ソート条件を指定します。キーに項目名、値にソート順（ `ASC` (昇順) 又は `DESC` (降順)）を指定します。
+            kcount (int): 検索結果件数
 
         Yields:
             record: ドキュメントレコード
@@ -280,7 +284,7 @@ class RagPgvector(rag_store.RagStore):
         with connection.cursor() as cur:
             table_name = f"{self.dbuser}.{servicename}_embedding"
             I = sql.Identifier
-            where_clauses = filter(None, [
+            where_clauses = list(filter(None, [
                 ("vec_id = %(vec_id)s" if vec_id is not None else ""),
                 ("content_text like %(content_text)s" if content_text is not None else ""),
                 ("content_type = %(content_type)s" if content_type is not None else ""),
@@ -289,7 +293,7 @@ class RagPgvector(rag_store.RagStore):
                 ("origin_url = %(origin_url)s" if origin_url is not None else ""),
                 (f"({metadata_where})" if metadata_where is not None else ""),
                 ("vec_model = %(vec_model)s" if vec_model is not None else "")
-            ])
+            ]))
             params = {
                 'vec_id': vec_id if vec_id is not None else '',
                 'content_text': f'%{content_text}%' if content_text is not None else '',
@@ -298,11 +302,24 @@ class RagPgvector(rag_store.RagStore):
                 'origin_type': origin_type if origin_type is not None else '',
                 'origin_url': origin_url if origin_url is not None else '',
                 'vec_model': vec_model if vec_model is not None else '',
+                'vec_data': vec_data if vec_data is not None else '',
             }
             if metadata is not None:
                 params.update({k: common.to_str(v) for k, v in metadata.items()})
+            if sort_dict is not None and len(sort_dict) > 0:
+                order_clauses = []
+                for k, v in sort_dict.items():
+                    if v.upper() not in ['ASC', 'DESC']:
+                        raise ValueError("sort_dict values must be 'ASC' or 'DESC'.")
+                    order_clauses.append(f"{k} {v.upper()}")
+                order_sql = " ORDER BY " + ", ".join(order_clauses)
             cur.execute(query=sql.SQL(
-                "SELECT * FROM {} " + ("WHERE " + " AND ".join(where_clauses) if where_clauses else "")
-            ).format(I(table_name)), params=params)
+                "SELECT {} FROM {} " + ("WHERE " + " AND ".join(where_clauses) if where_clauses else "")
+                + (" ORDER BY vec_data <=> %(vec_data)s ASC " if vec_data is not None else "")
+                + (order_sql if vec_data is None and order_sql is not None else "")
+                + (f"LIMIT {kcount}" if kcount is not None else "")
+            ).format(sql.SQL(',').join(map(I, select)) if select else sql.SQL('*'),
+                     I(table_name)),
+                     params=params)
             for record in cur:
                 yield record

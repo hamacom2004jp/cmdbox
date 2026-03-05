@@ -38,7 +38,7 @@ class RagRegist(rag_base.RAGBase):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=True,
             description_ja="RAG（検索拡張生成）の登録処理を実行します。",
             description_en="Execute the RAG (Retrieval-Augmented Generation) registration process.",
             choice=[
@@ -157,12 +157,16 @@ class RagRegist(rag_base.RAGBase):
                     self.put_resqueue(args, dict(process=dict(message=f"Loading extract configuration...extract_name={extract_name}")))
                     st, extract_conf, cl = self.load_extract_config(extract_name, args, cl, tm, pf, logger)
                     if st != self.RESP_SUCCESS:
+                        msg = dict(warn=f"Failed to load extract configuration for '{extract_name}'.", res=extract_conf)
+                        self.put_resqueue(args, msg)
                         return st, extract_conf, cl
 
                     # Extractコマンドの取得
                     self.put_resqueue(args, dict(process=dict(message=f"Loading extract command...extract_name={extract_name}")))
                     st, extract_cmd_res, cl = self.load_extract_cmd(extract_conf, options, args, cl, tm, pf, logger)
                     if st != self.RESP_SUCCESS:
+                        msg = dict(warn=f"Failed to load extract command for '{extract_name}'.", res=extract_cmd_res)
+                        self.put_resqueue(args, msg)
                         return st, extract_cmd_res, cl
                     extract_feat = extract_cmd_res['success']['extract_feat']
                     extract_opt = extract_cmd_res['success']['extract_opt']
@@ -173,6 +177,8 @@ class RagRegist(rag_base.RAGBase):
                     st, check_res, _ = self.check_cmd_permission(signin_data, user_name,
                                                                 extract_opt, extract_args, args, tm, pf, logger)
                     if st != self.RESP_SUCCESS:
+                        msg = dict(warn=f"Permission check failed for extract command '{extract_name}'.", res=check_res)
+                        self.put_resqueue(args, msg)
                         return st, check_res, cl
 
                     # Extract対象ファイル一覧を取得
@@ -181,6 +187,8 @@ class RagRegist(rag_base.RAGBase):
                     self.put_resqueue(args, dict(process=dict(message=f"Listing target files for extract command...extract_name={extract_name}")))
                     st, file_list, _ = self.list_file(marge_opt, options, args, tm, pf, logger)
                     if st != self.RESP_SUCCESS:
+                        msg = dict(warn=f"Failed to list target files for extract command '{extract_name}'.", res=file_list)
+                        self.put_resqueue(args, msg)
                         return st, file_list, cl
 
                     # ファイル一覧に対してExtractコマンドの実行とRAGストアへの登録を実施
@@ -202,8 +210,9 @@ class RagRegist(rag_base.RAGBase):
                                                                       count=children_count, index=children_index, filename=Path(kv['path']).name)))
                             st, extract_res, _ = self.exec_extract_cmd(extract_feat, marge_args, options, args, tm, pf, logger)
                             if st != self.RESP_SUCCESS:
-                                msg = dict(warn=f"Failed to execute extract command for file '{kv['path']}'. Skipping registration for this file. Warning: {extract_res.get('warn', 'Unknown error')}")
+                                msg = dict(warn=f"Failed to execute extract command for file '{kv['path']}'. Skipping registration for this file.", res=extract_res)
                                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                                self.put_resqueue(args, msg)
                                 continue
                             # save_typeの処理
                             if args.savetype == 'per_doc':
@@ -214,7 +223,7 @@ class RagRegist(rag_base.RAGBase):
                             # チャンク毎に登録実施
                             doc_count = len(extract_res)
                             doc_index = 0
-                            doc_bcount = 20
+                            doc_bcount = 50
                             for i in range(0, len(extract_res), doc_bcount):
                                 docs = extract_res[i:i+doc_bcount]
                                 doc_index += len(docs)
@@ -225,6 +234,7 @@ class RagRegist(rag_base.RAGBase):
                                 if len([doc for doc in docs if 'metadata' not in doc]) > 0:
                                     msg = dict(warn=f"Extracted document does not contain 'metadata' field.")
                                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                                    self.put_resqueue(args, msg)
                                     continue
 
                                 # Embeddingの実行
@@ -232,6 +242,9 @@ class RagRegist(rag_base.RAGBase):
                                                                           count=doc_count, index=doc_index, filename=Path(marge_opt['loadpath']).name)))
                                 st, embed_res, _ = self.embedding(rag_config, [doc['content'] for doc in docs], args, cl, tm, pf, logger)
                                 if st != self.RESP_SUCCESS:
+                                    msg = dict(warn=f"Failed to execute embedding for extracted document from file '{kv['path']}'.", res=embed_res)
+                                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                                    self.put_resqueue(args, msg)
                                     return st, embed_res, cl
                                 # RAGストアへの登録
                                 self.put_resqueue(args, dict(process=dict(message=f"({doc_index}/{doc_count}) Registering extracted document to RAG store...file={marge_opt['loadpath']}",
@@ -246,44 +259,17 @@ class RagRegist(rag_base.RAGBase):
                                                     metadata=docs[embed_i]['metadata'],
                                                     vec_model=rag_config.get('embed'),
                                                     vec_data=vev_list)
-                        conn.commit()
+                                conn.commit()
 
             ret = dict(success="RAG registration completed successfully.")
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            self.put_resqueue(args, ret)
             if 'success' not in ret:
                 return self.RESP_WARN, ret, cl
             return self.RESP_SUCCESS, ret, cl
         except Exception as e:
             msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
+            self.put_resqueue(args, msg)
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, cl
-
-    def is_cluster_redirect(self):
-        return False
-
-    def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
-              sessions:Dict[str, Dict[str, Any]]) -> int:
-        reskey = msg[1]
-        try:
-            payload = json.loads(convert.b64str2str(msg[2]))
-
-            rag_name = payload.get('rag_name')
-            configure_path = data_dir / ".agent" / f"rag-{rag_name}.json"
-            if not configure_path.exists():
-                msg = dict(warn=f"Specified RAG configuration '{rag_name}' not found on server at '{str(configure_path)}'.")
-                redis_cli.rpush(reskey, msg)
-                return self.RESP_WARN
-
-            with configure_path.open('r', encoding='utf-8') as f:
-                configure = json.load(f)
-
-            msg = dict(success=configure)
-            redis_cli.rpush(reskey, msg)
-            return self.RESP_SUCCESS
-
-        except Exception as e:
-            msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
-            logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
-            redis_cli.rpush(reskey, msg)
-            return self.RESP_WARN, msg, None

@@ -35,7 +35,7 @@ class CmdLoad(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
             description_ja="データフォルダ配下のコマンドの内容を取得します。",
             description_en="Obtains the contents of commands under the data folder.",
             choice=[

@@ -36,7 +36,7 @@ class EmbedStart(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="入力情報の特徴量データを生成するエンベッドモデルを開始します。",
             description_en="Start the embedding model that generates feature data from the input information.",
             choice=[

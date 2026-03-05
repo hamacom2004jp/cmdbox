@@ -40,7 +40,7 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True, use_agent=False,
             description_ja="cmdboxのコンテナをインストールします。",
             description_en="Install the cmdbox container.",
             choice=[
@@ -87,6 +87,12 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                      choice_edit=True,
                      description_ja="使用するVOICEVOXのホイールファイルを指定します。",
                      description_en="Specify the VOICEVOX wheel file to use."),
+                dict(opt="run_extra", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
+                     description_ja="追加で実行するコマンドを指定します。",
+                     description_en="Specify additional commands to run."),
+                dict(opt="install_extra", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
+                     description_ja="追加でインストールするパッケージを指定します。",
+                     description_en="Specify additional packages to install."),
                 dict(opt="compose_path", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="in",
                      description_ja="`docker-compose.yml` ファイルを指定します。",
                      description_en="Specify the `docker-compose.yml` file."),
@@ -135,6 +141,8 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                                   tts_engine=args.tts_engine,
                                   voicevox_ver=args.voicevox_ver,
                                   voicevox_whl=args.voicevox_whl,
+                                  run_extra=args.run_extra,
+                                  install_extra=args.install_extra,
                                   compose_path=args.compose_path,
                                   language=args.language)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -148,6 +156,7 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                        install_no_python:bool=False, install_compile_python:bool=False,
                        install_tag:str=None, install_use_gpu:bool=False,
                        tts_engine:str=None, voicevox_ver:str=None, voicevox_whl:str=None,
+                       run_extra:List[str]=None, install_extra:List[str]=None,
                        compose_path:str=None, language:str=None) -> Dict[str, Any]:
         """
         cmdboxが含まれるdockerイメージをインストールします。
@@ -164,6 +173,8 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
             tts_engine (str): TTSエンジンの指定
             voicevox_ver (str): VoiceVoxのバージョン
             voicevox_whl (str): VoiceVoxのwhlファイルの名前
+            run_extra (List[str]): 追加で実行するコマンド
+            install_extra (List[str]): 追加でインストールするパッケージ
             compose_path (str): docker-compose.ymlファイルパス
             language (str): 言語コード
 
@@ -201,7 +212,7 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                 shutil.copytree(start_sh_src, start_sh_hst, dirs_exist_ok=True)
                 text = text.replace('#{COPY_CMDBOX_START}', f'RUN mkdir -p {start_sh_tgt}\nCOPY {start_sh_hst} {start_sh_tgt}')
 
-                base_image = 'python:3.11.9-slim' #'python:3.8.18-slim'
+                base_image = 'python:3.12.12-slim' #'python:3.11.9-slim' #'python:3.8.18-slim'
                 if install_use_gpu:
                     #base_image = 'nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04'
                     #base_image = 'pytorch/pytorch:2.7.0-cuda12.8-cudnn9-runtime'
@@ -226,9 +237,16 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                 install_voicevox = ''
                 if tts_engine is not None and tts_engine.lower() == 'voicevox':
                     install_voicevox = f'RUN pip install https://github.com/VOICEVOX/voicevox_core/releases/download/{voicevox_ver}/{voicevox_whl}'
+                if install_extra is not None and type(install_extra) == list and install_extra != []:
+                    install_extra = f'RUN pip install {" ".join(install_extra)}'
+                if run_extra is not None and type(run_extra) == list and run_extra != []:
+                    run_extra = f'RUN {" && ".join(run_extra)}'
                 text = text.replace('#{INSTALL_TAG}', install_tag)
                 text = text.replace('#{INSTALL_CMDBOX}', install_cmdbox_tgt)
                 text = text.replace('#{INSTALL_VOICEVOX}', install_voicevox)
+                text = text.replace('#{INSTALL_EXTRA}', install_extra)
+                text = text.replace('#{RUN_EXTRA}', run_extra)
+                text = text.replace('#{ENV_EXTRA}', f'ENV APPID={self.ver.__appid__}')
                 fp.write(text)
             if not compose_path:
                 compose_path = 'docker-compose.yml'

@@ -36,7 +36,7 @@ class EmbedDel(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="入力情報の特徴量データを生成するエンベッドモデルの設定を削除します。",
             description_en="Delete the embed model configuration that generates feature data from input information.",
             choice=[

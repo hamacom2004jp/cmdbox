@@ -35,7 +35,7 @@ class CmdboxServerUninstall(feature.OneshotNotifyEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True, use_agent=False,
             description_ja="cmdboxサーバーをアンインストールします。",
             description_en="Uninstalls the cmdbox server.",
             choice=[

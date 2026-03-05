@@ -40,7 +40,7 @@ class A2aSvStart(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="A2A サーバーを起動します。",
             description_en="Start A2A server.",
             choice=[

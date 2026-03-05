@@ -17,11 +17,11 @@ class AgentRunnerLoad(feature.OneshotResultEdgeFeature):
         return 'runner_load'
 
     def get_option(self) -> Dict[str, Any]:
-         return dict(
-             use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
-             description_ja="Runner 設定を読み込みます。",
-             description_en="Loads runner configuration.",
-          choice=[
+        return dict(
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
+            description_ja="Runner 設定を読み込みます。",
+            description_en="Loads runner configuration.",
+            choice=[
                 dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
                     description_ja="Redisサーバーのサービスホストを指定します。",
                     description_en="Specify the service host of the Redis server."),
@@ -43,9 +43,9 @@ class AgentRunnerLoad(feature.OneshotResultEdgeFeature):
                 dict(opt="timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=True, choice=None,
                     description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                     description_en="Specify the maximum waiting time until the server responds."),
-                 dict(opt="runner_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
-                     description_ja="読み込むRunner設定の名前を指定します。",
-                     description_en="Specify the name of the runner configuration to load."),
+                dict(opt="runner_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                    description_ja="読み込むRunner設定の名前を指定します。",
+                    description_en="Specify the name of the runner configuration to load."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                     description_ja="処理結果jsonの保存先ファイルを指定。",
                     description_en="Specify the destination file for saving the processing result json."),
@@ -62,7 +62,7 @@ class AgentRunnerLoad(feature.OneshotResultEdgeFeature):
                     description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
                     description_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
             ]
-       )
+        )
 
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         if not getattr(args, 'runner_name', None):

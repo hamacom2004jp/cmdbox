@@ -36,7 +36,7 @@ class RagSave(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="RAG（検索拡張生成）の設定を保存します。",
             description_en="Saves the settings for RAG (Retrieval-Augmented Generation).",
             choice=[

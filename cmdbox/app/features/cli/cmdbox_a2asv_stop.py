@@ -37,7 +37,7 @@ class A2asvStop(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=True, use_agent=False,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=True, use_agent=False,
             description_ja="A2A サーバーを停止します。",
             description_en="Stop A2A server.",
             choice=[

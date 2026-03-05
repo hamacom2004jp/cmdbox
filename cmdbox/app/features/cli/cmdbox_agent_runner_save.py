@@ -35,7 +35,7 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature):
                       f"3. If an error occurs, provide the user with the command name, parameters, and error description.\n" \
                       f"4. The result of the command execution should be output as a json string. The json string should be a string enclosed in '```json' and '```'."
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="Runner 設定を保存します。",
             description_en="Saves runner configuration.",
             choice=[

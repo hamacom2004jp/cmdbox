@@ -17,7 +17,7 @@ class AgentRunnerList(feature.OneshotResultEdgeFeature):
 
     def get_option(self) -> Dict[str, Any]:
        return dict(
-          use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
+          use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
           description_ja="保存されているRunner設定を一覧表示します。",
           description_en="Lists saved runner configurations.",
           choice=[

@@ -33,7 +33,7 @@ class ClientTime(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
             description_ja="クライアント側の現在時刻を表示します。",
             description_en="Displays the current time at the client side.",
             choice=[

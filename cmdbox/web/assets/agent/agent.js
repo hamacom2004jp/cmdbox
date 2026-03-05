@@ -170,6 +170,7 @@ agentView.exec_cmd = async (mode, cmd, opt={}, error_func=null, loading=true, ss
         const evtSource = new EventSource(`exec_sse_cmd?${queryString}`, {withCredentials: true,});
         evtSource.onmessage = function(event) {
             try {
+                console.log('SSE message received:', event.data);
                 const data = JSON.parse(event.data);
                 sse_cb(data);
                 if (data['success'] || data['error'] || data['warn']) {
@@ -181,7 +182,6 @@ agentView.exec_cmd = async (mode, cmd, opt={}, error_func=null, loading=true, ss
             }
         };
         evtSource.onerror = function(e) {
-            console.error('SSE error:', e);
             evtSource.close();
             if (loading) cmdbox.hide_loading();
             if (error_func) error_func({'error': 'An error occurred during command execution.'});

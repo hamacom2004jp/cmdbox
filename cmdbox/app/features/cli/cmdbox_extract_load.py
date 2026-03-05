@@ -36,7 +36,7 @@ class ExtractLoad(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="指定されたファイルからテキストを抽出する設定を読み込みます。",
             description_en="Loads settings for extracting text from the specified file.",
             choice=[

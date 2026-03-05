@@ -39,7 +39,7 @@ class McpsvStart(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True, use_agent=False,
             description_ja="MCP サーバーを起動します。",
             description_en="Start MCP server.",
             choice=[

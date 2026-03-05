@@ -35,7 +35,7 @@ class ClientFileMkdir(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False, use_agent=True,
             description_ja="データフォルダ配下に新しいフォルダを作成します。",
             description_en="Create a new folder under the data folder.",
             choice=[

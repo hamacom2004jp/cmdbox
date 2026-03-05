@@ -36,7 +36,7 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="指定されたドキュメントファイルからテキストを抽出します。",
             description_en="Extracts text from the specified document file.",
             choice=[

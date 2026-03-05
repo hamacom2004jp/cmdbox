@@ -36,7 +36,7 @@ class ExtractDel(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="抽出設定を削除します。",
             description_en="Delete the extraction configuration.",
             choice=[

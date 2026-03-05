@@ -35,7 +35,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False,
+            use_redis=self.USE_REDIS_MEIGHT, nouse_webmode=False, use_agent=True,
             description_ja="サーバー側のデータフォルダ配下のファイルをダウンロードします。",
             description_en="Download a file under the data folder on the server.",
             choice=[

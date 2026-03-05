@@ -35,7 +35,7 @@ class EmbedList(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="保存されているエンベッドモデル設定を一覧表示します。",
             description_en="Display a list of saved embedding model settings.",
             choice=[

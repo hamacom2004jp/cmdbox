@@ -29,9 +29,7 @@ class AgentChat(agant_base.AgentBase):
 
     def get_option(self) -> Dict[str, Any]:
         return dict(
-            use_redis=self.USE_REDIS_FALSE,
-            nouse_webmode=False,
-            use_agent=True,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=True,
             description_ja="Agentとチャットを行います。",
             description_en="Chat with the agent.",
             choice=[

@@ -34,7 +34,7 @@ class AgentMemorySave(feature.OneshotResultEdgeFeature):
                       f"・Whether the agent met the user's expectations. And if so, a summary of the response.\n" + \
                       f"・Summary of why the user had such expectations.\n"
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="Memory 設定を保存します。",
             description_en="Saves memory configuration.",
             choice=[

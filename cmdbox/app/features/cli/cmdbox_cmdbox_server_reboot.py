@@ -38,7 +38,7 @@ class CmdboxServerReboot(feature.OneshotNotifyEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True, use_agent=False,
             description_ja="cmdboxサーバーを再起動します。",
             description_en="Reboots the cmdbox server.",
             choice=[
