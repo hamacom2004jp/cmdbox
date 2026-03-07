@@ -15,244 +15,262 @@
 </head>
 
 <body>
-<div class="layout-grid split-pane fixed-left">
-    <!-- LEFT PANEL: Console / Chat Interface -->
-    <aside class="console-panel split-pane-component" style="z-index:52;">
-        <div class="d-flex align-items-center console-header justify-content-between">
-            <h5 class="d-inline-block m-0 glow-text-cyan system-font">
-                <span class="d-flex align-items-center">
-                    <i class="fas fa-terminal me-2"></i>
-                    <span id="display_runner_name" style="cursor: pointer;" title="Click to select runner">
-                        Click Here
+<div class="layout-grid">
+    <!-- NAVIGATION SIDEBAR -->
+    <nav class="nav-sidebar" id="navSidebar" style="z-index:51;">
+        <div class="nav-sidebar-header ps-2 pt-3 pb-3">
+            <button id="btn_toggle_sidebar" class="btn btn-nav-toggle me-auto" title="Toggle sidebar" style="width:53px;border:none;">
+                <i class="fas fa-bars fa-xl"></i>
+            </button>
+        </div>
+        <div class="nav-sidebar-content">
+            <button id="btn_histories" class="btn btn-nav-action" data-bs-toggle="modal" data-bs-target="#historyModal" title="Histories" style="border:none;">
+                <i class="fas fa-history fa-2xl"></i>
+                <span class="nav-label">Histories</span>
+            </button>
+            <button id="btn_filetrancefer" class="btn btn-nav-action" data-bs-toggle="modal" data-bs-target="#fileTranceferModal" title="Files" style="border:none;">
+                <i class="fa-solid fa-folder-open fa-2xl"></i>
+                <span class="nav-label">Files</span>
+            </button>
+            <button id="btn_memories" class="btn btn-nav-action" data-bs-toggle="modal" data-bs-target="#memoryModal" title="Memory" style="border:none;">
+                <i class="fas fa-brain fa-2xl"></i>
+                <span class="nav-label">MEMORY</span>
+            </button>
+            <button id="btn_config" class="btn btn-nav-action" data-bs-toggle="modal" data-bs-target="#agent_settings_modal" title="Config" style="border:none;">
+                <i class="fas fa-cog fa-2xl"></i>
+                <span class="nav-label">CONFIG</span>
+            </button>
+        </div>
+    </nav>
+    <div class="split-pane fixed-left">
+        <!-- LEFT PANEL: Console / Chat Interface -->
+        <aside class="console-panel split-pane-component" style="z-index:52;">
+            <div class="d-flex align-items-center console-header justify-content-between">
+                <h5 class="d-inline-block m-0 glow-text-cyan system-font">
+                    <span class="d-flex align-items-center">
+                        <i class="fas fa-terminal me-2"></i>
+                        <span id="display_runner_name" style="cursor: pointer;" title="Click to select runner">
+                            Click Here
+                        </span>
                     </span>
+                </h5>
+                <div class="d-none dropdown user_info" style="font-size: 0.8rem;">
+                    <a href="#" class="d-block text-decoration-none dropdown-toggle show" data-bs-toggle="dropdown" aria-expanded="true">
+                        <div class="d-inline-block me-1">
+                            <svg width="24" height="24" viewBox="0 0 16 16" style="fill:var(--accent-cyan);vertical-align:inherit;">
+                                <use href="#svg_signin_ico"></use>
+                            </svg>
+                        </div>
+                        <div class="d-inline-block">
+                            <span class="user_info_color">USER: <span class="username glow-text-magenta">UserName</span></span>
+                            <br/>
+                            <span class="user_info_color">STATUS: <span style="color:var(--accent-green)">ONLINE</span></span>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu text-small shadow" style="position:absolute;inset:0px 0px auto auto;margin:0px;transform:translate(0px, 34px);" data-popper-placement="bottom-end">
+                        <div class="user_info_note ps-3 pe-3"></div>
+                        <li><hr class="dropdown-divider"></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="chat-history" id="chatContainer">
+                <div class="chat-container-header d-flex justify-content-end p-2" style="position:sticky;top:0;z-index:10;">
+                    <button id="btn_new_chat" class="btn btn-nav-action" title="新しいチャットを始める" style="flex-shrink:0;border:none;">
+                        <i class="fas fa-plus fa-2xl"></i>
+                    </button>
+                </div>
+                <div id="messages"></div>
+            </div>
+
+            <div class="console-footer">
+                <div class="input-group input-group-sf m-0">
+                    <button id="btn_rec" class="btn btn-sf-icon" type="button" title="音声入力">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <textarea id="user_msg" class="form-control form-control-sf" placeholder="Command..." rows="1" style="border:0px;box-shadow:none;resize:none;field-sizing:content;"></textarea>
+                    <button id="btn_say" class="btn btn-sf-icon" type="button" title="読み上げ切替">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                    <button id="btn_user_msg" class="btn btn-sf-icon" type="button">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 左右のスプリッター -->
+        <div class="split-pane-divider split-pane-divider-left" style="z-index: 52;"></div>
+
+        <!-- AI Core and System Info Overlay -->
+        <div class="system-location-container" style="position: absolute; top: 20px; right: 20px; text-align: right; z-index:5;" class="system-font text-white-50">
+            <div id="current_time">--:--:--</div>
+            <div id="appid_version">cmdbox</div>
+        </div>
+        <!-- Center AI Core (Default View) -->
+        <div class="ai-core-container" id="aiCoreContainer">
+            <div class="ai-core text-nowrap">
+                <span id="logo_title" class="core-text">---</span>
+            </div>
+            <div class="ai-core-msg text-nowrap">
+                <span id="display_runner_msg" class="glow-text-cyan system-font" style="font-size: 0.8rem; letter-spacing: 5px; white-space:nowrap;">
+                    PLEASE SELECT A AGENT RUNNER
                 </span>
-            </h5>
-            <div class="d-none dropdown user_info" style="font-size: 0.8rem;">
-                <a href="#" class="d-block text-decoration-none dropdown-toggle show" data-bs-toggle="dropdown" aria-expanded="true">
-                    <div class="d-inline-block me-1">
-                        <svg width="24" height="24" viewBox="0 0 16 16" style="fill:var(--accent-cyan);vertical-align:inherit;">
-                            <use href="#svg_signin_ico"></use>
-                        </svg>
-                    </div>
-                    <div class="d-inline-block">
-                        <span class="user_info_color">USER: <span class="username glow-text-magenta">UserName</span></span>
-                        <br/>
-                        <span class="user_info_color">STATUS: <span style="color:var(--accent-green)">ONLINE</span></span>
-                    </div>
-                </a>
-                <ul class="dropdown-menu text-small shadow" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);" data-popper-placement="bottom-end">
-                    <div class="user_info_note ps-3 pe-3"></div>
-                    <li><hr class="dropdown-divider"></li>
-                </ul>
             </div>
         </div>
 
-        <div class="chat-history" id="chatContainer">
-            <div id="messages"></div>
-        </div>
-
-        <div class="console-footer">
-            <div class="input-group input-group-sf">
-                <button id="btn_rec" class="btn btn-sf-icon" type="button" title="音声入力">
-                    <i class="fas fa-microphone"></i>
-                </button>
-                <textarea id="user_msg" class="form-control form-control-sf" placeholder="Command..." rows="1" style="border:0px;box-shadow:none;resize:none;field-sizing:content;"></textarea>
-                <button id="btn_say" class="btn btn-sf-icon" type="button" title="読み上げ切替">
-                    <i class="fas fa-volume-up"></i>
-                </button>
-                <button id="btn_user_msg" class="btn btn-sf-icon" type="button">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
-            </div>
-
-            <div class="footer-controls">
-                <button id="btn_filetrancefer" class="btn btn-footer-action btn-footer-action-ps0" data-bs-toggle="modal" data-bs-target="#fileTranceferModal">
-                    <i class="fa-solid fa-folder-open fa-lg"></i>
-                    <span>Files</span>
-                </button>
-                <button id="btn_memories" class="btn btn-footer-action btn-footer-action-ps0" data-bs-toggle="modal" data-bs-target="#memoryModal">
-                    <i class="fas fa-brain fa-lg"></i>
-                    <span>MEMORY</span>
-                </button>
-                <button class="btn btn-footer-action btn-footer-action-ps0" data-bs-toggle="modal" data-bs-target="#agent_settings_modal">
-                    <i class="fas fa-cog fa-lg"></i>
-                    <span>CONFIG</span>
-                </button>
-            </div>
-        </div>
-    </aside>
-
-    <!-- 左右のスプリッター -->
-    <div class="split-pane-divider split-pane-divider-left" style="z-index: 52;"></div>
-
-    <!-- AI Core and System Info Overlay -->
-    <div class="system-location-container" style="position: absolute; top: 20px; right: 20px; text-align: right; z-index:5;" class="system-font text-white-50">
-        <div id="current_time">--:--:--</div>
-        <div id="appid_version">cmdbox</div>
-    </div>
-    <!-- Center AI Core (Default View) -->
-    <div class="ai-core-container" id="aiCoreContainer">
-        <div class="ai-core text-nowrap">
-            <span id="logo_title" class="core-text">---</span>
-        </div>
-        <div class="ai-core-msg text-nowrap">
-            <span id="display_runner_msg" class="glow-text-cyan system-font" style="font-size: 0.8rem; letter-spacing: 5px; white-space:nowrap;">
-                PLEASE SELECT A AGENT RUNNER
-            </span>
-        </div>
+        <!-- RIGHT PANEL: Visualizer / AI Monitor -->
+        <main class="visualizer-panel split-pane-component split-pane-right-width">
+        </main>
     </div>
 
-    <!-- RIGHT PANEL: Visualizer / AI Monitor -->
-    <main class="visualizer-panel split-pane-component split-pane-right-width">
-    </main>
-</div>
-
-<!-- 設定モーダル -->
-<div id="agent_settings_modal" class="modal fade" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content sf-modal doc-card h-100">
-            <div class="modal-header doc-header">
-                <h5 class="modal-title glow-text-cyan system-font">Settings</h5>
-                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
-            </div>
-            <div class="modal-body p-0 h-100 overflow-hidden">
-                <div id="settings_split_pane" class="split-pane fixed-left h-100 w-100">
-                    <!-- 左側ペイン: 設定項目リスト -->
-                    <div class="split-pane-component" style="width:200px;">
-                        <div class="list-group list-group-flush">
-                            <a href="#" class="list-group-item list-group-item-action active" data-bs-target="#agent_settings">Agent Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#llm_settings">LLM Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#embedding_settings">Embedding Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#memory_settings">Memory Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#mcpsv_settings">MCPSV Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#extract_settings">Extract Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#rag_settings">RAG Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#runner_settings">Runner Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#tts_settings">TTS Settings</a>
+    <!-- 設定モーダル -->
+    <div id="agent_settings_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content sf-modal doc-card h-100">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">Settings</h5>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body p-0 h-100 overflow-hidden">
+                    <div id="settings_split_pane" class="split-pane fixed-left h-100 w-100">
+                        <!-- 左側ペイン: 設定項目リスト -->
+                        <div class="split-pane-component" style="width:200px;">
+                            <div class="list-group list-group-flush">
+                                <a href="#" class="list-group-item list-group-item-action active" data-bs-target="#agent_settings">Agent Settings</a>
+                                <a href="#" class="list-group-item list-group-item-action" data-bs-target="#llm_settings">LLM Settings</a>
+                                <a href="#" class="list-group-item list-group-item-action" data-bs-target="#embedding_settings">Embedding Settings</a>
+                                <a href="#" class="list-group-item list-group-item-action" data-bs-target="#memory_settings">Memory Settings</a>
+                                <a href="#" class="list-group-item list-group-item-action" data-bs-target="#mcpsv_settings">MCPSV Settings</a>
+                                <a href="#" class="list-group-item list-group-item-action" data-bs-target="#extract_settings">Extract Settings</a>
+                                <a href="#" class="list-group-item list-group-item-action" data-bs-target="#rag_settings">RAG Settings</a>
+                                <a href="#" class="list-group-item list-group-item-action" data-bs-target="#runner_settings">Runner Settings</a>
+                                <a href="#" class="list-group-item list-group-item-action" data-bs-target="#tts_settings">TTS Settings</a>
+                            </div>
                         </div>
-                    </div>
-                    <!-- スプリッター -->
-                    <div class="split-pane-divider" style="left:200px; border: 1px solid var(--area-border-color);"></div>
-                    <!-- 右側ペイン: 設定内容 -->
-                    <div class="split-pane-component" style="left:200px;">
-                        <div class="p-3 h-100 overflow-auto">
-                            <div id="agent_settings" class="settings-content">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">Agent Settings</h6>
-                                    <button id="btn_add_agent" class="btn btn-sf ms-3">
-                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        Add Setting
-                                    </button>
-                                </div>
-                                <div id="agent_list_container" class="list-group">
-                                    <!-- Agent List Items will be injected here -->
-                                </div>
-                            </div>
-                            <div id="llm_settings" class="settings-content d-none">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">LLM Settings</h6>
-                                    <button id="btn_add_llm" class="btn btn-sf ms-3">
-                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        Add Setting
-                                    </button>
-                                </div>
-                                <div id="llm_list_container" class="list-group">
-                                    <!-- LLM List Items will be injected here -->
-                                </div>
-                            </div>
-                            <div id="mcpsv_settings" class="settings-content d-none">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">MCPSV Settings</h6>
-                                    <button id="btn_add_mcpsv" class="btn btn-sf ms-3">
-                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        Add Setting
-                                    </button>
-                                </div>
-                                <div id="mcpsv_list_container" class="list-group">
-                                    <!-- MCPSV List Items will be injected here -->
-                                </div>
-                            </div>
-                            <div id="runner_settings" class="settings-content d-none">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">Runner Settings</h6>
-                                    <button id="btn_add_runner" class="btn btn-sf ms-3">
-                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        Add Setting
-                                    </button>
-                                </div>
-                                <div id="runner_list_container" class="list-group">
-                                    <!-- Runner List Items will be injected here -->
-                                </div>
-                            </div>
-                            <div id="embedding_settings" class="settings-content d-none">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">Embedding Settings</h6>
-                                    <button id="btn_add_embedding" class="btn btn-sf ms-3">
-                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        Add Setting
-                                    </button>
-                                </div>
-                                <div id="embedding_list_container" class="list-group">
-                                    <!-- Embedding List Items will be injected here -->
-                                </div>
-                            </div>
-                            <div id="rag_settings" class="settings-content d-none">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">RAG Settings</h6>
-                                    <button id="btn_add_rag" class="btn btn-sf ms-3">
-                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        Add Setting
-                                    </button>
-                                </div>
-                                <div id="rag_list_container" class="list-group">
-                                    <!-- RAG List Items will be injected here -->
-                                </div>
-                            </div>
-                            <div id="extract_settings" class="settings-content d-none">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">Extract Settings</h6>
-                                    <button id="btn_add_extract" class="btn btn-sf ms-3">
-                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        Add Setting
-                                    </button>
-                                </div>
-                                <div id="extract_list_container" class="list-group">
-                                    <!-- Extract List Items will be injected here -->
-                                </div>
-                            </div>
-                            <div id="memory_settings" class="settings-content d-none">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">Memory Settings</h6>
-                                    <button id="btn_add_memory" class="btn btn-sf ms-3">
-                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        Add Setting
-                                    </button>
-                                </div>
-                                <div id="memory_list_container" class="list-group">
-                                    <!-- Memory List Items will be injected here -->
-                                </div>
-                            </div>
-                            <div id="tts_settings" class="settings-content d-none">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">TTS Settings</h6>
-                                </div>
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h6 class="card-title">Install TTS Engine</h6>
-                                        <form id="form_tts_install" class="row"></form>
-                                        <div class="mt-3 text-end">
-                                            <button id="btn_install_tts" class="btn btn-sf">Install</button>
-                                        </div>
+                        <!-- スプリッター -->
+                        <div class="split-pane-divider" style="left:200px; border: 1px solid var(--area-border-color);"></div>
+                        <!-- 右側ペイン: 設定内容 -->
+                        <div class="split-pane-component" style="left:200px;">
+                            <div class="p-3 h-100 overflow-auto">
+                                <div id="agent_settings" class="settings-content">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="m-0 glow-text-cyan system-font">Agent Settings</h6>
+                                        <button id="btn_add_agent" class="btn btn-sf ms-3">
+                                            <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                            Add Setting
+                                        </button>
+                                    </div>
+                                    <div id="agent_list_container" class="list-group">
+                                        <!-- Agent List Items will be injected here -->
                                     </div>
                                 </div>
-                                <div class="card mt-3">
-                                    <div class="card-body">
-                                        <h6 class="card-title">Uninstall TTS Engine</h6>
-                                        <form id="form_tts_uninstall" class="row"></form>
-                                        <div class="mt-3 text-end">
-                                            <button id="btn_uninstall_tts" class="btn btn-sf-danger">Uninstall</button>
+                                <div id="llm_settings" class="settings-content d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="m-0 glow-text-cyan system-font">LLM Settings</h6>
+                                        <button id="btn_add_llm" class="btn btn-sf ms-3">
+                                            <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                            Add Setting
+                                        </button>
+                                    </div>
+                                    <div id="llm_list_container" class="list-group">
+                                        <!-- LLM List Items will be injected here -->
+                                    </div>
+                                </div>
+                                <div id="mcpsv_settings" class="settings-content d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="m-0 glow-text-cyan system-font">MCPSV Settings</h6>
+                                        <button id="btn_add_mcpsv" class="btn btn-sf ms-3">
+                                            <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                            Add Setting
+                                        </button>
+                                    </div>
+                                    <div id="mcpsv_list_container" class="list-group">
+                                        <!-- MCPSV List Items will be injected here -->
+                                    </div>
+                                </div>
+                                <div id="runner_settings" class="settings-content d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="m-0 glow-text-cyan system-font">Runner Settings</h6>
+                                        <button id="btn_add_runner" class="btn btn-sf ms-3">
+                                            <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                            Add Setting
+                                        </button>
+                                    </div>
+                                    <div id="runner_list_container" class="list-group">
+                                        <!-- Runner List Items will be injected here -->
+                                    </div>
+                                </div>
+                                <div id="embedding_settings" class="settings-content d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="m-0 glow-text-cyan system-font">Embedding Settings</h6>
+                                        <button id="btn_add_embedding" class="btn btn-sf ms-3">
+                                            <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                            Add Setting
+                                        </button>
+                                    </div>
+                                    <div id="embedding_list_container" class="list-group">
+                                        <!-- Embedding List Items will be injected here -->
+                                    </div>
+                                </div>
+                                <div id="rag_settings" class="settings-content d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="m-0 glow-text-cyan system-font">RAG Settings</h6>
+                                        <button id="btn_add_rag" class="btn btn-sf ms-3">
+                                            <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                            Add Setting
+                                        </button>
+                                    </div>
+                                    <div id="rag_list_container" class="list-group">
+                                        <!-- RAG List Items will be injected here -->
+                                    </div>
+                                </div>
+                                <div id="extract_settings" class="settings-content d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="m-0 glow-text-cyan system-font">Extract Settings</h6>
+                                        <button id="btn_add_extract" class="btn btn-sf ms-3">
+                                            <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                            Add Setting
+                                        </button>
+                                    </div>
+                                    <div id="extract_list_container" class="list-group">
+                                        <!-- Extract List Items will be injected here -->
+                                    </div>
+                                </div>
+                                <div id="memory_settings" class="settings-content d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="m-0 glow-text-cyan system-font">Memory Settings</h6>
+                                        <button id="btn_add_memory" class="btn btn-sf ms-3">
+                                            <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                            Add Setting
+                                        </button>
+                                    </div>
+                                    <div id="memory_list_container" class="list-group">
+                                        <!-- Memory List Items will be injected here -->
+                                    </div>
+                                </div>
+                                <div id="tts_settings" class="settings-content d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="m-0 glow-text-cyan system-font">TTS Settings</h6>
+                                    </div>
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Install TTS Engine</h6>
+                                            <form id="form_tts_install" class="row"></form>
+                                            <div class="mt-3 text-end">
+                                                <button id="btn_install_tts" class="btn btn-sf">Install</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card mt-3">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Uninstall TTS Engine</h6>
+                                            <form id="form_tts_uninstall" class="row"></form>
+                                            <div class="mt-3 text-end">
+                                                <button id="btn_uninstall_tts" class="btn btn-sf-danger">Uninstall</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -260,456 +278,459 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- LLM追加/編集モーダル -->
-<div id="llm_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content sf-modal doc-card" style="height:auto;">
-            <div class="modal-header doc-header">
-                <h5 class="modal-title glow-text-cyan system-font">Add/Edit LLM</h5>
-                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="form_llm_edit" class="row"></form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
-                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_llm" style="display:none;">DELETE</button>
-                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_llm">SAVE</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- MCPSV追加/編集モーダル -->
-<div id="mcpsv_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content sf-modal doc-card" style="height:auto;">
-            <div class="modal-header doc-header">
-                <h5 class="modal-title glow-text-cyan system-font">Add/Edit MCPSV</h5>
-                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="form_mcpsv_edit" class="row"></form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
-                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_mcpsv" style="display:none;">DELETE</button>
-                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_mcpsv">SAVE</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Agent追加/編集モーダル -->
-<div id="agent_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content sf-modal doc-card" style="height:auto;">
-            <div class="modal-header doc-header">
-                <h5 class="modal-title glow-text-cyan system-font">Add/Edit Agent</h5>
-                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="form_agent_edit" class="row"></form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
-                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_agent" style="display:none;">DELETE</button>
-                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_agent">SAVE</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Embed追加/編集モーダル -->
-<div id="embedding_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content sf-modal doc-card" style="height:auto;">
-            <div class="modal-header doc-header">
-                <h5 class="modal-title glow-text-cyan system-font">Add/Edit Embedding</h5>
-                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="form_embedding_edit" class="row"></form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
-                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_embedding" style="display:none;">DELETE</button>
-                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_embedding">SAVE</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Memory追加/編集モーダル -->
-<div id="memory_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content sf-modal doc-card" style="height:auto;">
-            <div class="modal-header doc-header">
-                <h5 class="modal-title glow-text-cyan system-font">Add/Edit Memory</h5>
-                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="form_memory_edit" class="row"></form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
-                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_memory" style="display:none;">DELETE</button>
-                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_memory">SAVE</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- RAG追加/編集モーダル -->
-<div id="rag_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content sf-modal doc-card" style="height:auto;">
-            <div class="modal-header doc-header">
-                <h5 class="modal-title glow-text-cyan system-font">Add/Edit RAG</h5>
-                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="form_rag_edit" class="row"></form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
-                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_rag" style="display:none;">DELETE</button>
-                <button type="button" class="btn btn-outline-danger me-auto" id="btn_build_rag" style="display:none;">BUILD</button>
-                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_rag">SAVE</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Extract追加/編集モーダル -->
-<div id="extract_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content sf-modal doc-card" style="height:auto;">
-            <div class="modal-header doc-header">
-                <h5 class="modal-title glow-text-cyan system-font">Add/Edit Extract</h5>
-                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="form_extract_edit" class="row"></form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
-                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_extract" style="display:none;">DELETE</button>
-                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_extract">SAVE</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Runner選択モーダル -->
-<div id="runner_select_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content sf-modal doc-card" style="height:auto;">
-            <div class="modal-header doc-header">
-                <h5 class="modal-title glow-text-cyan system-font">Select Runner</h5>
-                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div id="runner_select_list" class="list-group">
-                    <!-- Runner List Items will be injected here -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- LLM追加/編集モーダル -->
+    <div id="llm_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content sf-modal doc-card" style="height:auto;">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">Add/Edit LLM</h5>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form_llm_edit" class="row"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                    <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_llm" style="display:none;">DELETE</button>
+                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_llm">SAVE</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Runner追加/編集モーダル -->
-<div id="runner_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content sf-modal doc-card" style="height:auto;">
-            <div class="modal-header doc-header">
-                <h5 class="modal-title glow-text-cyan system-font">Add/Edit Runner</h5>
-                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="form_runner_edit" class="row"></form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
-                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_runner" style="display:none;">DELETE</button>
-                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_runner">SAVE</button>
+    <!-- MCPSV追加/編集モーダル -->
+    <div id="mcpsv_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content sf-modal doc-card" style="height:auto;">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">Add/Edit MCPSV</h5>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form_mcpsv_edit" class="row"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                    <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_mcpsv" style="display:none;">DELETE</button>
+                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_mcpsv">SAVE</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- メモリーモーダル -->
-<div id="memoryModal" class="modal fade" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content sf-modal doc-card" style="height:auto;">
-            <div class="modal-header doc-header">
-                <h5 class="modal-title glow-text-cyan system-font">MEMORY AND SESSIONS</h5>
-                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
+    <!-- Agent追加/編集モーダル -->
+    <div id="agent_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content sf-modal doc-card" style="height:auto;">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">Add/Edit Agent</h5>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form_agent_edit" class="row"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                    <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_agent" style="display:none;">DELETE</button>
+                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_agent">SAVE</button>
+                </div>
             </div>
-            <div class="modal-body">
-                <ul class="nav nav-tabs">
-                    <li class="nav-item">
-                        <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#memory_tab" href="#">
-                            <i class="fas fa-brain fa-lg"></i>
-                            MEMORY
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#session_tab" href="#">
-                            <i class="fas fa-history fa-lg"></i>
-                            SESSIONS
-                        </a>
-                    </li>
-                </ul>
-                <div class="tab-content p-1">
-                    <div id="memory_tab" class="tab-pane active">
-                        <div class="sf-param-grid mb-3">
-                            <div class="sf-param-box">
-                                <div class="text-white-50" style="font-size: 0.8rem;">REFERENCE_RANGE</div>
-                                <div class="d-flex fs-5 system-font glow-text-cyan mt-2">
-                                    <div id="memory_range_start">---</div>
-                                    <div class="mx-1">~</div>
-                                    <div id="memory_range_end">---</div>
-                                </div>
-                            </div>
-                            <div class="sf-param-box">
-                                <div class="text-white-50" style="font-size: 0.8rem;">USAGE_RATIO</div>
-                                <div class="fs-2 text-end system-font glow-text-magenta d-flex">
-                                    <div id="memory_performance">---</div>
-                                </div>
+        </div>
+    </div>
+
+    <!-- Embed追加/編集モーダル -->
+    <div id="embedding_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content sf-modal doc-card" style="height:auto;">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">Add/Edit Embedding</h5>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form_embedding_edit" class="row"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                    <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_embedding" style="display:none;">DELETE</button>
+                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_embedding">SAVE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Memory追加/編集モーダル -->
+    <div id="memory_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content sf-modal doc-card" style="height:auto;">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">Add/Edit Memory</h5>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form_memory_edit" class="row"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                    <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_memory" style="display:none;">DELETE</button>
+                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_memory">SAVE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RAG追加/編集モーダル -->
+    <div id="rag_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content sf-modal doc-card" style="height:auto;">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">Add/Edit RAG</h5>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form_rag_edit" class="row"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                    <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_rag" style="display:none;">DELETE</button>
+                    <button type="button" class="btn btn-outline-danger me-auto" id="btn_build_rag" style="display:none;">BUILD</button>
+                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_rag">SAVE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Extract追加/編集モーダル -->
+    <div id="extract_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content sf-modal doc-card" style="height:auto;">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">Add/Edit Extract</h5>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form_extract_edit" class="row"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                    <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_extract" style="display:none;">DELETE</button>
+                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_extract">SAVE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Runner選択モーダル -->
+    <div id="runner_select_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content sf-modal doc-card" style="height:auto;">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">Select Runner</h5>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="runner_select_list" class="list-group">
+                        <!-- Runner List Items will be injected here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Runner追加/編集モーダル -->
+    <div id="runner_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content sf-modal doc-card" style="height:auto;">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">Add/Edit Runner</h5>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form_runner_edit" class="row"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                    <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_runner" style="display:none;">DELETE</button>
+                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_runner">SAVE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- メモリーモーダル -->
+    <div id="memoryModal" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content sf-modal doc-card" style="height:auto;">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">MEMORY AND SESSIONS</h5>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="sf-param-grid mb-3">
+                        <div class="sf-param-box">
+                            <div class="text-white-50" style="font-size: 0.8rem;">REFERENCE_RANGE</div>
+                            <div class="d-flex fs-5 system-font glow-text-cyan mt-2">
+                                <div id="memory_range_start">---</div>
+                                <div class="mx-1">~</div>
+                                <div id="memory_range_end">---</div>
                             </div>
                         </div>
-                        <h6 class="glow-text-cyan system-font mt-4 mb-2">
-                            <i class="fa-regular fa-address-card fa-lg mx-2"></i>USER_PROFILE_ANALYSIS
-                        </h6>
-                        <div class="p-3 border border-secondary bg-black bg-opacity-25" style="font-family: var(--font-body);">
-                            <p id="memory_content" class="mb-2"><strong>Loading..</strong></p>
+                        <div class="sf-param-box">
+                            <div class="text-white-50" style="font-size: 0.8rem;">USAGE_RATIO</div>
+                            <div class="fs-2 text-end system-font glow-text-magenta d-flex">
+                                <div id="memory_performance">---</div>
+                            </div>
                         </div>
                     </div>
+                    <h6 class="glow-text-cyan system-font mt-4 mb-2">
+                        <i class="fa-regular fa-address-card fa-lg mx-2"></i>USER_PROFILE_ANALYSIS
+                    </h6>
+                    <div class="p-3 border border-secondary bg-black bg-opacity-25" style="font-family: var(--font-body);">
+                        <p id="memory_content" class="mb-2"><strong>Loading..</strong></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ヒストリーモーダル -->
+    <div id="historyModal" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content sf-modal doc-card" style="height:auto;">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">
+                        <i class="fas fa-history fa-lg"></i>HISTORIES
+                    </h5>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
                     <div id="session_tab" class="tab-pane">
                         <ul class="sf-list-group">
                         </ul>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- オプション選択用ファイラーモーダル -->
-<div id="filer_modal" class="modal" style="z-index: 2000;" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <form id="filer_form" class="modal-content novalidate">
-            <div class="modal-header">
-                <h5 class="modal-title glow-text-cyan text-nowrap">Modal title</h5>
-                <div class="input-group p-1">
-                    <button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Current</button>'
-                    <input name="filer_host" type="hidden" class="filer_host">
-                    <input name="filer_port" type="hidden" class="filer_port">
-                    <input name="filer_password" type="hidden" class="filer_password">
-                    <input name="filer_svname" type="hidden" class="filer_svname">
-                    <input name="filer_scope" type="hidden" class="filer_scope">
-                    <input name="filer_client_data" type="hidden" class="filer_client_data">
-                    <ul class="dropdown-menu filer_server"></ul>
-                    <input type="text" class="form-control filer_address" aria-describedby="button-addon2">
-                    <button class="btn btn-outline-secondary filer_address_bot" type="button" id="button-addon2">
-                        <svg class="bi bi-arrow-right-circle" width="16" height="16" fill="currentColor"><use href="#btn_arrow_right_circle"></use></svg>
+    <!-- オプション選択用ファイラーモーダル -->
+    <div id="filer_modal" class="modal" style="z-index: 2000;" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="filer_form" class="modal-content novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title glow-text-cyan text-nowrap">Modal title</h5>
+                    <div class="input-group p-1">
+                        <button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Current</button>'
+                        <input name="filer_host" type="hidden" class="filer_host">
+                        <input name="filer_port" type="hidden" class="filer_port">
+                        <input name="filer_password" type="hidden" class="filer_password">
+                        <input name="filer_svname" type="hidden" class="filer_svname">
+                        <input name="filer_scope" type="hidden" class="filer_scope">
+                        <input name="filer_client_data" type="hidden" class="filer_client_data">
+                        <ul class="dropdown-menu filer_server"></ul>
+                        <input type="text" class="form-control filer_address" aria-describedby="button-addon2">
+                        <button class="btn btn-outline-secondary filer_address_bot" type="button" id="button-addon2">
+                            <svg class="bi bi-arrow-right-circle" width="16" height="16" fill="currentColor"><use href="#btn_arrow_right_circle"></use></svg>
+                        </button>
+                    </div>
+                    <button type="button" class="btn btn_window_stack">
+                        <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
+                    </button>
+                    <button type="button" class="btn btn_window">
+                        <svg class="bi bi-window" width="16" height="16" fill="currentColor"><use href="#btn_window"></use></svg>
+                    </button>
+                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">
+                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
                     </button>
                 </div>
-                <button type="button" class="btn btn_window_stack">
-                    <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
-                </button>
-                <button type="button" class="btn btn_window">
-                    <svg class="bi bi-window" width="16" height="16" fill="currentColor"><use href="#btn_window"></use></svg>
-                </button>
-                <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">
-                    <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
-                </button>
-            </div>
-            <div class="modal-body row">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </form>
+                <div class="modal-body row">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- ファイル転送モーダル -->
-<div id="fileTranceferModal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
-    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
-        <div class="modal-content sf-modal doc-card">
-            <div class="modal-header doc-header">
-                <h5 class="modal-title glow-text-cyan system-font">Files</h5>
-                <button type="button" class="btn btn-sf-icon btn_window_stack">
-                    <i class="fa-regular fa-window-restore"></i>
-                </button>
-                <button type="button" class="btn btn-sf-icon btn_window">
-                    <i class="fa-regular fa-window-maximize"></i>
-                </button>
-                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div id="main_container" class="container-fluid overflow-auto split-pane fixed-left" style="height:calc(100% - 17px);">
-                    <!-- ローカル側ペイン -->
-                    <div id="left_container" class="split-pane-component filer-pane-left" style="width:49%;">
-                        <div class="split-pane fixed-top">
-                            <div class="split-pane-component filer-pane-left-top" style="height:45%;">
-                                <!-- ローカル側アドレスバー -->
-                                <div class="input-group p-1" style="top:0%;">
-                                    <button class="btn btn-outline-secondary filer_local_bot" type="button">Local</button>'
-                                    <input type="text" class="form-control filer_address" readonly>
+    <!-- ファイル転送モーダル -->
+    <div id="fileTranceferModal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+            <div class="modal-content sf-modal doc-card">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">Files</h5>
+                    <button type="button" class="btn btn-sf-icon btn_window_stack">
+                        <i class="fa-regular fa-window-restore"></i>
+                    </button>
+                    <button type="button" class="btn btn-sf-icon btn_window">
+                        <i class="fa-regular fa-window-maximize"></i>
+                    </button>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="main_container" class="container-fluid overflow-auto split-pane fixed-left" style="height:calc(100% - 17px);">
+                        <!-- ローカル側ペイン -->
+                        <div id="left_container" class="split-pane-component filer-pane-left" style="width:49%;">
+                            <div class="split-pane fixed-top">
+                                <div class="split-pane-component filer-pane-left-top" style="height:45%;">
+                                    <!-- ローカル側アドレスバー -->
+                                    <div class="input-group p-1" style="top:0%;">
+                                        <button class="btn btn-outline-secondary filer_local_bot" type="button">Local</button>'
+                                        <input type="text" class="form-control filer_address" readonly>
+                                    </div>
+                                    <!-- ローカル側ツリー -->
+                                    <ul class="tree-menu tree_ul overflow-auto border w-100" style="min-height:auto; height:calc(100% - 50px);"></ul>
                                 </div>
-                                <!-- ローカル側ツリー -->
-                                <ul class="tree-menu tree_ul overflow-auto border w-100" style="min-height:auto; height:calc(100% - 50px);"></ul>
-                            </div>
-                            <!-- 上下のスプリッター -->
-                            <div class="split-pane-divider filer-pane-divider" style="top:45%;"></div>
-                            <!-- ローカル側ファイルリスト -->
-                            <div class="split-pane-component filer-pane-left-bottom file-list drop-area overflow-auto p-1" style="top:45%;">
-                                <table class="table table-bordered table-hover table-sm">
-                                    <thead><tr>
-                                        <th class="th" scope="col">-</th>
-                                        <th class="th" scope="col">name</th>
-                                        <th class="th" scope="col">mime</th>
-                                        <th class="th" scope="col">size</th>
-                                        <th class="th" scope="col">last</th>
-                                    </tr></thead><tbody></tbody>
-                                </table>
+                                <!-- 上下のスプリッター -->
+                                <div class="split-pane-divider filer-pane-divider" style="top:45%;"></div>
+                                <!-- ローカル側ファイルリスト -->
+                                <div class="split-pane-component filer-pane-left-bottom file-list drop-area overflow-auto p-1" style="top:45%;">
+                                    <table class="table table-bordered table-hover table-sm">
+                                        <thead><tr>
+                                            <th class="th" scope="col">-</th>
+                                            <th class="th" scope="col">name</th>
+                                            <th class="th" scope="col">mime</th>
+                                            <th class="th" scope="col">size</th>
+                                            <th class="th" scope="col">last</th>
+                                        </tr></thead><tbody></tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- 左右のスプリッター -->
-                    <div class="split-pane-divider filer-pane-divider" style="left:49%;"></div>
-                    <!-- サーバー側ペイン -->
-                    <div id="right_container" class="split-pane-component filer-pane-right" style="left:49%;">
-                        <div class="split-pane fixed-top">
-                            <div class="split-pane-component filer-pane-right-top" style="height:45%;">
-                                <!-- サーバー側アドレスバー -->
-                                <div class="input-group p-1" style="top:0%;">
-                                    <button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Server</button>
-                                    <input name="filer_host" type="hidden" class="filer_host">
-                                    <input name="filer_port" type="hidden" class="filer_port">
-                                    <input name="filer_password" type="hidden" class="filer_password">
-                                    <input name="filer_svname" type="hidden" class="filer_svname">
-                                    <input name="filer_scope" type="hidden" class="filer_scope">
-                                    <input name="filer_client_data" type="hidden" class="filer_client_data">
-                                    <ul class="dropdown-menu filer_server"></ul>
-                                    <input type="text" class="form-control filer_address" aria-describedby="button-addon2">
-                                    <button class="btn btn-outline-secondary filer_address_bot" type="button" id="button-addon2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
-                                            <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
-                                        </svg>
-                                    </button>
+                        <!-- 左右のスプリッター -->
+                        <div class="split-pane-divider filer-pane-divider" style="left:49%;"></div>
+                        <!-- サーバー側ペイン -->
+                        <div id="right_container" class="split-pane-component filer-pane-right" style="left:49%;">
+                            <div class="split-pane fixed-top">
+                                <div class="split-pane-component filer-pane-right-top" style="height:45%;">
+                                    <!-- サーバー側アドレスバー -->
+                                    <div class="input-group p-1" style="top:0%;">
+                                        <button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Server</button>
+                                        <input name="filer_host" type="hidden" class="filer_host">
+                                        <input name="filer_port" type="hidden" class="filer_port">
+                                        <input name="filer_password" type="hidden" class="filer_password">
+                                        <input name="filer_svname" type="hidden" class="filer_svname">
+                                        <input name="filer_scope" type="hidden" class="filer_scope">
+                                        <input name="filer_client_data" type="hidden" class="filer_client_data">
+                                        <ul class="dropdown-menu filer_server"></ul>
+                                        <input type="text" class="form-control filer_address" aria-describedby="button-addon2">
+                                        <button class="btn btn-outline-secondary filer_address_bot" type="button" id="button-addon2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <!-- サーバー側ツリー -->
+                                    <ul class="tree-menu tree_ul overflow-auto border w-100" style="min-height:auto; height:calc(100% - 50px)!important;"></ul>
                                 </div>
-                                <!-- サーバー側ツリー -->
-                                <ul class="tree-menu tree_ul overflow-auto border w-100" style="min-height:auto; height:calc(100% - 50px)!important;"></ul>
-                            </div>
-                            <!-- 上下のスプリッター -->
-                            <div class="split-pane-divider filer-pane-divider" style="top:45%;"></div>
-                            <!-- サーバー側ファイルリスト -->
-                            <div class="split-pane-component filer-pane-right-bottom file-list drop-area overflow-auto p-1" style="top:45%;">
-                                <table class="table table-bordered table-hover table-sm">
-                                    <thead><tr>
-                                        <th class="th" scope="col">-</th>
-                                        <th class="th" scope="col">name</th>
-                                        <th class="th" scope="col">mime</th>
-                                        <th class="th" scope="col">size</th>
-                                        <th class="th" scope="col">last</th>
-                                    </tr></thead><tbody></tbody>
-                                </table>
+                                <!-- 上下のスプリッター -->
+                                <div class="split-pane-divider filer-pane-divider" style="top:45%;"></div>
+                                <!-- サーバー側ファイルリスト -->
+                                <div class="split-pane-component filer-pane-right-bottom file-list drop-area overflow-auto p-1" style="top:45%;">
+                                    <table class="table table-bordered table-hover table-sm">
+                                        <thead><tr>
+                                            <th class="th" scope="col">-</th>
+                                            <th class="th" scope="col">name</th>
+                                            <th class="th" scope="col">mime</th>
+                                            <th class="th" scope="col">size</th>
+                                            <th class="th" scope="col">last</th>
+                                        </tr></thead><tbody></tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
+                        <a class="filer_download d-none" href="#">.</a>
                     </div>
-                    <a class="filer_download d-none" href="#">.</a>
-                </div>
-                <!-- プログレスバー -->
-                <div id="progress" class="progress p-0 d-none" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="align-items:center;width:0%">
-                        <div class="progress-bar-text text-center w-100" style="color:var(--bs-body-bg)"></div>
+                    <!-- プログレスバー -->
+                    <div id="progress" class="progress p-0 d-none" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="align-items:center;width:0%">
+                            <div class="progress-bar-text text-center w-100" style="color:var(--bs-body-bg)"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
-                <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_regist_rag">Start registering files to RAG</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_regist_rag">Start registering files to RAG</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- ビューアモーダル -->
-<div id="viewer_modal" class="modal" style="z-index:2000;" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <dic class="modal-content novalidate">
-            <div class="modal-header doc-header">
-                <h5 class="modal-title glow-text-cyan system-font">Viwer</h5>
-                <button type="button" class="btn btn-sf-icon btn_window_stack">
-                    <i class="fa-regular fa-window-restore"></i>
-                </button>
-                <button type="button" class="btn btn-sf-icon btn_window">
-                    <i class="fa-regular fa-window-maximize"></i>
-                </button>
-                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
-            </div>
-            <div class="modal-body"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+    <!-- ビューアモーダル -->
+    <div id="viewer_modal" class="modal" style="z-index:2000;" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <dic class="modal-content novalidate">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">Viwer</h5>
+                    <button type="button" class="btn btn-sf-icon btn_window_stack">
+                        <i class="fa-regular fa-window-restore"></i>
+                    </button>
+                    <button type="button" class="btn btn-sf-icon btn_window">
+                        <i class="fa-regular fa-window-maximize"></i>
+                    </button>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- ローディングマスク -->
-<div id="loading" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(0, 0, 0, 0.3);z-index:10000;">
-    <div class="text-center position-absolute top-50 start-50 w-100 translate-middle">
-        <div class="spinner-border text-light" role="status">
-            <span class="sr-only"></span>
-        </div>
-        <div>
-            <button type="button" class="btn btn-outline-danger mt-3 bbforce">Back by force</button>
+    <!-- ローディングマスク -->
+    <div id="loading" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(0, 0, 0, 0.3);z-index:10000;">
+        <div class="text-center position-absolute top-50 start-50 w-100 translate-middle">
+            <div class="spinner-border text-light" role="status">
+                <span class="sr-only"></span>
+            </div>
+            <div>
+                <button type="button" class="btn btn-outline-danger mt-3 bbforce">Back by force</button>
+            </div>
         </div>
     </div>
+    <!-- フッター -->
+    <footer class="copyright"></footer>
 </div>
-<!-- フッター -->
-<footer class="copyright"></footer>
 <script type="text/javascript">
     document.getElementById('loading').classList.remove('d-none');
 </script>

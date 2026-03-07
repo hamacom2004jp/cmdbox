@@ -38,32 +38,11 @@ aliases:                                # Specify the alias for the specified co
         move:                           # Specify whether to move the regular expression group of the source to the target.
                                         #   e.g. true
 agentrule:                              # Specifies a list of rules that determine which commands the agent can execute.
-  policy: deny                          # Specify the default policy for the rule. The value can be allow or deny.
+  policy: default                       # Specify the default policy for the rule. The value can be allow or deny or default.
   rules:                                # Specify the rules for the commands that the agent can execute according to the group to which the user belongs.
   - mode: cmd                           # Specify the "mode" as the condition for applying the rule.
     cmds: [list, load]                  # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
     rule: allow                         # Specifies whether the specified command is allowed or not. Values are allow or deny.
-  - mode: agent
-    cmds: [chat, agent_list, mcp_client, mcpsv_list, runner_list, session_list]
-    rule: allow
-  - mode: client
-    cmds: [file_download, file_list, http, server_info]
-    rule: allow
-  - mode: excel
-    cmds: [cell_details, cell_search, cell_values, sheet_list]
-    rule: allow
-  - mode: embed
-    cmds: [list]
-    rule: allow
-  - mode: llm
-    cmds: [list]
-    rule: allow
-  - mode: server
-    cmds: [list]
-    rule: allow
-  - mode: tts
-    cmds: [say]
-    rule: allow
 audit:
   enabled: true                         # Specify whether to enable the audit function.
   write:

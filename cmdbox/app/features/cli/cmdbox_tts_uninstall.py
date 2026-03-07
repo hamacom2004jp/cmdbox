@@ -70,7 +70,6 @@ class TtsUninstall(feature.UnsupportEdgeFeature):
                      description_en="Do not make connections to the server."),
                 dict(opt="tts_engine", type=Options.T_STR, default="voicevox", required=True, multi=False, hide=False,
                      choice=["", "voicevox"],
-                     choice_show=dict(voicevox=["voicevox_ver", "voicevox_os", "voicevox_arc", "voicevox_device", "voicevox_whl"]),
                      description_ja="使用するTTSエンジンを指定します。",
                      description_en="Specify the TTS engine to use."),
             ]

@@ -51,7 +51,7 @@ class AgentChat(agant_base.AgentBase):
                 dict(opt="retry_interval", type=Options.T_INT, default=5, required=False, multi=False, hide=True, choice=None,
                      description_ja="Redisサーバーに再接続までの秒数を指定します。",
                      description_en="Specifies the number of seconds before reconnecting to the Redis server."),
-                dict(opt="timeout", type=Options.T_INT, default=120, required=False, multi=False, hide=True, choice=None,
+                dict(opt="timeout", type=Options.T_INT, default=600, required=False, multi=False, hide=True, choice=None,
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                      description_en="Specify the maximum waiting time until the server responds."),
                 dict(opt="runner_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,

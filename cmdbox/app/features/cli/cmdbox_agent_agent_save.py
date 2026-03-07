@@ -23,14 +23,14 @@ class AgentAgentSave(feature.OneshotResultEdgeFeature):
         instruction = f"あなたはコマンドの意味を熟知しているエキスパートです。" + \
                       f"ユーザーがコマンドを実行したいとき、あなたは以下の手順に従ってコマンドを確実に実行してください。\n" + \
                       f"1. ユーザーのクエリからが実行したいコマンドを特定します。\n" + \
-                      f"2. コマンド実行に必要なパラメータのなかで、ユーザーのクエリから取得できないものは、コマンド定義にあるデフォルト値を指定して実行してください。\n" + \
+                      f"2. コマンド実行に必要なパラメータのなかで、ユーザーのクエリから取得できないものは、特にパラメータを指定せず実行してください。\n" + \
                       f"3. もしエラーが発生した場合は、ユーザーにコマンド名とパラメータとエラー内容を提示してください。\n" \
                       f"4. コマンドの実行結果は、json文字列で出力するようにしてください。この時json文字列は「```json」と「```」で囲んだ文字列にしてください。\n"
         instruction = instruction if is_japan else \
                       f"You are the expert who knows what the commands mean." + \
                       f"When a user wants to execute a command, you follow these steps to ensure that the command is executed.\n" + \
                       f"1. Identify the command you want to execute from the user's query.\n" + \
-                      f"2. Any parameters required to execute the command that cannot be obtained from the user's query should be executed with the default values provided in the command definition.\n" + \
+                      f"2. For parameters required to execute the command that cannot be obtained from the user's query, execute without specifying any parameters.\n" + \
                       f"3. If an error occurs, provide the user with the command name, parameters, and error description.\n" \
                       f"4. The result of the command execution should be output as a json string. The json string should be a string enclosed in '```json' and '```'."
         return dict(

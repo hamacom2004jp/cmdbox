@@ -1,5 +1,19 @@
 const agentView = {};
 agentView.initView = () => {
+    // --- サイドバー初期化 ---
+    agentView.navSidebar = $('#navSidebar');
+    agentView.btnToggleSidebar = $('#btn_toggle_sidebar');
+    agentView.sidebarExpanded = false;
+    
+    agentView.btnToggleSidebar.on('click', () => {
+        agentView.sidebarExpanded = !agentView.sidebarExpanded;
+        if (agentView.sidebarExpanded) {
+            agentView.navSidebar.addClass('expanded');
+        } else {
+            agentView.navSidebar.removeClass('expanded');
+        }
+    });
+
     // --- 各コンテナのエレメント取得 ---
     agentView.chatContainer = $('#chatContainer');
     agentView.user_msg = $('#user_msg');
@@ -15,10 +29,13 @@ agentView.initView = () => {
     agentView.chatMessages = $('#messages');
     agentView.chatContainer = $('#chatContainer');
     agentView.memoryModal = $('#memoryModal');
+    agentView.historyModal = $('#historyModal');
     agentView.chatHistories = $('#session_tab ul.sf-list-group');
     agentView.fileTranceferModal = $('#fileTranceferModal');
+    agentView.btn_new_chat = $('#btn_new_chat');
     agentView.btn_filetrancefer = $('#btn_filetrancefer');
     agentView.btn_memories = $('#btn_memories');
+    agentView.btn_histories = $('#btn_histories');
     agentView.chat_reconnect_count = 0;
 
     // バージョン情報の取得と表示
@@ -46,6 +63,9 @@ agentView.initView = () => {
     // メモリーモーダルの shown.bs.modal イベントハンドラ
     agentView.memoryModal.off('shown.bs.modal').on('shown.bs.modal', async () => {
         await agentView.show_memories();
+    });
+    // ヒストリーモーダルの shown.bs.modal イベントハンドラ
+    agentView.historyModal.off('shown.bs.modal').on('shown.bs.modal', async () => {
         await agentView.list_sessions();
     });
     // ファイル転送モーダルの shown.bs.modal イベントハンドラ
@@ -58,10 +78,16 @@ agentView.initView = () => {
     // メッセージ送信ボタン
     // agent_runnerが設定されていない場合は送信ボタンを無効化
     agentView.btn_user_msg.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
+    // 新しいチャットを始めるボタンも同様に無効化
+    agentView.btn_new_chat.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
     // ファイル転送ボタンも同様に無効化
     agentView.btn_filetrancefer.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
     // MEMORYボタンも同様に無効化
     agentView.btn_memories.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
+    // Historiesボタンも同様に無効化
+    agentView.btn_histories.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
+    // 音声入力ボタンも同様に無効化
+    agentView.btn_rec.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
     agentView.user_msg.off('keydown').on('keydown', (e) => {
         // Ctrl+Enterで送信
         if (e.key === 'Enter' && e.ctrlKey && !agentView.btn_user_msg.prop('disabled')) {
@@ -69,6 +95,15 @@ agentView.initView = () => {
             agentView.btn_user_msg.click();
             return
         }
+    });
+    // 新しいチャットを始めるボタン
+    agentView.btn_new_chat.off('click').on('click', () => {
+        if (!window.confirm('Start a new chat? This will clear the current chat history.')) return;
+        // メッセージ一覧をクリア
+        agentView.chatMessages.html('');
+        // 新しいセッションを作成
+        agentView.ws && agentView.ws.close();
+        agentView.chat(cmdbox.random_string(16));
     });
     // 音声入力ボタン
     agentView.btn_rec.off('click').on('click', () => {

@@ -50,6 +50,9 @@ cmdbox ( server_install ) : `cmdbox -m cmdbox -c server_install <Option>`
     "--tts_engine <TTS Engine>","","Specify the TTS engine to use."
     "--voicevox_ver <version>","","Specify the version of the TTS engine to use."
     "--voicevox_whl <whl>","","Specify the wheel file for the TTS engine."
+    "--run_extra_pre <command>","","Specify additional commands to run before install_extra execution."
+    "--run_extra_post <command>","","Specify additional commands to run after install_extra execution."
+    "--install_extra <module>","","Specify additional packages to install."
     "--compose_path <path>","","Specify the `docker-compose.yml` file."
 
 

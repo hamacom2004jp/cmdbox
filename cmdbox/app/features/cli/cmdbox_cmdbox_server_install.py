@@ -67,7 +67,7 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                      description_en="Install with a module configuration that uses the GPU."),
                 dict(opt="tts_engine", type=Options.T_STR, default="voicevox", required=True, multi=False, hide=False,
                      choice=["", "voicevox"],
-                     choice_show=dict(voicevox=["voicevox_ver", "voicevox_os", "voicevox_arc", "voicevox_device", "voicevox_whl"]),
+                     choice_show=dict(voicevox=["voicevox_ver", "voicevox_whl"]),
                      description_ja="使用するTTSエンジンを指定します。",
                      description_en="Specify the TTS engine to use."),
                 dict(opt="voicevox_ver", type=Options.T_STR, default='0.16.3', required=False, multi=False, hide=False,
@@ -87,9 +87,12 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                      choice_edit=True,
                      description_ja="使用するVOICEVOXのホイールファイルを指定します。",
                      description_en="Specify the VOICEVOX wheel file to use."),
-                dict(opt="run_extra", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
-                     description_ja="追加で実行するコマンドを指定します。",
-                     description_en="Specify additional commands to run."),
+                dict(opt="run_extra_pre", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
+                     description_ja="install_extraの実行前に実行するコマンドを指定します。",
+                     description_en="Specify additional commands to run before install_extra execution."),
+                dict(opt="run_extra_post", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
+                     description_ja="install_extraの実行後に実行するコマンドを指定します。",
+                     description_en="Specify additional commands to run after install_extra execution."),
                 dict(opt="install_extra", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
                      description_ja="追加でインストールするパッケージを指定します。",
                      description_en="Specify additional packages to install."),
@@ -141,7 +144,8 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                                   tts_engine=args.tts_engine,
                                   voicevox_ver=args.voicevox_ver,
                                   voicevox_whl=args.voicevox_whl,
-                                  run_extra=args.run_extra,
+                                  run_extra_pre=args.run_extra_pre,
+                                  run_extra_post=args.run_extra_post,
                                   install_extra=args.install_extra,
                                   compose_path=args.compose_path,
                                   language=args.language)
@@ -156,7 +160,7 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                        install_no_python:bool=False, install_compile_python:bool=False,
                        install_tag:str=None, install_use_gpu:bool=False,
                        tts_engine:str=None, voicevox_ver:str=None, voicevox_whl:str=None,
-                       run_extra:List[str]=None, install_extra:List[str]=None,
+                       run_extra_pre:List[str]=None, run_extra_post:List[str]=None, install_extra:List[str]=None,
                        compose_path:str=None, language:str=None) -> Dict[str, Any]:
         """
         cmdboxが含まれるdockerイメージをインストールします。
@@ -173,7 +177,8 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
             tts_engine (str): TTSエンジンの指定
             voicevox_ver (str): VoiceVoxのバージョン
             voicevox_whl (str): VoiceVoxのwhlファイルの名前
-            run_extra (List[str]): 追加で実行するコマンド
+            run_extra_pre (List[str]): install_extraの実行前に実行するコマンド
+            run_extra_post (List[str]): install_extraの実行後に実行するコマンド
             install_extra (List[str]): 追加でインストールするパッケージ
             compose_path (str): docker-compose.ymlファイルパス
             language (str): 言語コード
@@ -190,7 +195,11 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                 user = f'_{user}' # ユーザー名が数字始まりの場合、先頭にアンダースコアを付与
             install_tag = f"_{install_tag}" if install_tag is not None else ''
             with open('Dockerfile', 'w', encoding='utf-8') as fp:
-                text = resources.read_text(f'{self.ver.__appid__}.docker', 'Dockerfile')
+                text = ''
+                try:
+                    text = resources.read_text(f'{self.ver.__appid__}.docker', 'Dockerfile')
+                except:
+                    text = resources.read_text(f'{version.__appid__}.docker', 'Dockerfile')
                 # cmdboxのインストール設定
                 if install_cmdbox_tgt is None:
                     install_cmdbox_tgt = f'cmdbox=={self.ver.__version__}'
@@ -205,19 +214,24 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                 else:
                     text = text.replace('#{COPY_CMDBOX}', '')
 
-                start_sh_src = Path(self.get_version_module().__file__).parent / 'docker' / 'scripts'
                 start_sh_tgt = f'/opt/{self.ver.__appid__}/scripts'
                 start_sh_hst = Path(self.ver.__appid__) / 'scripts'
                 start_sh_hst.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copytree(start_sh_src, start_sh_hst, dirs_exist_ok=True)
+                shutil.copytree(Path(version.__file__).parent / 'docker' / 'scripts', start_sh_hst, dirs_exist_ok=True)
+                try:
+                    shutil.copytree(Path(self.ver.__file__).parent / 'docker' / 'scripts', start_sh_hst, dirs_exist_ok=True)
+                except:
+                    pass
                 text = text.replace('#{COPY_CMDBOX_START}', f'RUN mkdir -p {start_sh_tgt}\nCOPY {start_sh_hst} {start_sh_tgt}')
 
                 base_image = 'python:3.12.12-slim' #'python:3.11.9-slim' #'python:3.8.18-slim'
+                install_torch = 'RUN pip install --upgrade pip && pip install torch "torchvision>=0.25.0"'
                 if install_use_gpu:
                     #base_image = 'nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04'
                     #base_image = 'pytorch/pytorch:2.7.0-cuda12.8-cudnn9-runtime'
                     #base_image = 'pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime'
                     base_image = 'pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime'
+                    install_torch = ''
                 if install_from is not None and install_from != '':
                     base_image = install_from
                 text = text.replace('#{FROM}', f'FROM {base_image}')
@@ -238,15 +252,29 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                 if tts_engine is not None and tts_engine.lower() == 'voicevox':
                     install_voicevox = f'RUN pip install https://github.com/VOICEVOX/voicevox_core/releases/download/{voicevox_ver}/{voicevox_whl}'
                 if install_extra is not None and type(install_extra) == list and install_extra != []:
-                    install_extra = f'RUN pip install {" ".join(install_extra)}'
-                if run_extra is not None and type(run_extra) == list and run_extra != []:
-                    run_extra = f'RUN {" && ".join(run_extra)}'
+                    ie = "\n".join([f'COPY {Path(r).name} {r}' for r in install_extra if r.endswith('.whl')])
+                    install_extra = f"{ie}\n" + f'RUN pip install {" ".join(install_extra)}'
+                else:
+                    install_extra = ''
+                if run_extra_pre is not None and type(run_extra_pre) == list and run_extra_pre != []:
+                    run_extra_pre = f'RUN {" && ".join(run_extra_pre)}'
+                else:
+                    run_extra_pre = ''
+                if run_extra_post is not None and type(run_extra_post) == list and run_extra_post != []:
+                    run_extra_post = f'RUN {" && ".join(run_extra_post)}'
+                else:
+                    run_extra_post = ''
                 text = text.replace('#{INSTALL_TAG}', install_tag)
                 text = text.replace('#{INSTALL_CMDBOX}', install_cmdbox_tgt)
                 text = text.replace('#{INSTALL_VOICEVOX}', install_voicevox)
+                text = text.replace('#{INSTALL_TORCH}', install_torch)
                 text = text.replace('#{INSTALL_EXTRA}', install_extra)
-                text = text.replace('#{RUN_EXTRA}', run_extra)
+                text = text.replace('#{RUN_EXTRA_PRE}', run_extra_pre)
+                text = text.replace('#{RUN_EXTRA_POST}', run_extra_post)
                 text = text.replace('#{ENV_EXTRA}', f'ENV APPID={self.ver.__appid__}')
+                text = text.replace('#{MK_DATA_DIR}',
+                                    'RUN mkdir -p /home/${MKUSER}/.'+self.ver.__appid__ + \
+                                    ' && chown -R ${MKUSER}:${MKUSER} /home/${MKUSER}/.'+self.ver.__appid__)
                 fp.write(text)
             if not compose_path:
                 compose_path = 'docker-compose.yml'
@@ -264,6 +292,7 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                     environment=dict(
                         TZ='Asia/Tokyo',
                         CMDBOX_DEBUG=False,
+                        APPID='${APPID:-'+self.ver.__appid__+'}',
                         REDIS_HOST='${REDIS_HOST:-redis}',
                         REDIS_PORT='${REDIS_PORT:-6379}',
                         REDIS_PASSWORD='${REDIS_PASSWORD:-password}',
@@ -315,11 +344,13 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
         finally:
             common.set_debug(logger, False)
 
-    def get_version_module(self):
+    def audited_by(self, logger:logging.Logger, args:argparse.Namespace) -> bool:
         """
-        バージョンモジュールを返します
+        この機能が監査ログを記録する対象かどうかを返します
 
         Returns:
-            module: バージョンモジュール
+            logger (logging.Logger): ロガー
+            args (argparse.Namespace): 引数
+            bool: 監査ログを記録する場合はTrue
         """
-        return version
+        return False

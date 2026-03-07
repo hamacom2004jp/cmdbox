@@ -382,7 +382,10 @@ class Options:
                 svcmd = fobj.get_svcmd()
                 if svcmd is not None:
                     self._options["svcmd"][svcmd] = fobj
-                opt['use_agent'] = self.check_agentrule(mode, cmd, logger)
+                jadge = self.check_agentrule(mode, cmd, logger)
+                if jadge == 'deny': opt['use_agent'] = False
+                if jadge == 'allow': opt['use_agent'] = True
+                if 'use_agent' not in opt: opt['use_agent'] = False
         self.init_debugoption()
     
     def is_features_loaded(self, ftype:str) -> bool:
@@ -710,8 +713,8 @@ class Options:
         if 'agentrule' not in yml: return
         if 'policy' not in yml['agentrule']:
             raise Exception('features.yml is invalid. (The agentrule element must have "policy" specified.)')
-        if yml['agentrule']['policy'] not in ['allow', 'deny']:
-            raise Exception('features.yml is invalid. (The policy element must specify allow or deny.)')
+        if yml['agentrule']['policy'] not in ['allow', 'deny', 'default']:
+            raise Exception('features.yml is invalid. (The policy element must specify allow, deny, or default.)')
         if 'rules' not in yml['agentrule']:
             raise Exception('features.yml is invalid. (The agentrule element must have "rules" specified.)')
         for rule in yml['agentrule']['rules']:
@@ -725,7 +728,7 @@ class Options:
                 raise Exception('features.yml is invalid. (The agentrule.rules element must have "rule" specified.)')
         self.agentrule_loaded = True
 
-    def check_agentrule(self, mode:str, cmd:str, logger:logging.Logger) -> bool:
+    def check_agentrule(self, mode:str, cmd:str, logger:logging.Logger) -> str:
         """
         エージェントが使用してよいコマンドかどうかをチェックします
 
@@ -734,10 +737,10 @@ class Options:
             cmd (str): コマンド
 
         Returns:
-            bool: 認可されたかどうか
+            str: 認可されたかどうか ('allow', 'deny', or 'default')
         """
         if not self.agentrule_loaded:
-            return False
+            return 'deny'
         # コマンドチェック
         jadge = self.features_yml_data['agentrule']['policy']
         for rule in self.features_yml_data['agentrule']['rules']:
@@ -749,7 +752,7 @@ class Options:
             jadge = rule['rule']
         if logger.level == logging.DEBUG:
             logger.debug(f"agent rule: mode={mode}, cmd={cmd}: {jadge}")
-        return jadge == 'allow'
+        return jadge
 
     AT_USER = 'user'
     AT_ADMIN = 'admin'

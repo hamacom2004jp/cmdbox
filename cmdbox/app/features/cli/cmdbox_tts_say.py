@@ -179,7 +179,6 @@ class TtsSay(feature.ResultEdgeFeature):
                      description_en="Specify the maximum waiting time until the server responds."),
                 dict(opt="tts_engine", type=Options.T_STR, default="voicevox", required=True, multi=False, hide=False,
                      choice=["", "voicevox"],
-                     choice_show=dict(voicevox=["voicevox_ver", "voicevox_os", "voicevox_arc", "voicevox_device", "voicevox_whl"]),
                      description_ja="使用するTTSエンジンを指定します。",
                      description_en="Specify the TTS engine to use."),
                 dict(opt="voicevox_model", type=Options.T_STR, default=None, required=False, multi=False, hide=False,

@@ -86,7 +86,7 @@ Save RAG configuration. : `cmdbox -m rag -c save <Option>`
     "--extract <name>","Yes","Specify the registered name for the Extract process used in RAG (multiple values allowed)."
     "--embed <name>","","If rag_type is vector, specify the registration name of the embed model."
     "--embed_vector_dim <dimension>","","Specify the vector dimension for embedding. Default: 256."
-    "--savetype <pattern>","","Specify the storage pattern. Available values: `per_doc`, `per_service`, `add_only`. Default: `per_doc`."
+    "--savetype <pattern>","","Specify the storage pattern. `per_doc` :per document, `per_service` :per service, `add_only` :add only"
     "--vector_store_pghost <host>","","Specify the postgresql host for VecRAG storage. Default: localhost."
     "--vector_store_pgport <port>","","Specify the postgresql port for VecRAG storage. Default: 5432."
     "--vector_store_pguser <user>","","Specify the postgresql user for VecRAG storage. Default: postgres."

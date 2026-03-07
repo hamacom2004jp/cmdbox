@@ -79,7 +79,7 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature):
                     choice_show=dict(postgresql=["session_store_pghost", "session_store_pgport", "session_store_pguser", "session_store_pgpass", "session_store_pgdbname"]),),
                 dict(opt="tts_engine", type=Options.T_STR, default="voicevox", required=True, multi=False, hide=False,
                      choice=["", "voicevox"],
-                     choice_show=dict(voicevox=["voicevox_ver", "voicevox_os", "voicevox_arc", "voicevox_device", "voicevox_whl"]),
+                     choice_show=dict(voicevox=["voicevox_ver", "voicevox_whl"]),
                      description_ja="使用するTTSエンジンを指定します。",
                      description_en="Specify the TTS engine to use."),
                 dict(opt="memory", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],

@@ -313,6 +313,7 @@ class RagPgvector(rag_store.RagStore):
                         raise ValueError("sort_dict values must be 'ASC' or 'DESC'.")
                     order_clauses.append(f"{k} {v.upper()}")
                 order_sql = " ORDER BY " + ", ".join(order_clauses)
+            select = [s for s in select] if select is not None and len(select) > 0 else None
             cur.execute(query=sql.SQL(
                 "SELECT {} FROM {} " + ("WHERE " + " AND ".join(where_clauses) if where_clauses else "")
                 + (" ORDER BY vec_data <=> %(vec_data)s ASC " if vec_data is not None else "")
@@ -321,5 +322,6 @@ class RagPgvector(rag_store.RagStore):
             ).format(sql.SQL(',').join(map(I, select)) if select else sql.SQL('*'),
                      I(table_name)),
                      params=params)
+            colnames = [desc[0] for desc in cur.description]
             for record in cur:
-                yield record
+                yield dict(zip(colnames, record))

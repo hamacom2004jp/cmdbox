@@ -258,10 +258,16 @@ agentView.select_runner = async (runner_name) => {
         $('#display_runner_msg').html(`AGENT RUNNER IS READY`);
         // 送信ボタンを有効化
         agentView.btn_user_msg.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
+        // 新しいチャットを始めるボタンも有効化
+        agentView.btn_new_chat.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
         // ファイル転送ボタンも有効化
         agentView.btn_filetrancefer.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
         // MEMORYボタンも有効化
         agentView.btn_memories.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
+        // Historiesボタンも有効化
+        agentView.btn_histories.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
+        // 音声入力ボタンも有効化
+        agentView.btn_rec.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
         // モーダルを閉じる
         $('#runner_select_modal').modal('hide');
         // メッセージ一覧をクリア
