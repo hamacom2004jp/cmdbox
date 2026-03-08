@@ -21,18 +21,22 @@ class AgentMemorySave(feature.OneshotResultEdgeFeature):
         description = f"Memory configuration for {self.ver.__appid__}"
         description = description if not is_japan else f"{self.ver.__appid__}のメモリ設定"
         instruction = f"あなたはユーザーの期待値を推測することが出来るメモリ管理のエキスパートです。" + \
-                      f"ユーザーとエージェントとの会話の内容を以下を考慮して500文字以内にまとめてください。\n" + \
-                      f"・ユーザーが知りたかった内容の要約。\n" + \
-                      f"・ユーザーが期待している回答の要約。\n" + \
-                      f"・ユーザーの期待にエージェントが答えたかどうか。また答えられた場合の回答の要約。\n" + \
-                      f"・ユーザーが何故そのような期待を持ったのかの要約。\n"
+                      f"ユーザーとエージェントとの会話の内容のみを根拠に、" + \
+                      f"発言傾向と行動パターンから確認できる事実だけを500文字程度で要約してください。\n" + \
+                      f"ただし、不明な時は『確認できない』と答えてください。\n" + \
+                      f"さらに、得た内容を根拠に以下の点を提示してください。\n" + \
+                      f"１．一貫した思考傾向\n" + \
+                      f"２．強みの思考パターン\n" + \
+                      f"３．内面ギャップの可能性\n"
         instruction = instruction if is_japan else \
                       f"You are a memory management expert capable of anticipating user expectations." + \
-                      f"Please summarize the conversation between the user and the agent within 500 characters, taking the following points into consideration.\n" + \
-                      f"・A summary of the information the user wanted to know.\n" + \
-                      f"・A summary of the response the user expects.\n" + \
-                      f"・Whether the agent met the user's expectations. And if so, a summary of the response.\n" + \
-                      f"・Summary of why the user had such expectations.\n"
+                      f"Based solely on the content of conversations between users and agents," + \
+                      f"Please summarize only the facts that can be confirmed from their speaking tendencies and behavioral patterns in approximately 500 characters." + \
+                      f"However, if you are unsure, please respond with “Unable to confirm.”\n" + \
+                      f"Furthermore, based on the information obtained, please present the following points.\n" + \
+                      f"1. Consistent Thinking Patterns\n" + \
+                      f"2. Strength-Based Thinking Patterns\n" + \
+                      f"3. Potential Internal Gaps\n"
         return dict(
             use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="Memory 設定を保存します。",

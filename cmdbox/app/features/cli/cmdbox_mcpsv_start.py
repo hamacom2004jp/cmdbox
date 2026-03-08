@@ -79,7 +79,7 @@ class McpsvStart(feature.UnsupportEdgeFeature):
                 dict(opt="ssl_ca_certs", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="in",
                      description_ja="SSLサーバーCA証明書ファイルを指定します。",
                      description_en="Specify the SSL server CA certificate file."),
-                dict(opt="signin_file", type=Options.T_FILE, default=f'.{self.ver.__appid__}/user_list.yml', required=False, multi=False, hide=False, choice=None, fileio="in",
+                dict(opt="signin_file", type=Options.T_FILE, default=f'.{self.ver.__appid__}/user_list.yml', required=False, multi=False, hide=False, choice=None, fileio="in", web="mask",
                      description_ja=f"サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.{self.ver.__appid__}/user_list.yml' を指定します。",
                      description_en=f"Specify a file containing users and passwords with which they can signin.Typically, specify '.{self.ver.__appid__}/user_list.yml'."),
                 dict(opt="gunicorn_workers", type=Options.T_INT, default=multiprocessing.cpu_count(), required=False, multi=False, hide=True, choice=None,

@@ -62,7 +62,14 @@ class RagSearch(rag_base.RAGBase):
                 dict(opt="timeout", type=Options.T_INT, default=600, required=False, multi=False, hide=True, choice=None,
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                      description_en="Specify the maximum waiting time until the server responds."),
-                dict(opt="rag_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                dict(opt="rag_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
+                    callcmd="async () => {await cmdbox.callcmd('rag','list',{},(res)=>{"
+                            + "const val = $(\"[name='rag_name']\").val();"
+                            + "$(\"[name='rag_name']\").empty().append('<option></option>');"
+                            + "res['data'].map(elm=>{$(\"[name='rag_name']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
+                            + "$(\"[name='rag_name']\").val(val);"
+                            + "},$(\"[name='title']\").val(),'rag_name');"
+                            + "}",
                      description_ja="登録に使用するRAG設定の名前を指定します。",
                      description_en="Specify the name of the RAG configuration to use for registration."),
                 dict(opt="query", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,

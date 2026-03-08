@@ -284,28 +284,34 @@ class RagPgvector(rag_store.RagStore):
         with connection.cursor() as cur:
             table_name = f"{self.dbuser}.{servicename}_embedding"
             I = sql.Identifier
-            where_clauses = list(filter(None, [
-                ("vec_id = %(vec_id)s" if vec_id is not None else ""),
-                ("content_text like %(content_text)s" if content_text is not None else ""),
-                ("content_type = %(content_type)s" if content_type is not None else ""),
-                ("origin_name = %(origin_name)s" if origin_name is not None else ""),
-                ("origin_type = %(origin_type)s" if origin_type is not None else ""),
-                ("origin_url = %(origin_url)s" if origin_url is not None else ""),
-                (f"({metadata_where})" if metadata_where is not None else ""),
-                ("vec_model = %(vec_model)s" if vec_model is not None else "")
-            ]))
-            params = {
-                'vec_id': vec_id if vec_id is not None else '',
-                'content_text': f'%{content_text}%' if content_text is not None else '',
-                'content_type': content_type if content_type is not None else '',
-                'origin_name': origin_name if origin_name is not None else '',
-                'origin_type': origin_type if origin_type is not None else '',
-                'origin_url': origin_url if origin_url is not None else '',
-                'vec_model': vec_model if vec_model is not None else '',
-                'vec_data': vec_data if vec_data is not None else '',
-            }
-            if metadata is not None:
+            where_clauses = []
+            params = {}
+            if vec_id:
+                where_clauses.append("vec_id = %(vec_id)s")
+                params['vec_id'] = vec_id
+            if content_text:
+                where_clauses.append("content_text like %(content_text)s")
+                params['content_text'] = f'%{content_text}%'
+            if content_type:
+                where_clauses.append("content_type = %(content_type)s")
+                params['content_type'] = content_type
+            if origin_name:
+                where_clauses.append("origin_name = %(origin_name)s")
+                params['origin_name'] = origin_name
+            if origin_type:
+                where_clauses.append("origin_type = %(origin_type)s")
+                params['origin_type'] = origin_type
+            if origin_url:
+                where_clauses.append("origin_url = %(origin_url)s")
+                params['origin_url'] = origin_url
+            if metadata_where:
+                where_clauses.append(f"({metadata_where})")
                 params.update({k: common.to_str(v) for k, v in metadata.items()})
+            if vec_model:
+                where_clauses.append("vec_model = %(vec_model)s")
+                params['vec_model'] = vec_model
+            if vec_data:
+                params['vec_data'] = vec_data
             if sort_dict is not None and len(sort_dict) > 0:
                 order_clauses = []
                 for k, v in sort_dict.items():
@@ -313,7 +319,7 @@ class RagPgvector(rag_store.RagStore):
                         raise ValueError("sort_dict values must be 'ASC' or 'DESC'.")
                     order_clauses.append(f"{k} {v.upper()}")
                 order_sql = " ORDER BY " + ", ".join(order_clauses)
-            select = [s for s in select] if select is not None and len(select) > 0 else None
+            select = [s for s in select if s] if select is not None and len(select) > 0 else None
             cur.execute(query=sql.SQL(
                 "SELECT {} FROM {} " + ("WHERE " + " AND ".join(where_clauses) if where_clauses else "")
                 + (" ORDER BY vec_data <=> %(vec_data)s ASC " if vec_data is not None else "")

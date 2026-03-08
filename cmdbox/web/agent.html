@@ -38,7 +38,7 @@
             </button>
             <button id="btn_config" class="btn btn-nav-action" data-bs-toggle="modal" data-bs-target="#agent_settings_modal" title="Config" style="border:none;">
                 <i class="fas fa-cog fa-2xl"></i>
-                <span class="nav-label">CONFIG</span>
+                <span class="nav-label">SETTINGS</span>
             </button>
         </div>
     </nav>
@@ -105,7 +105,9 @@
         <!-- AI Core and System Info Overlay -->
         <div class="system-location-container" style="position: absolute; top: 20px; right: 20px; text-align: right; z-index:5;" class="system-font text-white-50">
             <div id="current_time">--:--:--</div>
-            <div id="appid_version">cmdbox</div>
+            <div>
+                <a id="appid_version" class="dropdown-item" href="#" onclick="$(`#versions_modal`).modal(`show`);">cmdbox</a>
+            </div>
         </div>
         <!-- Center AI Core (Default View) -->
         <div class="ai-core-container" id="aiCoreContainer">
@@ -129,7 +131,10 @@
         <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
             <div class="modal-content sf-modal doc-card h-100">
                 <div class="modal-header doc-header">
-                    <h5 class="modal-title glow-text-cyan system-font">Settings</h5>
+                    <h5 class="modal-title glow-text-cyan system-font">
+                        <i class="fas fa-cog fa-lg me-2"></i>
+                        Settings
+                    </h5>
                     <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
                         <i class="fas fa-times fa-lg"></i>
                     </button>
@@ -489,7 +494,10 @@
         <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
             <div class="modal-content sf-modal doc-card" style="height:auto;">
                 <div class="modal-header doc-header">
-                    <h5 class="modal-title glow-text-cyan system-font">MEMORY AND SESSIONS</h5>
+                    <h5 class="modal-title glow-text-cyan system-font">
+                        <i class="fas fa-brain fa-lg me-2"></i>
+                        MEMORY
+                    </h5>
                     <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
                         <i class="fas fa-times fa-lg"></i>
                     </button>
@@ -531,7 +539,8 @@
             <div class="modal-content sf-modal doc-card" style="height:auto;">
                 <div class="modal-header doc-header">
                     <h5 class="modal-title glow-text-cyan system-font">
-                        <i class="fas fa-history fa-lg"></i>HISTORIES
+                        <i class="fas fa-history fa-lg me-2"></i>
+                        HISTORIES
                     </h5>
                     <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
                         <i class="fas fa-times fa-lg"></i>
@@ -594,7 +603,10 @@
         <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
             <div class="modal-content sf-modal doc-card">
                 <div class="modal-header doc-header">
-                    <h5 class="modal-title glow-text-cyan system-font">Files</h5>
+                    <h5 class="modal-title glow-text-cyan system-font">
+                        <i class="fa-solid fa-folder-open fa-lg me-2"></i>
+                        Files
+                    </h5>
                     <button type="button" class="btn btn-sf-icon btn_window_stack">
                         <i class="fa-regular fa-window-restore"></i>
                     </button>
@@ -696,7 +708,7 @@
     <!-- ビューアモーダル -->
     <div id="viewer_modal" class="modal" style="z-index:2000;" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <dic class="modal-content novalidate">
+            <div class="modal-content novalidate">
                 <div class="modal-header doc-header">
                     <h5 class="modal-title glow-text-cyan system-font">Viwer</h5>
                     <button type="button" class="btn btn-sf-icon btn_window_stack">
@@ -714,6 +726,33 @@
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- versionsモーダル -->
+    <div id="versions_modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="version_form" class="modal-content novalidate">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">Versions</h5>
+                    <button type="button" class="btn btn-sf-icon btn_window_stack">
+                        <i class="fa-regular fa-window-restore"></i>
+                    </button>
+                    <button type="button" class="btn btn-sf-icon btn_window">
+                        <i class="fa-regular fa-window-maximize"></i>
+                    </button>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs version-tabs" role="tablist"></ul>
+                    <div class="tab-content version-content"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                </div>
+            </form>
         </div>
     </div>
 

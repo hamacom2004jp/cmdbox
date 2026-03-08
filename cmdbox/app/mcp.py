@@ -393,7 +393,12 @@ class ToolList(object):
             choices = options.get_cmd_choices(mode, cmd, False)
             description += '\n' + str(options.get_cmd_attr(mode, cmd, 'description_ja' if is_japan else 'description_en'))
             # 関数の定義を生成
-            func_txt  = self._create_func_txt(func_name, mode, cmd, is_japan, options, title=opt['title'])
+            if func_name:
+                opt_path = self.data / ".cmds" / f"cmd-{func_name}.json"
+                params = common.loadopt(opt_path)
+            else:
+                params = {}
+            func_txt = self._create_func_txt(func_name, mode, cmd, is_japan, options, title=opt['title'], params=params)
             if self.logger.level == logging.DEBUG:
                 self.logger.debug(f"generating agent tool: {func_name}")
             func_ctx = []
@@ -404,7 +409,7 @@ class ToolList(object):
             # 関数のスキーマを生成
             input_schema = dict(
                 type="object",
-                properties={o['opt']: self._to_schema(o, is_japan) for o in choices},
+                properties={o['opt']: self._to_schema(o, is_japan, params) for o in choices},
                 required=[],
             )
             output_schema = dict(type="object", properties=dict())
@@ -421,10 +426,15 @@ class ToolList(object):
             return (tool.fn for tool in ret_tools if callable(tool.fn)).__iter__()
         return ret_tools.__iter__()
 
-    def _to_schema(self, o:Dict[str, Any], is_japan:bool) -> Dict[str, Any]:
+    def _to_schema(self, o:Dict[str, Any], is_japan:bool, params:Dict[str, Any]={}) -> Dict[str, Any]:
         t, m = o["type"], o["multi"]
         title = o['opt'].title().replace('_', ' ')
         description = o['description_ja'] if is_japan else o['description_en']
+        if o['opt'] in params and params[o['opt']]:
+            if 'web' in o and o['web']=='mask':
+                description += f" (No designation required for masked value)"
+            else:
+                description += f" (Default: {params[o['opt']]})"
         if t == Options.T_BOOL:
             return dict(title=title, type="array", items=dict(type="boolean"), description=description) if m \
                 else dict(title=title, type="boolean", description=description)
@@ -456,7 +466,7 @@ class ToolList(object):
     def _ds(self, d:str) -> str:
         return f'"{d}"' if d is not None else 'None'
     
-    def _doc_arg_type(self, o:Dict[str, Any], use_default:True) -> str:
+    def _doc_arg(self, o:Dict[str, Any], is_japan:bool) -> str:
         t, m, d, r = o["type"], o["multi"], o["default"], o["required"]
         ret = ""
         dft = "None"
@@ -490,16 +500,18 @@ class ToolList(object):
             dft = "[]"
         else:
             raise ValueError(f"Unknown type: {t} for option {o['opt']}")
-        return f"{ret}={dft}" if use_default else ret
+        desc = f'{o["description_ja"] if is_japan else o["description_en"]}'
+        return f"        {o['opt']} ({ret}, optional): {desc} Defaults to {dft}"
 
-    def _doc_arg(self, o:Dict[str, Any], is_japan) -> str:
-        s = f'        {o["opt"]}:{self._doc_arg_type(o, True)} '
-        s += f'{o["description_ja"] if is_japan else o["description_en"]}'
-        return s
-
-    def _create_func_txt(self, func_name:str, mode:str, cmd:str, is_japan:bool, options:Options, title:str='') -> str:
+    def _create_func_txt(self, func_name:str, mode:str, cmd:str, is_japan:bool, options:Options, title:str='', params={}) -> str:
         description = options.get_cmd_attr(mode, cmd, 'description_ja' if is_japan else 'description_en')
         choices = options.get_cmd_choices(mode, cmd, False)
+        for o in choices:
+            if o["opt"] in params:
+                o["default"] = params[o["opt"]]
+        if "description" in params and params["description"]:
+            description += '\n' + params["description"]
+
         func_doc_args = "\n".join([self._doc_arg(o, is_japan) for o in choices])
         func_txt  = f"def {func_name}(*args, **kwargs):\n"
         func_txt += f'    """\n'

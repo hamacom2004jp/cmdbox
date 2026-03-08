@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import logging
 import json
+import platform
 import re
 
 
@@ -84,6 +85,36 @@ class AgentBase(feature.ResultEdgeFeature):
         with memory_conf_path.open('r', encoding='utf-8') as f:
             memory_conf = json.load(f)
         return memory_conf
+
+    def create_session_service(self, data_dir:Path, logger:logging.Logger, runner_conf:Dict[str, Any]) -> Any:
+        """
+        セッションサービスを作成します
+
+        Args:
+            runner_conf (Dict[str, Any]): Runnerの設定
+
+        Returns:
+            BaseSessionService: セッションサービス
+        """
+        if runner_conf.get('session_store_type') == 'sqlite':
+            uri = (data_dir / '.agent' / 'session.db').as_uri()
+            if platform.system() == 'Windows':
+                runner_conf['agent_session_dburl'] = f"sqlite+aiosqlite:{uri.replace('file:///', '///')}"
+            else:
+                runner_conf['agent_session_dburl'] = f"sqlite+aiosqlite:{uri.replace('file:///', '////')}"
+        elif runner_conf.get('session_store_type') == 'postgresql':
+            runner_conf['agent_session_dburl'] = f"postgresql+psycopg://{runner_conf['session_store_pguser']}:{runner_conf['session_store_pgpass']}@{runner_conf['session_store_pghost']}:{runner_conf['session_store_pgport']}/{runner_conf['session_store_pgdbname']}"
+        else:
+            runner_conf['agent_session_dburl'] = None
+        from google.adk.sessions import InMemorySessionService
+        from google.adk.sessions.database_session_service import DatabaseSessionService
+        if runner_conf['agent_session_dburl'] is not None:
+            logger.info(f"Using DatabaseSessionService: {runner_conf['agent_session_dburl']}")
+            dss = DatabaseSessionService(db_url=runner_conf['agent_session_dburl'])
+            return dss
+        else:
+            logger.info(f"Using InMemorySessionService")
+            return InMemorySessionService()
 
     async def create_agent_session(self, session_service:Any, runner_name:str, user_name:str, session_id:str=None) -> Any:
         """

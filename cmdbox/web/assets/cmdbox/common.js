@@ -587,8 +587,8 @@ cmdbox.init_version_modal = () => {
  */
 cmdbox.init_modal_button = () => {
     // modal setting
-    $('.modal-dialog').draggable({cursor:'move',cancel:'.modal-body'});
-    $('#filer_modal .modal-dialog').draggable({cursor:'move',cancel:'.modal-body, .filer_address'});
+    $('.modal-dialog').draggable({cursor:'move',cancel:'.modal-body, .modal-footer, button'});
+    $('#filer_modal .modal-dialog').draggable({cursor:'move',cancel:'.modal-body, .modal-footer, button, .filer_address'});
     $('.btn_window_stack').off('click').on('click', (ev) => {
         const modal_dialog = $(ev.currentTarget).parents('.modal-dialog');
         modal_dialog.find('.btn_window_stack').css('margin-left', '0px').hide();

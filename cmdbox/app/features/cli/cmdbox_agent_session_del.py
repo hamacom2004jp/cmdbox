@@ -1,5 +1,6 @@
 from cmdbox.app import common, client, feature, options
 from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.features.cli.agent import agant_base
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List
@@ -8,7 +9,7 @@ import logging
 import json
 
 
-class AgentSessionDel(feature.ResultEdgeFeature):
+class AgentSessionDel(agant_base.AgentBase):
 
     def get_mode(self) -> str:
         return 'agent'
@@ -106,22 +107,18 @@ class AgentSessionDel(feature.ResultEdgeFeature):
                 sessions['agents'] = {}
 
             payload = json.loads(convert.b64str2str(msg[2]))
-            name = payload.get('runner_name')
+            runner_name = payload.get('runner_name')
             session_id = payload.get('session_id')
             user_name = payload.get('user_name')
-            if name not in sessions['agents']:
-                out = dict(warn=f"Runner '{name}' is not running.", end=True)
-                redis_cli.rpush(reskey, out)
-                return self.RESP_WARN
 
-            runner = sessions['agents'][name]['runner']
-            session_service = getattr(runner, 'session_service', None)
+            runner_conf, _, _, _, _, _, _ = self.load_conf(runner_name, data_dir, logger)
+            session_service = self.create_session_service(data_dir, logger, runner_conf=runner_conf)
             if session_service is None:
                 out = dict(warn="Runner does not expose a session_service.", end=True)
                 redis_cli.rpush(reskey, out)
                 return self.RESP_WARN
 
-            await session_service.delete_session(app_name=name, user_id=user_name, session_id=session_id)
+            await session_service.delete_session(app_name=runner_name, user_id=user_name, session_id=session_id)
 
             msg = dict(success=[session_id], end=True)
             redis_cli.rpush(reskey, msg)
