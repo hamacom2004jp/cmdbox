@@ -434,7 +434,8 @@ class ToolList(object):
             if 'web' in o and o['web']=='mask':
                 description += f" (No designation required for masked value)"
             else:
-                description += f" (Default: {params[o['opt']]})"
+                v = str(params[o['opt']]).replace('\\', '/')
+                description += f" (Default: {v})"
         if t == Options.T_BOOL:
             return dict(title=title, type="array", items=dict(type="boolean"), description=description) if m \
                 else dict(title=title, type="boolean", description=description)
@@ -464,8 +465,9 @@ class ToolList(object):
         raise ValueError(f"Unknown type: {t} for option {o['opt']}")
 
     def _ds(self, d:str) -> str:
-        return f'"{d}"' if d is not None else 'None'
-    
+        v = d.replace('\\', '/') if d is not None else None
+        return f"'{v}'" if v is not None else 'None'
+
     def _doc_arg(self, o:Dict[str, Any], is_japan:bool) -> str:
         t, m, d, r = o["type"], o["multi"], o["default"], o["required"]
         ret = ""

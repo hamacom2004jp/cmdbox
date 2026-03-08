@@ -179,12 +179,12 @@ cmdbox.editapikey = async () => {
         cmdbox.message('user not found');
         return;
     }
-    const editapikey_modal = $('#editapikey_modal').length?$('#editapikey_modal'):$(`<div id="editapikey_modal" class="modal" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
+    const editapikey_modal = $('#editapikey_modal').length?$('#editapikey_modal'):$(`<div id="editapikey_modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
     editapikey_modal.html('');
     const daialog = $(`<div class="modal-dialog modal-lg ui-draggable ui-draggable-handle"/>`).appendTo(editapikey_modal);
     const form = $(`<form id="editapikey_form" class="modal-content novalidate"/>`).appendTo(daialog);
-    const header = $(`<div class="modal-header"/>`).appendTo(form);
-    header.append('<h5 class="modal-title glow-text-cyan">Edit ApiKey</h5>');
+    const header = $(`<div class="modal-header doc-header"/>`).appendTo(form);
+    header.append('<h5 class="modal-title glow-text-cyan system-font">Edit ApiKey</h5>');
     header.append('<button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">'
                  +'<svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>'
                  +'</button>');
@@ -293,12 +293,12 @@ cmdbox.getUserLanguage = async () => {
  */
 cmdbox.editUserLanguage = async () => {
     const language = await cmdbox.getUserLanguage();
-    const editlang_modal = $('#editlang_modal').length?$('#editlang_modal'):$(`<div id="editlang_modal" class="modal" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
+    const editlang_modal = $('#editlang_modal').length?$('#editlang_modal'):$(`<div id="editlang_modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
     editlang_modal.html('');
     const daialog = $(`<div class="modal-dialog ui-draggable ui-draggable-handle"/>`).appendTo(editlang_modal);
     const form = $(`<form id="editlang_form" class="modal-content novalidate"/>`).appendTo(daialog);
-    const header = $(`<div class="modal-header"/>`).appendTo(form);
-    header.append('<h5 class="modal-title glow-text-cyan">Edit Language</h5>');
+    const header = $(`<div class="modal-header doc-header"/>`).appendTo(form);
+    header.append('<h5 class="modal-title glow-text-cyan system-font">Edit Language</h5>');
     header.append('<button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">'
                  +'<svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>'
                  +'</button>');
@@ -348,12 +348,12 @@ cmdbox.passchange = async () => {
         cmdbox.message('This account is an SAML account and cannot be changed.');
         return;
     }
-    const chpass_modal = $('#chpass_modal').length?$('#chpass_modal'):$(`<div id="chpass_modal" class="modal" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
+    const chpass_modal = $('#chpass_modal').length?$('#chpass_modal'):$(`<div id="chpass_modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
     chpass_modal.html('');
     const daialog = $(`<div class="modal-dialog ui-draggable ui-draggable-handle"/>`).appendTo(chpass_modal);
     const form = $(`<form id="chpass_form" class="modal-content novalidate"/>`).appendTo(daialog);
-    const header = $(`<div class="modal-header"/>`).appendTo(form);
-    header.append('<h5 class="modal-title glow-text-cyan">Change Password</h5>');
+    const header = $(`<div class="modal-header doc-header"/>`).appendTo(form);
+    header.append('<h5 class="modal-title glow-text-cyan system-font">Change Password</h5>');
     header.append('<button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">'
                  +'<svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>'
                  +'</button>');

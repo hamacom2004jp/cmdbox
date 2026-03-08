@@ -12,11 +12,6 @@
     --font-header: 'Orbitron', sans-serif;
     --font-body: 'Rajdhani', sans-serif;
     --console-panel-width: 450px;
-    --area-border-color: var(--bs-border-color);
-    --area-bg-color-50: rgba(0, 247, 255, 0.5);
-    --area-bg-color-10: rgba(0, 247, 255, 0.1);
-    --area-bg-color-danger-50: rgba(255, 0, 230, 0.5);
-    --area-bg-color-danger-10: rgba(255, 0, 230, 0.1);
     --item-border-color: var(--bs-border-color);
     --item-border-danger-color: rgba(255, 0, 230, 0.3);
     --item-border-warning-color: rgba(255, 140, 0, 0.3);
@@ -46,22 +41,6 @@
 }
 
 /* --- Base Styles --- */
-body {
-    font-family: var(--font-body);
-    height: 100vh;
-    overflow: hidden;
-    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
-    background-image: 
-        radial-gradient(1px 1px at 10% 10%, white 1px, transparent 0),
-        radial-gradient(1px 1px at 20% 20%, white 1px, transparent 0),
-        radial-gradient(2px 2px at 30% 30%, rgba(255,255,255,0.5) 1px, transparent 0),
-        radial-gradient(circle at 80% 20%, rgba(0, 247, 255, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 20% 80%, rgba(255, 0, 230, 0.08) 0%, transparent 40%);
-}
-[data-bs-theme="spaceship"] body {
-    background-color: var(--bg-slate-950);
-    color: var(--text-primary);
-}
 .user_info_color {
     color: var(--bs-body-color);
 }
@@ -293,57 +272,15 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     border: 1px solid var(--accent-cyan);
 }
 /* Corner Accents */
-.doc-card::before {
+[data-bs-theme="spaceship"] .doc-card::before {
     content: ''; position: absolute; top: 0; left: 0; width: 20px; height: 20px;
     border-top: 2px solid var(--bs-emphasis-color); border-left: 2px solid var(--bs-emphasis-color);
-}
-[data-bs-theme="spaceship"] .doc-card::before {
     border-top: 2px solid var(--accent-cyan); border-left: 2px solid var(--accent-cyan);
 }
-.doc-card::after {
+[data-bs-theme="spaceship"] .doc-card::after {
     content: ''; position: absolute; bottom: 0; right: 0; width: 20px; height: 20px;
     border-bottom: 2px solid var(--bs-emphasis-color); border-right: 2px solid var(--bs-emphasis-color);
-}
-[data-bs-theme="spaceship"] .doc-card::after {
     border-bottom: 2px solid var(--accent-cyan); border-right: 2px solid var(--accent-cyan);
-}
-
-.doc-header {
-    padding: 15px 20px;
-    border-bottom: 1px solid var(--area-border-color);
-    background: linear-gradient(90deg, var(--area-bg-color-10), transparent);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.doc-body {
-    flex-grow: 1;
-    padding: 25px;
-    overflow-y: auto;
-    color: #d1d5db;
-    font-family: var(--font-body);
-    line-height: 1.6;
-}
-.doc-body::-webkit-scrollbar { width: 6px; }
-.doc-body::-webkit-scrollbar-thumb { background: var(--bs-emphasis-color); }
-[data-bs-theme="spaceship"] .doc-body::-webkit-scrollbar-thumb { background: var(--accent-cyan); }
-
-.doc-link {
-    color: var(--bs-emphasis-color);
-    text-decoration: underline;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-[data-bs-theme="spaceship"] .doc-link {
-    color: var(--accent-cyan);
-}
-.doc-link:hover {
-    color: #fff;
-    text-shadow: 0 0 10px var(--bs-emphasis-color);
-}
-[data-bs-theme="spaceship"] .doc-link:hover {
-    color: #fff;
-    text-shadow: 0 0 10px var(--accent-cyan);
 }
 
 /* --- Chat Messages --- */
@@ -404,21 +341,6 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     background: transparent;
     color: var(--text-primary);
     box-shadow: none;
-}
-
-.btn-sf-icon {
-    border: none;
-    background: transparent;
-}
-[data-bs-theme="spaceship"] .btn-sf-icon {
-    color: var(--accent-cyan);
-}
-.btn-sf-icon:hover {
-    color: var(--text-primary);
-    text-shadow: 0 0 10px var(--bs-emphasis-color);
-}
-[data-bs-theme="spaceship"] .btn-sf-icon:hover {
-    text-shadow: 0 0 10px var(--accent-cyan);
 }
 
 /* Footer Control Grid */

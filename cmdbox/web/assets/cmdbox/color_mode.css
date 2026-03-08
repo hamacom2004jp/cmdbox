@@ -1,3 +1,27 @@
+/* --- Defines Global Variables & Theme Colors --- */
+:root {
+    --area-border-color: var(--bs-border-color);
+    --area-bg-color-50: rgba(0, 247, 255, 0.5);
+    --area-bg-color-10: rgba(0, 247, 255, 0.1);
+    --area-bg-color-danger-50: rgba(255, 0, 230, 0.5);
+    --area-bg-color-danger-10: rgba(255, 0, 230, 0.1);
+}
+body {
+    font-family: var(--font-body);
+    height: 100vh;
+    overflow: hidden;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+    background-image: 
+        radial-gradient(1px 1px at 10% 10%, white 1px, transparent 0),
+        radial-gradient(1px 1px at 20% 20%, white 1px, transparent 0),
+        radial-gradient(2px 2px at 30% 30%, rgba(255,255,255,0.5) 1px, transparent 0),
+        radial-gradient(circle at 80% 20%, rgba(0, 247, 255, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 20% 80%, rgba(255, 0, 230, 0.08) 0%, transparent 40%);
+}
+[data-bs-theme="spaceship"] body {
+    background-color: var(--bg-slate-950);
+    color: var(--text-primary);
+}
 .th {
     background-color: var(--bs-tertiary-bg) !important;
     word-break:normal;
@@ -8,6 +32,57 @@
     field-sizing: content;
     min-height: min-content;
 }
+.doc-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--area-border-color);
+    background: linear-gradient(90deg, var(--area-bg-color-10), transparent);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.doc-body {
+    flex-grow: 1;
+    padding: 25px;
+    overflow-y: auto;
+    color: #d1d5db;
+    font-family: var(--font-body);
+    line-height: 1.6;
+}
+.doc-body::-webkit-scrollbar { width: 6px; }
+.doc-body::-webkit-scrollbar-thumb { background: var(--bs-emphasis-color); }
+[data-bs-theme="spaceship"] .doc-body::-webkit-scrollbar-thumb { background: var(--accent-cyan); }
+.doc-link {
+    color: var(--bs-emphasis-color);
+    text-decoration: underline;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+[data-bs-theme="spaceship"] .doc-link {
+    color: var(--accent-cyan);
+}
+.doc-link:hover {
+    color: #fff;
+    text-shadow: 0 0 10px var(--bs-emphasis-color);
+}
+[data-bs-theme="spaceship"] .doc-link:hover {
+    color: #fff;
+    text-shadow: 0 0 10px var(--accent-cyan);
+}
+.btn-sf-icon {
+    border: none;
+    background: transparent;
+}
+[data-bs-theme="spaceship"] .btn-sf-icon {
+    color: var(--accent-cyan);
+}
+.btn-sf-icon:hover {
+    color: var(--text-primary);
+    text-shadow: 0 0 10px var(--bs-emphasis-color);
+}
+[data-bs-theme="spaceship"] .btn-sf-icon:hover {
+    text-shadow: 0 0 10px var(--accent-cyan);
+}
+
 /* ライトモード (基本) - 必要に応じて調整 */
 [data-bs-theme="light"] {
     --bs-body-bg: #fff;

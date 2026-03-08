@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.options &mdash; cmdbox 2026/02/08 documentation</title>
+  <title>cmdbox.app.options &mdash; cmdbox 2026/03/08 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=22b6552c"></script>
+      <script src="../../../_static/documentation_options.js?v=30706936"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -505,7 +505,10 @@
                 <span class="n">svcmd</span> <span class="o">=</span> <span class="n">fobj</span><span class="o">.</span><span class="n">get_svcmd</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">svcmd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;svcmd&quot;</span><span class="p">][</span><span class="n">svcmd</span><span class="p">]</span> <span class="o">=</span> <span class="n">fobj</span>
-                <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;use_agent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_agentrule</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+                <span class="n">jadge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_agentrule</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">jadge</span> <span class="o">==</span> <span class="s1">&#39;deny&#39;</span><span class="p">:</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;use_agent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="n">jadge</span> <span class="o">==</span> <span class="s1">&#39;allow&#39;</span><span class="p">:</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;use_agent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="s1">&#39;use_agent&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;use_agent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_debugoption</span><span class="p">()</span></div>
 
     
@@ -854,8 +857,8 @@
         <span class="k">if</span> <span class="s1">&#39;agentrule&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">:</span> <span class="k">return</span>
         <span class="k">if</span> <span class="s1">&#39;policy&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;agentrule&#39;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The agentrule element must have &quot;policy&quot; specified.)&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;agentrule&#39;</span><span class="p">][</span><span class="s1">&#39;policy&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;allow&#39;</span><span class="p">,</span> <span class="s1">&#39;deny&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The policy element must specify allow or deny.)&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;agentrule&#39;</span><span class="p">][</span><span class="s1">&#39;policy&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;allow&#39;</span><span class="p">,</span> <span class="s1">&#39;deny&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The policy element must specify allow, deny, or default.)&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;rules&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;agentrule&#39;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;features.yml is invalid. (The agentrule element must have &quot;rules&quot; specified.)&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;agentrule&#39;</span><span class="p">][</span><span class="s1">&#39;rules&#39;</span><span class="p">]:</span>
@@ -872,7 +875,7 @@
 
 <div class="viewcode-block" id="Options.check_agentrule">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.options.Options.check_agentrule">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">check_agentrule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_agentrule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        エージェントが使用してよいコマンドかどうかをチェックします</span>
 
@@ -881,10 +884,10 @@
 <span class="sd">            cmd (str): コマンド</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            bool: 認可されたかどうか</span>
+<span class="sd">            str: 認可されたかどうか (&#39;allow&#39;, &#39;deny&#39;, or &#39;default&#39;)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">agentrule_loaded</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="s1">&#39;deny&#39;</span>
         <span class="c1"># コマンドチェック</span>
         <span class="n">jadge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_yml_data</span><span class="p">[</span><span class="s1">&#39;agentrule&#39;</span><span class="p">][</span><span class="s1">&#39;policy&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_yml_data</span><span class="p">[</span><span class="s1">&#39;agentrule&#39;</span><span class="p">][</span><span class="s1">&#39;rules&#39;</span><span class="p">]:</span>
@@ -896,7 +899,7 @@
             <span class="n">jadge</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;rule&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;agent rule: mode=</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">, cmd=</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">jadge</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">jadge</span> <span class="o">==</span> <span class="s1">&#39;allow&#39;</span></div>
+        <span class="k">return</span> <span class="n">jadge</span></div>
 
 
     <span class="n">AT_USER</span> <span class="o">=</span> <span class="s1">&#39;user&#39;</span>

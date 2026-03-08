@@ -98,23 +98,19 @@
         </div>
     </div>
     <!-- usersモーダル -->
-    <div id="users_modal" class="modal" tabindex="-1">
+    <div id="users_modal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <form id="users_form" class="modal-content novalidate">
-                <div class="modal-header">
-                    <h5 class="modal-title glow-text-cyan"></h5>
-                    <button type="button" class="btn btn_window_stack">
-                        <svg width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
-                            <use href="#btn_window_stack"></use>
-                        </svg>
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font"></h5>
+                    <button type="button" class="btn btn-sf-icon btn_window_stack">
+                        <i class="fa-regular fa-window-restore"></i>
                     </button>
-                    <button type="button" class="btn btn_window">
-                        <svg width="16" height="16" fill="currentColor" class="bi bi-window" viewBox="0 0 16 16">
-                            <use href="#btn_window"></use>
-                        </svg>
+                    <button type="button" class="btn btn-sf-icon btn_window">
+                        <i class="fa-regular fa-window-maximize"></i>
                     </button>
-                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">
-                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -166,25 +162,21 @@
         </div>
     </div>
     <!-- versionsモーダル -->
-    <div id="versions_modal" class="modal" tabindex="-1">
+    <div id="versions_modal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <form id="version_form" class="modal-content novalidate">
-                <div class="modal-header">
-                    <h5 class="modal-title glow-text-cyan">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">
                         Versions
                     </h5>
-                    <button type="button" class="btn btn_window_stack">
-                        <svg width="16" height="16" fill="currentColor" class="bi bi-window-stack">
-                            <use href="#btn_window_stack"></use>
-                        </svg>
+                    <button type="button" class="btn btn-sf-icon btn_window_stack">
+                        <i class="fa-regular fa-window-restore"></i>
                     </button>
-                    <button type="button" class="btn btn_window">
-                        <svg width="16" height="16" fill="currentColor" class="bi bi-window">
-                            <use href="#btn_window"></use>
-                        </svg>
+                    <button type="button" class="btn btn-sf-icon btn_window">
+                        <i class="fa-regular fa-window-maximize"></i>
                     </button>
-                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">
-                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -224,6 +216,8 @@
         document.querySelector(`body`).style.setProperty(`--bs-secondary-bg`, null);
     });
 </script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/bootstrap/bootstrap.min.5.3.0.css">
 <link rel="stylesheet" href="assets/cmdbox/color_mode.css">
 <link rel="stylesheet" href="assets/lightbox2/css/lightbox.min.css">

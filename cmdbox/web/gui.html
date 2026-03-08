@@ -131,25 +131,25 @@
         </div>
     </div>
     <!-- コマンドモーダル -->
-    <div id="cmd_modal" class="modal" tabindex="-1">
+    <div id="cmd_modal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <form id="cmd_form" class="modal-content novalidate">
-                <div class="modal-header">
+                <div class="modal-header doc-header">
                     <button type="button" class="btn btn_pin_angle ps-1 pt-0 pb-0">
                         <svg class="bi bi-pin-angle" width="24" height="24" fill="currentColor"><use href="#btn_pin_angle"></use></svg>
                     </button>
                     <button type="button" class="btn btn_pin_fill ps-1 pt-0 pb-0">
                         <svg class="bi bi-pin-fill" width="24" height="24" fill="currentColor"><use href="#btn_pin_fill"></use></svg>
                     </button>
-                    <h5 class="modal-title glow-text-cyan">Modal title</h5>
-                    <button type="button" class="btn btn_window_stack">
-                        <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
+                    <h5 class="modal-title glow-text-cyan system-font">Modal title</h5>
+                    <button type="button" class="btn btn-sf-icon btn_window_stack">
+                        <i class="fa-regular fa-window-restore"></i>
                     </button>
-                    <button type="button" class="btn btn_window">
-                        <svg class="bi bi-window" width="16" height="16" fill="currentColor"><use href="#btn_window"></use></svg>
+                    <button type="button" class="btn btn-sf-icon btn_window">
+                        <i class="fa-regular fa-window-maximize"></i>
                     </button>
-                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">
-                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -203,25 +203,25 @@
         </div>
     </div>
     <!-- パイプラインモーダル -->
-    <div id="pipe_modal" class="modal" tabindex="-1">
+    <div id="pipe_modal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <form id="pipe_form" class="modal-content novalidate">
-                <div class="modal-header">
+                <div class="modal-header doc-header">
                     <button type="button" class="btn btn_pin_angle ps-1 pt-0 pb-0">
                         <svg class="bi bi-pin-angle" width="24" height="24" fill="currentColor"><use href="#btn_pin_angle"></use></svg>
                     </button>
                     <button type="button" class="btn btn_pin_fill ps-1 pt-0 pb-0">
                         <svg class="bi bi-pin-fill" width="24" height="24" fill="currentColor"><use href="#btn_pin_fill"></use></svg>
                     </button>
-                    <h5 class="modal-title glow-text-cyan">Modal title</h5>
-                    <button type="button" class="btn btn_window_stack">
-                        <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
+                    <h5 class="modal-title glow-text-cyan system-font">Modal title</h5>
+                    <button type="button" class="btn btn-sf-icon btn_window_stack">
+                        <i class="fa-regular fa-window-restore"></i>
                     </button>
-                    <button type="button" class="btn btn_window">
-                        <svg class="bi bi-window" width="16" height="16" fill="currentColor"><use href="#btn_window"></use></svg>
+                    <button type="button" class="btn btn-sf-icon btn_window">
+                        <i class="fa-regular fa-window-maximize"></i>
                     </button>
-                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">
-                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -274,19 +274,19 @@
         </div>
     </div>
     <!-- 結果モーダル -->
-    <div id="result_modal" class="modal" tabindex="-1">
+    <div id="result_modal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <form id="result_form" class="modal-content novalidate">
-                <div class="modal-header">
-                    <h5 class="modal-title glow-text-cyan">Modal title</h5>
-                    <button type="button" class="btn btn_window_stack">
-                        <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">Modal title</h5>
+                    <button type="button" class="btn btn-sf-icon btn_window_stack">
+                        <i class="fa-regular fa-window-restore"></i>
                     </button>
-                    <button type="button" class="btn btn_window">
-                        <svg class="bi bi-window" width="16" height="16" fill="currentColor"><use href="#btn_window"></use></svg>
+                    <button type="button" class="btn btn-sf-icon btn_window">
+                        <i class="fa-regular fa-window-maximize"></i>
                     </button>
-                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">
-                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
                     </button>
                 </div>
                 <div class="modal-body overflow-auto"></div>
@@ -297,11 +297,11 @@
         </div>
     </div>
     <!-- ファイラーモーダル -->
-    <div id="filer_modal" class="modal" style="z-index: 2000;" tabindex="-1">
+    <div id="filer_modal" class="modal fade" style="z-index: 2000;" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <form id="filer_form" class="modal-content novalidate">
-                <div class="modal-header">
-                    <h5 class="modal-title glow-text-cyan text-nowrap">Modal title</h5>
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font text-nowrap">Modal title</h5>
                     <div class="input-group p-1">
                         <button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Current</button>'
                         <input name="filer_host" type="hidden" class="filer_host">
@@ -316,14 +316,14 @@
                             <svg class="bi bi-arrow-right-circle" width="16" height="16" fill="currentColor"><use href="#btn_arrow_right_circle"></use></svg>
                         </button>
                     </div>
-                    <button type="button" class="btn btn_window_stack">
-                        <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
+                    <button type="button" class="btn btn-sf-icon btn_window_stack">
+                        <i class="fa-regular fa-window-restore"></i>
                     </button>
-                    <button type="button" class="btn btn_window">
-                        <svg class="bi bi-window" width="16" height="16" fill="currentColor"><use href="#btn_window"></use></svg>
+                    <button type="button" class="btn btn-sf-icon btn_window">
+                        <i class="fa-regular fa-window-maximize"></i>
                     </button>
-                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">
-                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
                     </button>
                 </div>
                 <div class="modal-body row">
@@ -335,19 +335,19 @@
         </div>
     </div>
     <!-- consoleモーダル -->
-    <div id="console_modal" class="modal" tabindex="-1">
+    <div id="console_modal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <form id="console_form" class="modal-content novalidate">
-                <div class="modal-header">
-                    <h5 class="modal-title glow-text-cyan">Console log</h5>
-                    <button type="button" class="btn btn_window_stack">
-                        <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">Console log</h5>
+                    <button type="button" class="btn btn-sf-icon btn_window_stack">
+                        <i class="fa-regular fa-window-restore"></i>
                     </button>
-                    <button type="button" class="btn btn_window">
-                        <svg class="bi bi-window" width="16" height="16" fill="currentColor"><use href="#btn_window"></use></svg>
+                    <button type="button" class="btn btn-sf-icon btn_window">
+                        <i class="fa-regular fa-window-maximize"></i>
                     </button>
-                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">
-                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -361,21 +361,21 @@
         </div>
     </div>
     <!-- versionsモーダル -->
-    <div id="versions_modal" class="modal" tabindex="-1">
+    <div id="versions_modal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <form id="version_form" class="modal-content novalidate">
-                <div class="modal-header">
-                    <h5 class="modal-title glow-text-cyan glow-text-cyan">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font">
                         Versions
                     </h5>
-                    <button type="button" class="btn btn_window_stack">
-                        <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
+                    <button type="button" class="btn btn-sf-icon btn_window_stack">
+                        <i class="fa-regular fa-window-restore"></i>
                     </button>
-                    <button type="button" class="btn btn_window">
-                        <svg class="bi bi-window" width="16" height="16" fill="currentColor"><use href="#btn_window"></use></svg>
+                    <button type="button" class="btn btn-sf-icon btn_window">
+                        <i class="fa-regular fa-window-maximize"></i>
                     </button>
-                    <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">
-                        <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -415,6 +415,8 @@
         document.querySelector(`body`).style.setProperty(`--bs-secondary-bg`, null);
     });
 </script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/bootstrap/bootstrap.min.5.3.0.css">
 <link rel="stylesheet" href="assets/cmdbox/color_mode.css">
 <link rel="stylesheet" href="assets/lightbox2/css/lightbox.min.css">
