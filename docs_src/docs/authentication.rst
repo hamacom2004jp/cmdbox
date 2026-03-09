@@ -15,28 +15,28 @@ Configuration items in `user_list.yml`
     users:                         # A list of users, each of which is a map that contains the following fields.
     - uid: 1                       # An ID that identifies a user. No two users can have the same ID.
       name: admin                  # A name that identifies the user. No two users can have the same name.
-      password: admin              # The user's password. The value is hashed with the hash function specified in the next hash field.
+      password: XXXXXXXXXXXXXXX    # The user's password. The value is hashed with the hash function specified in the next hash field.
       hash: plain                  # The hash function used to hash the password, which can be plain, md5, sha1, or sha256, or oauth2, or saml.
       groups: [admin]              # A list of groups to which the user belongs, as specified in the groups field.
       email: admin@aaa.bbb.jp      # The email address of the user, used when authenticating using the provider specified in the oauth2 or saml field.
-      home: /                      # The home directory of the user, used for file operations.
+      home: /.users/admin          # The home directory of the user, used for file operations.
     - uid: 101
       name: user01
-      password: b75705d7e35e7014521a46b532236ec3
+      password: XXXXXXXXXXXXXXX
       hash: md5
       groups: [user]
       email: user01@aaa.bbb.jp
       home: /.users/user01
     - uid: 102
       name: user02
-      password: a7659675668c2b34f0a456dbaa508200340dc36c
+      password: XXXXXXXXXXXXXXX
       hash: sha1
       groups: [readonly]
       email: user02@aaa.bbb.jp
       home: /.users/user02
     - uid: 103
       name: user03
-      password: d64243e8519cce2304fffb92d31acaca622585011b40439c97e9274fae146189
+      password: XXXXXXXXXXXXXXX
       hash: sha256
       groups: [editor]
       email: user03@aaa.bbb.jp
@@ -44,7 +44,7 @@ Configuration items in `user_list.yml`
     groups:                        # A list of groups, each of which is a map that contains the following fields.
     - gid: 1                       # An ID that identifies a group. No two groups can have the same ID.
       name: admin                  # A name that identifies the group. No two groups can have the same name.
-      home: /.groups               # The home directory of the group, used for file operations.
+      home: /.groups/admin         # The home directory of the group, used for file operations.
     - gid: 2
       name: guest
       home: /.groups/guest
@@ -75,11 +75,19 @@ Configuration items in `user_list.yml`
         rule: allow                # Specifies whether or not the specified command is allowed for the specified group. The value can be allow or deny.
       - groups: [user]
         mode: agent
-        cmds: [chat, agent_list, mcp_client, mcpsv_list, runner_list,
+        cmds: [chat, agent_list, mcp_client, mcpsv_list, memory_list, runner_list,
                session_list, session_del, start, stop]
         rule: allow
       - groups: [user]
+        mode: cmd
+        cmds: [list, load]
+        rule: allow
+      - groups: [user]
         mode: embed
+        cmds: [list]
+        rule: allow
+      - groups: [user]
+        mode: extract
         cmds: [list]
         rule: allow
       - groups: [user]
@@ -87,12 +95,12 @@ Configuration items in `user_list.yml`
         cmds: [list]
         rule: allow
       - groups: [user]
-        mode: server
+        mode: rag
         cmds: [list]
         rule: allow
       - groups: [user]
-        mode: cmd
-        cmds: [list, load]
+        mode: server
+        cmds: [list]
         rule: allow
       - groups: [user, guest]
         mode: audit
@@ -112,9 +120,13 @@ Configuration items in `user_list.yml`
         rule: allow
       - groups: [editor]
         mode: agent
-        cmds: [agent_del, mcpsv_del, runner_del,
-               agent_load, mcpsv_load, runner_load,
-               agent_save, mcpsv_save, runner_save,]
+        cmds: [agent_del, mcpsv_del, memory_del, runner_del,
+               agent_load, mcpsv_load, memory_load, runner_load,
+               agent_save, mcpsv_save, memory_save, runner_save,]
+        rule: allow
+      - groups: [editor]
+        mode: extract
+        cmds: [del, load, save]
         rule: allow
       - groups: [editor]
         mode: llm

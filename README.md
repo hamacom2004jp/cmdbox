@@ -31,8 +31,8 @@ pip install cmdbox[agent_mcp]
 pip install cmdbox[agent_adk]
 pip install cmdbox[agent_mem]
 pip install cmdbox[rag]
-pip install cmdbox[omni]
-apt-get -y install ffmpeg
+#pip install cmdbox[omni]
+#apt-get -y install ffmpeg
 ```
 
 or..
@@ -42,8 +42,8 @@ pip install "pydantic>=2.0.0,<3.0.0" "fastmcp>=2.14.4" "mcp>=1.23.0,<2.0.0"
 pip install "google-adk>=1.23.0" "a2a-sdk>=0.3.4,<0.4.0" "litellm>=1.75.5,<1.80.17"
 pip install "sentence-transformers" "sqlite_vec" "transformers>=4.48.0" "torch"
 pip install "chunklet-py[document]" "langchain_community" "markdown" "pdfplumber"
-pip install "accelerate>=1.12.0" "qwen-omni-utils>=0.0.9" "torchvision>=0.25.0"
-apt-get -y install ffmpeg
+#pip install "accelerate>=1.12.0" "qwen-omni-utils>=0.0.9" "torchvision>=0.25.0"
+#apt-get -y install ffmpeg
 ```
 
 # Run
@@ -78,7 +78,12 @@ cmdbox -m mcpsv -c start --signin_file .cmdbox/user_list.yml &
 ```bash
 python -m venv .venv
 . .venv/bin/activate
-pip install -e .[all]
+pip install -e .[dev]
+pip install -e .[agent_mcp]
+pip install -e .[agent_adk]
+pip install -e .[agent_mem]
+pip install -e .[rag]
+#pip install -e .[omni]
 pip uninstall -y cmdbox
 ```
 
@@ -286,23 +291,11 @@ aliases:                                # Specify the alias for the specified co
         move:                           # Specify whether to move the regular expression group of the source to the target.
                                         #   e.g. true
 agentrule:                              # Specifies a list of rules that determine which commands the agent can execute.
-  policy: deny                          # Specify the default policy for the rule. The value can be allow or deny.
+  policy: default                       # Specify the default policy for the rule. The value can be allow or deny or default.
   rules:                                # Specify the rules for the commands that the agent can execute according to the group to which the user belongs.
   - mode: cmd                           # Specify the "mode" as the condition for applying the rule.
     cmds: [list, load]                  # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
     rule: allow                         # Specifies whether the specified command is allowed or not. Values are allow or deny.
-  - mode: client
-    cmds: [file_download, file_list, http, server_info]
-    rule: allow
-  - mode: excel
-    cmds: [cell_details, cell_search, cell_values, sheet_list]
-    rule: allow
-  - mode: server
-    cmds: [list]
-    rule: allow
-  - mode: tts
-    cmds: [say]
-    rule: allow
 audit:
   enabled: true                         # Specify whether to enable the audit function.
   write:
@@ -326,7 +319,6 @@ audit:
     pg_password: password               # Specify the postgresql password.
     pg_dbname: audit                    # Specify the postgresql database name.
     retention_period_days: 365          # Specify the number of days to retain audit logs.
-
 ```
 
 - The following files should also be known when using commands on the web screen or RESTAPI.
@@ -339,41 +331,50 @@ audit:
 users:                         # A list of users, each of which is a map that contains the following fields.
 - uid: 1                       # An ID that identifies a user. No two users can have the same ID.
   name: admin                  # A name that identifies the user. No two users can have the same name.
-  password: XXXXX              # The user's password. The value is hashed with the hash function specified in the next hash field.
+  password: XXXXXXXXXXXXXXX    # The user's password. The value is hashed with the hash function specified in the next hash field.
   hash: plain                  # The hash function used to hash the password, which can be plain, md5, sha1, or sha256, or oauth2, or saml.
   groups: [admin]              # A list of groups to which the user belongs, as specified in the groups field.
   email: admin@aaa.bbb.jp      # The email address of the user, used when authenticating using the provider specified in the oauth2 or saml field.
+  home: /.users/admin          # The home directory of the user, used for file operations.
 - uid: 101
   name: user01
-  password: XXXXX
+  password: XXXXXXXXXXXXXXX
   hash: md5
   groups: [user]
   email: user01@aaa.bbb.jp
+  home: /.users/user01
 - uid: 102
   name: user02
-  password: XXXXX
+  password: XXXXXXXXXXXXXXX
   hash: sha1
   groups: [readonly]
   email: user02@aaa.bbb.jp
+  home: /.users/user02
 - uid: 103
   name: user03
-  password: XXXXX
+  password: XXXXXXXXXXXXXXX
   hash: sha256
   groups: [editor]
   email: user03@aaa.bbb.jp
+  home: /.users/user03
 groups:                        # A list of groups, each of which is a map that contains the following fields.
 - gid: 1                       # An ID that identifies a group. No two groups can have the same ID.
   name: admin                  # A name that identifies the group. No two groups can have the same name.
+  home: /.groups/admin         # The home directory of the group, used for file operations.
 - gid: 2
   name: guest
+  home: /.groups/guest
 - gid: 101
   name: user
+  home: /.groups/user
 - gid: 102
   name: readonly
   parent: user                 # The parent group of the group. If the parent group is not specified, the group is a top-level group.
+  home: /.groups/readonly
 - gid: 103
   name: editor
   parent: user
+  home: /.groups/editor
 cmdrule:                       # A list of command rules, Specify a rule that determines whether or not a command is executable when executed by a user in web mode.
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
   rules:                       # Specify rules to allow or deny execution of the command, depending on the group the user belongs to.
@@ -381,15 +382,41 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     rule: allow
   - groups: [user]             # Specify the groups to which the rule applies.
     mode: client               # Specify the "mode" as the condition for applying the rule.
-    cmds: [file_download, file_list, server_info] # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
+    cmds: [file_download, file_list, server_info, time] # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
+    coercion:                  # Specify a coercion value for each item to be set when a rule is matched.
+                               # e.g. wpath: f"/users/{user_name}"
+      fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
+      from_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
+      to_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
     rule: allow                # Specifies whether or not the specified command is allowed for the specified group. The value can be allow or deny.
   - groups: [user]
-    mode: server
-    cmds: [list]
+    mode: agent
+    cmds: [chat, agent_list, mcp_client, mcpsv_list, memory_list, runner_list,
+           session_list, session_del, start, stop]
     rule: allow
   - groups: [user]
     mode: cmd
     cmds: [list, load]
+    rule: allow
+  - groups: [user]
+    mode: embed
+    cmds: [list]
+    rule: allow
+  - groups: [user]
+    mode: extract
+    cmds: [list]
+    rule: allow
+  - groups: [user]
+    mode: llm
+    cmds: [list]
+    rule: allow
+  - groups: [user]
+    mode: rag
+    cmds: [list]
+    rule: allow
+  - groups: [user]
+    mode: server
+    cmds: [list]
     rule: allow
   - groups: [user, guest]
     mode: audit
@@ -402,6 +429,28 @@ cmdrule:                       # A list of command rules, Specify a rule that de
   - groups: [editor]
     mode: client
     cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
+    coercion:
+      fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
+      from_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
+      to_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
+    rule: allow
+  - groups: [editor]
+    mode: agent
+    cmds: [agent_del, mcpsv_del, memory_del, runner_del,
+           agent_load, mcpsv_load, memory_load, runner_load,
+           agent_save, mcpsv_save, memory_save, runner_save,]
+    rule: allow
+  - groups: [editor]
+    mode: extract
+    cmds: [del, load, save]
+    rule: allow
+  - groups: [editor]
+    mode: llm
+    cmds: [del, load, save]
+    rule: allow
+  - groups: [editor]
+    mode: embed
+    cmds: [del, load, save, start, stop]
     rule: allow
 pathrule:                      # List of RESTAPI rules, rules that determine whether or not a RESTAPI can be executed when a user in web mode accesses it.
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
@@ -411,13 +460,15 @@ pathrule:                      # List of RESTAPI rules, rules that determine whe
     rule: allow                # Specifies whether or not the specified RESTAPI is allowed for the specified group. The value can be allow or deny.
   - groups: [guest]
     paths: [/signin, /assets, /copyright, /dosignin, /dosignout, /password/change,
-            /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
+            /gui, /get_server_opt, /usesignout,
+            /versions, /versions_cmdbox, /versions_used]
     rule: allow
   - groups: [user]
     paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout, /password/change,
             /gui/user_data/load, /gui/user_data/save, /gui/user_data/delete,
-            /agent, /mcpsv,
-            /exec_cmd, /exec_pipe, /filer, /result, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
+            /agent, /a2a, /a2a_reload, /mcp,
+            /exec_cmd, /exec_pipe, /filer, /result, /gui, /get_server_opt, /usesignout,
+            /versions, /versions_cmdbox, /versions_used]
     rule: allow
   - groups: [readonly]
     paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
@@ -528,7 +579,6 @@ saml:                               # SAML settings.
         singleLogoutService: {}
         certFingerprint: ''
         certFingerprintAlgorithm: sha1
-
 ```
 
 - See the documentation for references to each file.

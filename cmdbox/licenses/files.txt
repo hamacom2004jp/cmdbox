@@ -158,7 +158,6 @@ Samuel Colvin <s@muelcolvin.com>, Adrian Garcia Badaracco <1755071+adriangb@user
 Paul McGuire <ptmcg.gm+pyparsing@gmail.com>	MIT	pyparsing	https://github.com/pyparsing/pyparsing/	3.3.2	cmdbox\licenses\LICENSE_pyparsing_3_3_2_MIT.txt
 Al Sweigart <al@inventwithpython.com>	BSD License	pyperclip	https://github.com/asweigart/pyperclip	1.11.0	cmdbox\licenses\LICENSE_pyperclip_1_11_0_BSD_License.txt
 Thomas Kluyver <thomas@kluyver.me.uk>	MIT License	pyproject_hooks	https://github.com/pypa/pyproject-hooks	1.2.0	cmdbox\licenses\LICENSE_pyproject_hooks_1_2_0_MIT_License.txt
-Moses Palmér	GNU Lesser General Public License v3 (LGPLv3)	pystray	https://github.com/moses-palmer/pystray	0.19.5	cmdbox\licenses\LICENSE_pystray_0_19_5_GNU_Lesser_General_Public_License_v3-LGPLv3.txt
 Gustavo Niemeyer	Apache Software License; BSD License	python-dateutil	https://github.com/dateutil/dateutil	2.9.0.post0	cmdbox\licenses\LICENSE_python-dateutil_2_9_0_post0_Apache_Software_License-BSD_License.txt
 Saurabh Kumar <me+github@saurabh-kumar.com>	BSD-3-Clause	python-dotenv	https://github.com/theskumar/python-dotenv	1.2.2	cmdbox\licenses\LICENSE_python-dotenv_1_2_2_BSD-3-Clause.txt
 Andrew Dunham <andrew@du.nham.ca>, Marcelo Trylesinski <marcelotryle@gmail.com>	Apache-2.0	python-multipart	https://github.com/Kludex/python-multipart	0.0.22	cmdbox\licenses\LICENSE_python-multipart_0_0_22_Apache-2_0.txt
@@ -244,6 +243,7 @@ Chris Guidry <guid@omg.lol>	MIT License	uncalled-for	https://github.com/chrisgui
 Ian Stapleton Cordasco	BSD 3-Clause OR Apache-2.0	uritemplate	https://uritemplate.readthedocs.org	4.2.0	cmdbox\licenses\LICENSE_uritemplate_4_2_0_BSD_3-Clause_OR_Apache-2_0.txt
 Andrey Petrov <andrey.petrov@shazow.net>	MIT	urllib3	https://github.com/urllib3/urllib3/blob/main/CHANGES.rst	2.6.3	cmdbox\licenses\LICENSE_urllib3_2_6_3_MIT.txt
 Tom Christie <tom@tomchristie.com>	BSD-3-Clause	uvicorn	https://uvicorn.dev/	0.41.0	cmdbox\licenses\LICENSE_uvicorn_0_41_0_BSD-3-Clause.txt
+Hiroshiba <hihokaruta@gmail.com>	MIT	voicevox_core	UNKNOWN	0.16.3	cmdbox\licenses\LICENSE_voicevox_core_0_16_3_MIT.txt
 Mickaël Schoentgen	Apache Software License	watchdog	https://github.com/gorakhargosh/watchdog	6.0.0	cmdbox\licenses\LICENSE_watchdog_6_0_0_Apache_Software_License.txt
 Samuel Colvin <s@muelcolvin.com>	MIT License	watchfiles	https://github.com/samuelcolvin/watchfiles	1.1.1	cmdbox\licenses\LICENSE_watchfiles_1_1_1_MIT_License.txt
 Jeff Quast <contact@jeffquast.com>	MIT	wcwidth	https://github.com/jquast/wcwidth	0.6.0	cmdbox\licenses\LICENSE_wcwidth_0_6_0_MIT.txt

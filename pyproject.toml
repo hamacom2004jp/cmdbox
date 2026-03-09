@@ -53,7 +53,7 @@ dependencies = [
     "plyer",
     "psycopg[binary]",
     "pyjwt",
-    "pystray",
+    #"pystray",
     "python-multipart",
     "pycryptodome",
     "pyyaml",

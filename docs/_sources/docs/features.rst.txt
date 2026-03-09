@@ -60,23 +60,11 @@ Configuration items in `features.yml`
             move:                           # Specify whether to move the regular expression group of the source to the target.
                                             #   e.g. true
     agentrule:                              # Specifies a list of rules that determine which commands the agent can execute.
-      policy: deny                          # Specify the default policy for the rule. The value can be allow or deny.
+      policy: default                       # Specify the default policy for the rule. The value can be allow or deny or default.
       rules:                                # Specify the rules for the commands that the agent can execute according to the group to which the user belongs.
       - mode: cmd                           # Specify the "mode" as the condition for applying the rule.
         cmds: [list, load]                  # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
         rule: allow                         # Specifies whether the specified command is allowed or not. Values are allow or deny.
-      - mode: client
-        cmds: [file_download, file_list, http, server_info]
-        rule: allow
-      - mode: excel
-        cmds: [cell_details, cell_search, cell_values, sheet_list]
-        rule: allow
-      - mode: server
-        cmds: [list]
-        rule: allow
-      - mode: tts
-        cmds: [say]
-        rule: allow
     audit:
       enabled: true                         # Specify whether to enable the audit function.
       write:
@@ -224,10 +212,40 @@ Implement a class that extends `cmdbox.app.feature.Feature`
                 prevres (Any): Result of the previous command, used when referencing the results of a pipeline run.
 
             Yields:
-                Tuple[int, Dict[str, Any]]: 終了コード, 結果
+                Tuple[int, Dict[str, Any]]: exit_code, result
             """
             status, res = tool.exec_cmd(opt, logger, timeout, prevres)
             yield status, res
+
+        def audited_by(self, logger:logging.Logger, args:argparse.Namespace) -> bool:
+            """
+            Returns whether this feature is subject to audit logging.
+
+            Args:
+                logger (logging.Logger): logger
+                args (argparse.Namespace): arguments
+
+            Returns:
+                bool: True if audit logging should be performed
+            """
+            if hasattr(self, 'client_only') and self.client_only:
+                return False
+            return True
+
+        def put_resqueue(self, args:argparse.Namespace, msg:Dict[str, Any]):
+            """
+            Stores the command execution result in the result queue.
+
+            Args:
+                resqueue (queue.Queue): The queue to store the result
+                msg (Dict[str, Any]): The message to store
+            """
+            try:
+                if hasattr(args, '_resqueue') and args._resqueue is not None:
+                    q:queue.Queue = args._resqueue
+                    q.put_nowait(msg)
+            except:
+                pass
 
 
 - To simplify implementation on the edge, we provide several classes that inherit from `cmdbox.app.feature`.
@@ -346,12 +364,12 @@ Implementation of the `get_option(self) -> Dict[str, Any]` method
                     オプションのchoiceを動的に生成する関数
 
                     Args:
-                        o (Dict[str, Any]): choice_fn関数が呼ばれたコマンドオプションのchoice定義
-                        webmode (bool): Webモードかどうか
-                        opt (Dict[str, Any]): このコマンドのすべてのコマンドオプションのchoice定義
+                        o (Dict[str, Any]): Definition of the choice for the command option for which the choice_fn function was called
+                        webmode (bool): Whether it is in Web mode
+                        opt (Dict[str, Any]): Definition of all command options for this command
 
                     Returns:
-                        Any: choice情報
+                        Any: choice information
                     """
                     choices = []
                     return choices
@@ -363,7 +381,7 @@ Implementation of the `get_option(self) -> Dict[str, Any]` method
                 choice_show=dict(choice1=["opt1", "opt2"], choice2=["opt3"], choice3=["opt4", "opt5"]),
 
 
-        - callcmd: コマンドボタンを追加し、そのコマンドボタンが押されたときに呼ばれるjavascript関数を指定します。
+        - callcmd: Add a command button and specify the JavaScript function to be called when the command button is pressed.
 
             .. code-block:: python
 

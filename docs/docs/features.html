@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Features &mdash; cmdbox 2026/03/08 documentation</title>
+  <title>Features &mdash; cmdbox 2026/03/09 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=30706936"></script>
+      <script src="../_static/documentation_options.js?v=9408ed2f"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -146,23 +146,11 @@
 <span class="w">        </span><span class="nt">move</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specify whether to move the regular expression group of the source to the target.</span>
 <span class="w">                                        </span><span class="c1">#   e.g. true</span>
 <span class="nt">agentrule</span><span class="p">:</span><span class="w">                              </span><span class="c1"># Specifies a list of rules that determine which commands the agent can execute.</span>
-<span class="w">  </span><span class="nt">policy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deny</span><span class="w">                          </span><span class="c1"># Specify the default policy for the rule. The value can be allow or deny.</span>
+<span class="w">  </span><span class="nt">policy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w">                       </span><span class="c1"># Specify the default policy for the rule. The value can be allow or deny or default.</span>
 <span class="w">  </span><span class="nt">rules</span><span class="p">:</span><span class="w">                                </span><span class="c1"># Specify the rules for the commands that the agent can execute according to the group to which the user belongs.</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cmd</span><span class="w">                           </span><span class="c1"># Specify the &quot;mode&quot; as the condition for applying the rule.</span>
 <span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">load</span><span class="p p-Indicator">]</span><span class="w">                  </span><span class="c1"># Specify the &quot;cmd&quot; to which the rule applies. Multiple items can be specified in a list.</span>
 <span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span><span class="w">                         </span><span class="c1"># Specifies whether the specified command is allowed or not. Values are allow or deny.</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span>
-<span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">file_download</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">file_list</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">http</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">server_info</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">excel</span>
-<span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">cell_details</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">cell_search</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">cell_values</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">sheet_list</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span>
-<span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tts</span>
-<span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">say</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span>
 <span class="nt">audit</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">                         </span><span class="c1"># Specify whether to enable the audit function.</span>
 <span class="w">  </span><span class="nt">write</span><span class="p">:</span>
@@ -310,10 +298,40 @@
 <span class="sd">            prevres (Any): Result of the previous command, used when referencing the results of a pipeline run.</span>
 
 <span class="sd">        Yields:</span>
-<span class="sd">            Tuple[int, Dict[str, Any]]: 終了コード, 結果</span>
+<span class="sd">            Tuple[int, Dict[str, Any]]: exit_code, result</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">status</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">tool</span><span class="o">.</span><span class="n">exec_cmd</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">prevres</span><span class="p">)</span>
         <span class="k">yield</span> <span class="n">status</span><span class="p">,</span> <span class="n">res</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">audited_by</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns whether this feature is subject to audit logging.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging.Logger): logger</span>
+<span class="sd">            args (argparse.Namespace): arguments</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if audit logging should be performed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;client_only&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_only</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">put_resqueue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stores the command execution result in the result queue.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resqueue (queue.Queue): The queue to store the result</span>
+<span class="sd">            msg (Dict[str, Any]): The message to store</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;_resqueue&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">_resqueue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">q</span><span class="p">:</span><span class="n">queue</span><span class="o">.</span><span class="n">Queue</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">_resqueue</span>
+                <span class="n">q</span><span class="o">.</span><span class="n">put_nowait</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -436,12 +454,12 @@
 <span class="sd">    オプションのchoiceを動的に生成する関数</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        o (Dict[str, Any]): choice_fn関数が呼ばれたコマンドオプションのchoice定義</span>
-<span class="sd">        webmode (bool): Webモードかどうか</span>
-<span class="sd">        opt (Dict[str, Any]): このコマンドのすべてのコマンドオプションのchoice定義</span>
+<span class="sd">        o (Dict[str, Any]): Definition of the choice for the command option for which the choice_fn function was called</span>
+<span class="sd">        webmode (bool): Whether it is in Web mode</span>
+<span class="sd">        opt (Dict[str, Any]): Definition of all command options for this command</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Any: choice情報</span>
+<span class="sd">        Any: choice information</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">choices</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">return</span> <span class="n">choices</span>
@@ -456,7 +474,7 @@
 </div>
 </div></blockquote>
 </li>
-<li><p>callcmd: コマンドボタンを追加し、そのコマンドボタンが押されたときに呼ばれるjavascript関数を指定します。</p>
+<li><p>callcmd: Add a command button and specify the JavaScript function to be called when the command button is pressed.</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">callcmd</span><span class="o">=</span><span class="s2">&quot;()=&gt;{cmdbox.callcmd(&#39;cmd&#39;,&#39;list&#39;,{&#39;kwd&#39;:&#39;*&#39;},(res)=&gt;{console.log(res);},$(</span><span class="se">\&quot;</span><span class="s2">[name=&#39;title&#39;]</span><span class="se">\&quot;</span><span class="s2">).val(),&#39;tag&#39;);}&quot;</span><span class="p">,</span>
 </pre></div>
