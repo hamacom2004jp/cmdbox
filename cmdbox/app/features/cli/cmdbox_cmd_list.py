@@ -106,7 +106,7 @@ class CmdList(feature.OneshotResultEdgeFeature):
         is_japan = common.is_japan(args=args)
         options = Options.getInstance()
         ret_list = []
-        args.match_opt = [opt for opt in args.match_opt if opt is not None and opt != ''] if args.match_opt is not None and isinstance(args.match_opt, list) else []
+        args.match_opt = [opt for opt in args.match_opt if opt] if args.match_opt is not None and isinstance(args.match_opt, list) else []
         for r in cmd_list:
             if args.match_mode is not None and args.match_mode != '' and args.match_mode not in r['mode']:
                 continue
@@ -114,7 +114,7 @@ class CmdList(feature.OneshotResultEdgeFeature):
                 continue
             if args.match_cmd is not None and args.match_cmd != '' and args.match_cmd not in r['cmd']:
                 continue
-            if args.match_opt is not None and isinstance(args.match_opt, list) and len([k for k in args.match_opt if k not in r]) > 0:
+            if len([k for k in args.match_opt if k not in r]) > 0:
                 continue
             if not signin.Signin._check_cmd(self.signin_file_data, args.groups, r['mode'], r['cmd'], args.__dict__, "unknown", logger):
                 continue
