@@ -22,38 +22,14 @@ handlers:
         omit_repeated_times: false
         tracebacks_word_wrap: false
         log_time_format: '[%Y-%m-%d %H:%M]'
-    agent:
+    a2asv:
         class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
         level: INFO
         formatter: fmt
         backupCount: 5
         when : 'D'
         encoding : 'utf-8'
-        filename: .logs/cmdbox_agent.log
-    audit:
-        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
-        level: INFO
-        formatter: fmt
-        backupCount: 5
-        when : 'D'
-        encoding : 'utf-8'
-        filename: .logs/cmdbox_audit.log
-    client:
-        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
-        level: INFO
-        formatter: fmt
-        backupCount: 5
-        when : 'D'
-        encoding : 'utf-8'
-        filename: .logs/cmdbox_client.log
-    cmd:
-        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
-        level: INFO
-        formatter: fmt
-        backupCount: 5
-        when : 'D'
-        encoding : 'utf-8'
-        filename: .logs/cmdbox_cmd.log
+        filename: .logs/cmdbox_a2asv.log
     cmdbox:
         class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
         level: INFO
@@ -70,22 +46,6 @@ handlers:
         when : 'D'
         encoding : 'utf-8'
         filename: .logs/cmdbox_edge.log
-    excel:
-        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
-        level: INFO
-        formatter: fmt
-        backupCount: 5
-        when : 'D'
-        encoding : 'utf-8'
-        filename: .logs/cmdbox_excel.log
-    gui:
-        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
-        level: INFO
-        formatter: fmt
-        backupCount: 5
-        when : 'D'
-        encoding : 'utf-8'
-        filename: .logs/cmdbox_gui.log
     mcpsv:
         class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
         level: INFO
@@ -102,14 +62,6 @@ handlers:
         when : 'D'
         encoding : 'utf-8'
         filename: .logs/cmdbox_server.log
-    tts:
-        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
-        level: INFO
-        formatter: fmt
-        backupCount: 5
-        when : 'D'
-        encoding : 'utf-8'
-        filename: .logs/cmdbox_tts.log
     web:
         class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
         level: INFO
@@ -134,25 +86,10 @@ handlers:
         filename: .logs/cmdbox_logsv.log
 
 loggers:
-    agent:
-        handlers: [agent, std]
+    a2asv:
+        handlers: [a2asv, std]
         level: INFO
-        qualname: agent
-        propagate: false
-    audit:
-        handlers: [audit, std]
-        level: INFO
-        qualname: audit
-        propagate: false
-    client:
-        handlers: [client, std]
-        level: INFO
-        qualname: client
-        propagate: false
-    cmd:
-        handlers: [cmd, std]
-        level: INFO
-        qualname: cmd
+        qualname: a2asv
         propagate: false
     cmdbox:
         handlers: [cmdbox, std]
@@ -164,16 +101,6 @@ loggers:
         level: INFO
         qualname: edge
         propagate: false
-    excel:
-        handlers: [excel, std]
-        level: INFO
-        qualname: excel
-        propagate: false
-    gui:
-        handlers: [gui, std]
-        level: INFO
-        qualname: gui
-        propagate: false
     mcpsv:
         handlers: [mcpsv, std]
         level: INFO
@@ -184,15 +111,15 @@ loggers:
         level: INFO
         qualname: server
         propagate: false
-    tts:
-        handlers: [tts, std]
-        level: INFO
-        qualname: tts
-        propagate: false
     web:
         handlers: [web, std]
         level: INFO
         qualname: web
+        propagate: false
+    logcl:
+        handlers: [logcl]
+        level: INFO
+        qualname: logcl
         propagate: false
     logsv:
         handlers: [logsv]

@@ -175,131 +175,159 @@ class LLMChat(feature.OneshotResultEdgeFeature):
         reskey = msg[1]
         try:
             payload = json.loads(convert.b64str2str(msg[2]))
-
             llmname = payload.get('llmname')
-            configure_path = data_dir / ".agent" / f"llm-{llmname}.json"
-            if not configure_path.exists():
-                msg = dict(warn=f"Specified LLM configuration '{llmname}' not found on server at '{str(configure_path)}'.")
-                redis_cli.rpush(reskey, msg)
-                return self.RESP_WARN
-            with configure_path.open('r', encoding='utf-8') as f:
-                configure = json.load(f)
 
-            msg_role = payload.get('msg_role', 'user')
-            msg_name = payload.get('msg_name', None)
-            msg_text = payload.get('msg_text', None)
-            msg_text_system = payload.get('msg_text_system', None)
-            msg_text_param = payload.get('msg_text_param', None)
-            msg_image_url = payload.get('msg_image_url', None)
-            msg_audio = payload.get('msg_audio', None)
-            msg_audio_format = payload.get('msg_audio_format', None)
-            msg_video_url = payload.get('msg_video_url', None)
-            msg_file_url = payload.get('msg_file_url', None)
-            msg_doc = payload.get('msg_doc', None)
-            msg_doc_mime = payload.get('msg_doc_mime', None)
-
-            if msg_text_system:
-                if msg_text_param:
-                    for k, v in msg_text_param.items():
-                        placeholder = f"{{{k}}}"
-                        if placeholder in msg_text_system:
-                            msg_text_system = msg_text_system.replace(placeholder, str(v))
-                if msg_text:
-                    placeholder = "{{msg_text}}"
-                    if placeholder in msg_text_system:
-                        msg_text_system = msg_text_system.replace(placeholder, str(msg_text))
-                    else:
-                        msg_text_system += f"\n\n{msg_text}"
-                msg_text = msg_text_system
-
-            message = dict(role=msg_role, content=[])
-            if msg_text:
-                message['content'].append(dict(type="text", text=msg_text))
-            if msg_image_url:
-                message['content'].append(dict(type="image_url", image_url=dict(url=msg_image_url)))
-            if msg_audio:
-                message['content'].append(dict(type="input_audio", input_audio=dict(data=msg_audio, format=msg_audio_format)))
-            if msg_video_url:
-                message['content'].append(dict(type="video_url", video_url=dict(url=msg_video_url)))
-            if msg_file_url:
-                message['content'].append(dict(type="file", file=dict(file_id=msg_file_url)))
-            if msg_doc:
-                message['content'].append(dict(type="document", source=dict(type="text", data=msg_doc, media_type=msg_doc_mime)))
-
-            import litellm
-            llmprov = configure.get('llmprov', None)
-            if llmprov == 'openai':
-                llmmodel = configure.get('llmmodel', None)
-                llmapikey = configure.get('llmapikey', None)
-                llmendpoint = configure.get('llmendpoint', None)
-                if llmmodel is None: raise ValueError("llmmodel is required.")
-                if llmapikey is None: raise ValueError("llmapikey is required.")
-                response = litellm.completion(
-                    model=llmmodel,
-                    api_key=llmapikey,
-                    endpoint=llmendpoint,
-                    messages=[message],)
-                res = []
-                for choice in response.get("choices", []):
-                    message = choice.get("message", {})
-                    res.append(dict(role=message.get("role"), content=message.get("content")))
-            elif llmprov == 'azureopenai':
-                llmmodel = configure.get('llmmodel', None)
-                llmapikey = configure.get('llmapikey', None)
-                llmendpoint = configure.get('llmendpoint', None)
-                llmapiversion = configure.get('llmapiversion', None)
-                if llmmodel is None: raise ValueError("llmmodel is required.")
-                if llmendpoint is None: raise ValueError("llmendpoint is required.")
-                if "/openai/deployments" in llmendpoint:
-                    llmendpoint = llmendpoint.split("/openai/deployments")[0]
-                if llmapikey is None: raise ValueError("llmapikey is required.")
-                if llmapiversion is None: raise ValueError("llmapiversion is required.")
-                if not llmmodel.startswith("azure/"):
-                    llmmodel = f"azure/{llmmodel}"
-                response = litellm.completion(
-                    model=llmmodel,
-                    api_key=llmapikey,
-                    api_base=llmendpoint,
-                    api_version=llmapiversion,
-                    base_url=llmendpoint,
-                    messages=[message],)
-                res = []
-                for choice in response.get("choices", []):
-                    message = choice.get("message", {})
-                    res.append(dict(role=message.get("role"), content=message.get("content")))
-            elif llmprov == 'vertexai':
-                llmprojectid = configure.get('llmprojectid', None)
-                llmsvaccountfile = configure.get('llmsvaccountfile', None)
-                llmmodel = configure.get('llmmodel', None)
-                llmlocation = configure.get('llmlocation', None)
-                llmsvaccountfile_data = configure.get('llmsvaccountfile_data', {})
-                llmtemperature = configure.get('llmtemperature', None)
-                llmseed = configure.get('llmseed', None)
-                if llmmodel is None: raise ValueError("llmmodel is required.")
-                if llmlocation is None: raise ValueError("llmlocation is required.")
-                if llmsvaccountfile_data is None: raise ValueError("llmsvaccountfile_data is required.")
-                from google.adk.planners import BuiltInPlanner
-                from google.genai import types
-                response = litellm.completion(
-                    model=llmmodel,
-                    vertex_credentials=llmsvaccountfile_data,
-                    vertex_location=llmlocation,
-                    seed=llmseed,
-                    temperature=llmtemperature,
-                    messages=[message],)
-                res = []
-                for choice in response.get("choices", []):
-                    message = choice.get("message", {})
-                    res.append(dict(role=message.get("role"), content=message.get("content")))
-            else:
-                raise ValueError(f"Unsupported LLM provider: {llmprov}")
-
-            msg = dict(success=res)
+            st, msg = self.chat(data_dir, logger, llmname,
+                            msg_role=payload.get('msg_role', 'user'),
+                            msg_name=payload.get('msg_name', None),
+                            msg_text=payload.get('msg_text', None),
+                            msg_text_system=payload.get('msg_text_system', None),
+                            msg_text_param=payload.get('msg_text_param', None),
+                            msg_image_url=payload.get('msg_image_url', None),
+                            msg_audio=payload.get('msg_audio', None),
+                            msg_audio_format=payload.get('msg_audio_format', None),
+                            msg_video_url=payload.get('msg_video_url', None),
+                            msg_file_url=payload.get('msg_file_url', None),
+                            msg_doc=payload.get('msg_doc', None),
+                            msg_doc_mime=payload.get('msg_doc_mime', None),
+                            )
             redis_cli.rpush(reskey, msg)
-            return self.RESP_SUCCESS
+            return st
 
         except Exception as e:
             msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
+
+    def chat(self, data_dir:Path, logger:logging.Logger, llmname:str, *,
+             msg_role:str=None, msg_name:str=None, msg_text:str=None, msg_text_system:str=None, msg_text_param:Dict[str, Any]=None,
+             msg_image_url:str=None, msg_audio:str=None, msg_audio_format:str=None, msg_video_url:str=None, msg_file_url:str=None,
+             msg_doc:str=None, msg_doc_mime:str=None) -> Tuple[int, List[Dict[str, Any]]]:
+        """
+        LLMにチャットメッセージを送信します。
+
+        Args:
+            data_dir (Path): データディレクトリのパス
+            logger (logging.Logger): ロガー
+            llmname (str): LLM設定の名前
+            msg_role (str, optional): メッセージ送信者の役割。
+            msg_name (str, optional): メッセージ送信者の名前。
+            msg_text (str, optional): 送信するテキストの内容。
+            msg_text_system (str, optional): 送信するシステムプロンプト。 `{{AAA}}` と表記すると `AAA` のパラメータを設定できます。なお `{{msg_text}}` と指定すると `msg_text` オプションの値が設定されます。
+            msg_text_param (Dict[str, Any], optional): 送信するテキストのパラメータ。
+            msg_image_url (str, optional): 送信する画像のURL。
+            msg_audio (str, optional): 送信する音声の内容。Base64エンコードされた文字列で指定します。
+            msg_audio_format (str, optional): 送信する音声のフォーマット。 `wav`, `mp3`, `ogg`, `flac` のいずれかを指定します。
+            msg_video_url (str, optional): 送信する動画のURL。
+            msg_file_url (str, optional): 送信するファイルのURL。
+            msg_doc (str, optional): 送信するドキュメントの内容。Base64エンコードされた文字列で指定します。
+            msg_doc_mime (str, optional): 送信するドキュメントのMIMEタイプ。
+        Returns:
+            Tuple[int, List[Dict[str, Any]]]: (ステータスコード, LLMからの応答メッセージのリスト)
+        """
+
+        configure_path = data_dir / ".agent" / f"llm-{llmname}.json"
+        if not configure_path.exists():
+            msg = dict(warn=f"Specified LLM configuration '{llmname}' not found on server at '{str(configure_path)}'.")
+            return self.RESP_WARN, msg
+        with configure_path.open('r', encoding='utf-8') as f:
+            configure = json.load(f)
+
+        if msg_text_system:
+            if msg_text_param:
+                for k, v in msg_text_param.items():
+                    placeholder = f"{{{k}}}"
+                    if placeholder in msg_text_system:
+                        msg_text_system = msg_text_system.replace(placeholder, str(v))
+            if msg_text:
+                placeholder = "{{msg_text}}"
+                if placeholder in msg_text_system:
+                    msg_text_system = msg_text_system.replace(placeholder, str(msg_text))
+                else:
+                    msg_text_system += f"\n\n{msg_text}"
+            msg_text = msg_text_system
+
+        message = dict(role=msg_role, content=[])
+        if msg_text:
+            message['content'].append(dict(type="text", text=msg_text))
+        if msg_image_url:
+            message['content'].append(dict(type="image_url", image_url=dict(url=msg_image_url)))
+        if msg_audio:
+            message['content'].append(dict(type="input_audio", input_audio=dict(data=msg_audio, format=msg_audio_format)))
+        if msg_video_url:
+            message['content'].append(dict(type="video_url", video_url=dict(url=msg_video_url)))
+        if msg_file_url:
+            message['content'].append(dict(type="file", file=dict(file_id=msg_file_url)))
+        if msg_doc:
+            message['content'].append(dict(type="document", source=dict(type="text", data=msg_doc, media_type=msg_doc_mime)))
+
+        import litellm
+        llmprov = configure.get('llmprov', None)
+        if llmprov == 'openai':
+            llmmodel = configure.get('llmmodel', None)
+            llmapikey = configure.get('llmapikey', None)
+            llmendpoint = configure.get('llmendpoint', None)
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmapikey is None: raise ValueError("llmapikey is required.")
+            response = litellm.completion(
+                model=llmmodel,
+                api_key=llmapikey,
+                endpoint=llmendpoint,
+                messages=[message],)
+            res = []
+            for choice in response.get("choices", []):
+                message = choice.get("message", {})
+                res.append(dict(role=message.get("role"), content=message.get("content")))
+        elif llmprov == 'azureopenai':
+            llmmodel = configure.get('llmmodel', None)
+            llmapikey = configure.get('llmapikey', None)
+            llmendpoint = configure.get('llmendpoint', None)
+            llmapiversion = configure.get('llmapiversion', None)
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmendpoint is None: raise ValueError("llmendpoint is required.")
+            if "/openai/deployments" in llmendpoint:
+                llmendpoint = llmendpoint.split("/openai/deployments")[0]
+            if llmapikey is None: raise ValueError("llmapikey is required.")
+            if llmapiversion is None: raise ValueError("llmapiversion is required.")
+            if not llmmodel.startswith("azure/"):
+                llmmodel = f"azure/{llmmodel}"
+            response = litellm.completion(
+                model=llmmodel,
+                api_key=llmapikey,
+                api_base=llmendpoint,
+                api_version=llmapiversion,
+                base_url=llmendpoint,
+                messages=[message],)
+            res = []
+            for choice in response.get("choices", []):
+                message = choice.get("message", {})
+                res.append(dict(role=message.get("role"), content=message.get("content")))
+        elif llmprov == 'vertexai':
+            llmprojectid = configure.get('llmprojectid', None)
+            llmsvaccountfile = configure.get('llmsvaccountfile', None)
+            llmmodel = configure.get('llmmodel', None)
+            llmlocation = configure.get('llmlocation', None)
+            llmsvaccountfile_data = configure.get('llmsvaccountfile_data', {})
+            llmtemperature = configure.get('llmtemperature', None)
+            llmseed = configure.get('llmseed', None)
+            if llmmodel is None: raise ValueError("llmmodel is required.")
+            if llmlocation is None: raise ValueError("llmlocation is required.")
+            if llmsvaccountfile_data is None: raise ValueError("llmsvaccountfile_data is required.")
+            from google.adk.planners import BuiltInPlanner
+            from google.genai import types
+            response = litellm.completion(
+                model=llmmodel,
+                vertex_credentials=llmsvaccountfile_data,
+                vertex_location=llmlocation,
+                seed=llmseed,
+                temperature=llmtemperature,
+                messages=[message],)
+            res = []
+            for choice in response.get("choices", []):
+                message = choice.get("message", {})
+                res.append(dict(role=message.get("role"), content=message.get("content")))
+        else:
+            raise ValueError(f"Unsupported LLM provider: {llmprov}")
+        return self.RESP_SUCCESS, res
+

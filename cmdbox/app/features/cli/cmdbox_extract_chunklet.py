@@ -6,7 +6,7 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
-import re
+import platform
 
 
 class ExtractChunklet(feature.OneshotResultEdgeFeature):
@@ -67,9 +67,13 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature):
                      choice_edit=True,
                      description_ja="チャンキングするテキストの言語を指定します。`auto` を指定した場合は自動で言語を判定します。",
                      description_en="Specify the language of the text to be chunked. If `auto` is specified, the language will be automatically detected."),
-                #dict(opt="chunk_max_tokens", type=Options.T_INT, default=1024, required=False, multi=False, hide=False, choice=None,
-                #     description_ja="チャンキングするテキストの最大トークン数を指定します。",
-                #     description_en="Specify the maximum number of tokens for chunking text."),
+                dict(opt="chunk_max_token_counter", type=Options.T_STR, default="gpt-4o", required=False, multi=False, hide=False, choice=None,
+                     choice_fn=self.choice_chunk_max_token_counter, choice_edit=True,
+                     description_ja="チャンキングするテキストの最大トークン数を指定します。",
+                     description_en="Specify the maximum number of tokens for chunking text."),
+                dict(opt="chunk_max_tokens", type=Options.T_INT, default=1024, required=False, multi=False, hide=False, choice=None,
+                     description_ja="チャンキングするテキストの最大トークン数を指定します。",
+                     description_en="Specify the maximum number of tokens for chunking text."),
                 dict(opt="chunk_max_sentences", type=Options.T_INT, default=4, required=False, multi=False, hide=False, choice=None,
                      description_ja="チャンキングするテキストの最大文数(文字数ではない)を指定します。",
                      description_en="Specify the maximum number of sentences (not characters) for chunking text."),
@@ -95,6 +99,21 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature):
                      description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
                      description_en="Available only in GUI mode. Outputs standard output during command execution to Console log."),
             ])
+
+    def choice_chunk_max_token_counter(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
+        """
+        オプションのchoiceを動的に生成する関数
+
+        Args:
+            o (Dict[str, Any]): choice_fn関数が呼ばれたコマンドオプションのchoice定義
+            webmode (bool): Webモードかどうか
+            opt (Dict[str, Any]): このコマンドのすべてのコマンドオプションのchoice定義
+
+        Returns:
+            Any: choice情報
+        """
+        from tiktoken import model
+        return [""] + sorted([k for k in model.MODEL_TO_ENCODING.keys()])
 
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
@@ -227,20 +246,36 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature):
         try:
             if abspath is not None and not abspath.is_file():
                 raise IOError(f"File not found. {abspath}")
-            def word_counter(text: str) -> int:
-                return len(text.split())
+            import tiktoken
             from chunklet.document_chunker import DocumentChunker
+            counter = None
+            if args.chunk_max_token_counter:
+                model = tiktoken.encoding_for_model(args.chunk_max_token_counter)
+                counter = lambda text: len(model.encode(text))
+            elif args.chunk_max_tokens:
+                raise ValueError("chunk_max_token_counter is required when chunk_max_tokens is specified.")
             chunker = DocumentChunker()
-            chunks = chunker.batch_chunk(
-                paths=[str(abspath)],
-                lang=args.chunk_lang,
-                #token_counter=word_counter,
-                #max_tokens=args.chunk_max_tokens,
-                max_sentences=args.chunk_max_sentences,
-                overlap_percent=args.chunk_overlap_percent,
-                show_progress=True,
-                offset=0
-            )
+            if platform.system() == "Windows":
+                logger.warning(f"In a Windows environment, only text file formats are supported.", exc_info=True)
+                chunks = chunker.chunk_file(
+                    path=abspath,
+                    lang=args.chunk_lang,
+                    token_counter=counter,
+                    max_tokens=args.chunk_max_tokens,
+                    max_sentences=args.chunk_max_sentences,
+                    overlap_percent=args.chunk_overlap_percent,
+                    offset=0
+                )
+            else:
+                chunks = chunker.chunk_files(
+                    paths=[abspath],
+                    lang=args.chunk_lang,
+                    token_counter=counter,
+                    max_tokens=args.chunk_max_tokens,
+                    max_sentences=args.chunk_max_sentences,
+                    overlap_percent=args.chunk_overlap_percent,
+                    offset=0
+                )
             res_data = []
             for i, chunk in enumerate(chunks):
                 data = dict(content=chunk.content, metadata=chunk.metadata)
