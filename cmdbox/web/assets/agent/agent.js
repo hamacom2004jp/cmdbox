@@ -1,23 +1,5 @@
 const agentView = {};
 agentView.initView = () => {
-    // --- サイドバー初期化 ---
-    fetch('assets/agent/agent_sidebar_content.html').then(res => res.text()).then(html => {
-        agentView.navSidebar = $('#navSidebar');
-        agentView.navSidebar.find('.nav-sidebar-content').remove();
-        agentView.navSidebar.append(html);
-        agentView.btnToggleSidebar = $('#btn_toggle_sidebar');
-        agentView.sidebarExpanded = false;
-
-        agentView.btnToggleSidebar.on('click', () => {
-            agentView.sidebarExpanded = !agentView.sidebarExpanded;
-            if (agentView.sidebarExpanded) {
-                agentView.navSidebar.addClass('expanded');
-            } else {
-                agentView.navSidebar.removeClass('expanded');
-            }
-        });
-    });
-
     // --- 各コンテナのエレメント取得 ---
     agentView.chatContainer = $('#chatContainer');
     agentView.user_msg = $('#user_msg');

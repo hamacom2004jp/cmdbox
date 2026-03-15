@@ -67,29 +67,13 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature):
                     description_en="Specifies how to chunk tables in the PDF file. `none` :do not chunk by table, `table` :by table, `row_with_header` :by row (with header)",
                     choice_show={"none":["chunk_separator", "chunk_exclude"],
                                 "table":["chunk_exclude"],
-                                "row_with_header":["chunk_table_header","chunk_exclude","chunk_in_metadata"]}),
+                                "row_with_header":["chunk_table_header","chunk_exclude"]}),
                 dict(opt="chunk_table_header", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
                     description_ja="PDFファイル内の表のヘッダー項目名を、左から順に指定し既存のヘッダー項目を置き換えます。",
                     description_en="Replaces existing header items by specifying the names of the table header items in the PDF file, from left to right. "),
-                dict(opt="chunk_exec", type=Options.T_TEXT, default=None, required=False, multi=True, hide=False, choice=None,
-                    description_ja="チャンクのコンテンツに対してexec文を指定します。" \
-                        "現在の行のコンテンツの変数名は `doc` (langchain_core.documents.Document型) 、" \
-                        "前の行のコンテンツの変数名は `prev` (langchain_core.documents.Document型) 、" \
-                        "コンテンツリストの変数名は `docs` 、" \
-                        "ツールの変数名は `tool` (witshape.app.tools.Tools)、" \
-                        "DBアクセス変数名は `db` (langchain_postgres.PGVector) です。",
-                    description_en="Specify an exec statement for the contents of the chunk. " \
-                        "The variable name for the contents of the current row is `doc` (langchain_core.documents.Document type), " \
-                        "The variable name for the contents of the previous line is `prev` (langchain_core.documents.Document type), " \
-                        "the variable name for the contents list is `docs`, " \
-                        "the variable name for the tools is `tool` (witshape.app.tools.Tools), " \
-                        "and the DB access variable name is `db` (langchain_postgres.PGVector)."),
                 dict(opt="chunk_exclude", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
                     description_ja="チャンクに含めない文字列を正規表現で指定します。この指定にマッチした場合はembeddingされません。",
                     description_en="A regular expression specifying a string that should not be included in the chunk. If this specification is matched, embedding will not be performed."),
-                dict(opt="chunk_tag", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
-                    description_ja="チャンクのメタデータに登録するタグを指定します。",
-                    description_en="Specify tags to be registered in the chunk metadata."),
                 dict(opt="chunk_size", type=Options.T_INT, default=1000, required=False, multi=False, hide=False, choice=None,
                     description_ja="チャンクサイズを指定します。",
                     description_en="Specifies the chunk size."),
@@ -99,9 +83,6 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature):
                 dict(opt="chunk_separator", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
                     description_ja="チャンク化するための区切り文字を指定します。",
                     description_en="Specifies the delimiter character for chunking."),
-                dict(opt="chunk_in_metadata", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
-                    description_ja="チャンクのコンテンツに含めるメタデータを指定します。",
-                    description_en="Specifies metadata to be included in the contents of the chunk."),
                 dict(opt="chunk_spage", type=Options.T_INT, default=0, required=False, multi=False, hide=False, choice=None,
                     description_ja="エンベディング範囲の開始ページを指定します。",
                     description_en="Specifies the starting page of the embedding range."),

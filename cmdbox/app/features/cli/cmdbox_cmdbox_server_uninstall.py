@@ -1,14 +1,12 @@
-from cmdbox.app import common, feature
+from cmdbox.app import common
+from cmdbox.app.features.cli.cmdbox import cmdbox_base
 from cmdbox.app.options import Options
-from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
-import platform
-import yaml
 
 
-class CmdboxServerUninstall(feature.OneshotNotifyEdgeFeature):
+class CmdboxServerUninstall(cmdbox_base.CmdboxBase):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -34,34 +32,18 @@ class CmdboxServerUninstall(feature.OneshotNotifyEdgeFeature):
         Returns:
             Dict[str, Any]: オプション
         """
-        return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True, use_agent=False,
-            description_ja="cmdboxサーバーをアンインストールします。",
-            description_en="Uninstalls the cmdbox server.",
-            choice=[
-                dict(opt="install_tag", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                     description_ja="指定すると作成するdockerイメージのタグ名に追記出来ます。",
-                     description_en="If specified, you can add to the tag name of the docker image to create."),
-                dict(opt="compose_path", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="in",
-                     description_ja="`docker-compose.yml` ファイルを指定します。",
-                     description_en="Specify the `docker-compose.yml` file."),
-                dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
-                     description_ja="処理結果jsonの保存先ファイルを指定。",
-                     description_en="Specify the destination file for saving the processing result json."),
-                dict(opt="output_json_append", short="a", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
-                     description_ja="処理結果jsonファイルを追記保存します。",
-                     description_en="Save the processing result json file by appending."),
-                dict(opt="stdout_log", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
-                     description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
-                     description_en="Available only in GUI mode. Outputs standard output during command execution to Console log."),
-                dict(opt="capture_stdout", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
-                     description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
-                     description_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
-                dict(opt="capture_maxsize", type=Options.T_INT, default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choice=None,
-                     description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
-                     description_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
-            ]
-        )
+        opt = super().get_option()
+        opt['description_ja'] = "cmdboxサーバーをアンインストールします。"
+        opt['description_en'] = "Uninstalls the cmdbox server."
+        opt['choice'] = [
+            dict(opt="install_tag", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                description_ja="指定すると作成するdockerイメージのタグ名に追記出来ます。",
+                description_en="If specified, you can add to the tag name of the docker image to create."),
+            dict(opt="compose_path", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="in",
+                description_ja="`docker-compose.yml` ファイルを指定します。",
+                description_en="Specify the `docker-compose.yml` file."),
+        ]
+        return opt
 
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
@@ -76,60 +58,8 @@ class CmdboxServerUninstall(feature.OneshotNotifyEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        ret = self.server_uninstall(logger, args.install_tag, args.compose_path)
+        ret = self.uninstall(logger, args.compose_path, 'cmdbox', args.install_tag)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-
         if 'success' not in ret:
             return self.RESP_WARN, ret, None
         return self.RESP_SUCCESS, ret, None
-
-    def server_uninstall(self, logger:logging.Logger, install_tag:str="", compose_path:str=None):
-        """
-        cmdboxサーバーをアンインストールします。
-
-        Args:
-            logger (logging.Logger): ロガー
-            install_tag (str): インストールタグ
-            compose_path (str): docker-compose.ymlファイルパス
-
-        Returns:
-            dict: 処理結果
-        """
-        common.set_debug(logger, True)
-        try:
-            if platform.system() == 'Windows':
-                return {"warn": f"Uninstall server command is Unsupported in windows platform."}
-
-            container = self.ver.__appid__
-            newenv = common.newenv(container, self.ver)
-            if Path(f'{newenv["CWD"]}{container}/scripts/rmi.sh').exists():
-                returncode, _, cmd = common.cmd(f'bash {newenv["CWD"]}{container}/scripts/rmi.sh', logger=logger, newenv=newenv)
-                if returncode != 0:
-                    logger.error(f"Failed to uninstall {container}. command: {cmd}")
-                    return {"error": f"Failed to uninstall {container}. command: {cmd}"}
-            else:
-                install_tag = f"_{install_tag}" if install_tag is not None else ''
-                cmd = f"docker rmi hamacom/{self.ver.__appid__}:{self.ver.__version__}{install_tag}"
-                returncode, _, _cmd = common.cmd(cmd, logger=logger, slise=-1)
-                if returncode != 0:
-                    logger.warning(f"Failed to uninstall {container}. cmd:{_cmd}")
-                    return {"error": f"Failed to uninstall {container}. cmd:{_cmd}"}
-
-            if not compose_path:
-                compose_path = 'docker-compose.yml'
-            docker_compose_path = Path(compose_path)
-            if not docker_compose_path.exists():
-                logger.error(f"docker-compose.yml file not found: {docker_compose_path}")
-                return {"error": f"docker-compose.yml file not found: {compose_path}"}
-
-            with open(f'{docker_compose_path}', 'r+', encoding='utf-8') as fp:
-                comp = yaml.safe_load(fp)
-                services:dict = comp['services']
-                services.pop(f'{self.ver.__appid__}{install_tag}', None)
-                fp.seek(0)
-                yaml.dump(comp, fp)
-                fp.truncate()
-
-            return {"success": f"Success to uninstall {container}. cmd:{_cmd}"}
-        finally:
-            common.set_debug(logger, False)

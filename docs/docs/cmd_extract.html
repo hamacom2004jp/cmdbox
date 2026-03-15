@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( extract mode ) &mdash; cmdbox 2026/03/09 documentation</title>
+  <title>Command Reference ( extract mode ) &mdash; cmdbox 2026/03/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=9408ed2f"></script>
+      <script src="../_static/documentation_options.js?v=2f2514c3"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -404,17 +404,9 @@
 <td></td>
 <td><p>Replaces existing header items by specifying the names of table header items (multiple values allowed).</p></td>
 </tr>
-<tr class="row-odd"><td><p>--chunk_exec &lt;statement&gt;</p></td>
-<td></td>
-<td><p>Specify an exec statement for the contents of the chunk (multiple values allowed).</p></td>
-</tr>
-<tr class="row-even"><td><p>--chunk_exclude &lt;pattern&gt;</p></td>
+<tr class="row-odd"><td><p>--chunk_exclude &lt;pattern&gt;</p></td>
 <td></td>
 <td><p>A regular expression specifying a string that should not be included in the chunk (multiple values allowed).</p></td>
-</tr>
-<tr class="row-odd"><td><p>--chunk_tag &lt;tag&gt;</p></td>
-<td></td>
-<td><p>Specify tags to be registered in the chunk metadata (multiple values allowed).</p></td>
 </tr>
 <tr class="row-even"><td><p>--chunk_size &lt;size&gt;</p></td>
 <td></td>
@@ -428,27 +420,23 @@
 <td></td>
 <td><p>Specifies the delimiter character for chunking (multiple values allowed).</p></td>
 </tr>
-<tr class="row-odd"><td><p>--chunk_in_metadata &lt;metadata&gt;</p></td>
-<td></td>
-<td><p>Specifies metadata to be included in the contents of the chunk (multiple values allowed).</p></td>
-</tr>
-<tr class="row-even"><td><p>--chunk_spage &lt;page&gt;</p></td>
+<tr class="row-odd"><td><p>--chunk_spage &lt;page&gt;</p></td>
 <td></td>
 <td><p>Specifies the starting page of the embedding range. Default: 0.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--chunk_epage &lt;page&gt;</p></td>
+<tr class="row-even"><td><p>--chunk_epage &lt;page&gt;</p></td>
 <td></td>
 <td><p>Specifies the ending page of the embedding range. Default: 9999.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>

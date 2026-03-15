@@ -153,10 +153,11 @@ class AgentMemoryStatus(agant_base.AgentBase):
             if memory_fetch_summary and len(res) > 0:
                 # 取得したメモリーを要約する
                 all_text = "---\n".join([f"{r['text']}" for r in res])
-                agent = self.create_memory_agent(logger, data_dir, memory_conf, memory_llm_conf)
-                runner = self.create_memory_runner(agent)
-                sess = await self.create_memory_session(runner, user_name)
-                all_text = await self.summary(runner, user_name, sess, all_text)
+                all_text = self.chat(data_dir, logger, llm_conf.get("llmname"), msg_role="system", msg_text=all_text)
+                #agent = self.create_memory_agent(logger, data_dir, memory_conf, memory_llm_conf)
+                #runner = self.create_memory_runner(agent)
+                #sess = await self.create_memory_session(runner, user_name)
+                #all_text = await self.summary(runner, user_name, sess, all_text)
                 res = [dict(event_id=common.random_string(),
                             score=1,
                             role='system',

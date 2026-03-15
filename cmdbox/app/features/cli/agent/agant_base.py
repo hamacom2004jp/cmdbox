@@ -1,4 +1,5 @@
 from cmdbox.app import common, client, feature, options
+from cmdbox.app.features.cli import cmdbox_llm_chat
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import logging
@@ -10,6 +11,7 @@ import re
 class AgentBase(feature.ResultEdgeFeature):
     def __init__(self, appcls, ver, language:str=None):
         super().__init__(appcls, ver, language=language)
+        self.llm_chat = cmdbox_llm_chat.LLMChat(appcls, ver, language=language)
 
     def load_conf(self, runner_name:str, data_dir:Path, logger:logging.Logger):
         runner_conf_path = data_dir / ".agent" / f"runner-{runner_name}.json"
@@ -171,3 +173,40 @@ class AgentBase(feature.ResultEdgeFeature):
             return json.dumps(data, ensure_ascii=False, default=common.default_json_enc)
         except json.JSONDecodeError:
             return json_str
+
+    def chat(self, data_dir:Path, logger:logging.Logger, llmname:str, *,
+             msg_role:str=None, msg_name:str=None, msg_text:str=None, msg_text_system:str=None, msg_text_param:Dict[str, Any]=None,
+             msg_image_url:str=None, msg_audio:str=None, msg_audio_format:str=None, msg_video_url:str=None, msg_file_url:str=None,
+             msg_doc:str=None, msg_doc_mime:str=None) -> Tuple[int, List[Dict[str, Any]]]:
+        """
+        LLMにチャットメッセージを送信します。
+
+        Args:
+            data_dir (Path): データディレクトリのパス
+            logger (logging.Logger): ロガー
+            llmname (str): LLM設定の名前
+            msg_role (str, optional): メッセージ送信者の役割。
+            msg_name (str, optional): メッセージ送信者の名前。
+            msg_text (str, optional): 送信するテキストの内容。
+            msg_text_system (str, optional): 送信するシステムプロンプト。 `{{AAA}}` と表記すると `AAA` のパラメータを設定できます。なお `{{msg_text}}` と指定すると `msg_text` オプションの値が設定されます。
+            msg_text_param (Dict[str, Any], optional): 送信するテキストのパラメータ。
+            msg_image_url (str, optional): 送信する画像のURL。
+            msg_audio (str, optional): 送信する音声の内容。Base64エンコードされた文字列で指定します。
+            msg_audio_format (str, optional): 送信する音声のフォーマット。 `wav`, `mp3`, `ogg`, `flac` のいずれかを指定します。
+            msg_video_url (str, optional): 送信する動画のURL。
+            msg_file_url (str, optional): 送信するファイルのURL。
+            msg_doc (str, optional): 送信するドキュメントの内容。Base64エンコードされた文字列で指定します。
+            msg_doc_mime (str, optional): 送信するドキュメントのMIMEタイプ。
+        Returns:
+            Tuple[int, List[Dict[str, Any]]]: (ステータスコード, LLMからの応答メッセージのリスト)
+        """
+        ret = self.llm_chat.chat(
+            data_dir, logger, llmname,
+            msg_role=msg_role, msg_name=msg_name,
+            msg_text=msg_text, msg_text_system=msg_text_system, msg_text_param=msg_text_param,
+            msg_image_url=msg_image_url,
+            msg_audio=msg_audio, msg_audio_format=msg_audio_format,
+            msg_video_url=msg_video_url, msg_file_url=msg_file_url,
+            msg_doc=msg_doc, msg_doc_mime=msg_doc_mime
+        )
+        return ret

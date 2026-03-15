@@ -1,7 +1,7 @@
 from cmdbox import version
 from cmdbox.app import common, feature
+from cmdbox.app.features.cli.cmdbox import cmdbox_base
 from cmdbox.app.options import Options
-from importlib import resources
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -13,7 +13,7 @@ import shutil
 import yaml
 
 
-class CmdboxServerInstall(feature.OneshotEdgeFeature):
+class CmdboxServerInstall(cmdbox_base.CmdboxBase):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -190,16 +190,15 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
         try:
             if platform.system() == 'Windows':
                 return {"warn": f"Build server command is Unsupported in windows platform."}
+            container = "cmdbox"
             user = getpass.getuser()
             if re.match(r'^[0-9]', user):
                 user = f'_{user}' # ユーザー名が数字始まりの場合、先頭にアンダースコアを付与
-            install_tag = f"_{install_tag}" if install_tag is not None else ''
-            with open('Dockerfile', 'w', encoding='utf-8') as fp:
-                text = ''
-                try:
-                    text = resources.read_text(f'{self.ver.__appid__}.docker', 'Dockerfile')
-                except:
-                    text = resources.read_text(f'{version.__appid__}.docker', 'Dockerfile')
+            install_tag = f"_{install_tag}" if install_tag else ''
+            imgname = f"hamacom/{self.ver.__appid__}/{container}:{self.ver.__version__}{f'_{install_tag}' if install_tag else ''}"
+            dockerfile = Path(f'Dockerfile.{container}')
+            with open(dockerfile, 'w', encoding='utf-8') as fp:
+                text = self._load_dockerfile(container)
                 # cmdboxのインストール設定
                 if install_cmdbox_tgt is None:
                     install_cmdbox_tgt = f'cmdbox=={self.ver.__version__}'
@@ -214,12 +213,12 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                 else:
                     text = text.replace('#{COPY_CMDBOX}', '')
 
-                start_sh_tgt = f'/opt/{self.ver.__appid__}/scripts'
-                start_sh_hst = Path(self.ver.__appid__) / 'scripts'
+                start_sh_tgt = f'/opt/{self.ver.__appid__}/{container}/scripts'
+                start_sh_hst = Path(self.ver.__appid__) / container / 'scripts'
                 start_sh_hst.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copytree(Path(version.__file__).parent / 'docker' / 'scripts', start_sh_hst, dirs_exist_ok=True)
+                shutil.copytree(Path(version.__file__).parent / 'docker' / container / 'scripts', start_sh_hst, dirs_exist_ok=True)
                 try:
-                    shutil.copytree(Path(self.ver.__file__).parent / 'docker' / 'scripts', start_sh_hst, dirs_exist_ok=True)
+                    shutil.copytree(Path(self.ver.__file__).parent / 'docker' / container / 'scripts', start_sh_hst, dirs_exist_ok=True)
                 except:
                     pass
                 text = text.replace('#{COPY_CMDBOX_START}', f'RUN mkdir -p {start_sh_tgt}\nCOPY {start_sh_hst} {start_sh_tgt}')
@@ -276,19 +275,27 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                                     'RUN mkdir -p /home/${MKUSER}/.'+self.ver.__appid__ + \
                                     ' && chown -R ${MKUSER}:${MKUSER} /home/${MKUSER}/.'+self.ver.__appid__)
                 fp.write(text)
+
+            cmd = f"docker build ./ --rm -t {imgname} -f {dockerfile}"
+            returncode, _, _cmd = common.cmd(f"{cmd}", logger, slise=-1)
+            if returncode != 0:
+                logger.warning(f"Failed to install {self.ver.__appid__}-server. cmd:{_cmd}")
+                return {"error": f"Failed to install {self.ver.__appid__}-server. cmd:{_cmd}"}
+            dockerfile.unlink(missing_ok=True)
+
             if not compose_path:
                 compose_path = 'docker-compose.yml'
             docker_compose_path = Path(compose_path)
             if not docker_compose_path.exists():
                 with open(docker_compose_path, 'w', encoding='utf-8') as fp:
-                    text = resources.read_text(f'{self.ver.__appid__}.docker', 'docker-compose.yml')
-                    fp.write(text)
-            with open(docker_compose_path, 'r+', encoding='utf-8') as fp:
+                    fp.write(self._load_base_compose())
+            with open(docker_compose_path, 'r', encoding='utf-8') as fp:
                 comp = yaml.safe_load(fp)
+            with open(docker_compose_path, 'w', encoding='utf-8') as fp:
                 services = comp['services']
-                services[f'{self.ver.__appid__}{install_tag}'] = dict(
-                    image=f'hamacom/{self.ver.__appid__}:{self.ver.__version__}{install_tag}',
-                    container_name=f'{self.ver.__appid__}{install_tag}',
+                services[container] = dict(
+                    image=imgname,
+                    container_name=container,
                     environment=dict(
                         TZ='Asia/Tokyo',
                         CMDBOX_DEBUG=False,
@@ -332,25 +339,10 @@ class CmdboxServerInstall(feature.OneshotEdgeFeature):
                             capabilities=['gpu']
                         )]))
                     )
-                fp.seek(0)
                 yaml.dump(comp, fp)
-            cmd = f'docker build -t hamacom/{self.ver.__appid__}:{self.ver.__version__}{install_tag} -f Dockerfile .'
-            returncode, _, _cmd = common.cmd(f"{cmd}", logger, slise=-1)
             if returncode != 0:
-                logger.warning(f"Failed to install {self.ver.__appid__}-server. cmd:{_cmd}")
-                return {"error": f"Failed to install {self.ver.__appid__}-server. cmd:{_cmd}"}
-            #os.remove('Dockerfile')
-            return {"success": f"Success to install {self.ver.__appid__}-server. and docker-compose.yml is copied. cmd:{_cmd}"}
+                logger.warning(f"Failed to install {self.ver.__appid__} server. cmd:{_cmd}")
+                return {"error": f"Failed to install {self.ver.__appid__} server. cmd:{_cmd}"}
+            return {"success": f"Success to install {self.ver.__appid__} server. cmd:{_cmd}"}
         finally:
             common.set_debug(logger, False)
-
-    def audited_by(self, logger:logging.Logger, args:argparse.Namespace) -> bool:
-        """
-        この機能が監査ログを記録する対象かどうかを返します
-
-        Returns:
-            logger (logging.Logger): ロガー
-            args (argparse.Namespace): 引数
-            bool: 監査ログを記録する場合はTrue
-        """
-        return False
