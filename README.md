@@ -11,15 +11,42 @@
 # Install
 
 - Install cmdbox with the following command.
-- Also install the docker version of the redis server.
 
 ```bash
-docker run -p 6379:6379 --name redis -e REDIS_PASSWORD=password -it ubuntu/redis:latest
 pip install cmdbox
 cmdbox -v
 ```
 
+## How to Set Up the Docker Version
+
+- cmdbox requires a Redis server.
+- You can install the Docker version using the following command.
+
+```bash
+cmdbox -m cmdbox -c redis_install
+cmdbox -m cmdbox -c up -C redis
+```
+
+- PostgreSQL is also supported by some cmdbox commands.
+- You can install the Docker version using the following command.
+
+```bash
+cmdbox -m cmdbox -c pgsql_install
+cmdbox -m cmdbox -c up -C pgsql
+```
+
+- You can also build the entire cmdbox suite.
+- Use the following command to build the Docker version.
+
+```bash
+cmdbox -m cmdbox -c server_install
+cmdbox -m cmdbox -c up -C cmdbox
+```
+
+## How to Install Expansion Modules
+
 - When using SAML in web mode, install the modules with dependencies.
+
 ```bash
 pip install cmdbox[saml]
 apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl build-essential
@@ -64,6 +91,12 @@ cmdbox -m web -c start --signin_file .cmdbox/user_list.yml &
 
 ```bash
 cmdbox -m mcpsv -c start --signin_file .cmdbox/user_list.yml &
+```
+
+- Run the cmdbox a2asv.
+
+```bash
+cmdbox -m a2a -c start --signin_file .cmdbox/user_list.yml &
 ```
 
 
