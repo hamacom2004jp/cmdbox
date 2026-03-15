@@ -1,7 +1,7 @@
 from contextlib import aclosing
 from cmdbox.app import common, client, feature, options
 from cmdbox.app.commons import convert, redis_client
-from cmdbox.app.features.cli import cmdbox_embed_start
+from cmdbox.app.features.cli import cmdbox_embed_start, cmdbox_llm_chat
 from cmdbox.app.features.cli.agent import agant_base
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -13,6 +13,10 @@ import re
 
 
 class AgentMemoryStatus(agant_base.AgentBase):
+
+    def __init__(self, appcls, ver, language:str=None):
+        super().__init__(appcls, ver, language=language)
+        self.llm_chat = cmdbox_llm_chat.LLMChat(appcls, ver, language=language)
 
     def get_mode(self) -> str:
         return 'agent'
@@ -127,7 +131,7 @@ class AgentMemoryStatus(agant_base.AgentBase):
             memory_fetch_offset = payload.get('memory_fetch_offset', 0)
             memory_fetch_count = payload.get('memory_fetch_count', 10)
             memory_fetch_summary = payload.get('memory_fetch_summary', False)
-            runner_conf, agent_conf, llm_conf, memory_conf, memory_llm_conf, memory_embed_conf, mcpsv_confs = self.load_conf(runner_name, data_dir, logger)
+            _, _, llm_conf, memory_conf, memory_llm_conf, memory_embed_conf, _ = self.load_conf(runner_name, data_dir, logger)
 
             # memory_queryが指定されていない場合は新しいもの順で取得する
             memory_conf["memory_fetch_offset"] = memory_fetch_offset
@@ -136,8 +140,7 @@ class AgentMemoryStatus(agant_base.AgentBase):
             from google.adk.memory import BaseMemoryService
             memory_service:BaseMemoryService = self.create_memory_service(
                 data_dir, logger, memory_conf, memory_llm_conf, memory_embed_conf, sessions)
-            memory_runner_name = f"{memory_conf.get('memory_name', 'memory_agent')}_runner"
-            responce = await memory_service.search_memory(app_name=memory_runner_name, user_id=user_name, query=memory_query)
+            responce = await memory_service.search_memory(app_name=runner_name, user_id=user_name, query=memory_query)
             responce.memories.sort(key=lambda m: m.custom_metadata.get('distance', 0), reverse=True)
             # Build status information
             res = responce.model_dump()
@@ -153,11 +156,10 @@ class AgentMemoryStatus(agant_base.AgentBase):
             if memory_fetch_summary and len(res) > 0:
                 # 取得したメモリーを要約する
                 all_text = "---\n".join([f"{r['text']}" for r in res])
-                all_text = self.chat(data_dir, logger, llm_conf.get("llmname"), msg_role="system", msg_text=all_text)
-                #agent = self.create_memory_agent(logger, data_dir, memory_conf, memory_llm_conf)
-                #runner = self.create_memory_runner(agent)
-                #sess = await self.create_memory_session(runner, user_name)
-                #all_text = await self.summary(runner, user_name, sess, all_text)
+                st, all_text = self.chat(data_dir, logger, llm_conf.get("llmname"), msg_role="system", msg_text=all_text)
+                if st != self.RESP_SUCCESS:
+                    raise Exception(f"Failed to summarize memory contents: {all_text}")
+                all_text = "\n\n".join([r['content'] for r in all_text])
                 res = [dict(event_id=common.random_string(),
                             score=1,
                             role='system',
@@ -255,145 +257,20 @@ class AgentMemoryStatus(agant_base.AgentBase):
             logger.info(f"Using InMemoryMemoryService (unknown memory_type: {memory_type})")
             return InMemoryMemoryService()
 
-    def create_memory_agent(self, logger:logging.Logger, data_dir:Path,
-                            memory_conf:Dict[str, Any], llm_conf:Dict[str, Any]) -> Any:
-        if logger.level == logging.DEBUG:
-            logger.debug(f"google-adk loading..")
-        from google.adk.agents import Agent as AdkAgent
-        if logger.level == logging.DEBUG:
-            logger.debug(f"litellm loading..")
-        from google.adk.models import lite_llm
-        #from litellm import _logging
-        #_logging._turn_on_debug()
-        # App name mismatch警告を回避するためのラッパークラス
-        class Agent(AdkAgent):
-            pass
-        agent_name = memory_conf.get('memory_name', 'memory_agent')
-        description = memory_conf.get('memory_description', '')
-        instruction = memory_conf.get('memory_instruction', '')
-        llmprov = llm_conf.get('llmprov', None)
-        if llmprov == 'openai':
-            llmmodel = llm_conf.get('llmmodel', None)
-            llmapikey = llm_conf.get('llmapikey', None)
-            llmendpoint = llm_conf.get('llmendpoint', None)
-            if llmmodel is None: raise ValueError("llmmodel is required.")
-            if llmapikey is None: raise ValueError("llmapikey is required.")
-            agent = Agent(
-                name=agent_name,
-                model=lite_llm.LiteLlm(
-                    model=llmmodel,
-                    api_key=llmapikey,
-                    endpoint=llmendpoint,
-                ),
-                description=description,
-                instruction=instruction,
-            )
-        elif llmprov == 'azureopenai':
-            llmmodel = llm_conf.get('llmmodel', None)
-            llmapikey = llm_conf.get('llmapikey', None)
-            llmendpoint = llm_conf.get('llmendpoint', None)
-            llmapiversion = llm_conf.get('llmapiversion', None)
-            if llmmodel is None: raise ValueError("llmmodel is required.")
-            if llmendpoint is None: raise ValueError("llmendpoint is required.")
-            if "/openai/deployments" in llmendpoint:
-                llmendpoint = llmendpoint.split("/openai/deployments")[0]
-            if llmapikey is None: raise ValueError("llmapikey is required.")
-            if llmapiversion is None: raise ValueError("llmapiversion is required.")
-            if not llmmodel.startswith("azure/"):
-                llmmodel = f"azure/{llmmodel}"
-            agent = Agent(
-                name=agent_name,
-                model=lite_llm.LiteLlm(
-                    model=llmmodel,
-                    api_key=llmapikey,
-                    api_base=llmendpoint,
-                    api_version=llmapiversion,
-                    base_url=llmendpoint,
-                ),
-                description=description,
-                instruction=instruction,
-            )
-        elif llmprov == 'vertexai':
-            llmprojectid = llm_conf.get('llmprojectid', None)
-            llmsvaccountfile = llm_conf.get('llmsvaccountfile', None)
-            llmmodel = llm_conf.get('llmmodel', None)
-            llmlocation = llm_conf.get('llmlocation', None)
-            llmsvaccountfile_data = llm_conf.get('llmsvaccountfile_data', {})
-            llmtemperature = llm_conf.get('llmtemperature', None)
-            llmseed = llm_conf.get('llmseed', None)
-            if llmmodel is None: raise ValueError("llmmodel is required.")
-            if llmlocation is None: raise ValueError("llmlocation is required.")
-            if llmsvaccountfile_data is None: raise ValueError("llmsvaccountfile_data is required.")
-            agent = Agent(
-                name=agent_name,
-                model=lite_llm.LiteLlm(
-                    model=llmmodel,
-                    #vertex_project=llmprojectid,
-                    vertex_credentials=llmsvaccountfile_data,
-                    vertex_location=llmlocation,
-                    seed=llmseed,
-                    temperature=llmtemperature,
-                ),
-                description=description,
-                instruction=instruction,
-            )
-        elif llmprov == 'ollama':
-            llmmodel = llm_conf.get('llmmodel', None)
-            llmendpoint = llm_conf.get('llmendpoint', None)
-            llmtemperature = llm_conf.get('llmtemperature', None)
-            if llmmodel is None: raise ValueError("llmmodel is required.")
-            if llmendpoint is None: raise ValueError("llmendpoint is required.")
-            agent = Agent(
-                name=agent_name,
-                model=lite_llm.LiteLlm(
-                    model=f"ollama/{llmmodel}",
-                    api_base=llmendpoint,
-                    temperature=llmtemperature,
-                    stream=True
-                ),
-                description=description,
-                instruction=instruction,
-            )
-        else:
-            raise ValueError("llmprov is required.")
-        if logger.level == logging.DEBUG:
-            logger.debug(f"create_memory_agent complate.")
-        return agent
+    async def summary(self, data_dir:Path, logger:logging.Logger, llmname:str, short_mem_msg:str, msg_text_system:str):
+        st, res = self.llm_chat.chat(data_dir, logger, llmname,
+                                     msg_role="system", msg_text=short_mem_msg, msg_text_system=msg_text_system)
+        if st != self.RESP_SUCCESS:
+            raise Exception(f"Failed to summarize memory contents: {res}")
+        return res
 
-    def create_memory_runner(self, memory_agent: Any) -> Any:
-        from google.adk.runners import Runner
-        from google.adk.sessions import InMemorySessionService
-        memory_runner = Runner(
-            app_name=f"{memory_agent.name}_runner",
-            agent=memory_agent,
-            session_service=InMemorySessionService(),
-        )
-        return memory_runner
-    
-    async def create_memory_session(self, memory_runner:Any, user_name:str) -> Any:
-        memory_session = await self.create_agent_session(memory_runner.session_service, memory_runner.app_name,
-                                                    user_name, session_id=None)
-        return memory_session
-
-    async def summary(self, memory_runner, user_name, memory_session, short_mem_msg:str):
-        from google.genai import types
-        from google.adk.runners import Runner
-        runner:Runner = memory_runner
-        memory_content = types.Content(role='user', parts=[types.Part(text=short_mem_msg)])
-        async with aclosing(runner.run_async(user_id=user_name, session_id=memory_session.id, new_message=memory_content)) as mem_iter:
-            async for event in mem_iter:
-                msg, _, _ = self.gen_msg(event)
-                if event.is_final_response():
-                    return msg
-        return None
-
-    async def add_memory(self, memory_service, memory_session, sammary_msg):
+    async def add_memory(self, memory_service, session, sammary_msg):
         from google.adk.events import Event
         from google.genai import types
-        memory_session.events.append(Event(
+        session.events.append(Event(
             id=common.random_string(32),
             author='system',
             content=types.Content(role='system', parts=[types.Part(text=sammary_msg)]),
         ))
         # メモリーにセッションを保存する
-        await memory_service.add_session_to_memory(memory_session)
+        await memory_service.add_session_to_memory(session)

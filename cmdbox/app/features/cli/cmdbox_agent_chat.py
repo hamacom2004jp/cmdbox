@@ -497,14 +497,10 @@ class AgentChat(agant_base.AgentBase):
                     logger.warning(f"Failed to prepare TTS model: {e}", exc_info=True)
                     enable_tts = False
 
-            # メモリーエージェントを作成
-            memory_agent = self.memory.create_memory_agent(logger, data_dir, memory_conf, memory_llm_conf)
-            memory_runner = self.memory.create_memory_runner(memory_agent)
             short_mem_msg = f"The following is an instruction from {user_name}: {message}\n\n=====\n\n"
             # セッションを作成する
             agent_session = await self.create_agent_session(runner.session_service, runner.app_name,
                                                        user_name, session_id=session_id)
-            memory_session = await self.memory.create_memory_session(memory_runner, user_name)
             # チャットを実行する
             signin.set_request_scope(dict(mcpserver_apikey=mcpserver_apikey, a2asv_apikey=a2asv_apikey))
             run_config = RunConfig(streaming_mode=StreamingMode.NONE)
@@ -540,14 +536,18 @@ class AgentChat(agant_base.AgentBase):
                                     success['wav_b64'] = None
                             if msg is not None and msg.strip() != '':
                                 mem_msg = re.sub(r'```json.*?```', '', msg, flags=re.DOTALL) # json表現部分を除去
-                                short_mem_msg += f"The following is an instruction from {event.author}: {msg}\n\n=====\n\n" \
+                                short_mem_msg += f"The following is an instruction from {event.author}: {mem_msg}\n\n=====\n\n" \
                                     if mem_msg is not None and mem_msg.strip() != '' else ''
                             redis_cli.rpush(reskey, outputs)
                             if flags['final_response']:
                                 # 要約文生成
-                                sammary_msg = await self.memory.summary(memory_runner, user_name, memory_session, short_mem_msg)
+                                sammary_msg = await self.memory.summary(data_dir=data_dir, logger=logger,
+                                                                        llmname=memory_conf['llm'], short_mem_msg=short_mem_msg,
+                                                                        msg_text_system=memory_conf['memory_instruction'])
+                                sammary_msg = sammary_msg[-1] if sammary_msg and isinstance(sammary_msg, list) and len(sammary_msg) > 0 else None
                                 # メモリーにセッションを保存する
-                                await self.memory.add_memory(memory_service, memory_session, sammary_msg)
+                                if sammary_msg:
+                                    await self.memory.add_memory(memory_service, agent_session, sammary_msg.get('content', ''))
                                 break
 
                 except Exception as e:
