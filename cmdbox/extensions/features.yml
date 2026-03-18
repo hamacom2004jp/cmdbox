@@ -60,9 +60,9 @@ audit:
     retry_interval: 1                   # Specifies the number of seconds before reconnecting to the audit Redis server.
     timeout: 15                         # Specify the maximum waiting time until the server responds.
     pg_enabled: False                   # Specify True if using the postgresql database server.
-    pg_host: localhost                  # Specify the postgresql host.
+    pg_host: pgsql                      # Specify the postgresql host.
     pg_port: 5432                       # Specify the postgresql port.
-    pg_user: postgres                   # Specify the postgresql user name.
-    pg_password: password               # Specify the postgresql password.
+    pg_user: pgsql                      # Specify the postgresql user name.
+    pg_password: pgsql                  # Specify the postgresql password.
     pg_dbname: audit                    # Specify the postgresql database name.
     retention_period_days: 365          # Specify the number of days to retain audit logs.

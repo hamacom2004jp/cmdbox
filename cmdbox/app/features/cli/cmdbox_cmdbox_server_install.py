@@ -108,7 +108,7 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
                 dict(opt="stdout_log", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
                      description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
                      description_en="Available only in GUI mode. Outputs standard output during command execution to Console log."),
-                dict(opt="capture_stdout", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
+                dict(opt="capture_stdout", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
                      description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                      description_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
                 dict(opt="capture_maxsize", type=Options.T_INT, default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choice=None,
@@ -195,7 +195,7 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
             if re.match(r'^[0-9]', user):
                 user = f'_{user}' # ユーザー名が数字始まりの場合、先頭にアンダースコアを付与
             install_tag = f"_{install_tag}" if install_tag else ''
-            imgname = f"hamacom/{self.ver.__appid__}/{container}:{self.ver.__version__}{f'_{install_tag}' if install_tag else ''}"
+            imgname = f"hamacom/{self.ver.__appid__}/{container}:{self.ver.__version__}{install_tag}"
             dockerfile = Path(f'Dockerfile.{container}')
             with open(dockerfile, 'w', encoding='utf-8') as fp:
                 text = self._load_dockerfile(container)

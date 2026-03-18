@@ -57,7 +57,7 @@ class AuditCreatedb(feature.UnsupportEdgeFeature):
                 dict(opt="pg_dbname", type=Options.T_STR, default='postgresql', required=True, multi=False, hide=False, choice=None,
                      description_ja="postgresqlデータベース名を指定します。",
                      description_en="Specify the postgresql database name."),
-                dict(opt="new_pg_dbname", type=Options.T_STR, default='pgsql', required=True, multi=False, hide=False, choice=None,
+                dict(opt="new_pg_dbname", type=Options.T_STR, default='audit', required=True, multi=False, hide=False, choice=None,
                      description_ja="新しいpostgresqlデータベース名を指定します。",
                      description_en="Specify a new postgresql database name."),
 

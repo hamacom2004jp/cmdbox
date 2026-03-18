@@ -1,6 +1,7 @@
 agentView.scrollToBottom = () => {
     agentView.chatContainer.scrollTop(agentView.chatContainer.prop("scrollHeight"));
 };
+agentView.chat_listeners = [];
 agentView.chat = (session_id) => {
     const ping_interval = 5000; // pingの間隔
     const max_reconnect_count = 60000/ping_interval*1; // 最大再接続回数
@@ -135,6 +136,8 @@ agentView.chat = (session_id) => {
             // エージェント側の表示枠が無かったら追加
             agentView.message_id = cmdbox.random_string(16);
         }
+        // チャットリスナーにメッセージを渡す
+        agentView.chat_listeners && agentView.chat_listeners.forEach(listener => listener(packet));
         if (packet && packet['warn']) {
             const txt = agentView.create_agent_message(agentView.message_id);
             await agentView.format_agent_message(txt, `${packet['warn']}`);

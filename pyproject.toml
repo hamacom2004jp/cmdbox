@@ -101,7 +101,6 @@ saml = [
     "python3-saml",
     "xmlsec==1.3.13",
 ]
-all = ["cmdbox[agent_mcp,agent_adk,agent_mem,rag,omni,saml]"]
 dev = [
     "build",
     "collectlicense",

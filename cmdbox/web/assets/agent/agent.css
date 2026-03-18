@@ -11,7 +11,8 @@
     --text-primary: #e2e8f0;
     --font-header: 'Orbitron', sans-serif;
     --font-body: 'Rajdhani', sans-serif;
-    --console-panel-width: 450px;
+    --console-panel-width: 519px;
+    --nav-sidebar-width: 70px;
     --item-border-color: var(--bs-border-color);
     --item-border-danger-color: rgba(255, 0, 230, 0.3);
     --item-border-warning-color: rgba(255, 140, 0, 0.3);
@@ -67,7 +68,7 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
 
 /* --- Left Panel: Console --- */
 .console-panel {
-    width: var(--console-panel-width);
+    width: calc(var(--console-panel-width) - var(--nav-sidebar-width));
     min-width: 350px;
     display: flex;
     flex-direction: column;
@@ -79,8 +80,10 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     background: var(--bg-panel-dark);
     border-right: 2px solid var(--accent-cyan);
 }
-.split-pane-divider-left { left: var(--console-panel-width); }
-.split-pane-right-width { width: calc(100vw - var(--console-panel-width)); }
+.split-pane-divider-left {
+    left: calc(var(--console-panel-width) - var(--nav-sidebar-width));
+}
+.split-pane-right-width { flex: 1; }
 
 .console-header {
     padding: 20px;
@@ -657,8 +660,8 @@ a.list-group-item.active {
 
 /* --- Navigation Sidebar --- */
 .nav-sidebar {
-    width: 70px;
-    min-width: 70px;
+    width: var(--nav-sidebar-width);
+    min-width: var(--nav-sidebar-width);
     height: 100vh;
     display: flex;
     flex-direction: column;

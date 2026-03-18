@@ -44,7 +44,7 @@ class RagApacheAGE(rag_store.RagStore):
 
     def install(self) -> None:
         """
-        pgvector拡張機能をインストールします
+        apacheage拡張機能をインストールします
         """
         with psycopg.connect(
             host=self.dbhost,
@@ -62,14 +62,14 @@ class RagApacheAGE(rag_store.RagStore):
                 cur.execute(sql.SQL("GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA {} TO {}").format(I(self.dbuser), I(self.dbuser)))
                 cur.execute(sql.SQL("GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA {} TO {}").format(I(self.dbuser), I(self.dbuser)))
                 cur.execute(sql.SQL("GRANT ALL PRIVILEGES ON SCHEMA {} TO {}").format(I(self.dbuser), I(self.dbuser)))
-                cur.execute(sql.SQL("CREATE EXTENSION IF NOT EXISTS vector"))
-                cur.execute(sql.SQL("SELECT extversion FROM pg_extension WHERE extname = 'vector'"))
+                cur.execute(sql.SQL("CREATE EXTENSION IF NOT EXISTS age"))
+                cur.execute(sql.SQL("SELECT extversion FROM pg_extension WHERE extname = 'age'"))
                 for record in cur:
                     self.logger.info(f"extversion={record}")
 
     def create_tables(self, servicename:str, embed_vector_dim:int=256) -> None:
         """
-        テーブルを作成します
+        テーブル（グラフ）を作成します
 
         Args:
             servicename (str): サービス名
@@ -79,8 +79,11 @@ class RagApacheAGE(rag_store.RagStore):
 
         with self.connect() as conn:
             conn.autocommit = False
-            # 特徴量テーブルを作成
             with conn.cursor() as cur:
+                # グラフを作成
+                graph_name = f"{servicename}"
+                cur.execute(sql.SQL("SELECT create_graph({})").format(sql.Literal(graph_name)))
+                # 特徴量テーブルを作成
                 table_name = f"{self.dbuser}.{servicename}_embedding"
                 I = sql.Identifier
                 cur.execute(sql.SQL(
