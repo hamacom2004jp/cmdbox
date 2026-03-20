@@ -363,9 +363,35 @@ agentView.recursive_json_parse = (jobj) => {
 };
 
 agentView.say = {};
+agentView.say.source = null;
+agentView.say.audioContext = null;
 agentView.say.isStart = () => {
     const icon = agentView.btn_say.find('i');
     return agentView.btn_say.hasClass('say_on') && icon.hasClass('fa-volume-up');
+};
+agentView.say.isPlaying = () => {
+    return agentView.say.source !== null && agentView.say.audioContext !== null;
+};
+agentView.say.stop = () => {
+    if (agentView.say.source) {
+        try {
+            agentView.say.source.stop();
+        } catch (e) {
+            console.debug('Failed to stop audio source:', e);
+        }
+    }
+    if (agentView.say.audioContext) {
+        try {
+            agentView.say.audioContext.close();
+        } catch (e) {
+            console.debug('Failed to close audio context:', e);
+        }
+    }
+    agentView.say.source = null;
+    agentView.say.audioContext = null;
+    const aicore = $('.ai-core');
+    aicore.css('box-shadow', '');
+    aicore.css('animation', '');
 };
 agentView.say.say = (tts_text) => {
     if (!agentView.say.isStart()) return;
@@ -380,6 +406,10 @@ agentView.say.say = (tts_text) => {
 };
 agentView.say.play = async (wav_b64) => {
     if (!wav_b64 || wav_b64.length <= 0) return;
+    // 前の再生を停止
+    if (agentView.say.isPlaying()) {
+        agentView.say.stop();
+    }
     // 発話中のエフェクトを表示
     const aicore = $('.ai-core');
     aicore.css('box-shadow', '0 0 200px var(--area-bg-color-50)');
@@ -396,9 +426,17 @@ agentView.say.play = async (wav_b64) => {
     source.buffer = audioBuffer;
     source.connect(audioContext.destination);
     source.onended = () => {
-        audioContext.close();
+        agentView.say.source = null;
+        agentView.say.audioContext = null;
         aicore.css('box-shadow', '');
         aicore.css('animation', '');
+        try {
+            audioContext.close();
+        } catch (e) {
+            console.debug('Failed to close audio context:', e);
+        }
     }
+    agentView.say.source = source;
+    agentView.say.audioContext = audioContext;
     source.start(0);
 };

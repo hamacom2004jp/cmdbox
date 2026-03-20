@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cmdbox"
-dynamic = ["version"] 
+dynamic = ["version"]
 description = "cmdbox: It is a command line application with a plugin mechanism."
 readme = "README.md"
 authors = [
@@ -139,6 +139,9 @@ packages = [
     "cmdbox.app.features.web",
     "cmdbox.extensions"
 ]
+
+[tool.setuptools.dynamic]
+version = { attr = "cmdbox.version.__version__" }
 
 [tool.setuptools.package-data]
 # setup()のpackage_dataとexclude_package_dataに相当

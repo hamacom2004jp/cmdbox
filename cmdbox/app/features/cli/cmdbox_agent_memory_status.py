@@ -155,7 +155,8 @@ class AgentMemoryStatus(agant_base.AgentBase):
                         ) for content in res.get('memories', [])]
             if memory_fetch_summary and len(res) > 0:
                 # 取得したメモリーを要約する
-                all_text = "---\n".join([f"{r['text']}" for r in res])
+                all_text = memory_conf.get('memory_instruction', '') + "\n\n"
+                all_text+= "---\n".join([f"{r['text']}" for r in res])
                 st, all_text = self.chat(data_dir, logger, llm_conf.get("llmname"), msg_role="system", msg_text=all_text)
                 if st != self.RESP_SUCCESS:
                     raise Exception(f"Failed to summarize memory contents: {all_text}")

@@ -122,8 +122,11 @@ class AgentSessionList(cmdbox_agent_chat.AgentChat):
                     ss = await session_service.get_session(app_name=name, user_id=user_name, session_id=s.id)
                     row['events'] = []
                     for ev in ss.events:
-                        msg = cmdbox_agent_chat.AgentChat.gen_msg(ev)
-                        row['events'].append(dict(author=ev.author, text=msg))
+                        msg, is_func_call, is_func_response, is_final_response = cmdbox_agent_chat.AgentChat.gen_msg(ev)
+                        row['events'].append(dict(author=ev.author, text=msg,
+                                                  final_response=is_final_response,
+                                                  function_call=is_func_call,
+                                                  function_response=is_func_response))
                     data.append(row)
                 data.sort(key=lambda x: (x['last_update_time'],))
                 out = dict(success=data, end=True)
@@ -137,8 +140,11 @@ class AgentSessionList(cmdbox_agent_chat.AgentChat):
                     row = dict(runner_name=s.app_name, session_id=s.id, user_name=s.user_id, last_update_time=s.last_update_time)
                     row['events'] = []
                     for ev in s.events:
-                        msg = cmdbox_agent_chat.AgentChat.gen_msg(ev)
-                        row['events'].append(dict(author=ev.author, text=msg))
+                        msg, is_func_call, is_func_response, is_final_response = cmdbox_agent_chat.AgentChat.gen_msg(ev)
+                        row['events'].append(dict(author=ev.author, text=msg,
+                                                  final_response=is_final_response,
+                                                  function_call=is_func_call,
+                                                  function_response=is_func_response))
                     out = dict(success=[row], end=True)
                 redis_cli.rpush(reskey, out)
                 return self.RESP_SUCCESS

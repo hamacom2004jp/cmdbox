@@ -1,6 +1,11 @@
 $(() => {
-    fetch('assets/agent/agent_sidebar_content.html').then(res => res.text()).then(html => {
+    fetch('assets/agent/agent_sidebar_content.html').then(res => res.text()).then(async html => {
         try {
+            // ファイラー画面の読込み
+            const files_html = await fetch('assets/agent/agent_files_content.html').then(res => res.text());
+            $('.layout-grid').append(files_html);
+            fsapi.left = $('#left_container');
+            fsapi.right = $('#right_container');
             // SVGロゴ初期化
             init_svglogo();
             $('.split-pane').splitPane();
@@ -21,6 +26,8 @@ $(() => {
             });
             // agent初期化
             agentView.initView();
+            // アップロード機能の初期化
+            agentView.fileuploader.initUploadPanel();
             // バージョン情報モーダル初期化
             cmdbox.init_version_modal();
             // モーダルボタン初期化

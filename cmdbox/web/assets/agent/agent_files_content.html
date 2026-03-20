@@ -1,0 +1,171 @@
+<!-- ファイル転送モーダル -->
+<div id="fileTranceferModal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+        <div class="modal-content sf-modal doc-card">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan system-font">
+                    <i class="fa-solid fa-folder-open fa-lg me-2"></i>
+                    Files
+                </h5>
+                <button type="button" class="btn btn-sf-icon btn_window_stack">
+                    <i class="fa-regular fa-window-restore"></i>
+                </button>
+                <button type="button" class="btn btn-sf-icon btn_window">
+                    <i class="fa-regular fa-window-maximize"></i>
+                </button>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body file-transfer-body">
+                <!-- タブナビゲーション -->
+                <ul class="nav nav-tabs" id="fileTransferTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload-content" type="button" role="tab" aria-controls="upload-content" aria-selected="true">
+                            <i class="fa-solid fa-cloud-arrow-up fa-lg me-2"></i>Upload
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="transfer-tab" data-bs-toggle="tab" data-bs-target="#transfer-content" type="button" role="tab" aria-controls="transfer-content" aria-selected="false">
+                            <i class="fa-solid fa-exchange fa-lg me-2"></i>File Transfer
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- タブコンテンツ -->
+                <div class="tab-content" id="fileTransferTabContent">
+                    <!-- Upload タブ -->
+                    <div class="tab-pane fade show active" id="upload-content" role="tabpanel" aria-labelledby="upload-tab">
+                        <div class="upload-layout">
+                            <!-- ドラッグアンドドロップエリア -->
+                            <div id="upload_drop_area" class="border border-2 rounded p-5 d-flex flex-column align-items-center justify-content-center">
+                                <p id="upload_target" class="text-white-50 mb-3"></p>
+                                <div class="mb-3">
+                                    <i class="fa-solid fa-cloud-arrow-up fa-4x glow-text-cyan"></i>
+                                </div>
+                                <h5 class="system-font glow-text-cyan mb-2">DRAG AND DROP FILES</h5>
+                                <p class="text-white-50 mb-3">OR CLICK TO SELECT</p>
+                                <input id="upload_file_input" type="file" multiple class="d-none">
+                                <button type="button" id="upload_file_select_btn" class="btn btn-outline-secondary">
+                                    <i class="fa-solid fa-folder-open me-2"></i>SELECT FILES
+                                </button>
+                            </div>
+
+                            <!-- ファイルリスト -->
+                            <div class="d-flex flex-column">
+                                <h6 class="system-font glow-text-cyan mb-2">
+                                    <i class="fa-solid fa-list me-2"></i>FILES TO BE UPLOADED
+                                </h6>
+                                <div class="upload-file-list-container flex-grow-1">
+                                    <ul id="upload_file_list" class="list-group list-group-flush h-100">
+                                        <li class="list-group-item text-white-50 text-center py-3">
+                                            FILES NOT SELECTED
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ボタンエリア -->
+                        <div class="upload-button-area d-flex gap-2 pt-3">
+                            <button type="button" id="upload_clear_btn" class="btn btn-outline-danger">
+                                <i class="fa-solid fa-trash me-2"></i>CLEAR
+                            </button>
+                            <button type="button" id="upload_start_btn" class="btn btn-footer-action ms-auto">
+                                <i class="fa-solid fa-upload me-2"></i>START UPLOADING
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- File Transfer タブ -->
+                    <div class="tab-pane fade" id="transfer-content" role="tabpanel" aria-labelledby="transfer-tab">
+                        <div id="main_container" class="split-pane fixed-left">
+                            <!-- ローカル側ペイン -->
+                            <div id="left_container" class="split-pane-component filer-pane-left" style="width:49%;">
+                                <div class="split-pane fixed-top">
+                                    <div class="split-pane-component filer-pane-left-top" style="height:45%;">
+                                        <!-- ローカル側アドレスバー -->
+                                        <div class="input-group p-1" style="top:0%;">
+                                            <button class="btn btn-outline-secondary filer_local_bot" type="button">Local</button>'
+                                            <input type="text" class="form-control filer_address" readonly>
+                                        </div>
+                                        <!-- ローカル側ツリー -->
+                                        <ul class="tree-menu tree_ul overflow-auto border w-100" style="min-height:auto; height:calc(100% - 50px);"></ul>
+                                    </div>
+                                    <!-- 上下のスプリッター -->
+                                    <div class="split-pane-divider filer-pane-divider" style="top:45%;"></div>
+                                    <!-- ローカル側ファイルリスト -->
+                                    <div class="split-pane-component filer-pane-left-bottom file-list drop-area overflow-auto p-1" style="top:45%;">
+                                        <table class="table table-bordered table-hover table-sm">
+                                            <thead><tr>
+                                                <th class="th" scope="col">-</th>
+                                                <th class="th" scope="col">name</th>
+                                                <th class="th" scope="col">mime</th>
+                                                <th class="th" scope="col">size</th>
+                                                <th class="th" scope="col">last</th>
+                                            </tr></thead><tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 左右のスプリッター -->
+                            <div class="split-pane-divider filer-pane-divider" style="left:49%;"></div>
+                            <!-- サーバー側ペイン -->
+                            <div id="right_container" class="split-pane-component filer-pane-right" style="left:49%;">
+                                <div class="split-pane fixed-top">
+                                    <div class="split-pane-component filer-pane-right-top" style="height:45%;">
+                                        <!-- サーバー側アドレスバー -->
+                                        <div class="input-group p-1" style="top:0%;">
+                                            <button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Server</button>
+                                            <input name="filer_host" type="hidden" class="filer_host">
+                                            <input name="filer_port" type="hidden" class="filer_port">
+                                            <input name="filer_password" type="hidden" class="filer_password">
+                                            <input name="filer_svname" type="hidden" class="filer_svname">
+                                            <input name="filer_scope" type="hidden" class="filer_scope">
+                                            <input name="filer_client_data" type="hidden" class="filer_client_data">
+                                            <ul class="dropdown-menu filer_server"></ul>
+                                            <input type="text" class="form-control filer_address" aria-describedby="button-addon2">
+                                            <button class="btn btn-outline-secondary filer_address_bot" type="button" id="button-addon2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                                                    <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <!-- サーバー側ツリー -->
+                                        <ul class="tree-menu tree_ul overflow-auto border w-100" style="min-height:auto; height:calc(100% - 50px)!important;"></ul>
+                                    </div>
+                                    <!-- 上下のスプリッター -->
+                                    <div class="split-pane-divider filer-pane-divider" style="top:45%;"></div>
+                                    <!-- サーバー側ファイルリスト -->
+                                    <div class="split-pane-component filer-pane-right-bottom file-list drop-area overflow-auto p-1" style="top:45%;">
+                                        <table class="table table-bordered table-hover table-sm">
+                                            <thead><tr>
+                                                <th class="th" scope="col">-</th>
+                                                <th class="th" scope="col">name</th>
+                                                <th class="th" scope="col">mime</th>
+                                                <th class="th" scope="col">size</th>
+                                                <th class="th" scope="col">last</th>
+                                            </tr></thead><tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <a class="filer_download d-none" href="#">.</a>
+                        </div>
+                    </div>
+                    <!-- プログレスバー -->
+                    <div id="progress" class="progress p-0 d-none" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="align-items:center;width:0%">
+                            <div class="progress-bar-text text-center w-100" style="color:var(--bs-body-bg)"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-footer-action d-none" id="btn_regist_rag">Start registering files to RAG</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="assets/agent/agent_files.js"></script>

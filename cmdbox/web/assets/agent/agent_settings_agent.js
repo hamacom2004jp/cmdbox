@@ -1,6 +1,6 @@
 agentView.get_agent_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('agent', 'agent_save');
-    const vform_names = ['agent_name', 'agent_type',
+    const vform_names = ['agent_name', 'agent_type', 'use_planner',
                          'a2asv_baseurl', 'a2asv_delegated_auth', 'a2asv_apikey',
                          'llm', 'mcpservers', 'subagents',
                          'agent_description', 'agent_instruction'];

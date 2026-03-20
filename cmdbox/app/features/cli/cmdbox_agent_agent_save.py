@@ -68,6 +68,9 @@ class AgentAgentSave(feature.OneshotResultEdgeFeature):
                                      remote=["a2asv_baseurl", "a2asv_delegated_auth", "a2asv_apikey", "agent_description"]),
                     description_ja="Agentの種類を指定します。`local` または `remote` を指定します。",
                     description_en="Specify the agent type. Specify either `local` or `remote`."),
+                dict(opt="use_planner", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[False, True],
+                    description_ja="エージェントの計画機能を使用するかどうかを指定します。",
+                    description_en="Specify whether to use the planning feature of the agent."),
                 dict(opt="a2asv_baseurl", type=Options.T_STR, default="http://localhost:8071/a2a/<agent_name>", required=False, multi=False, hide=False, choice=None,
                     description_ja="A2A Serverの基本URLを指定します。",
                     description_en="Specify the base URL for the A2A Server."),
@@ -207,6 +210,7 @@ class AgentAgentSave(feature.OneshotResultEdgeFeature):
         configure = dict(
             agent_name=args.agent_name,
             agent_type=args.agent_type,
+            use_planner=args.use_planner if hasattr(args, 'use_planner') else False,
             a2asv_baseurl=args.a2asv_baseurl if hasattr(args, 'a2asv_baseurl') else None,
             a2asv_delegated_auth=args.a2asv_delegated_auth if hasattr(args, 'a2asv_delegated_auth') else False,
             a2asv_apikey=args.a2asv_apikey if hasattr(args, 'a2asv_apikey') else None,

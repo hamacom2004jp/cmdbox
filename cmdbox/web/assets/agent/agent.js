@@ -111,6 +111,10 @@ agentView.initView = () => {
         } else {
             icon.addClass('fa-volume-mute').removeClass('fa-volume-up');
             agentView.btn_say.css("opacity", "0.5");
+            // 再生中の場合は停止
+            if (agentView.say && agentView.say.isPlaying()) {
+                agentView.say.stop();
+            }
         }
     });
     // 設定モーダルの設定メニューの切り替え

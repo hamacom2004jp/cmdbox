@@ -4,14 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <!-- Font Awesome Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap">
     <!-- Agent CSS -->
-    <link href="assets/cmdbox/color_mode.css" rel="stylesheet">
-    <link href="assets/agent/agent.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/cmdbox/color_mode.css">
+    <link rel="stylesheet" href="assets/agent/agent.css">
+    <!-- Additional CSS libraries -->
+    <link rel="stylesheet" href="assets/lightbox2/css/lightbox.min.css">
+    <link rel="stylesheet" href="assets/tree-menu/css/tree-menu.css">
+    <link rel="stylesheet" href="assets/split-pane/split-pane.css">
+    <link rel="stylesheet" href="assets/highlight/styles/tokyo-night-dark.min.css">
+    <link rel="stylesheet" href="assets/jquery-linedtextarea/jquery-linedtextarea.css">
 </head>
 
 <body>
@@ -306,7 +312,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
                     <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_llm" style="display:none;">DELETE</button>
-                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_llm">SAVE</button>
+                    <button type="button" class="btn btn-footer-action" id="btn_save_llm">SAVE</button>
                 </div>
             </div>
         </div>
@@ -328,7 +334,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
                     <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_mcpsv" style="display:none;">DELETE</button>
-                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_mcpsv">SAVE</button>
+                    <button type="button" class="btn btn-footer-action" id="btn_save_mcpsv">SAVE</button>
                 </div>
             </div>
         </div>
@@ -350,7 +356,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
                     <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_agent" style="display:none;">DELETE</button>
-                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_agent">SAVE</button>
+                    <button type="button" class="btn btn-footer-action" id="btn_save_agent">SAVE</button>
                 </div>
             </div>
         </div>
@@ -372,7 +378,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
                     <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_embedding" style="display:none;">DELETE</button>
-                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_embedding">SAVE</button>
+                    <button type="button" class="btn btn-footer-action" id="btn_save_embedding">SAVE</button>
                 </div>
             </div>
         </div>
@@ -394,7 +400,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
                     <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_memory" style="display:none;">DELETE</button>
-                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_memory">SAVE</button>
+                    <button type="button" class="btn btn-footer-action" id="btn_save_memory">SAVE</button>
                 </div>
             </div>
         </div>
@@ -417,7 +423,7 @@
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
                     <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_rag" style="display:none;">DELETE</button>
                     <button type="button" class="btn btn-outline-danger me-auto" id="btn_build_rag" style="display:none;">BUILD</button>
-                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_rag">SAVE</button>
+                    <button type="button" class="btn btn-footer-action" id="btn_save_rag">SAVE</button>
                 </div>
             </div>
         </div>
@@ -439,7 +445,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
                     <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_extract" style="display:none;">DELETE</button>
-                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_extract">SAVE</button>
+                    <button type="button" class="btn btn-footer-action" id="btn_save_extract">SAVE</button>
                 </div>
             </div>
         </div>
@@ -483,7 +489,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
                     <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_runner" style="display:none;">DELETE</button>
-                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_save_runner">SAVE</button>
+                    <button type="button" class="btn btn-footer-action" id="btn_save_runner">SAVE</button>
                 </div>
             </div>
         </div>
@@ -598,113 +604,6 @@
         </div>
     </div>
 
-    <!-- ファイル転送モーダル -->
-    <div id="fileTranceferModal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
-        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
-            <div class="modal-content sf-modal doc-card">
-                <div class="modal-header doc-header">
-                    <h5 class="modal-title glow-text-cyan system-font">
-                        <i class="fa-solid fa-folder-open fa-lg me-2"></i>
-                        Files
-                    </h5>
-                    <button type="button" class="btn btn-sf-icon btn_window_stack">
-                        <i class="fa-regular fa-window-restore"></i>
-                    </button>
-                    <button type="button" class="btn btn-sf-icon btn_window">
-                        <i class="fa-regular fa-window-maximize"></i>
-                    </button>
-                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
-                        <i class="fas fa-times fa-lg"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div id="main_container" class="container-fluid overflow-auto split-pane fixed-left" style="height:calc(100% - 17px);">
-                        <!-- ローカル側ペイン -->
-                        <div id="left_container" class="split-pane-component filer-pane-left" style="width:49%;">
-                            <div class="split-pane fixed-top">
-                                <div class="split-pane-component filer-pane-left-top" style="height:45%;">
-                                    <!-- ローカル側アドレスバー -->
-                                    <div class="input-group p-1" style="top:0%;">
-                                        <button class="btn btn-outline-secondary filer_local_bot" type="button">Local</button>'
-                                        <input type="text" class="form-control filer_address" readonly>
-                                    </div>
-                                    <!-- ローカル側ツリー -->
-                                    <ul class="tree-menu tree_ul overflow-auto border w-100" style="min-height:auto; height:calc(100% - 50px);"></ul>
-                                </div>
-                                <!-- 上下のスプリッター -->
-                                <div class="split-pane-divider filer-pane-divider" style="top:45%;"></div>
-                                <!-- ローカル側ファイルリスト -->
-                                <div class="split-pane-component filer-pane-left-bottom file-list drop-area overflow-auto p-1" style="top:45%;">
-                                    <table class="table table-bordered table-hover table-sm">
-                                        <thead><tr>
-                                            <th class="th" scope="col">-</th>
-                                            <th class="th" scope="col">name</th>
-                                            <th class="th" scope="col">mime</th>
-                                            <th class="th" scope="col">size</th>
-                                            <th class="th" scope="col">last</th>
-                                        </tr></thead><tbody></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 左右のスプリッター -->
-                        <div class="split-pane-divider filer-pane-divider" style="left:49%;"></div>
-                        <!-- サーバー側ペイン -->
-                        <div id="right_container" class="split-pane-component filer-pane-right" style="left:49%;">
-                            <div class="split-pane fixed-top">
-                                <div class="split-pane-component filer-pane-right-top" style="height:45%;">
-                                    <!-- サーバー側アドレスバー -->
-                                    <div class="input-group p-1" style="top:0%;">
-                                        <button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Server</button>
-                                        <input name="filer_host" type="hidden" class="filer_host">
-                                        <input name="filer_port" type="hidden" class="filer_port">
-                                        <input name="filer_password" type="hidden" class="filer_password">
-                                        <input name="filer_svname" type="hidden" class="filer_svname">
-                                        <input name="filer_scope" type="hidden" class="filer_scope">
-                                        <input name="filer_client_data" type="hidden" class="filer_client_data">
-                                        <ul class="dropdown-menu filer_server"></ul>
-                                        <input type="text" class="form-control filer_address" aria-describedby="button-addon2">
-                                        <button class="btn btn-outline-secondary filer_address_bot" type="button" id="button-addon2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
-                                                <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <!-- サーバー側ツリー -->
-                                    <ul class="tree-menu tree_ul overflow-auto border w-100" style="min-height:auto; height:calc(100% - 50px)!important;"></ul>
-                                </div>
-                                <!-- 上下のスプリッター -->
-                                <div class="split-pane-divider filer-pane-divider" style="top:45%;"></div>
-                                <!-- サーバー側ファイルリスト -->
-                                <div class="split-pane-component filer-pane-right-bottom file-list drop-area overflow-auto p-1" style="top:45%;">
-                                    <table class="table table-bordered table-hover table-sm">
-                                        <thead><tr>
-                                            <th class="th" scope="col">-</th>
-                                            <th class="th" scope="col">name</th>
-                                            <th class="th" scope="col">mime</th>
-                                            <th class="th" scope="col">size</th>
-                                            <th class="th" scope="col">last</th>
-                                        </tr></thead><tbody></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        <a class="filer_download d-none" href="#">.</a>
-                    </div>
-                    <!-- プログレスバー -->
-                    <div id="progress" class="progress p-0 d-none" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="align-items:center;width:0%">
-                            <div class="progress-bar-text text-center w-100" style="color:var(--bs-body-bg)"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
-                    <button type="button" class="btn btn-footer-action btn-footer-action-ps0" id="btn_regist_rag">Start registering files to RAG</button>
-                </div>
-            </div>
-        </div>
-    </div>
     <!-- ビューアモーダル -->
     <div id="viewer_modal" class="modal fade" style="z-index:2000;" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
@@ -776,38 +675,33 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Agent Logic Script -->
-<link rel="stylesheet" href="assets/lightbox2/css/lightbox.min.css">
-<link rel="stylesheet" href="assets/tree-menu/css/tree-menu.css">
-<link rel="stylesheet" href="assets/split-pane/split-pane.css">
-<link rel="stylesheet" href="assets/highlight/styles/tokyo-night-dark.min.css">
-<link rel="stylesheet" href="assets/jquery-linedtextarea/jquery-linedtextarea.css">
-<script type="text/javascript" src="assets/encodingjs/encoding.js"></script>
-<script type="text/javascript" src="assets/jquery/jquery.min.3.2.0.js"></script>
-<script type="text/javascript" src="assets/jquery-ui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="assets/tree-menu/js/tree-menu.js"></script>
-<script type="text/javascript" src="assets/lightbox2/js/lightbox.min.js"></script>
-<script type="text/javascript" src="assets/split-pane/split-pane.js"></script>
-<script type="text/javascript" src="assets/highlight/highlight.min.js"></script>
-<script type="text/javascript" src="assets/jquery-linedtextarea/jquery-linedtextarea.js"></script>
-<script type="text/javascript" src="assets/cmdbox/svgicon.js"></script>
-<script type="text/javascript" src="assets/cmdbox/common.js"></script>
-<script type="text/javascript" src="assets/cmdbox/filer_modal.js"></script>
-<script type="text/javascript" src="assets/cmdbox/view_result.js"></script>
-<script type="text/javascript" src="assets/agent/agent.js"></script>
-<script type="text/javascript" src="assets/agent/agent_logo.js"></script>
-<script type="text/javascript" src="assets/agent/agent_chat.js"></script>
-<script type="text/javascript" src="assets/agent/agent_document.js"></script>
-<script type="text/javascript" src="assets/agent/agent_history.js"></script>
-<script type="text/javascript" src="assets/agent/agent_settings_agent.js"></script>
-<script type="text/javascript" src="assets/agent/agent_settings_embed.js"></script>
-<script type="text/javascript" src="assets/agent/agent_settings_extract.js"></script>
-<script type="text/javascript" src="assets/agent/agent_settings_llm.js"></script>
-<script type="text/javascript" src="assets/agent/agent_settings_mcpsv.js"></script>
-<script type="text/javascript" src="assets/agent/agent_settings_memory.js"></script>
-<script type="text/javascript" src="assets/agent/agent_settings_rag.js"></script>
-<script type="text/javascript" src="assets/agent/agent_settings_runner.js"></script>
-<script type="text/javascript" src="assets/agent/agent_settings_tts.js"></script>
-<script type="text/javascript" src="assets/filer/filer.js"></script>
-<script type="text/javascript" src="assets/agent/main.js"></script>
+<script type="text/javascript" defer src="assets/encodingjs/encoding.js"></script>
+<script type="text/javascript" defer src="assets/jquery/jquery.min.3.2.0.js"></script>
+<script type="text/javascript" defer src="assets/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" defer src="assets/tree-menu/js/tree-menu.js"></script>
+<script type="text/javascript" defer src="assets/lightbox2/js/lightbox.min.js"></script>
+<script type="text/javascript" defer src="assets/split-pane/split-pane.js"></script>
+<script type="text/javascript" defer src="assets/highlight/highlight.min.js"></script>
+<script type="text/javascript" defer src="assets/jquery-linedtextarea/jquery-linedtextarea.js"></script>
+<script type="text/javascript" defer src="assets/cmdbox/svgicon.js"></script>
+<script type="text/javascript" defer src="assets/cmdbox/common.js"></script>
+<script type="text/javascript" defer src="assets/cmdbox/filer_modal.js"></script>
+<script type="text/javascript" defer src="assets/cmdbox/view_result.js"></script>
+<script type="text/javascript" defer src="assets/agent/agent.js"></script>
+<script type="text/javascript" defer src="assets/agent/agent_logo.js"></script>
+<script type="text/javascript" defer src="assets/agent/agent_chat.js"></script>
+<script type="text/javascript" defer src="assets/agent/agent_document.js"></script>
+<script type="text/javascript" defer src="assets/agent/agent_history.js"></script>
+<script type="text/javascript" defer src="assets/agent/agent_settings_agent.js"></script>
+<script type="text/javascript" defer src="assets/agent/agent_settings_embed.js"></script>
+<script type="text/javascript" defer src="assets/agent/agent_settings_extract.js"></script>
+<script type="text/javascript" defer src="assets/agent/agent_settings_llm.js"></script>
+<script type="text/javascript" defer src="assets/agent/agent_settings_mcpsv.js"></script>
+<script type="text/javascript" defer src="assets/agent/agent_settings_memory.js"></script>
+<script type="text/javascript" defer src="assets/agent/agent_settings_rag.js"></script>
+<script type="text/javascript" defer src="assets/agent/agent_settings_runner.js"></script>
+<script type="text/javascript" defer src="assets/agent/agent_settings_tts.js"></script>
+<script type="text/javascript" defer src="assets/filer/filer.js"></script>
+<script type="text/javascript" defer src="assets/agent/main.js"></script>
 </body>
 </html>

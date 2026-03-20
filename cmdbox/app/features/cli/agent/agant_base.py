@@ -144,11 +144,12 @@ class AgentBase(feature.ResultEdgeFeature):
             return session
 
     @classmethod
-    def gen_msg(cls, event:Any) -> Tuple[str, bool, bool]:
+    def gen_msg(cls, event:Any) -> Tuple[str, bool, bool, bool]:
         json_pattern = re.compile(r'\{.*?\}')
         msg = None
         is_func_call = False
         is_func_response = False
+        is_final_response = False
         if event.content and event.content.parts:
             msg = "\n".join([p.text for p in event.content.parts if p and p.text])
             calls = event.get_function_calls()
@@ -159,11 +160,12 @@ class AgentBase(feature.ResultEdgeFeature):
             if responses:
                 is_func_response = True
                 msg += '\n```json{"function_responses":'+common.to_str([dict(fn=r.name, res=r.response) for r in responses])+'}```'
+            is_final_response = event.is_final_response()
         elif event.actions and event.actions.escalate:
             msg = f"Agent escalated: {event.error_message or 'No specific message.'}"
         if msg:
             msg = json_pattern.sub(cls._replace_match, msg)
-        return msg, is_func_call, is_func_response
+        return msg, is_func_call, is_func_response, is_final_response
     
     @classmethod
     def _replace_match(cls, match_obj):

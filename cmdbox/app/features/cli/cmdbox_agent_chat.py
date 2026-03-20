@@ -223,6 +223,7 @@ class AgentChat(agant_base.AgentBase):
         # 各種設定値の取得
         agent_name = agent_conf.get('agent_name', None)
         agent_type = agent_conf.get('agent_type', None)
+        use_planner = agent_conf.get('use_planner', False)
         a2asv_baseurl = agent_conf.get('a2asv_baseurl', "http://localhost:8071/a2a")
         a2asv_delegated_auth = agent_conf.get('a2asv_delegated_auth', False)
         a2asv_apikey = agent_conf.get('a2asv_apikey', None)
@@ -295,7 +296,7 @@ class AgentChat(agant_base.AgentBase):
                 ),
                 description=description,
                 instruction=instruction,
-                planner=PlanReActPlanner(),
+                planner=PlanReActPlanner() if use_planner else None,
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs),
                 sub_agents=subagents,
             )
@@ -324,7 +325,7 @@ class AgentChat(agant_base.AgentBase):
                 ),
                 description=description,
                 instruction=instruction,
-                planner=PlanReActPlanner(),
+                planner=PlanReActPlanner() if use_planner else None,
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs),
                 sub_agents=subagents,
             )
@@ -356,7 +357,7 @@ class AgentChat(agant_base.AgentBase):
                 planner=BuiltInPlanner(thinking_config=types.ThinkingConfig(
                     include_thoughts=True,
                     thinking_budget=1024,
-                )),
+                )) if use_planner else None,
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs),
                 sub_agents=subagents,
             )
@@ -377,7 +378,7 @@ class AgentChat(agant_base.AgentBase):
                 ),
                 description=description,
                 instruction=instruction,
-                planner=PlanReActPlanner(),
+                planner=PlanReActPlanner() if use_planner else None,
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs),
                 sub_agents=subagents,
             )
@@ -518,8 +519,8 @@ class AgentChat(agant_base.AgentBase):
                             flags['turn_complete'] = True
                         if event.interrupted:
                             flags['interrupted'] = True
-                        msg, is_func_call, is_func_response = self.gen_msg(event)
-                        flags['final_response'] = event.is_final_response()
+                        msg, is_func_call, is_func_response, is_final_response = self.gen_msg(event)
+                        flags['final_response'] = is_final_response
                         flags['function_call'] = is_func_call
                         flags['function_response'] = is_func_response
                         if msg:
