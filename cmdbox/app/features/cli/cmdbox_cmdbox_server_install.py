@@ -251,8 +251,18 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
                 if tts_engine is not None and tts_engine.lower() == 'voicevox':
                     install_voicevox = f'RUN pip install https://github.com/VOICEVOX/voicevox_core/releases/download/{voicevox_ver}/{voicevox_whl}'
                 if install_extra is not None and type(install_extra) == list and install_extra != []:
-                    ie = "\n".join([f'COPY {Path(r).name} {r}' for r in install_extra if r.endswith('.whl')])
-                    install_extra = f"{ie}\n" + f'RUN pip install {" ".join(install_extra)}'
+                    whls = []
+                    for r in install_extra:
+                        tp = Path('.') / Path(r).name
+                        if not r.endswith('.whl'): continue
+                        if not tp.exists() or not Path(r).samefile(tp):
+                            shutil.copy(r, tp)
+                        whls.append(tp)
+                    ie = "\n".join([f'COPY {r} {r}' for r in whls])
+                    install_extra = f"{ie}\n" + f'RUN pip install {" ".join([str(r) for r in whls])}'
+                    #whls = [r for r in install_extra if r.endswith('.whl')]
+                    #ie = "\n".join([f'COPY {r} {Path(r).name}' for r in whls])
+                    #install_extra = f"{ie}\n" + f'RUN pip install {" ".join([Path(r).name for r in whls])}'
                 else:
                     install_extra = ''
                 if run_extra_pre is not None and type(run_extra_pre) == list and run_extra_pre != []:
