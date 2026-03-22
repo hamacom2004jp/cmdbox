@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/03/15 documentation</title>
+  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/03/22 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=2f2514c3"></script>
+      <script src="../_static/documentation_options.js?v=49fcf4c2"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -329,39 +329,43 @@
 <td><p>Yes</p></td>
 <td><p>Specify the agent type. Specify either <cite>local</cite> or <cite>remote</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--a2asv_baseurl &lt;url&gt;</p></td>
+<tr class="row-even"><td><p>--use_planner</p></td>
+<td></td>
+<td><p>Specify whether to use the planning feature of the agent.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--a2asv_baseurl &lt;url&gt;</p></td>
 <td></td>
 <td><p>Specify the base URL for the A2A Server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--llm &lt;name&gt;</p></td>
+<tr class="row-even"><td><p>--llm &lt;name&gt;</p></td>
 <td></td>
 <td><p>LLM configuration name or reference.</p></td>
 </tr>
-<tr class="row-even"><td><p>--mcpservers &lt;name&gt;</p></td>
+<tr class="row-odd"><td><p>--mcpservers &lt;name&gt;</p></td>
 <td></td>
 <td><p>Specify the MCP server name used by the Agent.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--subagents &lt;name&gt;</p></td>
+<tr class="row-even"><td><p>--subagents &lt;name&gt;</p></td>
 <td></td>
 <td><p>Specify the subagent name used by the agent.</p></td>
 </tr>
-<tr class="row-even"><td><p>--agent_description &lt;text&gt;</p></td>
+<tr class="row-odd"><td><p>--agent_description &lt;text&gt;</p></td>
 <td></td>
 <td><p>Specify a description of the agent's capabilities. The model uses this to determine whether to delegate control to the agent. A single line description is sufficient and recommended.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--agent_instruction &lt;text&gt;</p></td>
+<tr class="row-even"><td><p>--agent_instruction &lt;text&gt;</p></td>
 <td></td>
 <td><p>Specify instructions for the LLM model used by the agent. These will guide the agent's behavior.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>

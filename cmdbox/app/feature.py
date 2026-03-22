@@ -220,9 +220,10 @@ class WebFeature(object):
     DEFAULT_CAPTURE_MAXSIZE:int = Feature.DEFAULT_CAPTURE_MAXSIZE
     DEFAULT_401_MESSAGE:str = "Unauthorized operation. Please sign in again as an authorized user."
 
-    def __init__(self, appcls=None, ver=version):
+    def __init__(self, appcls=None, ver=version, language:str=None):
         self.ver = ver
         self.appcls = appcls
+        self.language = language
 
     def route(self, web:Web, app:FastAPI) -> None:
         """

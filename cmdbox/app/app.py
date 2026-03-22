@@ -74,16 +74,19 @@ class CmdBoxApp:
         common.copy_sample(Path.cwd(), ver=self.ver)
         self.options._load_features_yml(self.ver, logger=self.default_logger)
         self.options.load_features_agentrule(self.default_logger)
-        self.options.load_svcmd('cmdbox.app.features.cli', prefix="cmdbox_", excludes=[], appcls=self.appcls, ver=self.ver, logger=self.default_logger,
-                                isloaded=self.options.is_features_loaded('cli'))
+        self.options.load_svcmd('cmdbox.app.features.cli', prefix="cmdbox_", excludes=[],
+                                appcls=self.appcls, ver=self.ver, language=self.default_language,
+                                logger=self.default_logger, isloaded=self.options.is_features_loaded('cli'))
         if self.cli_features_packages is not None:
             if self.cli_features_prefix is None:
                 raise ValueError(f"cli_features_prefix is None. cli_features_packages={self.cli_features_packages}")
             if len(self.cli_features_prefix) != len(self.cli_features_packages):
                 raise ValueError(f"cli_features_prefix is not match. cli_features_packages={self.cli_features_packages}, cli_features_prefix={self.cli_features_prefix}")
             for i, pn in enumerate(self.cli_features_packages):
-                self.options.load_svcmd(pn, prefix=self.cli_features_prefix[i], excludes=[], appcls=self.appcls, ver=self.ver, logger=self.default_logger)
-        self.options.load_features_file('cli', self.options.load_svcmd, self.appcls, self.ver, self.default_logger)
+                self.options.load_svcmd(pn, prefix=self.cli_features_prefix[i], excludes=[],
+                                        appcls=self.appcls, ver=self.ver, language=self.default_language,
+                                        logger=self.default_logger)
+        self.options.load_features_file('cli', self.options.load_svcmd, self.appcls, self.ver, self.default_language, self.default_logger)
         self.options.load_features_aliases_cli(self.default_logger)
         self.options.load_features_audit(self.default_logger)
         efeatureloadtime = time.perf_counter()

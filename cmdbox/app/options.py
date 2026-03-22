@@ -356,7 +356,7 @@ class Options:
             self._options["mode"][key] = mode
             self._options["mode"]["choice"] += [mode]
 
-    def load_svcmd(self, package_name:str, prefix:str="cmdbox_", excludes:list=[], appcls=None, ver=None, logger:logging.Logger=None, isloaded:bool=True):
+    def load_svcmd(self, package_name:str, prefix:str="cmdbox_", excludes:list=[], appcls=None, ver=None, language:str=None, logger:logging.Logger=None, isloaded:bool=True):
         """
         指定されたパッケージの指定された接頭語を持つモジュールを読み込みます。
 
@@ -366,12 +366,13 @@ class Options:
             excludes (list): 除外するモジュール名のリスト
             appcls (Any): アプリケーションクラス
             ver (Any): バージョンモジュール
+            language (str): 言語
             logger (logging.Logger): ロガー
             isloaded (bool): 読み込み済みかどうか
         """
         if "svcmd" not in self._options:
             self._options["svcmd"] = dict()
-        for mode, f in module.load_features(package_name, prefix, excludes, appcls=appcls, ver=ver).items():
+        for mode, f in module.load_features(package_name, prefix, excludes, appcls=appcls, ver=ver, language=language).items():
             if mode not in self._options["cmd"]:
                 self._options["cmd"][mode] = dict()
             for cmd, opt in f.items():
@@ -419,7 +420,7 @@ class Options:
             return yml
         return None
 
-    def load_features_file(self, ftype:str, func, appcls, ver, logger:logging.Logger=None):
+    def load_features_file(self, ftype:str, func, appcls, ver, language, logger:logging.Logger=None):
         """
         フィーチャーファイル（features.yml）を読み込みます。
 
@@ -428,6 +429,7 @@ class Options:
             func (Any): フィーチャーの処理関数
             appcls (Any): アプリケーションクラス
             ver (Any): バージョンモジュール
+            language (str): 言語設定
             logger (logging.Logger): ロガー
         """
         # 読込み済みかどうかの判定
@@ -459,7 +461,7 @@ class Options:
                 if type(data['exclude_modules']) is not list:
                     raise Exception(f'features.yml is invalid. (The “exclude_modules” element must be a list element. data={data})')
                 exclude_modules = data['exclude_modules']
-            func(data['package'], data['prefix'], exclude_modules, appcls, ver, logger, self.is_features_loaded(ftype))
+            func(data['package'], data['prefix'], exclude_modules, appcls, ver, language, logger, self.is_features_loaded(ftype))
             self.features_loaded[ftype] = True
 
 

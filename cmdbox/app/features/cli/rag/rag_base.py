@@ -210,7 +210,8 @@ class RAGBase(feature.ResultEdgeFeature):
         from cmdbox.app.auth import signin
         sign = signin.Signin._check_cmd(signin_data, args.groups,
                                         extract_opt.get('mode'), extract_opt.get('cmd'),
-                                        extract_opt, user_name, logger)
+                                        extract_opt, user_name, logger,
+                                        self.appcls, self.ver, self.language)
         if not sign:
             msg = dict(warn=f"You do not have permission to execute the extract command '{extract_opt.get('title')}' required for RAG registration."
                             f" mode={extract_opt.get('mode')}, cmd={extract_opt.get('cmd')}")

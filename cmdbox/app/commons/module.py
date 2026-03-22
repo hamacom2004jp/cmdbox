@@ -65,7 +65,8 @@ def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], appc
                         features[m][cmd]['feature'] = fobj
     return features
 
-def load_webfeatures(package_name:str, prefix:str="cmdbox_web_", excludes:list=[], appcls=None, ver=None, logger:logging.Logger=None) -> List[Any]:
+def load_webfeatures(package_name:str, prefix:str="cmdbox_web_", excludes:list=[],
+                     appcls=None, ver=None, language:str=None, logger:logging.Logger=None) -> List[Any]:
     """
     Webフィーチャーを読み込みます。
 
@@ -75,6 +76,7 @@ def load_webfeatures(package_name:str, prefix:str="cmdbox_web_", excludes:list=[
         excludes (list, optional): 除外するモジュール名のリスト. Defaults to [].
         appcls ([type], optional): アプリケーションクラス. Defaults to None.
         ver ([type], optional): バージョンモジュール. Defaults to None.
+        language (str, optional): 言語設定. Defaults to None.
         logger ([type], optional): ロガー. Defaults to None.
     Returns:
         Dict[feature.WebFeature]: Webフィーチャーのリスト
@@ -92,7 +94,7 @@ def load_webfeatures(package_name:str, prefix:str="cmdbox_web_", excludes:list=[
             for name, cls in members:
                 if cls is feature.WebFeature or not issubclass(cls, feature.WebFeature):
                     continue
-                fobj = cls(appcls, ver)
+                fobj = cls(appcls, ver, language)
                 if logger is not None and logger.level == logging.DEBUG:
                     logger.debug(f'load_webfeatures: {fobj}')
                 webfeatures.append(fobj)

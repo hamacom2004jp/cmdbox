@@ -136,6 +136,10 @@ class ClientFileDownload(feature.OneshotEdgeFeature):
             msg = dict(warn=f"Please specify the --svname option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
+        if args.svpath is None:
+            msg = dict(warn=f"Please specify the --svpath option.")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
         client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None

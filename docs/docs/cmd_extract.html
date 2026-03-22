@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( extract mode ) &mdash; cmdbox 2026/03/15 documentation</title>
+  <title>Command Reference ( extract mode ) &mdash; cmdbox 2026/03/22 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=2f2514c3"></script>
+      <script src="../_static/documentation_options.js?v=49fcf4c2"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -388,55 +388,59 @@
 <td></td>
 <td><p>Specify the reference scope. Available scopes: <cite>client</cite>, <cite>current</cite>, <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--loadpath &lt;path&gt;</p></td>
+<tr class="row-odd"><td><p>--fwpath &lt;path&gt;</p></td>
+<td></td>
+<td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
+</tr>
+<tr class="row-even"><td><p>--loadpath &lt;path&gt;</p></td>
 <td><p>Yes</p></td>
 <td><p>Specify the source file path.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;path&gt;</p></td>
+<tr class="row-odd"><td><p>--client_data &lt;path&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--chunk_table &lt;method&gt;</p></td>
+<tr class="row-even"><td><p>--chunk_table &lt;method&gt;</p></td>
 <td></td>
 <td><p>Specifies how to chunk tables in the PDF file. Available values: <cite>none</cite>, <cite>table</cite>, <cite>row_with_header</cite>. Default: <cite>table</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--chunk_table_header &lt;name&gt;</p></td>
+<tr class="row-odd"><td><p>--chunk_table_header &lt;name&gt;</p></td>
 <td></td>
 <td><p>Replaces existing header items by specifying the names of table header items (multiple values allowed).</p></td>
 </tr>
-<tr class="row-odd"><td><p>--chunk_exclude &lt;pattern&gt;</p></td>
+<tr class="row-even"><td><p>--chunk_exclude &lt;pattern&gt;</p></td>
 <td></td>
 <td><p>A regular expression specifying a string that should not be included in the chunk (multiple values allowed).</p></td>
 </tr>
-<tr class="row-even"><td><p>--chunk_size &lt;size&gt;</p></td>
+<tr class="row-odd"><td><p>--chunk_size &lt;size&gt;</p></td>
 <td></td>
 <td><p>Specifies the chunk size. Default: 1000.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--chunk_overlap &lt;size&gt;</p></td>
+<tr class="row-even"><td><p>--chunk_overlap &lt;size&gt;</p></td>
 <td></td>
 <td><p>Specifies the overlap size of the chunk. Default: 50.</p></td>
 </tr>
-<tr class="row-even"><td><p>--chunk_separator &lt;separator&gt;</p></td>
+<tr class="row-odd"><td><p>--chunk_separator &lt;separator&gt;</p></td>
 <td></td>
 <td><p>Specifies the delimiter character for chunking (multiple values allowed).</p></td>
 </tr>
-<tr class="row-odd"><td><p>--chunk_spage &lt;page&gt;</p></td>
+<tr class="row-even"><td><p>--chunk_spage &lt;page&gt;</p></td>
 <td></td>
 <td><p>Specifies the starting page of the embedding range. Default: 0.</p></td>
 </tr>
-<tr class="row-even"><td><p>--chunk_epage &lt;page&gt;</p></td>
+<tr class="row-odd"><td><p>--chunk_epage &lt;page&gt;</p></td>
 <td></td>
 <td><p>Specifies the ending page of the embedding range. Default: 9999.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
@@ -481,35 +485,39 @@
 <td></td>
 <td><p>Specify the reference scope. Available scopes: <cite>client</cite>, <cite>current</cite>, <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--loadpath &lt;path&gt;</p></td>
+<tr class="row-odd"><td><p>--fwpath &lt;path&gt;</p></td>
+<td></td>
+<td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
+</tr>
+<tr class="row-even"><td><p>--loadpath &lt;path&gt;</p></td>
 <td><p>Yes</p></td>
 <td><p>Specify the source file path.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;path&gt;</p></td>
+<tr class="row-odd"><td><p>--client_data &lt;path&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--chunk_lang &lt;language&gt;</p></td>
+<tr class="row-even"><td><p>--chunk_lang &lt;language&gt;</p></td>
 <td></td>
 <td><p>Specify the language of the text to be chunked. Available values: <cite>auto</cite>, <cite>ja</cite>, <cite>en</cite>. Default: <cite>auto</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--chunk_max_sentences &lt;count&gt;</p></td>
+<tr class="row-odd"><td><p>--chunk_max_sentences &lt;count&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum number of sentences (not characters) for chunking text. Default: 4.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--chunk_overlap_percent &lt;percent&gt;</p></td>
+<tr class="row-even"><td><p>--chunk_overlap_percent &lt;percent&gt;</p></td>
 <td></td>
 <td><p>Specifies the overlap percentage of the chunk. Default: 20.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>

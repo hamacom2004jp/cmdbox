@@ -61,15 +61,15 @@ agentView.install_tts = async () => {
         cmdbox.hide_loading();
         
         if (res && res.success) {
-            alert('TTS engine installation started/completed successfully. Check server logs for details.');
+            cmdbox.message('TTS engine installation started/completed successfully. Check server logs for details.');
         } else {
             const msg = res && res.warn ? res.warn : 'Failed to install TTS engine.';
-            alert(msg);
+            cmdbox.message(msg);
         }
     } catch (e) {
         cmdbox.hide_loading();
         console.error(e);
-        alert(`Error: ${e.message}`);
+        cmdbox.message(`Error: ${e.message}`);
     }
 };
 
@@ -106,14 +106,14 @@ agentView.uninstall_tts = async () => {
         cmdbox.hide_loading();
         
         if (res && res.success) {
-            alert('TTS engine uninstallation started/completed successfully. Check server logs for details.');
+            cmdbox.message('TTS engine uninstallation started/completed successfully. Check server logs for details.');
         } else {
             const msg = res && res.warn ? res.warn : 'Failed to uninstall TTS engine.';
-            alert(msg);
+            cmdbox.message(msg);
         }
     } catch (e) {
         cmdbox.hide_loading();
         console.error(e);
-        alert(`Error: ${e.message}`);
+        cmdbox.message(`Error: ${e.message}`);
     }
 };

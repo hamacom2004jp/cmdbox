@@ -115,9 +115,13 @@ agentView.list_rag = async () => {
                 // Delete button handler
                 $('#btn_del_rag').show().off('click').on('click', async () => {
                     if (!confirm(`Are you sure you want to delete '${config.rag_name}'?`)) return;
-                    await agentView.exec_cmd('rag', 'del', { rag_name: config.rag_name });
-                    $('#rag_edit_modal').modal('hide');
-                    agentView.list_rag();
+                    const res = await agentView.exec_cmd('rag', 'del', { rag_name: config.rag_name });
+                    if (res && res.success) {
+                        $('#rag_edit_modal').modal('hide');
+                        agentView.list_rag();
+                    } else {
+                        cmdbox.message(res);
+                    }
                 });
                 $('#btn_build_rag').show().off('click').on('click', async () => {
                     if (!confirm(`Are you sure you want to build '${config.rag_name}'?`)) return;
@@ -159,11 +163,11 @@ agentView.save_rag = async () => {
             $('#rag_edit_modal').modal('hide');
             agentView.list_rag();
         } else {
-            alert('Failed to save RAG settings.');
+            cmdbox.message(res);
         }
     } catch (e) {
         console.error(e);
-        alert(`Error: ${e.message}`);
+        cmdbox.message(`Error: ${e.message}`);
     }
 };
 
@@ -180,10 +184,10 @@ agentView.build_rag = async () => {
             $('#rag_edit_modal').modal('hide');
             agentView.list_rag();
         } else {
-            alert('Failed to build RAG settings.');
+            cmdbox.message(res);
         }
     } catch (e) {
         console.error(e);
-        alert(`Error: ${e.message}`);
+        cmdbox.message(`Error: ${e.message}`);
     }
 };

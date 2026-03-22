@@ -20,12 +20,13 @@ import string
 class Signin(object):
 
     def __init__(self, logger:logging.Logger, signin_file:Path, signin_file_data:Dict[str, Any],
-                 redis_cli:redis_client.RedisClient, appcls, ver):
+                 redis_cli:redis_client.RedisClient, appcls, ver, language:str):
         self.logger = logger
         self.signin_file = signin_file
         self.options = options.Options.getInstance(appcls, ver)
         self.ver = ver
         self.appcls = appcls
+        self.language = language
         if redis_cli is None:
             raise ValueError(f"redis_cli is None.")
         self.redis_cli = redis_cli
@@ -787,7 +788,8 @@ class Signin(object):
             return True
         if 'signin' not in req.session or 'groups' not in req.session['signin']:
             return False
-        return Signin._check_cmd(data, req.session['signin']['groups'], mode, cmd, opt, req.session['signin']['name'], self.logger)
+        return Signin._check_cmd(data, req.session['signin']['groups'], mode, cmd, opt, req.session['signin']['name'],
+                                 self.logger, self.appcls, self.ver, self.language)
 
     @classmethod
     def load_groups(cls, signin_file_data:Dict[str, Any], apikey:str, logger:logging.Logger):
@@ -819,7 +821,8 @@ class Signin(object):
 
     @classmethod
     def _check_cmd(cls, signin_file_data:Dict[str, Any], user_groups:List[str], mode:str, cmd:str,
-                   opt:Dict[str, Any], user_name:str, logger:logging.Logger) -> bool:
+                   opt:Dict[str, Any], user_name:str, logger:logging.Logger,
+                   appcls, ver, language) -> bool:
         """
         コマンドの認可をチェックします
 
@@ -829,6 +832,11 @@ class Signin(object):
             mode (str): モード
             cmd (str): コマンド
             opt (Dict[str, Any]): オプション
+            user_name (str): ユーザ名
+            logger (logging.Logger): ロガー
+            appcls: アプリクラス
+            ver: バージョン
+            language: 言語
 
         Returns:
             bool: 認可されたかどうか
@@ -850,7 +858,9 @@ class Signin(object):
             # コマンドオプションの強制設定
             if 'coercion' in rule:
                 for key, value in rule['coercion'].items():
-                    opt[key] = eval(value, {}, dict(user_name=user_name, groups=user_groups, mode=mode, cmd=cmd))
+                    opt[key] = eval(value, {}, dict(user_name=user_name, groups=user_groups,
+                                                    mode=mode, cmd=cmd,
+                                                    appcls=appcls, ver=ver, language=language))
             jadge = rule['rule']
         if logger.level == logging.DEBUG:
             logger.debug(f"cmd rule: mode={mode}, cmd={cmd}: {jadge}")

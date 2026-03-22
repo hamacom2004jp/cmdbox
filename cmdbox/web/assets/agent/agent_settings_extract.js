@@ -105,9 +105,13 @@ agentView.list_extract = async () => {
                 // Delete button handler
                 $('#btn_del_extract').show().off('click').on('click', async () => {
                     if (!confirm(`Are you sure you want to delete '${config.extract_name}'?`)) return;
-                    await agentView.exec_cmd('extract', 'del', {extract_name: config.extract_name});
-                    $('#extract_edit_modal').modal('hide');
-                    agentView.list_extract();
+                    const res = await agentView.exec_cmd('extract', 'del', {extract_name: config.extract_name});
+                    if (res && res.success) {
+                        $('#extract_edit_modal').modal('hide');
+                        agentView.list_extract();
+                    } else {
+                        cmdbox.message(res);
+                    }
                 });
 
                 // extract_cmdをロード
@@ -136,15 +140,15 @@ agentView.save_extract = async () => {
     });
 
     try {
-        const res = await agentView.exec_cmd('extract', 'save', data, {match_mode: 'extract'});
+        const res = await agentView.exec_cmd('extract', 'save', {...data, match_mode: 'extract'});
         if (res && res.success) {
             $('#extract_edit_modal').modal('hide');
             agentView.list_extract();
         } else {
-            alert('Failed to save Extract settings.');
+            cmdbox.message(res);
         }
     } catch (e) {
         console.error(e);
-        alert(`Error: ${e.message}`);
+        cmdbox.message(`Error: ${e.message}`);
     }
 };

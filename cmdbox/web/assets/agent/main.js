@@ -2,7 +2,7 @@ $(() => {
     fetch('assets/agent/agent_sidebar_content.html').then(res => res.text()).then(async html => {
         try {
             // ファイラー画面の読込み
-            const files_html = await fetch('assets/agent/agent_files_content.html').then(res => res.text());
+            const files_html = await fetch('assets/agent/agent_files.html').then(res => res.text());
             $('.layout-grid').append(files_html);
             fsapi.left = $('#left_container');
             fsapi.right = $('#right_container');

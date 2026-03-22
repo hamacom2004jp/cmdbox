@@ -93,9 +93,13 @@ agentView.list_embedding = async () => {
                 // Delete button handler
                 $('#btn_del_embedding').show().off('click').on('click', async () => {
                     if (!confirm(`Are you sure you want to delete '${config.embed_name}'?`)) return;
-                    await agentView.exec_cmd('embed', 'del', { embed_name: config.embed_name });
-                    $('#embedding_edit_modal').modal('hide');
-                    agentView.list_embedding();
+                    const res = await agentView.exec_cmd('embed', 'del', { embed_name: config.embed_name });
+                    if (res && res.success) {
+                        $('#embedding_edit_modal').modal('hide');
+                        agentView.list_embedding();
+                    } else {
+                        cmdbox.message(res);
+                    }
                 });
 
                 $('#embedding_edit_modal').modal('show');
@@ -122,10 +126,10 @@ agentView.save_embedding = async () => {
             $('#embedding_edit_modal').modal('hide');
             agentView.list_embedding();
         } else {
-            alert('Failed to save Embedding settings.');
+            cmdbox.message(res);
         }
     } catch (e) {
         console.error(e);
-        alert(`Error: ${e.message}`);
+        cmdbox.message(`Error: ${e.message}`);
     }
 };

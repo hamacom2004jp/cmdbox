@@ -116,7 +116,8 @@ class CmdList(feature.OneshotResultEdgeFeature):
                 continue
             if len([k for k in args.match_opt if k not in r]) > 0:
                 continue
-            if not signin.Signin._check_cmd(self.signin_file_data, args.groups, r['mode'], r['cmd'], args.__dict__, "unknown", logger):
+            if not signin.Signin._check_cmd(self.signin_file_data, args.groups, r['mode'], r['cmd'], args.__dict__, "unknown", logger,
+                                            self.appcls, self.ver, self.language):
                 continue
             row = dict(title=r.get('title',''),
                        mode=r['mode'],

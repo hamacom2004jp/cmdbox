@@ -94,9 +94,13 @@ agentView.list_llm = async () => {
                 // Delete button handler
                 $('#btn_del_llm').show().off('click').on('click', async () => {
                     if (!confirm(`Are you sure you want to delete '${config.llmname}'?`)) return;
-                    await agentView.exec_cmd('llm', 'del', { llmname: config.llmname });
-                    $('#llm_edit_modal').modal('hide');
-                    agentView.list_llm();
+                    const res = await agentView.exec_cmd('llm', 'del', { llmname: config.llmname });
+                    if (res && res.success) {
+                        $('#llm_edit_modal').modal('hide');
+                        agentView.list_llm();
+                    } else {
+                        cmdbox.message(res);
+                    }
                 });
 
                 $('#llm_edit_modal').modal('show');
@@ -123,10 +127,10 @@ agentView.save_llm = async () => {
             $('#llm_edit_modal').modal('hide');
             agentView.list_llm();
         } else {
-            alert('Failed to save LLM settings.');
+            cmdbox.message(res);
         }
     } catch (e) {
         console.error(e);
-        alert(`Error: ${e.message}`);
+        cmdbox.message(`Error: ${e.message}`);
     }
 };

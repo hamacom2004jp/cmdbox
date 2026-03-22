@@ -111,9 +111,13 @@ agentView.list_memory = async () => {
                 // Delete button handler
                 $('#btn_del_memory').show().off('click').on('click', async () => {
                     if (!confirm(`Are you sure you want to delete '${config.memory_name}'?`)) return;
-                    await agentView.exec_cmd('agent', 'memory_del', { memory_name: config.memory_name });
-                    $('#memory_edit_modal').modal('hide');
-                    agentView.list_memory();
+                    const res = await agentView.exec_cmd('agent', 'memory_del', { memory_name: config.memory_name });
+                    if (res && res.success) {
+                        $('#memory_edit_modal').modal('hide');
+                        agentView.list_memory();
+                    } else {
+                        cmdbox.message(res);
+                    }
                 });
 
                 $('#memory_edit_modal').modal('show');
@@ -151,11 +155,11 @@ agentView.save_memory = async () => {
             $('#memory_edit_modal').modal('hide');
             agentView.list_memory();
         } else {
-            alert('Failed to save Memory settings.');
+            cmdbox.message(res);
         }
     } catch (e) {
         console.error(e);
-        alert(`Error: ${e.message}`);
+        cmdbox.message(`Error: ${e.message}`);
     }
 };
 

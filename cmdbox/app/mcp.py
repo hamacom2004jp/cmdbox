@@ -19,7 +19,7 @@ class Mcp:
     default_pass:str = os.environ.get('REDIS_PASSWORD', 'password')
     default_svname:str = os.environ.get('SVNAME', 'server')
 
-    def __init__(self, logger:logging.Logger, data:Path, sign:signin.Signin, appcls=None, ver=None,):
+    def __init__(self, logger:logging.Logger, data:Path, sign:signin.Signin, appcls=None, ver=None, language:str=None):
         """
         MCP (Multi-Channel Protocol) クラスの初期化
 
@@ -29,13 +29,14 @@ class Mcp:
             sign (signin.Signin): サインインオブジェクト
             appcls (type, optional): アプリケーションクラス. Defaults to None.
             ver (module, optional): バージョンモジュール. Defaults to None.
+            language (str, optional): 言語. Defaults to None.
         """
         self.logger = logger
         self.data = data
         self.appcls = appcls
         self.ver = ver
         self.signin = sign
-
+        self.language = language
     def create_mcpserver(self, logger:logging.Logger, args:argparse.Namespace, tools) -> Any:
         """
         mcpserverを作成します
@@ -119,7 +120,7 @@ class Mcp:
         Returns:
             ToolList: ToolListのリスト
         """
-        tool_list = ToolList(logger, self.data, appcls=self.appcls, ver=self.ver)
+        tool_list = ToolList(logger, self.data, appcls=self.appcls, ver=self.ver, language=self.language)
         tool_list.extract_callable = extract_callable
         return tool_list
 
@@ -208,7 +209,7 @@ class Mcp:
         return ToolListMiddleware()
 
 class ToolList(object):
-    def __init__(self, logger:logging.Logger, data:Path, *tools:List, appcls=None, ver=None,):
+    def __init__(self, logger:logging.Logger, data:Path, *tools:List, appcls=None, ver=None, language:str=None):
         """
         ツールリストを初期化します
 
@@ -218,6 +219,7 @@ class ToolList(object):
             *tools (List): 追加するツールのリスト
             appcls ([type], optional): アプリケーションクラス. Defaults to None.
             ver ([type], optional): バージョン. Defaults to None.
+            language (str, optional): 言語. Defaults to None.
         """
         from fastmcp.tools import FunctionTool
 
@@ -227,6 +229,7 @@ class ToolList(object):
         self.extract_callable = False
         self.appcls = appcls
         self.ver = ver
+        self.language = language
         """ すべてのモードとコマンドから、エージェント用のツールを生成する場合のコード ---
         options = Options.getInstance()
         is_japan = common.is_japan()
@@ -373,8 +376,8 @@ class ToolList(object):
             cmd_list = [dict(title=r.get('title',''), mode=r['mode'], cmd=r['cmd'],
                         description=r.get('description','') + str(options.get_cmd_attr(r['mode'], r['cmd'], 'description_ja' if is_japan else 'description_en')),
                         tag=r.get('tag','')) for r in cmd_list \
-                       if signin.Signin._check_cmd(data, ['admin'], r['mode'], r['cmd'], r, "unknown", self.logger)]
-
+                       if signin.Signin._check_cmd(data, ['admin'], r['mode'], r['cmd'], r, "unknown", self.logger,
+                                                   self.appcls, self.ver, language=web.language)]
         except Exception as e:
             # ユーザーコマンドの読み込みに失敗した場合は警告を出して登録済みのリストを返す
             self.logger.warning(f"Error loading user commands: {e}", exc_info=True)
@@ -404,7 +407,8 @@ class ToolList(object):
             func_ctx = []
             # 関数を実行してコンテキストに追加
             exec(func_txt,
-                dict(time=time,List=List, Path=Path, argparse=argparse, common=common, options=options, logging=logging, signin=signin,),
+                dict(time=time,List=List, Path=Path, argparse=argparse, common=common, options=options, logging=logging, signin=signin,
+                     appcls=self.appcls, ver=self.ver, language=self.language),
                 dict(func_ctx=func_ctx))
             # 関数のスキーマを生成
             input_schema = dict(
@@ -562,7 +566,7 @@ class ToolList(object):
         func_txt += f'        return dict(warn="The command could not be executed due to an authentication error. check="+common.to_str(sign))\n'
         func_txt += f'    groups = req.session["signin"]["groups"]\n'
         func_txt += f'    user_name = req.session["signin"]["name"]\n'
-        func_txt += f'    sign = signin.Signin._check_cmd(signin_data, groups, "{mode}", "{cmd}", opt, user_name, logger)\n'
+        func_txt += f'    sign = signin.Signin._check_cmd(signin_data, groups, "{mode}", "{cmd}", opt, user_name, logger, appcls, ver, language)\n'
         func_txt += f'    if not sign:\n'
         func_txt += f'        logger.warning("You do not have permission to execute this command. check="+common.to_str(sign))\n'
         func_txt += f'        logger.warning("mode={mode}, cmd={cmd}, sign="+common.to_str(sign)+", groups="+common.to_str(groups))\n'

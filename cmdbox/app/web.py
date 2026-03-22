@@ -163,8 +163,10 @@ class Web:
         self.webcap_client = requests.Session()
         from cmdbox.app.auth import signin, signin_saml
         signin_file_data = signin.Signin.load_signin_file(self.signin_file, None, self=self, logger=logger)
-        self.signin = signin.Signin(self.logger, self.signin_file, signin_file_data, self.redis_cli, self.appcls, self.ver)
-        self.signin_saml = signin_saml.SigninSAML(self.logger, self.signin_file, signin_file_data, self.redis_cli, self.appcls, self.ver)
+        self.signin = signin.Signin(self.logger, self.signin_file, signin_file_data, self.redis_cli,
+                                    self.appcls, self.ver, self.language)
+        self.signin_saml = signin_saml.SigninSAML(self.logger, self.signin_file, signin_file_data, self.redis_cli,
+                                                  self.appcls, self.ver, self.language)
         signin.Signin.set_webcls(self.__class__)
 
         if self.logger.level == logging.DEBUG:
@@ -201,10 +203,10 @@ class Web:
             return
         # webfeatureの読込み
         self.wf_dep = []
-        def wf_route(pk, prefix, excludes, w, app, appcls, ver, logger):
+        def wf_route(pk, prefix, excludes, w, app, appcls, ver, language, logger):
             if pk in w.wf_dep: return
             w.wf_dep.append(pk)
-            for wf in module.load_webfeatures(pk, prefix, excludes, appcls=appcls, ver=ver, logger=logger):
+            for wf in module.load_webfeatures(pk, prefix, excludes, appcls=appcls, ver=ver, language=language, logger=logger):
                 wf.route(self, app)
                 self.filemenu = {**self.filemenu, **wf.filemenu(w)}
                 self.toolmenu = {**self.toolmenu, **wf.toolmenu(w)}
@@ -217,9 +219,11 @@ class Web:
             if len(self.web_features_prefix) != len(self.web_features_packages):
                 raise ValueError(f"web_features_prefix is not match. web_features_packages={self.web_features_packages}, web_features_prefix={self.web_features_prefix}")
             for i, pn in enumerate(self.web_features_packages):
-                wf_route(pn, self.web_features_prefix[i], [], self, app, self.appcls, self.ver, self.logger)
-        self.options.load_features_file('web', lambda pk, pn, excludes, appcls, ver, logger, _: wf_route(pk, pn, excludes, self, app, appcls, ver, logger), self.appcls, self.ver, self.logger)
-        wf_route("cmdbox.app.features.web", "cmdbox_web_", [], self, app, self.appcls, self.ver, self.logger)
+                wf_route(pn, self.web_features_prefix[i], [], self, app, self.appcls, self.ver, self.language, self.logger)
+        self.options.load_features_file('web',
+                                        lambda pk, pn, excludes, appcls, ver, language, logger, _: wf_route(pk, pn, excludes, self, app, appcls, ver, language, logger),
+                                        self.appcls, self.ver, self.language, self.logger)
+        wf_route("cmdbox.app.features.web", "cmdbox_web_", [], self, app, self.appcls, self.ver, self.language, self.logger)
         # エイリアスの登録
         self.options.load_features_aliases_web(app.routes, self.logger)
         # 読込んだrouteの内容をログに出力

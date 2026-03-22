@@ -120,9 +120,13 @@ agentView.list_runner = async () => {
                 // Delete button handler
                 $('#btn_del_runner').show().off('click').on('click', async () => {
                     if (!confirm(`Are you sure you want to delete '${config.runner_name}'?`)) return;
-                    await agentView.exec_cmd('agent', 'runner_del', { runner_name: config.runner_name });
-                    $('#runner_edit_modal').modal('hide');
-                    agentView.list_runner();
+                    const res = await agentView.exec_cmd('agent', 'runner_del', { runner_name: config.runner_name });
+                    if (res && res.success) {
+                        $('#runner_edit_modal').modal('hide');
+                        agentView.list_runner();
+                    } else {
+                        cmdbox.message(res);
+                    }
                 });
 
                 $('#runner_edit_modal').modal('show');
@@ -182,11 +186,11 @@ agentView.save_runner = async () => {
             $('#runner_edit_modal').modal('hide');
             agentView.list_runner();
         } else {
-            alert('Failed to save Runner settings.');
+            cmdbox.message(res);
         }
     } catch (e) {
         console.error(e);
-        alert(`Error: ${e.message}`);
+        cmdbox.message(`Error: ${e.message}`);
     }
 };
 

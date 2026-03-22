@@ -68,19 +68,24 @@ agentView.fileuploader.initUploadPanel = () => {
             cmdbox.message({ 'error': 'ファイルが選択されていません' });
             return;
         }
-        await agentView.fileuploader.uploadFiles_execute();
+        await agentView.fileuploader.uploadFiles_execute(
+            agentView.fileuploader.uploadSuccessCallback,
+            agentView.fileuploader.uploadErrorCallback
+        );
     });
+    // ユーザー情報の取得とアップロード先の表示
     cmdbox.user_info().then(user => {
         agentView.user = user;
         const user_name = agentView.user ? agentView.user['name'] : 'USER';
         $('#upload_target').text(`TO : /.users/${user_name}/`);
     });
-
+    // このスクリプトは動的に読み込まれるため、devtoolから参照できるようにするためログ出力。
     console.log('agent_files.js initialized.');
 };
 
 /**
  * ファイル選択の処理
+ * @param {FileList} files 選択されたファイル一覧
  */
 agentView.fileuploader.handleFileSelect = (files) => {
     if (files && files.length > 0) {
@@ -132,8 +137,10 @@ agentView.fileuploader.updateUploadFileList = () => {
 
 /**
  * ファイルアップロードの実行
+ * @param {function} successCallback アップロード成功時のコールバック
+ * @param {function} errorCallback アップロードエラー時のコールバック
  */
-agentView.fileuploader.uploadFiles_execute = async () => {
+agentView.fileuploader.uploadFiles_execute = async (successCallback, errorCallback) => {
     const fileList = $('#upload_file_list');
     
     if (!agentView.fileuploader.uploadFiles || agentView.fileuploader.uploadFiles.length === 0) {
@@ -151,8 +158,11 @@ agentView.fileuploader.uploadFiles_execute = async () => {
         const user_name = agentView.user ? agentView.user['name'] : 'USER';
         // FormDataを準備
         const formData = new FormData();
+        const files = [...agentView.fileuploader.uploadFiles];
+        const opt = cmdbox.get_server_opt(false, fsapi.right);
+        opt['svpath'] = `/.users/${user_name}/`;
         for (let i = 0; i < totalFiles; i++) {
-            const file = agentView.fileuploader.uploadFiles[i];
+            const file = files[i];
             const fileName = file.name;
             const fileSize = file.size;
             formData.append('files', file);
@@ -162,21 +172,33 @@ agentView.fileuploader.uploadFiles_execute = async () => {
             $('#upload_file_input').val('');
             agentView.fileuploader.updateUploadFileList();
         };
-        cmdbox.file_upload(fsapi.right, `/.users/${user_name}/`, formData, orverwrite=false,
+        cmdbox.file_upload(fsapi.right, opt['svpath'], formData, orverwrite=false,
             progress_func=(e) => {
                 cmdbox.progress(0, e.total, e.loaded, '', true, e.total==e.loaded);
             },
             success_func=(target, svpath, data) => {
+                if (data && !data.success && data!="upload success") {
+                    cmdbox.message(data);
+                    errorCallback && errorCallback(opt, files, data);
+                    cmdbox.hide_loading();
+                    return;
+                }
                 const listItem = fileList.find('li i.fa-file');
                 listItem.removeClass('fa-file').addClass('fa-check').css('color', 'var(--accent-green)');
-                cmdbox.hide_loading();
-                setTimeout(reset, 5000);
+                try {
+                    successCallback && successCallback(opt, files, data);
+                    setTimeout(reset, 1000);
+                } catch (err) {
+                    cmdbox.message(err);
+                } finally {
+                    cmdbox.hide_loading();
+                }
             },
             error_func=(target, svpath, data) => {
                 const listItem = fileList.find('li i.fa-file');
                 listItem.removeClass('fa-file').addClass('fa-exclamation').css('color', 'var(--accent-red)');
+                errorCallback && errorCallback(opt, files, data);
                 cmdbox.hide_loading();
-                setTimeout(reset, 5000);
             }
         );
         
@@ -185,4 +207,25 @@ agentView.fileuploader.uploadFiles_execute = async () => {
         cmdbox.hide_loading();
         cmdbox.message({ 'error': 'アップロード中にエラーが発生しました' });
     }
+};
+
+/**
+ * [拡張ポイント]
+ * ファイルアップロード成功時のコールバック
+ * @param {object} opt ファイルアップロード時のコマンドオプション
+ * @param {Array<File>} files アップロードファイル一覧
+ * @param {object} data アップロード結果のデータ
+ * @throws {Error} エラーが発生した場合はErrorをスローすることができます。スローされたエラーはcmdbox.messageで表示されます。
+ */
+agentView.fileuploader.uploadSuccessCallback = (opt, files, data) => {
+};
+
+/**
+ * [拡張ポイント]
+ * ファイルアップロードエラー時のコールバック
+ * @param {object} opt ファイルアップロード時のコマンドオプション
+ * @param {Array<File>} files アップロードファイル一覧
+ * @param {object} data アップロード結果のデータ
+ */
+agentView.fileuploader.uploadErrorCallback = (opt, files, data) => {
 };

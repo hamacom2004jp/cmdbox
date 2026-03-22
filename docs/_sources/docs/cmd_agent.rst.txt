@@ -81,6 +81,7 @@ Save Agent configuration. : `cmdbox -m agent -c agent_save <Option>`
     "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
     "--agent_name <name>","Yes","Specify the name of the agent configuration to save."
     "--agent_type <type>","Yes","Specify the agent type. Specify either `local` or `remote`."
+    "--use_planner","","Specify whether to use the planning feature of the agent."
     "--a2asv_baseurl <url>","","Specify the base URL for the A2A Server."
     "--llm <name>","","LLM configuration name or reference."
     "--mcpservers <name>","","Specify the MCP server name used by the Agent."

@@ -132,7 +132,7 @@ class A2aSvStart(feature.UnsupportEdgeFeature):
                                        redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                                        signin_file=args.signin_file)
 
-            sign = signin.Signin(logger, signin_file, signin_data, _web.redis_cli, self.appcls, self.ver)
+            sign = signin.Signin(logger, signin_file, signin_data, _web.redis_cli, self.appcls, self.ver, self.language)
             self.a2a = a2a_mod.A2a(logger, Path(args.data), sign, self.appcls, self.ver)
             a2a_app:FastAPI = await self.a2a.create_a2aserver(logger, args, _web)
 

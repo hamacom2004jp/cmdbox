@@ -104,14 +104,7 @@ class LLMLoad(feature.OneshotResultEdgeFeature):
             payload = json.loads(convert.b64str2str(msg[2]))
 
             llmname = payload.get('llmname')
-            configure_path = data_dir / ".agent" / f"llm-{llmname}.json"
-            if not configure_path.exists():
-                msg = dict(warn=f"Specified LLM configuration '{llmname}' not found on server at '{str(configure_path)}'.")
-                redis_cli.rpush(reskey, msg)
-                return self.RESP_WARN
-
-            with configure_path.open('r', encoding='utf-8') as f:
-                configure = json.load(f)
+            configure = self.load(data_dir, llmname)
 
             msg = dict(success=configure)
             redis_cli.rpush(reskey, msg)
@@ -122,3 +115,23 @@ class LLMLoad(feature.OneshotResultEdgeFeature):
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
+
+    def load(self, data_dir:Path, llmname:str) -> Dict[str, Any]:
+        """
+        指定されたLLM設定をサーバーから読み込みます。
+
+        Args:
+            data_dir (Path): データディレクトリのパス
+            llmname (str): 読み込むLLM設定の名前
+
+        Returns:
+            Dict[str, Any]: 読み込んだLLM設定の内容。
+        """
+        configure_path = data_dir / ".agent" / f"llm-{llmname}.json"
+        if not configure_path.exists():
+            raise FileNotFoundError(f"Specified LLM configuration '{llmname}' not found on server at '{str(configure_path)}'.")
+
+        with configure_path.open('r', encoding='utf-8') as f:
+            configure = json.load(f)
+
+        return configure

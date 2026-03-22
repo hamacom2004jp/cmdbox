@@ -325,9 +325,9 @@ const list_cmd_func_then = () => {
         $('.cmd_card').off('click').on('click', cmd_card_func);
         if (result.success) {
             cmd_modal.find('[name="modal_mode"]').val('edit');
-            alert(result.success);
+            cmdbox.message(result.success);
         }
-        else if (result.warn) alert(result.warn);
+        else if (result.warn) cmdbox.message(result.warn);
         cmdbox.hide_loading();
     });
     // コマンドファイルの削除

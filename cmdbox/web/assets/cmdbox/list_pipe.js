@@ -139,8 +139,8 @@ list_pipe_func_then = () => {
         const result = await save_pipe(title, opt);
         await list_pipe_func();
         $('.pipe_card').off('click').on('click', pipe_card_func);
-        if (result['success']) alert(result['success']);
-        else if (result['warn']) alert(result['warn']);
+        if (result['success']) cmdbox.message(result['success']);
+        else if (result['warn']) cmdbox.message(result['warn']);
         cmdbox.hide_loading();
     });
     // パイプラインファイルの削除

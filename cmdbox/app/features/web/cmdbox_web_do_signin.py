@@ -138,7 +138,7 @@ class DoSignin(cmdbox_web_signin.Signin):
             web.options.audit_exec(req, res, web, body=dict(msg='Signin succeeded.'), audit_type='auth', user=name)
             return RedirectResponse(url=f'../{next}', headers=dict(signin="success"))
 
-        def _load_signin(web:Web, signin_module:str, appcls, ver):
+        def _load_signin(web:Web, signin_module:str, appcls, ver, language:str):
             """
             サインインオブジェクトを読込む
             
@@ -146,6 +146,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 signin_module (str): サインインオブジェクトのモジュール名
                 appcls (class): アプリケーションクラス
                 ver (str): バージョン
+                language (str): 言語
             Returns:
                 signin.Signin: サインインオブジェクト
             """
@@ -157,7 +158,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 signin_data = web.signin.signin_file_data
                 for name, cls in members:
                     if cls is signin.Signin or issubclass(cls, signin.Signin):
-                        sobj = cls(web.logger, web.signin_file, signin_data, web.redis_cli, appcls, ver)
+                        sobj = cls(web.logger, web.signin_file, signin_data, web.redis_cli, appcls, ver, language)
                         return sobj
                 return None
             except Exception as e:
@@ -165,23 +166,23 @@ class DoSignin(cmdbox_web_signin.Signin):
                 raise e
 
         signin_data = web.signin.signin_file_data
-        self.google_signin = google_signin.GoogleSignin(web.logger, web.signin_file, signin_data, web.redis_cli, self.appcls, self.ver)
-        self.github_signin = github_signin.GithubSignin(web.logger, web.signin_file, signin_data, web.redis_cli, self.appcls, self.ver)
-        self.azure_signin = azure_signin.AzureSignin(web.logger, web.signin_file, signin_data, web.redis_cli, self.appcls, self.ver)
-        self.azure_saml_signin = azure_signin_saml.AzyreSigninSAML(web.logger, web.signin_file, signin_data, web.redis_cli, self.appcls, self.ver)
+        self.google_signin = google_signin.GoogleSignin(web.logger, web.signin_file, signin_data, web.redis_cli, self.appcls, self.ver, self.language)
+        self.github_signin = github_signin.GithubSignin(web.logger, web.signin_file, signin_data, web.redis_cli, self.appcls, self.ver, self.language)
+        self.azure_signin = azure_signin.AzureSignin(web.logger, web.signin_file, signin_data, web.redis_cli, self.appcls, self.ver, self.language)
+        self.azure_saml_signin = azure_signin_saml.AzyreSigninSAML(web.logger, web.signin_file, signin_data, web.redis_cli, self.appcls, self.ver, self.language)
         if signin_data is not None:
             # signinオブジェクトの指定があった場合読込む
             if 'signin_module' in signin_data['oauth2']['providers']['google']:
-                sobj = _load_signin(web, signin_data['oauth2']['providers']['google']['signin_module'], self.appcls, self.ver)
+                sobj = _load_signin(web, signin_data['oauth2']['providers']['google']['signin_module'], self.appcls, self.ver, self.language)
                 self.google_signin = sobj if sobj is not None else self.google_signin
             if 'signin_module' in signin_data['oauth2']['providers']['github']:
-                sobj = _load_signin(web, signin_data['oauth2']['providers']['github']['signin_module'], self.appcls, self.ver)
+                sobj = _load_signin(web, signin_data['oauth2']['providers']['github']['signin_module'], self.appcls, self.ver, self.language)
                 self.github_signin = sobj if sobj is not None else self.github_signin
             if 'signin_module' in signin_data['oauth2']['providers']['azure']:
-                sobj = _load_signin(web, signin_data['oauth2']['providers']['azure']['signin_module'], self.appcls, self.ver)
+                sobj = _load_signin(web, signin_data['oauth2']['providers']['azure']['signin_module'], self.appcls, self.ver, self.language)
                 self.azure_signin = sobj if sobj is not None else self.azure_signin
             if 'signin_module' in signin_data['saml']['providers']['azure']:
-                sobj = _load_signin(web, signin_data['saml']['providers']['azure']['signin_module'], self.appcls, self.ver)
+                sobj = _load_signin(web, signin_data['saml']['providers']['azure']['signin_module'], self.appcls, self.ver, self.language)
                 self.azure_saml_signin = sobj if sobj is not None else self.azure_saml_signin
 
         def _set_session(req:Request, user:dict, email:str, hashed_password:str, access_token:str, group_names:list, group_homes:list, gids:list):

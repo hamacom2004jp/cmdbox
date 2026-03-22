@@ -14,7 +14,7 @@ fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_di
         const key = c_path.replace(/[\s\:\\\/\,\.\#\$\%\^\&\!\@\*\(\)\{\}\[\]\'\"\`]/g, `_`);
         const current_node = $(`#${key}`);
         /*if (current_node.length <= 0) {
-            alert(`invalid path:${c_path}`);
+            cmdbox.message(`invalid path:${c_path}`);
             return;
         }*/
         await reload_tree(target_id, filer_modal.find('.tree-menu'), c_path, filer_modal.find('.file-list'));

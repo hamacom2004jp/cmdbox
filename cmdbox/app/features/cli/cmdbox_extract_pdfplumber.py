@@ -59,6 +59,9 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature):
                 dict(opt="loadpath", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="読み込みファイルパスを指定します。",
                      description_en="Specify the source file path."),
+                dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None,
+                     description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合エラーにします。",
+                     description_en="Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.",),
                 dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None, web="mask",
                      description_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
                      description_en="Specify the path of the data folder when local is referenced."),
@@ -134,6 +137,10 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature):
             msg = dict(warn=f"Please specify the --loadpath option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
+        if args.fwpath is None:
+            msg = dict(warn=f"Please specify the --fwpath option.")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
 
         try:
             client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
@@ -141,6 +148,10 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature):
                 if client_data is not None:
                     f = filer.Filer(client_data, logger)
                     chk, abspath, msg = f._file_exists(args.loadpath)
+                    if not chk:
+                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                        return self.RESP_WARN, msg, None
+                    chk, msg = f.check_fwpath(args.loadpath, args.fwpath)
                     if not chk:
                         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                         return self.RESP_WARN, msg, None
@@ -159,6 +170,10 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature):
                 if not chk:
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                     return self.RESP_WARN, msg, None
+                chk, msg = f.check_fwpath(args.loadpath, args.fwpath)
+                if not chk:
+                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                    return self.RESP_WARN, msg, None
                 res = self.extract(abspath, args, logger, tm, pf)
                 common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 if 'success' not in res:
@@ -168,6 +183,7 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature):
                 cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
                 payload = dict(
                     loadpath=args.loadpath,
+                    fwpath=args.fwpath,
                     client_data=args.client_data,
                     chunk_lang=args.chunk_lang,
                     chunk_max_tokens=args.chunk_max_tokens,
@@ -213,6 +229,11 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature):
             chk, abspath, res = f._file_exists(payload.get('loadpath'))
             if not chk:
                 logger.warning(f"File not found. {payload.get('loadpath')}")
+                redis_cli.rpush(reskey, res)
+                return self.RESP_WARN
+            chk, msg = f.check_fwpath(payload.get('loadpath'), payload.get('fwpath'))
+            if not chk:
+                logger.warning(f"F{msg}. {payload.get('loadpath')}")
                 redis_cli.rpush(reskey, res)
                 return self.RESP_WARN
             args = argparse.Namespace(**payload)

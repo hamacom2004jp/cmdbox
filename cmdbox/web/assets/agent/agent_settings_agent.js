@@ -121,9 +121,13 @@ agentView.list_agent = async () => {
                 // Delete button handler
                 $('#btn_del_agent').show().off('click').on('click', async () => {
                     if (!confirm(`Are you sure you want to delete '${config.agent_name}'?`)) return;
-                    await agentView.exec_cmd('agent', 'agent_del', { agent_name: config.agent_name });
-                    $('#agent_edit_modal').modal('hide');
-                    agentView.list_agent();
+                    const res = await agentView.exec_cmd('agent', 'agent_del', { agent_name: config.agent_name });
+                    if (res && res.success) {
+                        $('#agent_edit_modal').modal('hide');
+                        agentView.list_agent();
+                    } else {
+                        cmdbox.message(res);
+                    }
                 });
 
                 $('#agent_edit_modal').modal('show');
@@ -195,10 +199,10 @@ agentView.save_agent = async () => {
             $('#agent_edit_modal').modal('hide');
             agentView.list_agent();
         } else {
-            alert('Failed to save Agent settings.');
+            cmdbox.message(res);
         }
     } catch (e) {
         console.error(e);
-        alert(`Error: ${e.message}`);
+        cmdbox.message(`Error: ${e.message}`);
     }
 };
