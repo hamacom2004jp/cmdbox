@@ -21,18 +21,32 @@ class Assets(feature.WebFeature):
         """
         ondemand_load = web.logger.level == logging.DEBUG
         def asset_func(asset_data, asset, path):
-            @app.get(f'/signin/assets/{path}')
-            @app.get(f'/assets/{path}')
-            async def func(req:Request, res:Response):
-                if ondemand_load:
+            if ondemand_load:
+                @app.get(f'/signin/assets/{path}')
+                @app.get(f'/assets/{path}')
+                async def func(req:Request, res:Response):
                     if not asset.is_file():
                         raise HTTPException(status_code=404, detail=f'asset is not found. ({asset})')
                     mime, enc = mimetypes.guess_type(path)
+                    im = req.headers.get('If-None-Match')
+                    md5 = str(asset.stat().st_mtime_ns)
+                    if im == md5:
+                        return Response(status_code=304, headers={'Cache-Control':'no-cache', 'ETag': md5})
                     with open(asset, 'rb') as f:
-                        return StreamingResponse(io.BytesIO(f.read()), media_type=mime)
-                else:
+                        asset_data = f.read()
+                        return StreamingResponse(io.BytesIO(asset_data), media_type=mime,
+                                                 headers={'Cache-Control':'no-cache', 'ETag': md5})
+            else:
+                md5 = str(asset.stat().st_mtime_ns)
+                @app.get(f'/signin/assets/{path}')
+                @app.get(f'/assets/{path}')
+                async def func(req:Request, res:Response):
                     mime, enc = mimetypes.guess_type(path)
-                    return StreamingResponse(io.BytesIO(asset_data), media_type=mime)
+                    im = req.headers.get('If-None-Match')
+                    if im == md5:
+                        return Response(status_code=304, headers={'Cache-Control':'no-cache', 'ETag': md5})
+                    return StreamingResponse(io.BytesIO(asset_data), media_type=mime,
+                                             headers={'Cache-Control':'no-cache', 'ETag': md5})
 
         # assetsフォルダ内のファイルを全てマッピング
         for asset in glob.glob(str(Path(feature.__file__).parent.parent / 'web' / 'assets') + '/**/*', recursive=True):

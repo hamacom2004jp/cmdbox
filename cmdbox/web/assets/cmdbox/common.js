@@ -520,7 +520,7 @@ cmdbox.init_version_modal = () => {
             tab.append(btn);
             $('.version-tabs').prepend(tab);
             if (!url) return;
-            const tabcont = $(`<div class="tab-pane fade show" id="${tabid}" role="tabpanel" aria-labelledby="${tabid}-tab"/>`);
+            const tabcont = $(`<div class="tab-pane fade" id="${tabid}" role="tabpanel" aria-labelledby="${tabid}-tab"/>`);
             $('.version-content').prepend(tabcont);
             const res = await fetch(url, {method: 'GET'});
             if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
@@ -542,9 +542,9 @@ cmdbox.init_version_modal = () => {
                 }
             });
             $('.version-tabs').find('.nav-link').removeClass('active');
-            $('.version-content').children().removeClass('active');
+            $('.version-content').children().removeClass('show');
             $('.version-tabs').find('.nav-link').first().addClass('active');
-            $('.version-content').children().first().addClass('active');
+            $('.version-content').children().first().addClass('show');
         }
         $('.version-tabs').html('');
         $('.version-content').html('<div class="tab-pane fade" id="versions_used" role="tabpanel" aria-labelledby="versions_used-tab">versions_used</div>');
