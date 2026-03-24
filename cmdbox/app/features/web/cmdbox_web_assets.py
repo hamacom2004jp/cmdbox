@@ -30,12 +30,12 @@ class Assets(feature.WebFeature):
                     mime, enc = mimetypes.guess_type(path)
                     im = req.headers.get('If-None-Match')
                     md5 = str(asset.stat().st_mtime_ns)
+                    headers = {'Cache-Control':'private, no-cache', 'ETag': md5}
                     if im == md5:
-                        return Response(status_code=304, headers={'Cache-Control':'no-cache', 'ETag': md5})
+                        return Response(status_code=304, headers=headers)
                     with open(asset, 'rb') as f:
                         asset_data = f.read()
-                        return StreamingResponse(io.BytesIO(asset_data), media_type=mime,
-                                                 headers={'Cache-Control':'no-cache', 'ETag': md5})
+                        return StreamingResponse(io.BytesIO(asset_data), media_type=mime, headers=headers)
             else:
                 md5 = str(asset.stat().st_mtime_ns)
                 @app.get(f'/signin/assets/{path}')
@@ -43,10 +43,10 @@ class Assets(feature.WebFeature):
                 async def func(req:Request, res:Response):
                     mime, enc = mimetypes.guess_type(path)
                     im = req.headers.get('If-None-Match')
+                    headers = {'Cache-Control':'private, no-cache', 'ETag': md5}
                     if im == md5:
-                        return Response(status_code=304, headers={'Cache-Control':'no-cache', 'ETag': md5})
-                    return StreamingResponse(io.BytesIO(asset_data), media_type=mime,
-                                             headers={'Cache-Control':'no-cache', 'ETag': md5})
+                        return Response(status_code=304, headers=headers)
+                    return StreamingResponse(io.BytesIO(asset_data), media_type=mime, headers=headers)
 
         # assetsフォルダ内のファイルを全てマッピング
         for asset in glob.glob(str(Path(feature.__file__).parent.parent / 'web' / 'assets') + '/**/*', recursive=True):
