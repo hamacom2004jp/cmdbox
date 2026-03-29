@@ -34,8 +34,8 @@ client ( Copy File ) : `cmdbox -m client -c file_copy <Option>`
 client ( Download File ) : `cmdbox -m client -c file_download <Option>`
 ==========================================================================================
 
-- サーバー側のデータフォルダ配下のファイルをダウンロードします。
-- `--svpath` で指定したファイルを `--download_file` で指定した場所に保存します。
+- Download a file under the data folder on the server.
+- Save the file specified by `--svpath` to the location specified by `--download_file`.
 
 .. csv-table::
     :widths: 20, 10, 70
@@ -48,6 +48,7 @@ client ( Download File ) : `cmdbox -m client -c file_download <Option>`
     "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
     "--svpath <server-side path>","","Specify the directory path to get the list of files."
     "--fwpath <server-side fwpath>","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
+    "--etag <hash>","","Specify the ETag. If the ETag matches the file's ETag on the server, the file content will not be downloaded and an empty response will be returned."
     "--scope <reference scope>","","Specifies the scope to be referenced. Possible image types are `client` , `current`, and `server`."
     "--rpath <client-request path>","","Specifies the request path. This value is returned in the response without any modification."
     "--download_file <client-side path>","","Specify the destination path of the client."

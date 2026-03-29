@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.options &mdash; cmdbox 2026/03/22 documentation</title>
+  <title>cmdbox.app.options &mdash; cmdbox 2026/03/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=49fcf4c2"></script>
+      <script src="../../../_static/documentation_options.js?v=5d974da7"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -135,6 +135,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">aliases_loaded_web</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">audit_loaded</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">agentrule_loaded</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_package_names</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_options</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Options.get_mode_keys">
@@ -495,7 +496,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s2">&quot;svcmd&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;svcmd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">mode</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">module</span><span class="o">.</span><span class="n">load_features</span><span class="p">(</span><span class="n">package_name</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">excludes</span><span class="p">,</span> <span class="n">appcls</span><span class="o">=</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">package_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_package_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Package &#39;</span><span class="si">{</span><span class="n">package_name</span><span class="si">}</span><span class="s2">&#39; is already loaded. skip loading features.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">for</span> <span class="n">mode</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">module</span><span class="o">.</span><span class="n">load_features</span><span class="p">(</span><span class="n">package_name</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">excludes</span><span class="p">,</span> <span class="n">ref_options</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">appcls</span><span class="o">=</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">]:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">][</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -510,6 +515,7 @@
                 <span class="k">if</span> <span class="n">jadge</span> <span class="o">==</span> <span class="s1">&#39;deny&#39;</span><span class="p">:</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;use_agent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="k">if</span> <span class="n">jadge</span> <span class="o">==</span> <span class="s1">&#39;allow&#39;</span><span class="p">:</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;use_agent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">if</span> <span class="s1">&#39;use_agent&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;use_agent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_package_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">package_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_debugoption</span><span class="p">()</span></div>
 
     

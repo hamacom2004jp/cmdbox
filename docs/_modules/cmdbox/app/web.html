@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.web &mdash; cmdbox 2026/03/22 documentation</title>
+  <title>cmdbox.app.web &mdash; cmdbox 2026/03/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=49fcf4c2"></script>
+      <script src="../../../_static/documentation_options.js?v=5d974da7"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -80,10 +80,11 @@
   <h1>Source code for cmdbox.app.web</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">options</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">module</span><span class="p">,</span> <span class="n">redis_client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">starlette.middleware.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">SessionMiddleware</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">uvicorn.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
@@ -316,7 +317,23 @@
         <span class="c1"># 読込んだrouteの内容をログに出力</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">routes</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;loaded webfeature: </span><span class="si">{</span><span class="n">route</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;loaded webfeature: </span><span class="si">{</span><span class="n">route</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># 重複したパスをチェック</span>
+        <span class="n">routes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">copy</span><span class="p">():</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">route</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">methods</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">route</span><span class="p">,</span> <span class="s2">&quot;methods&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">endpoint</span><span class="p">:</span><span class="n">Callable</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">route</span><span class="p">,</span> <span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">methods</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">routes</span><span class="p">:</span>
+                <span class="c1"># 重複したパスがある場合は、先に登録されたルートを削除して、後に登録されたルートを優先する</span>
+                <span class="n">app</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">routes</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;route&#39;</span><span class="p">])</span>
+                <span class="n">ep</span> <span class="o">=</span> <span class="n">routes</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;endpoint&#39;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicate web route path:</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">, &quot;</span> <span class="o">+</span> \
+                                 <span class="sa">f</span><span class="s2">&quot;endpoint:</span><span class="si">{</span><span class="n">ep</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ep</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ep</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">+</span> \
+                                 <span class="sa">f</span><span class="s2">&quot; -&gt; </span><span class="si">{</span><span class="n">endpoint</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">endpoint</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">endpoint</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">routes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="n">methods</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">route</span><span class="o">=</span><span class="n">route</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Web.change_password">
@@ -362,7 +379,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">],</span> <span class="n">user_name</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;last_update&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
                 <span class="c1"># サインインファイルの保存</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">signin_data</span>
-                <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">)</span>
+                <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="s2">&quot;Password changed.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s2">&quot;User not found.&quot;</span><span class="p">)</span></div>
 
@@ -468,7 +485,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;apikey_add: </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">signin_data</span>
-        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">)</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">apikey</span></div>
 
 
@@ -511,7 +528,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;apikey_del: </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">signin_data</span>
-        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">)</span></div>
+        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Web.user_add">
@@ -570,7 +587,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">],</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;last_update&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
         <span class="c1"># サインインファイルの保存</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">signin_data</span>
-        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">)</span></div>
+        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Web.user_edit">
@@ -633,7 +650,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;user_edit: </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># サインインファイルの保存</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">signin_data</span>
-        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">)</span></div>
+        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Web.user_del">
@@ -661,7 +678,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;user_del: </span><span class="si">{</span><span class="n">uid</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">signin_data</span>
-        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">)</span></div>
+        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Web.group_list">
@@ -725,7 +742,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;group_add: </span><span class="si">{</span><span class="n">group</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">signin_data</span>
-        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">)</span></div>
+        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Web.group_edit">
@@ -769,7 +786,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;group_edit: </span><span class="si">{</span><span class="n">group</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">signin_data</span>
-        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">)</span></div>
+        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Web.group_del">
@@ -827,7 +844,24 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;group_del: </span><span class="si">{</span><span class="n">gid</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">signin_data</span>
-        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">)</span></div>
+        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Web.user_data_hash">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.user_data_hash">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">user_data_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">user_name</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ユーザーデータのハッシュ値を取得する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            uid (str): ユーザーID</span>
+<span class="sd">            user_name (str): ユーザー名</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: ハッシュ値</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">users_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;user-</span><span class="si">{</span><span class="n">uid</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">user_name</span><span class="si">}</span><span class="s2">.json&quot;</span>
+        <span class="k">return</span> <span class="n">user_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime_ns</span> <span class="k">if</span> <span class="n">user_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="k">else</span> <span class="mi">0</span></div>
 
 
 <div class="viewcode-block" id="Web.user_data">
@@ -958,6 +992,15 @@
         <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">SessionMiddleware</span><span class="p">,</span> <span class="o">**</span><span class="n">mwparam</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_webfeatures</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui_mode</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_open_browser</span><span class="p">():</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># サーバーが起動するまで少し待つ</span>
+                <span class="n">ssl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssl_cert</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssl_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="n">schema</span> <span class="o">=</span> <span class="s2">&quot;https&quot;</span> <span class="k">if</span> <span class="n">ssl</span> <span class="k">else</span> <span class="s2">&quot;http&quot;</span>
+                <span class="n">browser_port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssl_listen_port</span> <span class="k">if</span> <span class="n">ssl</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span>
+                <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">schema</span><span class="si">}</span><span class="s1">://localhost:</span><span class="si">{</span><span class="n">browser_port</span><span class="si">}</span><span class="s1">/gui&#39;</span><span class="p">)</span>
+            <span class="n">bth</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_open_browser</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">bth</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">th</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">th_ssl</span> <span class="o">=</span> <span class="kc">None</span>
@@ -968,19 +1011,15 @@
             <span class="n">th_ssl</span> <span class="o">=</span> <span class="n">ThreadedASGI</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">https_config</span><span class="p">,</span>
                                   <span class="n">gunicorn_config</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_workers</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_timeout</span><span class="p">))</span>
             <span class="n">th_ssl</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-            <span class="n">browser_port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssl_listen_port</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">http_config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="p">)</span>
             <span class="n">th</span> <span class="o">=</span> <span class="n">ThreadedASGI</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">http_config</span><span class="p">,</span>
                               <span class="n">gunicorn_config</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_workers</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gunicorn_timeout</span><span class="p">))</span>
             <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-            <span class="n">browser_port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui_mode</span><span class="p">:</span>
-                <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;http://localhost:</span><span class="si">{</span><span class="n">browser_port</span><span class="si">}</span><span class="s1">/gui&#39;</span><span class="p">)</span>
             <span class="k">def</span><span class="w"> </span><span class="nf">_w</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()))</span>
-            <span class="n">common</span><span class="o">.</span><span class="n">save_file</span><span class="p">(</span><span class="s2">&quot;web.pid&quot;</span><span class="p">,</span> <span class="n">_w</span><span class="p">)</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">save_file</span><span class="p">(</span><span class="s2">&quot;web.pid&quot;</span><span class="p">,</span> <span class="n">_w</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
                 <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">th</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1011,7 +1050,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stop web.&quot;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;pid is empty.&quot;</span><span class="p">)</span>
-            <span class="n">common</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s2">&quot;web.pid&quot;</span><span class="p">,</span> <span class="n">_r</span><span class="p">)</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s2">&quot;web.pid&quot;</span><span class="p">,</span> <span class="n">_r</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;web.pid&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>

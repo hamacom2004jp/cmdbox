@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.common &mdash; cmdbox 2026/02/23 documentation</title>
+  <title>cmdbox.app.common &mdash; cmdbox 2026/03/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=ff424cc1"></script>
+      <script src="../../../_static/documentation_options.js?v=5d974da7"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -175,13 +175,13 @@
 
 <div class="viewcode-block" id="load_yml">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.load_yml">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">load_yml</span><span class="p">(</span><span class="n">yml_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_yml</span><span class="p">(</span><span class="n">yml_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    YAMLファイルを読み込みます。</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        yml_path (Path): YAMLファイルのパス</span>
-<span class="sd">        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to False.</span>
+<span class="sd">        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to True.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: 読み込んだYAMLファイルの内容</span>
@@ -193,14 +193,14 @@
 
 <div class="viewcode-block" id="save_yml">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.save_yml">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">save_yml</span><span class="p">(</span><span class="n">yml_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_yml</span><span class="p">(</span><span class="n">yml_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    YAMLファイルに書き込みます。</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        yml_path (Path): YAMLファイルのパス</span>
 <span class="sd">        data (dict): 書き込むデータ</span>
-<span class="sd">        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to False.</span>
+<span class="sd">        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to True.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_w</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
         <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -209,7 +209,7 @@
 
 <div class="viewcode-block" id="load_file">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.load_file">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">load_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    ファイルを読み込みます。読み込み時に排他ロックします。</span>
 
@@ -218,7 +218,7 @@
 <span class="sd">        func: 読み込んだデータを処理する関数</span>
 <span class="sd">        mode (str, optional): ファイルモード. Defaults to &#39;r&#39;.</span>
 <span class="sd">        encoding (str, optional): エンコーディング. Defaults to &#39;utf-8&#39;.</span>
-<span class="sd">        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to False.</span>
+<span class="sd">        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to True.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="p">):</span>
         <span class="k">if</span> <span class="s1">&#39;b&#39;</span> <span class="ow">in</span> <span class="n">mode</span><span class="p">:</span>
@@ -254,7 +254,7 @@
 
 <div class="viewcode-block" id="save_file">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.save_file">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    ファイルに書き込みます。書き込み時に排他ロックします。</span>
 
@@ -263,7 +263,7 @@
 <span class="sd">        func: 書き込む関数</span>
 <span class="sd">        mode (str, optional): ファイルモード. Defaults to &#39;w&#39;.</span>
 <span class="sd">        encoding (str, optional): エンコーディング. Defaults to &#39;utf-8&#39;.</span>
-<span class="sd">        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to False.</span>
+<span class="sd">        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to True.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_save</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="p">):</span>
         <span class="k">if</span> <span class="s1">&#39;b&#39;</span> <span class="ow">in</span> <span class="n">mode</span><span class="p">:</span>
@@ -585,7 +585,7 @@
                 <span class="n">opt</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lopts</span> <span class="k">else</span> <span class="n">lopts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_w</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default_json_enc</span><span class="p">)</span>
-    <span class="n">save_file</span><span class="p">(</span><span class="n">opt_path</span><span class="p">,</span> <span class="n">_w</span><span class="p">)</span></div>
+    <span class="n">save_file</span><span class="p">(</span><span class="n">opt_path</span><span class="p">,</span> <span class="n">_w</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="saveuser">
@@ -800,15 +800,11 @@
         <span class="k">if</span> <span class="n">stdout</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">txt</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tm</span><span class="si">:</span><span class="s2">.03f</span><span class="si">}</span><span class="s2">s.&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">perf_counter</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tm</span><span class="si">:</span><span class="s2">.03f</span><span class="si">}</span><span class="s2">s.&quot;</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">BrokenPipeError</span><span class="p">:</span>
                 <span class="k">pass</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">is_success_dict</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;performance&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]:</span>
-                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">][</span><span class="s2">&quot;performance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">performance</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">][</span><span class="s2">&quot;performance&quot;</span><span class="p">]</span>
-            <span class="n">performance</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;app_proc&quot;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tm</span><span class="si">:</span><span class="s2">.03f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">))</span>
+        <span class="n">update_performance</span><span class="p">(</span><span class="s2">&quot;total&quot;</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">is_data_dict</span> <span class="ow">or</span> <span class="n">is_data_list</span><span class="p">:</span>
                 <span class="n">txt</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default_json_enc</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -826,7 +822,7 @@
             <span class="k">def</span><span class="w"> </span><span class="nf">_w</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
                 <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default_json_enc</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-            <span class="n">save_file</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">output_json</span><span class="p">),</span> <span class="n">_w</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;a&#39;</span> <span class="k">if</span> <span class="n">output_json_append</span> <span class="k">else</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+            <span class="n">save_file</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">output_json</span><span class="p">),</span> <span class="n">_w</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;a&#39;</span> <span class="k">if</span> <span class="n">output_json_append</span> <span class="k">else</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">pass</span>
     <span class="k">return</span> <span class="n">txt</span></div>
@@ -866,7 +862,7 @@
     <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_w</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
-    <span class="n">save_file</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">save_path</span><span class="p">),</span> <span class="n">_w</span><span class="p">)</span>
+    <span class="n">save_file</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">save_path</span><span class="p">),</span> <span class="n">_w</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">save_path</span></div>
 
 
@@ -1057,6 +1053,75 @@
         <span class="k">return</span> <span class="kc">False</span></div>
 
 
+<div class="viewcode-block" id="perf_counter">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.perf_counter">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">perf_counter</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    パフォーマンス計測用のタイムスタンプを取得します。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: タイムスタンプ</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="update_performance">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.update_performance">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_performance</span><span class="p">(</span><span class="n">key</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">res_json</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">&quot;success&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span> <span class="k">return</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">&quot;performance&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]:</span>
+        <span class="n">pf</span> <span class="o">=</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">][</span><span class="s2">&quot;performance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pf</span> <span class="o">=</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">][</span><span class="s2">&quot;performance&quot;</span><span class="p">]</span>
+    <span class="n">pf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">perf_counter</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tm</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> s&quot;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="result_format">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.result_format">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">result_format</span><span class="p">(</span><span class="n">res_json</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">pf</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span><span class="o">=</span><span class="p">[])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Redisサーバーからの応答をフォーマットする</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        res_json (dict): Redisサーバーからの応答</span>
+<span class="sd">        logger (Logger): ロガー</span>
+<span class="sd">        pf (List[Any], optional): パフォーマンス情報. Defaults to [].</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: フォーマットされた応答</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res_json</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">res_json</span>
+    <span class="n">msg_json</span> <span class="o">=</span> <span class="n">res_json</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s2">&quot;output_image&quot;</span> <span class="ow">in</span> <span class="n">msg_json</span><span class="p">:</span>
+        <span class="n">msg_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;binary&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;error&quot;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">to_str</span><span class="p">(</span><span class="n">msg_json</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s2">&quot;warn&quot;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">to_str</span><span class="p">(</span><span class="n">msg_json</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s2">&quot;success&quot;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="n">msg_str</span> <span class="o">=</span> <span class="n">to_str</span><span class="p">(</span><span class="n">msg_json</span><span class="p">,</span> <span class="n">slise</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;redis_client._res_cmd: msg=</span><span class="si">{</span><span class="n">msg_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">dict</span><span class="p">:</span>
+            <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">&quot;performance&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]:</span>
+            <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">][</span><span class="s2">&quot;performance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pf</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_tmp_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">][</span><span class="s2">&quot;performance&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">pf</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;key&quot;</span> <span class="ow">in</span> <span class="n">i</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">_tmp_dict</span><span class="p">:</span>
+                    <span class="n">_tmp_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">_tmp_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">][</span><span class="s2">&quot;performance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_tmp_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">res_json</span></div>
+
+
 <div class="viewcode-block" id="exec_sync">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.exec_sync">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">exec_sync</span><span class="p">(</span><span class="n">apprun</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">pf</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span> <span class="n">webcall</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
@@ -1074,6 +1139,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple[int, Dict[str, Any], Any]: 戻り値のタプル。0は成功、1は失敗、2はキャンセル</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">apprun_tm</span> <span class="o">=</span> <span class="n">perf_counter</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">iscoroutinefunction</span><span class="p">(</span><span class="n">apprun</span><span class="p">):</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">_run</span><span class="p">(</span><span class="n">apprun</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="p">):</span>
             <span class="n">signin</span><span class="o">.</span><span class="n">set_request_scope</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
@@ -1082,13 +1148,21 @@
         <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">signin</span>
         <span class="n">scope</span> <span class="o">=</span> <span class="n">signin</span><span class="o">.</span><span class="n">get_request_scope</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">webcall</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">apprun</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="p">))</span>
+            <span class="n">st</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">o</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">apprun</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="p">))</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">result_format</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">pf</span><span class="p">)</span>
+            <span class="n">update_performance</span><span class="p">(</span><span class="s2">&quot;apprun&quot;</span><span class="p">,</span> <span class="n">apprun_tm</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">st</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">o</span>
         <span class="n">th</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_run</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">apprun</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="p">))</span>
         <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="n">th</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">ctx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">ctx</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="n">result</span>
-    <span class="k">return</span> <span class="n">apprun</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="p">)</span></div>
+        <span class="n">st</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">o</span> <span class="o">=</span> <span class="n">ctx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">ctx</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">result_format</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">pf</span><span class="p">)</span>
+        <span class="n">update_performance</span><span class="p">(</span><span class="s2">&quot;apprun&quot;</span><span class="p">,</span> <span class="n">apprun_tm</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">st</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">o</span>
+    <span class="n">st</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">o</span> <span class="o">=</span> <span class="n">apprun</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">result_format</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">pf</span><span class="p">)</span>
+    <span class="n">update_performance</span><span class="p">(</span><span class="s2">&quot;apprun&quot;</span><span class="p">,</span> <span class="n">apprun_tm</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">st</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">o</span></div>
 
 
 <div class="viewcode-block" id="exec_svrun_sync">
