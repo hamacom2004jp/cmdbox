@@ -10,7 +10,6 @@ import datetime
 import logging
 import json
 import numpy as np
-import time
 import sys
 
 
@@ -169,7 +168,7 @@ class VisionPredict(cmdbox_vision_start.VisionStart):
                     if logger.level == logging.DEBUG:
                         ret_str = common.to_str(r, slise=100)
                         logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, ret={ret_str}")
-                    tm = time.perf_counter()
+                    tm = common.perf_counter()
                     args.output_json_append = True
             else:
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -199,7 +198,7 @@ class VisionPredict(cmdbox_vision_start.VisionStart):
                     #thread = threading.Thread(target=_pred, args=(args, line, tm))
                     #thread.start()
                     _pred(args, line, tm)
-                    tm = time.perf_counter()
+                    tm = common.perf_counter()
                     args.output_json_append = True
             else:
                 if logger.level == logging.DEBUG:
@@ -212,7 +211,7 @@ class VisionPredict(cmdbox_vision_start.VisionStart):
                 if logger.level == logging.DEBUG:
                     ret_str = common.to_str(ret, slise=100)
                     logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, ret={ret_str}")
-                tm = time.perf_counter()
+                tm = common.perf_counter()
         else:
             msg = {"warn":f"Image file or stdin is empty."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -251,7 +250,7 @@ class VisionPredict(cmdbox_vision_start.VisionStart):
         Returns:
             dict: Redisサーバーからの応答
         """
-        spredtime = time.perf_counter()
+        spredtime = common.perf_counter()
         if vision_engine is None or vision_engine == "":
             logger.warning(f"vision_engine is empty.")
             return {"error": f"vision_engine is empty."}
@@ -259,7 +258,7 @@ class VisionPredict(cmdbox_vision_start.VisionStart):
             logger.warning(f"image and img_input_file is empty.")
             return {"error": f"image and img_input_file is empty."}
         npy_b64 = None
-        simgloadtime = time.perf_counter()
+        simgloadtime = common.perf_counter()
         if img_input_file is not None and img_input_file_enable:
             if type(img_input_file) == str:
                 if not Path(img_input_file).exists():
@@ -352,7 +351,7 @@ class VisionPredict(cmdbox_vision_start.VisionStart):
                 logger.warning(f"img_input_type is invalid. {img_input_type}.")
                 return {"error": f"img_input_type is invalid. {img_input_type}."}
 
-        eimgloadtime = time.perf_counter()
+        eimgloadtime = common.perf_counter()
         img_npy_b64 = convert.npy2b64str(img_npy)
         model_param_b64 = convert.str2b64str(common.to_str(model_param))
         img_input_file_b64 = convert.str2b64str(img_input_file)
@@ -362,15 +361,15 @@ class VisionPredict(cmdbox_vision_start.VisionStart):
                                  img_input_file_b64, str(nodraw),],
                                 retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
 
-        soutputtime = time.perf_counter()
+        soutputtime = common.perf_counter()
         if "output_image" in res_json and "output_image_shape" in res_json:
             img_npy = convert.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
             if img_output_file is not None:
                 exp = Path(img_output_file).suffix
                 exp = exp[1:] if exp[0] == '.' else exp
                 convert.npy2imgfile(img_npy, output_image_file=img_output_file, image_type=exp)
-        eoutputtime = time.perf_counter()
-        epredtime = time.perf_counter()
+        eoutputtime = common.perf_counter()
+        epredtime = common.perf_counter()
         if "success" in res_json:
             if "performance" not in res_json["success"]:
                 res_json["success"]["performance"] = []

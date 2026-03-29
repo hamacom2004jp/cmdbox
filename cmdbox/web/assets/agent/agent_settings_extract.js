@@ -28,7 +28,7 @@ agentView.list_extract = async () => {
         await cmdbox.callcmd('cmd','list', {match_opt:['scope','loadpath']},
             (res)=>{
                 $("[name='extract_cmd']").empty().append('<option></option>');
-                res.forEach(elm=>{$('[name="extract_cmd"]').append('<option value="'+elm["title"]+'">'+elm["title"]+'</option>');});
+                res['data'].forEach(elm=>{$('[name="extract_cmd"]').append('<option value="'+elm["title"]+'">'+elm["title"]+'</option>');});
         },$('[name="title"]').val(),'extract_cmd');
     });
 
@@ -118,7 +118,7 @@ agentView.list_extract = async () => {
                 await cmdbox.callcmd('cmd','list', {match_opt:['scope','loadpath']}, (res)=>{
                     const val = $("[name='extract_cmd']").val();
                     $("[name='extract_cmd']").empty().append('<option></option>');
-                    res.forEach(elm=>{$('[name="extract_cmd"]').append('<option value="'+elm["title"]+'">'+elm["title"]+'</option>');});
+                    res['data'].forEach(elm=>{$('[name="extract_cmd"]').append('<option value="'+elm["title"]+'">'+elm["title"]+'</option>');});
                     form.find('[name="extract_cmd"]').val(config.extract_cmd);
                 },$('[name="title"]').val(),'extract_cmd');
                 $('#extract_edit_modal').modal('show');

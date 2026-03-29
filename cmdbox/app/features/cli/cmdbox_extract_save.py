@@ -68,7 +68,7 @@ class ExtractSave(feature.OneshotResultEdgeFeature):
                      callcmd="async () => {await cmdbox.callcmd('cmd','list',{match_opt:['scope','loadpath']},"
                             + "(res)=>{const val = $(\"[name='extract_cmd']\").val();"
                             + "$(\"[name='extract_cmd']\").empty().append('<option></option>');"
-                            + "res.forEach(elm=>{$(\"[name='extract_cmd']\").append('<option value=\"'+elm[\"title\"]+'\">'+elm[\"title\"]+'</option>');});"
+                            + "res['data'].forEach(elm=>{$(\"[name='extract_cmd']\").append('<option value=\"'+elm[\"title\"]+'\">'+elm[\"title\"]+'</option>');});"
                             + "$(\"[name='extract_cmd']\").val(val);"
                             + "},$(\"[name='title']\").val(),'extract_cmd');"
                             + "}",

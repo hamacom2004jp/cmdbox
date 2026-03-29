@@ -158,7 +158,7 @@ class A2aSvStart(feature.UnsupportEdgeFeature):
             try:
                 def _w(f):
                     f.write(str(os.getpid()))
-                common.save_file("a2a.pid", _w)
+                common.save_file("a2a.pid", _w, nolock=False)
                 # ブロッキングで稼働
                 import gevent
                 while True:

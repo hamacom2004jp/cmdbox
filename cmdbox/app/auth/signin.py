@@ -322,7 +322,7 @@ class Signin(object):
         if cls.signin_file_last >= signin_file.stat().st_mtime and signin_file_data is not None:
             return signin_file_data
         cls.signin_file_last = signin_file.stat().st_mtime
-        yml = common.load_yml(signin_file)
+        yml = common.load_yml(signin_file, nolock=True)
         # usersのフォーマットチェック
         if 'users' not in yml:
             raise HTTPException(status_code=500, detail=f'signin_file format error. "users" not found. ({signin_file})')

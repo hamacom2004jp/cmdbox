@@ -7,7 +7,6 @@ import argcomplete
 import logging
 import os
 import queue
-import time
 import threading
 import sys
 
@@ -46,7 +45,7 @@ class CmdBoxApp:
         """
         コマンドライン引数を処理し、サーバーまたはクライアントを起動し、コマンドを実行する。
         """
-        smaintime = time.perf_counter()
+        smaintime = common.perf_counter()
         if sys.version_info[0] >= 3 and sys.version_info[1] >= 9:
             parser = argparse.ArgumentParser(prog=self.ver.__appid__, description=self.ver.__logo__ + '\n\n' + self.ver.__description__,
                                             formatter_class=argparse.RawDescriptionHelpFormatter, exit_on_error=False)
@@ -70,13 +69,13 @@ class CmdBoxApp:
             self.default_language = 'en_US'
 
         # プラグイン読込み
-        sfeatureloadtime = time.perf_counter()
+        sfeatureloadtime = common.perf_counter()
         common.copy_sample(Path.cwd(), ver=self.ver)
         self.options._load_features_yml(self.ver, logger=self.default_logger)
         self.options.load_features_agentrule(self.default_logger)
-        self.options.load_svcmd('cmdbox.app.features.cli', prefix="cmdbox_", excludes=[],
-                                appcls=self.appcls, ver=self.ver, language=self.default_language,
-                                logger=self.default_logger, isloaded=self.options.is_features_loaded('cli'))
+        #self.options.load_svcmd('cmdbox.app.features.cli', prefix="cmdbox_", excludes=[],
+        #                        appcls=self.appcls, ver=self.ver, language=self.default_language,
+        #                        logger=self.default_logger, isloaded=self.options.is_features_loaded('cli'))
         if self.cli_features_packages is not None:
             if self.cli_features_prefix is None:
                 raise ValueError(f"cli_features_prefix is None. cli_features_packages={self.cli_features_packages}")
@@ -89,10 +88,10 @@ class CmdBoxApp:
         self.options.load_features_file('cli', self.options.load_svcmd, self.appcls, self.ver, self.default_language, self.default_logger)
         self.options.load_features_aliases_cli(self.default_logger)
         self.options.load_features_audit(self.default_logger)
-        efeatureloadtime = time.perf_counter()
+        efeatureloadtime = common.perf_counter()
 
         # コマンド引数の生成
-        sargsparsetime = time.perf_counter()
+        sargsparsetime = common.perf_counter()
         opts = self.options.list_options(language=self.default_language)
         for opt in opts.values():
             default = opt["default"] if opt["default"] is not None and opt["default"] != "" else None
@@ -136,7 +135,7 @@ class CmdBoxApp:
         # featuresの初期値を適用する
         self.options.load_features_args(args_dict)
         args = argparse.Namespace(**{k:common.chopdq(v) for k,v in args_dict.items()})
-        eargsparsetime = time.perf_counter()
+        eargsparsetime = common.perf_counter()
 
         if args.debug_attach:
             import debugpy
@@ -155,9 +154,9 @@ class CmdBoxApp:
             common.saveopt(opt, args.useopt)
             ret = dict(success=f"Save options file. {args.useopt}")
 
-        smakesampletime = time.perf_counter()
+        if not hasattr(args, 'data') or args.data is None:
+            args.data = str(Path.home() / f".{self.ver.__appid__}")
         common.mklogdir(args.data)
-        emakesampletime = time.perf_counter()
 
         if args.version:
             v = self.ver.__logo__ + '\n' + self.ver.__description__
@@ -170,10 +169,10 @@ class CmdBoxApp:
             if resqueue is not None: resqueue.put(msg)
             return feature.Feature.RESP_WARN, msg, None
 
-        sloggerinittime = time.perf_counter()
+        sloggerinittime = common.perf_counter()
         logger = self.load_config(args, webcall=webcall if args.cmd != 'webcap' else True)
         try:
-            eloggerinittime = time.perf_counter()
+            eloggerinittime = common.perf_counter()
             #if logger.level == logging.DEBUG:
             #    logger.debug(f"args.mode={args.mode}, args.cmd={args.cmd}")
             #    # 警告出力時にスタックを出力する
@@ -184,14 +183,13 @@ class CmdBoxApp:
             #        traceback.print_stack()
             #    warnings.showwarning = custom_warning_handler
 
-            #scmdexectime = time.perf_counter()
+            #scmdexectime = common.perf_counter()
             feat = self.options.get_cmd_attr(args.mode, args.cmd, 'feature')
             if feat is not None and isinstance(feat, feature.Feature):
                 pf = []
-                pf.append(dict(key="app_featureload", val=f"{efeatureloadtime-sfeatureloadtime:.03f}s"))
-                pf.append(dict(key="app_argsparse", val=f"{eargsparsetime-sargsparsetime:.03f}s"))
-                pf.append(dict(key="app_makesample", val=f"{emakesampletime-smakesampletime:.03f}s"))
-                pf.append(dict(key="app_loggerinit", val=f"{eloggerinittime-sloggerinittime:.03f}s"))
+                pf.append(dict(key="featureload", val=f"{efeatureloadtime-sfeatureloadtime:.03f}s"))
+                pf.append(dict(key="argsparse", val=f"{eargsparsetime-sargsparsetime:.03f}s"))
+                pf.append(dict(key="loggerinit", val=f"{eloggerinittime-sloggerinittime:.03f}s"))
                 self.options.audit_exec(args, logger, feat, audit_type=options.Options.AT_EVENT)
                 args._resqueue = resqueue # コマンド実行結果を格納するキューを引数に追加
                 status, ret, obj = common.exec_sync(feat.apprun, logger, args, smaintime, pf, webcall)

@@ -84,13 +84,13 @@ def mklogdir(data:Path) -> Path:
         return mkdirs(logdir)
     return logdir
 
-def load_yml(yml_path:Path, nolock=False) -> dict:
+def load_yml(yml_path:Path, nolock=True) -> dict:
     """
     YAMLファイルを読み込みます。
 
     Args:
         yml_path (Path): YAMLファイルのパス
-        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to False.
+        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to True.
 
     Returns:
         dict: 読み込んだYAMLファイルの内容
@@ -99,20 +99,20 @@ def load_yml(yml_path:Path, nolock=False) -> dict:
         return yaml.safe_load(f)
     return load_file(yml_path, _r, nolock=nolock)
 
-def save_yml(yml_path:Path, data:dict, nolock=False) -> None:
+def save_yml(yml_path:Path, data:dict, nolock=True) -> None:
     """
     YAMLファイルに書き込みます。
 
     Args:
         yml_path (Path): YAMLファイルのパス
         data (dict): 書き込むデータ
-        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to False.
+        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to True.
     """
     def _w(f):
         yaml.dump(data, f, default_flow_style=False, sort_keys=False)
     save_file(yml_path, _w, nolock=nolock)
 
-def load_file(file_path:Path, func, mode='r', encoding='utf-8', nolock=False) -> None:
+def load_file(file_path:Path, func, mode='r', encoding='utf-8', nolock=True) -> None:
     """
     ファイルを読み込みます。読み込み時に排他ロックします。
 
@@ -121,7 +121,7 @@ def load_file(file_path:Path, func, mode='r', encoding='utf-8', nolock=False) ->
         func: 読み込んだデータを処理する関数
         mode (str, optional): ファイルモード. Defaults to 'r'.
         encoding (str, optional): エンコーディング. Defaults to 'utf-8'.
-        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to False.
+        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to True.
     """
     def _load(file_path, func, mode, encoding):
         if 'b' in mode:
@@ -154,7 +154,7 @@ def load_file(file_path:Path, func, mode='r', encoding='utf-8', nolock=False) ->
         except:
             pass
 
-def save_file(file_path:Path, func, mode='w', encoding='utf-8', nolock=False) -> None:
+def save_file(file_path:Path, func, mode='w', encoding='utf-8', nolock=True) -> None:
     """
     ファイルに書き込みます。書き込み時に排他ロックします。
 
@@ -163,7 +163,7 @@ def save_file(file_path:Path, func, mode='w', encoding='utf-8', nolock=False) ->
         func: 書き込む関数
         mode (str, optional): ファイルモード. Defaults to 'w'.
         encoding (str, optional): エンコーディング. Defaults to 'utf-8'.
-        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to False.
+        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to True.
     """
     def _save(file_path, func, mode, encoding):
         if 'b' in mode:
@@ -449,7 +449,7 @@ def saveopt(opt:dict, opt_path:Path, webmode:bool=False) -> None:
                 opt[k] = d if k not in lopts else lopts.get(k, d)
     def _w(f):
         json.dump(opt, f, indent=4, default=default_json_enc)
-    save_file(opt_path, _w)
+    save_file(opt_path, _w, nolock=False)
 
 def saveuser(user_data:dict, user_path:Path) -> None:
     """
@@ -634,15 +634,11 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
         if stdout:
             try:
                 print(txt)
-                print(f"{time.perf_counter() - tm:.03f}s.")
+                print(f"{perf_counter() - tm:.03f}s.")
             except BrokenPipeError:
                 pass
     else:
-        if is_success_dict:
-            if "performance" not in data["success"]:
-                data["success"]["performance"] = []
-            performance = data["success"]["performance"]
-            performance.append(dict(key="app_proc", val=f"{time.perf_counter() - tm:.03f}s"))
+        update_performance("total", tm, data)
         try:
             if is_data_dict or is_data_list:
                 txt = json.dumps(data, default=default_json_enc, ensure_ascii=False)
@@ -660,7 +656,7 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
             def _w(f):
                 json.dump(data, f, default=default_json_enc, ensure_ascii=False)
                 print('', file=f)
-            save_file(Path(output_json), _w, mode='a' if output_json_append else 'w')
+            save_file(Path(output_json), _w, mode='a' if output_json_append else 'w', nolock=True)
         except Exception as e:
             pass
     return txt
@@ -694,7 +690,7 @@ def download_file(url:str, save_path:Path) -> Path:
     r = requests.get(url, stream=True)
     def _w(f):
         f.write(r.content)
-    save_file(Path(save_path), _w)
+    save_file(Path(save_path), _w, nolock=False)
     return save_path
 
 def newenv(container:str, ver:Any) -> Dict[str, str]:
@@ -860,6 +856,66 @@ def is_event_loop_running() -> bool:
     except RuntimeError:
         return False
 
+def perf_counter() -> float:
+    """
+    パフォーマンス計測用のタイムスタンプを取得します。
+
+    Returns:
+        float: タイムスタンプ
+    """
+    return time.perf_counter()
+
+def update_performance(key:str, tm:float, res_json:Dict[str, Any]) -> None:
+    if "success" not in res_json: return
+    if type(res_json["success"]) is not dict:
+        res_json["success"] = dict(data=res_json["success"])
+    if "performance" not in res_json["success"]:
+        pf = res_json["success"]["performance"] = []
+    else:
+        pf = res_json["success"]["performance"]
+    pf.append(dict(key=key, val=f"{perf_counter() - tm:.3f} s"))
+
+def result_format(res_json:dict, logger:logging.Logger, pf:List[Any]=[]) -> dict:
+    """
+    Redisサーバーからの応答をフォーマットする
+
+    Args:
+        res_json (dict): Redisサーバーからの応答
+        logger (Logger): ロガー
+        pf (List[Any], optional): パフォーマンス情報. Defaults to [].
+
+    Returns:
+        dict: フォーマットされた応答
+    """
+    if not isinstance(res_json, dict):
+        return res_json
+    msg_json = res_json.copy()
+    if "output_image" in msg_json:
+        msg_json["output_image"] = "binary"
+    if "error" in res_json:
+        logger.warning(to_str(msg_json))
+    if "warn" in res_json:
+        logger.warning(to_str(msg_json))
+    if "success" in res_json:
+        if logger.level == logging.DEBUG:
+            msg_str = to_str(msg_json, slise=100)
+            logger.debug(f"redis_client._res_cmd: msg={msg_str}")
+        if type(res_json["success"]) is not dict:
+            res_json["success"] = dict(data=res_json["success"])
+        if "performance" not in res_json["success"]:
+            res_json["success"]["performance"] = pf
+        else:
+            _tmp_dict = dict()
+            for i in res_json["success"]["performance"] + pf:
+                key = i["key"] if "key" in i else None
+                if key is None: continue
+                if key in _tmp_dict:
+                    _tmp_dict[key].update(i)
+                else:
+                    _tmp_dict[key] = i
+            res_json["success"]["performance"] = list(_tmp_dict.values())
+    return res_json
+
 def exec_sync(apprun, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]], webcall:bool=False) -> Tuple[int, Dict[str, Any], Any]:
     """"
     指定された関数が非同期関数であっても同期的に実行します。
@@ -875,6 +931,7 @@ def exec_sync(apprun, logger:logging.Logger, args:argparse.Namespace, tm:float, 
     Returns:
         Tuple[int, Dict[str, Any], Any]: 戻り値のタプル。0は成功、1は失敗、2はキャンセル
     """
+    apprun_tm = perf_counter()
     if inspect.iscoroutinefunction(apprun):
         def _run(apprun, ctx, logger, args, scope, tm, pf):
             signin.set_request_scope(scope)
@@ -883,13 +940,21 @@ def exec_sync(apprun, logger:logging.Logger, args:argparse.Namespace, tm:float, 
         from cmdbox.app.auth import signin
         scope = signin.get_request_scope()
         if not webcall:
-            return asyncio.run(apprun(logger, args, tm, pf))
+            st, res, o = asyncio.run(apprun(logger, args, tm, pf))
+            res = result_format(res, logger, pf)
+            update_performance("apprun", apprun_tm, res)
+            return st, res, o
         th = threading.Thread(target=_run, args=(apprun, ctx, logger, args, scope, tm, pf))
         th.start()
         th.join()
-        result = ctx[0] if ctx else None
-        return result
-    return apprun(logger, args, tm, pf)
+        st, res, o = ctx[0] if ctx else None
+        res = result_format(res, logger, pf)
+        update_performance("apprun", apprun_tm, res)
+        return st, res, o
+    st, res, o = apprun(logger, args, tm, pf)
+    res = result_format(res, logger, pf)
+    update_performance("apprun", apprun_tm, res)
+    return st, res, o
 
 def exec_svrun_sync(svrun, data_dir, logger:logging.Logger, redis_cli, msg, sessions) -> int:
     """"

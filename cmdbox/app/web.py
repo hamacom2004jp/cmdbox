@@ -1,9 +1,10 @@
 from cmdbox.app import common, options
 from cmdbox.app.commons import module, redis_client
+from collections import Counter
 from fastapi import FastAPI, Request, Response
 from pathlib import Path
 from starlette.middleware.sessions import SessionMiddleware
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 from uvicorn.config import Config
 import asyncio
 import copy
@@ -230,6 +231,22 @@ class Web:
         if self.logger.level == logging.DEBUG:
             for route in app.routes:
                 self.logger.debug(f"loaded webfeature: {route}")
+        # 重複したパスをチェック
+        routes = {}
+        for route in app.routes.copy():
+            path = getattr(route, "path", None)
+            methods = getattr(route, "methods", None)
+            endpoint:Callable = getattr(route, "endpoint", None)
+            key = f"{methods}-{path}"
+            if key in routes:
+                # 重複したパスがある場合は、先に登録されたルートを削除して、後に登録されたルートを優先する
+                app.routes.remove(routes[key]['route'])
+                ep = routes[key]['endpoint']
+                self.logger.warning(f"Duplicate web route path:{key}, " + \
+                                 f"endpoint:{ep.__module__}.{ep.__class__.__name__}.{ep.__name__}" + \
+                                 f" -> {endpoint.__module__}.{endpoint.__class__.__name__}.{endpoint.__name__}")
+            else:
+                routes[key] = dict(path=path, methods=methods, endpoint=endpoint, route=route)
 
     def change_password(self, user_name:str, password:str, new_password:str, confirm_password:str):
         """
@@ -272,7 +289,7 @@ class Web:
                 self.user_data(None, u['uid'], user_name, 'password', 'last_update', datetime.datetime.now())
                 # サインインファイルの保存
                 self.signin.signin_file_data = signin_data
-                common.save_yml(self.signin_file, signin_data)
+                common.save_yml(self.signin_file, signin_data, nolock=False)
                 return dict(success="Password changed.")
         return dict(warn="User not found.")
 
@@ -372,7 +389,7 @@ class Web:
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"apikey_add: {user} -> {self.signin_file}")
         self.signin.signin_file_data = signin_data
-        common.save_yml(self.signin_file, signin_data)
+        common.save_yml(self.signin_file, signin_data, nolock=False)
         return apikey
 
     def apikey_del(self, user:Dict[str, Any]):
@@ -412,7 +429,7 @@ class Web:
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"apikey_del: {user} -> {self.signin_file}")
         self.signin.signin_file_data = signin_data
-        common.save_yml(self.signin_file, signin_data)
+        common.save_yml(self.signin_file, signin_data, nolock=False)
 
     def user_add(self, user:Dict[str, Any]):
         """
@@ -468,7 +485,7 @@ class Web:
         self.user_data(None, user['uid'], user['name'], 'password', 'last_update', datetime.datetime.now())
         # サインインファイルの保存
         self.signin.signin_file_data = signin_data
-        common.save_yml(self.signin_file, signin_data)
+        common.save_yml(self.signin_file, signin_data, nolock=False)
 
     def user_edit(self, user:Dict[str, Any]):
         """
@@ -528,7 +545,7 @@ class Web:
             self.logger.debug(f"user_edit: {user} -> {self.signin_file}")
         # サインインファイルの保存
         self.signin.signin_file_data = signin_data
-        common.save_yml(self.signin_file, signin_data)
+        common.save_yml(self.signin_file, signin_data, nolock=False)
 
     def user_del(self, uid:int):
         """
@@ -553,7 +570,7 @@ class Web:
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"user_del: {uid} -> {self.signin_file}")
         self.signin.signin_file_data = signin_data
-        common.save_yml(self.signin_file, signin_data)
+        common.save_yml(self.signin_file, signin_data, nolock=False)
 
     def group_list(self, name:str=None) -> List[Dict[str, Any]]:
         """
@@ -611,7 +628,7 @@ class Web:
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"group_add: {group} -> {self.signin_file}")
         self.signin.signin_file_data = signin_data
-        common.save_yml(self.signin_file, signin_data)
+        common.save_yml(self.signin_file, signin_data, nolock=False)
 
     def group_edit(self, group:Dict[str, Any]):
         """
@@ -652,7 +669,7 @@ class Web:
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"group_edit: {group} -> {self.signin_file}")
         self.signin.signin_file_data = signin_data
-        common.save_yml(self.signin_file, signin_data)
+        common.save_yml(self.signin_file, signin_data, nolock=False)
 
     def group_del(self, gid:int):
         """
@@ -707,7 +724,21 @@ class Web:
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"group_del: {gid} -> {self.signin_file}")
         self.signin.signin_file_data = signin_data
-        common.save_yml(self.signin_file, signin_data)
+        common.save_yml(self.signin_file, signin_data, nolock=False)
+
+    def user_data_hash(self, uid:str, user_name:str) -> int:
+        """
+        ユーザーデータのハッシュ値を取得する
+
+        Args:
+            uid (str): ユーザーID
+            user_name (str): ユーザー名
+
+        Returns:
+            int: ハッシュ値
+        """
+        user_path = self.users_path / f"user-{uid}_{user_name}.json"
+        return user_path.stat().st_mtime_ns if user_path.is_file() else 0
 
     def user_data(self, req:Request, uid:str, user_name:str, categoly:str, key:str=None, val:Any=None, delkey:bool=False) -> Any:
         """
@@ -832,6 +863,15 @@ class Web:
         app.add_middleware(SessionMiddleware, **mwparam)
         self.init_webfeatures(app)
 
+        if self.gui_mode:
+            def _open_browser():
+                time.sleep(1) # サーバーが起動するまで少し待つ
+                ssl = self.ssl_cert is not None and self.ssl_key is not None
+                schema = "https" if ssl else "http"
+                browser_port = self.ssl_listen_port if ssl else self.listen_port
+                webbrowser.open(f'{schema}://localhost:{browser_port}/gui')
+            bth = threading.Thread(target=_open_browser, daemon=True)
+            bth.start()
         self.is_running = True
         th = None
         th_ssl = None
@@ -842,19 +882,15 @@ class Web:
             th_ssl = ThreadedASGI(app, self.logger, config=https_config,
                                   gunicorn_config=dict(workers=self.gunicorn_workers, timeout=self.gunicorn_timeout))
             th_ssl.start()
-            browser_port = self.ssl_listen_port
         else:
             http_config = Config(app=app, host=self.allow_host, port=self.listen_port)
             th = ThreadedASGI(app, self.logger, config=http_config,
                               gunicorn_config=dict(workers=self.gunicorn_workers, timeout=self.gunicorn_timeout))
             th.start()
-            browser_port = self.listen_port
         try:
-            if self.gui_mode:
-                webbrowser.open(f'http://localhost:{browser_port}/gui')
             def _w(f):
                 f.write(str(os.getpid()))
-            common.save_file("web.pid", _w)
+            common.save_file("web.pid", _w, nolock=False)
             while self.is_running:
                 gevent.sleep(1)
             if th is not None:
@@ -882,7 +918,7 @@ class Web:
                     self.logger.info(f"Stop web.")
                 else:
                     self.logger.warning(f"pid is empty.")
-            common.load_file("web.pid", _r)
+            common.load_file("web.pid", _r, nolock=True)
             Path("web.pid").unlink(missing_ok=True)
         except:
             traceback.print_exc()

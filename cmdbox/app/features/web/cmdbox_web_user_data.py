@@ -24,7 +24,14 @@ class UserData(feature.WebFeature):
             categoly = form.get('categoly')
             key = form.get('key')
             sess = req.session['signin']
+
+            im = req.headers.get('If-None-Match')
+            hs = str(web.user_data_hash(sess['uid'], sess['name']))
+            headers = {'Cache-Control':'private, no-cache', 'ETag': hs}
+            if im == hs:
+                return Response(status_code=304, headers=headers)
             ret = web.user_data(req, sess['uid'], sess['name'], categoly, key)
+            res.headers.update(headers)
             return dict(success=ret)
 
         @app.post('/gui/user_data/save')

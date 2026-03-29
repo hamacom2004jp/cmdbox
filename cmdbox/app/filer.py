@@ -230,7 +230,8 @@ class Filer(object):
             self.logger.warning(f"Failed to remove {abspath}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to remove {abspath}. {e}")
 
-    def file_download(self, current_path:str, img_thumbnail:float=0.0, fwpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+    def file_download(self, current_path:str, img_thumbnail:float=0.0,
+                      fwpaths:List[str]=None, etag:str=None) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルをダウンロードする
 
@@ -238,6 +239,7 @@ class Filer(object):
             current_path (str): ファイルパス
             img_thumbnail (float, optional): サムネイルのサイズ, by default 0.0
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
+            etag (str, optional): ETag. Defaults to None.
 
         Returns:
             int: レスポンスコード
@@ -265,8 +267,12 @@ class Filer(object):
                     #fname = f"{fname}.thumbnail.jpg"
                 data = convert.bytes2b64str(fd)
                 return data
-            data = common.load_file(abspath, _r, mode='rb')
-            return self.RESP_SUCCESS, dict(success=dict(name=fname, data=data, mime_type=mime_type))
+            file_etag = str(abspath.stat().st_mtime_ns)
+            if etag is not None and etag == file_etag:
+                return self.RESP_SUCCESS, dict(success=dict(name=fname, data="", mime_type=mime_type, etag=file_etag, not_modified=True))
+            else:
+                data = common.load_file(abspath, _r, mode='rb', nolock=True)
+            return self.RESP_SUCCESS, dict(success=dict(name=fname, data=data, mime_type=mime_type, etag=file_etag, not_modified=False))
         except Exception as e:
             self.logger.warning(f"Failed to download {abspath}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to download {abspath}. {e}")
@@ -311,7 +317,7 @@ class Filer(object):
                 save_path.parent.mkdir(parents=True, exist_ok=True)
             def _w(f):
                 f.write(file_data)
-            common.save_file(Path(save_path), _w, mode='wb')
+            common.save_file(Path(save_path), _w, mode='wb', nolock=False)
             return self.RESP_SUCCESS, dict(success=f"Uploaded {save_path}")
         except Exception as e:
             self.logger.warning(f"Failed to upload {save_path}. {e}")

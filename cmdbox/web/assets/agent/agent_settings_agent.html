@@ -1,0 +1,21 @@
+<!-- Agent追加/編集モーダル -->
+<div id="agent_edit_modal" class="modal fade" tabindex="-1" aria-hidden="true" style="z-index: 1090;">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content sf-modal doc-card" style="height:auto;">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan system-font">Add/Edit Agent</h5>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form_agent_edit" class="row"></form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-danger me-auto" id="btn_del_agent" style="display:none;">DELETE</button>
+                <button type="button" class="btn btn-footer-action" id="btn_save_agent">SAVE</button>
+            </div>
+        </div>
+    </div>
+</div>

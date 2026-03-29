@@ -170,7 +170,7 @@ class McpsvStart(feature.UnsupportEdgeFeature):
             try:
                 def _w(f):
                     f.write(str(os.getpid()))
-                common.save_file("mcpsv.pid", _w)
+                common.save_file("mcpsv.pid", _w, nolock=False)
                 # ブロッキングで稼働
                 import gevent
                 while True:

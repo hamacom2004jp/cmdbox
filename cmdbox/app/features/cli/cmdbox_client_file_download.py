@@ -60,6 +60,9 @@ class ClientFileDownload(feature.OneshotEdgeFeature):
                 dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None,
                      description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合エラーにします。",
                      description_en="Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.",),
+                dict(opt="etag", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja="ETagを指定します。サーバー側でファイルのETagと一致する場合、ファイルコンテンツはダウンロードされずに空が返されます。",
+                     description_en="Specify the ETag. If the ETag matches the file's ETag on the server, the file content will not be downloaded and an empty response will be returned."),
                 dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="参照先スコープを指定します。指定可能な画像タイプは `client` , `current` , `server` です。",
                      description_en="Specifies the scope to be referenced. When omitted, 'client' is used.",
@@ -140,13 +143,17 @@ class ClientFileDownload(feature.OneshotEdgeFeature):
             msg = dict(warn=f"Please specify the --svpath option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
+        if args.etag is not None and args.download_file is not None:
+            msg = dict(warn=f"Cannot specify both --etag and --download_file options.")
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
         client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
         download_file = Path(args.download_file.replace('"','')) if args.download_file is not None else None
         fwpaths = [p.replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
         ret = cl.file_download(args.svpath.replace('"',''), download_file, scope=args.scope, client_data=client_data,
-                               fwpaths=fwpaths, rpath=args.rpath, img_thumbnail=args.img_thumbnail,
+                               fwpaths=fwpaths, etag=args.etag, rpath=args.rpath, img_thumbnail=args.img_thumbnail,
                                retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
@@ -182,15 +189,16 @@ class ClientFileDownload(feature.OneshotEdgeFeature):
         payload = json.loads(convert.b64str2str(msg[2]))
         svpath = payload.get("svpath")
         fwpaths = payload.get("fwpaths")
+        etag = payload.get("etag")
         img_thumbnail = payload.get("img_thumbnail", 0.0)
         if img_thumbnail == 'None':
             img_thumbnail = 0.0
         else:
             img_thumbnail = float(img_thumbnail)
-        st = self.file_download(msg[1], svpath, img_thumbnail, fwpaths, data_dir, logger, redis_cli, sessions)
+        st = self.file_download(msg[1], svpath, img_thumbnail, fwpaths, etag, data_dir, logger, redis_cli, sessions)
         return st
 
-    def file_download(self, reskey:str, current_path:str, img_thumbnail:float, fwpaths:List[str],
+    def file_download(self, reskey:str, current_path:str, img_thumbnail:float, fwpaths:List[str], etag:str,
                       data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ファイルをダウンロードする
@@ -200,6 +208,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature):
             current_path (str): ファイルパス
             fwpaths (List[str]): 範囲内かどうかを示すパスのリスト
             img_thumbnail (float, optional): サムネイルサイズ. Defaults to 0.0.
+            etag (str, optional): ETag. Defaults to None.
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
@@ -210,7 +219,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature):
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_download(current_path, img_thumbnail, fwpaths)
+            rescode, msg = f.file_download(current_path, img_thumbnail, fwpaths=fwpaths, etag=etag)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

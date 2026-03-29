@@ -300,7 +300,7 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                         return dict(warn=_msg)
                     def _wd_dic(f):
                         f.write(responce.content)
-                    common.save_file(dic_file, _wd_dic, mode='wb')
+                    common.save_file(dic_file, _wd_dic, mode='wb', nolock=False)
                     # 辞書の展開
                     if logger.level == logging.DEBUG:
                         logger.debug(f"Extracting dictionary.. : {dic_file}")
@@ -333,7 +333,7 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                         def _wd_model(f):
                             f.write(responce.content)
                         save_file = model_dir / f'{i}.vvm'
-                        common.save_file(save_file, _wd_model, mode='wb')
+                        common.save_file(save_file, _wd_model, mode='wb', nolock=False)
                         if logger.level == logging.DEBUG:
                             logger.debug(f"Saved model. : {save_file}")
                     if logger.level == logging.DEBUG:
@@ -358,7 +358,7 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                     def _wd_model(f):
                         f.write(responce.content)
                     save_file = onnx_dir / f'{onnxruntime_lib}'
-                    common.save_file(save_file, _wd_model, mode='wb')
+                    common.save_file(save_file, _wd_model, mode='wb', nolock=False)
                     if logger.level == logging.DEBUG:
                         logger.debug(f"Downloading onnxruntime Completed.")
                     # libの展開
@@ -390,7 +390,7 @@ class TtsInstall(feature.UnsupportEdgeFeature):
                         return dict(warn=_msg)
                     def _ww(f):
                         f.write(responce.content)
-                    common.save_file(voicevox_whl, _ww, mode='wb')
+                    common.save_file(voicevox_whl, _ww, mode='wb', nolock=False)
                 else:
                     logger.info(f"Since it already existed, I skipped downloading VOICEVOX whl. : {voicevox_whl}")
                 # whlファイルをpipでインストール

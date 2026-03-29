@@ -73,7 +73,7 @@ class AgentMcpSave(feature.OneshotResultEdgeFeature):
                             + "},(res)=>{"
                             + "const val = $(\"[name='mcp_tools']\").val();"
                             + "$(\"[name='mcp_tools']\").empty();"
-                            + "res.map(elm=>{$(\"[name='mcp_tools']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
+                            + "res['data'].map(elm=>{$(\"[name='mcp_tools']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
                             + "$(\"[name='mcp_tools']\").val(val);"
                             + "},$(\"[name='title']\").val(),'mcp_tools');"
                             + "}",

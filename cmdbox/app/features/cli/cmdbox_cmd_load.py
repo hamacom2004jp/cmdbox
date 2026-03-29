@@ -53,7 +53,7 @@ class CmdLoad(feature.OneshotResultEdgeFeature):
                      callcmd="async () => {await cmdbox.callcmd('cmd','list',{},"
                             + "(res)=>{const val = $(\"[name='cmd_title']\").val();"
                             + "$(\"[name='cmd_title']\").empty().append('<option></option>');"
-                            + "res.forEach(elm=>{$(\"[name='cmd_title']\").append('<option value=\"'+elm[\"title\"]+'\">'+elm[\"title\"]+'</option>');});"
+                            + "res['data'].forEach(elm=>{$(\"[name='cmd_title']\").append('<option value=\"'+elm[\"title\"]+'\">'+elm[\"title\"]+'</option>');});"
                             + "$(\"[name='cmd_title']\").val(val);"
                             + "},$(\"[name='cmd_title']\").val(),'cmd_title');"
                             + "}",

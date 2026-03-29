@@ -31,16 +31,20 @@ class Signin(feature.WebFeature):
         @app.api_route('/{full_path:path}/signin/{next}', methods=['GET', 'POST'], response_class=HTMLResponse)
         async def _signin(next:str, req:Request, res:Response, full_path:str=None):
             signin.Signin._enable_cors(req, res)
-            res.headers['Access-Control-Allow-Origin'] = '*'
+            im = req.headers.get('If-None-Match')
+            hs = str(web.signin_html.stat().st_mtime_ns)
+            headers = {'Cache-Control':'private, no-cache', 'ETag': hs, 'Access-Control-Allow-Origin': '*'}
+            if im == hs:
+                return Response(status_code=304, headers=headers)
             if ondemand_load:
                 if not web.signin_html.is_file():
                     raise HTTPException(status_code=404, detail=f'signin_html is not found. ({web.signin_html})')
                 with open(web.signin_html, 'r', encoding='utf-8') as f:
                     web.options.audit_exec(req, res, web)
-                    return HTMLResponse(f.read())
+                    return HTMLResponse(f.read(), headers=headers)
             else:
                 web.options.audit_exec(req, res, web)
-                return HTMLResponse(web.signin_html_data)
+                return HTMLResponse(web.signin_html_data, headers=headers)
 
         # https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest
         @app.get('/oauth2/google/{next}')

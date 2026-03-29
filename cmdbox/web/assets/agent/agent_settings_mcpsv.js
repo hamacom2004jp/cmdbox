@@ -117,7 +117,7 @@ agentView.list_mcpsv = async () => {
                     'operation':'list_tools',
                 },(res)=>{
                     $("[name='mcp_tools']").empty().append('<option></option>');
-                    res.map(elm=>{$('[name="mcp_tools"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                    res['data'].map(elm=>{$('[name="mcp_tools"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
                     form.find('[name="mcp_tools"]').val(config.mcpserver_mcp_tools);
                 },$('[name="title"]').val(),'mcp_tools');
             });

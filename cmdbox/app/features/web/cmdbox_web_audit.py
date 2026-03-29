@@ -5,7 +5,6 @@ from fastapi.responses import HTMLResponse
 from typing import Dict, Any
 import argparse
 import logging
-import time
 
 
 class Audit(feature.WebFeature):
@@ -32,16 +31,20 @@ class Audit(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            res.headers['Access-Control-Allow-Origin'] = '*'
+            im = req.headers.get('If-None-Match')
+            hs = str(web.audit_html.stat().st_mtime_ns)
+            headers = {'Cache-Control':'private, no-cache', 'ETag': hs, 'Access-Control-Allow-Origin': '*'}
+            if im == hs:
+                return Response(status_code=304, headers=headers)
             if ondemand_load:
                 if not web.audit_html.is_file():
                     raise HTTPException(status_code=404, detail=f'audit_html is not found. ({web.audit_html})')
                 with open(web.audit_html, 'r', encoding='utf-8') as f:
                     web.options.audit_exec(req, res, web)
-                    return HTMLResponse(f.read())
+                    return HTMLResponse(f.read(), headers=headers)
             else:
                 web.options.audit_exec(req, res, web)
-                return HTMLResponse(web.audit_html_data)
+                return HTMLResponse(web.audit_html_data, headers=headers)
 
         @app.post('/audit/rawlog')
         async def audit_rawlog(req:Request, res:Response):
@@ -59,7 +62,7 @@ class Audit(feature.WebFeature):
             opt['password'] = web.redis_password
             opt['svname'] = web.svname
             args = argparse.Namespace(**{k:common.chopdq(v) for k,v in opt.items()})
-            status, ret_main, _ = web.options.audit_search.apprun(web.logger, args, time.perf_counter(), [])
+            status, ret_main, _ = web.options.audit_search.apprun(web.logger, args, common.perf_counter(), [])
             if status != 0:
                 return dict(error=ret_main)
             return ret_main

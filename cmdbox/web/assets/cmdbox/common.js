@@ -542,9 +542,9 @@ cmdbox.init_version_modal = () => {
                 }
             });
             $('.version-tabs').find('.nav-link').removeClass('active');
-            $('.version-content').children().removeClass('show');
+            $('.version-content').children().removeClass('active').removeClass('show');
             $('.version-tabs').find('.nav-link').first().addClass('active');
-            $('.version-content').children().first().addClass('show');
+            $('.version-content').children().first().addClass('active').addClass('show');
         }
         $('.version-tabs').html('');
         $('.version-content').html('<div class="tab-pane fade" id="versions_used" role="tabpanel" aria-labelledby="versions_used-tab">versions_used</div>');
@@ -796,7 +796,7 @@ cmdbox.load_server_list = (parent_elem, call_back_func, server_only, current_onl
                 return;
             }
             const svnames = {};
-            res[0]['success'].forEach(elem => {
+            res[0]['success']['data'].forEach(elem => {
                 const svname = elem['svname'].split('-')[0];
                 if (svnames[svname]) return;
                 svnames[svname] = true;

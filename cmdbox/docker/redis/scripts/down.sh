@@ -1,2 +1,2 @@
-docker compose stop ${CONTAINER}
-docker compose rm -f ${CONTAINER}
+docker stop ${CONTAINER}
+docker rm -f ${CONTAINER}

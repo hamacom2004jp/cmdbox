@@ -36,16 +36,20 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
-            res.headers['Access-Control-Allow-Origin'] = '*'
+            im = req.headers.get('If-None-Match')
+            ht = str(web.agent_html.stat().st_mtime_ns)
+            headers = {'Cache-Control':'private, no-cache', 'ETag': ht, 'Access-Control-Allow-Origin': '*'}
+            if im == ht:
+                return Response(status_code=304, headers=headers)
             if ondemand_load:
                 if not web.agent_html.is_file():
                     raise HTTPException(status_code=404, detail=f'agent_html is not found. ({web.agent_html})')
                 with open(web.agent_html, 'r', encoding='utf-8') as f:
                     web.options.audit_exec(req, res, web)
-                    return HTMLResponse(f.read())
+                    return HTMLResponse(f.read(), headers=headers)
             else:
                 web.options.audit_exec(req, res, web)
-                return HTMLResponse(web.agent_html_data)
+                return HTMLResponse(web.agent_html_data, headers=headers)
 
         @app.websocket('/{webapp}/chat/ws/{runner_name}')
         @app.websocket('/{webapp}/chat/ws/{runner_name}/{session_id}')

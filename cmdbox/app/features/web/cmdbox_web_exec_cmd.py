@@ -35,7 +35,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 opt = await self._preprocess(web, app, req, res, title)
                 if options.Options.getInstance().get_cmd_attr(opt['mode'], opt['cmd'], "nouse_webmode"):
                     return dict(warn=f'Command "{title}" failed. This command is not available in web mode.')
-                return await self.exec_cmd(req, res, web, title, opt, opt['capture_stdout'])
+                return await self.exec_cmd(req, res, web, title, opt, True)
             except:
                 return dict(warn=f'Command "{title}" failed. {traceback.format_exc()}')
 
@@ -48,7 +48,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     return dict(warn=f'Command "{title}" failed. This command is not available in web mode.')
                 async def sse_event_generator(req:Request, res:Response, title:str=None, opt:Dict[str, Any]=None):
                     resqueue = queue.Queue()
-                    th = threading.Thread(target=lambda: asyncio.run(self.exec_cmd(req, res, web, title, opt, opt['capture_stdout'], None, resqueue)), daemon=True)
+                    th = threading.Thread(target=lambda: asyncio.run(self.exec_cmd(req, res, web, title, opt, True, None, resqueue)), daemon=True)
                     th.start()
                     try:
                         while True:
@@ -106,7 +106,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
             opt = _marge_opt(opt_def, req.query_params)
         if 'mode' not in opt or 'cmd' not in opt:
             raise HTTPException(status_code=404, detail='mode or cmd is not found.')
-        opt['capture_stdout'] = nothread = True
+        opt['capture_stdout'] = opt['capture_stdout'] if 'capture_stdout' in opt else False
         opt['stdout_log'] = False
         return opt
 

@@ -1,0 +1,201 @@
+<!-- 設定モーダル -->
+<div id="agent_settings_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content sf-modal doc-card h-100">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan system-font">
+                    <i class="fas fa-cog fa-lg me-2"></i>
+                    Settings
+                </h5>
+                <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body p-0 h-100 overflow-hidden">
+                <div id="settings_split_pane" class="split-pane fixed-left h-100 w-100">
+                    <!-- 左側ペイン: 設定項目リスト -->
+                    <div class="split-pane-component" style="width:200px;">
+                        <div class="list-group list-group-flush">
+                            <a href="#" class="list-group-item list-group-item-action active" data-bs-target="#agent_settings">Agent Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#llm_settings">LLM Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#embedding_settings">Embedding Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#memory_settings">Memory Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#mcpsv_settings">MCPSV Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#extract_settings">Extract Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#rag_settings">RAG Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#runner_settings">Runner Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#tts_settings">TTS Settings</a>
+                        </div>
+                    </div>
+                    <!-- スプリッター -->
+                    <div class="split-pane-divider" style="left:200px; border: 1px solid var(--area-border-color);"></div>
+                    <!-- 右側ペイン: 設定内容 -->
+                    <div class="split-pane-component" style="left:200px;">
+                        <div class="p-3 h-100 overflow-auto">
+                            <div id="agent_settings" class="settings-content">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">Agent Settings</h6>
+                                    <button id="btn_add_agent" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        Add Setting
+                                    </button>
+                                </div>
+                                <div id="agent_list_container" class="list-group">
+                                    <!-- Agent List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="llm_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">LLM Settings</h6>
+                                    <button id="btn_add_llm" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        Add Setting
+                                    </button>
+                                </div>
+                                <div id="llm_list_container" class="list-group">
+                                    <!-- LLM List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="mcpsv_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">MCPSV Settings</h6>
+                                    <button id="btn_add_mcpsv" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        Add Setting
+                                    </button>
+                                </div>
+                                <div id="mcpsv_list_container" class="list-group">
+                                    <!-- MCPSV List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="runner_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">Runner Settings</h6>
+                                    <button id="btn_add_runner" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        Add Setting
+                                    </button>
+                                </div>
+                                <div id="runner_list_container" class="list-group">
+                                    <!-- Runner List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="embedding_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">Embedding Settings</h6>
+                                    <button id="btn_add_embedding" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        Add Setting
+                                    </button>
+                                </div>
+                                <div id="embedding_list_container" class="list-group">
+                                    <!-- Embedding List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="rag_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">RAG Settings</h6>
+                                    <button id="btn_add_rag" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        Add Setting
+                                    </button>
+                                </div>
+                                <div id="rag_list_container" class="list-group">
+                                    <!-- RAG List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="extract_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">Extract Settings</h6>
+                                    <button id="btn_add_extract" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        Add Setting
+                                    </button>
+                                </div>
+                                <div id="extract_list_container" class="list-group">
+                                    <!-- Extract List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="memory_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">Memory Settings</h6>
+                                    <button id="btn_add_memory" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        Add Setting
+                                    </button>
+                                </div>
+                                <div id="memory_list_container" class="list-group">
+                                    <!-- Memory List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="tts_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font">TTS Settings</h6>
+                                </div>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Install TTS Engine</h6>
+                                        <form id="form_tts_install" class="row"></form>
+                                        <div class="mt-3 text-end">
+                                            <button id="btn_install_tts" class="btn btn-sf">Install</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card mt-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Uninstall TTS Engine</h6>
+                                        <form id="form_tts_uninstall" class="row"></form>
+                                        <div class="mt-3 text-end">
+                                            <button id="btn_uninstall_tts" class="btn btn-sf-danger">Uninstall</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- オプション選択用ファイラーモーダル -->
+<div id="filer_modal" class="modal fade" style="z-index: 2000;" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <form id="filer_form" class="modal-content novalidate">
+            <div class="modal-header doc-header">
+                <h5 class="modal-title glow-text-cyan text-nowrap">Modal title</h5>
+                <div class="input-group p-1">
+                    <button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Current</button>'
+                    <input name="filer_host" type="hidden" class="filer_host">
+                    <input name="filer_port" type="hidden" class="filer_port">
+                    <input name="filer_password" type="hidden" class="filer_password">
+                    <input name="filer_svname" type="hidden" class="filer_svname">
+                    <input name="filer_scope" type="hidden" class="filer_scope">
+                    <input name="filer_client_data" type="hidden" class="filer_client_data">
+                    <ul class="dropdown-menu filer_server"></ul>
+                    <input type="text" class="form-control filer_address" aria-describedby="button-addon2">
+                    <button class="btn btn-outline-secondary filer_address_bot" type="button" id="button-addon2">
+                        <svg class="bi bi-arrow-right-circle" width="16" height="16" fill="currentColor"><use href="#btn_arrow_right_circle"></use></svg>
+                    </button>
+                </div>
+                <button type="button" class="btn btn_window_stack">
+                    <svg class="bi bi-window-stack" width="16" height="16" fill="currentColor"><use href="#btn_window_stack"></use></svg>
+                </button>
+                <button type="button" class="btn btn_window">
+                    <svg class="bi bi-window" width="16" height="16" fill="currentColor"><use href="#btn_window"></use></svg>
+                </button>
+                <button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">
+                    <svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>
+                </button>
+            </div>
+            <div class="modal-body row">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </form>
+    </div>
+</div>

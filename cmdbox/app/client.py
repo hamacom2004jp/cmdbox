@@ -165,7 +165,7 @@ class Client(object):
             return dict(warn=f"scope is invalid. {scope}")
     
     def file_download(self, svpath:str, download_file:Path, scope:str="client", client_data:Path=None, fwpaths:List[str]=None,
-                      rpath:str="", img_thumbnail:float=0.0,
+                      etag:str=None, rpath:str="", img_thumbnail:float=0.0,
                       retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバー上のファイルをダウンロードする
@@ -176,6 +176,7 @@ class Client(object):
             scope (str, optional): 参照先のスコープ. Defaults to "client".
             client_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
+            etag (str, optional): ETag. Defaults to None.
             rpath (str, optional): リクエストパス. Defaults to "".
             img_thumbnail (float, optional): サムネイル画像のサイズ. Defaults to 0.0.
             retry_count (int, optional): リトライ回数. Defaults to 3.
@@ -188,15 +189,15 @@ class Client(object):
         if scope == "client":
             if client_data is not None:
                 f = filer.Filer(client_data, self.logger)
-                _, res_json = f.file_download(svpath, img_thumbnail, fwpaths)
+                _, res_json = f.file_download(svpath, img_thumbnail, fwpaths, etag=etag)
             else:
                 self.logger.warning(f"client_data is empty.")
                 return dict(warn=f"client_data is empty.")
         elif scope == "current":
             f = filer.Filer(Path.cwd(), self.logger)
-            _, res_json = f.file_download(svpath, img_thumbnail, fwpaths)
+            _, res_json = f.file_download(svpath, img_thumbnail, fwpaths, etag=etag)
         elif scope == "server":
-            payload = dict(svpath=svpath, img_thumbnail=img_thumbnail, fwpaths=fwpaths)
+            payload = dict(svpath=svpath, img_thumbnail=img_thumbnail, fwpaths=fwpaths, etag=etag)
             payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
             res_json = self.redis_cli.send_cmd('file_download', [payload_b64],
                                                retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
@@ -216,7 +217,7 @@ class Client(object):
                     f.write(base64.b64decode(res_json["success"]["data"]))
                     del res_json["success"]["data"]
                     res_json["success"]["download_file"] = str(download_file.absolute())
-                common.save_file(download_file, _wd, mode='wb')
+                common.save_file(download_file, _wd, mode='wb', nolock=False)
         return res_json
 
     def file_upload(self, svpath:str, upload_file:Path, scope:str="client", client_data:Path=None, fwpaths:List[str]=None,

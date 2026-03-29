@@ -172,7 +172,7 @@ class CmdboxPgSQLInstall(cmdbox_base.CmdboxBase):
         docker_compose_path = Path(compose_path)
         if not docker_compose_path.exists():
             with open(docker_compose_path, 'w', encoding='utf-8') as fp:
-                fp.write(self._load_base_compose())
+                fp.write(self._load_base_compose(container))
         with open(docker_compose_path, 'r', encoding='utf-8') as fp:
             comp = yaml.safe_load(fp)
         with open(docker_compose_path, 'w', encoding='utf-8') as fp:

@@ -102,7 +102,7 @@ def npy2imgfile(npy, output_image_file:Path=None, image_type:str='jpeg') -> byte
         from cmdbox.app import common
         def _w(f):
             f.write(img_byte)
-        common.save_file(output_image_file, _w, mode='wb')
+        common.save_file(output_image_file, _w, mode='wb', nolock=False)
     return img_byte
 
 def bytes2b64str(img:bytes) -> str:

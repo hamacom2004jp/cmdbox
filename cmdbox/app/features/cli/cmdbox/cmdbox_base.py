@@ -44,14 +44,30 @@ class CmdboxBase(feature.OneshotEdgeFeature):
             ]
         )
 
-    def _load_base_compose(self) -> str:
-        return resources.read_text(f'{self.ver.__appid__}.docker.cmdbox', 'docker-compose.yml')
+    def _load_base_compose(self, container:str) -> str:
+        return self._load_file(container, 'docker-compose.yml')
 
     def _load_dockerfile(self, container:str) -> str:
+        return self._load_file(container, 'Dockerfile')
+
+    def _load_file(self, container:str, file:str) -> str:
         try:
-            return resources.read_text(f'{self.ver.__appid__}.docker.{container}', 'Dockerfile')
+            return resources.read_text(f'{self.ver.__appid__}.docker.{container}', file)
         except:
-            return resources.read_text(f'{version.__appid__}.docker.{container}', 'Dockerfile')
+            pass
+        try:
+            return resources.read_text(f'{self.ver.__appid__}.docker', file)
+        except:
+            pass
+        try:
+            return resources.read_text(f'{version.__appid__}.docker.{container}', file)
+        except:
+            pass
+        try:
+            return resources.read_text(f'{version.__appid__}.docker.{version.__appid__}', file)
+        except:
+            pass
+        return resources.read_text(f'{version.__appid__}.docker', file)
 
     def up(self, logger:logging.Logger, compose_path:str=None, container:str=None) -> Dict[str, Any]:
         """

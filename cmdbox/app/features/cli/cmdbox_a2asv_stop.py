@@ -84,7 +84,7 @@ class A2asvStop(feature.UnsupportEdgeFeature):
                 else:
                     logger.warning(f"pid is empty.")
 
-            common.load_file("a2a.pid", _r)
+            common.load_file("a2a.pid", _r, nolock=True)
             Path("a2a.pid").unlink(missing_ok=True)
             msg = dict(success="a2a complate.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

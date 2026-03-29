@@ -43,8 +43,10 @@ class RedisClient(object):
             self.redis_cli.close()
             self.redis_cli = None
     
-    def rpush(self, name:str, value:dict):
+    def rpush(self, name:str, value:dict, pfkey:str='svrun', tm:float=0.0):
         if type(value) is dict or type(value) is list:
+            if pfkey and tm > 0:
+                common.update_performance(pfkey, tm, value)
             self.redis_cli.rpush(name, json.dumps(value, default=common.default_json_enc))
         elif type(value) is str:
             self.redis_cli.rpush(name, value)
@@ -159,7 +161,6 @@ class RedisClient(object):
             try:
                 if timeout <= 0:
                     raise ValueError(f"timeout must be greater than 0. timeout={timeout}")
-                sreqtime = time.perf_counter()
                 if not self.check_server(find_svname=True, retry_count=retry_count, retry_interval=retry_interval, outstatus=outstatus):
                     yield dict(error=f"Connected server failed or server not found. svname={self.svname.split('-')[1]}")
                     return
@@ -179,11 +180,11 @@ class RedisClient(object):
                         continue
                     stime = time.time()
                     if sse:
-                        msg = self._res_cmd(reskey, res, sreqtime, True)
+                        msg = self._res_cmd(reskey, res, True)
                         yield msg
                         if 'end' in msg: return
                     else:
-                        yield self._res_cmd(reskey, res, sreqtime)
+                        yield self._res_cmd(reskey, res)
                         return
                 raise KeyboardInterrupt(f"Stop command.")
             except KeyboardInterrupt as e:
@@ -203,14 +204,13 @@ class RedisClient(object):
             thread.start()
             yield dict(success=f"Command sent. cmd={cmd}, nowait={nowait}")
 
-    def _res_cmd(self, reskey:str, res_msg:bytes, sreqtime:float, sse:bool=False) -> dict:
+    def _res_cmd(self, reskey:str, res_msg:bytes, sse:bool=False) -> dict:
         """
         Redisサーバーからの応答を解析する
 
         Args:
             reskey (str): Redisサーバーからの応答のキー
             res_msg (bytes): Redisサーバーからの応答
-            sreqtime (float): コマンド送信時の時間
             sse (bool, optional): サーバーサイドからの終了メッセージを受けるまで連続してレスポンスを受け取る. Defaults to False.
 
         Returns:
@@ -219,26 +219,11 @@ class RedisClient(object):
         reskbyte = len(res_msg) / 1024
         msg = res_msg.decode('utf-8')
         res_json = json.loads(msg)
-        msg_json = res_json.copy()
         if not sse or (sse and 'end' in res_json):
             self.redis_cli.delete(reskey)
-        if "output_image" in msg_json:
-            msg_json["output_image"] = "binary"
-        if "error" in res_json:
-            self.logger.warning(common.to_str(msg_json))
-        if "warn" in res_json:
-            self.logger.warning(common.to_str(msg_json))
-        if "success" in res_json:
-            if self.logger.level == logging.DEBUG:
-                msg_str = common.to_str(msg_json, slise=100)
-                self.logger.debug(f"redis_client._res_cmd: msg={msg_str}")
-            if type(res_json["success"]) is not dict:
-                res_json["success"] = dict(data=res_json["success"])
-            if "performance" not in res_json["success"]:
-                res_json["success"]["performance"] = []
-            performance = res_json["success"]["performance"]
-            performance.append(dict(key="cl_svreqest", val=f"{time.perf_counter()-sreqtime:.3f}s"))
-            performance.append(dict(key="cl_reskbyte", val=f"{reskbyte:.3f}KB"))
+        res_json = common.result_format(res_json, self.logger, pf=[
+            dict(key="receive", val=f"{reskbyte:.3f}KB"),
+        ])
         return res_json
 
     def receive_showimg(self):

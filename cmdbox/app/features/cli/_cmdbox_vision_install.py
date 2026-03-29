@@ -176,7 +176,7 @@ class VisionInstall(cmdbox_vision_start.VisionStart):
                         return dict(warn=_msg)
                     def _wm(f):
                         f.write(responce.content)
-                    common.save_file(model_file, _wm, mode='wb')
+                    common.save_file(model_file, _wm, mode='wb', nolock=False)
                 #===============================================================
                 # SAM2のpythonライブラリのインストール
                 whl_url = f'git+https://github.com/facebookresearch/sam2.git'

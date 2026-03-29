@@ -576,7 +576,7 @@ class ToolList(object):
         func_txt += f'    args.groups = groups\n'
         func_txt += f'    try:\n'
         func_txt +=  '        logger.info(f"MCP Call mode='+mode+', cmd='+cmd+', {feat}#apprun, args={args}")\n'
-        func_txt += f'        st, ret, _ = feat.apprun(logger, args, time.perf_counter(), [])\n'
+        func_txt += f'        st, ret, _ = feat.apprun(logger, args, common.perf_counter(), [])\n'
         func_txt += f'        return ret\n'
         func_txt += f'    except Exception as e:\n'
         func_txt += f'        logger.error("Error occurs when tool is executed:", exc_info=True)\n'

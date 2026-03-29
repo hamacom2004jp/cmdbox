@@ -19,7 +19,7 @@ def get_module_list(package_name) -> List[str]:
     package = __import__(package_name, fromlist=[''])
     return [name for _, name, _ in pkgutil.iter_modules(package.__path__)]
 
-def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], appcls=None, ver=None, language:str=None) -> Dict[str, Any]:
+def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], ref_options=None, appcls=None, ver=None, language:str=None) -> Dict[str, Any]:
     """
     フィーチャーを読み込みます。
 
@@ -27,6 +27,7 @@ def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], appc
         package_name (str): パッケージ名
         prefix (str, optional): プレフィックス. Defaults to "cmdbox_".
         excludes (list, optional): 除外するモジュール名のリスト. Defaults to [].
+        ref_options (options.Options, optional): 参照用のオプション. Defaults to None.
         appcls ([type], optional): アプリケーションクラス. Defaults to None.
         ver ([type], optional): バージョンモジュール. Defaults to None.
         language (str, optional): 言語設定. Defaults to None.
@@ -35,6 +36,15 @@ def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], appc
     """
     features = dict()
     package = __import__(package_name, fromlist=[''])
+    def _cmd(ref_options, mode):
+        if ref_options is None:
+            return []
+        ref_cmds = [c for c in ref_options.get_cmds(mode) if type(c) is not str]
+        ret = []
+        for c in ref_cmds:
+            ret += [k for k in c.keys() if 'feature' in c[k]]
+        return ret
+
     for finder, name, ispkg in pkgutil.iter_modules(package.__path__):
         if name.startswith(prefix):
             if name in excludes:
@@ -50,6 +60,13 @@ def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], appc
                     cmd = fobj.get_cmd()
                     if mode not in features:
                         features[mode] = dict()
+                    _cls,_ref_cls = fobj.__class__, None
+                    if cmd in features[mode]:
+                        _ref_cls = features[mode][cmd]['feature'].__class__
+                    elif ref_options is not None and cmd in _cmd(ref_options, mode):
+                        _ref_cls = ref_options.get_cmd_attr(mode, cmd, 'feature').__class__
+                    if _ref_cls is not None:
+                        raise ValueError(f'load_features: Duplicate feature for cmd "{cmd}" of mode "{mode}". ({_cls} is overwriting {_ref_cls})')
                     features[mode][cmd] = fobj.get_option()
                     if features[mode][cmd] is None:
                         raise ValueError(f'load_features: Cannot get options from {fobj}. The get_option() method returns None.')
@@ -59,6 +76,13 @@ def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], appc
                         cmd = fobj.get_cmd()
                         if m not in features:
                             features[m] = dict()
+                        _cls,_ref_cls = fobj.__class__, None
+                        if cmd in features[m]:
+                            _ref_cls = features[m][cmd]['feature'].__class__
+                        elif ref_options is not None and cmd in _cmd(ref_options, m):
+                            _ref_cls = ref_options.get_cmd_attr(m, cmd, 'feature').__class__
+                        if _ref_cls is not None:
+                            raise ValueError(f'load_features: Duplicate feature for  cmd "{cmd}" of mode "{m}". ({_cls} is overwriting {_ref_cls})')
                         features[m][cmd] = fobj.get_option()
                         if features[m][cmd] is None:
                             raise ValueError(f'load_features: Cannot get options from {fobj}. The get_option() method returns None.')

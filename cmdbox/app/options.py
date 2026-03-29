@@ -50,6 +50,7 @@ class Options:
         self.aliases_loaded_web = False
         self.audit_loaded = False
         self.agentrule_loaded = False
+        self._package_names = []
         self.init_options()
 
     def get_mode_keys(self) -> List[str]:
@@ -372,7 +373,11 @@ class Options:
         """
         if "svcmd" not in self._options:
             self._options["svcmd"] = dict()
-        for mode, f in module.load_features(package_name, prefix, excludes, appcls=appcls, ver=ver, language=language).items():
+        if package_name in self._package_names:
+            if logger is not None and logger.level == logging.DEBUG:
+                logger.debug(f"Package '{package_name}' is already loaded. skip loading features.")
+            return
+        for mode, f in module.load_features(package_name, prefix, excludes, ref_options=self, appcls=appcls, ver=ver, language=language).items():
             if mode not in self._options["cmd"]:
                 self._options["cmd"][mode] = dict()
             for cmd, opt in f.items():
@@ -387,6 +392,7 @@ class Options:
                 if jadge == 'deny': opt['use_agent'] = False
                 if jadge == 'allow': opt['use_agent'] = True
                 if 'use_agent' not in opt: opt['use_agent'] = False
+        self._package_names.append(package_name)
         self.init_debugoption()
     
     def is_features_loaded(self, ftype:str) -> bool:

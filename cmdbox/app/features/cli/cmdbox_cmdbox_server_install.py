@@ -190,12 +190,12 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
         try:
             if platform.system() == 'Windows':
                 return {"warn": f"Build server command is Unsupported in windows platform."}
-            container = "cmdbox"
+            container = self.ver.__appid__
             user = getpass.getuser()
             if re.match(r'^[0-9]', user):
                 user = f'_{user}' # ユーザー名が数字始まりの場合、先頭にアンダースコアを付与
             install_tag = f"_{install_tag}" if install_tag else ''
-            imgname = f"hamacom/{self.ver.__appid__}/{container}:{self.ver.__version__}{install_tag}"
+            imgname = f"hamacom/{self.ver.__appid__}:{self.ver.__version__}{install_tag}"
             dockerfile = Path(f'Dockerfile.{container}')
             with open(dockerfile, 'w', encoding='utf-8') as fp:
                 text = self._load_dockerfile(container)
@@ -216,9 +216,21 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
                 start_sh_tgt = f'/opt/{self.ver.__appid__}/{container}/scripts'
                 start_sh_hst = Path(self.ver.__appid__) / container / 'scripts'
                 start_sh_hst.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copytree(Path(version.__file__).parent / 'docker' / container / 'scripts', start_sh_hst, dirs_exist_ok=True)
+                scripts_src = Path(self.ver.__file__).parent / 'docker' / container / 'scripts'
+                if not scripts_src.exists():
+                    scripts_src = Path(self.ver.__file__).parent / 'docker' / 'scripts'
+                if not scripts_src.exists():
+                    scripts_src = Path(version.__file__).parent / 'docker' / container / 'scripts'
+                if not scripts_src.exists():
+                    scripts_src = Path(version.__file__).parent / 'docker' / version.__appid__ / 'scripts'
+                if not scripts_src.exists():
+                    scripts_src = Path(version.__file__).parent / 'docker' / 'scripts'
+                shutil.copytree(scripts_src, start_sh_hst, dirs_exist_ok=True)
                 try:
-                    shutil.copytree(Path(self.ver.__file__).parent / 'docker' / container / 'scripts', start_sh_hst, dirs_exist_ok=True)
+                    scripts_src = Path(self.ver.__file__).parent / 'docker' / container / 'scripts'
+                    if not start_sh_hst.exists():
+                        scripts_src = Path(self.ver.__file__).parent / 'docker' / self.ver.__appid__ / 'scripts'
+                    shutil.copytree(scripts_src, start_sh_hst, dirs_exist_ok=True)
                 except:
                     pass
                 text = text.replace('#{COPY_CMDBOX_START}', f'RUN mkdir -p {start_sh_tgt}\nCOPY {start_sh_hst} {start_sh_tgt}')
@@ -298,7 +310,7 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
             docker_compose_path = Path(compose_path)
             if not docker_compose_path.exists():
                 with open(docker_compose_path, 'w', encoding='utf-8') as fp:
-                    fp.write(self._load_base_compose())
+                    fp.write(self._load_base_compose(container))
             with open(docker_compose_path, 'r', encoding='utf-8') as fp:
                 comp = yaml.safe_load(fp)
             with open(docker_compose_path, 'w', encoding='utf-8') as fp:

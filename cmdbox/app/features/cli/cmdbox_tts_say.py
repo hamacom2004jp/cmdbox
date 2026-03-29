@@ -237,7 +237,7 @@ class TtsSay(feature.ResultEdgeFeature):
                 wav_data = convert.b64str2bytes(wav_b64)
                 def _w(f):
                     f.write(wav_data)
-                common.save_file(args.tts_output, _w, mode='wb')
+                common.save_file(args.tts_output, _w, mode='wb', nolock=False)
                 del ret['success']['data'] # 音声データは削除
         common.print_format(ret, False, tm, None, False, pf=pf)
         if 'success' not in ret:

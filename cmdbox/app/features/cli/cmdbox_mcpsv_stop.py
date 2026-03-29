@@ -84,7 +84,7 @@ class McpsvStop(feature.UnsupportEdgeFeature):
                 else:
                     logger.warning(f"pid is empty.")
 
-            common.load_file("mcpsv.pid", _r)
+            common.load_file("mcpsv.pid", _r, nolock=True)
             Path("mcpsv.pid").unlink(missing_ok=True)
             msg = dict(success="mcpsv complate.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
