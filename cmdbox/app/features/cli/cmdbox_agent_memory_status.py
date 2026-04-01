@@ -212,7 +212,7 @@ class AgentMemoryStatus(agant_base.AgentBase):
         from cmdbox.app.features.cli.agent.postgresql_memory_service import PostgresqlMemoryService
         
         memory_type = memory_conf.get('memory_type', 'memory')
-        device = memory_embed_conf.get('embed_device', 'cpu')
+        device = memory_embed_conf.get('embed_device', None)
         embed_name = memory_embed_conf.get('embed_name', None)
         embed_model = memory_embed_conf.get('embed_model', None)
 

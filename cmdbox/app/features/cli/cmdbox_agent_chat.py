@@ -505,7 +505,11 @@ class AgentChat(agant_base.AgentBase):
             # チャットを実行する
             signin.set_request_scope(dict(mcpserver_apikey=mcpserver_apikey, a2asv_apikey=a2asv_apikey))
             run_config = RunConfig(streaming_mode=StreamingMode.NONE)
-            async with aclosing(runner.run_async(user_id=user_name, session_id=agent_session.id, new_message=content, run_config=run_config)) as run_iter:
+            async with aclosing(runner.run_async(user_id=user_name,
+                                                 session_id=agent_session.id,
+                                                 new_message=content,
+                                                 state_delta=None,
+                                                 run_config=run_config)) as run_iter:
                 try:
                     async for event in run_iter:
                         outputs = dict(success=dict(),)
@@ -541,14 +545,16 @@ class AgentChat(agant_base.AgentBase):
                                     if mem_msg is not None and mem_msg.strip() != '' else ''
                             redis_cli.rpush(reskey, outputs)
                             if flags['final_response']:
-                                # 要約文生成
-                                sammary_msg = await self.memory.summary(data_dir=data_dir, logger=logger,
-                                                                        llmname=memory_conf['llm'], short_mem_msg=short_mem_msg,
-                                                                        msg_text_system=memory_conf['memory_instruction'])
-                                sammary_msg = sammary_msg[-1] if sammary_msg and isinstance(sammary_msg, list) and len(sammary_msg) > 0 else None
-                                # メモリーにセッションを保存する
-                                if sammary_msg:
-                                    await self.memory.add_memory(memory_service, agent_session, sammary_msg.get('content', ''))
+                                if 'llm' in memory_conf and memory_conf['llm'] is not None \
+                                    and 'memory_instruction' in memory_conf and memory_conf['memory_instruction'] is not None:
+                                    # 要約文生成
+                                    sammary_msg = await self.memory.summary(data_dir=data_dir, logger=logger,
+                                                                            llmname=memory_conf['llm'], short_mem_msg=short_mem_msg,
+                                                                            msg_text_system=memory_conf['memory_instruction'])
+                                    sammary_msg = sammary_msg[-1] if sammary_msg and isinstance(sammary_msg, list) and len(sammary_msg) > 0 else None
+                                    # メモリーにセッションを保存する
+                                    if sammary_msg:
+                                        await self.memory.add_memory(memory_service, agent_session, sammary_msg.get('content', ''))
                                 break
 
                 except Exception as e:

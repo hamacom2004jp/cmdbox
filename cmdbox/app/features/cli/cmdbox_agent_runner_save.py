@@ -82,7 +82,7 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature):
                      choice_show=dict(voicevox=["voicevox_ver", "voicevox_whl"]),
                      description_ja="使用するTTSエンジンを指定します。",
                      description_en="Specify the TTS engine to use."),
-                dict(opt="memory", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
+                dict(opt="memory", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=[],
                     callcmd="async () => {await cmdbox.callcmd('agent','memory_list',{},(res)=>{"
                             + "const val = $(\"[name='memory']\").val();"
                             + "$(\"[name='memory']\").empty().append('<option></option>');"
@@ -165,10 +165,6 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature):
             return self.RESP_WARN, msg, None
         if not hasattr(args, 'agent') or args.agent is None:
             msg = dict(warn="Please specify --agent")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if not hasattr(args, 'memory') or args.memory is None:
-            msg = dict(warn="Please specify --memory")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
 

@@ -31,15 +31,20 @@ class AgentBase(feature.ResultEdgeFeature):
         else:
             mcpsv_confs = []
 
-        memory_conf = self._load_memory_config(data_dir, runner_conf['memory'])
-        if memory_conf.get('llm', None) is not None:
-            memory_llm_conf = self._load_llm_config(data_dir, memory_conf['llm'])
-        else:
-            memory_llm_conf = {}
+        if 'memory' in runner_conf and runner_conf['memory'] is not None:
+            memory_conf = self._load_memory_config(data_dir, runner_conf['memory'])
+            if memory_conf.get('llm', None) is not None:
+                memory_llm_conf = self._load_llm_config(data_dir, memory_conf['llm'])
+            else:
+                memory_llm_conf = {}
 
-        if memory_conf.get('embed', None) is not None:
-            memory_embed_conf = self._load_embed_config(data_dir, memory_conf['embed'])
+            if memory_conf.get('embed', None) is not None:
+                memory_embed_conf = self._load_embed_config(data_dir, memory_conf['embed'])
+            else:
+                memory_embed_conf = {}
         else:
+            memory_conf = {}
+            memory_llm_conf = {}
             memory_embed_conf = {}
 
         return runner_conf, agent_conf, llm_conf, memory_conf, memory_llm_conf, memory_embed_conf, mcpsv_confs

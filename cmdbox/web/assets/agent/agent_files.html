@@ -90,7 +90,18 @@
                                             <input type="text" class="form-control filer_address" readonly>
                                         </div>
                                         <!-- ローカル側ツリー -->
-                                        <ul class="tree-menu tree_ul overflow-auto border w-100" style="min-height:auto; height:calc(100% - 50px);"></ul>
+                                        <ul class="tree-menu tree_ul overflow-auto border w-100" style="min-height:auto; height:calc(100% - 50px);">
+                                            <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                                                <div class="mb-3">
+                                                    <i class="fa-solid fa-computer fa-4x glow-text-cyan"></i>
+                                                </div>
+                                                <h5 class="system-font glow-text-cyan mb-2">
+                                                    <button type="button" class="btn btn-outline-secondary filer_local_bot">
+                                                        SELECT LOCAL FOLDER
+                                                    </button>
+                                                </h5>
+                                            </div>
+                                        </ul>
                                     </div>
                                     <!-- 上下のスプリッター -->
                                     <div class="split-pane-divider filer-pane-divider" style="top:45%;"></div>
