@@ -1581,6 +1581,64 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
             btn_t.click(mk_func(input_elem.parent().parent(), row));
         }
     }
+    if(row.type=='mlist') {
+        const label = elem.find('label.input-group-text').addClass('justify-content-center px-1').css('flex-direction', 'column');
+        const select = elem.find('select[multiple]').hide();
+        select.after(`<ul class="list-group selected_options overflow-auto border" style="max-height:110px;width:calc(100% - 160px);"></ul>`);
+        const selected_options = select.next('.selected_options');
+        const observer = new MutationObserver((mutations) => {
+            if (mutations && mutations.length <= 0) return;
+            const hasAddedNodes = mutations.some(mutation => mutation.addedNodes.length > 0);
+            if (!hasAddedNodes) return;
+            const pid = select.attr('id');
+            selected_options.empty();
+            // 全選択・全解除ボタンを追加
+            label.removeClass('text-decoration-underline').find('span').addClass('text-decoration-underline');
+            const bots = $(`<div class="d-flex mt-2"></div>`).appendTo(label);
+            const all_btn = $(`<button class="btn btn-sm btn-outline-secondary me-1" type="button">All</button>`).appendTo(bots);
+            all_btn.click(() => {
+                selected_options.find('input[type="checkbox"]').prop('checked', true).trigger('change');
+            });
+            const clear_btn = $(`<button class="btn btn-sm btn-outline-secondary" type="button">Clear</button>`).appendTo(bots);
+            clear_btn.click(() => {
+                selected_options.find('input[type="checkbox"]').prop('checked', false).trigger('change');
+            });
+            // チェックボックスの幅を考慮して、selectの幅から他の要素の幅を引いた値をulの幅に設定
+            let width = '100%';
+            select.parent().children().each((i, e) => {
+                if ($(e).is('ul') || $(e).is('select')) return;
+                width += ` - ${e.offsetWidth}px`;
+            });
+            selected_options.css('width', `calc(${width})`);
+            // 追加されたノードごとにチェックボックスを作成
+            mutations.forEach((mutation, mutationIdx) => {
+                mutation.addedNodes.forEach((n, nodeIdx) => {
+                    const node = $(n);
+                    if(!node.val()) return;
+                    const uniqueId = `${pid}_${mutationIdx}_${nodeIdx}`;
+                    const item = $(`<li class="list-group-item px-1 pb-0 border-0 text-nowrap"></li>`).appendTo(selected_options);
+                    const check = $(`<input class="form-check-input me-2" type="checkbox" value="${node.val()}" id="${uniqueId}">`).appendTo(item);
+                    check.prop('checked', node.prop('selected'));
+                    $(`<label class="form-check-label" for="${uniqueId}">${node.val()}</label>`).appendTo(item);
+                    check.change(() => {
+                        const val = check.val();
+                        const options = select.find('option');
+                        options.each((i, o) => {
+                            if ($(o).val()==val) {
+                                if (check.prop('checked')) {
+                                    $(o).prop('selected', true);
+                                } else {
+                                    $(o).prop('selected', false);
+                                }
+                            }
+                        });
+                    });
+                });
+            });
+        });
+        // select要素の子ノードの変化を監視
+        observer.observe(select[0], {childList: true, subtree: true});
+    }
     const title = elem.find('.row_content_template_title');
     title.html('');
     title.attr('title', window.navigator.language=='ja'?row.description_ja:row.description_en)
@@ -1642,8 +1700,10 @@ cmdbox.callcmd = async (mode, cmd, params, callback, title, opt_name) => {
         console.log({'error':res});
         return;
     }
-    if (callback) callback(res[0]['success']);
-    if (!title || !opt_name) return;
+    if (!title || !opt_name) {
+        if (callback) callback(res[0]['success']);
+        return;
+    }
     return cmdbox.load_cmd(title).then(cmd_opt => {
         if (!cmd_opt || cmd_opt['error']) {
             cmdbox.message(cmd_opt);
@@ -1651,8 +1711,12 @@ cmdbox.callcmd = async (mode, cmd, params, callback, title, opt_name) => {
             return;
         }
         if (!cmd_opt[opt_name]) return;
+        if (callback) callback(res[0]['success']);
         $(`[name="${opt_name}"]`).val(cmd_opt[opt_name]);
     });
+};
+cmdbox.isAsync = (func) => {
+    return func.constructor.name === "AsyncFunction";
 };
 cmdbox.load_cmd = async (title) => {
     const formData = new FormData();
