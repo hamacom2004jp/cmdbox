@@ -157,7 +157,8 @@ class Signin(object):
             name = req.session['signin']['name']
             user = Signin._find_user_by_name(name, signin_file_data)
             if user is not None:
-                req.session['signin']['apikeys'] = user.get('apikeys', None)
+                #req.session['signin']['apikeys'] = user.get('apikeys', None)
+                req.session['apikeys'] = user.get('apikeys', None)
             return None
         if logger.level == logging.DEBUG:
             logger.debug(f"Not found siginin session. Try check_apikey. path={req.url.path}")
@@ -243,7 +244,8 @@ class Signin(object):
         group_names = list(set(Signin.parent_group(signin_file_data, find_user['groups'])))
         gids = [g['gid'] for g in signin_file_data['groups'] if g['name'] in group_names]
         req.session['signin'] = dict(uid=find_user['uid'], name=find_user['name'], password=find_user['password'],
-                                     gids=gids, groups=group_names, apikeys=find_user.get('apikeys', None), apikey=apikey)
+                                     gids=gids, groups=group_names, apikey=apikey)
+        req.session['apikeys'] = find_user.get('apikeys', None)
         if logger.level == logging.DEBUG:
             logger.debug(f"find user: name={find_user['name']}, group_names={group_names}")
         # パスルールチェック

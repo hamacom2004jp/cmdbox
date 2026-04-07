@@ -49,7 +49,7 @@ class Signin(feature.WebFeature):
         # https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest
         @app.get('/oauth2/google/{next}')
         async def oauth2_google(next:str, req:Request, res:Response):
-            if web.signin_html_data is None:
+            if web.signin is None or web.signin.signin_file_data is None:
                 return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
             conf = web.signin.signin_file_data['oauth2']['providers']['google']
             data = {'scope': ' '.join(conf['scope']),
@@ -64,7 +64,7 @@ class Signin(feature.WebFeature):
         # https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes
         @app.get('/oauth2/github/{next}')
         async def oauth2_github(next:str, req:Request, res:Response):
-            if web.signin_html_data is None:
+            if web.signin is None or web.signin.signin_file_data is None:
                 return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
             conf = web.signin.signin_file_data['oauth2']['providers']['github']
             data = {'scope': ' '.join(conf['scope']),
@@ -79,7 +79,7 @@ class Signin(feature.WebFeature):
         # https://learn.microsoft.com/ja-jp/entra/identity-platform/v2-oauth2-auth-code-flow
         @app.get('/oauth2/azure/{next}')
         async def oauth2_azure(next:str, req:Request, res:Response):
-            if web.signin_html_data is None:
+            if web.signin is None or web.signin.signin_file_data is None:
                 return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
             conf = web.signin.signin_file_data['oauth2']['providers']['azure']
             data = {'scope': ' '.join(conf['scope']),
@@ -94,7 +94,7 @@ class Signin(feature.WebFeature):
 
         @app.get('/oauth2/enabled')
         async def oauth2_enabled(req:Request, res:Response):
-            if web.signin_html_data is None:
+            if web.signin is None or web.signin.signin_file_data is None:
                 return dict(google=False, github=False, azure=False)
             signin_data = web.signin.signin_file_data
             return dict(google=signin_data['oauth2']['providers']['google']['enabled'],
@@ -118,7 +118,7 @@ class Signin(feature.WebFeature):
 
         @app.get('/saml/enabled')
         async def saml_enabled(req:Request, res:Response):
-            if web.signin_html_data is None:
+            if web.signin_saml is None or web.signin_saml.signin_file_data is None:
                 return dict(azure=False)
             signin_data = web.signin_saml.signin_file_data
             return dict(azure=signin_data['saml']['providers']['azure']['enabled'],)

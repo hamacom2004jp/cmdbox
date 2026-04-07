@@ -85,7 +85,8 @@ class A2a(mcp.Mcp):
                         # ユーザー情報を取得
                         apikey = session['signin'].get('apikey', None)
                         if apikey is None:
-                            apikeys = session['signin'].get('apikeys', None)
+                            #apikeys = session['signin'].get('apikeys', None)
+                            apikeys = session.get('apikeys', None)
                             if apikeys is not None and isinstance(apikeys, dict) and len(apikeys) > 0:
                                 apikey = apikeys.values().__iter__().__next__()
                                 scope['headers'] = list(scope['headers']) + [(b'Authorization', f"Bearer {apikey}".encode('utf-8'))]

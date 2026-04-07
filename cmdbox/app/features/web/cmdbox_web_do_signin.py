@@ -210,9 +210,13 @@ class DoSignin(cmdbox_web_signin.Signin):
                 # パスワード間違い回数削除
                 web.user_data(None, user['uid'], user['name'], 'password', 'pass_miss_count', 0, delkey=True)
             # セッションに保存
-            req.session['signin'] = dict(uid=user['uid'], name=user['name'], home=user['home'],
-                                         password=hashed_password, access_token=access_token, apikeys=user.get('apikeys', None),
+            req.session['signin'] = dict(uid=user['uid'], name=user['name'], home=user['home'], password=hashed_password,
                                          gids=gids, groups=group_names, group_homes=group_homes, email=email)
+            #req.session['access_token'] = access_token # アクセストークンはセッションに保存しない。大きすぎてCookieに入らないため。
+            req.session['apikeys'] = user.get('apikeys', None)
+            # セッション変更を明示的にマーク（SessionMiddleware が認識するために重要）
+            if hasattr(req.session, 'mark_modified'):
+                req.session.mark_modified()
             # ユーザーフォルダチェック
             user_dir = web.data / user['home']
             if not user_dir.exists():
@@ -286,7 +290,13 @@ class DoSignin(cmdbox_web_signin.Signin):
                 group_homes = list(set(web.signin.__class__.group_home(signin_data, group_names)))
                 # セッションに保存
                 _set_session(req, user, email, None, access_token, group_names, group_homes, gids)
-                return RedirectResponse(url=f'../../{next}', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス
+                #return RedirectResponse(url=f'../../{next}', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス
+                html = """
+                <html><head><meta http-equiv="refresh" content="0;url=../../{next}"></head>
+                <body style="background-color:#212529;color:#fff;">loading..</body>
+                <script type="text/javascript">window.location.href="../../{next}";</script></html>
+                """.format(next=next)
+                return HTMLResponse(content=html, headers=dict(signin="success"))
             except Exception as e:
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
                 raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')

@@ -80,7 +80,8 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
                 mcpserver_apikey = session['signin'].get('apikey', None)
                 a2asv_apikey = session['signin'].get('apikey', None)
                 if mcpserver_apikey is None:
-                    apikeys = session['signin'].get('apikeys', None)
+                    #apikeys = session['signin'].get('apikeys', None)
+                    apikeys = session.get('apikeys', None)
                     if apikeys is not None and isinstance(apikeys, dict) and len(apikeys) > 0:
                         mcpserver_apikey = apikeys.values().__iter__().__next__()
                         a2asv_apikey = mcpserver_apikey
