@@ -73,8 +73,12 @@ class Gui(feature.WebFeature):
             name = req.session['signin']['name']
             try:
                 users = web.user_list(name)
-                if users is None or len(users) == 0:
-                    return dict(warn='User information is not found.')
+                # oauth2やsamlの場合、user_listに登録されていない可能性があるため、セッションのユーザー情報を返す
+                if users is None or len(users) == 0 or users[0]['hash'] == 'oauth2' or users[0]['hash'] == 'saml':
+                    ret = req.session['signin'].copy() 
+                    del ret['password']
+                    return ret
+                    #return dict(warn='User information is not found.')
                 return users[0]
             except Exception as e:
                 return dict(error=f'{e}')

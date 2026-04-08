@@ -1,4 +1,5 @@
 #{FROM}
+#{INIT_EXTRA}
 ARG MKUSER
 RUN groupadd ${MKUSER} && \
     useradd -m -g ${MKUSER} -s /usr/bin/bash ${MKUSER} && \

@@ -37,7 +37,7 @@ class WebGroupAdd(feature.UnsupportEdgeFeature):
             description_ja="Webモードのグループを追加します。",
             description_en="Add a group in Web mode.",
             choice=[
-                dict(opt="group_id", type=Options.T_INT, default=None, required=True, multi=False, hide=False, choice=None,
+                dict(opt="group_id", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="グループIDを指定します。他のグループと重複しないようにしてください。",
                      description_en="Specify the group ID. Do not duplicate other groups."),
                 dict(opt="group_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,

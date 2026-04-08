@@ -282,7 +282,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 # ユーザー情報取得(email)
                 email = signin.get_email(access_token)
                 # サインイン判定
-                jadge, user = signin.jadge(email)
+                jadge, user = signin.jadge(access_token, email)
                 if not jadge:
                     return RedirectResponse(url=f'/signin/{next}?error=appdeny')
                 # グループ取得
@@ -336,7 +336,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                     # ユーザー情報取得
                     email = saml_signin.get_email(auth)
                     # サインイン判定
-                    jadge, user = saml_signin.jadge(email)
+                    jadge, user = saml_signin.jadge(auth, email)
                     if not jadge:
                         return RedirectResponse(url=f'/signin/{next}?error=appdeny')
                     # グループ取得

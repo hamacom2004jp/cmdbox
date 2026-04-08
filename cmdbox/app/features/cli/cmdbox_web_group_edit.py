@@ -37,7 +37,7 @@ class WebGroupEdit(feature.UnsupportEdgeFeature):
             description_ja="Webモードのグループを編集します。",
             description_en="Edit a group in Web mode.",
             choice=[
-                dict(opt="group_id", type=Options.T_INT, default=None, required=True, multi=False, hide=False, choice=None,
+                dict(opt="group_id", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="グループIDを指定します。",
                      description_en="Specify the group ID. Do not duplicate other groups."),
                 dict(opt="group_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,

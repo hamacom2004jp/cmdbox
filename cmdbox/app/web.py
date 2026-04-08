@@ -606,10 +606,6 @@ class Web:
             raise ValueError(f"signin_file is None.")
         if 'gid' not in group:
             raise ValueError(f"Group gid is not found. ({group})")
-        try:
-            group['gid'] = int(group['gid'])
-        except:
-            raise ValueError(f"Group gid is not number. ({group})")
         if 'name' not in group:
             raise ValueError(f"Group name is not found. ({group})")
         if 'parent' in group and (group['parent'] is None or group['parent'] == ''):
@@ -644,10 +640,6 @@ class Web:
             raise ValueError(f"signin_file is None.")
         if 'gid' not in group:
             raise ValueError(f"Group gid is not found. ({group})")
-        try:
-            group['gid'] = int(group['gid'])
-        except:
-            raise ValueError(f"Group gid is not number. ({group})")
         if 'name' not in group:
             raise ValueError(f"Group name is not found. ({group})")
         if 'parent' in group and (group['parent'] is None or group['parent'] == ''):
@@ -671,22 +663,18 @@ class Web:
         self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data, nolock=False)
 
-    def group_del(self, gid:int):
+    def group_del(self, gid:str):
         """
         サインインファイルからグループを削除する
 
         Args:
-            gid (int): グループID
+            gid (str): グループID
         """
         signin_data = self.signin.signin_file_data
         if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
-        try:
-            gid = int(gid)
-        except:
-            raise ValueError(f"Group gid is not number. ({gid})")
         # グループがユーザーに使用されているかチェック
         user_group_ids = []
         for user in signin_data['users']:

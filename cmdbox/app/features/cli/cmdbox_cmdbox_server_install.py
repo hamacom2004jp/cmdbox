@@ -87,6 +87,9 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
                      choice_edit=True,
                      description_ja="使用するVOICEVOXのホイールファイルを指定します。",
                      description_en="Specify the VOICEVOX wheel file to use."),
+                dict(opt="init_extra", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
+                     description_ja="from直後に実行するコマンドを指定します。",
+                     description_en="Specify the command to be executed immediately after “from”."),
                 dict(opt="run_extra_pre", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
                      description_ja="install_extraの実行前に実行するコマンドを指定します。",
                      description_en="Specify additional commands to run before install_extra execution."),
@@ -144,6 +147,7 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
                                   tts_engine=args.tts_engine,
                                   voicevox_ver=args.voicevox_ver,
                                   voicevox_whl=args.voicevox_whl,
+                                  init_extra=args.init_extra,
                                   run_extra_pre=args.run_extra_pre,
                                   run_extra_post=args.run_extra_post,
                                   install_extra=args.install_extra,
@@ -160,6 +164,7 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
                        install_no_python:bool=False, install_compile_python:bool=False,
                        install_tag:str=None, install_use_gpu:bool=False,
                        tts_engine:str=None, voicevox_ver:str=None, voicevox_whl:str=None,
+                       init_extra:List[str]=None,
                        run_extra_pre:List[str]=None, run_extra_post:List[str]=None, install_extra:List[str]=None,
                        compose_path:str=None, language:str=None) -> Dict[str, Any]:
         """
@@ -177,6 +182,7 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
             tts_engine (str): TTSエンジンの指定
             voicevox_ver (str): VoiceVoxのバージョン
             voicevox_whl (str): VoiceVoxのwhlファイルの名前
+            init_extra (List[str]): from直後に実行するコマンド
             run_extra_pre (List[str]): install_extraの実行前に実行するコマンド
             run_extra_post (List[str]): install_extraの実行後に実行するコマンド
             install_extra (List[str]): 追加でインストールするパッケージ
@@ -277,6 +283,10 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
                     #install_extra = f"{ie}\n" + f'RUN pip install {" ".join([Path(r).name for r in whls])}'
                 else:
                     install_extra = ''
+                if init_extra is not None and type(init_extra) == list and init_extra != []:
+                    init_extra = "\n".join(init_extra)
+                else:
+                    init_extra = ''
                 if run_extra_pre is not None and type(run_extra_pre) == list and run_extra_pre != []:
                     run_extra_pre = f'RUN {" && ".join(run_extra_pre)}'
                 else:
@@ -292,6 +302,7 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
                 text = text.replace('#{INSTALL_EXTRA}', install_extra)
                 text = text.replace('#{RUN_EXTRA_PRE}', run_extra_pre)
                 text = text.replace('#{RUN_EXTRA_POST}', run_extra_post)
+                text = text.replace('#{INIT_EXTRA}', init_extra)
                 text = text.replace('#{ENV_EXTRA}', f'ENV APPID={self.ver.__appid__}')
                 text = text.replace('#{MK_DATA_DIR}',
                                     'RUN mkdir -p /home/${MKUSER}/.'+self.ver.__appid__ + \

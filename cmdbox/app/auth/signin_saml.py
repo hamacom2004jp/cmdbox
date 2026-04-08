@@ -7,12 +7,13 @@ import logging
 
 class SigninSAML(Signin):
 
-    def jadge(self, email:str) -> Tuple[bool, Dict[str, Any]]:
+    def jadge(self, data:Any, email:str) -> Tuple[bool, Dict[str, Any]]:
         """
         サインインを成功させるかどうかを判定します。
         返すユーザーデータには、uid, name, email, groups, hash が必要です。
 
         Args:
+            data (str): アクセストークン又は属性データ
             email (str): メールアドレス
 
         Returns:
