@@ -137,7 +137,7 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
             msg = dict(warn=f"Please specify the --data option.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
-        ret = self.server_install(logger, Path(args.data),
+        ret = self.server_install(logger, args, Path(args.data),
                                   install_cmdbox_tgt=args.install_cmdbox,
                                   install_from=args.install_from,
                                   install_no_python=args.install_no_python,
@@ -159,7 +159,7 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
             return self.RESP_WARN, ret, None
         return self.RESP_SUCCESS, ret, None
 
-    def server_install(self, logger:logging.Logger,
+    def server_install(self, logger:logging.Logger, args:argparse.Namespace,
                        data:Path, install_cmdbox_tgt:str=None, install_from:str=None,
                        install_no_python:bool=False, install_compile_python:bool=False,
                        install_tag:str=None, install_use_gpu:bool=False,
@@ -172,6 +172,7 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
 
         Args:
             logger (logging.Logger): ロガー
+            args (argparse.Namespace): 引数
             data (Path): cmdbox-serverのデータディレクトリ
             install_cmdbox_tgt (str): cmdboxのインストール元
             install_from (str): インストール元dockerイメージ
@@ -196,12 +197,12 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
         try:
             if platform.system() == 'Windows':
                 return {"warn": f"Build server command is Unsupported in windows platform."}
-            container = self.ver.__appid__
+            container = args.container if hasattr(args, 'container') and args.container else self.ver.__appid__
             user = getpass.getuser()
             if re.match(r'^[0-9]', user):
                 user = f'_{user}' # ユーザー名が数字始まりの場合、先頭にアンダースコアを付与
             install_tag = f"_{install_tag}" if install_tag else ''
-            imgname = f"hamacom/{self.ver.__appid__}:{self.ver.__version__}{install_tag}"
+            imgname = self.get_imgname(container, args)
             dockerfile = Path(f'Dockerfile.{container}')
             with open(dockerfile, 'w', encoding='utf-8') as fp:
                 text = self._load_dockerfile(container)
@@ -219,26 +220,8 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
                 else:
                     text = text.replace('#{COPY_CMDBOX}', '')
 
+                start_sh_hst = self.copy_scripts(logger, container)
                 start_sh_tgt = f'/opt/{self.ver.__appid__}/{container}/scripts'
-                start_sh_hst = Path(self.ver.__appid__) / container / 'scripts'
-                start_sh_hst.parent.mkdir(parents=True, exist_ok=True)
-                scripts_src = Path(self.ver.__file__).parent / 'docker' / container / 'scripts'
-                if not scripts_src.exists():
-                    scripts_src = Path(self.ver.__file__).parent / 'docker' / 'scripts'
-                if not scripts_src.exists():
-                    scripts_src = Path(version.__file__).parent / 'docker' / container / 'scripts'
-                if not scripts_src.exists():
-                    scripts_src = Path(version.__file__).parent / 'docker' / version.__appid__ / 'scripts'
-                if not scripts_src.exists():
-                    scripts_src = Path(version.__file__).parent / 'docker' / 'scripts'
-                shutil.copytree(scripts_src, start_sh_hst, dirs_exist_ok=True)
-                try:
-                    scripts_src = Path(self.ver.__file__).parent / 'docker' / container / 'scripts'
-                    if not start_sh_hst.exists():
-                        scripts_src = Path(self.ver.__file__).parent / 'docker' / self.ver.__appid__ / 'scripts'
-                    shutil.copytree(scripts_src, start_sh_hst, dirs_exist_ok=True)
-                except:
-                    pass
                 text = text.replace('#{COPY_CMDBOX_START}', f'RUN mkdir -p {start_sh_tgt}\nCOPY {start_sh_hst} {start_sh_tgt}')
 
                 base_image = 'python:3.12.12-slim' #'python:3.11.9-slim' #'python:3.8.18-slim'
@@ -247,7 +230,7 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
                     #base_image = 'nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04'
                     #base_image = 'pytorch/pytorch:2.7.0-cuda12.8-cudnn9-runtime'
                     #base_image = 'pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime'
-                    base_image = 'pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime'
+                    base_image = 'pytorch/pytorch:2.4.0-cuda12.1-cudnn9-devel'
                     install_torch = ''
                 if install_from is not None and install_from != '':
                     base_image = install_from
@@ -316,62 +299,9 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
                 return {"error": f"Failed to install {self.ver.__appid__}-server. cmd:{_cmd}"}
             dockerfile.unlink(missing_ok=True)
 
-            if not compose_path:
-                compose_path = 'docker-compose.yml'
-            docker_compose_path = Path(compose_path)
-            if not docker_compose_path.exists():
-                with open(docker_compose_path, 'w', encoding='utf-8') as fp:
-                    fp.write(self._load_base_compose(container))
-            with open(docker_compose_path, 'r', encoding='utf-8') as fp:
-                comp = yaml.safe_load(fp)
+            comp, docker_compose_path = self.make_compose_server(logger, compose_path, container, imgname, user, data,
+                                                                 start_sh_tgt, install_use_gpu, install_tag, language)
             with open(docker_compose_path, 'w', encoding='utf-8') as fp:
-                services = comp['services']
-                services[container] = dict(
-                    image=imgname,
-                    container_name=container,
-                    environment=dict(
-                        TZ='Asia/Tokyo',
-                        CMDBOX_DEBUG=False,
-                        APPID='${APPID:-'+self.ver.__appid__+'}',
-                        REDIS_HOST='${REDIS_HOST:-redis}',
-                        REDIS_PORT='${REDIS_PORT:-6379}',
-                        REDIS_PASSWORD='${REDIS_PASSWORD:-password}',
-                        SVNAME='${SVNAME:-'+self.ver.__appid__+install_tag+'}',
-                        LISTEN_PORT='${LISTEN_PORT:-8081}',
-                        MCPSV_LISTEN_PORT='${MCPSV_LISTEN_PORT:-8091}',
-                        A2ASV_LISTEN_PORT='${A2ASV_LISTEN_PORT:-8071}',
-                        SSL_LISTEN_PORT='${SSL_LISTEN_PORT:-8443}',
-                        SSL_MCPSV_LISTEN_PORT='${SSL_MCPSV_LISTEN_PORT:-8453}',
-                        SSL_A2ASV_LISTEN_PORT='${SSL_A2ASV_LISTEN_PORT:-8433}',
-                        SVCOUNT='${SVCOUNT:-2}',
-                        LANGUAGE='${LANGUAGE:-'+(language if language else 'ja_JP')+'}'
-                    ),
-                    user=user,
-                    ports=['${LISTEN_PORT:-8081}:${LISTEN_PORT:-8081}',
-                        '${MCPSV_LISTEN_PORT:-8091}:${MCPSV_LISTEN_PORT:-8091}',
-                        '${A2ASV_LISTEN_PORT:-8071}:${A2ASV_LISTEN_PORT:-8071}',
-                        '${SSL_LISTEN_PORT:-8443}:${SSL_LISTEN_PORT:-8443}',
-                        '${SSL_MCPSV_LISTEN_PORT:-8453}:${SSL_MCPSV_LISTEN_PORT:-8453}',
-                        '${SSL_A2ASV_LISTEN_PORT:-8433}:${SSL_A2ASV_LISTEN_PORT:-8433}'],
-                    privileged=True,
-                    restart='always',
-                    working_dir=f'/opt/{self.ver.__appid__}',
-                    devices=['/dev/bus/usb:/dev/bus/usb'],
-                    volumes=[
-                        f'{data}:/home/{user}/.{self.ver.__appid__}',
-                        f'/home/{user}:/home/{user}',
-                        f'./{self.ver.__appid__}:/opt/{self.ver.__appid__}'
-                    ],
-                    command=f'bash {start_sh_tgt}/start.sh'
-                )
-                if install_use_gpu:
-                    services[f'{self.ver.__appid__}{install_tag}']['deploy'] = dict(
-                        resources=dict(reservations=dict(devices=[dict(
-                            driver='nvidia',
-                            count=1,
-                            capabilities=['gpu']
-                        )]))
-                    )
                 yaml.dump(comp, fp)
             if returncode != 0:
                 logger.warning(f"Failed to install {self.ver.__appid__} server. cmd:{_cmd}")

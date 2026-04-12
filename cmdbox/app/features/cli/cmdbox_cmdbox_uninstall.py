@@ -6,7 +6,7 @@ import argparse
 import logging
 
 
-class CmdboxServerUninstall(cmdbox_base.CmdboxBase):
+class CmdboxUninstall(cmdbox_base.CmdboxBase):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -23,7 +23,7 @@ class CmdboxServerUninstall(cmdbox_base.CmdboxBase):
         Returns:
             str: コマンド
         """
-        return 'server_uninstall'
+        return 'uninstall'
 
     def get_option(self):
         """
@@ -33,9 +33,12 @@ class CmdboxServerUninstall(cmdbox_base.CmdboxBase):
             Dict[str, Any]: オプション
         """
         opt = super().get_option()
-        opt['description_ja'] = "cmdboxサーバーをアンインストールします。"
-        opt['description_en'] = "Uninstalls the cmdbox server."
+        opt['description_ja'] = "コンテナをアンインストールします。"
+        opt['description_en'] = "Uninstalls the container."
         opt['choice'] = [
+            dict(short="C", opt="container", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                description_ja="コンテナ名を指定します。",
+                description_en="Specify the container name."),
             dict(opt="install_tag", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                 description_ja="指定すると作成するdockerイメージのタグ名に追記出来ます。",
                 description_en="If specified, you can add to the tag name of the docker image to create."),
@@ -58,7 +61,7 @@ class CmdboxServerUninstall(cmdbox_base.CmdboxBase):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        ret = self.uninstall(logger, args.compose_path, 'cmdbox', args.install_tag)
+        ret = self.uninstall(logger, args)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, None

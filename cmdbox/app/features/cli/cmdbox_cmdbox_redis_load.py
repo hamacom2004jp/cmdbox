@@ -11,7 +11,7 @@ import shutil
 import yaml
 
 
-class CmdboxRedisInstall(cmdbox_base.CmdboxBase):
+class CmdboxRedisLoad(cmdbox_base.CmdboxBase):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -28,7 +28,7 @@ class CmdboxRedisInstall(cmdbox_base.CmdboxBase):
         Returns:
             str: コマンド
         """
-        return 'redis_install'
+        return 'redis_load'
 
     def get_option(self):
         """
@@ -38,12 +38,12 @@ class CmdboxRedisInstall(cmdbox_base.CmdboxBase):
             Dict[str, Any]: オプション
         """
         opt = super().get_option()
-        opt['description_ja'] = "cmdboxのRedisをインストールします。"
-        opt['description_en'] = "Installs the cmdbox Redis."
+        opt['description_ja'] = "cmdboxのRedisをロードします。"
+        opt['description_en'] = "Loads the cmdbox Redis."
         opt['choice'] = [
-            dict(opt="install_from", type=Options.T_STR, default="ubuntu/redis:latest", required=False, multi=False, hide=False, choice=None,
-                description_ja="インストール元のRedisイメージを指定します。",
-                description_en="Specify the source Redis image to install."),
+            dict(opt="image_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
+                description_ja="読込元イメージファイルを指定します。",
+                description_en="Specify the source image file."),
             dict(opt="install_tag", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                 description_ja="指定すると作成するdockerイメージのタグ名に追記出来ます。",
                 description_en="If specified, you can add to the tag name of the docker image to create."),
@@ -68,33 +68,11 @@ class CmdboxRedisInstall(cmdbox_base.CmdboxBase):
         """
         common.set_debug(logger, True)
         try:
-            ret = self.redis_install(logger, args)
-            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            if platform.system() == 'Windows':
+                return {"warn": f"load Redis command is Unsupported in windows platform."}
 
-            if 'success' not in ret:
-                return self.RESP_WARN, ret, None
-            return self.RESP_SUCCESS, ret, None
-        finally:
-            common.set_debug(logger, False)
-
-    def redis_install(self, logger:logging.Logger, args:argparse.Namespace) -> Dict[str, str]:
-        """
-        redisサーバーをインストールします
-
-        Args:
-            logger (logging.Logger): ロガー
-            args (argparse.Namespace): 引数
-
-        Returns:
-            Dict[str, str]: 結果
-        """
-        if platform.system() == 'Windows':
-            return {"warn": f"install Redis command is Unsupported in windows platform."}
-
-        container = "redis"
-        dockerfile = Path(f'.Dockerfile.{container}')
-        with open(dockerfile, 'w', encoding='utf-8') as fp:
-            text = self._load_dockerfile(container)
+            container = "redis"
+            imgname = self.get_imgname(container, args)
             start_sh_hst = Path(self.ver.__appid__) / container / 'scripts'
             start_sh_hst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copytree(Path(version.__file__).parent / 'docker' / container / 'scripts', start_sh_hst, dirs_exist_ok=True)
@@ -102,19 +80,14 @@ class CmdboxRedisInstall(cmdbox_base.CmdboxBase):
                 shutil.copytree(Path(self.ver.__file__).parent / 'docker' / container / 'scripts', start_sh_hst, dirs_exist_ok=True)
             except:
                 pass
-            imgname = self.get_imgname(container, args)
-            text = text.replace('#{FROM}', f'FROM {args.install_from if args.install_from else "ubuntu/redis:latest"}')
-            fp.write(text)
 
-        cmd = f"docker build ./ --rm -t {imgname} -f {dockerfile}"
-        returncode, _, _cmd = common.cmd(f"{cmd}", logger, slise=-1)
-        dockerfile.unlink(missing_ok=True)
-
-        comp, docker_compose_path = self.make_compose_redis(logger, args.compose_path, container, imgname)
-        with open(docker_compose_path, 'w', encoding='utf-8') as fp:
-            yaml.dump(comp, fp)
-
-        if returncode != 0:
-            logger.warning(f"Failed to install Redis server. cmd:{_cmd}")
-            return {"error": f"Failed to install Redis server. cmd:{_cmd}"}
-        return {"success": f"Success to install Redis server. cmd:{_cmd}"}
+            comp, docker_compose_path = self.make_compose_redis(logger, args.compose_path, container, imgname)
+            with open(docker_compose_path, 'w', encoding='utf-8') as fp:
+                yaml.dump(comp, fp)
+            ret = self.load(logger, args.compose_path, container, args.install_tag, args.image_file)
+            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            if 'success' not in ret:
+                return self.RESP_WARN, ret, None
+            return self.RESP_SUCCESS, ret, None
+        finally:
+            common.set_debug(logger, False)

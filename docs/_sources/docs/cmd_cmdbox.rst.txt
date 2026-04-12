@@ -35,6 +35,22 @@ cmdbox ( exec ) : `cmdbox -m cmdbox -c exec <Option>`
     "--command <command>","","Specify the command to execute."
 
 
+cmdbox ( load ) : `cmdbox -m cmdbox -c load <Option>`
+========================================================================================
+
+- Loads the container.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--image_file <file>","","Specify the source image file."
+    "--container <container>","","Specify the container name."
+    "--install_tag <tag>","","If specified, you can add to the tag name of the docker image to create."
+    "--compose_path <path>","","Specify the `docker-compose.yml` file."
+
+
 cmdbox ( logs ) : `cmdbox -m cmdbox -c logs <Option>`
 ========================================================================================
 
@@ -65,6 +81,22 @@ cmdbox ( reboot ) : `cmdbox -m cmdbox -c reboot <Option>`
     "--compose_path <path>","","Specify the `docker-compose.yml` file."
 
 
+cmdbox ( save ) : `cmdbox -m cmdbox -c save <Option>`
+========================================================================================
+
+- Saves the container.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--container <container>","","Specify the container name."
+    "--image_file <file>","","Specify the destination image file."
+    "--install_tag <tag>","","If specified, you can add to the tag name of the docker image to create."
+    "--compose_path <path>","","Specify the `docker-compose.yml` file."
+
+
 cmdbox ( up ) : `cmdbox -m cmdbox -c up <Option>`
 ========================================================================================
 
@@ -76,6 +108,21 @@ cmdbox ( up ) : `cmdbox -m cmdbox -c up <Option>`
 
     "Option","Required","Description"
     "--container <container>","","Specify the container name."
+    "--compose_path <path>","","Specify the `docker-compose.yml` file."
+
+
+cmdbox ( uninstall ) : `cmdbox -m cmdbox -c uninstall <Option>`
+========================================================================================
+
+- Uninstalls the container.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--container <container>","","Specify the container name."
+    "--install_tag <tag>","","If specified, you can add to the tag name of the docker image to create."
     "--compose_path <path>","","Specify the `docker-compose.yml` file."
 
 
@@ -101,16 +148,17 @@ cmdbox ( pgsql_install ) : `cmdbox -m cmdbox -c pgsql_install <Option>`
     "--compose_path <path>","","Specify the `docker-compose.yml` file."
 
 
-cmdbox ( pgsql_uninstall ) : `cmdbox -m cmdbox -c pgsql_uninstall <Option>`
+cmdbox ( pgsql_load ) : `cmdbox -m cmdbox -c pgsql_load <Option>`
 ========================================================================================
 
-- Uninstalls the PostgreSQL server.
+- Loads the PostgreSQL server.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
+    "--image_file <file>","","Specify the source image file."
     "--install_pgsqlver <version>","","Specify the PostgreSQL version."
     "--install_tag <tag>","","If specified, you can add to the tag name of the docker image to create."
     "--compose_path <path>","","Specify the `docker-compose.yml` file."
@@ -131,16 +179,18 @@ cmdbox ( redis_install ) : `cmdbox -m cmdbox -c redis_install <Option>`
     "--compose_path <path>","","Specify the `docker-compose.yml` file."
 
 
-cmdbox ( redis_uninstall ) : `cmdbox -m cmdbox -c redis_uninstall <Option>`
+cmdbox ( redis_load ) : `cmdbox -m cmdbox -c redis_load <Option>`
 ========================================================================================
 
-- Uninstalls the cmdbox Redis.
+- Loads the Redis server.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
+    "--image_file <file>","","Specify the source image file."
+    "--install_tag <tag>","","If specified, you can add to the tag name of the docker image to create."
     "--compose_path <path>","","Specify the `docker-compose.yml` file."
 
 
@@ -164,22 +214,26 @@ cmdbox ( server_install ) : `cmdbox -m cmdbox -c server_install <Option>`
     "--tts_engine <TTS Engine>","","Specify the TTS engine to use."
     "--voicevox_ver <version>","","Specify the version of the TTS engine to use."
     "--voicevox_whl <whl>","","Specify the wheel file for the TTS engine."
+    "--init_extra <command>","","Specify the command to be executed immediately after “from”."
     "--run_extra_pre <command>","","Specify additional commands to run before install_extra execution."
     "--run_extra_post <command>","","Specify additional commands to run after install_extra execution."
     "--install_extra <module>","","Specify additional packages to install."
     "--compose_path <path>","","Specify the `docker-compose.yml` file."
 
 
-cmdbox ( server_uninstall ) : `cmdbox -m cmdbox -c server_uninstall <Option>`
+cmdbox ( server_load ) : `cmdbox -m cmdbox -c server_load <Option>`
 ========================================================================================
 
-- Uninstalls the cmdbox server.
+- Loads the cmdbox server.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
+    "--data <data folder>","","When omitted, `$HONE/.{self.ver.__appid__}` is used."
+    "--image_file <file>","","Specify the source image file."
     "--install_tag <tag>","","If specified, you can add to the tag name of the docker image to create."
+    "--install_use_gpu","","Install with a module configuration that uses the GPU."
     "--compose_path <path>","","Specify the `docker-compose.yml` file."
 

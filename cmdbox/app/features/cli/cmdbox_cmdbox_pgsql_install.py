@@ -138,7 +138,7 @@ class CmdboxPgSQLInstall(cmdbox_base.CmdboxBase):
                 shutil.copytree(Path(self.ver.__file__).parent / 'docker' / container / 'scripts', start_sh_hst, dirs_exist_ok=True)
             except:
                 pass
-            imgname = f"hamacom/{self.ver.__appid__}/{container}:{self.ver.__version__}_{args.install_pgsqlver}{f'_{args.install_tag}' if args.install_tag else ''}"
+            imgname = self.get_imgname(container, args)
             text = text.replace('#{FROM}', f'FROM {args.install_from if args.install_from else "postgres:18.2"}')
             text = text.replace('#{PGSQLVER}', args.install_pgsqlver)
             if not args.no_install_pgvector:
@@ -165,40 +165,8 @@ class CmdboxPgSQLInstall(cmdbox_base.CmdboxBase):
         returncode, _, _cmd = common.cmd(f"{cmd}", logger, slise=-1)
         dockerfile.unlink(missing_ok=True)
 
-        # docker_compose.ymlの設定
-        compose_path = args.compose_path
-        if not compose_path:
-            compose_path = 'docker-compose.yml'
-        docker_compose_path = Path(compose_path)
-        if not docker_compose_path.exists():
-            with open(docker_compose_path, 'w', encoding='utf-8') as fp:
-                fp.write(self._load_base_compose(container))
-        with open(docker_compose_path, 'r', encoding='utf-8') as fp:
-            comp = yaml.safe_load(fp)
+        comp, docker_compose_path = self.make_compose_pgsql(logger, args.compose_path, container, imgname, args.install_pgsqlver)
         with open(docker_compose_path, 'w', encoding='utf-8') as fp:
-            dbname = 'pgsql'
-            services = comp['services']
-            services[container] = dict(
-                image=imgname,
-                container_name=container,
-                environment=dict(
-                    APPID='${APPID:-'+self.ver.__appid__+'}',
-                    POSTGRES_USER=dbname,
-                    POSTGRES_PASSWORD=dbname,
-                    POSTGRES_DB=dbname,
-                    POSTGRES_HOST_AUTH_METHOD='trust',
-                    POSTGRES_PORT='5432',
-                    #PGDATA='/var/lib/postgresql/data/pgdata',
-                ),
-                ports=['5432:5432'],
-                restart='always',
-                working_dir=f'/opt/{self.ver.__appid__}/{container}',
-                volumes=[
-                    f'./{self.ver.__appid__}/{container}:/opt/{self.ver.__appid__}/{container}',
-                    f'./{self.ver.__appid__}/{container}/data:/var/lib/postgresql/{args.install_pgsqlver}/docker',
-                    #f'./{self.ver.__appid__}/{container}:/var/lib/postgresql/data',
-                ],
-            )
             yaml.dump(comp, fp)
 
         if returncode != 0:
