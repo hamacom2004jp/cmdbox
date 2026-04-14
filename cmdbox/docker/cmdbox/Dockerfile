@@ -1,8 +1,8 @@
 #{FROM}
 #{INIT_EXTRA}
 ARG MKUSER
-RUN groupadd ${MKUSER} && \
-    useradd -m -g ${MKUSER} -s /usr/bin/bash ${MKUSER} && \
+RUN groupadd -f ${MKUSER} && \
+    useradd -m -g ${MKUSER} -s /usr/bin/bash ${MKUSER} || true && \
     cp /etc/skel/.bash_logout /home/${MKUSER}/ && \
     cp /etc/skel/.bashrc /home/${MKUSER}/ && \
     cp /etc/skel/.profile /home/${MKUSER}/
@@ -12,6 +12,8 @@ ENV TZ=Asia/Tokyo
 RUN apt-get update && \
     apt-get install -y libgl1-mesa-dev libglib2.0-0 git wget
 #{INSTALL_PYTHON}
+RUN apt-get install -y python3-venv && python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 RUN apt-get update && \
     apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl build-essential libopencv-dev && \
     apt-get install -y iputils-ping net-tools && \
@@ -21,8 +23,7 @@ RUN pip install --upgrade pip && \
     pip install "pydantic>=2.0.0,<3.0.0" "fastmcp>=2.14.4" "mcp>=1.23.0,<2.0.0" && \
     pip install "google-adk>=1.23.0" "a2a-sdk>=0.3.4,<0.4.0" "litellm>=1.75.5,<1.80.17" && \
     pip install "sentence-transformers" "sqlite_vec" "transformers>=4.48.0" && \
-    pip install "chunklet-py[document]" "langchain_community" "markdown" "pdfplumber" && \
-    pip install "accelerate>=1.12.0" "qwen-omni-utils>=0.0.9"
+    pip install "chunklet-py[document]" "langchain_community" "markdown" "pdfplumber"
 #{RUN_EXTRA_PRE}
 #{COPY_CMDBOX}
 RUN pip install #{INSTALL_CMDBOX} && cmdbox --version
