@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.commons import convert, redis_client, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -9,7 +9,7 @@ import json
 import re
 
 
-class AgentAgentDel(feature.OneshotResultEdgeFeature):
+class AgentAgentDel(feature.OneshotResultEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
 
@@ -65,10 +65,9 @@ class AgentAgentDel(feature.OneshotResultEdgeFeature):
         )
 
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        if not getattr(args, 'agent_name', None):
-            msg = dict(warn="Please specify --agent_name")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, obj = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, obj
         if not re.match(r'^[\w\-]+$', args.agent_name):
             msg = dict(warn="Agent name can only contain alphanumeric characters, underscores, and hyphens.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

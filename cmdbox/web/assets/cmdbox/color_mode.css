@@ -10,13 +10,43 @@ body {
     font-family: var(--font-body);
     height: 100vh;
     overflow: hidden;
-    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+    isolation: isolate;
+}
+body::before {
+    content: '';
+    position: fixed;
+    top: -50vh;
+    left: -50vw;
+    width: 200vw;
+    height: 200vh;
+    background-size: 100% 100%, 100% 100%, 100% 100%;
     background-image: 
-        radial-gradient(1px 1px at 10% 10%, white 1px, transparent 0),
-        radial-gradient(1px 1px at 20% 20%, white 1px, transparent 0),
-        radial-gradient(2px 2px at 30% 30%, rgba(255,255,255,0.5) 1px, transparent 0),
-        radial-gradient(circle at 80% 20%, rgba(0, 247, 255, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 20% 80%, rgba(255, 0, 230, 0.08) 0%, transparent 40%);
+        radial-gradient(1px 1px at 35% 35%, white 1px, transparent 0),
+        radial-gradient(1px 1px at 60% 60%, white 1px, transparent 0),
+        radial-gradient(2px 2px at 40% 55%, rgba(255,255,255,0.5) 1px, transparent 0),
+        radial-gradient(3px 3px at 55% 40%, rgba(255,255,255,0.5) 1px, transparent 0);
+    animation: starfield-rotate 60s linear infinite;
+    z-index: -1;
+    pointer-events: none;
+}
+body::after {
+    content: '';
+    position: fixed;
+    top: -50vh;
+    left: -50vw;
+    width: 200vw;
+    height: 200vh;
+    background-size: 100% 100%, 100% 100%;
+    background-image: 
+        radial-gradient(circle at 65% 35%, rgba(0, 247, 255, 0.08) 0%, transparent 20%),
+        radial-gradient(circle at 35% 65%, rgba(255, 0, 230, 0.08) 0%, transparent 20%);
+    animation: starfield-rotate 180s linear infinite;
+    z-index: -1;
+    pointer-events: none;
+}
+@keyframes starfield-rotate {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
 }
 [data-bs-theme="spaceship"] body {
     background-color: var(--bg-slate-950);

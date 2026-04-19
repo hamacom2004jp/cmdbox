@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.commons import convert, redis_client, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -9,7 +9,7 @@ import json
 import re
 
 
-class AgentAgentSave(feature.OneshotResultEdgeFeature):
+class AgentAgentSave(feature.OneshotResultEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
 
@@ -80,7 +80,7 @@ class AgentAgentSave(feature.OneshotResultEdgeFeature):
                 dict(opt="a2asv_apikey", type=Options.T_PASSWD, default=None, required=False, multi=False, hide=False, choice=None,
                     description_ja="A2A Server起動時のAPI Keyを指定します。 また`a2asv_delegated_auth` が無効な場合は、Agent実行時に使用も使用されます。",
                     description_en="Specify the API Key when starting the A2A Server. Additionally, if `a2asv_delegated_auth` is disabled, it will also be used when running the Agent.",),
-                dict(opt="llm", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=[],
+                dict(opt="llm", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
                     callcmd="async () => {await cmdbox.callcmd('llm','list',{},(res)=>{"
                             + "const val = $(\"[name='llm']\").val();"
                             + "$(\"[name='llm']\").empty().append('<option></option>');"
@@ -180,16 +180,11 @@ class AgentAgentSave(feature.OneshotResultEdgeFeature):
         return ret
 
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        if not hasattr(args, 'agent_name') or args.agent_name is None:
-            msg = dict(warn="Please specify --agent_name")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, obj = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, obj
         if not re.match(r'^[\w\-]+$', args.agent_name):
             msg = dict(warn="Agent name can only contain alphanumeric characters, underscores, and hyphens.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if not hasattr(args, 'agent_type') or args.agent_type is None:
-            msg = dict(warn="Please specify --agent_type")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
         if args.agent_type == 'local':
@@ -280,3 +275,33 @@ class AgentAgentSave(feature.OneshotResultEdgeFeature):
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
+
+    def init_test(self) -> None:
+        """
+        テスト用の初期化処理を行います
+        """
+        app_obj = self.appcls.getInstance(appcls=self.appcls, ver=self.ver)
+        app_obj.main(args_list=[
+            "-m", "llm", "-c", "save",
+            "--llmname", "default_value",
+            "--llmprov", "azureopenai",
+        ])
+        app_obj.main(args_list=[
+            "-m", "llm", "-c", "save",
+            "--llmname", "enabled_value",
+            "--llmprov", "azureopenai",
+        ])
+
+    def cleaning_test(self) -> None:
+        """
+        テスト用のクリーンアップ処理を行います
+        """
+        app_obj = self.appcls.getInstance(appcls=self.appcls, ver=self.ver)
+        app_obj.main(args_list=[
+            "-m", "llm", "-c", "del",
+            "--llmname", "default_value",
+        ])
+        app_obj.main(args_list=[
+            "-m", "llm", "-c", "del",
+            "--llmname", "enabled_value",
+        ])

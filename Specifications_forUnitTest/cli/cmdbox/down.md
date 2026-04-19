@@ -1,0 +1,54 @@
+# cmdbox down
+
+## 基本情報
+
+| 項目 | 内容 |
+| --- | --- |
+| mode | cmdbox |
+| cmd | down |
+| クラス | CmdboxDown |
+| モジュール | cmdbox.app.features.cli.cmdbox_cmdbox_down |
+| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_down.py |
+| 詳細設計書 | Specifications/cli/cmdbox/down.md |
+| 実装上の必須推定 | - |
+
+## 概要
+
+- 日本語: コンテナを停止します。
+- 英語: Stops the container.
+
+## 境界値ポリシー
+
+- 数値型は仕様上の明示範囲がないため、0, 1, -1, 極大値を汎用境界値として扱う。
+- 文字列型は空文字、1文字、特殊文字列、512文字相当の長文を境界として扱う。
+- ファイル・ディレクトリは、存在する正常パス、存在しないパス、空リソースを境界として扱う。
+- 複数値パラメータは 0 件、1 件、複数件を境界として扱う。
+
+## 共通期待結果
+
+- 終了コード候補: RESP_SUCCESS, RESP_WARN
+- 結果キー候補: 特になし
+
+## 副作用確認観点
+
+- 戻り値とログのみを確認対象とする
+
+## 詳細設計からの観点
+
+- 終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する
+
+## テストパターン
+
+| ID | 分類 | 観点 | 入力パターン | 期待終了コード | 期待結果 | 追加確認 |
+| --- | --- | --- | --- | --- | --- | --- |
+| TC-001 | 正常系 | 最小有効入力 | 全パラメータ省略またはデフォルト値で実行する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 戻り値以外の副作用がないことを確認する |
+| TC-002 | 型境界 | container 空文字 | --container(-C) に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
+| TC-003 | 型境界 | container 1文字 | --container(-C) に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-004 | 型境界 | container 特殊文字 | --container(-C) に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-005 | 型境界 | container 長文 | --container(-C) に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+
+## ソース参照
+
+- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_down.py
+- 詳細設計書: Specifications/cli/cmdbox/down.md
+- 生成日時: 2026-04-19T21:16:02

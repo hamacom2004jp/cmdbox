@@ -1,9 +1,9 @@
 {
     "python.testing.pytestArgs": [
-        "cmdbox_test"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
+    "python.testing.autoTestDiscoverOnSaveEnabled": true,
     "esbonio.sphinx.confDir": "",
     "files.eol": "\n",
     "[python]": {

@@ -1,5 +1,5 @@
 from cmdbox.app import common, client
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.commons import convert, redis_client, validator
 from cmdbox.app.features.cli.audit import audit_base
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -11,7 +11,7 @@ import json
 import sys
 
 
-class AuditDelete(audit_base.AuditBase):
+class AuditDelete(audit_base.AuditBase, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -93,10 +93,9 @@ class AuditDelete(audit_base.AuditBase):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if args.svname is None:
-            msg = dict(warn=f"Please specify the --svname option.")
-            common.print_format(msg, args.format, tm, None, False, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
 
         delete_audit_type_b64 = convert.str2b64str(args.delete_audit_type)
         delete_clmsg_id_b64 = convert.str2b64str(args.delete_clmsg_id)

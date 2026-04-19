@@ -1,5 +1,5 @@
 from cmdbox.app import common, client
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.commons import convert, redis_client, validator
 from cmdbox.app.features.cli.audit import audit_base
 from cmdbox.app.options import Options
 from datetime import datetime
@@ -11,7 +11,7 @@ import json
 import uuid
 
 
-class AuditWrite(audit_base.AuditBase):
+class AuditWrite(audit_base.AuditBase, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -87,14 +87,10 @@ class AuditWrite(audit_base.AuditBase):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if args.svname is None:
-            msg = dict(warn=f"Please specify the --svname option.")
-            common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if args.audit_type is None:
-            msg = dict(warn=f"Please specify the --audit_type option.")
-            common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
+
         if args.clmsg_id is None:
             args.clmsg_id = str(uuid.uuid4())
         if args.clmsg_date is None:

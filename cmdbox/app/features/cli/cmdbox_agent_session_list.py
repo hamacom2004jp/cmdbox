@@ -1,5 +1,5 @@
-from cmdbox.app import common, client, feature, options
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app import common, client
+from cmdbox.app.commons import convert, redis_client, validator
 from cmdbox.app.features.cli import cmdbox_agent_chat
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -10,7 +10,7 @@ import json
 import re
 
 
-class AgentSessionList(cmdbox_agent_chat.AgentChat):
+class AgentSessionList(cmdbox_agent_chat.AgentChat, validator.Validator):
 
     def get_mode(self) -> str:
         return 'agent'
@@ -73,16 +73,12 @@ class AgentSessionList(cmdbox_agent_chat.AgentChat):
         )
 
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        if not getattr(args, 'runner_name', None):
-            msg = dict(warn="Please specify --runner_name")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
+
         if not re.match(r'^[\w\-]+$', args.runner_name):
             msg = dict(warn="Runner name can only contain alphanumeric characters, underscores, and hyphens.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if not getattr(args, 'user_name', None):
-            msg = dict(warn="Please specify --user_name")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
 

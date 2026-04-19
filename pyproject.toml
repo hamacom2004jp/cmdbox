@@ -11,7 +11,7 @@ authors = [
     { name = "hamacom2004jp", email = "hamacom2004jp@gmail.com" },
 ]
 license = { text = "MIT" }
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 keywords = [
     "audit",
     "a2a",
@@ -62,7 +62,6 @@ dependencies = [
     "requests",
     "rich",
     "six",
-    "python-toon",
     "tabulate",
     "uvicorn",
     "wsproto",
@@ -73,12 +72,12 @@ dependencies = [
 agent_mcp = [
     "pydantic>=2.0.0,<3.0.0",
     "fastmcp>=2.14.4",
-    "mcp>=1.23.0,<2.0.0",
+    "mcp>=1.24.0,<2.0.0",
 ]
 agent_adk = [
-    "google-adk>=1.23.0",
+    "google-adk>=1.30.0",
     "a2a-sdk>=0.3.4,<0.4.0",
-    "litellm>=1.75.5,<1.80.17",
+    "litellm>=1.82.6",
 ]
 agent_mem = [
     "sentence-transformers",
@@ -104,6 +103,7 @@ saml = [
 dev = [
     "build",
     "collectlicense",
+    "pytest",
     "sphinx",
     "sphinx-rtd-theme",
     "sphinx_fontawesome",

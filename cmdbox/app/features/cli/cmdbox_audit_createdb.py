@@ -1,17 +1,14 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client
-from cmdbox.app.features.cli.audit import audit_base
+from cmdbox.app.commons import convert, redis_client, validator
 from cmdbox.app.options import Options
-from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
-import json
 import psycopg
 
 
-class AuditCreatedb(feature.UnsupportEdgeFeature):
+class AuditCreatedb(feature.UnsupportEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -98,34 +95,9 @@ class AuditCreatedb(feature.UnsupportEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if args.svname is None:
-            msg = dict(warn=f"Please specify the --svname option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if args.pg_host is None:
-            msg = dict(warn=f"Please specify the --pg_host option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if args.pg_port is None:
-            msg = dict(warn=f"Please specify the --pg_port option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if args.pg_user is None:
-            msg = dict(warn=f"Please specify the --pg_user option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if args.pg_password is None:
-            msg = dict(warn=f"Please specify the --pg_password option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if args.pg_dbname is None:
-            msg = dict(warn=f"Please specify the --pg_dbname option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if args.new_pg_dbname is None:
-            msg = dict(warn=f"Please specify the --new_pg_dbname option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
 
         pg_host_b64 = convert.str2b64str(args.pg_host)
         pg_port = args.pg_port if isinstance(args.pg_port, int) else None

@@ -36,25 +36,28 @@ const list_cmd_func = async () => {
         const ct = $(e.currentTarget);
         const cmd_items = $('#cmd_items').find('.cmd_card:not(.cmd_add)');
         const andor_sw = ct.hasClass('andor_switch');
-        const and_val = $('#andor_switch').prop('checked');
         // 選択中のボタンの場合は解除中にする
         if (!andor_sw && ct.hasClass('btn-secondary')) {
             ct.removeClass('btn-secondary');
             ct.addClass('btn-outline-secondary');
+            cmd_item_tags.removeAttr(`data-tag-${ct.attr('data-tag')}`);
         }
         // 解除中のボタンの場合は選択中にする
         else if (!andor_sw && ct.hasClass('btn-outline-secondary')) {
             ct.removeClass('btn-outline-secondary');
             ct.addClass('btn-secondary');
+            cmd_item_tags.attr(`data-tag-${ct.attr('data-tag')}`, ct.attr('data-tag'));
         }
-        // 選択中のタグを取得
-        const tags = new Set();
-        cmd_item_tags.find('.btn-tag').each((i, elem) => {
-            if ($(elem).hasClass('btn-secondary')) tags.add($(elem).attr('data-tag'));
-        });
+        else if (andor_sw) {
+            cmd_item_tags.attr(`data-tagandor`, $('#andor_switch').prop('checked') ? 'and' : 'or');
+        }
         // タグ無しボタンが選択された場合
         if (ct.hasClass('btn_notag') && ct.hasClass('btn-secondary')) {
             cmd_item_tags.find('.btn-tag').removeClass('btn-secondary').addClass('btn-outline-secondary');
+            const attr_names = [...cmd_item_tags.get(0).attributes].map(attr => attr.name)
+            attr_names.forEach((name, i) => {
+                cmd_item_tags.removeAttr(name);
+            });
             cmd_items.parent().hide();
             cmd_items.each((i, elem) => {
                 const el = $(elem);
@@ -66,12 +69,29 @@ const list_cmd_func = async () => {
         }
         // notagボタンの選択を解除
         if (!andor_sw) $('#btn_notag').removeClass('btn-secondary').addClass('btn-outline-secondary');
+        cmd_item_show();
+    };
+    const cmd_item_show = () => {
+        const cmd_item_tags = $('#cmd_item_tags');
+        const cmd_items = $('#cmd_items').find('.cmd_card:not(.cmd_add)');
+        $('#andor_switch').prop('checked', cmd_item_tags.attr('data-tagandor')=='and');
+        const and_val = $('#andor_switch').prop('checked');
+        // 選択中のタグを取得
+        const tags = new Set();
+        const attr_names = [...cmd_item_tags.get(0).attributes].map(attr => attr.name)
+        attr_names.forEach((name, i) => {
+            if (!name || !name.startsWith('data-tag-')) return;
+            data_tag = cmd_item_tags.attr(name);
+            tags.add(data_tag);
+            const el = cmd_item_tags.find(`[data-tag="${data_tag}"]`);
+            el.removeClass('btn-outline-secondary');
+            el.addClass('btn-secondary');
+        });
         // タグがない場合は全て表示
         if (tags.size == 0) {
             cmd_items.parent().show();
             return;
         }
-        // タグがある場合はタグに一致するものだけ表示
         cmd_items.parent().hide();
         cmd_items.each((i, elem) => {
             const el = $(elem);
@@ -115,6 +135,7 @@ const list_cmd_func = async () => {
     andor_bot.append('<label class="form-check-label" for="andor_switch">or / and</label>');
     andor_bot.find('#andor_switch').click(tag_bot_click);
     cmd_item_tags.append(andor_bot);
+    cmd_item_show();
 }
 // コマンドファイルの取得が出来た時の処理
 const list_cmd_func_then = () => {

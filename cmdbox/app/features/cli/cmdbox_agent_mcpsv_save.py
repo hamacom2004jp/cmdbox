@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.commons import convert, redis_client, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -9,7 +9,7 @@ import json
 import re
 
 
-class AgentMcpSave(feature.OneshotResultEdgeFeature):
+class AgentMcpSave(feature.OneshotResultEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
 
@@ -98,14 +98,10 @@ class AgentMcpSave(feature.OneshotResultEdgeFeature):
         )
 
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        if not hasattr(args, 'mcpserver_name') or args.mcpserver_name is None:
-            msg = dict(warn="Please specify --mcpserver_name")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if not hasattr(args, 'mcpserver_url') or args.mcpserver_url is None:
-            msg = dict(warn="Please specify --mcpserver_url")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
+
         if not re.match(r'^[\w\-]+$', args.mcpserver_name):
             msg = dict(warn="MCP server name can only contain alphanumeric characters, underscores, and hyphens.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

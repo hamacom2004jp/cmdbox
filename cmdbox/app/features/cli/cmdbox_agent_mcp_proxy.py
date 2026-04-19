@@ -1,12 +1,12 @@
 from cmdbox.app import common, feature
-from cmdbox.app.features.cli import cmdbox_web_start
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 
 
-class AgentMcpProxy(feature.UnsupportEdgeFeature):
+class AgentMcpProxy(feature.UnsupportEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -64,14 +64,9 @@ class AgentMcpProxy(feature.UnsupportEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if not hasattr(args, 'mcpserver_name'):
-            args.mcpserver_name = 'mcpserver'
-        if not hasattr(args, 'mcpserver_url'):
-            args.mcpserver_url = 'http://localhost:8082/mcp'
-        if not hasattr(args, 'mcpserver_transport'):
-            args.mcpserver_transport = 'streamable-http'
-        if not hasattr(args, 'mcpserver_apikey'):
-            args.mcpserver_apikey = None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
 
         from fastmcp import FastMCP
         config = dict(

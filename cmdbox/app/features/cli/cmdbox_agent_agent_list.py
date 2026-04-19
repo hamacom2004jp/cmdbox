@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.commons import convert, redis_client, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -8,7 +8,7 @@ import logging
 import json
 
 
-class AgentAgentList(feature.OneshotResultEdgeFeature):
+class AgentAgentList(feature.OneshotResultEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
 
@@ -64,6 +64,9 @@ class AgentAgentList(feature.OneshotResultEdgeFeature):
        )
 
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
+        st, msg, obj = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, obj
         payload = dict(kwd=args.kwd)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 

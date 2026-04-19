@@ -1,5 +1,5 @@
-from cmdbox.app import common, client, feature, options
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app import common, client
+from cmdbox.app.commons import convert, redis_client, validator
 from cmdbox.app.features.cli.agent import agant_base
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -9,7 +9,7 @@ import logging
 import json
 
 
-class AgentSessionDel(agant_base.AgentBase):
+class AgentSessionDel(agant_base.AgentBase, validator.Validator):
 
     def get_mode(self) -> str:
         return 'agent'
@@ -72,18 +72,9 @@ class AgentSessionDel(agant_base.AgentBase):
         )
 
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        if not getattr(args, 'runner_name', None):
-            msg = dict(warn="Please specify --runner_name")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if not getattr(args, 'user_name', None):
-            msg = dict(warn="Please specify --user_name to delete sessions")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if not getattr(args, 'session_id', None):
-            msg = dict(warn="Please specify --session_id to delete sessions")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
 
         payload = dict(runner_name=args.runner_name, session_id=args.session_id, user_name=args.user_name)
         payload_b64 = convert.str2b64str(common.to_str(payload))
