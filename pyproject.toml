@@ -136,6 +136,7 @@ packages = [
     "cmdbox.app.features.cli.cmdbox",
     "cmdbox.app.features.cli.excel",
     "cmdbox.app.features.cli.rag",
+    "cmdbox.app.features.cli.test",
     "cmdbox.app.features.web",
     "cmdbox.extensions"
 ]

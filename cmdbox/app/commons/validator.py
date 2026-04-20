@@ -143,7 +143,7 @@ class Validator(feature.Feature):
             # オプション固有のバリデーション
             validator = validators.get(opt, None)
             if validator:
-                st, msg, obj = validator(self, logger, opt, val)
+                st, msg, obj = validator(logger, opt, val)
                 if st != self.RESP_SUCCESS:
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                     return st, msg, None

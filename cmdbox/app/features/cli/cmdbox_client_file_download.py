@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature, filer
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.commons import convert, redis_client, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -8,7 +8,7 @@ import logging
 import json
 
 
-class ClientFileDownload(feature.OneshotEdgeFeature):
+class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -135,14 +135,10 @@ class ClientFileDownload(feature.OneshotEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if args.svname is None:
-            msg = dict(warn=f"Please specify the --svname option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if args.svpath is None:
-            msg = dict(warn=f"Please specify the --svpath option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
+
         if args.etag is not None and args.download_file is not None:
             msg = dict(warn=f"Cannot specify both --etag and --download_file options.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

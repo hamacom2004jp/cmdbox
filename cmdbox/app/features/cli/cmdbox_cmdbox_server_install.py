@@ -1,5 +1,6 @@
 from cmdbox import version
-from cmdbox.app import common, feature
+from cmdbox.app import common
+from cmdbox.app.commons import validator
 from cmdbox.app.features.cli.cmdbox import cmdbox_base
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -13,7 +14,7 @@ import shutil
 import yaml
 
 
-class CmdboxServerInstall(cmdbox_base.CmdboxBase):
+class CmdboxServerInstall(cmdbox_base.CmdboxBase, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -133,10 +134,10 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if args.data is None:
-            msg = dict(warn=f"Please specify the --data option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, obj = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, obj
+
         ret = self.server_install(logger, args, Path(args.data),
                                   install_cmdbox_tgt=args.install_cmdbox,
                                   install_from=args.install_from,

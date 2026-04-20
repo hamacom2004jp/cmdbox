@@ -1,5 +1,6 @@
 from cmdbox import version
 from cmdbox.app import common
+from cmdbox.app.commons import validator
 from cmdbox.app.features.cli.cmdbox import cmdbox_base
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -11,7 +12,7 @@ import shutil
 import yaml
 
 
-class CmdboxPgsqlLoad(cmdbox_base.CmdboxBase):
+class CmdboxPgsqlLoad(cmdbox_base.CmdboxBase, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -71,6 +72,10 @@ class CmdboxPgsqlLoad(cmdbox_base.CmdboxBase):
         """
         common.set_debug(logger, True)
         try:
+            st, msg, obj = self.valid(logger, args, tm, pf)
+            if st != self.RESP_SUCCESS:
+                return st, msg, obj
+
             if platform.system() == 'Windows':
                 return {"warn": f"load PostgreSQL command is Unsupported in windows platform."}
 

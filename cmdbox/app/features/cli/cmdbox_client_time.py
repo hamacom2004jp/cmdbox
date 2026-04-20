@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, Union, List
 import argparse
@@ -6,7 +7,7 @@ import datetime
 import logging
 
 
-class ClientTime(feature.OneshotResultEdgeFeature):
+class ClientTime(feature.OneshotResultEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -55,6 +56,9 @@ class ClientTime(feature.OneshotResultEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
         tz = datetime.timezone(datetime.timedelta(hours=args.timedelta))
         dt = datetime.datetime.now(tz)
         ret = dict(success=dict(data=dt.strftime('%Y-%m-%d %H:%M:%S'), timezone=str(dt.tzinfo), timestamp=dt.timestamp()))

@@ -74,7 +74,8 @@ class Colors:
 
     _colorize_suffix = S + str(ResetAll) + E
 
-    product_word = re.compile(r"CMDBOX|IINFER|USOUND|GAIAN|GAIC|WITSHAPE", re.IGNORECASE)
+    option_word = re.compile(r"MODE|CMD|SVNAME|GROUPS|FWPATH", re.IGNORECASE)
+    product_word = re.compile(r"CMDBOX|IINFER|USOUND|GAIAN", re.IGNORECASE)
     success_word = re.compile(r"SUCCESS|OK|PASSED|DONE|COMPLETE|START|FINISH|OPEN|CONNECTED|ALLOW|EXEC", re.IGNORECASE)
     warning_word = re.compile(r"WARNING|WARN|CAUTION|NOTICE|STOP|DISCONNECTED|DENY", re.IGNORECASE)
     error_word = re.compile(r"ERROR|ALERT|CRITICAL|FATAL|ABORT|FAILED", re.IGNORECASE)
@@ -86,6 +87,7 @@ def colorize_msg(msg) -> str:
     msg = Colors.success_word.sub(colorize(r"\g<0>", Colors.Green), msg)
     msg = Colors.warning_word.sub(colorize(r"\g<0>", Colors.Yellow), msg)
     msg = Colors.error_word.sub(colorize(r"\g<0>", Colors.Red), msg)
+    msg = Colors.option_word.sub(colorize(r"\g<0>", Colors.LightGreen), msg)
     msg = Colors.product_word.sub(colorize(r"\g<0>", Colors.LightBlue), msg)
     return msg
 
@@ -109,6 +111,7 @@ theme=Theme({
     "repr.log_warn": "bold Yellow",
     "repr.log_error": "bold red",
     "repr.log_fatal": "bold red reverse",
+    "repr.log_option": "green4 reverse",
     "repr.log_product": "dodger_blue2 reverse",
     "repr.log_success": "green",})
 
@@ -123,7 +126,8 @@ class LogLevelHighlighter(highlighter.ReprHighlighter):
         self.highlights.append(r"(?P<log_warn>WARN|WARNING|WARN|CAUTION|NOTICE|STOP|DISCONNECTED|DENY)")
         self.highlights.append(r"(?P<log_error>ERROR|ALERT|ABORT|FAILED)")
         self.highlights.append(r"(?P<log_fatal>FATAL|CRITICAL)")
-        self.highlights.append(r"(?P<log_product>CMDBOX|IINFER|USOUND|GAIAN|GAIC|WITSHAPE)")
+        self.highlights.append(r"(?P<log_option>MODE|CMD|SVNAME|GROUPS|FWPATH)")
+        self.highlights.append(r"(?P<log_product>CMDBOX|IINFER|USOUND|GAIAN)")
         self.highlights.append(r"(?P<log_success>SUCCESS|OK|PASSED|DONE|COMPLETE|START|FINISH|OPEN|CONNECTED|ALLOW)")
         self.highlights = [re.compile(h, re.IGNORECASE) for h in self.highlights]
 

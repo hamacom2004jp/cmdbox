@@ -1,5 +1,6 @@
-from cmdbox.app import common, feature, options
+from cmdbox.app import common, feature
 from cmdbox.app.auth import signin
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -8,7 +9,7 @@ import glob
 import logging
 
 
-class CmdList(feature.OneshotResultEdgeFeature):
+class CmdList(feature.OneshotResultEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -54,7 +55,7 @@ class CmdList(feature.OneshotResultEdgeFeature):
                 dict(opt="match_opt", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
                      description_ja=f"検索したいコマンドのopt名を指定します。",
                      description_en=f"Specify the opt name of the command you want to search in."),
-                dict(opt="signin_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in", web="mask",
+                dict(opt="signin_file", type=Options.T_FILE, default=f'.{self.ver.__appid__}/user_list.yml', required=True, multi=False, hide=False, choice=None, fileio="in", web="mask",
                      description_ja=f"サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.{self.ver.__appid__}/user_list.yml' を指定します。",
                      description_en=f"Specify a file containing users and passwords with which they can signin.Typically, specify '.{self.ver.__appid__}/user_list.yml'."),
                 dict(opt="groups", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None, web="mask",
@@ -91,10 +92,10 @@ class CmdList(feature.OneshotResultEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if args.data is None:
-            msg = dict(warn=f"Please specify the --data option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
+
         kwd = args.kwd
         if kwd is None or kwd == '':
             kwd = '*'

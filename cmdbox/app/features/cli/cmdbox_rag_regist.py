@@ -69,7 +69,7 @@ class RagRegist(rag_base.RAGBase):
                 dict(opt="data", type=Options.T_DIR, default=self.default_data, required=True, multi=False, hide=False, choice=None, web="mask",
                      description_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
                      description_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
-                dict(opt="signin_file", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None, fileio="in", web="mask",
+                dict(opt="signin_file", type=Options.T_FILE, default=f'.{self.ver.__appid__}/user_list.yml', required=True, multi=False, hide=False, choice=None, fileio="in", web="mask",
                      description_ja=f"サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.{self.ver.__appid__}/user_list.yml' を指定します。",
                      description_en=f"Specify a file containing users and passwords with which they can signin.Typically, specify '.{self.ver.__appid__}/user_list.yml'."),
                 dict(opt="groups", type=Options.T_STR, default=None, required=True, multi=True, hide=True, choice=None, web="mask",

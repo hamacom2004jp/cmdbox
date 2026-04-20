@@ -1,4 +1,5 @@
 from cmdbox.app import common
+from cmdbox.app.commons import validator
 from cmdbox.app.features.cli.cmdbox import cmdbox_base
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, List, Union
@@ -6,7 +7,7 @@ import argparse
 import logging
 
 
-class CmdboxReboot(cmdbox_base.CmdboxBase):
+class CmdboxReboot(cmdbox_base.CmdboxBase, validator.Validator):
 
     def get_mode(self) -> Union[str, List[str]]:
         """
@@ -59,6 +60,10 @@ class CmdboxReboot(cmdbox_base.CmdboxBase):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
+        st, msg, obj = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, obj
+
         reboot_ret = self.reboot(logger, args, args.container, tm, pf)
         common.print_format(reboot_ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in reboot_ret:

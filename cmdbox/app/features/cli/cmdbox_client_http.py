@@ -1,5 +1,5 @@
-from cmdbox.app import common, client, feature, filer
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app import common, feature
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -9,7 +9,7 @@ import requests
 import urllib.parse
 
 
-class ClientHttp(feature.ResultEdgeFeature):
+class ClientHttp(feature.ResultEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -103,10 +103,10 @@ class ClientHttp(feature.ResultEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if args.url is None:
-            msg = dict(warn=f"Please specify the --url option.")
-            common.print_format(msg, args.format, tm, None, False, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
+
         query_param = {}
         if args.proxy == 'yes':
             from cmdbox.app.auth import signin

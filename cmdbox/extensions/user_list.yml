@@ -49,6 +49,10 @@ cmdrule:                       # A list of command rules, Specify a rule that de
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
   rules:                       # Specify rules to allow or deny execution of the command, depending on the group the user belongs to.
   - groups: [admin]
+    coercion:
+      fwpath: "['/']"
+      from_fwpath: "['/']"
+      to_fwpath: "['/']"
     rule: allow
   - groups: [user]             # Specify the groups to which the rule applies.
     mode: client               # Specify the "mode" as the condition for applying the rule.
