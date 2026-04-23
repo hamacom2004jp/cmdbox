@@ -10,7 +10,7 @@
 | モジュール | cmdbox.app.features.cli.cmdbox_test_gen_test_spec |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_test_gen_test_spec.py |
 | 詳細設計書 | Specifications/cli/test/gen_test_spec.md |
-| 実装上の必須推定 | input_json |
+| 実装上の必須推定 | - |
 
 ## 概要
 
@@ -38,7 +38,7 @@
 
 ## 詳細設計からの観点
 
-- 選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する
+- 選択肢を持つパラメータ clear_output_dir, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する
 - 結果オブジェクトのキー success, output_dir, json_file, count, warn が期待どおり構成されることを確認する
 - 終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する
 
@@ -56,12 +56,14 @@
 | TC-008 | 型境界 | root_dir 既存空ディレクトリ | --root_dir に既存の空ディレクトリを指定する | RESP_SUCCESS | 空ディレクトリ前提の初期状態が正常に処理される | 必要な初期化ファイルやサブディレクトリが作成される場合は生成を確認する |
 | TC-009 | 型境界 | root_dir 既存データありディレクトリ | --root_dir に既存データを含むディレクトリを指定する | RESP_SUCCESS | 既存データを読み込む経路が正常に処理される | 既存ファイルを意図せず破壊しないことを確認する |
 | TC-010 | 型境界 | root_dir 非存在ディレクトリ | --root_dir に存在しないディレクトリを指定する | RESP_WARN | 存在チェックエラーまたは初期化失敗が返る | 自動作成される仕様でない限り、ディレクトリが勝手に作成されないことを確認する |
-| TC-011 | ファイルI/O | output_json 追記保存 | 既存の output_json を用意し、output_json_append=True で 2 回連続実行する | RESP_SUCCESS | 各回の結果が保存され、追記モードで既存内容が失われない | 1 回目より 2 回目のファイルサイズが増加し、追記後も JSON として解釈可能であることを確認する |
-| TC-012 | 副作用確認 | 成果物検証 | 副作用を発生させる有効入力で実行する | RESP_SUCCESS | 戻り値が正常であり、関連する成果物が期待どおり更新される | output_dir で指定した出力ファイルが作成され、内容が空でないことを確認する / output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
-| TC-013 | 結果検証 | 結果キー整合性 | 正常系の代表入力で実行する | RESP_SUCCESS | 結果オブジェクトに success, output_dir, json_file, count, warn が含まれる | 不要なキー欠落や型崩れがないことを確認する |
+| TC-011 | 型境界 | clear_output_dir=False | --clear_output_dir に False を指定する | RESP_SUCCESS | False 分岐が正常に処理される | 既定値との差分がある場合は挙動の変化を確認する |
+| TC-012 | 型境界 | clear_output_dir=True | --clear_output_dir に True を指定する | RESP_SUCCESS | True 分岐が正常に処理される | 副作用がある場合は有効化に伴う成果物の差分を確認する |
+| TC-013 | ファイルI/O | output_json 追記保存 | 既存の output_json を用意し、output_json_append=True で 2 回連続実行する | RESP_SUCCESS | 各回の結果が保存され、追記モードで既存内容が失われない | 1 回目より 2 回目のファイルサイズが増加し、追記後も JSON として解釈可能であることを確認する |
+| TC-014 | 副作用確認 | 成果物検証 | 副作用を発生させる有効入力で実行する | RESP_SUCCESS | 戻り値が正常であり、関連する成果物が期待どおり更新される | output_dir で指定した出力ファイルが作成され、内容が空でないことを確認する / output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
+| TC-015 | 結果検証 | 結果キー整合性 | 正常系の代表入力で実行する | RESP_SUCCESS | 結果オブジェクトに success, output_dir, json_file, count, warn が含まれる | 不要なキー欠落や型崩れがないことを確認する |
 
 ## ソース参照
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_test_gen_test_spec.py
 - 詳細設計書: Specifications/cli/test/gen_test_spec.md
-- 生成日時: 2026-04-19T21:16:02
+- 生成日時: 2026-04-23T23:40:14

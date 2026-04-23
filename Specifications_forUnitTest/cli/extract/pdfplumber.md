@@ -10,7 +10,7 @@
 | モジュール | cmdbox.app.features.cli.cmdbox_extract_pdfplumber |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_pdfplumber.py |
 | 詳細設計書 | Specifications/cli/extract/pdfplumber.md |
-| 実装上の必須推定 | svname, scope, loadpath, fwpath |
+| 実装上の必須推定 | - |
 
 ## 概要
 
@@ -28,7 +28,7 @@
 
 ## 共通期待結果
 
-- 終了コード候補: RESP_WARN, RESP_SUCCESS, INT_1, INT_0, INT_2
+- 終了コード候補: RESP_SUCCESS, RESP_WARN, INT_1, INT_0, INT_2
 - 結果キー候補: warn
 
 ## 副作用確認観点
@@ -41,7 +41,7 @@
 - 選択肢を持つパラメータ scope, chunk_table, output_json_append, stdout_log の境界値と不正値を確認する
 - 複数値パラメータ fwpath, chunk_table_header, chunk_exclude, chunk_separator の 0 件・1 件・複数件入力を確認する
 - 結果オブジェクトのキー warn が期待どおり構成されることを確認する
-- 終了コード RESP_WARN, RESP_SUCCESS, INT_1, INT_0, INT_2 の到達条件をそれぞれ検証する
+- 終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_0, INT_2 の到達条件をそれぞれ検証する
 
 ## テストパターン
 
@@ -116,4 +116,4 @@
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_pdfplumber.py
 - 詳細設計書: Specifications/cli/extract/pdfplumber.md
-- 生成日時: 2026-04-19T21:16:02
+- 生成日時: 2026-04-23T23:40:14

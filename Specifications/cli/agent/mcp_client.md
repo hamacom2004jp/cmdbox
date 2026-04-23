@@ -9,7 +9,7 @@
 | クラス | AgentMcpClient |
 | モジュール | cmdbox.app.features.cli.cmdbox_agent_mcp_client |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcp_client.py |
-| 継承元 | UnsupportEdgeFeature, Feature |
+| 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | いいえ |
@@ -50,11 +50,8 @@
 - 終了コード候補: RESP_SUCCESS, RESP_ERROR
 - 結果キー候補: warn, success
 - 処理フロー:
-  - logger.info を呼び出す
-  - 条件 not hasattr(args, 'mcpserver_name') に応じて分岐する。主な呼出: hasattr
-  - 条件 not hasattr(args, 'mcpserver_url') に応じて分岐する。主な呼出: hasattr
-  - 条件 not hasattr(args, 'mcpserver_transport') に応じて分岐する。主な呼出: hasattr
-  - 条件 not hasattr(args, 'mcpserver_apikey') に応じて分岐する。主な呼出: hasattr
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - config に dict の結果を格納する
   - 例外処理を伴って処理する。主な呼出: common.reset_logger, Client, common.print_format, logger.debug, logger.setLevel, logger.error
   - Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_ERROR / 結果キー: warn）
@@ -84,4 +81,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcp_client.py
 - apprun 実装元: AgentMcpClient
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:05
+- 生成日時: 2026-04-23T23:39:57

@@ -9,7 +9,7 @@
 | クラス | ExtractSave |
 | モジュール | cmdbox.app.features.cli.cmdbox_extract_save |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_save.py |
-| 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Feature |
+| 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | いいえ |
@@ -48,11 +48,9 @@
 
 - 実装元: ExtractSave
 - 終了コード候補: RESP_SUCCESS, RESP_WARN
-- 結果キー候補: warn
 - 処理フロー:
-  - 条件 not hasattr(args, 'extract_name') or args.extract_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 not re.match('^[\\w\\-]+$', args.extract_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 not hasattr(args, 'extract_type') or args.extract_type is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - payload に dict の結果を格納する
   - payload_b64 に convert.str2b64str の結果を格納する
   - cl に client.Client の結果を格納する
@@ -73,14 +71,14 @@
 ## 処理結果
 
 - 終了コード候補: RESP_SUCCESS, RESP_WARN, INT_1, INT_2
-- 結果キー候補: warn, success
+- 結果キー候補: success, warn
 - 戻り値の基本形: Tuple[int, Dict[str, Any], Any]
 
 ## 単体テスト観点
 
 - 必須パラメータ extract_name, extract_cmd, loadpath が不足した場合の警告応答を確認する
 - 選択肢を持つパラメータ extract_type, scope, output_json_append, stdout_log の境界値と不正値を確認する
-- 結果オブジェクトのキー warn, success が期待どおり構成されることを確認する
+- 結果オブジェクトのキー success, warn が期待どおり構成されることを確認する
 - 終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する
 
 ## ソース参照
@@ -88,4 +86,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_save.py
 - apprun 実装元: ExtractSave
 - svrun 実装元: ExtractSave
-- 生成日時: 2026-04-19T20:59:10
+- 生成日時: 2026-04-23T23:40:02

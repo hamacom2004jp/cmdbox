@@ -69,4 +69,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_a2asv_stop.py
 - apprun 実装元: A2asvStop
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:04
+- 生成日時: 2026-04-23T23:39:56

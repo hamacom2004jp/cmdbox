@@ -21,11 +21,15 @@ body::before {
     height: 200vh;
     background-size: 100% 100%, 100% 100%, 100% 100%;
     background-image: 
-        radial-gradient(1px 1px at 35% 35%, white 1px, transparent 0),
-        radial-gradient(1px 1px at 60% 60%, white 1px, transparent 0),
-        radial-gradient(2px 2px at 40% 55%, rgba(255,255,255,0.5) 1px, transparent 0),
-        radial-gradient(3px 3px at 55% 40%, rgba(255,255,255,0.5) 1px, transparent 0);
-    animation: starfield-rotate 60s linear infinite;
+        radial-gradient(1px 1px at 35% 25%, var(--bs-body-color) 1px, transparent 0),
+        radial-gradient(1px 1px at 50% 30%, var(--bs-body-color) 1px, transparent 0),
+        radial-gradient(1px 1px at 65% 35%, var(--bs-body-color) 1px, transparent 0),
+        radial-gradient(1px 1px at 30% 60%, var(--bs-body-color) 2px, transparent 0),
+        radial-gradient(1px 1px at 60% 50%, var(--bs-primary) 2px, transparent 0),
+        radial-gradient(1px 1px at 40% 40%, var(--bs-primary) 2px, transparent 0),
+        radial-gradient(1px 1px at 70% 55%, var(--bs-primary) 1px, transparent 0),
+        radial-gradient(1px 1px at 55% 70%, var(--bs-primary) 1px, transparent 0);
+    animation: starfield-rotate 360s linear infinite;
     z-index: -1;
     pointer-events: none;
 }
@@ -38,9 +42,9 @@ body::after {
     height: 200vh;
     background-size: 100% 100%, 100% 100%;
     background-image: 
-        radial-gradient(circle at 65% 35%, rgba(0, 247, 255, 0.08) 0%, transparent 20%),
-        radial-gradient(circle at 35% 65%, rgba(255, 0, 230, 0.08) 0%, transparent 20%);
-    animation: starfield-rotate 180s linear infinite;
+        radial-gradient(circle at 65% 35%, var(--area-bg-color-10) 0%, transparent 20%),
+        radial-gradient(circle at 35% 65%, var(--area-bg-color-danger-10) 0%, transparent 20%);
+    animation: starfield-rotate 120s linear infinite;
     z-index: -1;
     pointer-events: none;
 }
@@ -878,4 +882,80 @@ body::after {
 }
 [data-bs-theme="spaceship"] .modal-footer {
     border-color: var(--area-border-color);
+}
+
+/* 桜モード */
+[data-bs-theme="sakura"] {
+    --bs-body-bg: #fdf0f5; /* 淡い桜色の白 */
+    --bs-body-color: #4a2030; /* 深みのある紅褐色 */
+    --bs-emphasis-color: #8b1a4a; /* 濃い桜色 */
+    --bs-secondary-color: #c47a90; /* くすんだ桜色 */
+    --bs-secondary-bg: #f9e0ea;
+    --bs-tertiary-color: #d4a0b0; /* 薄桜色 */
+    --bs-tertiary-bg: #fce8f0;
+    --bs-link-color: #c0315a; /* 紅 */
+    --bs-link-hover-color: #8b1a4a; /* 濃い紅 */
+    --bs-code-color: #7b4f00; /* 黄金茶 */
+    --bs-highlight-bg: #fce8f0;
+    --bs-highlight-border-color: #f5c8da;
+
+    --bs-primary: #e8698a; /* 桜色 */
+    --bs-primary-rgb: 232, 105, 138;
+    --bs-primary-text: #fff;
+    --bs-primary-bg-subtle: #fce8f0;
+    --bs-primary-border-subtle: #f5c8da;
+    --bs-secondary: #c47a90; /* くすんだ桜 */
+    --bs-secondary-rgb: 196, 122, 144;
+    --bs-secondary-text: #fff;
+    --bs-secondary-bg-subtle: #f9e0ea;
+    --bs-secondary-border-subtle: #f0c8d8;
+    --bs-success: #5a8a5a; /* 若葉色 */
+    --bs-success-rgb: 90, 138, 90;
+    --bs-success-text: #fff;
+    --bs-success-bg-subtle: #d8ead8;
+    --bs-success-border-subtle: #c0d8c0;
+    --bs-info: #7090c0; /* 春の空色 */
+    --bs-info-rgb: 112, 144, 192;
+    --bs-info-text: #fff;
+    --bs-info-bg-subtle: #dce8f5;
+    --bs-info-border-subtle: #c0d4ee;
+    --bs-warning: #d4860a; /* 枯れ葉色 */
+    --bs-warning-rgb: 212, 134, 10;
+    --bs-warning-text: #fff;
+    --bs-warning-bg-subtle: #fdefd4;
+    --bs-warning-border-subtle: #f8dcb0;
+    --bs-danger: #c0314a; /* 紅梅 */
+    --bs-danger-rgb: 192, 49, 74;
+    --bs-danger-text: #fff;
+    --bs-danger-bg-subtle: #f8d8de;
+    --bs-danger-border-subtle: #f0b8c4;
+    --bs-light: #fdf0f5; /* 淡い桜色 */
+    --bs-light-rgb: 253, 240, 245;
+    --bs-light-text: #4a2030;
+    --bs-light-bg-subtle: #fff7fa;
+    --bs-light-border-subtle: #fce8f0;
+    --bs-dark: #4a2030; /* 深紅褐色 */
+    --bs-dark-rgb: 74, 32, 48;
+    --bs-dark-text: #fff;
+    --bs-dark-bg-subtle: #f5d8e4;
+    --bs-dark-border-subtle: #e8c0d0;
+
+    --bs-gradient: linear-gradient(180deg, rgba(232, 105, 138, 0.08), rgba(232, 105, 138, 0));
+    --bs-border-width: 1px;
+    --bs-border-style: solid;
+    --bs-border-color: #e8b0c8;
+    --bs-border-color-translucent: rgba(196, 122, 144, 0.4);
+
+    --bs-emphasis-color-rgb: var(--bs-card-title-color);
+    --bs-warning-text-emphasis: var(--bs-code-color);
+    --bs-body-color-rgb: var(--bs-body-color);
+    --bs-secondary-rgb: var(--bs-btn-color);
+    --bs-table-bg: var(--bs-tertiary-bg);
+    --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
+
+    --area-border-color: rgba(232, 105, 138, 0.4);
+    --area-bg-color-50: rgba(232, 105, 138, 0.5);
+    --area-bg-color-10: rgba(232, 105, 138, 0.9);
+    --area-bg-color-danger-50: rgba(192, 49, 74, 0.5);
+    --area-bg-color-danger-10: rgba(192, 49, 74, 0.9);
 }

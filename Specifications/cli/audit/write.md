@@ -9,7 +9,7 @@
 | クラス | AuditWrite |
 | モジュール | cmdbox.app.features.cli.cmdbox_audit_write |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_audit_write.py |
-| 継承元 | AuditBase, ResultEdgeFeature, Feature |
+| 継承元 | AuditBase, ResultEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | はい |
@@ -54,11 +54,11 @@
 
 - 実装元: AuditWrite
 - 役割: この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
-- 終了コード候補: RESP_SUCCESS, RESP_WARN
-- 結果キー候補: success, warn
+- 終了コード候補: RESP_SUCCESS
+- 結果キー候補: success
 - 処理フロー:
-  - 条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 args.audit_type is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - 条件 args.clmsg_id is None に応じて分岐する。主な呼出: str, uuid.uuid4
   - 条件 args.clmsg_date is None に応じて分岐する。主な呼出: datetime.now().strftime, common.get_tzoffset_str, datetime.now
   - 条件 hasattr(args, 'client_only') and args.client_only == True を満たす場合は早期終了し、RESP_SUCCESS。結果キー: success
@@ -100,8 +100,8 @@
 
 ## 処理結果
 
-- 終了コード候補: RESP_SUCCESS, RESP_WARN, INT_2, INT_1
-- 結果キー候補: success, warn
+- 終了コード候補: RESP_SUCCESS, INT_2, INT_1
+- 結果キー候補: success
 - 戻り値の基本形: Tuple[int, Dict[str, Any], Any]
 
 ## 主な補助メソッド
@@ -119,12 +119,12 @@
 - 必須パラメータ audit_type が不足した場合の警告応答を確認する
 - 選択肢を持つパラメータ pg_enabled, client_only, audit_type の境界値と不正値を確認する
 - 複数値パラメータ clmsg_body, clmsg_tag の 0 件・1 件・複数件入力を確認する
-- 結果オブジェクトのキー success, warn が期待どおり構成されることを確認する
-- 終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する
+- 結果オブジェクトのキー success が期待どおり構成されることを確認する
+- 終了コード RESP_SUCCESS, INT_2, INT_1 の到達条件をそれぞれ検証する
 
 ## ソース参照
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_audit_write.py
 - apprun 実装元: AuditWrite
 - svrun 実装元: AuditWrite
-- 生成日時: 2026-04-19T20:59:07
+- 生成日時: 2026-04-23T23:39:59

@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature, web
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -6,7 +7,7 @@ import argparse
 import logging
 
 
-class WebStop(feature.UnsupportEdgeFeature):
+class WebStop(feature.UnsupportEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -71,6 +72,10 @@ class WebStop(feature.UnsupportEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
+        st, msg, obj = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, obj
+
         w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver)
         w.stop()
         msg = dict(success="web complate.")

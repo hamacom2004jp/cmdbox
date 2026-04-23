@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -11,7 +12,7 @@ import argparse
 import logging
 
 
-class WebGencert(feature.UnsupportEdgeFeature):
+class WebGencert(feature.UnsupportEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -91,10 +92,10 @@ class WebGencert(feature.UnsupportEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if args.webhost is None:
-            msg = dict(warn=f"Please specify the --webhost option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, obj = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, obj
+
         if args.output_cert is None:
             args.output_cert = f"{args.webhost}.crt"
         if args.output_pkey is None:

@@ -9,7 +9,7 @@
 | クラス | TtsSay |
 | モジュール | cmdbox.app.features.cli.cmdbox_tts_say |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_say.py |
-| 継承元 | ResultEdgeFeature, Feature |
+| 継承元 | ResultEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | はい |
@@ -45,9 +45,9 @@
 - 終了コード候補: RESP_SUCCESS, RESP_WARN
 - 結果キー候補: warn
 - 処理フロー:
-  - 条件 args.tts_engine is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, obj) に self.preprocess の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - 条件 args.tts_engine == 'voicevox' を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 args.tts_text is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
   - tts_engine_b64 に convert.str2b64str の結果を格納する
   - tts_text_b64 に convert.str2b64str の結果を格納する
   - cl に client.Client の結果を格納する
@@ -97,4 +97,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_say.py
 - apprun 実装元: TtsSay
 - svrun 実装元: TtsSay
-- 生成日時: 2026-04-19T20:59:11
+- 生成日時: 2026-04-23T23:40:04

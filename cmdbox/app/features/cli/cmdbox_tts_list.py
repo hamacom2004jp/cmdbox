@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.commons import convert, redis_client, validator
 from cmdbox.app.options import Options
 from cmdbox.app.features.cli import cmdbox_tts_say
 from pathlib import Path
@@ -8,7 +8,7 @@ import argparse
 import logging
 
 
-class TtsList(feature.UnsupportEdgeFeature):
+class TtsList(feature.UnsupportEdgeFeature, validator.Validator):
 
     def get_mode(self) -> Union[str, List[str]]:
         """
@@ -81,10 +81,10 @@ class TtsList(feature.UnsupportEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if args.tts_engine is None:
-            msg = dict(warn=f"Please specify the --tts_engine option.")
-            common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
+
         tts_engine_b64 = convert.str2b64str(args.tts_engine)
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.redis_cli.send_cmd(self.get_svcmd(), [tts_engine_b64],

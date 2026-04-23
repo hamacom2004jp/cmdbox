@@ -9,7 +9,7 @@
 | クラス | ServerList |
 | モジュール | cmdbox.app.features.cli.cmdbox_server_list |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_server_list.py |
-| 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Feature |
+| 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | はい |
@@ -42,6 +42,8 @@
 - 役割: この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
 - 終了コード候補: RESP_SUCCESS, RESP_WARN
 - 処理フロー:
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - sv に server.Server の結果を格納する
   - ret に sv.list_server の結果を格納する
   - common.print_format を呼び出す
@@ -71,4 +73,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_server_list.py
 - apprun 実装元: ServerList
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:11
+- 生成日時: 2026-04-23T23:40:03

@@ -10,7 +10,7 @@
 | モジュール | cmdbox.app.features.cli.cmdbox_embed_save |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_save.py |
 | 詳細設計書 | Specifications/cli/embed/save.md |
-| 実装上の必須推定 | embed_name, embed_model |
+| 実装上の必須推定 | - |
 
 ## 概要
 
@@ -73,4 +73,4 @@
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_save.py
 - 詳細設計書: Specifications/cli/embed/save.md
-- 生成日時: 2026-04-19T21:16:02
+- 生成日時: 2026-04-23T23:40:14

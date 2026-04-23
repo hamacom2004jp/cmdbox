@@ -82,4 +82,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_list.py
 - apprun 実装元: AgentAgentList
 - svrun 実装元: AgentAgentList
-- 生成日時: 2026-04-19T20:59:05
+- 生成日時: 2026-04-23T23:39:56

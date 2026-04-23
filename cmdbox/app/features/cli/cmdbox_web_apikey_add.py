@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature, web
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -6,7 +7,7 @@ import argparse
 import logging
 
 
-class WebApikeyAdd(feature.UnsupportEdgeFeature):
+class WebApikeyAdd(feature.UnsupportEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -71,10 +72,10 @@ class WebApikeyAdd(feature.UnsupportEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if args.data is None:
-            msg = dict(warn=f"Please specify the --data option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, obj = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, obj
+
         w = None
         try:
             w = web.Web(logger, self.default_data, appcls=self.appcls, ver=self.ver,

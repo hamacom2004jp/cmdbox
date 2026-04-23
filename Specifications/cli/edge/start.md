@@ -9,7 +9,7 @@
 | クラス | EdgeStart |
 | モジュール | cmdbox.app.features.cli.cmdbox_edge_start |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_edge_start.py |
-| 継承元 | UnsupportEdgeFeature, Feature |
+| 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | はい |
 | Agent 利用 | いいえ |
@@ -35,7 +35,8 @@
 - 終了コード候補: RESP_SUCCESS
 - 結果キー候補: success
 - 処理フロー:
-  - 条件 args.data is None に応じて分岐する
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - app に edge.Edge の結果を格納する
   - msg に app.start の結果を格納する
   - msg に dict の結果を格納する
@@ -87,4 +88,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_edge_start.py
 - apprun 実装元: EdgeStart
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:08
+- 生成日時: 2026-04-23T23:40:00

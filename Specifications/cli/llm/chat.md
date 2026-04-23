@@ -9,7 +9,7 @@
 | クラス | LLMChat |
 | モジュール | cmdbox.app.features.cli.cmdbox_llm_chat |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_llm_chat.py |
-| 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Feature |
+| 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | はい |
@@ -58,7 +58,8 @@
 - 終了コード候補: RESP_SUCCESS, RESP_WARN
 - 結果キー候補: warn
 - 処理フロー:
-  - 条件 not args.llmname を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - 条件 not re.match('^[\\w\\-]+$', args.llmname) を満たす場合は早期終了し、RESP_WARN。結果キー: warn
   - 条件 args.msg_audio を満たす場合は早期終了し、RESP_WARN。結果キー: warn
   - 条件 args.msg_doc を満たす場合は早期終了し、RESP_WARN。結果キー: warn
@@ -120,4 +121,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_llm_chat.py
 - apprun 実装元: LLMChat
 - svrun 実装元: LLMChat
-- 生成日時: 2026-04-19T20:59:10
+- 生成日時: 2026-04-23T23:40:02

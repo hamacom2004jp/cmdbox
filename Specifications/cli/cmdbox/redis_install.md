@@ -9,7 +9,7 @@
 | クラス | CmdboxRedisInstall |
 | モジュール | cmdbox.app.features.cli.cmdbox_cmdbox_redis_install |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_redis_install.py |
-| 継承元 | CmdboxBase, OneshotEdgeFeature, Feature |
+| 継承元 | CmdboxBase, OneshotEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | はい |
 | Agent 利用 | いいえ |
@@ -37,7 +37,7 @@
 - 終了コード候補: RESP_SUCCESS, RESP_WARN
 - 処理フロー:
   - common.set_debug を呼び出す
-  - 例外処理を伴って処理する。主な呼出: self.redis_install, common.print_format, common.set_debug
+  - 例外処理を伴って処理する。主な呼出: self.valid, self.redis_install, common.print_format, common.set_debug
 
 ### svrun
 
@@ -78,4 +78,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_redis_install.py
 - apprun 実装元: CmdboxRedisInstall
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:08
+- 生成日時: 2026-04-23T23:40:00

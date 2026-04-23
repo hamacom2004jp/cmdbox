@@ -9,7 +9,7 @@
 | クラス | AgentRunnerSave |
 | モジュール | cmdbox.app.features.cli.cmdbox_agent_runner_save |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_runner_save.py |
-| 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Feature |
+| 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | いいえ |
@@ -57,9 +57,9 @@
 - 終了コード候補: RESP_SUCCESS, RESP_WARN
 - 結果キー候補: warn
 - 処理フロー:
-  - 条件 not hasattr(args, 'runner_name') or args.runner_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - 条件 not re.match('^[\\w\\-]+$', args.runner_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 not hasattr(args, 'agent') or args.agent is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
   - configure に dict の結果を格納する
   - payload_b64 に convert.str2b64str の結果を格納する
   - cl に client.Client の結果を格納する
@@ -107,4 +107,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_runner_save.py
 - apprun 実装元: AgentRunnerSave
 - svrun 実装元: AgentRunnerSave
-- 生成日時: 2026-04-19T20:59:06
+- 生成日時: 2026-04-23T23:39:58

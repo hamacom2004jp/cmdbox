@@ -9,7 +9,7 @@
 | クラス | RagSearch |
 | モジュール | cmdbox.app.features.cli.cmdbox_rag_search |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_search.py |
-| 継承元 | RAGBase, ResultEdgeFeature, Feature |
+| 継承元 | RAGBase, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | はい |
@@ -39,7 +39,7 @@
 | --filter_dict | 辞書 | いいえ | はい | いいえ | None | - | 任意のフィルタ条件を指定します。cmetaの項目名と項目値を複数指定できます。項目値は `％` を使用することであいまい検索できます。 {args.query}という表記を含めるとqueryパラメータの値を使用できます。 |
 | --sort_dict | 辞書 | いいえ | はい | いいえ | None | , ASC, DESC | queryを指定しないときのソート条件を指定します。cmetaの項目名とソート順（ `ASC` (昇順) 又は `DESC` (降順)）を複数指定できます。 |
 | --data | ディレクトリ | はい | いいえ | いいえ | C:\Users\hama\.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
-| --signin_file | ファイル | はい | いいえ | いいえ | None | - | サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。 |
+| --signin_file | ファイル | はい | いいえ | いいえ | .cmdbox/user_list.yml | - | サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。 |
 | --groups | 文字列 | はい | はい | はい | None | - | `signin_file` を指定した場合に、このユーザーグループに許可されているコマンドリストを返すように指定します。 |
 | -o, --output_json | ファイル | いいえ | いいえ | はい | None | - | 処理結果jsonの保存先ファイルを指定。 |
 | -a, --output_json_append | 真偽値 | いいえ | いいえ | はい | false | True, False | 処理結果jsonファイルを追記保存します。 |
@@ -50,15 +50,12 @@
 ### apprun
 
 - 実装元: RagSearch
-- 終了コード候補: RESP_WARN, RESP_SUCCESS, INT_0
+- 終了コード候補: RESP_SUCCESS, RESP_WARN, INT_0
 - 結果キー候補: warn, success, res
 - 処理フロー:
-  - 条件 not hasattr(args, 'rag_name') or args.rag_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - 条件 not re.match('^[\\w\\-]+$', args.rag_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 not hasattr(args, 'data') or args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 not hasattr(args, 'groups') or args.groups is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 not hasattr(args, 'signin_file') or args.signin_file is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 not hasattr(args, 'kcount') or args.kcount is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
   - options に Options.getInstance の結果を格納する
   - cl に client.Client の結果を格納する
   - 例外処理を伴って処理する。主な呼出: self.load_rag_config, self.check_signin, self.embedstart, rag_store.RagStore.create, store.connect, store.select_doc
@@ -73,21 +70,21 @@
 
 ## 処理結果
 
-- 終了コード候補: RESP_WARN, RESP_SUCCESS, INT_0
+- 終了コード候補: RESP_SUCCESS, RESP_WARN, INT_0
 - 結果キー候補: warn, success, res
 - 戻り値の基本形: Tuple[int, Dict[str, Any], Any]
 
 ## 単体テスト観点
 
-- 必須パラメータ rag_name, signin_file, groups が不足した場合の警告応答を確認する
+- 必須パラメータ rag_name, groups が不足した場合の警告応答を確認する
 - 選択肢を持つパラメータ sort_dict, output_json_append, stdout_log の境界値と不正値を確認する
 - 複数値パラメータ select, filter_dict, sort_dict, groups の 0 件・1 件・複数件入力を確認する
 - 結果オブジェクトのキー warn, success, res が期待どおり構成されることを確認する
-- 終了コード RESP_WARN, RESP_SUCCESS, INT_0 の到達条件をそれぞれ検証する
+- 終了コード RESP_SUCCESS, RESP_WARN, INT_0 の到達条件をそれぞれ検証する
 
 ## ソース参照
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_search.py
 - apprun 実装元: RagSearch
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:11
+- 生成日時: 2026-04-23T23:40:03

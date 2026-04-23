@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import redis_client
+from cmdbox.app.commons import redis_client, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, Union, List
@@ -8,7 +8,7 @@ import datetime
 import logging
 
 
-class ServerTime(feature.Feature):
+class ServerTime(feature.Feature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -35,7 +35,7 @@ class ServerTime(feature.Feature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="サーバー側の現在時刻を表示します。",
             description_en="Displays the current time at the server side.",
             choice=[
@@ -78,6 +78,10 @@ class ServerTime(feature.Feature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
+
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.redis_cli.send_cmd(self.get_svcmd(), [str(args.timedelta)],
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)

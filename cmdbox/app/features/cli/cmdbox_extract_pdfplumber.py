@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature, filer
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.commons import convert, redis_client, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -9,7 +9,7 @@ import json
 import re
 
 
-class ExtractPdfplumber(feature.OneshotResultEdgeFeature):
+class ExtractPdfplumber(feature.OneshotResultEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -125,22 +125,9 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if args.svname is None:
-            msg = dict(warn=f"Please specify the --svname option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if args.scope is None:
-            msg = dict(warn=f"Please specify the --scope option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if args.loadpath is None:
-            msg = dict(warn=f"Please specify the --loadpath option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if args.fwpath is None:
-            msg = dict(warn=f"Please specify the --fwpath option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
 
         try:
             client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None

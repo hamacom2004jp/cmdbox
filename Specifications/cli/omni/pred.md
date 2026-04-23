@@ -9,7 +9,7 @@
 | クラス | OmniPred |
 | モジュール | cmdbox.app.features.cli.cmdbox_omni_pred |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_omni_pred.py |
-| 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Feature |
+| 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | はい |
@@ -44,6 +44,8 @@
 - 実装元: OmniPred
 - 終了コード候補: RESP_SUCCESS, RESP_WARN
 - 処理フロー:
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - payload に dict の結果を格納する
   - payload_b64 に convert.str2b64str の結果を格納する
   - cl に client.Client の結果を格納する
@@ -98,4 +100,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_omni_pred.py
 - apprun 実装元: OmniPred
 - svrun 実装元: OmniPred
-- 生成日時: 2026-04-19T20:59:10
+- 生成日時: 2026-04-23T23:40:03

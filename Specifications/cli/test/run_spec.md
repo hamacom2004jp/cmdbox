@@ -9,7 +9,7 @@
 | クラス | TestRunSpec |
 | モジュール | cmdbox.app.features.cli.cmdbox_test_run_spec |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_test_run_spec.py |
-| 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Feature |
+| 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | いいえ |
@@ -28,6 +28,8 @@
 | --cmd_filter | 文字列 | いいえ | いいえ | いいえ | None | - | 実行対象をコマンド名でフィルタします。省略時は全コマンドを実行します。(例: list, start) |
 | --input_json | ファイル | はい | いいえ | いいえ | ./Specifications_forUnitTest/cli-unit-test-specifications.json | - | 入力となる cli-unit-test-specifications.json のパスを指定します。 |
 | --use_tempdir | 真偽値 | いいえ | いいえ | いいえ | false | True, False | 出力系パラメータを一時ディレクトリに置換してテストを実行します。Trueにすると既存ファイルを上書きしません。 |
+| --output_dir | ディレクトリ | いいえ | いいえ | いいえ | ./Specifications_forUnitTest/results/ | - | テスト実行結果（JSONおよびMD）の出力先ディレクトリを指定します。省略時は ./Specifications_forUnitTest/results を使用します。 |
+| --clear_output_dir | 真偽値 | いいえ | いいえ | いいえ | false | True, False | Trueを指定すると、出力先ディレクトリが既に存在する場合にクリア（削除して再作成）してから結果を出力します。Falseの場合、存在するとワーニングを返します。 |
 | --app_class | 文字列 | いいえ | いいえ | いいえ | cmdbox.app.app.CmdBoxApp | - | テスト対象のアプリケーションクラスのモジュールパスを指定します。(例: myapp.app.MyApp) 省略時は cmdbox.app.app.CmdBoxApp を使用します。 |
 | --ver_module | 文字列 | いいえ | いいえ | いいえ | cmdbox.version | - | バージョンモジュールのパスを指定します。(例: myapp.version) 省略時は cmdbox.version を使用します。 |
 | -o, --output_json | ファイル | いいえ | いいえ | はい | None | - | 処理結果jsonの保存先ファイルを指定。 |
@@ -42,15 +44,21 @@
 
 - 実装元: TestRunSpec
 - 役割: テスト仕様JSONに基づいてテストを実行し、結果を報告します。  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
-- 終了コード候補: INT_0, RESP_WARN, RESP_SUCCESS
+- 終了コード候補: RESP_SUCCESS, INT_0, RESP_WARN
 - 結果キー候補: success, warn
 - 処理フロー:
-  - 条件 input_json is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
+  - input_json に Path の結果を格納する
   - 条件 not input_json.exists() を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - clear_output_dir に bool の結果を格納する
+  - 条件 output_dir is not None and output_dir.exists() を満たす場合は早期終了し、RESP_WARN。結果キー: warn
   - 条件 args.app_class を満たす場合は早期終了し、RESP_WARN。結果キー: warn
   - 条件 args.ver_module を満たす場合は早期終了し、RESP_WARN。結果キー: warn
   - 例外処理を伴って処理する。主な呼出: run_spec.run, logger.warning, dict, common.print_format, str
   - Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）
+  - success_data に dict の結果を格納する
+  - 条件 output_dir is not None に応じて分岐する。主な呼出: str
   - msg に dict の結果を格納する
   - 条件 failed_count > 0 に応じて分岐する
   - common.print_format を呼び出す
@@ -65,19 +73,19 @@
 
 ## 処理結果
 
-- 終了コード候補: INT_0, RESP_WARN, RESP_SUCCESS
+- 終了コード候補: RESP_SUCCESS, INT_0, RESP_WARN
 - 結果キー候補: success, warn
 - 戻り値の基本形: Tuple[int, Dict[str, Any], Any]
 
 ## 単体テスト観点
 
-- 選択肢を持つパラメータ use_tempdir, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する
+- 選択肢を持つパラメータ use_tempdir, clear_output_dir, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する
 - 結果オブジェクトのキー success, warn が期待どおり構成されることを確認する
-- 終了コード INT_0, RESP_WARN, RESP_SUCCESS の到達条件をそれぞれ検証する
+- 終了コード RESP_SUCCESS, INT_0, RESP_WARN の到達条件をそれぞれ検証する
 
 ## ソース参照
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_test_run_spec.py
 - apprun 実装元: TestRunSpec
 - svrun 実装元: TestRunSpec
-- 生成日時: 2026-04-19T20:59:11
+- 生成日時: 2026-04-23T23:40:04

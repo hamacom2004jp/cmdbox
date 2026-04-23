@@ -36,7 +36,7 @@
 | --ssl_key | ファイル | いいえ | いいえ | はい | None | - | SSLサーバー秘密鍵ファイルを指定します。 |
 | --ssl_keypass | 文字列 | いいえ | いいえ | はい | None | - | SSLサーバー秘密鍵ファイルの複合化パスワードを指定します。 |
 | --ssl_ca_certs | ファイル | いいえ | いいえ | はい | None | - | SSLサーバーCA証明書ファイルを指定します。 |
-| --signin_file | ファイル | いいえ | いいえ | いいえ | .cmdbox/user_list.yml | - | サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。 |
+| --signin_file | ファイル | はい | いいえ | いいえ | .cmdbox/user_list.yml | - | サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。 |
 | --gunicorn_workers | 整数 | いいえ | いいえ | はい | 6 | - | gunicornワーカー数を指定します。Linux環境でのみ有効です。-1又は未指定の場合はCPU数を使用します。 |
 | --gunicorn_timeout | 整数 | いいえ | いいえ | はい | 900 | - | gunicornワーカーのタイムアウトの時間を秒で指定します。 |
 | -o, --output_json | ファイル | いいえ | いいえ | はい | None | - | 処理結果jsonの保存先ファイルを指定。 |
@@ -83,4 +83,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_a2asv_start.py
 - apprun 実装元: A2aSvStart
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:04
+- 生成日時: 2026-04-23T23:39:56

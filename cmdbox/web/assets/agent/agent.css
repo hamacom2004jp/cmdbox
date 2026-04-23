@@ -539,6 +539,9 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
 a.list-group-item {
     color: var(--text-white-50);
 }
+[data-bs-theme="sakura"] a.list-group-item {
+    color: var(--bs-body-color);
+}
 [data-bs-theme="spaceship"] a.list-group-item {
     background-color: var(--bg-slate-950);
 }
@@ -546,6 +549,9 @@ a.list-group-item:hover {
     border-color: var(--bs-emphasis-color);
     color: var(--text-primary);
     text-shadow: 0 0 10px var(--bs-emphasis-color);
+}
+[data-bs-theme="sakura"] a.list-group-item:hover {
+    color: var(--bs-body-color);
 }
 [data-bs-theme="light"] a.list-group-item:hover {
     color: var(--text-white-50);

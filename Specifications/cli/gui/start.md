@@ -9,7 +9,7 @@
 | クラス | GuiStart |
 | モジュール | cmdbox.app.features.cli.cmdbox_gui_start |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_gui_start.py |
-| 継承元 | WebStart, UnsupportEdgeFeature, Feature |
+| 継承元 | WebStart, UnsupportEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | はい |
 | Agent 利用 | いいえ |
@@ -36,7 +36,7 @@
 | --ssl_key | ファイル | いいえ | いいえ | はい | None | - | SSLサーバー秘密鍵ファイルを指定します。 |
 | --ssl_keypass | 文字列 | いいえ | いいえ | はい | None | - | SSLサーバー秘密鍵ファイルの複合化パスワードを指定します。 |
 | --ssl_ca_certs | ファイル | いいえ | いいえ | はい | None | - | SSLサーバーCA証明書ファイルを指定します。 |
-| --signin_file | ファイル | いいえ | いいえ | いいえ | .cmdbox/user_list.yml | - | サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。 |
+| --signin_file | ファイル | はい | いいえ | いいえ | .cmdbox/user_list.yml | - | サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。 |
 | --session_domain | 文字列 | いいえ | いいえ | はい | None | - | サインインしたユーザーのセッションが有効なドメインを指定します。 |
 | --session_path | 文字列 | いいえ | いいえ | はい | / | - | サインインしたユーザーのセッションが有効なパスを指定します。 |
 | --session_secure | 真偽値 | いいえ | いいえ | はい | false | True, False | サインインしたユーザーのセッションにSecureフラグを設定します。 |
@@ -89,4 +89,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_gui_start.py
 - apprun 実装元: GuiStart
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:10
+- 生成日時: 2026-04-23T23:40:02

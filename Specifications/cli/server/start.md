@@ -9,7 +9,7 @@
 | クラス | ServerStart |
 | モジュール | cmdbox.app.features.cli.cmdbox_server_start |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_server_start.py |
-| 継承元 | UnsupportEdgeFeature, Feature |
+| 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | はい |
 | Agent 利用 | いいえ |
@@ -43,11 +43,11 @@
 
 - 実装元: ServerStart
 - 役割: この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
-- 終了コード候補: RESP_SUCCESS, RESP_WARN
-- 結果キー候補: success, warn
+- 終了コード候補: RESP_SUCCESS
+- 結果キー候補: success
 - 処理フロー:
-  - 条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - sv に server.Server の結果を格納する
   - sv.start_server を呼び出す
   - 終了コード RESP_SUCCESS / 結果キー success を返却する
@@ -61,19 +61,19 @@
 
 ## 処理結果
 
-- 終了コード候補: RESP_SUCCESS, RESP_WARN
-- 結果キー候補: success, warn
+- 終了コード候補: RESP_SUCCESS
+- 結果キー候補: success
 - 戻り値の基本形: Tuple[int, Dict[str, Any], Any]
 
 ## 単体テスト観点
 
 - 選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する
-- 結果オブジェクトのキー success, warn が期待どおり構成されることを確認する
-- 終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する
+- 結果オブジェクトのキー success が期待どおり構成されることを確認する
+- 終了コード RESP_SUCCESS の到達条件をそれぞれ検証する
 
 ## ソース参照
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_server_start.py
 - apprun 実装元: ServerStart
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:11
+- 生成日時: 2026-04-23T23:40:03

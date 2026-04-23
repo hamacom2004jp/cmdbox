@@ -9,7 +9,7 @@
 | クラス | WebStop |
 | モジュール | cmdbox.app.features.cli.cmdbox_web_stop |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_stop.py |
-| 継承元 | UnsupportEdgeFeature, Feature |
+| 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | はい |
 | Agent 利用 | いいえ |
@@ -40,6 +40,8 @@
 - 終了コード候補: RESP_SUCCESS
 - 結果キー候補: success
 - 処理フロー:
+  - (st, msg, obj) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - w に web.Web の結果を格納する
   - w.stop を呼び出す
   - msg に dict の結果を格納する
@@ -70,4 +72,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_stop.py
 - apprun 実装元: WebStop
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:12
+- 生成日時: 2026-04-23T23:40:04

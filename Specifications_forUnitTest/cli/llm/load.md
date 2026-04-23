@@ -60,4 +60,4 @@
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_llm_load.py
 - 詳細設計書: Specifications/cli/llm/load.md
-- 生成日時: 2026-04-19T21:16:02
+- 生成日時: 2026-04-23T23:40:14

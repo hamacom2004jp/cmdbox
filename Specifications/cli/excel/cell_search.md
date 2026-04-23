@@ -9,7 +9,7 @@
 | クラス | ExcelCellSearch |
 | モジュール | cmdbox.app.features.cli.cmdbox_excel_cell_search |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_search.py |
-| 継承元 | ExcelBase, ResultEdgeFeature, Feature |
+| 継承元 | ExcelBase, ResultEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | はい |
@@ -101,11 +101,8 @@
 - 実装元: ExcelCellSearch
 - 役割: 引数のチェックを行います  Args: args (argparse.Namespace): 引数  Returns: Tuple[bool, str]: チェック結果, メッセージ
 - 処理概要:
-  - 条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 args.scope is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 args.svpath is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 args.match_type is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 args.search_value is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, cl) に super().chk_args の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - 終了コード RESP_SUCCESS を返却する
 
 ### excel_proc
@@ -136,4 +133,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_search.py
 - apprun 実装元: ExcelBase
 - svrun 実装元: ExcelCellSearch
-- 生成日時: 2026-04-19T20:59:09
+- 生成日時: 2026-04-23T23:40:01

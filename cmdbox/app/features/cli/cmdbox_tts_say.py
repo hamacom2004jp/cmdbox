@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.commons import convert, redis_client, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -7,7 +7,7 @@ import argparse
 import logging
 
 
-class TtsSay(feature.ResultEdgeFeature):
+class TtsSay(feature.ResultEdgeFeature, validator.Validator):
     VOICEVOX_STYLE = dict()
     VOICEVOX_STYLE['0.vvm_2'] = dict(fn='0.vvm',ch='四国めたん',md='ノーマル',st=2)
     VOICEVOX_STYLE['0.vvm_0'] = dict(fn='0.vvm',ch='四国めたん',md='あまあま',st=0)
@@ -209,19 +209,15 @@ class TtsSay(feature.ResultEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if args.tts_engine is None:
-            msg = dict(warn=f"Please specify the --tts_engine option.")
-            common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, obj = self.preprocess(args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, obj
+
         if args.tts_engine == 'voicevox':
             if args.voicevox_model is None:
                 msg = dict(warn=f"Please specify the --voicevox_model option.")
                 common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, msg, None
-        if args.tts_text is None:
-            msg = dict(warn=f"Please specify the --tts_text option.")
-            common.print_format(msg, False, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
 
         tts_engine_b64 = convert.str2b64str(args.tts_engine)
         voicevox_model_b64 = convert.str2b64str(args.voicevox_model) if args.voicevox_model is not None else '-'

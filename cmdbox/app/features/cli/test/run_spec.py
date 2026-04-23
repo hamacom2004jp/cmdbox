@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 import tempfile
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 from unittest.mock import patch
@@ -49,6 +50,7 @@ def run(
     appcls: Any = None,
     ver: Any = None,
     use_tempdir: bool = True,
+    output_dir: Path | None = None,
 ) -> dict[str, Any]:
     """テスト仕様JSONに基づいてテストを実行します。
 
@@ -59,6 +61,7 @@ def run(
         appcls: フィーチャーインスタンス生成に使用するアプリクラス
         ver: フィーチャーインスタンス生成に使用するバージョンモジュール
         use_tempdir: True のとき出力系パラメータを一時ディレクトリに置換する
+        output_dir: 結果 JSON / MD ファイルの出力先ディレクトリ。None のとき出力しない
 
     Returns:
         summary と results を含む辞書
@@ -95,7 +98,7 @@ def run(
         f"{'=' * 60}"
     )
 
-    return {
+    return_value = {
         "summary": {
             "commands": len(results),
             "total": total,
@@ -105,6 +108,20 @@ def run(
         },
         "results": results,
     }
+
+    if output_dir is not None:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        json_file = output_dir / "test-run-results.json"
+        md_file = output_dir / "test-run-results.md"
+        json_file.write_text(
+            json.dumps(return_value, ensure_ascii=False, indent=2, default=str),
+            encoding="utf-8",
+        )
+        md_file.write_text(_render_results_markdown(return_value), encoding="utf-8")
+        print(json_file)
+        print(md_file)
+
+    return return_value
 
 
 # ---------------------------------------------------------------------------
@@ -342,3 +359,60 @@ def _build_args_list(
 
 def _truncate(s: str, maxlen: int) -> str:
     return s[:maxlen] + "..." if len(s) > maxlen else s
+
+
+def _render_results_markdown(data: dict[str, Any]) -> str:
+    summary = data["summary"]
+    results = data["results"]
+    generated_at = datetime.now().isoformat(timespec="seconds")
+
+    lines = [
+        "# テスト実行結果",
+        "",
+        f"生成日時: {generated_at}",
+        "",
+        "## サマリー",
+        "",
+        "| 項目 | 件数 |",
+        "| --- | --- |",
+        f"| コマンド数 | {summary['commands']} |",
+        f"| 総テストケース数 | {summary['total']} |",
+        f"| 成功 | {summary['passed']} |",
+        f"| 失敗 | {summary['failed']} |",
+        f"| スキップ | {summary['skipped']} |",
+        "",
+    ]
+
+    for cmd_result in results:
+        mode = cmd_result.get("mode", "")
+        cmd = cmd_result.get("cmd", "")
+        status_icon = "PASS" if cmd_result["failed"] == 0 else "FAIL"
+        lines += [
+            f"## [{status_icon}] {mode} {cmd}",
+            "",
+            f"- 成功: {cmd_result['passed']} / 失敗: {cmd_result['failed']} / スキップ: {cmd_result['skipped']}",
+            "",
+            "| # | カテゴリ | 観点 | 入力パターン | 期待ステータス | 実際のステータス | 結果 | 理由 |",
+            "| --- | --- | --- | --- | --- | --- | --- | --- |",
+        ]
+        for tc in cmd_result.get("test_cases", []):
+            tc_status = tc.get("status", "")
+            icon = {"passed": "OK", "failed": "NG", "skipped": "SKIP"}.get(tc_status, tc_status)
+            reason = _escape_table(str(tc.get("reason", "") or ""))
+            lines.append(
+                f"| {tc.get('id', '')} "
+                f"| {_escape_table(str(tc.get('category', '') or ''))} "
+                f"| {_escape_table(str(tc.get('focus', '') or ''))} "
+                f"| {_escape_table(str(tc.get('input_pattern', '') or ''))} "
+                f"| {_escape_table(str(tc.get('expected_status', '') or ''))} "
+                f"| {_escape_table(str(tc.get('actual_status', '') or ''))} "
+                f"| {icon} "
+                f"| {reason} |"
+            )
+        lines.append("")
+
+    return "\n".join(lines)
+
+
+def _escape_table(text: str) -> str:
+    return text.replace("|", "\\|").replace("\n", " ")

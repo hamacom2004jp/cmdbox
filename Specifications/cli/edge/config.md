@@ -9,7 +9,7 @@
 | クラス | EdgeConfig |
 | モジュール | cmdbox.app.features.cli.cmdbox_edge_config |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_edge_config.py |
-| 継承元 | UnsupportEdgeFeature, Feature |
+| 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | はい |
 | Agent 利用 | いいえ |
@@ -52,7 +52,8 @@
 - 役割: この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
 - 終了コード候補: RESP_SUCCESS
 - 処理フロー:
-  - 条件 args.data is None に応じて分岐する
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - app に edge.Edge の結果を格納する
   - msg に app.configure の結果を格納する
   - common.print_format を呼び出す
@@ -81,4 +82,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_edge_config.py
 - apprun 実装元: EdgeConfig
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:08
+- 生成日時: 2026-04-23T23:40:00

@@ -10,7 +10,7 @@
 | モジュール | cmdbox.app.features.cli.cmdbox_audit_write |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_audit_write.py |
 | 詳細設計書 | Specifications/cli/audit/write.md |
-| 実装上の必須推定 | svname, audit_type |
+| 実装上の必須推定 | - |
 
 ## 概要
 
@@ -27,8 +27,8 @@
 
 ## 共通期待結果
 
-- 終了コード候補: RESP_SUCCESS, RESP_WARN, INT_2, INT_1
-- 結果キー候補: success, warn
+- 終了コード候補: RESP_SUCCESS, INT_2, INT_1
+- 結果キー候補: success
 
 ## 副作用確認観点
 
@@ -39,81 +39,81 @@
 - 必須パラメータ audit_type が不足した場合の警告応答を確認する
 - 選択肢を持つパラメータ pg_enabled, client_only, audit_type の境界値と不正値を確認する
 - 複数値パラメータ clmsg_body, clmsg_tag の 0 件・1 件・複数件入力を確認する
-- 結果オブジェクトのキー success, warn が期待どおり構成されることを確認する
-- 終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する
+- 結果オブジェクトのキー success が期待どおり構成されることを確認する
+- 終了コード RESP_SUCCESS, INT_2, INT_1 の到達条件をそれぞれ検証する
 
 ## テストパターン
 
 | ID | 分類 | 観点 | 入力パターン | 期待終了コード | 期待結果 | 追加確認 |
 | --- | --- | --- | --- | --- | --- | --- |
-| TC-001 | 正常系 | 最小有効入力 | --audit_type=user。任意パラメータは省略する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 生成物が空でなく、フォーマット不整合がないことを確認する |
+| TC-001 | 正常系 | 最小有効入力 | --audit_type=user。任意パラメータは省略する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 生成物が空でなく、フォーマット不整合がないことを確認する |
 | TC-002 | 型境界 | pg_enabled=False | --pg_enabled に False を指定する | RESP_SUCCESS | False 分岐が正常に処理される | 既定値との差分がある場合は挙動の変化を確認する |
 | TC-003 | 型境界 | pg_enabled=True | --pg_enabled に True を指定する | RESP_SUCCESS | True 分岐が正常に処理される | 副作用がある場合は有効化に伴う成果物の差分を確認する |
 | TC-004 | 型境界 | pg_host 空文字 | --pg_host に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-005 | 型境界 | pg_host 1文字 | --pg_host に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-005 | 型境界 | pg_host 1文字 | --pg_host に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
 | TC-006 | 型境界 | pg_host 特殊文字 | --pg_host に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-007 | 型境界 | pg_host 長文 | --pg_host に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-008 | 型境界 | pg_port=0 | --pg_port に 0 を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 数値が内部で丸められず、そのまま評価されることを確認する |
-| TC-009 | 型境界 | pg_port=1 | --pg_port に 1 を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 数値が内部で丸められず、そのまま評価されることを確認する |
-| TC-010 | 型境界 | pg_port=-1 | --pg_port に -1 を指定する | RESP_WARN | 負値を許容しない場合はエラーまたは警告になる | 数値が内部で丸められず、そのまま評価されることを確認する |
-| TC-011 | 型境界 | pg_port=2147483647 | --pg_port に 2147483647 を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 数値が内部で丸められず、そのまま評価されることを確認する |
+| TC-007 | 型境界 | pg_host 長文 | --pg_host に 512 文字相当の文字列を指定する | INT_2 | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-008 | 型境界 | pg_port=0 | --pg_port に 0 を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 数値が内部で丸められず、そのまま評価されることを確認する |
+| TC-009 | 型境界 | pg_port=1 | --pg_port に 1 を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 数値が内部で丸められず、そのまま評価されることを確認する |
+| TC-010 | 型境界 | pg_port=-1 | --pg_port に -1 を指定する | INT_2 | 負値を許容しない場合はエラーまたは警告になる | 数値が内部で丸められず、そのまま評価されることを確認する |
+| TC-011 | 型境界 | pg_port=2147483647 | --pg_port に 2147483647 を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 数値が内部で丸められず、そのまま評価されることを確認する |
 | TC-012 | 型境界 | pg_user 空文字 | --pg_user に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-013 | 型境界 | pg_user 1文字 | --pg_user に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-013 | 型境界 | pg_user 1文字 | --pg_user に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
 | TC-014 | 型境界 | pg_user 特殊文字 | --pg_user に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-015 | 型境界 | pg_user 長文 | --pg_user に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-015 | 型境界 | pg_user 長文 | --pg_user に 512 文字相当の文字列を指定する | INT_2 | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-016 | 型境界 | pg_password 空文字 | --pg_password に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-017 | 型境界 | pg_password 1文字 | --pg_password に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-017 | 型境界 | pg_password 1文字 | --pg_password に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
 | TC-018 | 型境界 | pg_password 特殊文字 | --pg_password に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-019 | 型境界 | pg_password 長文 | --pg_password に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-019 | 型境界 | pg_password 長文 | --pg_password に 512 文字相当の文字列を指定する | INT_2 | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-020 | 型境界 | pg_dbname 空文字 | --pg_dbname に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-021 | 型境界 | pg_dbname 1文字 | --pg_dbname に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-021 | 型境界 | pg_dbname 1文字 | --pg_dbname に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
 | TC-022 | 型境界 | pg_dbname 特殊文字 | --pg_dbname に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-023 | 型境界 | pg_dbname 長文 | --pg_dbname に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-023 | 型境界 | pg_dbname 長文 | --pg_dbname に 512 文字相当の文字列を指定する | INT_2 | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-024 | 型境界 | client_only=False | --client_only に False を指定する | RESP_SUCCESS | False 分岐が正常に処理される | 既定値との差分がある場合は挙動の変化を確認する |
 | TC-025 | 型境界 | client_only=True | --client_only に True を指定する | RESP_SUCCESS | True 分岐が正常に処理される | 副作用がある場合は有効化に伴う成果物の差分を確認する |
-| TC-026 | 必須チェック | audit_type 未指定 | --audit_type を省略し、他の必須パラメータは有効値を指定する | RESP_WARN | --audit_type の不足を示すエラーまたは警告が返る | 処理を継続せず、副作用が発生しないことを確認する |
-| TC-027 | 選択値境界 | audit_type 先頭選択肢 | --audit_type に選択肢の先頭値 user を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 先頭選択肢でも分岐が正しく処理されることを確認する |
-| TC-028 | 選択値境界 | audit_type 末尾選択肢 | --audit_type に選択肢の末尾値 event を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 末尾選択肢でも分岐が正しく処理されることを確認する |
-| TC-029 | 選択値境界 | audit_type 不正選択肢 | --audit_type に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
-| TC-030 | 型境界 | audit_type 空文字 | --audit_type に空文字を指定する | RESP_WARN | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-031 | 型境界 | audit_type 1文字 | --audit_type に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-026 | 必須チェック | audit_type 未指定 | --audit_type を省略し、他の必須パラメータは有効値を指定する | INT_2 | --audit_type の不足を示すエラーまたは警告が返る | 処理を継続せず、副作用が発生しないことを確認する |
+| TC-027 | 選択値境界 | audit_type 先頭選択肢 | --audit_type に選択肢の先頭値 user を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 先頭選択肢でも分岐が正しく処理されることを確認する |
+| TC-028 | 選択値境界 | audit_type 末尾選択肢 | --audit_type に選択肢の末尾値 event を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 末尾選択肢でも分岐が正しく処理されることを確認する |
+| TC-029 | 選択値境界 | audit_type 不正選択肢 | --audit_type に選択肢外の値 INVALID_CHOICE を指定する | INT_2 | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
+| TC-030 | 型境界 | audit_type 空文字 | --audit_type に空文字を指定する | INT_2 | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
+| TC-031 | 型境界 | audit_type 1文字 | --audit_type に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
 | TC-032 | 型境界 | audit_type 特殊文字 | --audit_type に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-033 | 型境界 | audit_type 長文 | --audit_type に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-033 | 型境界 | audit_type 長文 | --audit_type に 512 文字相当の文字列を指定する | INT_2 | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-034 | 型境界 | clmsg_id 空文字 | --clmsg_id に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-035 | 型境界 | clmsg_id 1文字 | --clmsg_id に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-035 | 型境界 | clmsg_id 1文字 | --clmsg_id に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
 | TC-036 | 型境界 | clmsg_id 特殊文字 | --clmsg_id に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-037 | 型境界 | clmsg_id 長文 | --clmsg_id に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-037 | 型境界 | clmsg_id 長文 | --clmsg_id に 512 文字相当の文字列を指定する | INT_2 | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-038 | 型境界 | clmsg_src 空文字 | --clmsg_src に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-039 | 型境界 | clmsg_src 1文字 | --clmsg_src に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-039 | 型境界 | clmsg_src 1文字 | --clmsg_src に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
 | TC-040 | 型境界 | clmsg_src 特殊文字 | --clmsg_src に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-041 | 型境界 | clmsg_src 長文 | --clmsg_src に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-041 | 型境界 | clmsg_src 長文 | --clmsg_src に 512 文字相当の文字列を指定する | INT_2 | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-042 | 型境界 | clmsg_title 空文字 | --clmsg_title に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-043 | 型境界 | clmsg_title 1文字 | --clmsg_title に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-043 | 型境界 | clmsg_title 1文字 | --clmsg_title に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
 | TC-044 | 型境界 | clmsg_title 特殊文字 | --clmsg_title に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-045 | 型境界 | clmsg_title 長文 | --clmsg_title に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-045 | 型境界 | clmsg_title 長文 | --clmsg_title に 512 文字相当の文字列を指定する | INT_2 | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-046 | 型境界 | clmsg_user 空文字 | --clmsg_user に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-047 | 型境界 | clmsg_user 1文字 | --clmsg_user に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-047 | 型境界 | clmsg_user 1文字 | --clmsg_user に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
 | TC-048 | 型境界 | clmsg_user 特殊文字 | --clmsg_user に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-049 | 型境界 | clmsg_user 長文 | --clmsg_user に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-049 | 型境界 | clmsg_user 長文 | --clmsg_user に 512 文字相当の文字列を指定する | INT_2 | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-050 | 複数値境界 | clmsg_body 0件 | --clmsg_body に空配列または未指定を与える | RESP_SUCCESS | 0 件入力時の既定動作が仕様どおりである | 一覧条件や絞り込み結果が崩れないことを確認する |
-| TC-051 | 複数値境界 | clmsg_body 1件 | --clmsg_body に 1 件だけ指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 単一値で期待したフィルタリングまたは処理が行われることを確認する |
-| TC-052 | 複数値境界 | clmsg_body 複数件 | --clmsg_body に 2 件以上指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 順序・重複・集約結果が仕様どおりであることを確認する |
+| TC-051 | 複数値境界 | clmsg_body 1件 | --clmsg_body に 1 件だけ指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 単一値で期待したフィルタリングまたは処理が行われることを確認する |
+| TC-052 | 複数値境界 | clmsg_body 複数件 | --clmsg_body に 2 件以上指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 順序・重複・集約結果が仕様どおりであることを確認する |
 | TC-053 | 複数値境界 | clmsg_tag 0件 | --clmsg_tag に空配列または未指定を与える | RESP_SUCCESS | 0 件入力時の既定動作が仕様どおりである | 一覧条件や絞り込み結果が崩れないことを確認する |
-| TC-054 | 複数値境界 | clmsg_tag 1件 | --clmsg_tag に 1 件だけ指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 単一値で期待したフィルタリングまたは処理が行われることを確認する |
-| TC-055 | 複数値境界 | clmsg_tag 複数件 | --clmsg_tag に 2 件以上指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 順序・重複・集約結果が仕様どおりであることを確認する |
+| TC-054 | 複数値境界 | clmsg_tag 1件 | --clmsg_tag に 1 件だけ指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 単一値で期待したフィルタリングまたは処理が行われることを確認する |
+| TC-055 | 複数値境界 | clmsg_tag 複数件 | --clmsg_tag に 2 件以上指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 順序・重複・集約結果が仕様どおりであることを確認する |
 | TC-056 | 型境界 | clmsg_tag 空文字 | --clmsg_tag に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-057 | 型境界 | clmsg_tag 1文字 | --clmsg_tag に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-057 | 型境界 | clmsg_tag 1文字 | --clmsg_tag に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
 | TC-058 | 型境界 | clmsg_tag 特殊文字 | --clmsg_tag に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-059 | 型境界 | clmsg_tag 長文 | --clmsg_tag に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-060 | 型境界 | retention_period_days=0 | --retention_period_days に 0 を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 数値が内部で丸められず、そのまま評価されることを確認する |
-| TC-061 | 型境界 | retention_period_days=1 | --retention_period_days に 1 を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 数値が内部で丸められず、そのまま評価されることを確認する |
-| TC-062 | 型境界 | retention_period_days=-1 | --retention_period_days に -1 を指定する | RESP_WARN | 負値を許容しない場合はエラーまたは警告になる | 数値が内部で丸められず、そのまま評価されることを確認する |
-| TC-063 | 型境界 | retention_period_days=2147483647 | --retention_period_days に 2147483647 を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 数値が内部で丸められず、そのまま評価されることを確認する |
+| TC-059 | 型境界 | clmsg_tag 長文 | --clmsg_tag に 512 文字相当の文字列を指定する | INT_2 | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-060 | 型境界 | retention_period_days=0 | --retention_period_days に 0 を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 数値が内部で丸められず、そのまま評価されることを確認する |
+| TC-061 | 型境界 | retention_period_days=1 | --retention_period_days に 1 を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 数値が内部で丸められず、そのまま評価されることを確認する |
+| TC-062 | 型境界 | retention_period_days=-1 | --retention_period_days に -1 を指定する | INT_2 | 負値を許容しない場合はエラーまたは警告になる | 数値が内部で丸められず、そのまま評価されることを確認する |
+| TC-063 | 型境界 | retention_period_days=2147483647 | --retention_period_days に 2147483647 を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 数値が内部で丸められず、そのまま評価されることを確認する |
 | TC-064 | 副作用確認 | 成果物検証 | 副作用を発生させる有効入力で実行する | RESP_SUCCESS | 戻り値が正常であり、関連する成果物が期待どおり更新される | 生成物が空でなく、フォーマット不整合がないことを確認する |
-| TC-065 | 結果検証 | 結果キー整合性 | 正常系の代表入力で実行する | RESP_SUCCESS | 結果オブジェクトに success, warn が含まれる | 不要なキー欠落や型崩れがないことを確認する |
+| TC-065 | 結果検証 | 結果キー整合性 | 正常系の代表入力で実行する | RESP_SUCCESS | 結果オブジェクトに success が含まれる | 不要なキー欠落や型崩れがないことを確認する |
 
 ## ソース参照
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_audit_write.py
 - 詳細設計書: Specifications/cli/audit/write.md
-- 生成日時: 2026-04-19T21:16:02
+- 生成日時: 2026-04-23T23:40:13

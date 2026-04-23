@@ -10,7 +10,7 @@
 | モジュール | cmdbox.app.features.cli.cmdbox_tts_uninstall |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_uninstall.py |
 | 詳細設計書 | Specifications/cli/tts/uninstall.md |
-| 実装上の必須推定 | data, tts_engine |
+| 実装上の必須推定 | data |
 
 ## 概要
 
@@ -63,4 +63,4 @@
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_uninstall.py
 - 詳細設計書: Specifications/cli/tts/uninstall.md
-- 生成日時: 2026-04-19T21:16:02
+- 生成日時: 2026-04-23T23:40:14

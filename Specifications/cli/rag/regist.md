@@ -9,7 +9,7 @@
 | クラス | RagRegist |
 | モジュール | cmdbox.app.features.cli.cmdbox_rag_regist |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_regist.py |
-| 継承元 | RAGBase, ResultEdgeFeature, Feature |
+| 継承元 | RAGBase, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | はい |
@@ -33,7 +33,7 @@
 | --timeout | 整数 | いいえ | いいえ | はい | 120 | - | サーバーの応答が返ってくるまでの最大待ち時間を指定。 |
 | --rag_name | 文字列 | はい | いいえ | いいえ | None | - | 登録に使用するRAG設定の名前を指定します。 |
 | --data | ディレクトリ | はい | いいえ | いいえ | C:\Users\hama\.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
-| --signin_file | ファイル | はい | いいえ | いいえ | None | - | サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。 |
+| --signin_file | ファイル | はい | いいえ | いいえ | .cmdbox/user_list.yml | - | サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。 |
 | --groups | 文字列 | はい | はい | はい | None | - | `signin_file` を指定した場合に、このユーザーグループに許可されているコマンドリストを返すように指定します。 |
 | -o, --output_json | ファイル | いいえ | いいえ | はい | None | - | 処理結果jsonの保存先ファイルを指定。 |
 | -a, --output_json_append | 真偽値 | いいえ | いいえ | はい | false | True, False | 処理結果jsonファイルを追記保存します。 |
@@ -44,14 +44,12 @@
 ### apprun
 
 - 実装元: RagRegist
-- 終了コード候補: RESP_WARN, RESP_SUCCESS, INT_0, INT_1
+- 終了コード候補: RESP_SUCCESS, RESP_WARN, INT_0, INT_1
 - 結果キー候補: warn, success, res
 - 処理フロー:
-  - 条件 not hasattr(args, 'rag_name') or args.rag_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - 条件 not re.match('^[\\w\\-]+$', args.rag_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 not hasattr(args, 'data') or args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 not hasattr(args, 'groups') or args.groups is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 not hasattr(args, 'signin_file') or args.signin_file is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
   - options に Options.getInstance の結果を格納する
   - cl に client.Client の結果を格納する
   - 例外処理を伴って処理する。主な呼出: self.put_resqueue, self.load_rag_config, self.check_signin, self.embedstart, rag_config.get, rag_store.RagStore.create
@@ -66,21 +64,21 @@
 
 ## 処理結果
 
-- 終了コード候補: RESP_WARN, RESP_SUCCESS, INT_0, INT_1
+- 終了コード候補: RESP_SUCCESS, RESP_WARN, INT_0, INT_1
 - 結果キー候補: warn, success, res
 - 戻り値の基本形: Tuple[int, Dict[str, Any], Any]
 
 ## 単体テスト観点
 
-- 必須パラメータ rag_name, signin_file, groups が不足した場合の警告応答を確認する
+- 必須パラメータ rag_name, groups が不足した場合の警告応答を確認する
 - 選択肢を持つパラメータ output_json_append, stdout_log の境界値と不正値を確認する
 - 複数値パラメータ groups の 0 件・1 件・複数件入力を確認する
 - 結果オブジェクトのキー warn, success, res が期待どおり構成されることを確認する
-- 終了コード RESP_WARN, RESP_SUCCESS, INT_0, INT_1 の到達条件をそれぞれ検証する
+- 終了コード RESP_SUCCESS, RESP_WARN, INT_0, INT_1 の到達条件をそれぞれ検証する
 
 ## ソース参照
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_regist.py
 - apprun 実装元: RagRegist
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:11
+- 生成日時: 2026-04-23T23:40:03

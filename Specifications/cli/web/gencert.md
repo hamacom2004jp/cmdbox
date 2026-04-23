@@ -9,7 +9,7 @@
 | クラス | WebGencert |
 | モジュール | cmdbox.app.features.cli.cmdbox_web_gencert |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_gencert.py |
-| 継承元 | UnsupportEdgeFeature, Feature |
+| 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | いいえ |
@@ -45,7 +45,8 @@
 - 終了コード候補: RESP_SUCCESS, RESP_WARN
 - 結果キー候補: warn, success, error
 - 処理フロー:
-  - 条件 args.webhost is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, obj) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - 条件 args.output_cert is None に応じて分岐する
   - 条件 args.output_pkey is None に応じて分岐する
   - 条件 args.output_key is None に応じて分岐する
@@ -96,4 +97,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_gencert.py
 - apprun 実装元: WebGencert
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:12
+- 生成日時: 2026-04-23T23:40:04

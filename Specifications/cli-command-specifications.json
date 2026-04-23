@@ -203,7 +203,7 @@
         "short": null,
         "type": "file",
         "type_label": "ファイル",
-        "required": false,
+        "required": true,
         "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
@@ -382,7 +382,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:04"
+    "generated_at": "2026-04-23T23:39:56"
   },
   {
     "mode": "a2asv",
@@ -555,7 +555,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:04"
+    "generated_at": "2026-04-23T23:39:56"
   },
   {
     "mode": "agent",
@@ -851,7 +851,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:05"
+    "generated_at": "2026-04-23T23:39:56"
   },
   {
     "mode": "agent",
@@ -1143,7 +1143,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:05"
+    "generated_at": "2026-04-23T23:39:56"
   },
   {
     "mode": "agent",
@@ -1439,7 +1439,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:05"
+    "generated_at": "2026-04-23T23:39:56"
   },
   {
     "mode": "agent",
@@ -1967,7 +1967,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:05"
+    "generated_at": "2026-04-23T23:39:56"
   },
   {
     "mode": "agent",
@@ -1979,6 +1979,7 @@
     "base_classes": [
       "AgentBase",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_chat.py",
@@ -2287,8 +2288,8 @@
       }
     ],
     "statuses": [
-      "INT_0",
       "RESP_SUCCESS",
+      "INT_0",
       "RESP_WARN",
       "INT_1",
       "INT_2"
@@ -2303,8 +2304,8 @@
         "defining_class": "AgentChat",
         "docstring": "",
         "steps": [
-          "条件 not getattr(args, 'user_name', None) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not getattr(args, 'runner_name', None) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.runner_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
@@ -2320,8 +2321,8 @@
           "warn"
         ],
         "statuses": [
-          "INT_0",
           "RESP_SUCCESS",
+          "INT_0",
           "RESP_WARN"
         ]
       },
@@ -2375,7 +2376,7 @@
           "RESP_SUCCESS",
           "RESP_WARN"
         ],
-        "source_lines": "131-169"
+        "source_lines": "126-164"
       },
       {
         "name": "create_agent",
@@ -2411,7 +2412,7 @@
         "statuses": [
           "INT_0"
         ],
-        "source_lines": "174-391"
+        "source_lines": "169-386"
       },
       {
         "name": "create_tool_mcpsv",
@@ -2426,16 +2427,16 @@
           "Authorization"
         ],
         "statuses": [],
-        "source_lines": "393-457"
+        "source_lines": "388-452"
       }
     ],
     "test_viewpoints": [
       "必須パラメータ runner_name, user_name, message が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ call_tts, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "結果オブジェクトのキー success, warn, end が期待どおり構成されることを確認する",
-      "終了コード INT_0, RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
+      "終了コード RESP_SUCCESS, INT_0, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:05"
+    "generated_at": "2026-04-23T23:39:57"
   },
   {
     "mode": "agent",
@@ -2446,6 +2447,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_agent_mcp_client",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcp_client.py",
@@ -2730,11 +2732,8 @@
         "defining_class": "AgentMcpClient",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "logger.info を呼び出す",
-          "条件 not hasattr(args, 'mcpserver_name') に応じて分岐する。主な呼出: hasattr",
-          "条件 not hasattr(args, 'mcpserver_url') に応じて分岐する。主な呼出: hasattr",
-          "条件 not hasattr(args, 'mcpserver_transport') に応じて分岐する。主な呼出: hasattr",
-          "条件 not hasattr(args, 'mcpserver_apikey') に応じて分岐する。主な呼出: hasattr",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "config に dict の結果を格納する",
           "例外処理を伴って処理する。主な呼出: common.reset_logger, Client, common.print_format, logger.debug, logger.setLevel, logger.error",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_ERROR / 結果キー: warn）"
@@ -2774,7 +2773,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_ERROR の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:05"
+    "generated_at": "2026-04-23T23:39:57"
   },
   {
     "mode": "agent",
@@ -2785,6 +2784,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_agent_mcp_proxy",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcp_proxy.py",
@@ -2873,10 +2873,8 @@
         "defining_class": "AgentMcpProxy",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 not hasattr(args, 'mcpserver_name') に応じて分岐する。主な呼出: hasattr",
-          "条件 not hasattr(args, 'mcpserver_url') に応じて分岐する。主な呼出: hasattr",
-          "条件 not hasattr(args, 'mcpserver_transport') に応じて分岐する。主な呼出: hasattr",
-          "条件 not hasattr(args, 'mcpserver_apikey') に応じて分岐する。主な呼出: hasattr",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "config に dict の結果を格納する",
           "例外処理を伴って処理する。主な呼出: common.reset_logger, FastMCP.as_proxy, proxy.run, logger.setLevel, logger.error, h.setLevel",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_ERROR / 結果キー: warn）",
@@ -2916,7 +2914,7 @@
       "結果オブジェクトのキー info, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_ERROR の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:05"
+    "generated_at": "2026-04-23T23:39:57"
   },
   {
     "mode": "agent",
@@ -2928,6 +2926,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcpsv_del.py",
@@ -3157,7 +3156,8 @@
         "defining_class": "AgentMcpDel",
         "docstring": "",
         "steps": [
-          "条件 not getattr(args, 'mcpserver_name', None) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.mcpserver_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
@@ -3210,7 +3210,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:05"
+    "generated_at": "2026-04-23T23:39:57"
   },
   {
     "mode": "agent",
@@ -3222,6 +3222,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcpsv_list.py",
@@ -3451,6 +3452,8 @@
         "defining_class": "AgentMcpList",
         "docstring": "",
         "steps": [
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -3499,7 +3502,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:05"
+    "generated_at": "2026-04-23T23:39:57"
   },
   {
     "mode": "agent",
@@ -3511,6 +3514,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcpsv_load.py",
@@ -3740,7 +3744,8 @@
         "defining_class": "AgentMcpLoad",
         "docstring": "",
         "steps": [
-          "条件 not getattr(args, 'mcpserver_name', None) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.mcpserver_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
@@ -3793,7 +3798,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:05"
+    "generated_at": "2026-04-23T23:39:57"
   },
   {
     "mode": "agent",
@@ -3805,6 +3810,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcpsv_save.py",
@@ -4116,8 +4122,8 @@
         "defining_class": "AgentMcpSave",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'mcpserver_name') or args.mcpserver_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'mcpserver_url') or args.mcpserver_url is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.mcpserver_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "条件 not args.mcpserver_delegated_auth and (not hasattr(args, 'mcpserver_apikey') or args.mcpserver_ap... を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "configure に dict の結果を格納する",
@@ -4170,7 +4176,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:05"
+    "generated_at": "2026-04-23T23:39:58"
   },
   {
     "mode": "agent",
@@ -4182,6 +4188,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_del.py",
@@ -4378,7 +4385,8 @@
         "defining_class": "AgentMemoryDel",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'memory_name') or args.memory_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.memory_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
@@ -4431,7 +4439,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:05"
+    "generated_at": "2026-04-23T23:39:58"
   },
   {
     "mode": "agent",
@@ -4443,6 +4451,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_list.py",
@@ -4672,6 +4681,8 @@
         "defining_class": "AgentMemoryList",
         "docstring": "",
         "steps": [
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -4720,7 +4731,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:05"
+    "generated_at": "2026-04-23T23:39:58"
   },
   {
     "mode": "agent",
@@ -4732,6 +4743,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_load.py",
@@ -4928,7 +4940,8 @@
         "defining_class": "AgentMemoryLoad",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'memory_name') or args.memory_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.memory_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
@@ -4981,7 +4994,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:06"
+    "generated_at": "2026-04-23T23:39:58"
   },
   {
     "mode": "agent",
@@ -4993,6 +5006,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_save.py",
@@ -5377,9 +5391,10 @@
         "defining_class": "AgentMemorySave",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'memory_name') or args.memory_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.memory_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'memory_type') or args.memory_type is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "条件 args.memory_type == 'postgresql' を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "configure に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -5431,7 +5446,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:06"
+    "generated_at": "2026-04-23T23:39:58"
   },
   {
     "mode": "agent",
@@ -5443,6 +5458,7 @@
     "base_classes": [
       "AgentBase",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_status.py",
@@ -5750,9 +5766,9 @@
         "defining_class": "AgentMemoryStatus",
         "docstring": "",
         "steps": [
-          "条件 not getattr(args, 'runner_name', None) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.runner_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not getattr(args, 'user_name', None) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -5807,7 +5823,7 @@
         ],
         "result_keys": [],
         "statuses": [],
-        "source_lines": "268-277"
+        "source_lines": "263-272"
       },
       {
         "name": "create_memory_service",
@@ -5824,7 +5840,7 @@
         "statuses": [
           "INT_0"
         ],
-        "source_lines": "193-259"
+        "source_lines": "188-254"
       },
       {
         "name": "summary",
@@ -5839,7 +5855,7 @@
         "statuses": [
           "RESP_SUCCESS"
         ],
-        "source_lines": "261-266"
+        "source_lines": "256-261"
       }
     ],
     "test_viewpoints": [
@@ -5848,7 +5864,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_0, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:06"
+    "generated_at": "2026-04-23T23:39:58"
   },
   {
     "mode": "agent",
@@ -5860,6 +5876,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_runner_del.py",
@@ -6089,7 +6106,8 @@
         "defining_class": "AgentRunnerDel",
         "docstring": "",
         "steps": [
-          "条件 not getattr(args, 'runner_name', None) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.runner_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
@@ -6142,7 +6160,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:06"
+    "generated_at": "2026-04-23T23:39:58"
   },
   {
     "mode": "agent",
@@ -6154,6 +6172,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_runner_list.py",
@@ -6383,6 +6402,8 @@
         "defining_class": "AgentRunnerList",
         "docstring": "",
         "steps": [
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -6431,7 +6452,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:06"
+    "generated_at": "2026-04-23T23:39:58"
   },
   {
     "mode": "agent",
@@ -6443,6 +6464,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_runner_load.py",
@@ -6672,7 +6694,8 @@
         "defining_class": "AgentRunnerLoad",
         "docstring": "",
         "steps": [
-          "条件 not getattr(args, 'runner_name', None) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.runner_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
@@ -6725,7 +6748,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:06"
+    "generated_at": "2026-04-23T23:39:58"
   },
   {
     "mode": "agent",
@@ -6737,6 +6760,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_runner_save.py",
@@ -7252,9 +7276,9 @@
         "defining_class": "AgentRunnerSave",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'runner_name') or args.runner_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.runner_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'agent') or args.agent is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "configure に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -7322,7 +7346,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:06"
+    "generated_at": "2026-04-23T23:39:58"
   },
   {
     "mode": "agent",
@@ -7334,6 +7358,7 @@
     "base_classes": [
       "AgentBase",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_session_del.py",
@@ -7585,7 +7610,6 @@
       "INT_2"
     ],
     "result_keys": [
-      "warn",
       "success",
       "end"
     ],
@@ -7594,9 +7618,8 @@
         "defining_class": "AgentSessionDel",
         "docstring": "",
         "steps": [
-          "条件 not getattr(args, 'runner_name', None) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not getattr(args, 'user_name', None) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not getattr(args, 'session_id', None) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -7605,9 +7628,7 @@
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
           "RESP_SUCCESS",
           "RESP_WARN"
@@ -7645,10 +7666,10 @@
     "test_viewpoints": [
       "必須パラメータ runner_name, user_name, session_id が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
-      "結果オブジェクトのキー warn, success, end が期待どおり構成されることを確認する",
+      "結果オブジェクトのキー success, end が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:06"
+    "generated_at": "2026-04-23T23:39:58"
   },
   {
     "mode": "agent",
@@ -7661,6 +7682,7 @@
       "AgentChat",
       "AgentBase",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_session_list.py",
@@ -7923,9 +7945,9 @@
         "defining_class": "AgentSessionList",
         "docstring": "",
         "steps": [
-          "条件 not getattr(args, 'runner_name', None) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.runner_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not getattr(args, 'user_name', None) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -7980,7 +8002,7 @@
       "結果オブジェクトのキー warn, runner_name, session_id, user_name, last_update_time が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:06"
+    "generated_at": "2026-04-23T23:39:58"
   },
   {
     "mode": "audit",
@@ -7991,6 +8013,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_audit_createdb",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_audit_createdb.py",
@@ -8202,21 +8225,14 @@
       "INT_2",
       "INT_1"
     ],
-    "result_keys": [
-      "warn"
-    ],
+    "result_keys": [],
     "method_infos": {
       "apprun": {
         "defining_class": "AuditCreatedb",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.pg_host is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.pg_port is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.pg_user is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.pg_password is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.pg_dbname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.new_pg_dbname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "pg_host_b64 に convert.str2b64str の結果を格納する",
           "pg_user_b64 に convert.str2b64str の結果を格納する",
           "pg_password_b64 に convert.str2b64str の結果を格納する",
@@ -8228,9 +8244,7 @@
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
           "RESP_SUCCESS",
           "RESP_WARN"
@@ -8278,14 +8292,13 @@
           "RESP_WARN",
           "RESP_SUCCESS"
         ],
-        "source_lines": "180-214"
+        "source_lines": "152-186"
       }
     ],
     "test_viewpoints": [
-      "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:06"
+    "generated_at": "2026-04-23T23:39:58"
   },
   {
     "mode": "audit",
@@ -8297,6 +8310,7 @@
     "base_classes": [
       "AuditBase",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_audit_delete.py",
@@ -8698,15 +8712,14 @@
       "INT_2",
       "INT_1"
     ],
-    "result_keys": [
-      "warn"
-    ],
+    "result_keys": [],
     "method_infos": {
       "apprun": {
         "defining_class": "AuditDelete",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "delete_audit_type_b64 に convert.str2b64str の結果を格納する",
           "delete_clmsg_id_b64 に convert.str2b64str の結果を格納する",
           "delete_clmsg_sdate_b64 に convert.str2b64str の結果を格納する",
@@ -8729,9 +8742,7 @@
           "条件 'data' in ret['success'] に応じて分岐する。主な呼出: json.loads",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
           "RESP_SUCCESS",
           "RESP_WARN"
@@ -8792,16 +8803,15 @@
           "RESP_SUCCESS",
           "INT_1"
         ],
-        "source_lines": "199-299"
+        "source_lines": "198-298"
       }
     ],
     "test_viewpoints": [
       "選択肢を持つパラメータ pg_enabled, delete_audit_type の境界値と不正値を確認する",
       "複数値パラメータ delete_clmsg_body, delete_clmsg_tag の 0 件・1 件・複数件入力を確認する",
-      "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:06"
+    "generated_at": "2026-04-23T23:39:59"
   },
   {
     "mode": "audit",
@@ -8813,6 +8823,7 @@
     "base_classes": [
       "AuditBase",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_audit_search.py",
@@ -9452,18 +9463,14 @@
       "INT_1",
       "INT_2"
     ],
-    "result_keys": [
-      "warn"
-    ],
+    "result_keys": [],
     "method_infos": {
       "apprun": {
         "defining_class": "AuditSearch",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 not hasattr(args, 'format') or not args.format に応じて分岐する。主な呼出: hasattr",
-          "条件 not hasattr(args, 'output_json') or not args.output_json に応じて分岐する。主な呼出: hasattr",
-          "条件 not hasattr(args, 'output_json_append') or not args.output_json_append に応じて分岐する。主な呼出: hasattr",
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "select_b64 に convert.str2b64str の結果を格納する",
           "select_date_format_b64 に convert.str2b64str の結果を格納する",
           "groupby_b64 に convert.str2b64str の結果を格納する",
@@ -9495,9 +9502,7 @@
           "common.print_format を呼び出す",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
           "RESP_SUCCESS",
           "RESP_WARN"
@@ -9564,16 +9569,15 @@
           "RESP_SUCCESS",
           "INT_1"
         ],
-        "source_lines": "287-466"
+        "source_lines": "280-459"
       }
     ],
     "test_viewpoints": [
       "選択肢を持つパラメータ pg_enabled, select_date_format, filter_audit_type, groupby, groupby_date_format, csv, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "複数値パラメータ select, filter_clmsg_body, filter_clmsg_tag, groupby, sort の 0 件・1 件・複数件入力を確認する",
-      "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_0, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:39:59"
   },
   {
     "mode": "audit",
@@ -9585,6 +9589,7 @@
     "base_classes": [
       "AuditBase",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_audit_write.py",
@@ -9954,21 +9959,19 @@
     ],
     "statuses": [
       "RESP_SUCCESS",
-      "RESP_WARN",
       "INT_2",
       "INT_1"
     ],
     "result_keys": [
-      "success",
-      "warn"
+      "success"
     ],
     "method_infos": {
       "apprun": {
         "defining_class": "AuditWrite",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.audit_type is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 args.clmsg_id is None に応じて分岐する。主な呼出: str, uuid.uuid4",
           "条件 args.clmsg_date is None に応じて分岐する。主な呼出: datetime.now().strftime, common.get_tzoffset_str, datetime.now",
           "条件 hasattr(args, 'client_only') and args.client_only == True を満たす場合は早期終了し、RESP_SUCCESS。結果キー: success",
@@ -9987,12 +9990,10 @@
           "終了コード RESP_SUCCESS を返却する"
         ],
         "result_keys": [
-          "success",
-          "warn"
+          "success"
         ],
         "statuses": [
-          "RESP_SUCCESS",
-          "RESP_WARN"
+          "RESP_SUCCESS"
         ]
       },
       "svrun": {
@@ -10046,17 +10047,17 @@
           "RESP_SUCCESS",
           "INT_0"
         ],
-        "source_lines": "182-247"
+        "source_lines": "178-243"
       }
     ],
     "test_viewpoints": [
       "必須パラメータ audit_type が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ pg_enabled, client_only, audit_type の境界値と不正値を確認する",
       "複数値パラメータ clmsg_body, clmsg_tag の 0 件・1 件・複数件入力を確認する",
-      "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
-      "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
+      "結果オブジェクトのキー success が期待どおり構成されることを確認する",
+      "終了コード RESP_SUCCESS, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:39:59"
   },
   {
     "mode": "client",
@@ -10067,6 +10068,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_client_file_copy",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_copy.py",
@@ -10384,24 +10386,21 @@
       "INT_1",
       "INT_2"
     ],
-    "result_keys": [
-      "warn"
-    ],
+    "result_keys": [],
     "method_infos": {
       "apprun": {
         "defining_class": "ClientFileCopy",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "cl に client.Client の結果を格納する",
           "ret に cl.file_copy の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
           "RESP_SUCCESS",
           "RESP_WARN"
@@ -10467,10 +10466,9 @@
       "必須パラメータ from_path, to_path, from_fwpath, to_fwpath が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ orverwrite, scope, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "複数値パラメータ from_fwpath, to_fwpath の 0 件・1 件・複数件入力を確認する",
-      "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:39:59"
   },
   {
     "mode": "client",
@@ -10481,6 +10479,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_client_file_download",
     "base_classes": [
       "OneshotEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_download.py",
@@ -10818,8 +10817,8 @@
         "defining_class": "ClientFileDownload",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.svpath is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 args.etag is not None and args.download_file is not None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "cl に client.Client の結果を格納する",
           "ret に cl.file_download の結果を格納する",
@@ -10877,7 +10876,7 @@
         "statuses": [
           "RESP_WARN"
         ],
-        "source_lines": "201-228"
+        "source_lines": "197-224"
       },
       {
         "name": "get_svcmd",
@@ -10898,7 +10897,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:39:59"
   },
   {
     "mode": "client",
@@ -10910,6 +10909,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_list.py",
@@ -11212,29 +11212,22 @@
       "INT_1",
       "INT_2"
     ],
-    "result_keys": [
-      "warn"
-    ],
+    "result_keys": [],
     "method_infos": {
       "apprun": {
         "defining_class": "ClientFileList",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'svpath') or args.svpath is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'scope') or args.scope is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'listregs') or args.listregs is None に応じて分岐する。主な呼出: hasattr",
-          "条件 not hasattr(args, 'recursive') or args.recursive is None に応じて分岐する。主な呼出: hasattr",
           "条件 not hasattr(args, 'fwpath') or args.fwpath is None に応じて分岐する。主な呼出: hasattr",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "cl に client.Client の結果を格納する",
           "ret に cl.file_list の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
           "RESP_SUCCESS",
           "RESP_WARN"
@@ -11281,7 +11274,7 @@
         "statuses": [
           "RESP_WARN"
         ],
-        "source_lines": "195-222"
+        "source_lines": "183-210"
       },
       {
         "name": "get_svcmd",
@@ -11299,10 +11292,9 @@
       "必須パラメータ fwpath が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ recursive, scope, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "複数値パラメータ fwpath の 0 件・1 件・複数件入力を確認する",
-      "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:39:59"
   },
   {
     "mode": "client",
@@ -11313,6 +11305,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_client_file_mkdir",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_mkdir.py",
@@ -11582,24 +11575,21 @@
       "INT_1",
       "INT_2"
     ],
-    "result_keys": [
-      "warn"
-    ],
+    "result_keys": [],
     "method_infos": {
       "apprun": {
         "defining_class": "ClientFileMkdir",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "cl に client.Client の結果を格納する",
           "ret に cl.file_mkdir の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
           "RESP_SUCCESS",
           "RESP_WARN"
@@ -11662,10 +11652,9 @@
       "必須パラメータ fwpath が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ scope, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "複数値パラメータ fwpath の 0 件・1 件・複数件入力を確認する",
-      "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:39:59"
   },
   {
     "mode": "client",
@@ -11676,6 +11665,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_client_file_move",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_move.py",
@@ -11975,24 +11965,21 @@
       "INT_2",
       "INT_1"
     ],
-    "result_keys": [
-      "warn"
-    ],
+    "result_keys": [],
     "method_infos": {
       "apprun": {
         "defining_class": "ClientFileMove",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "cl に client.Client の結果を格納する",
           "ret に cl.file_move の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
           "RESP_SUCCESS",
           "RESP_WARN"
@@ -12057,10 +12044,9 @@
       "必須パラメータ from_path, to_path, from_fwpath, to_fwpath が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ scope, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "複数値パラメータ from_fwpath, to_fwpath の 0 件・1 件・複数件入力を確認する",
-      "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:39:59"
   },
   {
     "mode": "client",
@@ -12071,6 +12057,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_client_file_remove",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_remove.py",
@@ -12340,24 +12327,21 @@
       "INT_1",
       "INT_2"
     ],
-    "result_keys": [
-      "warn"
-    ],
+    "result_keys": [],
     "method_infos": {
       "apprun": {
         "defining_class": "ClientFileRemove",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "cl に client.Client の結果を格納する",
           "ret に cl.file_remove の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
           "RESP_SUCCESS",
           "RESP_WARN"
@@ -12420,10 +12404,9 @@
       "必須パラメータ fwpath が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ scope, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "複数値パラメータ fwpath の 0 件・1 件・複数件入力を確認する",
-      "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:39:59"
   },
   {
     "mode": "client",
@@ -12434,6 +12417,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_client_file_rmdir",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_rmdir.py",
@@ -12703,24 +12687,21 @@
       "INT_1",
       "INT_2"
     ],
-    "result_keys": [
-      "warn"
-    ],
+    "result_keys": [],
     "method_infos": {
       "apprun": {
         "defining_class": "ClientFileRmdir",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "cl に client.Client の結果を格納する",
           "ret に cl.file_rmdir の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
           "RESP_SUCCESS",
           "RESP_WARN"
@@ -12783,10 +12764,9 @@
       "必須パラメータ fwpath が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ scope, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "複数値パラメータ fwpath の 0 件・1 件・複数件入力を確認する",
-      "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:39:59"
   },
   {
     "mode": "client",
@@ -12797,6 +12777,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_client_file_upload",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_upload.py",
@@ -13117,24 +13098,21 @@
       "INT_1",
       "INT_2"
     ],
-    "result_keys": [
-      "warn"
-    ],
+    "result_keys": [],
     "method_infos": {
       "apprun": {
         "defining_class": "ClientFileUpload",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "cl に client.Client の結果を格納する",
           "ret に cl.file_upload の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
           "RESP_SUCCESS",
           "RESP_WARN"
@@ -13199,10 +13177,9 @@
       "必須パラメータ fwpath が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ scope, mkdir, orverwrite, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "複数値パラメータ fwpath の 0 件・1 件・複数件入力を確認する",
-      "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:39:59"
   },
   {
     "mode": "client",
@@ -13213,6 +13190,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_client_http",
     "base_classes": [
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_http.py",
@@ -13448,15 +13426,16 @@
       "RESP_WARN"
     ],
     "result_keys": [
-      "warn",
-      "error"
+      "error",
+      "warn"
     ],
     "method_infos": {
       "apprun": {
         "defining_class": "ClientHttp",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.url is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 args.proxy == 'yes' を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "url に urllib.parse.urlparse の結果を格納する",
           "query に urllib.parse.parse_qs の結果を格納する",
@@ -13469,8 +13448,8 @@
           "終了コード RESP_SUCCESS を返却する"
         ],
         "result_keys": [
-          "warn",
-          "error"
+          "error",
+          "warn"
         ],
         "statuses": [
           "RESP_SUCCESS",
@@ -13501,10 +13480,10 @@
       "必須パラメータ url が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ proxy, send_method, send_content_type, send_verify, stdout_log, capture_stdout の境界値と不正値を確認する",
       "複数値パラメータ send_header, send_param の 0 件・1 件・複数件入力を確認する",
-      "結果オブジェクトのキー warn, error が期待どおり構成されることを確認する",
+      "結果オブジェクトのキー error, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:39:59"
   },
   {
     "mode": "client",
@@ -13516,6 +13495,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_server_info.py",
@@ -13720,24 +13700,21 @@
       "RESP_WARN",
       "INT_1"
     ],
-    "result_keys": [
-      "warn"
-    ],
+    "result_keys": [],
     "method_infos": {
       "apprun": {
         "defining_class": "ClientServerInfo",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "cl に client.Client の結果を格納する",
           "ret に cl.server_info の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
           "RESP_SUCCESS",
           "RESP_WARN"
@@ -13797,10 +13774,9 @@
     ],
     "test_viewpoints": [
       "選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
-      "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:39:59"
   },
   {
     "mode": "client",
@@ -13812,6 +13788,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_time.py",
@@ -13849,6 +13826,8 @@
         "defining_class": "ClientTime",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "tz に datetime.timezone の結果を格納する",
           "dt に datetime.datetime.now の結果を格納する",
           "ret に dict の結果を格納する",
@@ -13896,14 +13875,14 @@
         "statuses": [
           "INT_1"
         ],
-        "source_lines": "66-82"
+        "source_lines": "70-86"
       }
     ],
     "test_viewpoints": [
       "結果オブジェクトのキー success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:39:59"
   },
   {
     "mode": "cmd",
@@ -13915,6 +13894,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmd_list.py",
@@ -14004,8 +13984,8 @@
         "short": null,
         "type": "file",
         "type_label": "ファイル",
-        "required": false,
-        "default": null,
+        "required": true,
+        "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
         "fileio": "in",
@@ -14116,12 +14096,11 @@
     ],
     "statuses": [
       "RESP_SUCCESS",
-      "RESP_WARN",
-      "INT_0"
+      "INT_0",
+      "RESP_WARN"
     ],
     "result_keys": [
       "success",
-      "warn",
       "title",
       "mode",
       "cmd",
@@ -14133,7 +14112,8 @@
         "defining_class": "CmdList",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 kwd is None or kwd == '' に応じて分岐する",
           "条件 not hasattr(self, 'signin_file_data') or self.signin_file_data is None に応じて分岐する。主な呼出: signin.Signin.load_signin_file, hasattr",
           "paths に glob.glob の結果を格納する",
@@ -14148,7 +14128,6 @@
         ],
         "result_keys": [
           "success",
-          "warn",
           "title",
           "mode",
           "cmd",
@@ -14157,8 +14136,8 @@
         ],
         "statuses": [
           "RESP_SUCCESS",
-          "RESP_WARN",
-          "INT_0"
+          "INT_0",
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -14184,10 +14163,10 @@
     "test_viewpoints": [
       "選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "複数値パラメータ match_opt, groups の 0 件・1 件・複数件入力を確認する",
-      "結果オブジェクトのキー success, warn, title, mode, cmd, description, tag が期待どおり構成されることを確認する",
-      "終了コード RESP_SUCCESS, RESP_WARN, INT_0 の到達条件をそれぞれ検証する"
+      "結果オブジェクトのキー success, title, mode, cmd, description, tag が期待どおり構成されることを確認する",
+      "終了コード RESP_SUCCESS, INT_0, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "cmd",
@@ -14199,6 +14178,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmd_load.py",
@@ -14228,8 +14208,8 @@
         "short": null,
         "type": "file",
         "type_label": "ファイル",
-        "required": false,
-        "default": null,
+        "required": true,
+        "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
         "fileio": "in",
@@ -14366,10 +14346,11 @@
         "defining_class": "CmdLoad",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.cmd_title is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not hasattr(self, 'signin_file_data') or self.signin_file_data is None に応じて分岐する。主な呼出: signin.Signin.load_signin_file, hasattr",
           "opt に common.loadopt の結果を格納する",
+          "条件 not opt or 'cmd' not in opt or 'mode' not in opt を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "条件 not signin.Signin._check_cmd(self.signin_file_data, args.groups, opt['mode'], opt['cmd'], args.__... を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "ret に dict の結果を格納する",
           "common.print_format を呼び出す",
@@ -14412,7 +14393,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "cmdbox",
@@ -14424,6 +14405,7 @@
     "base_classes": [
       "CmdboxBase",
       "OneshotEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_down.py",
@@ -14459,6 +14441,8 @@
         "defining_class": "CmdboxDown",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "ret に self.down の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
@@ -14493,7 +14477,7 @@
     "test_viewpoints": [
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "cmdbox",
@@ -14505,6 +14489,7 @@
     "base_classes": [
       "CmdboxBase",
       "OneshotEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_exec.py",
@@ -14570,6 +14555,8 @@
         "defining_class": "CmdboxExec",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "ret に self.exec の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
@@ -14605,7 +14592,7 @@
       "必須パラメータ command が不足した場合の警告応答を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "cmdbox",
@@ -14617,6 +14604,7 @@
     "base_classes": [
       "CmdboxBase",
       "OneshotEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_load.py",
@@ -14700,7 +14688,7 @@
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
           "common.set_debug を呼び出す",
-          "例外処理を伴って処理する。主な呼出: self.get_imgname, self.get_scripts_path, start_sh_hst.parent.mkdir, self.make_compose, self.load, common.print_format"
+          "例外処理を伴って処理する。主な呼出: self.valid, self.get_imgname, self.get_scripts_path, start_sh_hst.parent.mkdir, self.make_compose, self.load"
         ],
         "result_keys": [
           "warn"
@@ -14739,7 +14727,7 @@
         ],
         "result_keys": [],
         "statuses": [],
-        "source_lines": "114-123"
+        "source_lines": "118-127"
       },
       {
         "name": "make_compose",
@@ -14751,14 +14739,14 @@
         ],
         "result_keys": [],
         "statuses": [],
-        "source_lines": "98-112"
+        "source_lines": "102-116"
       }
     ],
     "test_viewpoints": [
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:07"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "cmdbox",
@@ -14770,6 +14758,7 @@
     "base_classes": [
       "CmdboxBase",
       "OneshotEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_logs.py",
@@ -14853,6 +14842,8 @@
         "defining_class": "CmdboxLogs",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "ret に self.logs の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
@@ -14888,7 +14879,7 @@
       "選択肢を持つパラメータ follow の境界値と不正値を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "cmdbox",
@@ -14900,6 +14891,7 @@
     "base_classes": [
       "CmdboxBase",
       "OneshotEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_pgsql_install.py",
@@ -15155,7 +15147,7 @@
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
           "common.set_debug を呼び出す",
-          "例外処理を伴って処理する。主な呼出: self.pgsql_install, common.print_format, common.set_debug"
+          "例外処理を伴って処理する。主な呼出: self.valid, self.pgsql_install, common.print_format, common.set_debug"
         ],
         "result_keys": [],
         "statuses": [
@@ -15192,7 +15184,7 @@
         ],
         "result_keys": [],
         "statuses": [],
-        "source_lines": "177-186"
+        "source_lines": "182-191"
       },
       {
         "name": "pgsql_install",
@@ -15218,14 +15210,14 @@
           "INT_0",
           "INT_1"
         ],
-        "source_lines": "117-175"
+        "source_lines": "122-180"
       }
     ],
     "test_viewpoints": [
       "選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "cmdbox",
@@ -15237,6 +15229,7 @@
     "base_classes": [
       "CmdboxBase",
       "OneshotEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_pgsql_load.py",
@@ -15320,7 +15313,7 @@
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
           "common.set_debug を呼び出す",
-          "例外処理を伴って処理する。主な呼出: self.get_imgname, start_sh_hst.parent.mkdir, shutil.copytree, self.make_compose_pgsql, self.load, common.print_format"
+          "例外処理を伴って処理する。主な呼出: self.valid, self.get_imgname, start_sh_hst.parent.mkdir, shutil.copytree, self.make_compose_pgsql, self.load"
         ],
         "result_keys": [
           "warn"
@@ -15354,7 +15347,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "cmdbox",
@@ -15366,6 +15359,7 @@
     "base_classes": [
       "CmdboxBase",
       "OneshotEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_reboot.py",
@@ -15416,6 +15410,8 @@
         "defining_class": "CmdboxReboot",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "reboot_ret に self.reboot の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in reboot_ret を満たす場合は早期終了し、RESP_WARN",
@@ -15450,7 +15446,7 @@
     "test_viewpoints": [
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "cmdbox",
@@ -15462,6 +15458,7 @@
     "base_classes": [
       "CmdboxBase",
       "OneshotEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_redis_install.py",
@@ -15528,7 +15525,7 @@
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
           "common.set_debug を呼び出す",
-          "例外処理を伴って処理する。主な呼出: self.redis_install, common.print_format, common.set_debug"
+          "例外処理を伴って処理する。主な呼出: self.valid, self.redis_install, common.print_format, common.set_debug"
         ],
         "result_keys": [],
         "statuses": [
@@ -15580,13 +15577,13 @@
           "INT_0",
           "INT_1"
         ],
-        "source_lines": "80-120"
+        "source_lines": "85-125"
       }
     ],
     "test_viewpoints": [
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "cmdbox",
@@ -15598,6 +15595,7 @@
     "base_classes": [
       "CmdboxBase",
       "OneshotEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_redis_load.py",
@@ -15666,7 +15664,7 @@
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
           "common.set_debug を呼び出す",
-          "例外処理を伴って処理する。主な呼出: self.get_imgname, start_sh_hst.parent.mkdir, shutil.copytree, self.make_compose_redis, self.load, common.print_format"
+          "例外処理を伴って処理する。主な呼出: self.valid, self.get_imgname, start_sh_hst.parent.mkdir, shutil.copytree, self.make_compose_redis, self.load"
         ],
         "result_keys": [
           "warn"
@@ -15700,7 +15698,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "cmdbox",
@@ -15712,6 +15710,7 @@
     "base_classes": [
       "CmdboxBase",
       "OneshotEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_save.py",
@@ -15792,6 +15791,8 @@
         "defining_class": "CmdboxSave",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "ret に self.save の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
@@ -15826,7 +15827,7 @@
     "test_viewpoints": [
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "cmdbox",
@@ -15838,6 +15839,7 @@
     "base_classes": [
       "CmdboxBase",
       "OneshotEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_server_install.py",
@@ -15868,14 +15870,14 @@
         "type": "str",
         "type_label": "文字列",
         "required": false,
-        "default": "cmdbox==0.7.8.5",
+        "default": "cmdbox==0.7.8.6",
         "multi": false,
         "hide": true,
         "fileio": null,
         "web": null,
         "choices": [],
-        "description_ja": "省略した時は `cmdbox==0.7.8.5` を使用します。",
-        "description_en": "When omitted, `cmdbox==0.7.8.5` is used."
+        "description_ja": "省略した時は `cmdbox==0.7.8.6` を使用します。",
+        "description_en": "When omitted, `cmdbox==0.7.8.6` is used."
       },
       {
         "name": "install_from",
@@ -16184,23 +16186,20 @@
       "RESP_SUCCESS",
       "RESP_WARN"
     ],
-    "result_keys": [
-      "warn"
-    ],
+    "result_keys": [],
     "method_infos": {
       "apprun": {
         "defining_class": "CmdboxServerInstall",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "ret に self.server_install の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
           "RESP_SUCCESS",
           "RESP_WARN"
@@ -16243,16 +16242,15 @@
           "INT_0",
           "INT_1"
         ],
-        "source_lines": "162-311"
+        "source_lines": "163-312"
       }
     ],
     "test_viewpoints": [
       "選択肢を持つパラメータ install_no_python, install_compile_python, install_use_gpu, tts_engine, voicevox_ver, voicevox_whl, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "複数値パラメータ init_extra, run_extra_pre, run_extra_post, install_extra の 0 件・1 件・複数件入力を確認する",
-      "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "cmdbox",
@@ -16264,6 +16262,7 @@
     "base_classes": [
       "CmdboxBase",
       "OneshotEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_server_load.py",
@@ -16437,8 +16436,8 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
-      "RESP_SUCCESS"
+      "RESP_SUCCESS",
+      "RESP_WARN"
     ],
     "result_keys": [
       "warn",
@@ -16449,7 +16448,8 @@
         "defining_class": "CmdboxServerLoad",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 platform.system() == 'Windows' を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "例外処理を伴って処理する。主な呼出: getpass.getuser, re.match, self.copy_scripts, self.get_imgname, self.make_compose_server, self.load",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: WARN）"
@@ -16459,8 +16459,8 @@
           "WARN"
         ],
         "statuses": [
-          "RESP_WARN",
-          "RESP_SUCCESS"
+          "RESP_SUCCESS",
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -16486,9 +16486,9 @@
     "test_viewpoints": [
       "選択肢を持つパラメータ install_use_gpu, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "結果オブジェクトのキー warn, WARN が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS の到達条件をそれぞれ検証する"
+      "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "cmdbox",
@@ -16500,6 +16500,7 @@
     "base_classes": [
       "CmdboxBase",
       "OneshotEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_uninstall.py",
@@ -16565,6 +16566,8 @@
         "defining_class": "CmdboxUninstall",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "ret に self.uninstall の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
@@ -16599,7 +16602,7 @@
     "test_viewpoints": [
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "cmdbox",
@@ -16611,6 +16614,7 @@
     "base_classes": [
       "CmdboxBase",
       "OneshotEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_up.py",
@@ -16661,6 +16665,8 @@
         "defining_class": "CmdboxUp",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "ret に self.up の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
@@ -16695,7 +16701,7 @@
     "test_viewpoints": [
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "edge",
@@ -16706,6 +16712,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_edge_config",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_edge_config.py",
@@ -17027,7 +17034,8 @@
         "defining_class": "EdgeConfig",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None に応じて分岐する",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "app に edge.Edge の結果を格納する",
           "msg に app.configure の結果を格納する",
           "common.print_format を呼び出す",
@@ -17062,7 +17070,7 @@
       "選択肢を持つパラメータ auth_type, oauth2, saml, svcert_no_verify の境界値と不正値を確認する",
       "終了コード RESP_SUCCESS の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "edge",
@@ -17073,6 +17081,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_edge_start",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_edge_start.py",
@@ -17109,7 +17118,8 @@
         "defining_class": "EdgeStart",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None に応じて分岐する",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "app に edge.Edge の結果を格納する",
           "msg に app.start の結果を格納する",
           "msg に dict の結果を格納する",
@@ -17159,7 +17169,7 @@
         "statuses": [
           "RESP_SUCCESS"
         ],
-        "source_lines": "67-83"
+        "source_lines": "69-85"
       },
       {
         "name": "load_pipes",
@@ -17177,14 +17187,14 @@
         "statuses": [
           "RESP_SUCCESS"
         ],
-        "source_lines": "85-101"
+        "source_lines": "87-103"
       }
     ],
     "test_viewpoints": [
       "結果オブジェクトのキー success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "embed",
@@ -17196,6 +17206,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_del.py",
@@ -17392,7 +17403,8 @@
         "defining_class": "EmbedDel",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'embed_name') or args.embed_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.embed_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
@@ -17445,7 +17457,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "embed",
@@ -17457,6 +17469,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_embedding.py",
@@ -17656,7 +17669,6 @@
     "statuses": [
       "RESP_SUCCESS",
       "RESP_WARN",
-      "INT_0",
       "INT_1",
       "INT_2"
     ],
@@ -17668,9 +17680,9 @@
         "defining_class": "EmbedEmbedding",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'embed_name') or args.embed_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.embed_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'original_data') or args.original_data is None or len(args.original_data) == 0 を満たす場合は早期終了し、INT_0, RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -17684,8 +17696,7 @@
         ],
         "statuses": [
           "RESP_SUCCESS",
-          "RESP_WARN",
-          "INT_0"
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -17721,9 +17732,9 @@
       "選択肢を持つパラメータ output_json_append, stdout_log の境界値と不正値を確認する",
       "複数値パラメータ original_data の 0 件・1 件・複数件入力を確認する",
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
-      "終了コード RESP_SUCCESS, RESP_WARN, INT_0, INT_1, INT_2 の到達条件をそれぞれ検証する"
+      "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "embed",
@@ -17735,6 +17746,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_list.py",
@@ -17964,6 +17976,8 @@
         "defining_class": "EmbedList",
         "docstring": "",
         "steps": [
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -18012,7 +18026,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:00"
   },
   {
     "mode": "embed",
@@ -18024,6 +18038,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_load.py",
@@ -18220,7 +18235,8 @@
         "defining_class": "EmbedLoad",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'embed_name') or args.embed_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.embed_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
@@ -18273,7 +18289,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:01"
   },
   {
     "mode": "embed",
@@ -18285,6 +18301,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_save.py",
@@ -18519,9 +18536,9 @@
         "defining_class": "EmbedSave",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'embed_name') or args.embed_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.embed_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'embed_model') or args.embed_model is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -18572,7 +18589,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:01"
   },
   {
     "mode": "embed",
@@ -18584,6 +18601,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_start.py",
@@ -18780,7 +18798,8 @@
         "defining_class": "EmbedStart",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'embed_name') or args.embed_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.embed_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
@@ -18832,7 +18851,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:01"
   },
   {
     "mode": "embed",
@@ -18844,6 +18863,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_stop.py",
@@ -19040,6 +19060,8 @@
         "defining_class": "EmbedStop",
         "docstring": "",
         "steps": [
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not hasattr(args, 'embed_name') or args.embed_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.embed_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
@@ -19092,7 +19114,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:08"
+    "generated_at": "2026-04-23T23:40:01"
   },
   {
     "mode": "excel",
@@ -19104,6 +19126,7 @@
     "base_classes": [
       "ExcelBase",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_details.py",
@@ -19513,19 +19536,15 @@
         "defining_class": "ExcelCellDetails",
         "docstring": "引数のチェックを行います  Args: args (argparse.Namespace): 引数  Returns: Tuple[bool, str]: チェック結果, メッセージ",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.scope is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.svpath is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に super().chk_args の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
-          "RESP_SUCCESS",
-          "RESP_WARN"
+          "RESP_SUCCESS"
         ],
-        "source_lines": "55-77"
+        "source_lines": "55-68"
       },
       {
         "name": "excel_proc",
@@ -19537,7 +19556,7 @@
         ],
         "result_keys": [],
         "statuses": [],
-        "source_lines": "79-96"
+        "source_lines": "70-87"
       },
       {
         "name": "get_cell_details",
@@ -19555,7 +19574,7 @@
           "INT_0",
           "INT_1"
         ],
-        "source_lines": "163-436"
+        "source_lines": "154-427"
       },
       {
         "name": "get_svparam",
@@ -19566,7 +19585,7 @@
         ],
         "result_keys": [],
         "statuses": [],
-        "source_lines": "98-112"
+        "source_lines": "89-103"
       }
     ],
     "test_viewpoints": [
@@ -19576,7 +19595,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:09"
+    "generated_at": "2026-04-23T23:40:01"
   },
   {
     "mode": "excel",
@@ -19588,6 +19607,7 @@
     "base_classes": [
       "ExcelBase",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_search.py",
@@ -20045,28 +20065,22 @@
         "statuses": [
           "INT_0"
         ],
-        "source_lines": "179-276"
+        "source_lines": "163-260"
       },
       {
         "name": "chk_args",
         "defining_class": "ExcelCellSearch",
         "docstring": "引数のチェックを行います  Args: args (argparse.Namespace): 引数  Returns: Tuple[bool, str]: チェック結果, メッセージ",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.scope is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.svpath is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.match_type is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.search_value is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に super().chk_args の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
-          "RESP_SUCCESS",
-          "RESP_WARN"
+          "RESP_SUCCESS"
         ],
-        "source_lines": "61-91"
+        "source_lines": "61-75"
       },
       {
         "name": "excel_proc",
@@ -20078,7 +20092,7 @@
         ],
         "result_keys": [],
         "statuses": [],
-        "source_lines": "93-110"
+        "source_lines": "77-94"
       },
       {
         "name": "get_svparam",
@@ -20089,7 +20103,7 @@
         ],
         "result_keys": [],
         "statuses": [],
-        "source_lines": "112-126"
+        "source_lines": "96-110"
       }
     ],
     "test_viewpoints": [
@@ -20099,7 +20113,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:09"
+    "generated_at": "2026-04-23T23:40:01"
   },
   {
     "mode": "excel",
@@ -20111,6 +20125,7 @@
     "base_classes": [
       "ExcelBase",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_values.py",
@@ -20548,26 +20563,22 @@
         "statuses": [
           "INT_0"
         ],
-        "source_lines": "167-258"
+        "source_lines": "158-249"
       },
       {
         "name": "chk_args",
         "defining_class": "ExcelCellValues",
         "docstring": "引数のチェックを行います  Args: args (argparse.Namespace): 引数  Returns: Tuple[bool, str]: チェック結果, メッセージ",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.scope is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.svpath is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に super().chk_args の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
-          "RESP_SUCCESS",
-          "RESP_WARN"
+          "RESP_SUCCESS"
         ],
-        "source_lines": "57-79"
+        "source_lines": "57-70"
       },
       {
         "name": "excel_proc",
@@ -20579,7 +20590,7 @@
         ],
         "result_keys": [],
         "statuses": [],
-        "source_lines": "81-98"
+        "source_lines": "72-89"
       },
       {
         "name": "get_svparam",
@@ -20590,7 +20601,7 @@
         ],
         "result_keys": [],
         "statuses": [],
-        "source_lines": "100-115"
+        "source_lines": "91-106"
       }
     ],
     "test_viewpoints": [
@@ -20600,7 +20611,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:09"
+    "generated_at": "2026-04-23T23:40:01"
   },
   {
     "mode": "excel",
@@ -20612,6 +20623,7 @@
     "base_classes": [
       "ExcelBase",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_excel_sheet_list.py",
@@ -20920,19 +20932,15 @@
         "defining_class": "ExcelSheetList",
         "docstring": "引数のチェックを行います  Args: args (argparse.Namespace): 引数  Returns: Tuple[bool, str]: チェック結果, メッセージ",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.scope is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.svpath is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に super().chk_args の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
-          "RESP_SUCCESS",
-          "RESP_WARN"
+          "RESP_SUCCESS"
         ],
-        "source_lines": "34-56"
+        "source_lines": "32-45"
       },
       {
         "name": "excel_proc",
@@ -20944,7 +20952,7 @@
         ],
         "result_keys": [],
         "statuses": [],
-        "source_lines": "58-73"
+        "source_lines": "47-62"
       },
       {
         "name": "get_svparam",
@@ -20955,7 +20963,7 @@
         ],
         "result_keys": [],
         "statuses": [],
-        "source_lines": "75-86"
+        "source_lines": "64-75"
       },
       {
         "name": "sheet_list",
@@ -20970,7 +20978,7 @@
           "warn"
         ],
         "statuses": [],
-        "source_lines": "129-159"
+        "source_lines": "118-148"
       }
     ],
     "test_viewpoints": [
@@ -20978,7 +20986,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:09"
+    "generated_at": "2026-04-23T23:40:02"
   },
   {
     "mode": "extract",
@@ -20990,6 +20998,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_chunklet.py",
@@ -21301,8 +21310,8 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
       "RESP_SUCCESS",
+      "RESP_WARN",
       "INT_1",
       "INT_0",
       "INT_2"
@@ -21315,10 +21324,8 @@
         "defining_class": "ExtractChunklet",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.scope is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.loadpath is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.fwpath is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "例外処理を伴って処理する。主な呼出: Path, logger.warning, args.client_data.replace, filer.Filer, f._file_exists, f.check_fwpath",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）"
         ],
@@ -21326,8 +21333,8 @@
           "warn"
         ],
         "statuses": [
-          "RESP_WARN",
-          "RESP_SUCCESS"
+          "RESP_SUCCESS",
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -21384,7 +21391,7 @@
         "statuses": [
           "INT_0"
         ],
-        "source_lines": "254-310"
+        "source_lines": "241-297"
       }
     ],
     "test_viewpoints": [
@@ -21392,9 +21399,9 @@
       "選択肢を持つパラメータ scope, chunk_lang, output_json_append, stdout_log の境界値と不正値を確認する",
       "複数値パラメータ fwpath の 0 件・1 件・複数件入力を確認する",
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS, INT_1, INT_0, INT_2 の到達条件をそれぞれ検証する"
+      "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_0, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:09"
+    "generated_at": "2026-04-23T23:40:02"
   },
   {
     "mode": "extract",
@@ -21406,6 +21413,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_del.py",
@@ -21602,7 +21610,8 @@
         "defining_class": "ExtractDel",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'extract_name') or args.extract_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.extract_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
@@ -21655,7 +21664,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:09"
+    "generated_at": "2026-04-23T23:40:02"
   },
   {
     "mode": "extract",
@@ -21667,6 +21676,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_list.py",
@@ -21896,6 +21906,8 @@
         "defining_class": "ExtractList",
         "docstring": "",
         "steps": [
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -21944,7 +21956,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:09"
+    "generated_at": "2026-04-23T23:40:02"
   },
   {
     "mode": "extract",
@@ -21956,6 +21968,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_load.py",
@@ -22152,7 +22165,8 @@
         "defining_class": "ExtractLoad",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'extract_name') or args.extract_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.extract_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
@@ -22205,7 +22219,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:09"
+    "generated_at": "2026-04-23T23:40:02"
   },
   {
     "mode": "extract",
@@ -22217,6 +22231,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_pdfplumber.py",
@@ -22573,8 +22588,8 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
       "RESP_SUCCESS",
+      "RESP_WARN",
       "INT_1",
       "INT_0",
       "INT_2"
@@ -22587,10 +22602,8 @@
         "defining_class": "ExtractPdfplumber",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.scope is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.loadpath is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.fwpath is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "例外処理を伴って処理する。主な呼出: Path, logger.warning, args.client_data.replace, filer.Filer, f._file_exists, f.check_fwpath",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）"
         ],
@@ -22598,8 +22611,8 @@
           "warn"
         ],
         "statuses": [
-          "RESP_WARN",
-          "RESP_SUCCESS"
+          "RESP_SUCCESS",
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -22646,7 +22659,7 @@
           "INT_0",
           "INT_1"
         ],
-        "source_lines": "248-349"
+        "source_lines": "235-336"
       }
     ],
     "test_viewpoints": [
@@ -22654,9 +22667,9 @@
       "選択肢を持つパラメータ scope, chunk_table, output_json_append, stdout_log の境界値と不正値を確認する",
       "複数値パラメータ fwpath, chunk_table_header, chunk_exclude, chunk_separator の 0 件・1 件・複数件入力を確認する",
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS, INT_1, INT_0, INT_2 の到達条件をそれぞれ検証する"
+      "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_0, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:10"
+    "generated_at": "2026-04-23T23:40:02"
   },
   {
     "mode": "extract",
@@ -22668,6 +22681,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_save.py",
@@ -22953,17 +22967,16 @@
       "INT_2"
     ],
     "result_keys": [
-      "warn",
-      "success"
+      "success",
+      "warn"
     ],
     "method_infos": {
       "apprun": {
         "defining_class": "ExtractSave",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'extract_name') or args.extract_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not re.match('^[\\\\w\\\\-]+$', args.extract_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'extract_type') or args.extract_type is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -22972,9 +22985,7 @@
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
           "RESP_SUCCESS",
           "RESP_WARN"
@@ -23012,10 +23023,10 @@
     "test_viewpoints": [
       "必須パラメータ extract_name, extract_cmd, loadpath が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ extract_type, scope, output_json_append, stdout_log の境界値と不正値を確認する",
-      "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
+      "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:10"
+    "generated_at": "2026-04-23T23:40:02"
   },
   {
     "mode": "gui",
@@ -23027,6 +23038,7 @@
     "base_classes": [
       "WebStart",
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_gui_start.py",
@@ -23221,12 +23233,12 @@
         "short": null,
         "type": "file",
         "type_label": "ファイル",
-        "required": false,
+        "required": true,
         "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
         "fileio": "in",
-        "web": null,
+        "web": "mask",
         "choices": [],
         "description_ja": "サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。",
         "description_en": "Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
@@ -23565,7 +23577,7 @@
       "選択肢を持つパラメータ session_secure, client_only, stdout_log, capture_stdout の境界値と不正値を確認する",
       "複数値パラメータ outputs_key, assets の 0 件・1 件・複数件入力を確認する"
     ],
-    "generated_at": "2026-04-19T20:59:10"
+    "generated_at": "2026-04-23T23:40:02"
   },
   {
     "mode": "gui",
@@ -23577,6 +23589,7 @@
     "base_classes": [
       "WebStop",
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_gui_stop.py",
@@ -23697,6 +23710,8 @@
         "defining_class": "WebStop",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "w に web.Web の結果を格納する",
           "w.stop を呼び出す",
           "msg に dict の結果を格納する",
@@ -23735,7 +23750,7 @@
       "結果オブジェクトのキー success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:10"
+    "generated_at": "2026-04-23T23:40:02"
   },
   {
     "mode": "llm",
@@ -23747,6 +23762,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_llm_chat.py",
@@ -24166,7 +24182,8 @@
         "defining_class": "LLMChat",
         "docstring": "",
         "steps": [
-          "条件 not args.llmname を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.llmname) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "条件 args.msg_audio を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "条件 args.msg_doc を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
@@ -24250,7 +24267,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:10"
+    "generated_at": "2026-04-23T23:40:02"
   },
   {
     "mode": "llm",
@@ -24262,6 +24279,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_llm_del.py",
@@ -24491,7 +24509,8 @@
         "defining_class": "LLMDel",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'llmname') or args.llmname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.llmname) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
@@ -24544,7 +24563,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:10"
+    "generated_at": "2026-04-23T23:40:02"
   },
   {
     "mode": "llm",
@@ -24556,6 +24575,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_llm_list.py",
@@ -24785,6 +24805,8 @@
         "defining_class": "LLMList",
         "docstring": "",
         "steps": [
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -24833,7 +24855,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:10"
+    "generated_at": "2026-04-23T23:40:02"
   },
   {
     "mode": "llm",
@@ -24845,6 +24867,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_llm_load.py",
@@ -25074,7 +25097,8 @@
         "defining_class": "LLMLoad",
         "docstring": "",
         "steps": [
-          "条件 not args.llmname を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.llmname) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
@@ -25141,7 +25165,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:10"
+    "generated_at": "2026-04-23T23:40:02"
   },
   {
     "mode": "llm",
@@ -25153,6 +25177,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_llm_save.py",
@@ -25538,8 +25563,8 @@
         "defining_class": "LLMSave",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'llmname') or args.llmname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'llmprov') or args.llmprov is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.llmname) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "configure に dict の結果を格納する",
           "条件 hasattr(args, 'llmsvaccountfile') and args.llmsvaccountfile is not None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
@@ -25593,7 +25618,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:10"
+    "generated_at": "2026-04-23T23:40:03"
   },
   {
     "mode": "mcpsv",
@@ -25604,6 +25629,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_mcpsv_start",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_mcpsv_start.py",
@@ -25798,7 +25824,7 @@
         "short": null,
         "type": "file",
         "type_label": "ファイル",
-        "required": false,
+        "required": true,
         "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
@@ -25924,31 +25950,31 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
       "RESP_SUCCESS",
+      "RESP_WARN",
       "INT_1"
     ],
     "result_keys": [
-      "warn",
-      "success"
+      "success",
+      "warn"
     ],
     "method_infos": {
       "apprun": {
         "defining_class": "McpsvStart",
         "docstring": "この機能の実行を行います",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.signin_file is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "例外処理を伴って処理する。主な呼出: web.Web.getInstance, signin.Signin, mcp_mod.Mcp, self.mcp.create_mcpserver, dict, mcp_app.add_middleware",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）"
         ],
         "result_keys": [
-          "warn",
-          "success"
+          "success",
+          "warn"
         ],
         "statuses": [
-          "RESP_WARN",
           "RESP_SUCCESS",
+          "RESP_WARN",
           "INT_1"
         ]
       },
@@ -25974,10 +26000,10 @@
     "helper_methods": [],
     "test_viewpoints": [
       "選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
-      "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS, INT_1 の到達条件をそれぞれ検証する"
+      "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
+      "終了コード RESP_SUCCESS, RESP_WARN, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:10"
+    "generated_at": "2026-04-23T23:40:03"
   },
   {
     "mode": "mcpsv",
@@ -25988,6 +26014,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_mcpsv_stop",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_mcpsv_stop.py",
@@ -26110,6 +26137,8 @@
         "defining_class": "McpsvStop",
         "docstring": "この機能の実行を行います  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "例外処理を伴って処理する。主な呼出: common.load_file, Path('mcpsv.pid').unlink, dict, common.print_format, f.read, traceback.print_exc",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）"
         ],
@@ -26147,7 +26176,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:10"
+    "generated_at": "2026-04-23T23:40:03"
   },
   {
     "mode": "omni",
@@ -26159,6 +26188,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_omni_pred.py",
@@ -26374,6 +26404,8 @@
         "defining_class": "OmniPred",
         "docstring": "",
         "steps": [
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -26444,7 +26476,7 @@
           "INT_1",
           "INT_0"
         ],
-        "source_lines": "106-165"
+        "source_lines": "110-169"
       }
     ],
     "test_viewpoints": [
@@ -26452,7 +26484,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_0, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:10"
+    "generated_at": "2026-04-23T23:40:03"
   },
   {
     "mode": "rag",
@@ -26464,6 +26496,7 @@
     "base_classes": [
       "RAGBase",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_build.py",
@@ -26660,7 +26693,8 @@
         "defining_class": "RagBuild",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'rag_name') or args.rag_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.rag_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "cl に client.Client の結果を格納する",
           "(st, rag_conf, _) に self.load_rag_config の結果を格納する",
@@ -26715,7 +26749,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:10"
+    "generated_at": "2026-04-23T23:40:03"
   },
   {
     "mode": "rag",
@@ -26727,6 +26761,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_del.py",
@@ -26923,7 +26958,8 @@
         "defining_class": "RagDel",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'rag_name') or args.rag_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.rag_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
@@ -26976,7 +27012,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:10"
+    "generated_at": "2026-04-23T23:40:03"
   },
   {
     "mode": "rag",
@@ -26988,6 +27024,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_list.py",
@@ -27217,6 +27254,8 @@
         "defining_class": "RagList",
         "docstring": "",
         "steps": [
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -27265,7 +27304,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:10"
+    "generated_at": "2026-04-23T23:40:03"
   },
   {
     "mode": "rag",
@@ -27277,6 +27316,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_load.py",
@@ -27473,7 +27513,8 @@
         "defining_class": "RagLoad",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'rag_name') or args.rag_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.rag_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
@@ -27526,7 +27567,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:11"
+    "generated_at": "2026-04-23T23:40:03"
   },
   {
     "mode": "rag",
@@ -27538,6 +27579,7 @@
     "base_classes": [
       "RAGBase",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_regist.py",
@@ -27688,7 +27730,7 @@
         "type": "file",
         "type_label": "ファイル",
         "required": true,
-        "default": null,
+        "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
         "fileio": "in",
@@ -27765,8 +27807,8 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
       "RESP_SUCCESS",
+      "RESP_WARN",
       "INT_0",
       "INT_1"
     ],
@@ -27780,11 +27822,9 @@
         "defining_class": "RagRegist",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'rag_name') or args.rag_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.rag_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'data') or args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'groups') or args.groups is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'signin_file') or args.signin_file is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "options に Options.getInstance の結果を格納する",
           "cl に client.Client の結果を格納する",
           "例外処理を伴って処理する。主な呼出: self.put_resqueue, self.load_rag_config, self.check_signin, self.embedstart, rag_config.get, rag_store.RagStore.create",
@@ -27796,8 +27836,8 @@
           "res"
         ],
         "statuses": [
-          "RESP_WARN",
           "RESP_SUCCESS",
+          "RESP_WARN",
           "INT_0",
           "INT_1"
         ]
@@ -27823,13 +27863,13 @@
     },
     "helper_methods": [],
     "test_viewpoints": [
-      "必須パラメータ rag_name, signin_file, groups が不足した場合の警告応答を確認する",
+      "必須パラメータ rag_name, groups が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ output_json_append, stdout_log の境界値と不正値を確認する",
       "複数値パラメータ groups の 0 件・1 件・複数件入力を確認する",
       "結果オブジェクトのキー warn, success, res が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS, INT_0, INT_1 の到達条件をそれぞれ検証する"
+      "終了コード RESP_SUCCESS, RESP_WARN, INT_0, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:11"
+    "generated_at": "2026-04-23T23:40:03"
   },
   {
     "mode": "rag",
@@ -27841,6 +27881,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_save.py",
@@ -28272,10 +28313,9 @@
         "defining_class": "RagSave",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'rag_name') or args.rag_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.rag_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'rag_type') or args.rag_type is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'savetype') or args.savetype not in ['per_doc', 'per_page', 'per_service', 'add... を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -28328,7 +28368,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:11"
+    "generated_at": "2026-04-23T23:40:03"
   },
   {
     "mode": "rag",
@@ -28340,6 +28380,7 @@
     "base_classes": [
       "RAGBase",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_search.py",
@@ -28584,7 +28625,7 @@
         "type": "file",
         "type_label": "ファイル",
         "required": true,
-        "default": null,
+        "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
         "fileio": "in",
@@ -28661,8 +28702,8 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
       "RESP_SUCCESS",
+      "RESP_WARN",
       "INT_0"
     ],
     "result_keys": [
@@ -28675,12 +28716,9 @@
         "defining_class": "RagSearch",
         "docstring": "",
         "steps": [
-          "条件 not hasattr(args, 'rag_name') or args.rag_name is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 not re.match('^[\\\\w\\\\-]+$', args.rag_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'data') or args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'groups') or args.groups is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'signin_file') or args.signin_file is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 not hasattr(args, 'kcount') or args.kcount is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "options に Options.getInstance の結果を格納する",
           "cl に client.Client の結果を格納する",
           "例外処理を伴って処理する。主な呼出: self.load_rag_config, self.check_signin, self.embedstart, rag_store.RagStore.create, store.connect, store.select_doc",
@@ -28692,8 +28730,8 @@
           "res"
         ],
         "statuses": [
-          "RESP_WARN",
           "RESP_SUCCESS",
+          "RESP_WARN",
           "INT_0"
         ]
       },
@@ -28718,13 +28756,13 @@
     },
     "helper_methods": [],
     "test_viewpoints": [
-      "必須パラメータ rag_name, signin_file, groups が不足した場合の警告応答を確認する",
+      "必須パラメータ rag_name, groups が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ sort_dict, output_json_append, stdout_log の境界値と不正値を確認する",
       "複数値パラメータ select, filter_dict, sort_dict, groups の 0 件・1 件・複数件入力を確認する",
       "結果オブジェクトのキー warn, success, res が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS, INT_0 の到達条件をそれぞれ検証する"
+      "終了コード RESP_SUCCESS, RESP_WARN, INT_0 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:11"
+    "generated_at": "2026-04-23T23:40:03"
   },
   {
     "mode": "server",
@@ -28736,6 +28774,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_server_list.py",
@@ -28900,6 +28939,8 @@
         "defining_class": "ServerList",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "sv に server.Server の結果を格納する",
           "ret に sv.list_server の結果を格納する",
           "common.print_format を呼び出す",
@@ -28936,7 +28977,7 @@
       "選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:11"
+    "generated_at": "2026-04-23T23:40:03"
   },
   {
     "mode": "server",
@@ -28947,6 +28988,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_server_start",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_server_start.py",
@@ -29147,31 +29189,27 @@
       }
     ],
     "statuses": [
-      "RESP_SUCCESS",
-      "RESP_WARN"
+      "RESP_SUCCESS"
     ],
     "result_keys": [
-      "success",
-      "warn"
+      "success"
     ],
     "method_infos": {
       "apprun": {
         "defining_class": "ServerStart",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "sv に server.Server の結果を格納する",
           "sv.start_server を呼び出す",
           "終了コード RESP_SUCCESS / 結果キー success を返却する"
         ],
         "result_keys": [
-          "success",
-          "warn"
+          "success"
         ],
         "statuses": [
-          "RESP_SUCCESS",
-          "RESP_WARN"
+          "RESP_SUCCESS"
         ]
       },
       "svrun": {
@@ -29196,10 +29234,10 @@
     "helper_methods": [],
     "test_viewpoints": [
       "選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
-      "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
-      "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
+      "結果オブジェクトのキー success が期待どおり構成されることを確認する",
+      "終了コード RESP_SUCCESS の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:11"
+    "generated_at": "2026-04-23T23:40:03"
   },
   {
     "mode": "server",
@@ -29210,6 +29248,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_server_stop",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_server_stop.py",
@@ -29414,24 +29453,21 @@
       "RESP_WARN",
       "INT_1"
     ],
-    "result_keys": [
-      "warn"
-    ],
+    "result_keys": [],
     "method_infos": {
       "apprun": {
         "defining_class": "ServerStop",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "cl に client.Client の結果を格納する",
           "ret に cl.stop_server の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
           "RESP_SUCCESS",
           "RESP_WARN"
@@ -29475,10 +29511,9 @@
     ],
     "test_viewpoints": [
       "選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
-      "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:11"
+    "generated_at": "2026-04-23T23:40:03"
   },
   {
     "mode": "test",
@@ -29490,6 +29525,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_test_gen_cli_spec.py",
@@ -29497,7 +29533,7 @@
     "use_redis": -1,
     "nouse_webmode": false,
     "use_agent": false,
-    "cluster_redirect": false,
+    "cluster_redirect": "不明",
     "parameters": [
       {
         "name": "feature_package",
@@ -29558,6 +29594,24 @@
         "choices": [],
         "description_ja": "フィーチャーモジュールのファイル名プレフィックスを指定します。",
         "description_en": "Specify the filename prefix of feature modules."
+      },
+      {
+        "name": "clear_output_dir",
+        "short": null,
+        "type": "bool",
+        "type_label": "真偽値",
+        "required": false,
+        "default": false,
+        "multi": false,
+        "hide": false,
+        "fileio": null,
+        "web": null,
+        "choices": [
+          "True",
+          "False"
+        ],
+        "description_ja": "Trueを指定すると、出力先ディレクトリが既に存在する場合にクリア（削除して再作成）してから仕様書を生成します。Falseの場合、出力先ディレクトリが既に存在するとワーニングを返します。",
+        "description_en": "If True, clears (deletes and recreates) the output directory before generating specifications when it already exists. If False, returns a warning when the output directory already exists."
       },
       {
         "name": "app_class",
@@ -29690,7 +29744,10 @@
         "defining_class": "TestGenCliSpec",
         "docstring": "フィーチャーパッケージを解析してCLIコマンド詳細設計書を生成します。  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 not feature_package を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
+          "clear_output_dir に bool の結果を格納する",
+          "条件 output_dir.exists() を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "条件 args.app_class を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "条件 args.ver_module を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "例外処理を伴って処理する。主な呼出: gen_cli_spec.generate, logger.warning, dict, common.print_format, str",
@@ -29712,21 +29769,19 @@
         ]
       },
       "svrun": {
-        "defining_class": "TestGenCliSpec",
-        "docstring": "",
+        "defining_class": "Feature",
+        "docstring": "この機能のサーバー側の実行を行います  Args: data_dir (Path): データディレクトリ logger (logging.Logger): ロガー redis_cli (redis_client.RedisClient): Redisクライアント msg (List[str]): 受信メッセージ sessions (Dict[str, Dict[str, Any]]): セッション情報  Returns: int: 終了コード",
         "steps": [
-          "終了コード RESP_SUCCESS を返却する"
+          "実装の主要ステップは自動抽出できませんでした。ソースコードを確認してください。"
         ],
         "result_keys": [],
-        "statuses": [
-          "RESP_SUCCESS"
-        ]
+        "statuses": []
       },
       "is_cluster_redirect": {
-        "defining_class": "TestGenCliSpec",
-        "docstring": "",
+        "defining_class": "Feature",
+        "docstring": "クラスター宛のメッセージの場合、メッセージを転送するかどうかを返します  Returns: bool: メッセージを転送する場合はTrue",
         "steps": [
-          "False を返却する"
+          "実装の主要ステップは自動抽出できませんでした。ソースコードを確認してください。"
         ],
         "result_keys": [],
         "statuses": []
@@ -29734,11 +29789,11 @@
     },
     "helper_methods": [],
     "test_viewpoints": [
-      "選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
+      "選択肢を持つパラメータ clear_output_dir, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "結果オブジェクトのキー success, output_dir, json_file, count, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:11"
+    "generated_at": "2026-04-23T23:40:03"
   },
   {
     "mode": "test",
@@ -29750,6 +29805,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_test_gen_test_spec.py",
@@ -29757,7 +29813,7 @@
     "use_redis": -1,
     "nouse_webmode": false,
     "use_agent": false,
-    "cluster_redirect": false,
+    "cluster_redirect": "不明",
     "parameters": [
       {
         "name": "input_json",
@@ -29803,6 +29859,24 @@
         "choices": [],
         "description_ja": "プロジェクトルートディレクトリを指定します。詳細設計書マークダウンの参照に使用します。省略時はカレントディレクトリを使用します。",
         "description_en": "Specify the project root directory used for referencing design document markdowns. Defaults to the current directory when omitted."
+      },
+      {
+        "name": "clear_output_dir",
+        "short": null,
+        "type": "bool",
+        "type_label": "真偽値",
+        "required": false,
+        "default": false,
+        "multi": false,
+        "hide": false,
+        "fileio": null,
+        "web": null,
+        "choices": [
+          "True",
+          "False"
+        ],
+        "description_ja": "Trueを指定すると、出力先ディレクトリが既に存在する場合にクリア（削除して再作成）してから仕様書を生成します。Falseの場合、出力先ディレクトリが既に存在するとワーニングを返します。",
+        "description_en": "If True, clears (deletes and recreates) the output directory before generating specifications when it already exists. If False, returns a warning when the output directory already exists."
       },
       {
         "name": "output_json",
@@ -29905,8 +29979,12 @@
         "defining_class": "TestGenTestSpec",
         "docstring": "CLIコマンド仕様JSONを読み込みユニットテスト仕様書を生成します。  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 input_json is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
+          "input_json に Path の結果を格納する",
           "条件 not input_json.exists() を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "clear_output_dir に bool の結果を格納する",
+          "条件 output_dir.exists() を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "例外処理を伴って処理する。主な呼出: gen_test_spec.generate, logger.warning, dict, common.print_format, str",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）",
           "msg に dict の結果を格納する",
@@ -29926,21 +30004,19 @@
         ]
       },
       "svrun": {
-        "defining_class": "TestGenTestSpec",
-        "docstring": "",
+        "defining_class": "Feature",
+        "docstring": "この機能のサーバー側の実行を行います  Args: data_dir (Path): データディレクトリ logger (logging.Logger): ロガー redis_cli (redis_client.RedisClient): Redisクライアント msg (List[str]): 受信メッセージ sessions (Dict[str, Dict[str, Any]]): セッション情報  Returns: int: 終了コード",
         "steps": [
-          "終了コード RESP_SUCCESS を返却する"
+          "実装の主要ステップは自動抽出できませんでした。ソースコードを確認してください。"
         ],
         "result_keys": [],
-        "statuses": [
-          "RESP_SUCCESS"
-        ]
+        "statuses": []
       },
       "is_cluster_redirect": {
-        "defining_class": "TestGenTestSpec",
-        "docstring": "",
+        "defining_class": "Feature",
+        "docstring": "クラスター宛のメッセージの場合、メッセージを転送するかどうかを返します  Returns: bool: メッセージを転送する場合はTrue",
         "steps": [
-          "False を返却する"
+          "実装の主要ステップは自動抽出できませんでした。ソースコードを確認してください。"
         ],
         "result_keys": [],
         "statuses": []
@@ -29948,11 +30024,11 @@
     },
     "helper_methods": [],
     "test_viewpoints": [
-      "選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
+      "選択肢を持つパラメータ clear_output_dir, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "結果オブジェクトのキー success, output_dir, json_file, count, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:11"
+    "generated_at": "2026-04-23T23:40:03"
   },
   {
     "mode": "test",
@@ -29964,6 +30040,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_test_run_spec.py",
@@ -30035,6 +30112,39 @@
         ],
         "description_ja": "出力系パラメータを一時ディレクトリに置換してテストを実行します。Trueにすると既存ファイルを上書きしません。",
         "description_en": "Replace output parameters with temporary directories during test execution. When True, avoids overwriting existing files."
+      },
+      {
+        "name": "output_dir",
+        "short": null,
+        "type": "dir",
+        "type_label": "ディレクトリ",
+        "required": false,
+        "default": "./Specifications_forUnitTest/results/",
+        "multi": false,
+        "hide": false,
+        "fileio": "out",
+        "web": null,
+        "choices": [],
+        "description_ja": "テスト実行結果（JSONおよびMD）の出力先ディレクトリを指定します。省略時は ./Specifications_forUnitTest/results を使用します。",
+        "description_en": "Specify the output directory for test run results (JSON and MD). Defaults to ./Specifications_forUnitTest/results when omitted."
+      },
+      {
+        "name": "clear_output_dir",
+        "short": null,
+        "type": "bool",
+        "type_label": "真偽値",
+        "required": false,
+        "default": false,
+        "multi": false,
+        "hide": false,
+        "fileio": null,
+        "web": null,
+        "choices": [
+          "True",
+          "False"
+        ],
+        "description_ja": "Trueを指定すると、出力先ディレクトリが既に存在する場合にクリア（削除して再作成）してから結果を出力します。Falseの場合、存在するとワーニングを返します。",
+        "description_en": "If True, clears (deletes and recreates) the output directory before writing results when it already exists. If False, returns a warning when the output directory already exists."
       },
       {
         "name": "app_class",
@@ -30152,9 +30262,9 @@
       }
     ],
     "statuses": [
+      "RESP_SUCCESS",
       "INT_0",
-      "RESP_WARN",
-      "RESP_SUCCESS"
+      "RESP_WARN"
     ],
     "result_keys": [
       "success",
@@ -30165,12 +30275,18 @@
         "defining_class": "TestRunSpec",
         "docstring": "テスト仕様JSONに基づいてテストを実行し、結果を報告します。  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 input_json is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
+          "input_json に Path の結果を格納する",
           "条件 not input_json.exists() を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "clear_output_dir に bool の結果を格納する",
+          "条件 output_dir is not None and output_dir.exists() を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "条件 args.app_class を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "条件 args.ver_module を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "例外処理を伴って処理する。主な呼出: run_spec.run, logger.warning, dict, common.print_format, str",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）",
+          "success_data に dict の結果を格納する",
+          "条件 output_dir is not None に応じて分岐する。主な呼出: str",
           "msg に dict の結果を格納する",
           "条件 failed_count > 0 に応じて分岐する",
           "common.print_format を呼び出す",
@@ -30181,9 +30297,9 @@
           "warn"
         ],
         "statuses": [
+          "RESP_SUCCESS",
           "INT_0",
-          "RESP_WARN",
-          "RESP_SUCCESS"
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -30209,11 +30325,11 @@
     },
     "helper_methods": [],
     "test_viewpoints": [
-      "選択肢を持つパラメータ use_tempdir, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
+      "選択肢を持つパラメータ use_tempdir, clear_output_dir, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
-      "終了コード INT_0, RESP_WARN, RESP_SUCCESS の到達条件をそれぞれ検証する"
+      "終了コード RESP_SUCCESS, INT_0, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:11"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "tts",
@@ -30224,6 +30340,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_tts_install",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_install.py",
@@ -30544,8 +30661,9 @@
         "defining_class": "TtsInstall",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 args.data is None and (not args.client_only) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.tts_engine is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "条件 args.tts_engine == 'voicevox' を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "条件 args.client_only に応じて分岐する。主な呼出: self.install, convert.str2b64str, client.Client, cl.redis_cli.send_cmd, common.random_string, str",
           "common.print_format を呼び出す",
@@ -30619,7 +30737,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:11"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "tts",
@@ -30630,6 +30748,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_tts_list",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_list.py",
@@ -30770,7 +30889,6 @@
       "INT_1"
     ],
     "result_keys": [
-      "warn",
       "success",
       "error"
     ],
@@ -30779,7 +30897,8 @@
         "defining_class": "TtsList",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.tts_engine is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, cl) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "tts_engine_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
           "ret に cl.redis_cli.send_cmd の結果を格納する",
@@ -30787,9 +30906,7 @@
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
           "終了コード RESP_SUCCESS を返却する"
         ],
-        "result_keys": [
-          "warn"
-        ],
+        "result_keys": [],
         "statuses": [
           "RESP_SUCCESS",
           "RESP_WARN"
@@ -30829,10 +30946,10 @@
     "helper_methods": [],
     "test_viewpoints": [
       "選択肢を持つパラメータ tts_engine の境界値と不正値を確認する",
-      "結果オブジェクトのキー warn, success, error が期待どおり構成されることを確認する",
+      "結果オブジェクトのキー success, error が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:11"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "tts",
@@ -30843,6 +30960,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_tts_say",
     "base_classes": [
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_say.py",
@@ -31149,9 +31267,9 @@
         "defining_class": "TtsSay",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.tts_engine is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, obj) に self.preprocess の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 args.tts_engine == 'voicevox' を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.tts_text is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "tts_engine_b64 に convert.str2b64str の結果を格納する",
           "tts_text_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
@@ -31209,7 +31327,7 @@
           "RESP_WARN",
           "RESP_SUCCESS"
         ],
-        "source_lines": "277-312"
+        "source_lines": "273-308"
       }
     ],
     "test_viewpoints": [
@@ -31218,7 +31336,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:11"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "tts",
@@ -31229,6 +31347,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_tts_uninstall",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_uninstall.py",
@@ -31409,8 +31528,9 @@
         "defining_class": "TtsUninstall",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 args.data is None and (not args.client_only) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.tts_engine is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "条件 args.client_only に応じて分岐する。主な呼出: self.uninstall, convert.str2b64str, client.Client, cl.redis_cli.send_cmd, common.random_string, self.get_svcmd",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
@@ -31477,7 +31597,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:12"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "web",
@@ -31488,6 +31608,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_web_apikey_add",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_apikey_add.py",
@@ -31533,7 +31654,7 @@
         "type": "file",
         "type_label": "ファイル",
         "required": true,
-        "default": null,
+        "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
         "fileio": "in",
@@ -31595,29 +31716,30 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
-      "RESP_SUCCESS"
+      "RESP_SUCCESS",
+      "RESP_WARN"
     ],
     "result_keys": [
-      "warn",
-      "success"
+      "success",
+      "warn"
     ],
     "method_infos": {
       "apprun": {
         "defining_class": "WebApikeyAdd",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "例外処理を伴って処理する。主な呼出: web.Web, dict, w.apikey_add, common.print_format",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）"
         ],
         "result_keys": [
-          "warn",
-          "success"
+          "success",
+          "warn"
         ],
         "statuses": [
-          "RESP_WARN",
-          "RESP_SUCCESS"
+          "RESP_SUCCESS",
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -31641,12 +31763,12 @@
     },
     "helper_methods": [],
     "test_viewpoints": [
-      "必須パラメータ user_name, apikey_name, signin_file が不足した場合の警告応答を確認する",
+      "必須パラメータ user_name, apikey_name が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ stdout_log, capture_stdout の境界値と不正値を確認する",
-      "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS の到達条件をそれぞれ検証する"
+      "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
+      "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:12"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "web",
@@ -31657,6 +31779,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_web_apikey_del",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_apikey_del.py",
@@ -31701,10 +31824,10 @@
         "short": null,
         "type": "file",
         "type_label": "ファイル",
-        "required": false,
-        "default": null,
+        "required": true,
+        "default": ".cmdbox/user_list.yml",
         "multi": false,
-        "hide": true,
+        "hide": false,
         "fileio": "in",
         "web": "mask",
         "choices": [],
@@ -31764,29 +31887,30 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
-      "RESP_SUCCESS"
+      "RESP_SUCCESS",
+      "RESP_WARN"
     ],
     "result_keys": [
-      "warn",
-      "success"
+      "success",
+      "warn"
     ],
     "method_infos": {
       "apprun": {
         "defining_class": "WebApikeyDel",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "例外処理を伴って処理する。主な呼出: web.Web, dict, w.apikey_del, common.print_format",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）"
         ],
         "result_keys": [
-          "warn",
-          "success"
+          "success",
+          "warn"
         ],
         "statuses": [
-          "RESP_WARN",
-          "RESP_SUCCESS"
+          "RESP_SUCCESS",
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -31812,10 +31936,10 @@
     "test_viewpoints": [
       "必須パラメータ user_name, apikey_name が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ stdout_log, capture_stdout の境界値と不正値を確認する",
-      "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS の到達条件をそれぞれ検証する"
+      "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
+      "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:12"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "web",
@@ -31826,6 +31950,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_web_gencert",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_gencert.py",
@@ -32033,7 +32158,8 @@
         "defining_class": "WebGencert",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.webhost is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 args.output_cert is None に応じて分岐する",
           "条件 args.output_pkey is None に応じて分岐する",
           "条件 args.output_key is None に応じて分岐する",
@@ -32091,7 +32217,7 @@
         ],
         "result_keys": [],
         "statuses": [],
-        "source_lines": "132-180"
+        "source_lines": "133-181"
       }
     ],
     "test_viewpoints": [
@@ -32099,7 +32225,7 @@
       "結果オブジェクトのキー warn, success, error が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:12"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "web",
@@ -32111,6 +32237,7 @@
     "base_classes": [
       "OneshotResultEdgeFeature",
       "ResultEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_genpass.py",
@@ -32277,8 +32404,8 @@
       }
     ],
     "statuses": [
-      "INT_1",
       "RESP_SUCCESS",
+      "INT_1",
       "RESP_WARN"
     ],
     "result_keys": [
@@ -32291,6 +32418,8 @@
         "defining_class": "WebGenpass",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "条件 args.pass_length < 1 を満たす場合は早期終了し、INT_1, RESP_WARN。結果キー: warn",
           "条件 args.pass_count < 1 を満たす場合は早期終了し、INT_1, RESP_WARN。結果キー: warn",
           "条件 args.pass_count >= 40 を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
@@ -32304,8 +32433,8 @@
           "error"
         ],
         "statuses": [
-          "INT_1",
           "RESP_SUCCESS",
+          "INT_1",
           "RESP_WARN"
         ]
       },
@@ -32342,15 +32471,15 @@
         ],
         "result_keys": [],
         "statuses": [],
-        "source_lines": "127-168"
+        "source_lines": "132-173"
       }
     ],
     "test_viewpoints": [
       "選択肢を持つパラメータ use_alphabet, use_number, use_symbol, similar, stdout_log, capture_stdout の境界値と不正値を確認する",
       "結果オブジェクトのキー warn, success, error が期待どおり構成されることを確認する",
-      "終了コード INT_1, RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
+      "終了コード RESP_SUCCESS, INT_1, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:12"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "web",
@@ -32361,6 +32490,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_web_group_add",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_add.py",
@@ -32421,7 +32551,7 @@
         "type": "file",
         "type_label": "ファイル",
         "required": true,
-        "default": null,
+        "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
         "fileio": "in",
@@ -32483,29 +32613,30 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
-      "RESP_SUCCESS"
+      "RESP_SUCCESS",
+      "RESP_WARN"
     ],
     "result_keys": [
-      "warn",
-      "success"
+      "success",
+      "warn"
     ],
     "method_infos": {
       "apprun": {
         "defining_class": "WebGroupAdd",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "例外処理を伴って処理する。主な呼出: web.Web, dict, w.group_add, common.print_format",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）"
         ],
         "result_keys": [
-          "warn",
-          "success"
+          "success",
+          "warn"
         ],
         "statuses": [
-          "RESP_WARN",
-          "RESP_SUCCESS"
+          "RESP_SUCCESS",
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -32529,12 +32660,12 @@
     },
     "helper_methods": [],
     "test_viewpoints": [
-      "必須パラメータ group_id, group_name, signin_file が不足した場合の警告応答を確認する",
+      "必須パラメータ group_id, group_name が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ stdout_log, capture_stdout の境界値と不正値を確認する",
-      "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS の到達条件をそれぞれ検証する"
+      "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
+      "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:12"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "web",
@@ -32545,6 +32676,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_web_group_del",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_del.py",
@@ -32575,7 +32707,7 @@
         "type": "file",
         "type_label": "ファイル",
         "required": true,
-        "default": null,
+        "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
         "fileio": "in",
@@ -32637,29 +32769,30 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
-      "RESP_SUCCESS"
+      "RESP_SUCCESS",
+      "RESP_WARN"
     ],
     "result_keys": [
-      "warn",
-      "success"
+      "success",
+      "warn"
     ],
     "method_infos": {
       "apprun": {
         "defining_class": "WebGroupDel",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "例外処理を伴って処理する。主な呼出: web.Web, w.group_del, dict, common.print_format",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）"
         ],
         "result_keys": [
-          "warn",
-          "success"
+          "success",
+          "warn"
         ],
         "statuses": [
-          "RESP_WARN",
-          "RESP_SUCCESS"
+          "RESP_SUCCESS",
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -32683,12 +32816,12 @@
     },
     "helper_methods": [],
     "test_viewpoints": [
-      "必須パラメータ group_id, signin_file が不足した場合の警告応答を確認する",
+      "必須パラメータ group_id が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ stdout_log, capture_stdout の境界値と不正値を確認する",
-      "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS の到達条件をそれぞれ検証する"
+      "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
+      "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:12"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "web",
@@ -32699,6 +32832,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_web_group_edit",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_edit.py",
@@ -32759,7 +32893,7 @@
         "type": "file",
         "type_label": "ファイル",
         "required": true,
-        "default": null,
+        "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
         "fileio": "in",
@@ -32821,29 +32955,30 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
-      "RESP_SUCCESS"
+      "RESP_SUCCESS",
+      "RESP_WARN"
     ],
     "result_keys": [
-      "warn",
-      "success"
+      "success",
+      "warn"
     ],
     "method_infos": {
       "apprun": {
         "defining_class": "WebGroupEdit",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "例外処理を伴って処理する。主な呼出: web.Web, dict, w.group_edit, common.print_format",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）"
         ],
         "result_keys": [
-          "warn",
-          "success"
+          "success",
+          "warn"
         ],
         "statuses": [
-          "RESP_WARN",
-          "RESP_SUCCESS"
+          "RESP_SUCCESS",
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -32867,12 +33002,12 @@
     },
     "helper_methods": [],
     "test_viewpoints": [
-      "必須パラメータ group_id, group_name, signin_file が不足した場合の警告応答を確認する",
+      "必須パラメータ group_id, group_name が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ stdout_log, capture_stdout の境界値と不正値を確認する",
-      "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS の到達条件をそれぞれ検証する"
+      "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
+      "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:12"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "web",
@@ -32883,6 +33018,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_web_group_list",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_list.py",
@@ -32913,7 +33049,7 @@
         "type": "file",
         "type_label": "ファイル",
         "required": true,
-        "default": null,
+        "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
         "fileio": "in",
@@ -32975,29 +33111,30 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
-      "RESP_SUCCESS"
+      "RESP_SUCCESS",
+      "RESP_WARN"
     ],
     "result_keys": [
-      "warn",
-      "success"
+      "success",
+      "warn"
     ],
     "method_infos": {
       "apprun": {
         "defining_class": "WebGroupList",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "例外処理を伴って処理する。主な呼出: web.Web, w.group_list, dict, common.print_format",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）"
         ],
         "result_keys": [
-          "warn",
-          "success"
+          "success",
+          "warn"
         ],
         "statuses": [
-          "RESP_WARN",
-          "RESP_SUCCESS"
+          "RESP_SUCCESS",
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -33021,12 +33158,11 @@
     },
     "helper_methods": [],
     "test_viewpoints": [
-      "必須パラメータ signin_file が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ stdout_log, capture_stdout の境界値と不正値を確認する",
-      "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS の到達条件をそれぞれ検証する"
+      "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
+      "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:12"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "web",
@@ -33037,6 +33173,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_web_start",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_start.py",
@@ -33231,12 +33368,12 @@
         "short": null,
         "type": "file",
         "type_label": "ファイル",
-        "required": false,
+        "required": true,
         "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
         "fileio": "in",
-        "web": null,
+        "web": "mask",
         "choices": [],
         "description_ja": "サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。",
         "description_en": "Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
@@ -33540,8 +33677,8 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
-      "RESP_SUCCESS"
+      "RESP_SUCCESS",
+      "RESP_WARN"
     ],
     "result_keys": [
       "warn",
@@ -33552,8 +33689,8 @@
         "defining_class": "WebStart",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
-          "条件 args.signin_file is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "signin_file に Path の結果を格納する",
           "条件 signin_file is not None and (not signin_file.is_file()) を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "例外処理を伴って処理する。主な呼出: self.createWeb, self.start, dict, common.print_format, Path, logger.error",
@@ -33564,8 +33701,8 @@
           "success"
         ],
         "statuses": [
-          "RESP_WARN",
-          "RESP_SUCCESS"
+          "RESP_SUCCESS",
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -33598,7 +33735,7 @@
         ],
         "result_keys": [],
         "statuses": [],
-        "source_lines": "184-200"
+        "source_lines": "181-197"
       },
       {
         "name": "start",
@@ -33609,16 +33746,16 @@
         ],
         "result_keys": [],
         "statuses": [],
-        "source_lines": "202-215"
+        "source_lines": "199-212"
       }
     ],
     "test_viewpoints": [
       "選択肢を持つパラメータ session_secure, client_only, stdout_log, capture_stdout の境界値と不正値を確認する",
       "複数値パラメータ outputs_key, assets の 0 件・1 件・複数件入力を確認する",
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS の到達条件をそれぞれ検証する"
+      "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:12"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "web",
@@ -33629,6 +33766,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_web_stop",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_stop.py",
@@ -33749,6 +33887,8 @@
         "defining_class": "WebStop",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "w に web.Web の結果を格納する",
           "w.stop を呼び出す",
           "msg に dict の結果を格納する",
@@ -33787,7 +33927,7 @@
       "結果オブジェクトのキー success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:12"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "web",
@@ -33798,6 +33938,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_web_user_add",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_user_add.py",
@@ -33910,7 +34051,7 @@
         "type": "file",
         "type_label": "ファイル",
         "required": true,
-        "default": null,
+        "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
         "fileio": "in",
@@ -33972,29 +34113,30 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
-      "RESP_SUCCESS"
+      "RESP_SUCCESS",
+      "RESP_WARN"
     ],
     "result_keys": [
-      "warn",
-      "success"
+      "success",
+      "warn"
     ],
     "method_infos": {
       "apprun": {
         "defining_class": "WebUserAdd",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "例外処理を伴って処理する。主な呼出: web.Web, dict, w.user_add, common.print_format",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）"
         ],
         "result_keys": [
-          "warn",
-          "success"
+          "success",
+          "warn"
         ],
         "statuses": [
-          "RESP_WARN",
-          "RESP_SUCCESS"
+          "RESP_SUCCESS",
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -34018,13 +34160,13 @@
     },
     "helper_methods": [],
     "test_viewpoints": [
-      "必須パラメータ user_id, user_name, user_group, signin_file が不足した場合の警告応答を確認する",
+      "必須パラメータ user_id, user_name, user_group が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ user_pass_hash, stdout_log, capture_stdout の境界値と不正値を確認する",
       "複数値パラメータ user_group の 0 件・1 件・複数件入力を確認する",
-      "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS の到達条件をそれぞれ検証する"
+      "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
+      "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:12"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "web",
@@ -34035,6 +34177,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_web_user_del",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_user_del.py",
@@ -34065,7 +34208,7 @@
         "type": "file",
         "type_label": "ファイル",
         "required": true,
-        "default": null,
+        "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
         "fileio": "in",
@@ -34127,29 +34270,30 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
-      "RESP_SUCCESS"
+      "RESP_SUCCESS",
+      "RESP_WARN"
     ],
     "result_keys": [
-      "warn",
-      "success"
+      "success",
+      "warn"
     ],
     "method_infos": {
       "apprun": {
         "defining_class": "WebUserDel",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "例外処理を伴って処理する。主な呼出: web.Web, w.user_del, dict, common.print_format",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）"
         ],
         "result_keys": [
-          "warn",
-          "success"
+          "success",
+          "warn"
         ],
         "statuses": [
-          "RESP_WARN",
-          "RESP_SUCCESS"
+          "RESP_SUCCESS",
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -34173,12 +34317,12 @@
     },
     "helper_methods": [],
     "test_viewpoints": [
-      "必須パラメータ user_id, signin_file が不足した場合の警告応答を確認する",
+      "必須パラメータ user_id が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ stdout_log, capture_stdout の境界値と不正値を確認する",
-      "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS の到達条件をそれぞれ検証する"
+      "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
+      "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:12"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "web",
@@ -34189,6 +34333,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_web_user_edit",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_user_edit.py",
@@ -34301,7 +34446,7 @@
         "type": "file",
         "type_label": "ファイル",
         "required": true,
-        "default": null,
+        "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
         "fileio": "in",
@@ -34363,29 +34508,30 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
-      "RESP_SUCCESS"
+      "RESP_SUCCESS",
+      "RESP_WARN"
     ],
     "result_keys": [
-      "warn",
-      "success"
+      "success",
+      "warn"
     ],
     "method_infos": {
       "apprun": {
         "defining_class": "WebUserEdit",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "例外処理を伴って処理する。主な呼出: web.Web, dict, w.user_edit, common.print_format",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）"
         ],
         "result_keys": [
-          "warn",
-          "success"
+          "success",
+          "warn"
         ],
         "statuses": [
-          "RESP_WARN",
-          "RESP_SUCCESS"
+          "RESP_SUCCESS",
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -34409,13 +34555,13 @@
     },
     "helper_methods": [],
     "test_viewpoints": [
-      "必須パラメータ user_id, user_name, user_group, signin_file が不足した場合の警告応答を確認する",
+      "必須パラメータ user_id, user_name, user_group が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ user_pass_hash, stdout_log, capture_stdout の境界値と不正値を確認する",
       "複数値パラメータ user_group の 0 件・1 件・複数件入力を確認する",
-      "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS の到達条件をそれぞれ検証する"
+      "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
+      "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:12"
+    "generated_at": "2026-04-23T23:40:04"
   },
   {
     "mode": "web",
@@ -34426,6 +34572,7 @@
     "module_name": "cmdbox.app.features.cli.cmdbox_web_user_list",
     "base_classes": [
       "UnsupportEdgeFeature",
+      "Validator",
       "Feature"
     ],
     "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_user_list.py",
@@ -34456,7 +34603,7 @@
         "type": "file",
         "type_label": "ファイル",
         "required": true,
-        "default": null,
+        "default": ".cmdbox/user_list.yml",
         "multi": false,
         "hide": false,
         "fileio": "in",
@@ -34518,29 +34665,30 @@
       }
     ],
     "statuses": [
-      "RESP_WARN",
-      "RESP_SUCCESS"
+      "RESP_SUCCESS",
+      "RESP_WARN"
     ],
     "result_keys": [
-      "warn",
-      "success"
+      "success",
+      "warn"
     ],
     "method_infos": {
       "apprun": {
         "defining_class": "WebUserList",
         "docstring": "この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト",
         "steps": [
-          "条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "(st, msg, obj) に self.valid の結果を格納する",
+          "条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS",
           "例外処理を伴って処理する。主な呼出: web.Web, w.user_list, dict, common.print_format",
           "Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）"
         ],
         "result_keys": [
-          "warn",
-          "success"
+          "success",
+          "warn"
         ],
         "statuses": [
-          "RESP_WARN",
-          "RESP_SUCCESS"
+          "RESP_SUCCESS",
+          "RESP_WARN"
         ]
       },
       "svrun": {
@@ -34564,11 +34712,10 @@
     },
     "helper_methods": [],
     "test_viewpoints": [
-      "必須パラメータ signin_file が不足した場合の警告応答を確認する",
       "選択肢を持つパラメータ stdout_log, capture_stdout の境界値と不正値を確認する",
-      "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
-      "終了コード RESP_WARN, RESP_SUCCESS の到達条件をそれぞれ検証する"
+      "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
+      "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-19T20:59:12"
+    "generated_at": "2026-04-23T23:40:04"
   }
 ]

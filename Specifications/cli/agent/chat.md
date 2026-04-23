@@ -9,7 +9,7 @@
 | クラス | AgentChat |
 | モジュール | cmdbox.app.features.cli.cmdbox_agent_chat |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_chat.py |
-| 継承元 | AgentBase, ResultEdgeFeature, Feature |
+| 継承元 | AgentBase, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | はい |
@@ -49,11 +49,11 @@
 ### apprun
 
 - 実装元: AgentChat
-- 終了コード候補: INT_0, RESP_SUCCESS, RESP_WARN
+- 終了コード候補: RESP_SUCCESS, INT_0, RESP_WARN
 - 結果キー候補: success, warn
 - 処理フロー:
-  - 条件 not getattr(args, 'user_name', None) を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 not getattr(args, 'runner_name', None) を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - 条件 not re.match('^[\\w\\-]+$', args.runner_name) を満たす場合は早期終了し、RESP_WARN。結果キー: warn
   - payload に dict の結果を格納する
   - payload_b64 に convert.str2b64str の結果を格納する
@@ -75,7 +75,7 @@
 
 ## 処理結果
 
-- 終了コード候補: INT_0, RESP_SUCCESS, RESP_WARN, INT_1, INT_2
+- 終了コード候補: RESP_SUCCESS, INT_0, RESP_WARN, INT_1, INT_2
 - 結果キー候補: success, warn, end
 - 戻り値の基本形: Tuple[int, Dict[str, Any], Any]
 
@@ -136,11 +136,11 @@
 - 必須パラメータ runner_name, user_name, message が不足した場合の警告応答を確認する
 - 選択肢を持つパラメータ call_tts, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する
 - 結果オブジェクトのキー success, warn, end が期待どおり構成されることを確認する
-- 終了コード INT_0, RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する
+- 終了コード RESP_SUCCESS, INT_0, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する
 
 ## ソース参照
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_chat.py
 - apprun 実装元: AgentChat
 - svrun 実装元: AgentChat
-- 生成日時: 2026-04-19T20:59:05
+- 生成日時: 2026-04-23T23:39:57

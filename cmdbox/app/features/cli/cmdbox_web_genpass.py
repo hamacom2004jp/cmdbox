@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -13,7 +14,7 @@ import re
 import string
 
 
-class WebGenpass(feature.OneshotResultEdgeFeature):
+class WebGenpass(feature.OneshotResultEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -87,6 +88,10 @@ class WebGenpass(feature.OneshotResultEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
+        st, msg, obj = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, obj
+
         if args.pass_length < 1:
             msg = dict(warn="The password length must be 1 or more.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

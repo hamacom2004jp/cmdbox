@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature, server
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -6,7 +7,7 @@ import argparse
 import logging
 
 
-class ServerStart(feature.UnsupportEdgeFeature):
+class ServerStart(feature.UnsupportEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -89,14 +90,10 @@ class ServerStart(feature.UnsupportEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if args.data is None:
-            msg = dict(warn=f"Please specify the --data option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg
-        if args.svname is None:
-            msg = dict(warn=f"Please specify the --svname option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
+
         sv = server.Server(Path(args.data), logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         sv.start_server(args.retry_count, args.retry_interval)
 

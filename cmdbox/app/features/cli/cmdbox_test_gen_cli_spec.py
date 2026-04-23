@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from cmdbox.app.features.cli.test import gen_cli_spec
 from pathlib import Path
@@ -6,9 +7,10 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import importlib
 import logging
+import shutil
 
 
-class TestGenCliSpec(feature.OneshotResultEdgeFeature):
+class TestGenCliSpec(feature.OneshotResultEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         return 'test'
 
@@ -33,6 +35,9 @@ class TestGenCliSpec(feature.OneshotResultEdgeFeature):
                 dict(opt="prefix", type=Options.T_STR, default="cmdbox_", required=False, multi=False, hide=False, choice=None,
                      description_ja="フィーチャーモジュールのファイル名プレフィックスを指定します。",
                      description_en="Specify the filename prefix of feature modules."),
+                dict(opt="clear_output_dir", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
+                     description_ja="Trueを指定すると、出力先ディレクトリが既に存在する場合にクリア（削除して再作成）してから仕様書を生成します。Falseの場合、出力先ディレクトリが既に存在するとワーニングを返します。",
+                     description_en="If True, clears (deletes and recreates) the output directory before generating specifications when it already exists. If False, returns a warning when the output directory already exists."),
                 dict(opt="app_class", type=Options.T_STR, default=f"{self.appcls.__module__}.{self.appcls.__name__}", required=False, multi=False, hide=False, choice=None,
                      description_ja=f"アプリケーションクラスのモジュールパスを指定します。(例: myapp.app.MyApp) 省略時は {self.appcls.__module__}.{self.appcls.__name__} を使用します。",
                      description_en=f"Specify the module path of the application class.(e.g. myapp.app.MyApp) Defaults to {self.appcls.__module__}.{self.appcls.__name__} when omitted."),
@@ -71,15 +76,22 @@ class TestGenCliSpec(feature.OneshotResultEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        feature_package = args.feature_package
-        if not feature_package:
-            msg = dict(warn="Please specify the --feature_package option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
 
+        feature_package = args.feature_package
         root_dir = Path(args.root_dir) if args.root_dir else Path.cwd()
         output_dir = Path(args.output_dir) if args.output_dir else root_dir / "Specifications"
         prefix = args.prefix or "cmdbox_"
+        clear_output_dir = bool(args.clear_output_dir)
+
+        if output_dir.exists():
+            if not clear_output_dir:
+                msg = dict(warn=f"Output directory already exists: '{output_dir}'. Use --clear_output_dir True to overwrite.")
+                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, msg, None
+            shutil.rmtree(output_dir)
 
         appcls = None
         if args.app_class:
@@ -124,10 +136,3 @@ class TestGenCliSpec(feature.OneshotResultEdgeFeature):
         )
         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         return self.RESP_SUCCESS, msg, None
-
-    def is_cluster_redirect(self) -> bool:
-        return False
-
-    def svrun(self, data_dir: Path, logger: logging.Logger, redis_cli, msg: List[str],
-              sessions: Dict[str, Dict[str, Any]]) -> int:
-        return self.RESP_SUCCESS

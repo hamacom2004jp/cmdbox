@@ -1,15 +1,13 @@
 from cmdbox.app import common, filer
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.commons import convert, redis_client, validator
 from cmdbox.app.features.cli.excel import excel_base
-from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, List, Tuple
 import argparse
 import logging
-import json
 
 
-class ExcelSheetList(excel_base.ExcelBase):
+class ExcelSheetList(excel_base.ExcelBase, validator.Validator):
     def get_cmd(self):
         """
         この機能のコマンドを返します
@@ -41,18 +39,9 @@ class ExcelSheetList(excel_base.ExcelBase):
         Returns:
             Tuple[bool, str]: チェック結果, メッセージ
         """
-        if args.svname is None:
-            msg = dict(warn=f"Please specify the --svname option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if args.scope is None:
-            msg = dict(warn=f"Please specify the --scope option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if args.svpath is None:
-            msg = dict(warn=f"Please specify the --svpath option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = super().chk_args(args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
         return self.RESP_SUCCESS, None, None
 
     def excel_proc(self, abspath:Path, args:argparse.Namespace, logger:logging.Logger, tm:float, pf:List[Dict[str, float]]=[]) -> Dict[str, Any]:

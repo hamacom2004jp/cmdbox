@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -10,7 +11,7 @@ import signal
 import traceback
 
 
-class McpsvStop(feature.UnsupportEdgeFeature):
+class McpsvStop(feature.UnsupportEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -69,6 +70,9 @@ class McpsvStop(feature.UnsupportEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
         try:
             def _r(f):
                 pid = f.read()

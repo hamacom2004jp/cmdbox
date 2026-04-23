@@ -9,7 +9,7 @@
 | クラス | ClientFileDownload |
 | モジュール | cmdbox.app.features.cli.cmdbox_client_file_download |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_download.py |
-| 継承元 | OneshotEdgeFeature, Feature |
+| 継承元 | OneshotEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | はい |
@@ -54,8 +54,8 @@
 - 終了コード候補: RESP_SUCCESS, RESP_WARN
 - 結果キー候補: warn
 - 処理フロー:
-  - 条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 args.svpath is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - 条件 args.etag is not None and args.download_file is not None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
   - cl に client.Client の結果を格納する
   - ret に cl.file_download の結果を格納する
@@ -114,4 +114,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_download.py
 - apprun 実装元: ClientFileDownload
 - svrun 実装元: ClientFileDownload
-- 生成日時: 2026-04-19T20:59:07
+- 生成日時: 2026-04-23T23:39:59

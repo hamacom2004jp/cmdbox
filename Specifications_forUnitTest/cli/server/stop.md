@@ -10,7 +10,7 @@
 | モジュール | cmdbox.app.features.cli.cmdbox_server_stop |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_server_stop.py |
 | 詳細設計書 | Specifications/cli/server/stop.md |
-| 実装上の必須推定 | svname |
+| 実装上の必須推定 | - |
 
 ## 概要
 
@@ -29,7 +29,7 @@
 ## 共通期待結果
 
 - 終了コード候補: RESP_SUCCESS, RESP_WARN, INT_1
-- 結果キー候補: warn
+- 結果キー候補: 特になし
 
 ## 副作用確認観点
 
@@ -38,20 +38,18 @@
 ## 詳細設計からの観点
 
 - 選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する
-- 結果オブジェクトのキー warn が期待どおり構成されることを確認する
 - 終了コード RESP_SUCCESS, RESP_WARN, INT_1 の到達条件をそれぞれ検証する
 
 ## テストパターン
 
 | ID | 分類 | 観点 | 入力パターン | 期待終了コード | 期待結果 | 追加確認 |
 | --- | --- | --- | --- | --- | --- | --- |
-| TC-001 | 正常系 | 最小有効入力 | 全パラメータ省略またはデフォルト値で実行する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn が含まれる | output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
+| TC-001 | 正常系 | 最小有効入力 | 全パラメータ省略またはデフォルト値で実行する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
 | TC-002 | ファイルI/O | output_json 追記保存 | 既存の output_json を用意し、output_json_append=True で 2 回連続実行する | RESP_SUCCESS | 各回の結果が保存され、追記モードで既存内容が失われない | 1 回目より 2 回目のファイルサイズが増加し、追記後も JSON として解釈可能であることを確認する |
 | TC-003 | 副作用確認 | 成果物検証 | 副作用を発生させる有効入力で実行する | RESP_SUCCESS | 戻り値が正常であり、関連する成果物が期待どおり更新される | output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
-| TC-004 | 結果検証 | 結果キー整合性 | 正常系の代表入力で実行する | RESP_SUCCESS | 結果オブジェクトに warn が含まれる | 不要なキー欠落や型崩れがないことを確認する |
 
 ## ソース参照
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_server_stop.py
 - 詳細設計書: Specifications/cli/server/stop.md
-- 生成日時: 2026-04-19T21:16:02
+- 生成日時: 2026-04-23T23:40:14

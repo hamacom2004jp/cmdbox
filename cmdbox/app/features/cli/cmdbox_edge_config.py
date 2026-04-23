@@ -1,4 +1,5 @@
 from cmdbox.app import common, edge, feature
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -6,7 +7,7 @@ import argparse
 import logging
 
 
-class EdgeConfig(feature.UnsupportEdgeFeature):
+class EdgeConfig(feature.UnsupportEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -119,8 +120,9 @@ class EdgeConfig(feature.UnsupportEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if args.data is None:
-            args.data = common.HOME_DIR / f".{self.ver.__appid__}"
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
         app = edge.Edge(logger, args.data, self.appcls, self.ver)
         msg = app.configure(self.get_mode(), self.get_cmd(), args, tm, pf)
         common.print_format(msg, True, tm, None, False, pf=pf)

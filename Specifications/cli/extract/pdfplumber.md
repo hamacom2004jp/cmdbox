@@ -9,7 +9,7 @@
 | クラス | ExtractPdfplumber |
 | モジュール | cmdbox.app.features.cli.cmdbox_extract_pdfplumber |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_pdfplumber.py |
-| 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Feature |
+| 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | いいえ |
@@ -53,13 +53,11 @@
 
 - 実装元: ExtractPdfplumber
 - 役割: この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
-- 終了コード候補: RESP_WARN, RESP_SUCCESS
+- 終了コード候補: RESP_SUCCESS, RESP_WARN
 - 結果キー候補: warn
 - 処理フロー:
-  - 条件 args.svname is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 args.scope is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 args.loadpath is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 args.fwpath is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - 例外処理を伴って処理する。主な呼出: Path, logger.warning, args.client_data.replace, filer.Filer, f._file_exists, f.check_fwpath
   - Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）
 
@@ -75,7 +73,7 @@
 
 ## 処理結果
 
-- 終了コード候補: RESP_WARN, RESP_SUCCESS, INT_1, INT_0, INT_2
+- 終了コード候補: RESP_SUCCESS, RESP_WARN, INT_1, INT_0, INT_2
 - 結果キー候補: warn
 - 戻り値の基本形: Tuple[int, Dict[str, Any], Any]
 
@@ -95,11 +93,11 @@
 - 選択肢を持つパラメータ scope, chunk_table, output_json_append, stdout_log の境界値と不正値を確認する
 - 複数値パラメータ fwpath, chunk_table_header, chunk_exclude, chunk_separator の 0 件・1 件・複数件入力を確認する
 - 結果オブジェクトのキー warn が期待どおり構成されることを確認する
-- 終了コード RESP_WARN, RESP_SUCCESS, INT_1, INT_0, INT_2 の到達条件をそれぞれ検証する
+- 終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_0, INT_2 の到達条件をそれぞれ検証する
 
 ## ソース参照
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_pdfplumber.py
 - apprun 実装元: ExtractPdfplumber
 - svrun 実装元: ExtractPdfplumber
-- 生成日時: 2026-04-19T20:59:10
+- 生成日時: 2026-04-23T23:40:02

@@ -10,7 +10,7 @@
 | モジュール | cmdbox.app.features.cli.cmdbox_test_run_spec |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_test_run_spec.py |
 | 詳細設計書 | Specifications/cli/test/run_spec.md |
-| 実装上の必須推定 | input_json |
+| 実装上の必須推定 | - |
 
 ## 概要
 
@@ -28,51 +28,57 @@
 
 ## 共通期待結果
 
-- 終了コード候補: INT_0, RESP_WARN, RESP_SUCCESS
+- 終了コード候補: RESP_SUCCESS, INT_0, RESP_WARN
 - 結果キー候補: success, warn
 
 ## 副作用確認観点
 
+- output_dir で指定した出力ファイルが作成され、内容が空でないことを確認する
 - output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する
 
 ## 詳細設計からの観点
 
-- 選択肢を持つパラメータ use_tempdir, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する
+- 選択肢を持つパラメータ use_tempdir, clear_output_dir, output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する
 - 結果オブジェクトのキー success, warn が期待どおり構成されることを確認する
-- 終了コード INT_0, RESP_WARN, RESP_SUCCESS の到達条件をそれぞれ検証する
+- 終了コード RESP_SUCCESS, INT_0, RESP_WARN の到達条件をそれぞれ検証する
 
 ## テストパターン
 
 | ID | 分類 | 観点 | 入力パターン | 期待終了コード | 期待結果 | 追加確認 |
 | --- | --- | --- | --- | --- | --- | --- |
-| TC-001 | 正常系 | 最小有効入力 | --input_json=./Specifications_forUnitTest/cli-unit-test-specifications.json。任意パラメータは省略する | INT_0 | 正常終了し、結果オブジェクトに success, warn が含まれる | output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
-| TC-002 | 型境界 | mode_filter 空文字 | --mode_filter に空文字を指定する | INT_0 | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-003 | 型境界 | mode_filter 1文字 | --mode_filter に 1 文字値 X を指定する | INT_0 | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-004 | 型境界 | mode_filter 特殊文字 | --mode_filter に a_日本語 space-_.# を指定する | INT_0 | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-001 | 正常系 | 最小有効入力 | --input_json=./Specifications_forUnitTest/cli-unit-test-specifications.json。任意パラメータは省略する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | output_dir で指定した出力ファイルが作成され、内容が空でないことを確認する / output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
+| TC-002 | 型境界 | mode_filter 空文字 | --mode_filter に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
+| TC-003 | 型境界 | mode_filter 1文字 | --mode_filter に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-004 | 型境界 | mode_filter 特殊文字 | --mode_filter に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
 | TC-005 | 型境界 | mode_filter 長文 | --mode_filter に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-006 | 型境界 | cmd_filter 空文字 | --cmd_filter に空文字を指定する | INT_0 | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-007 | 型境界 | cmd_filter 1文字 | --cmd_filter に 1 文字値 X を指定する | INT_0 | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-008 | 型境界 | cmd_filter 特殊文字 | --cmd_filter に a_日本語 space-_.# を指定する | INT_0 | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-006 | 型境界 | cmd_filter 空文字 | --cmd_filter に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
+| TC-007 | 型境界 | cmd_filter 1文字 | --cmd_filter に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-008 | 型境界 | cmd_filter 特殊文字 | --cmd_filter に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
 | TC-009 | 型境界 | cmd_filter 長文 | --cmd_filter に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-010 | ファイルI/O | input_json 有効入力ファイル | --input_json に存在する妥当なファイルを指定する | INT_0 | 正常終了し、結果オブジェクトに success, warn が含まれる | 入力ファイル内容が意図どおり読み込まれることを確認する |
+| TC-010 | ファイルI/O | input_json 有効入力ファイル | --input_json に存在する妥当なファイルを指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 入力ファイル内容が意図どおり読み込まれることを確認する |
 | TC-011 | ファイルI/O | input_json 存在しない入力ファイル | --input_json に存在しないパスを指定する | RESP_WARN | ファイル未存在のエラーまたは警告が返る | 後続処理に進まず、副作用が発生しないことを確認する |
 | TC-012 | ファイルI/O | input_json 空ファイル | --input_json に 0 byte の空ファイルを指定する | RESP_WARN | フォーマット不正または入力不足として扱われる | 異常終了時のログやエラー文言が十分であることを確認する |
-| TC-013 | 型境界 | use_tempdir=False | --use_tempdir に False を指定する | INT_0 | False 分岐が正常に処理される | 既定値との差分がある場合は挙動の変化を確認する |
-| TC-014 | 型境界 | use_tempdir=True | --use_tempdir に True を指定する | INT_0 | True 分岐が正常に処理される | 副作用がある場合は有効化に伴う成果物の差分を確認する |
-| TC-015 | 型境界 | app_class 空文字 | --app_class に空文字を指定する | INT_0 | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-016 | 型境界 | app_class 1文字 | --app_class に 1 文字値 X を指定する | INT_0 | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-017 | 型境界 | app_class 特殊文字 | --app_class に a_日本語 space-_.# を指定する | INT_0 | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-018 | 型境界 | app_class 長文 | --app_class に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-019 | 型境界 | ver_module 空文字 | --ver_module に空文字を指定する | INT_0 | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-020 | 型境界 | ver_module 1文字 | --ver_module に 1 文字値 X を指定する | INT_0 | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-021 | 型境界 | ver_module 特殊文字 | --ver_module に a_日本語 space-_.# を指定する | INT_0 | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-022 | 型境界 | ver_module 長文 | --ver_module に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-023 | ファイルI/O | output_json 追記保存 | 既存の output_json を用意し、output_json_append=True で 2 回連続実行する | INT_0 | 各回の結果が保存され、追記モードで既存内容が失われない | 1 回目より 2 回目のファイルサイズが増加し、追記後も JSON として解釈可能であることを確認する |
-| TC-024 | 副作用確認 | 成果物検証 | 副作用を発生させる有効入力で実行する | INT_0 | 戻り値が正常であり、関連する成果物が期待どおり更新される | output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
-| TC-025 | 結果検証 | 結果キー整合性 | 正常系の代表入力で実行する | INT_0 | 結果オブジェクトに success, warn が含まれる | 不要なキー欠落や型崩れがないことを確認する |
+| TC-013 | 型境界 | use_tempdir=False | --use_tempdir に False を指定する | RESP_SUCCESS | False 分岐が正常に処理される | 既定値との差分がある場合は挙動の変化を確認する |
+| TC-014 | 型境界 | use_tempdir=True | --use_tempdir に True を指定する | RESP_SUCCESS | True 分岐が正常に処理される | 副作用がある場合は有効化に伴う成果物の差分を確認する |
+| TC-015 | 型境界 | output_dir 既存空ディレクトリ | --output_dir に既存の空ディレクトリを指定する | RESP_SUCCESS | 空ディレクトリ前提の初期状態が正常に処理される | 必要な初期化ファイルやサブディレクトリが作成される場合は生成を確認する |
+| TC-016 | 型境界 | output_dir 既存データありディレクトリ | --output_dir に既存データを含むディレクトリを指定する | RESP_SUCCESS | 既存データを読み込む経路が正常に処理される | 既存ファイルを意図せず破壊しないことを確認する |
+| TC-017 | 型境界 | output_dir 非存在ディレクトリ | --output_dir に存在しないディレクトリを指定する | RESP_WARN | 存在チェックエラーまたは初期化失敗が返る | 自動作成される仕様でない限り、ディレクトリが勝手に作成されないことを確認する |
+| TC-018 | 型境界 | clear_output_dir=False | --clear_output_dir に False を指定する | RESP_SUCCESS | False 分岐が正常に処理される | 既定値との差分がある場合は挙動の変化を確認する |
+| TC-019 | 型境界 | clear_output_dir=True | --clear_output_dir に True を指定する | RESP_SUCCESS | True 分岐が正常に処理される | 副作用がある場合は有効化に伴う成果物の差分を確認する |
+| TC-020 | 型境界 | app_class 空文字 | --app_class に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
+| TC-021 | 型境界 | app_class 1文字 | --app_class に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-022 | 型境界 | app_class 特殊文字 | --app_class に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-023 | 型境界 | app_class 長文 | --app_class に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-024 | 型境界 | ver_module 空文字 | --ver_module に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
+| TC-025 | 型境界 | ver_module 1文字 | --ver_module に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-026 | 型境界 | ver_module 特殊文字 | --ver_module に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-027 | 型境界 | ver_module 長文 | --ver_module に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-028 | ファイルI/O | output_json 追記保存 | 既存の output_json を用意し、output_json_append=True で 2 回連続実行する | RESP_SUCCESS | 各回の結果が保存され、追記モードで既存内容が失われない | 1 回目より 2 回目のファイルサイズが増加し、追記後も JSON として解釈可能であることを確認する |
+| TC-029 | 副作用確認 | 成果物検証 | 副作用を発生させる有効入力で実行する | RESP_SUCCESS | 戻り値が正常であり、関連する成果物が期待どおり更新される | output_dir で指定した出力ファイルが作成され、内容が空でないことを確認する / output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
+| TC-030 | 結果検証 | 結果キー整合性 | 正常系の代表入力で実行する | RESP_SUCCESS | 結果オブジェクトに success, warn が含まれる | 不要なキー欠落や型崩れがないことを確認する |
 
 ## ソース参照
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_test_run_spec.py
 - 詳細設計書: Specifications/cli/test/run_spec.md
-- 生成日時: 2026-04-19T21:16:02
+- 生成日時: 2026-04-23T23:40:14

@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature, server
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -6,7 +7,7 @@ import argparse
 import logging
 
 
-class ServerList(feature.OneshotResultEdgeFeature):
+class ServerList(feature.OneshotResultEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -80,6 +81,10 @@ class ServerList(feature.OneshotResultEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
+
         sv = server.Server(Path(args.data), logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname='server') # list取得なのでデフォルトのsvnameを指定
         ret = sv.list_server()
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)

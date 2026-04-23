@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from cmdbox.app.features.cli.test import run_spec
 from pathlib import Path
@@ -6,9 +7,10 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import importlib
 import logging
+import shutil
 
 
-class TestRunSpec(feature.OneshotResultEdgeFeature):
+class TestRunSpec(feature.OneshotResultEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         return 'test'
 
@@ -44,6 +46,12 @@ class TestRunSpec(feature.OneshotResultEdgeFeature):
                 dict(opt="use_tempdir", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
                      description_ja="出力系パラメータを一時ディレクトリに置換してテストを実行します。Trueにすると既存ファイルを上書きしません。",
                      description_en="Replace output parameters with temporary directories during test execution. When True, avoids overwriting existing files."),
+                dict(opt="output_dir", type=Options.T_DIR, default="./Specifications_forUnitTest/results/", required=False, multi=False, hide=False, choice=None, fileio="out",
+                     description_ja="テスト実行結果（JSONおよびMD）の出力先ディレクトリを指定します。省略時は ./Specifications_forUnitTest/results を使用します。",
+                     description_en="Specify the output directory for test run results (JSON and MD). Defaults to ./Specifications_forUnitTest/results when omitted."),
+                dict(opt="clear_output_dir", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
+                     description_ja="Trueを指定すると、出力先ディレクトリが既に存在する場合にクリア（削除して再作成）してから結果を出力します。Falseの場合、存在するとワーニングを返します。",
+                     description_en="If True, clears (deletes and recreates) the output directory before writing results when it already exists. If False, returns a warning when the output directory already exists."),
                 dict(opt="app_class", type=Options.T_STR, default=f"{self.appcls.__module__}.{self.appcls.__name__}", required=False, multi=False, hide=False, choice=None,
                      description_ja=f"テスト対象のアプリケーションクラスのモジュールパスを指定します。(例: myapp.app.MyApp) 省略時は {self.appcls.__module__}.{self.appcls.__name__} を使用します。",
                      description_en=f"Specify the module path of the application class to test. (e.g. myapp.app.MyApp) Defaults to {self.appcls.__module__}.{self.appcls.__name__} when omitted."),
@@ -82,12 +90,11 @@ class TestRunSpec(feature.OneshotResultEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        input_json = Path(args.input_json) if args.input_json else None
-        if input_json is None:
-            msg = dict(warn="Please specify the --input_json option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
 
+        input_json = Path(args.input_json)
         if not input_json.exists():
             msg = dict(warn=f"input_json not found: {input_json}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -96,6 +103,16 @@ class TestRunSpec(feature.OneshotResultEdgeFeature):
         mode_filter = args.mode_filter or None
         cmd_filter = args.cmd_filter or None
         use_tempdir = args.use_tempdir if hasattr(args, 'use_tempdir') else False
+
+        output_dir = Path(args.output_dir) if args.output_dir else None
+        clear_output_dir = bool(args.clear_output_dir)
+
+        if output_dir is not None and output_dir.exists():
+            if not clear_output_dir:
+                msg = dict(warn=f"Output directory already exists: '{output_dir}'. Use --clear_output_dir True to overwrite.")
+                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, msg, None
+            shutil.rmtree(output_dir)
 
         # app_class の解決
         appcls = self.appcls
@@ -127,6 +144,7 @@ class TestRunSpec(feature.OneshotResultEdgeFeature):
                 appcls=appcls,
                 ver=ver,
                 use_tempdir=use_tempdir,
+                output_dir=output_dir,
             )
         except Exception as e:
             logger.warning(f"run_spec failed: {e}", exc_info=True)
@@ -136,13 +154,16 @@ class TestRunSpec(feature.OneshotResultEdgeFeature):
 
         summary = result["summary"]
         failed_count = summary["failed"]
-        msg: Dict[str, Any] = dict(
-            success=dict(data=dict(
-                message=f"Test completed",
-                **summary,
-                results=result["results"],
-            ))
+        success_data: Dict[str, Any] = dict(
+            message="Test completed",
+            **summary,
+            results=result["results"],
         )
+        if output_dir is not None:
+            success_data["output_dir"] = str(output_dir)
+            success_data["json_file"] = str(output_dir / "test-run-results.json")
+            success_data["md_file"] = str(output_dir / "test-run-results.md")
+        msg: Dict[str, Any] = dict(success=dict(data=success_data))
         if failed_count > 0:
             msg["warn"] = f"{failed_count} test case(s) failed."
 

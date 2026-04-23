@@ -1,13 +1,15 @@
 from cmdbox.app import common, feature
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from cmdbox.app.features.cli.test import gen_test_spec
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import shutil
 
 
-class TestGenTestSpec(feature.OneshotResultEdgeFeature):
+class TestGenTestSpec(feature.OneshotResultEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         return 'test'
 
@@ -29,6 +31,9 @@ class TestGenTestSpec(feature.OneshotResultEdgeFeature):
                 dict(opt="root_dir", type=Options.T_DIR, default="./", required=False, multi=False, hide=False, choice=None,
                      description_ja="プロジェクトルートディレクトリを指定します。詳細設計書マークダウンの参照に使用します。省略時はカレントディレクトリを使用します。",
                      description_en="Specify the project root directory used for referencing design document markdowns. Defaults to the current directory when omitted."),
+                dict(opt="clear_output_dir", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
+                     description_ja="Trueを指定すると、出力先ディレクトリが既に存在する場合にクリア（削除して再作成）してから仕様書を生成します。Falseの場合、出力先ディレクトリが既に存在するとワーニングを返します。",
+                     description_en="If True, clears (deletes and recreates) the output directory before generating specifications when it already exists. If False, returns a warning when the output directory already exists."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                      description_ja="処理結果jsonの保存先ファイルを指定。",
                      description_en="Specify the destination file for saving the processing result json."),
@@ -61,12 +66,11 @@ class TestGenTestSpec(feature.OneshotResultEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        input_json = Path(args.input_json) if args.input_json else None
-        if input_json is None:
-            msg = dict(warn="Please specify the --input_json option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
 
+        input_json = Path(args.input_json)
         if not input_json.exists():
             msg = dict(warn=f"input_json not found: {input_json}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -74,6 +78,14 @@ class TestGenTestSpec(feature.OneshotResultEdgeFeature):
 
         root_dir = Path(args.root_dir) if args.root_dir else Path.cwd()
         output_dir = Path(args.output_dir) if args.output_dir else root_dir / "Specifications_forUnitTest"
+        clear_output_dir = bool(args.clear_output_dir)
+
+        if output_dir.exists():
+            if not clear_output_dir:
+                msg = dict(warn=f"Output directory already exists: '{output_dir}'. Use --clear_output_dir True to overwrite.")
+                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, msg, None
+            shutil.rmtree(output_dir)
 
         try:
             documents = gen_test_spec.generate(
@@ -95,10 +107,3 @@ class TestGenTestSpec(feature.OneshotResultEdgeFeature):
         )
         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         return self.RESP_SUCCESS, msg, None
-
-    def is_cluster_redirect(self) -> bool:
-        return False
-
-    def svrun(self, data_dir: Path, logger: logging.Logger, redis_cli, msg: List[str],
-              sessions: Dict[str, Dict[str, Any]]) -> int:
-        return self.RESP_SUCCESS

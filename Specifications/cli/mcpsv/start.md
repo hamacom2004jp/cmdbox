@@ -9,7 +9,7 @@
 | クラス | McpsvStart |
 | モジュール | cmdbox.app.features.cli.cmdbox_mcpsv_start |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_mcpsv_start.py |
-| 継承元 | UnsupportEdgeFeature, Feature |
+| 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | はい |
 | Agent 利用 | いいえ |
@@ -36,7 +36,7 @@
 | --ssl_key | ファイル | いいえ | いいえ | はい | None | - | SSLサーバー秘密鍵ファイルを指定します。 |
 | --ssl_keypass | 文字列 | いいえ | いいえ | はい | None | - | SSLサーバー秘密鍵ファイルの複合化パスワードを指定します。 |
 | --ssl_ca_certs | ファイル | いいえ | いいえ | はい | None | - | SSLサーバーCA証明書ファイルを指定します。 |
-| --signin_file | ファイル | いいえ | いいえ | いいえ | .cmdbox/user_list.yml | - | サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。 |
+| --signin_file | ファイル | はい | いいえ | いいえ | .cmdbox/user_list.yml | - | サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。 |
 | --gunicorn_workers | 整数 | いいえ | いいえ | はい | 6 | - | gunicornワーカー数を指定します。Linux環境でのみ有効です。-1又は未指定の場合はCPU数を使用します。 |
 | --gunicorn_timeout | 整数 | いいえ | いいえ | はい | 900 | - | gunicornワーカーのタイムアウトの時間を秒で指定します。 |
 | -o, --output_json | ファイル | いいえ | いいえ | はい | None | - | 処理結果jsonの保存先ファイルを指定。 |
@@ -51,11 +51,11 @@
 
 - 実装元: McpsvStart
 - 役割: この機能の実行を行います
-- 終了コード候補: RESP_WARN, RESP_SUCCESS, INT_1
-- 結果キー候補: warn, success
+- 終了コード候補: RESP_SUCCESS, RESP_WARN, INT_1
+- 結果キー候補: success, warn
 - 処理フロー:
-  - 条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 args.signin_file is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - 例外処理を伴って処理する。主な呼出: web.Web.getInstance, signin.Signin, mcp_mod.Mcp, self.mcp.create_mcpserver, dict, mcp_app.add_middleware
   - Exception を捕捉した場合の代替経路を持つ（終了コード候補: RESP_WARN / 結果キー: warn）
 
@@ -68,19 +68,19 @@
 
 ## 処理結果
 
-- 終了コード候補: RESP_WARN, RESP_SUCCESS, INT_1
-- 結果キー候補: warn, success
+- 終了コード候補: RESP_SUCCESS, RESP_WARN, INT_1
+- 結果キー候補: success, warn
 - 戻り値の基本形: Tuple[int, Dict[str, Any], Any]
 
 ## 単体テスト観点
 
 - 選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する
-- 結果オブジェクトのキー warn, success が期待どおり構成されることを確認する
-- 終了コード RESP_WARN, RESP_SUCCESS, INT_1 の到達条件をそれぞれ検証する
+- 結果オブジェクトのキー success, warn が期待どおり構成されることを確認する
+- 終了コード RESP_SUCCESS, RESP_WARN, INT_1 の到達条件をそれぞれ検証する
 
 ## ソース参照
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_mcpsv_start.py
 - apprun 実装元: McpsvStart
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:10
+- 生成日時: 2026-04-23T23:40:03

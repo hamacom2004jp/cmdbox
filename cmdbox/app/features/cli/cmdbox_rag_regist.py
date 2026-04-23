@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.commons import convert, validator
 from cmdbox.app.features.cli.rag import rag_base, rag_store
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -10,7 +10,7 @@ import json
 import re
 
 
-class RagRegist(rag_base.RAGBase):
+class RagRegist(rag_base.RAGBase, validator.Validator):
 
     def get_mode(self) -> Union[str, List[str]]:
         """
@@ -88,24 +88,12 @@ class RagRegist(rag_base.RAGBase):
         )
 
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        if not hasattr(args, 'rag_name') or args.rag_name is None:
-            msg = dict(warn="Please specify --rag_name")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
+
         if not re.match(r'^[\w\-]+$', args.rag_name):
             msg = dict(warn="RAG name can only contain alphanumeric characters, underscores, and hyphens.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if not hasattr(args, 'data') or args.data is None:
-            msg = dict(warn="Please specify --data")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if not hasattr(args, 'groups') or args.groups is None:
-            msg = dict(warn="Please specify --groups")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if not hasattr(args, 'signin_file') or args.signin_file is None:
-            msg = dict(warn="Please specify --signin_file")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
 

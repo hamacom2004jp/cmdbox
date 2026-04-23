@@ -9,7 +9,7 @@
 | クラス | CmdboxDown |
 | モジュール | cmdbox.app.features.cli.cmdbox_cmdbox_down |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_down.py |
-| 継承元 | CmdboxBase, OneshotEdgeFeature, Feature |
+| 継承元 | CmdboxBase, OneshotEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | はい |
 | Agent 利用 | いいえ |
@@ -34,6 +34,8 @@
 - 役割: この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
 - 終了コード候補: RESP_SUCCESS, RESP_WARN
 - 処理フロー:
+  - (st, msg, obj) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - ret に self.down の結果を格納する
   - common.print_format を呼び出す
   - 条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN
@@ -61,4 +63,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_down.py
 - apprun 実装元: CmdboxDown
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:07
+- 生成日時: 2026-04-23T23:40:00

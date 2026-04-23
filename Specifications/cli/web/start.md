@@ -9,7 +9,7 @@
 | クラス | WebStart |
 | モジュール | cmdbox.app.features.cli.cmdbox_web_start |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_start.py |
-| 継承元 | UnsupportEdgeFeature, Feature |
+| 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | はい |
 | Agent 利用 | いいえ |
@@ -36,7 +36,7 @@
 | --ssl_key | ファイル | いいえ | いいえ | はい | None | - | SSLサーバー秘密鍵ファイルを指定します。 |
 | --ssl_keypass | 文字列 | いいえ | いいえ | はい | None | - | SSLサーバー秘密鍵ファイルの複合化パスワードを指定します。 |
 | --ssl_ca_certs | ファイル | いいえ | いいえ | はい | None | - | SSLサーバーCA証明書ファイルを指定します。 |
-| --signin_file | ファイル | いいえ | いいえ | いいえ | .cmdbox/user_list.yml | - | サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。 |
+| --signin_file | ファイル | はい | いいえ | いいえ | .cmdbox/user_list.yml | - | サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。 |
 | --session_domain | 文字列 | いいえ | いいえ | はい | None | - | サインインしたユーザーのセッションが有効なドメインを指定します。 |
 | --session_path | 文字列 | いいえ | いいえ | はい | / | - | サインインしたユーザーのセッションが有効なパスを指定します。 |
 | --session_secure | 真偽値 | いいえ | いいえ | はい | false | True, False | サインインしたユーザーのセッションにSecureフラグを設定します。 |
@@ -63,11 +63,11 @@
 
 - 実装元: WebStart
 - 役割: この機能の実行を行います  Args: logger (logging.Logger): ロガー args (argparse.Namespace): 引数 tm (float): 実行開始時間 pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報  Returns: Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
-- 終了コード候補: RESP_WARN, RESP_SUCCESS
+- 終了コード候補: RESP_SUCCESS, RESP_WARN
 - 結果キー候補: warn, success
 - 処理フロー:
-  - 条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 args.signin_file is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, obj) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - signin_file に Path の結果を格納する
   - 条件 signin_file is not None and (not signin_file.is_file()) を満たす場合は早期終了し、RESP_WARN。結果キー: warn
   - 例外処理を伴って処理する。主な呼出: self.createWeb, self.start, dict, common.print_format, Path, logger.error
@@ -82,7 +82,7 @@
 
 ## 処理結果
 
-- 終了コード候補: RESP_WARN, RESP_SUCCESS
+- 終了コード候補: RESP_SUCCESS, RESP_WARN
 - 結果キー候補: warn, success
 - 戻り値の基本形: Tuple[int, Dict[str, Any], Any]
 
@@ -108,11 +108,11 @@
 - 選択肢を持つパラメータ session_secure, client_only, stdout_log, capture_stdout の境界値と不正値を確認する
 - 複数値パラメータ outputs_key, assets の 0 件・1 件・複数件入力を確認する
 - 結果オブジェクトのキー warn, success が期待どおり構成されることを確認する
-- 終了コード RESP_WARN, RESP_SUCCESS の到達条件をそれぞれ検証する
+- 終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する
 
 ## ソース参照
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_start.py
 - apprun 実装元: WebStart
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:12
+- 生成日時: 2026-04-23T23:40:04

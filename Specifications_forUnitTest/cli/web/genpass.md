@@ -27,7 +27,7 @@
 
 ## 共通期待結果
 
-- 終了コード候補: INT_1, RESP_SUCCESS, RESP_WARN
+- 終了コード候補: RESP_SUCCESS, INT_1, RESP_WARN
 - 結果キー候補: warn, success, error
 
 ## 副作用確認観点
@@ -38,7 +38,7 @@
 
 - 選択肢を持つパラメータ use_alphabet, use_number, use_symbol, similar, stdout_log, capture_stdout の境界値と不正値を確認する
 - 結果オブジェクトのキー warn, success, error が期待どおり構成されることを確認する
-- 終了コード INT_1, RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する
+- 終了コード RESP_SUCCESS, INT_1, RESP_WARN の到達条件をそれぞれ検証する
 
 ## テストパターン
 
@@ -87,4 +87,4 @@
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_genpass.py
 - 詳細設計書: Specifications/cli/web/genpass.md
-- 生成日時: 2026-04-19T21:16:02
+- 生成日時: 2026-04-23T23:40:14

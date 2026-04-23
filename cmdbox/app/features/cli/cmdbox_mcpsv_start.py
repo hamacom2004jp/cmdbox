@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature, web
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from cmdbox.app import mcp as mcp_mod
 from cmdbox.app.auth import signin
@@ -12,7 +13,7 @@ import multiprocessing
 import os
 
 
-class McpsvStart(feature.UnsupportEdgeFeature):
+class McpsvStart(feature.UnsupportEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -110,14 +111,10 @@ class McpsvStart(feature.UnsupportEdgeFeature):
         """
         この機能の実行を行います
         """
-        if args.data is None:
-            msg = dict(warn=f"Please specify the --data option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if args.signin_file is None:
-            msg = dict(warn=f"Please specify the --signin_file option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
+
         try:
             # Signin 準備
             signin_file = None if not hasattr(args, 'signin_file') or args.signin_file is None else Path(args.signin_file)

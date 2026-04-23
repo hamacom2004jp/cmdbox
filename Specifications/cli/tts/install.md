@@ -9,7 +9,7 @@
 | クラス | TtsInstall |
 | モジュール | cmdbox.app.features.cli.cmdbox_tts_install |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_install.py |
-| 継承元 | UnsupportEdgeFeature, Feature |
+| 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | いいえ |
@@ -51,8 +51,9 @@
 - 終了コード候補: RESP_SUCCESS, RESP_WARN
 - 結果キー候補: warn
 - 処理フロー:
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - 条件 args.data is None and (not args.client_only) を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 args.tts_engine is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
   - 条件 args.tts_engine == 'voicevox' を満たす場合は早期終了し、RESP_WARN。結果キー: warn
   - 条件 args.client_only に応じて分岐する。主な呼出: self.install, convert.str2b64str, client.Client, cl.redis_cli.send_cmd, common.random_string, str
   - common.print_format を呼び出す
@@ -104,4 +105,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_install.py
 - apprun 実装元: TtsInstall
 - svrun 実装元: TtsInstall
-- 生成日時: 2026-04-19T20:59:11
+- 生成日時: 2026-04-23T23:40:04

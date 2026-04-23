@@ -58,4 +58,4 @@
 
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_uninstall.py
 - 詳細設計書: Specifications/cli/cmdbox/uninstall.md
-- 生成日時: 2026-04-19T21:16:02
+- 生成日時: 2026-04-23T23:40:14

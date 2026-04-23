@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, Union, List
 import argparse
@@ -6,7 +7,7 @@ import datetime
 import logging
 
 
-class ClientTime(feature.Feature):
+class ClientTime(feature.Feature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -33,7 +34,7 @@ class ClientTime(feature.Feature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
             description_ja="クライアント側の現在時刻を表示します。",
             description_en="Displays the current time at the client side.",
             choice=[
@@ -55,6 +56,10 @@ class ClientTime(feature.Feature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
+        st, msg, cl = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, cl
+
         tz = datetime.timezone(datetime.timedelta(hours=args.timedelta))
         dt = datetime.datetime.now(tz)
         ret = dict(success=dict(data=dt.strftime('%Y-%m-%d %H:%M:%S')))

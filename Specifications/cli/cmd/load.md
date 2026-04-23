@@ -9,7 +9,7 @@
 | クラス | CmdLoad |
 | モジュール | cmdbox.app.features.cli.cmdbox_cmd_load |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmd_load.py |
-| 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Feature |
+| 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | いいえ |
 | Agent 利用 | はい |
@@ -25,7 +25,7 @@
 | パラメータ | 型 | 必須 | 複数 | 非表示 | デフォルト | 選択肢 | 説明 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | --data | ディレクトリ | はい | いいえ | いいえ | C:\Users\hama\.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
-| --signin_file | ファイル | いいえ | いいえ | いいえ | None | - | サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。 |
+| --signin_file | ファイル | はい | いいえ | いいえ | .cmdbox/user_list.yml | - | サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。 |
 | --groups | 文字列 | いいえ | はい | はい | None | - | `signin_file` を指定した場合に、このユーザーグループに許可されているコマンドリストを返すように指定します。 |
 | --cmd_title | 文字列 | はい | いいえ | いいえ | None | - | 読込みたいコマンド名を指定します。 |
 | -o, --output_json | ファイル | いいえ | いいえ | はい | None | - | 処理結果jsonの保存先ファイルを指定。 |
@@ -43,10 +43,11 @@
 - 終了コード候補: RESP_SUCCESS, RESP_WARN
 - 結果キー候補: success, warn
 - 処理フロー:
-  - 条件 args.data is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
-  - 条件 args.cmd_title is None を満たす場合は早期終了し、RESP_WARN。結果キー: warn
+  - (st, msg, cl) に self.valid の結果を格納する
+  - 条件 st != self.RESP_SUCCESS を満たす場合は早期終了し、RESP_SUCCESS
   - 条件 not hasattr(self, 'signin_file_data') or self.signin_file_data is None に応じて分岐する。主な呼出: signin.Signin.load_signin_file, hasattr
   - opt に common.loadopt の結果を格納する
+  - 条件 not opt or 'cmd' not in opt or 'mode' not in opt を満たす場合は早期終了し、RESP_WARN。結果キー: warn
   - 条件 not signin.Signin._check_cmd(self.signin_file_data, args.groups, opt['mode'], opt['cmd'], args.__... を満たす場合は早期終了し、RESP_WARN。結果キー: warn
   - ret に dict の結果を格納する
   - common.print_format を呼び出す
@@ -79,4 +80,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmd_load.py
 - apprun 実装元: CmdLoad
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:07
+- 生成日時: 2026-04-23T23:40:00

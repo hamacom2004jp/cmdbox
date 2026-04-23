@@ -25,9 +25,11 @@ class Validator(feature.Feature):
             'data': self.valid_data,
             'signin_file': self.valid_signin_file,
         }
+        # 共通の引数のデフォルト値を設定
         if not hasattr(args, 'format'): setattr(args, 'format', False)
         if not hasattr(args, 'output_json'): setattr(args, 'output_json', None)
         if not hasattr(args, 'output_json_append'): setattr(args, 'output_json_append', False)
+        # 引数の検証
         for choice in choices:
             opt = choice.get('opt', None)
             default = choice.get('default', None)

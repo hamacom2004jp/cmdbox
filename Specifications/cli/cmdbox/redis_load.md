@@ -9,7 +9,7 @@
 | クラス | CmdboxRedisLoad |
 | モジュール | cmdbox.app.features.cli.cmdbox_cmdbox_redis_load |
 | 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_redis_load.py |
-| 継承元 | CmdboxBase, OneshotEdgeFeature, Feature |
+| 継承元 | CmdboxBase, OneshotEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | はい |
 | Agent 利用 | いいえ |
@@ -38,7 +38,7 @@
 - 結果キー候補: warn
 - 処理フロー:
   - common.set_debug を呼び出す
-  - 例外処理を伴って処理する。主な呼出: self.get_imgname, start_sh_hst.parent.mkdir, shutil.copytree, self.make_compose_redis, self.load, common.print_format
+  - 例外処理を伴って処理する。主な呼出: self.valid, self.get_imgname, start_sh_hst.parent.mkdir, shutil.copytree, self.make_compose_redis, self.load
 
 ### svrun
 
@@ -63,4 +63,4 @@
 - 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_redis_load.py
 - apprun 実装元: CmdboxRedisLoad
 - svrun 実装元: Feature
-- 生成日時: 2026-04-19T20:59:08
+- 生成日時: 2026-04-23T23:40:00
