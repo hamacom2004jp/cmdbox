@@ -1,0 +1,1213 @@
+{
+  "summary": {
+    "commands": 1,
+    "total": 52,
+    "passed": 29,
+    "failed": 23,
+    "skipped": 0
+  },
+  "results": [
+    {
+      "mode": "audit",
+      "cmd": "delete",
+      "total": 52,
+      "passed": 29,
+      "failed": 23,
+      "skipped": 0,
+      "test_cases": [
+        {
+          "id": "TC-001",
+          "category": "正常系",
+          "focus": "最小有効入力",
+          "input_pattern": "全パラメータ省略またはデフォルト値で実行する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:52:05",
+          "status": "failed",
+          "input_values": {
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-002",
+          "category": "型境界",
+          "focus": "pg_enabled=False",
+          "input_pattern": "--pg_enabled に False を指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:52:05",
+          "status": "failed",
+          "input_values": {
+            "pg_enabled": false,
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-003",
+          "category": "型境界",
+          "focus": "pg_enabled=True",
+          "input_pattern": "--pg_enabled に True を指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:52:06",
+          "status": "failed",
+          "input_values": {
+            "pg_enabled": false,
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-004",
+          "category": "型境界",
+          "focus": "pg_host 1文字",
+          "input_pattern": "--pg_host に 1 文字値 X を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:52:08",
+          "status": "passed",
+          "input_values": {
+            "pg_host": "に",
+            "host": "X",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "error": "Connected server failed or server not found. svname=cmdbox"
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'error': 'Connected server failed or server not found. svname=cmdbox'}",
+          "reason": "{'error': 'Connected server failed or server not found. svname=cmdbox'}"
+        },
+        {
+          "id": "TC-005",
+          "category": "型境界",
+          "focus": "pg_host 特殊文字",
+          "input_pattern": "--pg_host に a_日本語 space-_.#\"'&<> を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:54:46",
+          "status": "passed",
+          "input_values": {
+            "pg_host": "に",
+            "host": "a_日本語 space-_.#\"'&<>",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "error": "Connected server failed or server not found. svname=cmdbox"
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'error': 'Connected server failed or server not found. svname=cmdbox'}",
+          "reason": "{'error': 'Connected server failed or server not found. svname=cmdbox'}"
+        },
+        {
+          "id": "TC-006",
+          "category": "型境界",
+          "focus": "pg_host 長文",
+          "input_pattern": "--pg_host に 512 文字相当の文字列を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:55:23",
+          "status": "passed",
+          "input_values": {
+            "pg_host": "に",
+            "host": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "Invalid value for --host: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX (must be less than 512 characters)"
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'Invalid value for --host: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...",
+          "reason": "{'warn': 'Invalid value for --host: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..."
+        },
+        {
+          "id": "TC-007",
+          "category": "型境界",
+          "focus": "pg_port=0",
+          "input_pattern": "--pg_port に 0 を指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:55:23",
+          "status": "failed",
+          "input_values": {
+            "pg_port": 5432,
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-008",
+          "category": "型境界",
+          "focus": "pg_port=1",
+          "input_pattern": "--pg_port に 1 を指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:55:24",
+          "status": "failed",
+          "input_values": {
+            "pg_port": 5432,
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-009",
+          "category": "型境界",
+          "focus": "pg_port=-1",
+          "input_pattern": "--pg_port に -1 を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:55:25",
+          "status": "passed",
+          "input_values": {
+            "pg_port": 5432,
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}"
+        },
+        {
+          "id": "TC-010",
+          "category": "型境界",
+          "focus": "pg_port=2147483647",
+          "input_pattern": "--pg_port に 2147483647 を指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:55:26",
+          "status": "failed",
+          "input_values": {
+            "pg_port": 5432,
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-011",
+          "category": "型境界",
+          "focus": "pg_user 1文字",
+          "input_pattern": "--pg_user に 1 文字値 X を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:55:27",
+          "status": "passed",
+          "input_values": {
+            "pg_user": "X",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}"
+        },
+        {
+          "id": "TC-012",
+          "category": "型境界",
+          "focus": "pg_user 特殊文字",
+          "input_pattern": "--pg_user に a_日本語 space-_.#\"'&<> を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:55:29",
+          "status": "passed",
+          "input_values": {
+            "pg_user": "a_日本語 space-_.#\"'&<>",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}"
+        },
+        {
+          "id": "TC-013",
+          "category": "型境界",
+          "focus": "pg_user 長文",
+          "input_pattern": "--pg_user に 512 文字相当の文字列を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:55:30",
+          "status": "passed",
+          "input_values": {
+            "pg_user": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "Invalid value for --pg_user: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX (must be less than 512 characters)"
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'Invalid value for --pg_user: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...",
+          "reason": "{'warn': 'Invalid value for --pg_user: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..."
+        },
+        {
+          "id": "TC-014",
+          "category": "型境界",
+          "focus": "pg_password 1文字",
+          "input_pattern": "--pg_password に 1 文字値 X を指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:55:30",
+          "status": "failed",
+          "input_values": {
+            "pg_password": "に",
+            "password": "X",
+            "host": "localhost",
+            "port": 6379,
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "error": "Connected server failed or server not found. svname=cmdbox"
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'error': 'Connected server failed or server not found. svname=cmdbox'}",
+          "reason": "{'error': 'Connected server failed or server not found. svname=cmdbox'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-015",
+          "category": "型境界",
+          "focus": "pg_password 特殊文字",
+          "input_pattern": "--pg_password に a_日本語 space-_.#\"'&<> を指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:56:00",
+          "status": "failed",
+          "input_values": {
+            "pg_password": "に",
+            "password": "a_日本語 space-_.#\"'&<>",
+            "host": "localhost",
+            "port": 6379,
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "error": "Connected server failed or server not found. svname=cmdbox"
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'error': 'Connected server failed or server not found. svname=cmdbox'}",
+          "reason": "{'error': 'Connected server failed or server not found. svname=cmdbox'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-016",
+          "category": "型境界",
+          "focus": "pg_dbname 1文字",
+          "input_pattern": "--pg_dbname に 1 文字値 X を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:56:35",
+          "status": "passed",
+          "input_values": {
+            "pg_dbname": "X",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "error": "fail to execute command. cmd=audit_delete, msg=Response timed out."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'error': 'fail to execute command. cmd=audit_delete, msg=Response timed out.'}",
+          "reason": "{'error': 'fail to execute command. cmd=audit_delete, msg=Response timed out.'}"
+        },
+        {
+          "id": "TC-017",
+          "category": "型境界",
+          "focus": "pg_dbname 特殊文字",
+          "input_pattern": "--pg_dbname に a_日本語 space-_.#\"'&<> を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:56:50",
+          "status": "passed",
+          "input_values": {
+            "pg_dbname": "a_日本語 space-_.#\"'&<>",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "error": "fail to execute command. cmd=audit_delete, msg=Response timed out."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'error': 'fail to execute command. cmd=audit_delete, msg=Response timed out.'}",
+          "reason": "{'error': 'fail to execute command. cmd=audit_delete, msg=Response timed out.'}"
+        },
+        {
+          "id": "TC-018",
+          "category": "型境界",
+          "focus": "pg_dbname 長文",
+          "input_pattern": "--pg_dbname に 512 文字相当の文字列を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:57:05",
+          "status": "passed",
+          "input_values": {
+            "pg_dbname": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "Invalid value for --pg_dbname: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX (must be less than 512 characters)"
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'Invalid value for --pg_dbname: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...",
+          "reason": "{'warn': 'Invalid value for --pg_dbname: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..."
+        },
+        {
+          "id": "TC-019",
+          "category": "選択値境界",
+          "focus": "delete_audit_type 先頭選択肢",
+          "input_pattern": "--delete_audit_type に選択肢の先頭値  を指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:57:05",
+          "status": "failed",
+          "input_values": {
+            "delete_audit_type": "",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "error": "fail to execute command. cmd=audit_delete, msg=Response timed out."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'error': 'fail to execute command. cmd=audit_delete, msg=Response timed out.'}",
+          "reason": "{'error': 'fail to execute command. cmd=audit_delete, msg=Response timed out.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-020",
+          "category": "選択値境界",
+          "focus": "delete_audit_type 末尾選択肢",
+          "input_pattern": "--delete_audit_type に選択肢の末尾値 event を指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:57:20",
+          "status": "failed",
+          "input_values": {
+            "delete_audit_type": "event",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "error": "fail to execute command. cmd=audit_delete, msg=Response timed out."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'error': 'fail to execute command. cmd=audit_delete, msg=Response timed out.'}",
+          "reason": "{'error': 'fail to execute command. cmd=audit_delete, msg=Response timed out.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-021",
+          "category": "選択値境界",
+          "focus": "delete_audit_type 不正選択肢",
+          "input_pattern": "--delete_audit_type に選択肢外の値 INVALID_CHOICE を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:57:35",
+          "status": "passed",
+          "input_values": {
+            "delete_audit_type": "INVALID_CHOICE",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "ArgumentError: argument --delete_audit_type: invalid choice: 'INVALID_CHOICE' (choose from 'user', 'admin', 'system', 'auth', 'event')"
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': \"ArgumentError: argument --delete_audit_type: invalid choice: 'INVALID_CHOICE' (choose from 'user', 'admin', 'system', 'auth', 'event')\"}",
+          "reason": "{'warn': \"ArgumentError: argument --delete_audit_type: invalid choice: 'INVALID_CHOICE' (choose from 'user', 'admin', 'system', 'auth', 'event')\"}"
+        },
+        {
+          "id": "TC-022",
+          "category": "型境界",
+          "focus": "delete_audit_type 空文字",
+          "input_pattern": "--delete_audit_type に空文字を指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:57:35",
+          "status": "failed",
+          "input_values": {
+            "delete_audit_type": "",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "error": "fail to execute command. cmd=audit_delete, msg=Response timed out."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'error': 'fail to execute command. cmd=audit_delete, msg=Response timed out.'}",
+          "reason": "{'error': 'fail to execute command. cmd=audit_delete, msg=Response timed out.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-023",
+          "category": "型境界",
+          "focus": "delete_clmsg_id 空文字",
+          "input_pattern": "--delete_clmsg_id に空文字を指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:57:50",
+          "status": "failed",
+          "input_values": {
+            "delete_clmsg_id": "",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "error": "fail to execute command. cmd=audit_delete, msg=Response timed out."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'error': 'fail to execute command. cmd=audit_delete, msg=Response timed out.'}",
+          "reason": "{'error': 'fail to execute command. cmd=audit_delete, msg=Response timed out.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-024",
+          "category": "型境界",
+          "focus": "delete_clmsg_id 1文字",
+          "input_pattern": "--delete_clmsg_id に 1 文字値 X を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:58:06",
+          "status": "passed",
+          "input_values": {
+            "delete_clmsg_id": "X",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "error": "fail to execute command. cmd=audit_delete, msg=Response timed out."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'error': 'fail to execute command. cmd=audit_delete, msg=Response timed out.'}",
+          "reason": "{'error': 'fail to execute command. cmd=audit_delete, msg=Response timed out.'}"
+        },
+        {
+          "id": "TC-025",
+          "category": "型境界",
+          "focus": "delete_clmsg_id 特殊文字",
+          "input_pattern": "--delete_clmsg_id に a_日本語 space-_.#\"'&<> を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:58:21",
+          "status": "passed",
+          "input_values": {
+            "delete_clmsg_id": "a_日本語 space-_.#\"'&<>",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}"
+        },
+        {
+          "id": "TC-026",
+          "category": "型境界",
+          "focus": "delete_clmsg_id 長文",
+          "input_pattern": "--delete_clmsg_id に 512 文字相当の文字列を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:58:29",
+          "status": "passed",
+          "input_values": {
+            "delete_clmsg_id": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "Invalid value for --delete_clmsg_id: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX (must be less than 512 characters)"
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'Invalid value for --delete_clmsg_id: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...",
+          "reason": "{'warn': 'Invalid value for --delete_clmsg_id: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..."
+        },
+        {
+          "id": "TC-027",
+          "category": "型境界",
+          "focus": "delete_clmsg_src 空文字",
+          "input_pattern": "--delete_clmsg_src に空文字を指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:58:29",
+          "status": "failed",
+          "input_values": {
+            "delete_clmsg_src": "",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-028",
+          "category": "型境界",
+          "focus": "delete_clmsg_src 1文字",
+          "input_pattern": "--delete_clmsg_src に 1 文字値 X を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:58:32",
+          "status": "passed",
+          "input_values": {
+            "delete_clmsg_src": "X",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}"
+        },
+        {
+          "id": "TC-029",
+          "category": "型境界",
+          "focus": "delete_clmsg_src 特殊文字",
+          "input_pattern": "--delete_clmsg_src に a_日本語 space-_.#\"'&<> を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:58:42",
+          "status": "passed",
+          "input_values": {
+            "delete_clmsg_src": "a_日本語 space-_.#\"'&<>",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}"
+        },
+        {
+          "id": "TC-030",
+          "category": "型境界",
+          "focus": "delete_clmsg_src 長文",
+          "input_pattern": "--delete_clmsg_src に 512 文字相当の文字列を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:58:43",
+          "status": "passed",
+          "input_values": {
+            "delete_clmsg_src": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "Invalid value for --delete_clmsg_src: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX (must be less than 512 characters)"
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'Invalid value for --delete_clmsg_src: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...",
+          "reason": "{'warn': 'Invalid value for --delete_clmsg_src: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..."
+        },
+        {
+          "id": "TC-031",
+          "category": "型境界",
+          "focus": "delete_clmsg_title 空文字",
+          "input_pattern": "--delete_clmsg_title に空文字を指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:58:43",
+          "status": "failed",
+          "input_values": {
+            "delete_clmsg_title": "",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-032",
+          "category": "型境界",
+          "focus": "delete_clmsg_title 1文字",
+          "input_pattern": "--delete_clmsg_title に 1 文字値 X を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:58:44",
+          "status": "passed",
+          "input_values": {
+            "delete_clmsg_title": "X",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}"
+        },
+        {
+          "id": "TC-033",
+          "category": "型境界",
+          "focus": "delete_clmsg_title 特殊文字",
+          "input_pattern": "--delete_clmsg_title に a_日本語 space-_.#\"'&<> を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:58:46",
+          "status": "passed",
+          "input_values": {
+            "delete_clmsg_title": "a_日本語 space-_.#\"'&<>",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}"
+        },
+        {
+          "id": "TC-034",
+          "category": "型境界",
+          "focus": "delete_clmsg_title 長文",
+          "input_pattern": "--delete_clmsg_title に 512 文字相当の文字列を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:58:47",
+          "status": "passed",
+          "input_values": {
+            "delete_clmsg_title": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "Invalid value for --delete_clmsg_title: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX (must be less than 512 characters)"
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'Invalid value for --delete_clmsg_title: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...",
+          "reason": "{'warn': 'Invalid value for --delete_clmsg_title: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..."
+        },
+        {
+          "id": "TC-035",
+          "category": "型境界",
+          "focus": "delete_clmsg_user 空文字",
+          "input_pattern": "--delete_clmsg_user に空文字を指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:58:47",
+          "status": "failed",
+          "input_values": {
+            "delete_clmsg_user": "",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-036",
+          "category": "型境界",
+          "focus": "delete_clmsg_user 1文字",
+          "input_pattern": "--delete_clmsg_user に 1 文字値 X を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:58:48",
+          "status": "passed",
+          "input_values": {
+            "delete_clmsg_user": "X",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}"
+        },
+        {
+          "id": "TC-037",
+          "category": "型境界",
+          "focus": "delete_clmsg_user 特殊文字",
+          "input_pattern": "--delete_clmsg_user に a_日本語 space-_.#\"'&<> を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:58:49",
+          "status": "passed",
+          "input_values": {
+            "delete_clmsg_user": "a_日本語 space-_.#\"'&<>",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}"
+        },
+        {
+          "id": "TC-038",
+          "category": "型境界",
+          "focus": "delete_clmsg_user 長文",
+          "input_pattern": "--delete_clmsg_user に 512 文字相当の文字列を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:58:50",
+          "status": "passed",
+          "input_values": {
+            "delete_clmsg_user": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "Invalid value for --delete_clmsg_user: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX (must be less than 512 characters)"
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'Invalid value for --delete_clmsg_user: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...",
+          "reason": "{'warn': 'Invalid value for --delete_clmsg_user: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..."
+        },
+        {
+          "id": "TC-039",
+          "category": "複数値境界",
+          "focus": "delete_clmsg_body 0件",
+          "input_pattern": "--delete_clmsg_body に空配列または未指定を与える",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:58:51",
+          "status": "failed",
+          "input_values": {
+            "delete_clmsg_body": null,
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-040",
+          "category": "複数値境界",
+          "focus": "delete_clmsg_body 1件",
+          "input_pattern": "--delete_clmsg_body に 1 件だけ指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:58:51",
+          "status": "failed",
+          "reason": "IndexError: list index out of range",
+          "actual_code": null
+        },
+        {
+          "id": "TC-041",
+          "category": "複数値境界",
+          "focus": "delete_clmsg_body 複数件",
+          "input_pattern": "--delete_clmsg_body に 2 件以上指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:58:51",
+          "status": "failed",
+          "reason": "IndexError: list index out of range",
+          "actual_code": null
+        },
+        {
+          "id": "TC-042",
+          "category": "複数値境界",
+          "focus": "delete_clmsg_tag 0件",
+          "input_pattern": "--delete_clmsg_tag に空配列または未指定を与える",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:58:52",
+          "status": "failed",
+          "input_values": {
+            "delete_clmsg_tag": null,
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-043",
+          "category": "複数値境界",
+          "focus": "delete_clmsg_tag 1件",
+          "input_pattern": "--delete_clmsg_tag に 1 件だけ指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:58:53",
+          "status": "failed",
+          "input_values": {
+            "delete_clmsg_tag": "に",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-044",
+          "category": "複数値境界",
+          "focus": "delete_clmsg_tag 複数件",
+          "input_pattern": "--delete_clmsg_tag に 2 件以上指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:58:54",
+          "status": "failed",
+          "input_values": {
+            "delete_clmsg_tag": "に",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-045",
+          "category": "型境界",
+          "focus": "delete_clmsg_tag 空文字",
+          "input_pattern": "--delete_clmsg_tag に空文字を指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:58:55",
+          "status": "failed",
+          "input_values": {
+            "delete_clmsg_tag": "",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-046",
+          "category": "型境界",
+          "focus": "delete_clmsg_tag 1文字",
+          "input_pattern": "--delete_clmsg_tag に 1 文字値 X を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:58:57",
+          "status": "passed",
+          "input_values": {
+            "delete_clmsg_tag": "X",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}"
+        },
+        {
+          "id": "TC-047",
+          "category": "型境界",
+          "focus": "delete_clmsg_tag 特殊文字",
+          "input_pattern": "--delete_clmsg_tag に a_日本語 space-_.#\"'&<> を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:58:58",
+          "status": "passed",
+          "input_values": {
+            "delete_clmsg_tag": "a_日本語 space-_.#\"'&<>",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}"
+        },
+        {
+          "id": "TC-048",
+          "category": "型境界",
+          "focus": "delete_clmsg_tag 長文",
+          "input_pattern": "--delete_clmsg_tag に 512 文字相当の文字列を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:58:59",
+          "status": "passed",
+          "input_values": {
+            "delete_clmsg_tag": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "Invalid value for --delete_clmsg_tag: ['XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'] (each string must be less than 512 characters)"
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': \"Invalid value for --delete_clmsg_tag: ['XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...",
+          "reason": "{'warn': \"Invalid value for --delete_clmsg_tag: ['XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..."
+        },
+        {
+          "id": "TC-049",
+          "category": "型境界",
+          "focus": "delete_svmsg_id 空文字",
+          "input_pattern": "--delete_svmsg_id に空文字を指定する",
+          "expected_status": "RESP_SUCCESS",
+          "executed_at": "2026-04-26T09:58:59",
+          "status": "failed",
+          "input_values": {
+            "delete_svmsg_id": "",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}",
+          "expected_status_detail": "expected RESP_SUCCESS(0) but got RESP_WARN(1)"
+        },
+        {
+          "id": "TC-050",
+          "category": "型境界",
+          "focus": "delete_svmsg_id 1文字",
+          "input_pattern": "--delete_svmsg_id に 1 文字値 X を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:59:00",
+          "status": "passed",
+          "input_values": {
+            "delete_svmsg_id": "X",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}"
+        },
+        {
+          "id": "TC-051",
+          "category": "型境界",
+          "focus": "delete_svmsg_id 特殊文字",
+          "input_pattern": "--delete_svmsg_id に a_日本語 space-_.#\"'&<> を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:59:01",
+          "status": "passed",
+          "input_values": {
+            "delete_svmsg_id": "a_日本語 space-_.#\"'&<>",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "No data deleted."
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'No data deleted.'}",
+          "reason": "{'warn': 'No data deleted.'}"
+        },
+        {
+          "id": "TC-052",
+          "category": "型境界",
+          "focus": "delete_svmsg_id 長文",
+          "input_pattern": "--delete_svmsg_id に 512 文字相当の文字列を指定する",
+          "expected_status": "RESP_WARN",
+          "executed_at": "2026-04-26T09:59:03",
+          "status": "passed",
+          "input_values": {
+            "delete_svmsg_id": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "host": "localhost",
+            "port": 6379,
+            "password": "password",
+            "svname": "cmdbox"
+          },
+          "ret_msg": {
+            "warn": "Invalid value for --delete_svmsg_id: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX (must be less than 512 characters)"
+          },
+          "actual_code": 1,
+          "actual_status": "RESP_WARN",
+          "actual_result": "{'warn': 'Invalid value for --delete_svmsg_id: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...",
+          "reason": "{'warn': 'Invalid value for --delete_svmsg_id: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..."
+        }
+      ]
+    }
+  ]
+}

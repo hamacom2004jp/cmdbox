@@ -8,7 +8,7 @@
 | cmd | redis_install |
 | クラス | CmdboxRedisInstall |
 | モジュール | cmdbox.app.features.cli.cmdbox_cmdbox_redis_install |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_redis_install.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_redis_install.py |
 | 詳細設計書 | Specifications/cli/cmdbox/redis_install.md |
 | 実装上の必須推定 | - |
 
@@ -42,20 +42,19 @@
 | ID | 分類 | 観点 | 入力パターン | 期待終了コード | 期待結果 | 追加確認 |
 | --- | --- | --- | --- | --- | --- | --- |
 | TC-001 | 正常系 | 最小有効入力 | 全パラメータ省略またはデフォルト値で実行する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 戻り値以外の副作用がないことを確認する |
-| TC-002 | 型境界 | install_from 空文字 | --install_from に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-003 | 型境界 | install_from 1文字 | --install_from に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-004 | 型境界 | install_from 特殊文字 | --install_from に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-005 | 型境界 | install_from 長文 | --install_from に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-006 | 型境界 | install_tag 空文字 | --install_tag に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-007 | 型境界 | install_tag 1文字 | --install_tag に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-008 | 型境界 | install_tag 特殊文字 | --install_tag に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-009 | 型境界 | install_tag 長文 | --install_tag に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-010 | ファイルI/O | compose_path 有効入力ファイル | --compose_path に存在する妥当なファイルを指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 入力ファイル内容が意図どおり読み込まれることを確認する |
-| TC-011 | ファイルI/O | compose_path 存在しない入力ファイル | --compose_path に存在しないパスを指定する | RESP_WARN | ファイル未存在のエラーまたは警告が返る | 後続処理に進まず、副作用が発生しないことを確認する |
-| TC-012 | ファイルI/O | compose_path 空ファイル | --compose_path に 0 byte の空ファイルを指定する | RESP_WARN | フォーマット不正または入力不足として扱われる | 異常終了時のログやエラー文言が十分であることを確認する |
+| TC-002 | 型境界 | install_from 1文字 | --install_from に 1 文字値 X を指定する | RESP_WARN | 正常終了し、戻り値とログが期待どおりである | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-003 | 型境界 | install_from 特殊文字 | --install_from に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-004 | 型境界 | install_from 長文 | --install_from に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-005 | 型境界 | install_tag 空文字 | --install_tag に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
+| TC-006 | 型境界 | install_tag 1文字 | --install_tag に 1 文字値 X を指定する | RESP_WARN | 正常終了し、戻り値とログが期待どおりである | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-007 | 型境界 | install_tag 特殊文字 | --install_tag に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-008 | 型境界 | install_tag 長文 | --install_tag に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-009 | ファイルI/O | compose_path 有効入力ファイル | --compose_path に存在する妥当なファイルを指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 入力ファイル内容が意図どおり読み込まれることを確認する |
+| TC-010 | ファイルI/O | compose_path 存在しない入力ファイル | --compose_path に存在しないパスを指定する | RESP_WARN | ファイル未存在のエラーまたは警告が返る | 後続処理に進まず、副作用が発生しないことを確認する |
+| TC-011 | ファイルI/O | compose_path 空ファイル | --compose_path に 0 byte の空ファイルを指定する | RESP_WARN | フォーマット不正または入力不足として扱われる | 異常終了時のログやエラー文言が十分であることを確認する |
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_redis_install.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_redis_install.py
 - 詳細設計書: Specifications/cli/cmdbox/redis_install.md
-- 生成日時: 2026-04-23T23:40:14
+- 生成日時: 2026-04-26T00:53:18

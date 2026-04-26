@@ -8,7 +8,7 @@
 | cmd | agent_save |
 | クラス | AgentAgentSave |
 | モジュール | cmdbox.app.features.cli.cmdbox_agent_agent_save |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_save.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_save.py |
 | 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
@@ -32,7 +32,7 @@
 | --retry_interval | 整数 | いいえ | いいえ | はい | 5 | - | Redisサーバーに再接続までの秒数を指定します。 |
 | --timeout | 整数 | いいえ | いいえ | はい | 60 | - | サーバーの応答が返ってくるまでの最大待ち時間を指定。 |
 | --agent_name | 文字列 | はい | いいえ | いいえ | None | - | 保存するAgentの名前を指定します。 |
-| --agent_type | 文字列 | はい | いいえ | いいえ | local | , local, remote | Agentの種類を指定します。`local` または `remote` を指定します。 |
+| --agent_type | 文字列 | はい | いいえ | いいえ | local | local, remote | Agentの種類を指定します。`local` または `remote` を指定します。 |
 | --use_planner | 真偽値 | いいえ | いいえ | いいえ | false | False, True | エージェントの計画機能を使用するかどうかを指定します。 |
 | --a2asv_baseurl | 文字列 | いいえ | いいえ | いいえ | http://localhost:8071/a2a/<agent_name> | - | A2A Serverの基本URLを指定します。 |
 | --a2asv_delegated_auth | 真偽値 | いいえ | いいえ | いいえ | false | True, False | A2A Serverの認証を現在のログインユーザーのAPI Keyを使用して行います。 |
@@ -141,7 +141,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_save.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_save.py
 - apprun 実装元: AgentAgentSave
 - svrun 実装元: AgentAgentSave
-- 生成日時: 2026-04-23T23:39:56
+- 生成日時: 2026-04-26T00:53:04

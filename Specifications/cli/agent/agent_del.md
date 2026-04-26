@@ -8,7 +8,7 @@
 | cmd | agent_del |
 | クラス | AgentAgentDel |
 | モジュール | cmdbox.app.features.cli.cmdbox_agent_agent_del |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_del.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_del.py |
 | 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
@@ -81,7 +81,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_del.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_del.py
 - apprun 実装元: AgentAgentDel
 - svrun 実装元: AgentAgentDel
-- 生成日時: 2026-04-23T23:39:56
+- 生成日時: 2026-04-26T00:53:04

@@ -8,7 +8,7 @@
 | cmd | cell_values |
 | クラス | ExcelCellValues |
 | モジュール | cmdbox.app.features.cli.cmdbox_excel_cell_values |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_values.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_values.py |
 | 継承元 | ExcelBase, ResultEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | いいえ |
@@ -128,7 +128,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_values.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_values.py
 - apprun 実装元: ExcelBase
 - svrun 実装元: ExcelCellValues
-- 生成日時: 2026-04-23T23:40:01
+- 生成日時: 2026-04-26T00:53:07

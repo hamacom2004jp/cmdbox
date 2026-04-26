@@ -8,7 +8,7 @@
 | cmd | server_load |
 | クラス | CmdboxServerLoad |
 | モジュール | cmdbox.app.features.cli.cmdbox_cmdbox_server_load |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_server_load.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_server_load.py |
 | 継承元 | CmdboxBase, OneshotEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | はい |
@@ -24,7 +24,7 @@
 
 | パラメータ | 型 | 必須 | 複数 | 非表示 | デフォルト | 選択肢 | 説明 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| --data | ディレクトリ | いいえ | いいえ | いいえ | C:\Users\hama\.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
+| --data | ディレクトリ | いいえ | いいえ | いいえ | /home/ubuntu/.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
 | --image_file | ファイル | いいえ | いいえ | いいえ | None | - | 読込元イメージファイルを指定します。 |
 | --install_tag | 文字列 | いいえ | いいえ | いいえ | None | - | 指定すると作成するdockerイメージのタグ名に追記出来ます。 |
 | --install_use_gpu | 真偽値 | いいえ | いいえ | いいえ | false | True, False | GPUを使用するモジュール構成でインストールします。 |
@@ -71,7 +71,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_server_load.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_server_load.py
 - apprun 実装元: CmdboxServerLoad
 - svrun 実装元: Feature
-- 生成日時: 2026-04-23T23:40:00
+- 生成日時: 2026-04-26T00:53:06

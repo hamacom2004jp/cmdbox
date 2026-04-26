@@ -8,7 +8,7 @@
 | cmd | server_info |
 | クラス | ClientServerInfo |
 | モジュール | cmdbox.app.features.cli.cmdbox_client_server_info |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_server_info.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_server_info.py |
 | 詳細設計書 | Specifications/cli/client/server_info.md |
 | 実装上の必須推定 | - |
 
@@ -50,6 +50,6 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_server_info.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_server_info.py
 - 詳細設計書: Specifications/cli/client/server_info.md
-- 生成日時: 2026-04-23T23:40:13
+- 生成日時: 2026-04-26T00:53:18

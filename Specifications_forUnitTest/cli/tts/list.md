@@ -8,7 +8,7 @@
 | cmd | list |
 | クラス | TtsList |
 | モジュール | cmdbox.app.features.cli.cmdbox_tts_list |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_list.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_tts_list.py |
 | 詳細設計書 | Specifications/cli/tts/list.md |
 | 実装上の必須推定 | - |
 
@@ -48,14 +48,10 @@
 | TC-002 | 選択値境界 | tts_engine 先頭選択肢 | --tts_engine に選択肢の先頭値  を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, error が含まれる | 先頭選択肢でも分岐が正しく処理されることを確認する |
 | TC-003 | 選択値境界 | tts_engine 末尾選択肢 | --tts_engine に選択肢の末尾値 voicevox を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, error が含まれる | 末尾選択肢でも分岐が正しく処理されることを確認する |
 | TC-004 | 選択値境界 | tts_engine 不正選択肢 | --tts_engine に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
-| TC-005 | 型境界 | tts_engine 空文字 | --tts_engine に空文字を指定する | RESP_WARN | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-006 | 型境界 | tts_engine 1文字 | --tts_engine に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, error が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-007 | 型境界 | tts_engine 特殊文字 | --tts_engine に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-008 | 型境界 | tts_engine 長文 | --tts_engine に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-009 | 結果検証 | 結果キー整合性 | 正常系の代表入力で実行する | RESP_SUCCESS | 結果オブジェクトに success, error が含まれる | 不要なキー欠落や型崩れがないことを確認する |
+| TC-005 | 結果検証 | 結果キー整合性 | 正常系の代表入力で実行する | RESP_SUCCESS | 結果オブジェクトに success, error が含まれる | 不要なキー欠落や型崩れがないことを確認する |
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_list.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_tts_list.py
 - 詳細設計書: Specifications/cli/tts/list.md
-- 生成日時: 2026-04-23T23:40:14
+- 生成日時: 2026-04-26T00:53:18

@@ -63,7 +63,7 @@ class AgentAgentSave(feature.OneshotResultEdgeFeature, validator.Validator):
                     description_ja="保存するAgentの名前を指定します。",
                     description_en="Specify the name of the agent configuration to save."),
                 dict(opt="agent_type", type=Options.T_STR, default='local', required=True, multi=False, hide=False,
-                    choice=['', 'local', 'remote'],
+                    choice=['local', 'remote'],
                     choice_show=dict(local=["llm", "mcpservers", "subagents", "agent_description", "agent_instruction"],
                                      remote=["a2asv_baseurl", "a2asv_delegated_auth", "a2asv_apikey", "agent_description"]),
                     description_ja="Agentの種類を指定します。`local` または `remote` を指定します。",

@@ -8,7 +8,7 @@
 | cmd | file_upload |
 | クラス | ClientFileUpload |
 | モジュール | cmdbox.app.features.cli.cmdbox_client_file_upload |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_upload.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_upload.py |
 | 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | いいえ |
@@ -106,7 +106,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_upload.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_upload.py
 - apprun 実装元: ClientFileUpload
 - svrun 実装元: ClientFileUpload
-- 生成日時: 2026-04-23T23:39:59
+- 生成日時: 2026-04-26T00:53:06

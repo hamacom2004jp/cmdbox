@@ -8,7 +8,7 @@
 | cmd | delete |
 | クラス | AuditDelete |
 | モジュール | cmdbox.app.features.cli.cmdbox_audit_delete |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_audit_delete.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_audit_delete.py |
 | 継承元 | AuditBase, ResultEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | いいえ |
@@ -131,7 +131,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_audit_delete.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_audit_delete.py
 - apprun 実装元: AuditDelete
 - svrun 実装元: AuditDelete
-- 生成日時: 2026-04-23T23:39:59
+- 生成日時: 2026-04-26T00:53:05

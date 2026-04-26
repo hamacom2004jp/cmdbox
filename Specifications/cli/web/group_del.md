@@ -8,7 +8,7 @@
 | cmd | group_del |
 | クラス | WebGroupDel |
 | モジュール | cmdbox.app.features.cli.cmdbox_web_group_del |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_del.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_del.py |
 | 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | いいえ |
@@ -66,7 +66,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_del.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_del.py
 - apprun 実装元: WebGroupDel
 - svrun 実装元: Feature
-- 生成日時: 2026-04-23T23:40:04
+- 生成日時: 2026-04-26T00:53:09

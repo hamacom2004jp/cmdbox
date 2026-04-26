@@ -8,7 +8,7 @@
 | cmd | regist |
 | クラス | RagRegist |
 | モジュール | cmdbox.app.features.cli.cmdbox_rag_regist |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_regist.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_regist.py |
 | 継承元 | RAGBase, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
@@ -32,7 +32,7 @@
 | --retry_interval | 整数 | いいえ | いいえ | はい | 5 | - | Redisサーバーに再接続までの秒数を指定します。 |
 | --timeout | 整数 | いいえ | いいえ | はい | 120 | - | サーバーの応答が返ってくるまでの最大待ち時間を指定。 |
 | --rag_name | 文字列 | はい | いいえ | いいえ | None | - | 登録に使用するRAG設定の名前を指定します。 |
-| --data | ディレクトリ | はい | いいえ | いいえ | C:\Users\hama\.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
+| --data | ディレクトリ | はい | いいえ | いいえ | /home/ubuntu/.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
 | --signin_file | ファイル | はい | いいえ | いいえ | .cmdbox/user_list.yml | - | サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。 |
 | --groups | 文字列 | はい | はい | はい | None | - | `signin_file` を指定した場合に、このユーザーグループに許可されているコマンドリストを返すように指定します。 |
 | -o, --output_json | ファイル | いいえ | いいえ | はい | None | - | 処理結果jsonの保存先ファイルを指定。 |
@@ -78,7 +78,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_regist.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_regist.py
 - apprun 実装元: RagRegist
 - svrun 実装元: Feature
-- 生成日時: 2026-04-23T23:40:03
+- 生成日時: 2026-04-26T00:53:08

@@ -8,7 +8,7 @@
 | cmd | file_list |
 | クラス | ClientFileList |
 | モジュール | cmdbox.app.features.cli.cmdbox_client_file_list |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_list.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_list.py |
 | 詳細設計書 | Specifications/cli/client/file_list.md |
 | 実装上の必須推定 | - |
 
@@ -51,28 +51,23 @@
 | TC-003 | 複数値境界 | fwpath 0件 | --fwpath に空配列または未指定を与える | RESP_WARN | 0 件入力時の既定動作が仕様どおりである | 一覧条件や絞り込み結果が崩れないことを確認する |
 | TC-004 | 複数値境界 | fwpath 1件 | --fwpath に 1 件だけ指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 単一値で期待したフィルタリングまたは処理が行われることを確認する |
 | TC-005 | 複数値境界 | fwpath 複数件 | --fwpath に 2 件以上指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 順序・重複・集約結果が仕様どおりであることを確認する |
-| TC-006 | 型境界 | listregs 空文字 | --listregs に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-007 | 型境界 | listregs 1文字 | --listregs に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-008 | 型境界 | listregs 特殊文字 | --listregs に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-009 | 型境界 | listregs 長文 | --listregs に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-010 | 型境界 | recursive=False | --recursive に False を指定する | RESP_SUCCESS | False 分岐が正常に処理される | 既定値との差分がある場合は挙動の変化を確認する |
-| TC-011 | 型境界 | recursive=True | --recursive に True を指定する | RESP_SUCCESS | True 分岐が正常に処理される | 副作用がある場合は有効化に伴う成果物の差分を確認する |
-| TC-012 | 選択値境界 | scope 先頭選択肢 | --scope に選択肢の先頭値 client を指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 先頭選択肢でも分岐が正しく処理されることを確認する |
-| TC-013 | 選択値境界 | scope 末尾選択肢 | --scope に選択肢の末尾値 server を指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 末尾選択肢でも分岐が正しく処理されることを確認する |
-| TC-014 | 選択値境界 | scope 不正選択肢 | --scope に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
-| TC-015 | 型境界 | scope 空文字 | --scope に空文字を指定する | RESP_WARN | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-016 | 型境界 | scope 1文字 | --scope に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-017 | 型境界 | scope 特殊文字 | --scope に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-018 | 型境界 | scope 長文 | --scope に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-019 | 型境界 | client_data 空文字 | --client_data に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-020 | 型境界 | client_data 1文字 | --client_data に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-021 | 型境界 | client_data 特殊文字 | --client_data に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-022 | 型境界 | client_data 長文 | --client_data に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-023 | ファイルI/O | output_json 追記保存 | 既存の output_json を用意し、output_json_append=True で 2 回連続実行する | RESP_SUCCESS | 各回の結果が保存され、追記モードで既存内容が失われない | 1 回目より 2 回目のファイルサイズが増加し、追記後も JSON として解釈可能であることを確認する |
-| TC-024 | 副作用確認 | 成果物検証 | 副作用を発生させる有効入力で実行する | RESP_SUCCESS | 戻り値が正常であり、関連する成果物が期待どおり更新される | output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
+| TC-006 | 型境界 | listregs 1文字 | --listregs に 1 文字値 X を指定する | RESP_WARN | 正常終了し、戻り値とログが期待どおりである | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-007 | 型境界 | listregs 特殊文字 | --listregs に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-008 | 型境界 | listregs 長文 | --listregs に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-009 | 型境界 | recursive=False | --recursive に False を指定する | RESP_SUCCESS | False 分岐が正常に処理される | 既定値との差分がある場合は挙動の変化を確認する |
+| TC-010 | 型境界 | recursive=True | --recursive に True を指定する | RESP_SUCCESS | True 分岐が正常に処理される | 副作用がある場合は有効化に伴う成果物の差分を確認する |
+| TC-011 | 選択値境界 | scope 先頭選択肢 | --scope に選択肢の先頭値 client を指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 先頭選択肢でも分岐が正しく処理されることを確認する |
+| TC-012 | 選択値境界 | scope 末尾選択肢 | --scope に選択肢の末尾値 server を指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 末尾選択肢でも分岐が正しく処理されることを確認する |
+| TC-013 | 選択値境界 | scope 不正選択肢 | --scope に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
+| TC-014 | 型境界 | client_data 空文字 | --client_data に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
+| TC-015 | 型境界 | client_data 1文字 | --client_data に 1 文字値 X を指定する | RESP_WARN | 正常終了し、戻り値とログが期待どおりである | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-016 | 型境界 | client_data 特殊文字 | --client_data に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-017 | 型境界 | client_data 長文 | --client_data に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-018 | ファイルI/O | output_json 追記保存 | 既存の output_json を用意し、output_json_append=True で 2 回連続実行する | RESP_SUCCESS | 各回の結果が保存され、追記モードで既存内容が失われない | 1 回目より 2 回目のファイルサイズが増加し、追記後も JSON として解釈可能であることを確認する |
+| TC-019 | 副作用確認 | 成果物検証 | 副作用を発生させる有効入力で実行する | RESP_SUCCESS | 戻り値が正常であり、関連する成果物が期待どおり更新される | output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_list.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_list.py
 - 詳細設計書: Specifications/cli/client/file_list.md
-- 生成日時: 2026-04-23T23:40:13
+- 生成日時: 2026-04-26T00:53:18

@@ -8,7 +8,7 @@
 | cmd | config |
 | クラス | EdgeConfig |
 | モジュール | cmdbox.app.features.cli.cmdbox_edge_config |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_edge_config.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_edge_config.py |
 | 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | はい |
@@ -25,7 +25,7 @@
 | パラメータ | 型 | 必須 | 複数 | 非表示 | デフォルト | 選択肢 | 説明 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | --endpoint | 文字列 | いいえ | いいえ | いいえ | http://localhost:8081 | - | エンドポイントのURLを指定します。 |
-| --icon_path | ファイル | いいえ | いいえ | いいえ | F:\devenv\cmdbox\cmdbox\web\assets\cmdbox\favicon.ico | - | アイコン画像のパスを指定します。 |
+| --icon_path | ファイル | いいえ | いいえ | いいえ | /home/ubuntu/cmdbox/cmdbox/web/assets/cmdbox/favicon.ico | - | アイコン画像のパスを指定します。 |
 | --auth_type | 文字列 | いいえ | いいえ | いいえ | idpw | noauth, idpw, apikey, oauth2, saml | エンドポイント接続じの認証方式を指定します。 |
 | --user | 文字列 | いいえ | いいえ | いいえ | user | - | エンドポイントへの接続ユーザーを指定します。 |
 | --password | パスワード | いいえ | いいえ | いいえ | password | - | エンドポイントへの接続パスワードを指定します。 |
@@ -40,7 +40,7 @@
 | --saml_port | 整数 | いいえ | いいえ | いいえ | 8091 | - | SAML認証を使用する場合のコールバックポートを指定します。省略した時は `8091` を使用します。 |
 | --saml_tenant_id | 文字列 | いいえ | いいえ | いいえ | None | - | SAML認証を使用するときのテナントIDを指定します。 |
 | --saml_timeout | 整数 | いいえ | いいえ | いいえ | 60 | - | SAML認証が完了するまでのタイムアウト時間を指定します。 |
-| --data | ディレクトリ | いいえ | いいえ | はい | C:\Users\hama\.cmdbox | - | 省略した時は f`$HONE/.cmdbox` を使用します。 |
+| --data | ディレクトリ | いいえ | いいえ | はい | /home/ubuntu/.cmdbox | - | 省略した時は f`$HONE/.cmdbox` を使用します。 |
 | --svcert_no_verify | 真偽値 | いいえ | いいえ | はい | false | False, True | HTTPSリクエストの時にサーバー証明書の検証を行いません。 |
 | --timeout | 整数 | いいえ | いいえ | はい | 30 | - | リクエストが完了するまでのタイムアウト時間を指定します。 |
 
@@ -79,7 +79,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_edge_config.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_edge_config.py
 - apprun 実装元: EdgeConfig
 - svrun 実装元: Feature
-- 生成日時: 2026-04-23T23:40:00
+- 生成日時: 2026-04-26T00:53:06

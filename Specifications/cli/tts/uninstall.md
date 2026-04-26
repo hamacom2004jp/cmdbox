@@ -8,7 +8,7 @@
 | cmd | uninstall |
 | クラス | TtsUninstall |
 | モジュール | cmdbox.app.features.cli.cmdbox_tts_uninstall |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_uninstall.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_tts_uninstall.py |
 | 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | いいえ |
@@ -28,7 +28,7 @@
 | --port | 整数 | はい | いいえ | はい | 6379 | - | Redisサーバーのサービスポートを指定します。 |
 | --password | パスワード | はい | いいえ | はい | password | - | Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。 |
 | --svname | 文字列 | はい | いいえ | はい | cmdbox | - | サーバーのサービス名を指定します。省略時は `server` を使用します。 |
-| --data | ディレクトリ | いいえ | いいえ | いいえ | C:\Users\hama\.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
+| --data | ディレクトリ | いいえ | いいえ | いいえ | /home/ubuntu/.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
 | --retry_count | 整数 | いいえ | いいえ | はい | 3 | - | Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。 |
 | --retry_interval | 整数 | いいえ | いいえ | はい | 5 | - | Redisサーバーに再接続までの秒数を指定します。 |
 | --timeout | 整数 | いいえ | いいえ | はい | 300 | - | サーバーの応答が返ってくるまでの最大待ち時間を指定。 |
@@ -88,7 +88,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_uninstall.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_tts_uninstall.py
 - apprun 実装元: TtsUninstall
 - svrun 実装元: TtsUninstall
-- 生成日時: 2026-04-23T23:40:04
+- 生成日時: 2026-04-26T00:53:09

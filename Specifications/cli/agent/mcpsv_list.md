@@ -8,7 +8,7 @@
 | cmd | mcpsv_list |
 | クラス | AgentMcpList |
 | モジュール | cmdbox.app.features.cli.cmdbox_agent_mcpsv_list |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcpsv_list.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcpsv_list.py |
 | 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
@@ -78,7 +78,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcpsv_list.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcpsv_list.py
 - apprun 実装元: AgentMcpList
 - svrun 実装元: AgentMcpList
-- 生成日時: 2026-04-23T23:39:57
+- 生成日時: 2026-04-26T00:53:04

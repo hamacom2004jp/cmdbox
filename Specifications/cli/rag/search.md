@@ -8,7 +8,7 @@
 | cmd | search |
 | クラス | RagSearch |
 | モジュール | cmdbox.app.features.cli.cmdbox_rag_search |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_search.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_search.py |
 | 継承元 | RAGBase, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
@@ -38,7 +38,7 @@
 | --filter_origin_name | 文字列 | いいえ | いいえ | いいえ | None | - | フィルタ条件のorigin_nameを指定します。 |
 | --filter_dict | 辞書 | いいえ | はい | いいえ | None | - | 任意のフィルタ条件を指定します。cmetaの項目名と項目値を複数指定できます。項目値は `％` を使用することであいまい検索できます。 {args.query}という表記を含めるとqueryパラメータの値を使用できます。 |
 | --sort_dict | 辞書 | いいえ | はい | いいえ | None | , ASC, DESC | queryを指定しないときのソート条件を指定します。cmetaの項目名とソート順（ `ASC` (昇順) 又は `DESC` (降順)）を複数指定できます。 |
-| --data | ディレクトリ | はい | いいえ | いいえ | C:\Users\hama\.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
+| --data | ディレクトリ | はい | いいえ | いいえ | /home/ubuntu/.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
 | --signin_file | ファイル | はい | いいえ | いいえ | .cmdbox/user_list.yml | - | サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.cmdbox/user_list.yml' を指定します。 |
 | --groups | 文字列 | はい | はい | はい | None | - | `signin_file` を指定した場合に、このユーザーグループに許可されているコマンドリストを返すように指定します。 |
 | -o, --output_json | ファイル | いいえ | いいえ | はい | None | - | 処理結果jsonの保存先ファイルを指定。 |
@@ -84,7 +84,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_search.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_search.py
 - apprun 実装元: RagSearch
 - svrun 実装元: Feature
-- 生成日時: 2026-04-23T23:40:03
+- 生成日時: 2026-04-26T00:53:09

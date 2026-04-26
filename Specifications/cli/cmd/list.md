@@ -8,7 +8,7 @@
 | cmd | list |
 | クラス | CmdList |
 | モジュール | cmdbox.app.features.cli.cmdbox_cmd_list |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmd_list.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmd_list.py |
 | 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | いいえ |
@@ -24,7 +24,7 @@
 
 | パラメータ | 型 | 必須 | 複数 | 非表示 | デフォルト | 選択肢 | 説明 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| --data | ディレクトリ | はい | いいえ | いいえ | C:\Users\hama\.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
+| --data | ディレクトリ | はい | いいえ | いいえ | /home/ubuntu/.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
 | --kwd | 文字列 | いいえ | いいえ | いいえ | None | - | 検索したい名前を指定します。中間マッチで検索します。 |
 | --match_mode | 文字列 | いいえ | いいえ | いいえ | None | - | 検索したいコマンドのmode条件を指定します。中間マッチで検索します。 |
 | --match_cmd | 文字列 | いいえ | いいえ | いいえ | None | - | 検索したいコマンドのcmd条件を指定します。中間マッチで検索します。 |
@@ -82,7 +82,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmd_list.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmd_list.py
 - apprun 実装元: CmdList
 - svrun 実装元: Feature
-- 生成日時: 2026-04-23T23:40:00
+- 生成日時: 2026-04-26T00:53:06

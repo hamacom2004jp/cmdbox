@@ -8,7 +8,7 @@
 | cmd | say |
 | クラス | TtsSay |
 | モジュール | cmdbox.app.features.cli.cmdbox_tts_say |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_say.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_tts_say.py |
 | 継承元 | ResultEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | いいえ |
@@ -94,7 +94,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_say.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_tts_say.py
 - apprun 実装元: TtsSay
 - svrun 実装元: TtsSay
-- 生成日時: 2026-04-23T23:40:04
+- 生成日時: 2026-04-26T00:53:09

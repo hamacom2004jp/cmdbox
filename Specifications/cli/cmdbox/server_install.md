@@ -8,7 +8,7 @@
 | cmd | server_install |
 | クラス | CmdboxServerInstall |
 | モジュール | cmdbox.app.features.cli.cmdbox_cmdbox_server_install |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_server_install.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_server_install.py |
 | 継承元 | CmdboxBase, OneshotEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | はい |
@@ -24,8 +24,8 @@
 
 | パラメータ | 型 | 必須 | 複数 | 非表示 | デフォルト | 選択肢 | 説明 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| --data | ディレクトリ | いいえ | いいえ | いいえ | C:\Users\hama\.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
-| --install_cmdbox | 文字列 | いいえ | いいえ | はい | cmdbox==0.7.8.6 | - | 省略した時は `cmdbox==0.7.8.6` を使用します。 |
+| --data | ディレクトリ | いいえ | いいえ | いいえ | /home/ubuntu/.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
+| --install_cmdbox | 文字列 | いいえ | いいえ | はい | cmdbox==0.7.9 | - | 省略した時は `cmdbox==0.7.9` を使用します。 |
 | --install_from | 文字列 | いいえ | いいえ | いいえ | None | - | 作成するdockerイメージの元となるFROMイメージを指定します。 |
 | --install_no_python | 真偽値 | いいえ | いいえ | いいえ | false | True, False | pythonのインストールを行わないようにします。 |
 | --install_compile_python | 真偽値 | いいえ | いいえ | いいえ | false | True, False | python3をコンパイルしてインストールします。install_no_pythonが指定されるとそちらを優先します。 |
@@ -91,7 +91,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_server_install.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_server_install.py
 - apprun 実装元: CmdboxServerInstall
 - svrun 実装元: Feature
-- 生成日時: 2026-04-23T23:40:00
+- 生成日時: 2026-04-26T00:53:06

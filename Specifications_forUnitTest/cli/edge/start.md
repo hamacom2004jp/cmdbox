@@ -8,7 +8,7 @@
 | cmd | start |
 | クラス | EdgeStart |
 | モジュール | cmdbox.app.features.cli.cmdbox_edge_start |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_edge_start.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_edge_start.py |
 | 詳細設計書 | Specifications/cli/edge/start.md |
 | 実装上の必須推定 | - |
 
@@ -42,7 +42,7 @@
 
 | ID | 分類 | 観点 | 入力パターン | 期待終了コード | 期待結果 | 追加確認 |
 | --- | --- | --- | --- | --- | --- | --- |
-| TC-001 | 正常系 | 最小有効入力 | --data=C:\Users\hama\.cmdbox。任意パラメータは省略する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 戻り値以外の副作用がないことを確認する |
+| TC-001 | 正常系 | 最小有効入力 | --data=/home/ubuntu/.cmdbox。任意パラメータは省略する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success が含まれる | 戻り値以外の副作用がないことを確認する |
 | TC-002 | 型境界 | data 既存空ディレクトリ | --data に既存の空ディレクトリを指定する | RESP_SUCCESS | 空ディレクトリ前提の初期状態が正常に処理される | 必要な初期化ファイルやサブディレクトリが作成される場合は生成を確認する |
 | TC-003 | 型境界 | data 既存データありディレクトリ | --data に既存データを含むディレクトリを指定する | RESP_SUCCESS | 既存データを読み込む経路が正常に処理される | 既存ファイルを意図せず破壊しないことを確認する |
 | TC-004 | 型境界 | data 非存在ディレクトリ | --data に存在しないディレクトリを指定する | 異常系ステータス | 存在チェックエラーまたは初期化失敗が返る | 自動作成される仕様でない限り、ディレクトリが勝手に作成されないことを確認する |
@@ -50,6 +50,6 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_edge_start.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_edge_start.py
 - 詳細設計書: Specifications/cli/edge/start.md
-- 生成日時: 2026-04-23T23:40:14
+- 生成日時: 2026-04-26T00:53:18

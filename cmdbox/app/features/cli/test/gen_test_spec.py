@@ -32,7 +32,7 @@ from typing import Any
 
 INT_BOUNDARY_CANDIDATES = [0, 1, -1, 2147483647]
 FLOAT_BOUNDARY_CANDIDATES = [0.0, 1.0, -1.0, 1e308]
-SPECIAL_TEXT = "a_日本語 space-_.#"
+SPECIAL_TEXT = "a_日本語 space-_.#\"'&<>"
 EXCLUDED_PARAM_NAMES = {"host", "port", "password", "svname",
                         "retry_count", "retry_interval", "timeout",
                         "capture_stdout", "capture_maxsize",
@@ -76,7 +76,7 @@ def generate(
 
     documents: list[dict[str, Any]] = []
     for command_spec in command_specs:
-        document = build_unit_test_spec(command_spec, docs_dir, root_dir)
+        document = build_unit_test_spec(command_spec, docs_dir, root_dir, all_specs=command_specs)
         _write_document(document, root_dir)
         documents.append(document)
 
@@ -156,6 +156,7 @@ def build_unit_test_spec(
     command_spec: dict[str, Any],
     docs_dir: Path,
     root_dir: Path,
+    all_specs: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """コマンドの完全なユニットテスト仕様を構築します。
 
@@ -196,6 +197,8 @@ def build_unit_test_spec(
     except ValueError:
         output_file_rel = output_file.as_posix()
 
+    nouse_webmode = bool(command_spec.get("nouse_webmode", False))
+
     return {
         "mode": mode,
         "cmd": cmd,
@@ -206,6 +209,7 @@ def build_unit_test_spec(
         "source_file": command_spec.get("source_file", ""),
         "specification_file": command_spec.get("output_file", ""),
         "output_file": output_file_rel,
+        "nouse_webmode": nouse_webmode,
         "statuses": command_spec.get("statuses", []),
         "result_keys": command_spec.get("result_keys", []),
         "parameters": parameters,
@@ -213,6 +217,7 @@ def build_unit_test_spec(
         "test_viewpoints": command_spec.get("test_viewpoints", []),
         "artifact_checks": artifact_checks,
         "boundary_policy": _build_boundary_policy(parameters),
+        **_infer_pre_post_cmds(command_spec, all_specs or []),
         "test_cases": [
             {
                 "id": f"TC-{index:03d}",
@@ -222,6 +227,7 @@ def build_unit_test_spec(
                 "expected_status": case.expected_status,
                 "expected_result": case.expected_result,
                 "post_checks": case.post_checks,
+                "nouse_webmode": nouse_webmode,
             }
             for index, case in enumerate(test_cases, start=1)
         ],
@@ -489,8 +495,10 @@ def _build_parameter_boundary_cases(
             )
 
     elif param_type in {"str", "text", "passwd"}:
-        cases.extend(
-            [
+        has_default = parameter.get("default") not in (None, "None", "")
+        str_cases: list[TestCase] = []
+        if not has_default:
+            str_cases.append(
                 TestCase(
                     category="型境界",
                     focus=f"{name} 空文字",
@@ -498,33 +506,61 @@ def _build_parameter_boundary_cases(
                     expected_status=warning_status if is_required else success_status,
                     expected_result="空文字の扱いが省略と区別され、検証結果が仕様どおりになる",
                     post_checks="エラー時は副作用が発生しないことを確認する",
-                ),
-                TestCase(
-                    category="型境界",
-                    focus=f"{name} 1文字",
-                    input_pattern=f"{_format_parameter_name(parameter)} に 1 文字値 X を指定する",
-                    expected_status=success_status,
-                    expected_result=_build_success_result_text(result_keys),
-                    post_checks="最短相当の入力でも分岐や検索条件が崩れないことを確認する",
-                ),
-                TestCase(
-                    category="型境界",
-                    focus=f"{name} 特殊文字",
-                    input_pattern=f"{_format_parameter_name(parameter)} に {SPECIAL_TEXT} を指定する",
-                    expected_status=success_status,
-                    expected_result="日本語・空白・記号を含む入力が正しく受理される",
-                    post_checks="文字化けやエスケープ漏れがないことを確認する",
-                ),
-                TestCase(
-                    category="型境界",
-                    focus=f"{name} 長文",
-                    input_pattern=f"{_format_parameter_name(parameter)} に {validator.LONG_TEXT_BOUNDARY} 文字相当の文字列を指定する",
-                    expected_status=warning_status,
-                    expected_result=f"{validator.LONG_TEXT_BOUNDARY} 文字を超える入力は検証エラーまたは警告になる",
-                    post_checks="エラー時は副作用が発生しないことを確認する",
-                ),
-            ]
-        )
+                )
+            )
+        if not choices:
+            if param_type in {"text", "passwd"}:
+                str_cases.extend(
+                    [
+                        TestCase(
+                            category="型境界",
+                            focus=f"{name} 1文字",
+                            input_pattern=f"{_format_parameter_name(parameter)} に 1 文字値 X を指定する",
+                            expected_status=success_status,
+                            expected_result=_build_success_result_text(result_keys),
+                            post_checks="最短相当の入力でも分岐や検索条件が崩れないことを確認する",
+                        ),
+                        TestCase(
+                            category="型境界",
+                            focus=f"{name} 特殊文字",
+                            input_pattern=f"{_format_parameter_name(parameter)} に {SPECIAL_TEXT} を指定する",
+                            expected_status=success_status,
+                            expected_result="日本語・空白・記号を含む入力が正しく受理される",
+                            post_checks="文字化けやエスケープ漏れがないことを確認する",
+                        ),
+                    ]
+                )
+            else:
+                str_cases.extend(
+                    [
+                        TestCase(
+                            category="型境界",
+                            focus=f"{name} 1文字",
+                            input_pattern=f"{_format_parameter_name(parameter)} に 1 文字値 X を指定する",
+                            expected_status=success_status if choices!=[] else warning_status,
+                            expected_result=_build_success_result_text(result_keys),
+                            post_checks="最短相当の入力でも分岐や検索条件が崩れないことを確認する",
+                        ),
+                        TestCase(
+                            category="型境界",
+                            focus=f"{name} 特殊文字",
+                            input_pattern=f"{_format_parameter_name(parameter)} に {SPECIAL_TEXT} を指定する",
+                            expected_status=success_status if choices!=[] else warning_status,
+                            expected_result="日本語・空白・記号を含む入力が正しく受理される",
+                            post_checks="文字化けやエスケープ漏れがないことを確認する",
+                        ),
+                        TestCase(
+                            category="型境界",
+                            focus=f"{name} 長文",
+                            input_pattern=f"{_format_parameter_name(parameter)} に {validator.LONG_TEXT_BOUNDARY} 文字相当の文字列を指定する",
+                            expected_status=warning_status,
+                            expected_result=f"{validator.LONG_TEXT_BOUNDARY} 文字を超える入力は検証エラーまたは警告になる",
+                            post_checks="エラー時は副作用が発生しないことを確認する",
+                        ),
+                    ]
+                )
+
+        cases.extend(str_cases)
 
     elif param_type == "dir":
         cases.extend(
@@ -1164,6 +1200,57 @@ def _join_items(items: list[str], fallback: str) -> str:
 # ---------------------------------------------------------------------------
 # ファイル書き出し
 # ---------------------------------------------------------------------------
+
+def _infer_pre_post_cmds(
+    command_spec: dict[str, Any],
+    all_specs: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """コマンド名のパターンに基づいて pre_cmds / post_cmds を推論します。
+
+    - del / *_del コマンド: 対応する save / *_save を pre_cmds に追加
+    - load コマンド: 対応する save を pre_cmds に追加
+    - save コマンド: 対応する del を post_cmds に追加
+
+    各コマンドリストは {"mode": ..., "cmd": ..., "note": ...} の辞書リストです。
+
+    Args:
+        command_spec: 対象コマンドの仕様
+        all_specs: 全コマンド仕様リスト
+
+    Returns:
+        {"pre_cmds": [...], "post_cmds": [...]} を含む辞書
+    """
+    mode = command_spec["mode"]
+    cmd = command_spec["cmd"]
+
+    existing = {(s["mode"], s["cmd"]) for s in all_specs}
+
+    pre_cmds: list[dict[str, Any]] = []
+    post_cmds: list[dict[str, Any]] = []
+
+    # del / *_del → 対応 save / *_save を pre_cmds に
+    if cmd == "del" or cmd.endswith("_del"):
+        prefix = cmd[: -len("_del")] if cmd.endswith("_del") else ""
+        save_cmd = f"{prefix}_save" if prefix else "save"
+        if (mode, save_cmd) in existing:
+            pre_cmds.append({"mode": mode, "cmd": save_cmd, "note": f"Prepare data for {cmd}"})
+
+    # load → 対応 save を pre_cmds に
+    elif cmd == "load" or cmd.endswith("_load"):
+        prefix = cmd[: -len("_load")] if cmd.endswith("_load") else ""
+        save_cmd = f"{prefix}_save" if prefix else "save"
+        if (mode, save_cmd) in existing:
+            pre_cmds.append({"mode": mode, "cmd": save_cmd, "note": f"Prepare data for {cmd}"})
+
+    # save → 対応 del を post_cmds に（クリーンアップ）
+    elif cmd == "save" or cmd.endswith("_save"):
+        prefix = cmd[: -len("_save")] if cmd.endswith("_save") else ""
+        del_cmd = f"{prefix}_del" if prefix else "del"
+        if (mode, del_cmd) in existing:
+            post_cmds.append({"mode": mode, "cmd": del_cmd, "note": f"Cleanup data after {cmd}"})
+
+    return {"pre_cmds": pre_cmds, "post_cmds": post_cmds}
+
 
 def _write_document(document: dict[str, Any], root_dir: Path) -> None:
     """1つのユニットテスト仕様書をマークダウンファイルとして書き出します。

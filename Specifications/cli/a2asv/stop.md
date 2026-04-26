@@ -8,7 +8,7 @@
 | cmd | stop |
 | クラス | A2asvStop |
 | モジュール | cmdbox.app.features.cli.cmdbox_a2asv_stop |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_a2asv_stop.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_a2asv_stop.py |
 | 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | はい |
@@ -24,7 +24,7 @@
 
 | パラメータ | 型 | 必須 | 複数 | 非表示 | デフォルト | 選択肢 | 説明 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| --data | ディレクトリ | いいえ | いいえ | いいえ | C:\Users\hama\.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
+| --data | ディレクトリ | いいえ | いいえ | いいえ | /home/ubuntu/.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
 | -o, --output_json | ファイル | いいえ | いいえ | はい | None | - | 処理結果jsonの保存先ファイルを指定。 |
 | -a, --output_json_append | 真偽値 | いいえ | いいえ | はい | false | True, False | 処理結果jsonファイルを追記保存します。 |
 | --stdout_log | 真偽値 | いいえ | いいえ | はい | true | True, False | GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。 |
@@ -66,7 +66,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_a2asv_stop.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_a2asv_stop.py
 - apprun 実装元: A2asvStop
 - svrun 実装元: Feature
-- 生成日時: 2026-04-23T23:39:56
+- 生成日時: 2026-04-26T00:53:04

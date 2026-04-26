@@ -8,7 +8,7 @@
 | cmd | search |
 | クラス | RagSearch |
 | モジュール | cmdbox.app.features.cli.cmdbox_rag_search |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_search.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_search.py |
 | 詳細設計書 | Specifications/cli/rag/search.md |
 | 実装上の必須推定 | - |
 
@@ -47,15 +47,15 @@
 
 | ID | 分類 | 観点 | 入力パターン | 期待終了コード | 期待結果 | 追加確認 |
 | --- | --- | --- | --- | --- | --- | --- |
-| TC-001 | 正常系 | 最小有効入力 | --rag_name=enabled_value、--kcount=5、--data=C:\Users\hama\.cmdbox、--signin_file=.cmdbox/user_list.yml、--groups=enabled_value。任意パラメータは省略する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
+| TC-001 | 正常系 | 最小有効入力 | --rag_name=enabled_value、--kcount=5、--data=/home/ubuntu/.cmdbox、--signin_file=.cmdbox/user_list.yml、--groups=enabled_value。任意パラメータは省略する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
 | TC-002 | 必須チェック | rag_name 未指定 | --rag_name を省略し、他の必須パラメータは有効値を指定する | RESP_WARN | --rag_name の不足を示すエラーまたは警告が返る | 処理を継続せず、副作用が発生しないことを確認する |
 | TC-003 | 型境界 | rag_name 空文字 | --rag_name に空文字を指定する | RESP_WARN | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-004 | 型境界 | rag_name 1文字 | --rag_name に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-005 | 型境界 | rag_name 特殊文字 | --rag_name に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-004 | 型境界 | rag_name 1文字 | --rag_name に 1 文字値 X を指定する | RESP_WARN | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-005 | 型境界 | rag_name 特殊文字 | --rag_name に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
 | TC-006 | 型境界 | rag_name 長文 | --rag_name に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-007 | 型境界 | query 空文字 | --query に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-008 | 型境界 | query 1文字 | --query に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-009 | 型境界 | query 特殊文字 | --query に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-008 | 型境界 | query 1文字 | --query に 1 文字値 X を指定する | RESP_WARN | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-009 | 型境界 | query 特殊文字 | --query に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
 | TC-010 | 型境界 | query 長文 | --query に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-011 | 型境界 | kcount=0 | --kcount に 0 を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 数値が内部で丸められず、そのまま評価されることを確認する |
 | TC-012 | 型境界 | kcount=1 | --kcount に 1 を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 数値が内部で丸められず、そのまま評価されることを確認する |
@@ -65,12 +65,12 @@
 | TC-016 | 複数値境界 | select 1件 | --select に 1 件だけ指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 単一値で期待したフィルタリングまたは処理が行われることを確認する |
 | TC-017 | 複数値境界 | select 複数件 | --select に 2 件以上指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 順序・重複・集約結果が仕様どおりであることを確認する |
 | TC-018 | 型境界 | select 空文字 | --select に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-019 | 型境界 | select 1文字 | --select に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-020 | 型境界 | select 特殊文字 | --select に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-019 | 型境界 | select 1文字 | --select に 1 文字値 X を指定する | RESP_WARN | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-020 | 型境界 | select 特殊文字 | --select に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
 | TC-021 | 型境界 | select 長文 | --select に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-022 | 型境界 | filter_origin_name 空文字 | --filter_origin_name に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-023 | 型境界 | filter_origin_name 1文字 | --filter_origin_name に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-024 | 型境界 | filter_origin_name 特殊文字 | --filter_origin_name に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-023 | 型境界 | filter_origin_name 1文字 | --filter_origin_name に 1 文字値 X を指定する | RESP_WARN | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-024 | 型境界 | filter_origin_name 特殊文字 | --filter_origin_name に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
 | TC-025 | 型境界 | filter_origin_name 長文 | --filter_origin_name に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-026 | 複数値境界 | filter_dict 0件 | --filter_dict に空配列または未指定を与える | RESP_SUCCESS | 0 件入力時の既定動作が仕様どおりである | 一覧条件や絞り込み結果が崩れないことを確認する |
 | TC-027 | 複数値境界 | filter_dict 1件 | --filter_dict に 1 件だけ指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 単一値で期待したフィルタリングまたは処理が行われることを確認する |
@@ -92,8 +92,8 @@
 | TC-043 | 複数値境界 | groups 1件 | --groups に 1 件だけ指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 単一値で期待したフィルタリングまたは処理が行われることを確認する |
 | TC-044 | 複数値境界 | groups 複数件 | --groups に 2 件以上指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 順序・重複・集約結果が仕様どおりであることを確認する |
 | TC-045 | 型境界 | groups 空文字 | --groups に空文字を指定する | RESP_WARN | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-046 | 型境界 | groups 1文字 | --groups に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-047 | 型境界 | groups 特殊文字 | --groups に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-046 | 型境界 | groups 1文字 | --groups に 1 文字値 X を指定する | RESP_WARN | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-047 | 型境界 | groups 特殊文字 | --groups に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
 | TC-048 | 型境界 | groups 長文 | --groups に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-049 | ファイルI/O | output_json 追記保存 | 既存の output_json を用意し、output_json_append=True で 2 回連続実行する | RESP_SUCCESS | 各回の結果が保存され、追記モードで既存内容が失われない | 1 回目より 2 回目のファイルサイズが増加し、追記後も JSON として解釈可能であることを確認する |
 | TC-050 | 副作用確認 | 成果物検証 | 副作用を発生させる有効入力で実行する | RESP_SUCCESS | 戻り値が正常であり、関連する成果物が期待どおり更新される | output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
@@ -101,6 +101,6 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_search.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_search.py
 - 詳細設計書: Specifications/cli/rag/search.md
-- 生成日時: 2026-04-23T23:40:14
+- 生成日時: 2026-04-26T00:53:18

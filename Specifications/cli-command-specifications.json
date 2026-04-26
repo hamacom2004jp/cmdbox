@@ -11,10 +11,10 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_a2asv_start.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_a2asv_start.py",
     "output_file": "Specifications/cli/a2asv/start.md",
     "use_redis": 1,
-    "nouse_webmode": false,
+    "nouse_webmode": true,
     "use_agent": false,
     "cluster_redirect": "不明",
     "parameters": [
@@ -84,7 +84,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": false,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -382,7 +382,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:56"
+    "generated_at": "2026-04-26T00:53:03"
   },
   {
     "mode": "a2asv",
@@ -396,7 +396,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_a2asv_stop.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_a2asv_stop.py",
     "output_file": "Specifications/cli/a2asv/stop.md",
     "use_redis": 1,
     "nouse_webmode": true,
@@ -409,7 +409,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": false,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -555,7 +555,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:56"
+    "generated_at": "2026-04-26T00:53:04"
   },
   {
     "mode": "agent",
@@ -570,7 +570,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_del.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_del.py",
     "output_file": "Specifications/cli/agent/agent_del.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -851,7 +851,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:56"
+    "generated_at": "2026-04-26T00:53:04"
   },
   {
     "mode": "agent",
@@ -866,7 +866,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_list.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_list.py",
     "output_file": "Specifications/cli/agent/agent_list.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -1143,7 +1143,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:56"
+    "generated_at": "2026-04-26T00:53:04"
   },
   {
     "mode": "agent",
@@ -1158,7 +1158,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_load.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_load.py",
     "output_file": "Specifications/cli/agent/agent_load.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -1439,7 +1439,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:56"
+    "generated_at": "2026-04-26T00:53:04"
   },
   {
     "mode": "agent",
@@ -1454,7 +1454,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_save.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_save.py",
     "output_file": "Specifications/cli/agent/agent_save.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -1593,7 +1593,6 @@
         "fileio": null,
         "web": null,
         "choices": [
-          "",
           "local",
           "remote"
         ],
@@ -1967,7 +1966,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:56"
+    "generated_at": "2026-04-26T00:53:04"
   },
   {
     "mode": "agent",
@@ -1982,7 +1981,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_chat.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_chat.py",
     "output_file": "Specifications/cli/agent/chat.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -2436,7 +2435,7 @@
       "結果オブジェクトのキー success, warn, end が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, INT_0, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:57"
+    "generated_at": "2026-04-26T00:53:04"
   },
   {
     "mode": "agent",
@@ -2450,7 +2449,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcp_client.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcp_client.py",
     "output_file": "Specifications/cli/agent/mcp_client.md",
     "use_redis": -1,
     "nouse_webmode": false,
@@ -2773,7 +2772,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_ERROR の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:57"
+    "generated_at": "2026-04-26T00:53:04"
   },
   {
     "mode": "agent",
@@ -2787,7 +2786,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcp_proxy.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcp_proxy.py",
     "output_file": "Specifications/cli/agent/mcp_proxy.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -2914,7 +2913,7 @@
       "結果オブジェクトのキー info, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_ERROR の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:57"
+    "generated_at": "2026-04-26T00:53:04"
   },
   {
     "mode": "agent",
@@ -2929,7 +2928,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcpsv_del.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcpsv_del.py",
     "output_file": "Specifications/cli/agent/mcpsv_del.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -3210,7 +3209,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:57"
+    "generated_at": "2026-04-26T00:53:04"
   },
   {
     "mode": "agent",
@@ -3225,7 +3224,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcpsv_list.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcpsv_list.py",
     "output_file": "Specifications/cli/agent/mcpsv_list.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -3502,7 +3501,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:57"
+    "generated_at": "2026-04-26T00:53:04"
   },
   {
     "mode": "agent",
@@ -3517,7 +3516,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcpsv_load.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcpsv_load.py",
     "output_file": "Specifications/cli/agent/mcpsv_load.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -3798,7 +3797,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:57"
+    "generated_at": "2026-04-26T00:53:04"
   },
   {
     "mode": "agent",
@@ -3813,7 +3812,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcpsv_save.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcpsv_save.py",
     "output_file": "Specifications/cli/agent/mcpsv_save.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -4176,7 +4175,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:58"
+    "generated_at": "2026-04-26T00:53:04"
   },
   {
     "mode": "agent",
@@ -4191,7 +4190,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_del.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_del.py",
     "output_file": "Specifications/cli/agent/memory_del.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -4439,7 +4438,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:58"
+    "generated_at": "2026-04-26T00:53:04"
   },
   {
     "mode": "agent",
@@ -4454,7 +4453,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_list.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_list.py",
     "output_file": "Specifications/cli/agent/memory_list.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -4731,7 +4730,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:58"
+    "generated_at": "2026-04-26T00:53:04"
   },
   {
     "mode": "agent",
@@ -4746,7 +4745,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_load.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_load.py",
     "output_file": "Specifications/cli/agent/memory_load.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -4994,7 +4993,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:58"
+    "generated_at": "2026-04-26T00:53:04"
   },
   {
     "mode": "agent",
@@ -5009,7 +5008,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_save.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_save.py",
     "output_file": "Specifications/cli/agent/memory_save.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -5446,7 +5445,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:58"
+    "generated_at": "2026-04-26T00:53:04"
   },
   {
     "mode": "agent",
@@ -5461,7 +5460,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_status.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_status.py",
     "output_file": "Specifications/cli/agent/memory_status.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -5864,7 +5863,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_0, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:58"
+    "generated_at": "2026-04-26T00:53:05"
   },
   {
     "mode": "agent",
@@ -5879,7 +5878,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_runner_del.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_runner_del.py",
     "output_file": "Specifications/cli/agent/runner_del.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -6160,7 +6159,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:58"
+    "generated_at": "2026-04-26T00:53:05"
   },
   {
     "mode": "agent",
@@ -6175,7 +6174,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_runner_list.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_runner_list.py",
     "output_file": "Specifications/cli/agent/runner_list.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -6452,7 +6451,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:58"
+    "generated_at": "2026-04-26T00:53:05"
   },
   {
     "mode": "agent",
@@ -6467,7 +6466,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_runner_load.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_runner_load.py",
     "output_file": "Specifications/cli/agent/runner_load.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -6748,7 +6747,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:58"
+    "generated_at": "2026-04-26T00:53:05"
   },
   {
     "mode": "agent",
@@ -6763,7 +6762,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_runner_save.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_runner_save.py",
     "output_file": "Specifications/cli/agent/runner_save.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -7346,7 +7345,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:58"
+    "generated_at": "2026-04-26T00:53:05"
   },
   {
     "mode": "agent",
@@ -7361,7 +7360,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_session_del.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_session_del.py",
     "output_file": "Specifications/cli/agent/session_del.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -7623,7 +7622,7 @@
           "payload に dict の結果を格納する",
           "payload_b64 に convert.str2b64str の結果を格納する",
           "cl に client.Client の結果を格納する",
-          "ret に cl.redis_cli.send_cmd_sse の結果を格納する",
+          "ret に cl.redis_cli.send_cmd の結果を格納する",
           "common.print_format を呼び出す",
           "条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN",
           "終了コード RESP_SUCCESS を返却する"
@@ -7669,7 +7668,7 @@
       "結果オブジェクトのキー success, end が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:58"
+    "generated_at": "2026-04-26T00:53:05"
   },
   {
     "mode": "agent",
@@ -7685,7 +7684,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_session_list.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_session_list.py",
     "output_file": "Specifications/cli/agent/session_list.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -8002,7 +8001,7 @@
       "結果オブジェクトのキー warn, runner_name, session_id, user_name, last_update_time が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:58"
+    "generated_at": "2026-04-26T00:53:05"
   },
   {
     "mode": "audit",
@@ -8016,7 +8015,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_audit_createdb.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_audit_createdb.py",
     "output_file": "Specifications/cli/audit/createdb.md",
     "use_redis": 0,
     "nouse_webmode": true,
@@ -8298,7 +8297,7 @@
     "test_viewpoints": [
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:58"
+    "generated_at": "2026-04-26T00:53:05"
   },
   {
     "mode": "audit",
@@ -8313,7 +8312,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_audit_delete.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_audit_delete.py",
     "output_file": "Specifications/cli/audit/delete.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -8811,7 +8810,7 @@
       "複数値パラメータ delete_clmsg_body, delete_clmsg_tag の 0 件・1 件・複数件入力を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:59"
+    "generated_at": "2026-04-26T00:53:05"
   },
   {
     "mode": "audit",
@@ -8826,7 +8825,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_audit_search.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_audit_search.py",
     "output_file": "Specifications/cli/audit/search.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -9577,7 +9576,7 @@
       "複数値パラメータ select, filter_clmsg_body, filter_clmsg_tag, groupby, sort の 0 件・1 件・複数件入力を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_0, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:59"
+    "generated_at": "2026-04-26T00:53:05"
   },
   {
     "mode": "audit",
@@ -9592,7 +9591,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_audit_write.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_audit_write.py",
     "output_file": "Specifications/cli/audit/write.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -10057,7 +10056,7 @@
       "結果オブジェクトのキー success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:59"
+    "generated_at": "2026-04-26T00:53:05"
   },
   {
     "mode": "client",
@@ -10071,7 +10070,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_copy.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_copy.py",
     "output_file": "Specifications/cli/client/file_copy.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -10468,7 +10467,7 @@
       "複数値パラメータ from_fwpath, to_fwpath の 0 件・1 件・複数件入力を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:59"
+    "generated_at": "2026-04-26T00:53:05"
   },
   {
     "mode": "client",
@@ -10482,7 +10481,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_download.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_download.py",
     "output_file": "Specifications/cli/client/file_download.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -10897,7 +10896,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:59"
+    "generated_at": "2026-04-26T00:53:05"
   },
   {
     "mode": "client",
@@ -10912,7 +10911,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_list.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_list.py",
     "output_file": "Specifications/cli/client/file_list.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -11294,7 +11293,7 @@
       "複数値パラメータ fwpath の 0 件・1 件・複数件入力を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:59"
+    "generated_at": "2026-04-26T00:53:05"
   },
   {
     "mode": "client",
@@ -11308,7 +11307,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_mkdir.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_mkdir.py",
     "output_file": "Specifications/cli/client/file_mkdir.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -11654,7 +11653,7 @@
       "複数値パラメータ fwpath の 0 件・1 件・複数件入力を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:59"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "client",
@@ -11668,7 +11667,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_move.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_move.py",
     "output_file": "Specifications/cli/client/file_move.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -12046,7 +12045,7 @@
       "複数値パラメータ from_fwpath, to_fwpath の 0 件・1 件・複数件入力を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:59"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "client",
@@ -12060,7 +12059,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_remove.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_remove.py",
     "output_file": "Specifications/cli/client/file_remove.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -12406,7 +12405,7 @@
       "複数値パラメータ fwpath の 0 件・1 件・複数件入力を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:59"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "client",
@@ -12420,7 +12419,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_rmdir.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_rmdir.py",
     "output_file": "Specifications/cli/client/file_rmdir.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -12766,7 +12765,7 @@
       "複数値パラメータ fwpath の 0 件・1 件・複数件入力を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:59"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "client",
@@ -12780,7 +12779,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_upload.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_upload.py",
     "output_file": "Specifications/cli/client/file_upload.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -13179,7 +13178,7 @@
       "複数値パラメータ fwpath の 0 件・1 件・複数件入力を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:59"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "client",
@@ -13193,7 +13192,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_http.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_http.py",
     "output_file": "Specifications/cli/client/http.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -13483,7 +13482,7 @@
       "結果オブジェクトのキー error, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:59"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "client",
@@ -13498,7 +13497,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_server_info.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_server_info.py",
     "output_file": "Specifications/cli/client/server_info.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -13776,7 +13775,7 @@
       "選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:59"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "client",
@@ -13791,7 +13790,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_time.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_time.py",
     "output_file": "Specifications/cli/client/time.md",
     "use_redis": -1,
     "nouse_webmode": false,
@@ -13882,7 +13881,7 @@
       "結果オブジェクトのキー success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:39:59"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "cmd",
@@ -13897,7 +13896,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmd_list.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmd_list.py",
     "output_file": "Specifications/cli/cmd/list.md",
     "use_redis": -1,
     "nouse_webmode": false,
@@ -13910,7 +13909,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": true,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -14166,7 +14165,7 @@
       "結果オブジェクトのキー success, title, mode, cmd, description, tag が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, INT_0, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "cmd",
@@ -14181,7 +14180,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmd_load.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmd_load.py",
     "output_file": "Specifications/cli/cmd/load.md",
     "use_redis": -1,
     "nouse_webmode": false,
@@ -14194,7 +14193,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": true,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -14393,7 +14392,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "cmdbox",
@@ -14408,7 +14407,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_down.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_down.py",
     "output_file": "Specifications/cli/cmdbox/down.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -14477,7 +14476,7 @@
     "test_viewpoints": [
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "cmdbox",
@@ -14492,7 +14491,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_exec.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_exec.py",
     "output_file": "Specifications/cli/cmdbox/exec.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -14592,7 +14591,7 @@
       "必須パラメータ command が不足した場合の警告応答を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "cmdbox",
@@ -14607,7 +14606,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_load.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_load.py",
     "output_file": "Specifications/cli/cmdbox/load.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -14746,7 +14745,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "cmdbox",
@@ -14761,7 +14760,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_logs.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_logs.py",
     "output_file": "Specifications/cli/cmdbox/logs.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -14879,7 +14878,7 @@
       "選択肢を持つパラメータ follow の境界値と不正値を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "cmdbox",
@@ -14894,7 +14893,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_pgsql_install.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_pgsql_install.py",
     "output_file": "Specifications/cli/cmdbox/pgsql_install.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -15217,7 +15216,7 @@
       "選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "cmdbox",
@@ -15232,7 +15231,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_pgsql_load.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_pgsql_load.py",
     "output_file": "Specifications/cli/cmdbox/pgsql_load.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -15347,7 +15346,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "cmdbox",
@@ -15362,7 +15361,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_reboot.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_reboot.py",
     "output_file": "Specifications/cli/cmdbox/reboot.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -15446,7 +15445,7 @@
     "test_viewpoints": [
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "cmdbox",
@@ -15461,7 +15460,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_redis_install.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_redis_install.py",
     "output_file": "Specifications/cli/cmdbox/redis_install.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -15583,7 +15582,7 @@
     "test_viewpoints": [
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "cmdbox",
@@ -15598,7 +15597,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_redis_load.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_redis_load.py",
     "output_file": "Specifications/cli/cmdbox/redis_load.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -15698,7 +15697,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "cmdbox",
@@ -15713,7 +15712,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_save.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_save.py",
     "output_file": "Specifications/cli/cmdbox/save.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -15827,7 +15826,7 @@
     "test_viewpoints": [
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "cmdbox",
@@ -15842,7 +15841,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_server_install.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_server_install.py",
     "output_file": "Specifications/cli/cmdbox/server_install.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -15855,7 +15854,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": false,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -15870,14 +15869,14 @@
         "type": "str",
         "type_label": "文字列",
         "required": false,
-        "default": "cmdbox==0.7.8.6",
+        "default": "cmdbox==0.7.9",
         "multi": false,
         "hide": true,
         "fileio": null,
         "web": null,
         "choices": [],
-        "description_ja": "省略した時は `cmdbox==0.7.8.6` を使用します。",
-        "description_en": "When omitted, `cmdbox==0.7.8.6` is used."
+        "description_ja": "省略した時は `cmdbox==0.7.9` を使用します。",
+        "description_en": "When omitted, `cmdbox==0.7.9` is used."
       },
       {
         "name": "install_from",
@@ -16250,7 +16249,7 @@
       "複数値パラメータ init_extra, run_extra_pre, run_extra_post, install_extra の 0 件・1 件・複数件入力を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "cmdbox",
@@ -16265,7 +16264,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_server_load.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_server_load.py",
     "output_file": "Specifications/cli/cmdbox/server_load.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -16278,7 +16277,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": false,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -16488,7 +16487,7 @@
       "結果オブジェクトのキー warn, WARN が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "cmdbox",
@@ -16503,7 +16502,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_uninstall.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_uninstall.py",
     "output_file": "Specifications/cli/cmdbox/uninstall.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -16602,7 +16601,7 @@
     "test_viewpoints": [
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "cmdbox",
@@ -16617,7 +16616,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_up.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_up.py",
     "output_file": "Specifications/cli/cmdbox/up.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -16701,7 +16700,7 @@
     "test_viewpoints": [
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "edge",
@@ -16715,7 +16714,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_edge_config.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_edge_config.py",
     "output_file": "Specifications/cli/edge/config.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -16743,7 +16742,7 @@
         "type": "file",
         "type_label": "ファイル",
         "required": false,
-        "default": "F:\\devenv\\cmdbox\\cmdbox\\web\\assets\\cmdbox\\favicon.ico",
+        "default": "/home/ubuntu/cmdbox/cmdbox/web/assets/cmdbox/favicon.ico",
         "multi": false,
         "hide": false,
         "fileio": "in",
@@ -16982,7 +16981,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": false,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": true,
         "fileio": null,
@@ -17070,7 +17069,7 @@
       "選択肢を持つパラメータ auth_type, oauth2, saml, svcert_no_verify の境界値と不正値を確認する",
       "終了コード RESP_SUCCESS の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "edge",
@@ -17084,7 +17083,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_edge_start.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_edge_start.py",
     "output_file": "Specifications/cli/edge/start.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -17097,7 +17096,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": true,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": true,
         "fileio": null,
@@ -17194,7 +17193,7 @@
       "結果オブジェクトのキー success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "embed",
@@ -17209,7 +17208,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_del.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_embed_del.py",
     "output_file": "Specifications/cli/embed/del.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -17457,7 +17456,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "embed",
@@ -17472,7 +17471,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_embedding.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_embed_embedding.py",
     "output_file": "Specifications/cli/embed/embedding.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -17734,7 +17733,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "embed",
@@ -17749,7 +17748,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_list.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_embed_list.py",
     "output_file": "Specifications/cli/embed/list.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -18026,7 +18025,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:00"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "embed",
@@ -18041,7 +18040,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_load.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_embed_load.py",
     "output_file": "Specifications/cli/embed/load.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -18289,7 +18288,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:01"
+    "generated_at": "2026-04-26T00:53:06"
   },
   {
     "mode": "embed",
@@ -18304,7 +18303,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_save.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_embed_save.py",
     "output_file": "Specifications/cli/embed/save.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -18589,7 +18588,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:01"
+    "generated_at": "2026-04-26T00:53:07"
   },
   {
     "mode": "embed",
@@ -18604,7 +18603,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_start.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_embed_start.py",
     "output_file": "Specifications/cli/embed/start.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -18851,7 +18850,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:01"
+    "generated_at": "2026-04-26T00:53:07"
   },
   {
     "mode": "embed",
@@ -18866,7 +18865,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_stop.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_embed_stop.py",
     "output_file": "Specifications/cli/embed/stop.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -19114,7 +19113,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:01"
+    "generated_at": "2026-04-26T00:53:07"
   },
   {
     "mode": "excel",
@@ -19129,7 +19128,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_details.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_details.py",
     "output_file": "Specifications/cli/excel/cell_details.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -19595,7 +19594,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:01"
+    "generated_at": "2026-04-26T00:53:07"
   },
   {
     "mode": "excel",
@@ -19610,7 +19609,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_search.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_search.py",
     "output_file": "Specifications/cli/excel/cell_search.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -20113,7 +20112,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:01"
+    "generated_at": "2026-04-26T00:53:07"
   },
   {
     "mode": "excel",
@@ -20128,7 +20127,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_values.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_values.py",
     "output_file": "Specifications/cli/excel/cell_values.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -20611,7 +20610,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:01"
+    "generated_at": "2026-04-26T00:53:07"
   },
   {
     "mode": "excel",
@@ -20626,7 +20625,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_excel_sheet_list.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_excel_sheet_list.py",
     "output_file": "Specifications/cli/excel/sheet_list.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -20986,7 +20985,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:02"
+    "generated_at": "2026-04-26T00:53:07"
   },
   {
     "mode": "extract",
@@ -21001,7 +21000,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_chunklet.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_extract_chunklet.py",
     "output_file": "Specifications/cli/extract/chunklet.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -21401,7 +21400,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_0, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:02"
+    "generated_at": "2026-04-26T00:53:07"
   },
   {
     "mode": "extract",
@@ -21416,7 +21415,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_del.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_extract_del.py",
     "output_file": "Specifications/cli/extract/del.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -21664,7 +21663,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:02"
+    "generated_at": "2026-04-26T00:53:07"
   },
   {
     "mode": "extract",
@@ -21679,7 +21678,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_list.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_extract_list.py",
     "output_file": "Specifications/cli/extract/list.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -21956,7 +21955,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:02"
+    "generated_at": "2026-04-26T00:53:07"
   },
   {
     "mode": "extract",
@@ -21971,7 +21970,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_load.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_extract_load.py",
     "output_file": "Specifications/cli/extract/load.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -22219,7 +22218,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:02"
+    "generated_at": "2026-04-26T00:53:07"
   },
   {
     "mode": "extract",
@@ -22234,7 +22233,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_pdfplumber.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_extract_pdfplumber.py",
     "output_file": "Specifications/cli/extract/pdfplumber.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -22669,7 +22668,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_0, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:02"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "extract",
@@ -22684,7 +22683,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_save.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_extract_save.py",
     "output_file": "Specifications/cli/extract/save.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -23026,7 +23025,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:02"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "gui",
@@ -23041,7 +23040,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_gui_start.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_gui_start.py",
     "output_file": "Specifications/cli/gui/start.md",
     "use_redis": 0,
     "nouse_webmode": true,
@@ -23114,7 +23113,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": false,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -23577,7 +23576,7 @@
       "選択肢を持つパラメータ session_secure, client_only, stdout_log, capture_stdout の境界値と不正値を確認する",
       "複数値パラメータ outputs_key, assets の 0 件・1 件・複数件入力を確認する"
     ],
-    "generated_at": "2026-04-23T23:40:02"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "gui",
@@ -23592,7 +23591,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_gui_stop.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_gui_stop.py",
     "output_file": "Specifications/cli/gui/stop.md",
     "use_redis": 0,
     "nouse_webmode": true,
@@ -23605,7 +23604,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": false,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -23750,7 +23749,7 @@
       "結果オブジェクトのキー success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:02"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "llm",
@@ -23765,7 +23764,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_llm_chat.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_llm_chat.py",
     "output_file": "Specifications/cli/llm/chat.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -24267,7 +24266,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:02"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "llm",
@@ -24282,7 +24281,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_llm_del.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_llm_del.py",
     "output_file": "Specifications/cli/llm/del.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -24563,7 +24562,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:02"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "llm",
@@ -24578,7 +24577,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_llm_list.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_llm_list.py",
     "output_file": "Specifications/cli/llm/list.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -24855,7 +24854,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:02"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "llm",
@@ -24870,7 +24869,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_llm_load.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_llm_load.py",
     "output_file": "Specifications/cli/llm/load.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -25165,7 +25164,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:02"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "llm",
@@ -25180,7 +25179,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_llm_save.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_llm_save.py",
     "output_file": "Specifications/cli/llm/save.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -25618,7 +25617,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:03"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "mcpsv",
@@ -25632,7 +25631,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_mcpsv_start.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_mcpsv_start.py",
     "output_file": "Specifications/cli/mcpsv/start.md",
     "use_redis": -1,
     "nouse_webmode": true,
@@ -25705,7 +25704,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": false,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -26003,7 +26002,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:03"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "mcpsv",
@@ -26017,7 +26016,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_mcpsv_stop.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_mcpsv_stop.py",
     "output_file": "Specifications/cli/mcpsv/stop.md",
     "use_redis": 0,
     "nouse_webmode": true,
@@ -26030,7 +26029,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": false,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -26176,7 +26175,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:03"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "omni",
@@ -26191,7 +26190,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_omni_pred.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_omni_pred.py",
     "output_file": "Specifications/cli/omni/pred.md",
     "use_redis": -1,
     "nouse_webmode": false,
@@ -26484,7 +26483,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_0, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:03"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "rag",
@@ -26499,7 +26498,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_build.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_build.py",
     "output_file": "Specifications/cli/rag/build.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -26749,7 +26748,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:03"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "rag",
@@ -26764,7 +26763,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_del.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_del.py",
     "output_file": "Specifications/cli/rag/del.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -27012,7 +27011,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:03"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "rag",
@@ -27027,7 +27026,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_list.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_list.py",
     "output_file": "Specifications/cli/rag/list.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -27304,7 +27303,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:03"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "rag",
@@ -27319,7 +27318,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_load.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_load.py",
     "output_file": "Specifications/cli/rag/load.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -27567,7 +27566,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:03"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "rag",
@@ -27582,7 +27581,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_regist.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_regist.py",
     "output_file": "Specifications/cli/rag/regist.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -27715,7 +27714,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": true,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -27869,7 +27868,7 @@
       "結果オブジェクトのキー warn, success, res が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_0, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:03"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "rag",
@@ -27884,7 +27883,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_save.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_save.py",
     "output_file": "Specifications/cli/rag/save.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -28368,7 +28367,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1, INT_2 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:03"
+    "generated_at": "2026-04-26T00:53:08"
   },
   {
     "mode": "rag",
@@ -28383,7 +28382,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_search.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_search.py",
     "output_file": "Specifications/cli/rag/search.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -28610,7 +28609,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": true,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -28762,7 +28761,7 @@
       "結果オブジェクトのキー warn, success, res が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_0 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:03"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "server",
@@ -28777,7 +28776,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_server_list.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_server_list.py",
     "output_file": "Specifications/cli/server/list.md",
     "use_redis": 1,
     "nouse_webmode": false,
@@ -28977,7 +28976,7 @@
       "選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:03"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "server",
@@ -28991,7 +28990,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_server_start.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_server_start.py",
     "output_file": "Specifications/cli/server/start.md",
     "use_redis": 1,
     "nouse_webmode": true,
@@ -29064,7 +29063,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": false,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -29237,7 +29236,7 @@
       "結果オブジェクトのキー success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:03"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "server",
@@ -29251,7 +29250,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_server_stop.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_server_stop.py",
     "output_file": "Specifications/cli/server/stop.md",
     "use_redis": 1,
     "nouse_webmode": true,
@@ -29513,7 +29512,7 @@
       "選択肢を持つパラメータ output_json_append, stdout_log, capture_stdout の境界値と不正値を確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:03"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "test",
@@ -29528,7 +29527,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_test_gen_cli_spec.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_test_gen_cli_spec.py",
     "output_file": "Specifications/cli/test/gen_cli_spec.md",
     "use_redis": -1,
     "nouse_webmode": false,
@@ -29793,7 +29792,7 @@
       "結果オブジェクトのキー success, output_dir, json_file, count, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:03"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "test",
@@ -29808,7 +29807,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_test_gen_test_spec.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_test_gen_test_spec.py",
     "output_file": "Specifications/cli/test/gen_test_spec.md",
     "use_redis": -1,
     "nouse_webmode": false,
@@ -30028,7 +30027,7 @@
       "結果オブジェクトのキー success, output_dir, json_file, count, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:03"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "test",
@@ -30043,7 +30042,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_test_run_spec.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_test_run_spec.py",
     "output_file": "Specifications/cli/test/run_spec.md",
     "use_redis": -1,
     "nouse_webmode": false,
@@ -30068,8 +30067,8 @@
       {
         "name": "cmd_filter",
         "short": null,
-        "type": "str",
-        "type_label": "文字列",
+        "type": "mlist",
+        "type_label": "複数選択リスト",
         "required": false,
         "default": null,
         "multi": false,
@@ -30119,14 +30118,14 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": false,
-        "default": "./Specifications_forUnitTest/results/",
+        "default": "./Specifications_forUnitTest_results/",
         "multi": false,
         "hide": false,
         "fileio": "out",
         "web": null,
         "choices": [],
-        "description_ja": "テスト実行結果（JSONおよびMD）の出力先ディレクトリを指定します。省略時は ./Specifications_forUnitTest/results を使用します。",
-        "description_en": "Specify the output directory for test run results (JSON and MD). Defaults to ./Specifications_forUnitTest/results when omitted."
+        "description_ja": "テスト実行結果（JSONおよびMD）の出力先ディレクトリを指定します。省略時は ./Specifications_forUnitTest_results を使用します。",
+        "description_en": "Specify the output directory for test run results (JSON and MD). Defaults to ./Specifications_forUnitTest_results when omitted."
       },
       {
         "name": "clear_output_dir",
@@ -30143,8 +30142,8 @@
           "True",
           "False"
         ],
-        "description_ja": "Trueを指定すると、出力先ディレクトリが既に存在する場合にクリア（削除して再作成）してから結果を出力します。Falseの場合、存在するとワーニングを返します。",
-        "description_en": "If True, clears (deletes and recreates) the output directory before writing results when it already exists. If False, returns a warning when the output directory already exists."
+        "description_ja": "Trueを指定すると、出力先ディレクトリが既に存在する場合にクリア（削除して再作成）してから結果を出力します。Falseの場合（デフォルト）、既存の結果ファイルに今回のテストケース結果をマージして上書きします。",
+        "description_en": "If True, clears (deletes and recreates) the output directory before writing results when it already exists. If False (default), merges the current test case results into the existing result files, overwriting only the executed test cases."
       },
       {
         "name": "app_class",
@@ -30280,7 +30279,7 @@
           "input_json に Path の結果を格納する",
           "条件 not input_json.exists() を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "clear_output_dir に bool の結果を格納する",
-          "条件 output_dir is not None and output_dir.exists() を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
+          "条件 output_dir is not None and output_dir.exists() に応じて分岐する。主な呼出: output_dir.exists, shutil.rmtree",
           "条件 args.app_class を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "条件 args.ver_module を満たす場合は早期終了し、RESP_WARN。結果キー: warn",
           "例外処理を伴って処理する。主な呼出: run_spec.run, logger.warning, dict, common.print_format, str",
@@ -30329,7 +30328,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, INT_0, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "tts",
@@ -30343,7 +30342,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_install.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_tts_install.py",
     "output_file": "Specifications/cli/tts/install.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -30416,7 +30415,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": false,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -30737,7 +30736,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "tts",
@@ -30751,7 +30750,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_list.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_tts_list.py",
     "output_file": "Specifications/cli/tts/list.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -30949,7 +30948,7 @@
       "結果オブジェクトのキー success, error が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "tts",
@@ -30963,7 +30962,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_say.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_tts_say.py",
     "output_file": "Specifications/cli/tts/say.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -31336,7 +31335,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "tts",
@@ -31350,7 +31349,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_tts_uninstall.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_tts_uninstall.py",
     "output_file": "Specifications/cli/tts/uninstall.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -31423,7 +31422,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": false,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -31597,7 +31596,7 @@
       "結果オブジェクトのキー warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN, INT_2, INT_1 の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "web",
@@ -31611,7 +31610,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_apikey_add.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_apikey_add.py",
     "output_file": "Specifications/cli/web/apikey_add.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -31768,7 +31767,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "web",
@@ -31782,7 +31781,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_apikey_del.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_apikey_del.py",
     "output_file": "Specifications/cli/web/apikey_del.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -31939,7 +31938,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "web",
@@ -31953,7 +31952,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_gencert.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_gencert.py",
     "output_file": "Specifications/cli/web/gencert.md",
     "use_redis": -1,
     "nouse_webmode": false,
@@ -32225,7 +32224,7 @@
       "結果オブジェクトのキー warn, success, error が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "web",
@@ -32240,7 +32239,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_genpass.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_genpass.py",
     "output_file": "Specifications/cli/web/genpass.md",
     "use_redis": -1,
     "nouse_webmode": false,
@@ -32479,7 +32478,7 @@
       "結果オブジェクトのキー warn, success, error が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, INT_1, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "web",
@@ -32493,7 +32492,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_add.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_add.py",
     "output_file": "Specifications/cli/web/group_add.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -32665,7 +32664,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "web",
@@ -32679,7 +32678,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_del.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_del.py",
     "output_file": "Specifications/cli/web/group_del.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -32821,7 +32820,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "web",
@@ -32835,7 +32834,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_edit.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_edit.py",
     "output_file": "Specifications/cli/web/group_edit.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -33007,7 +33006,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "web",
@@ -33021,7 +33020,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_list.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_list.py",
     "output_file": "Specifications/cli/web/group_list.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -33162,7 +33161,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "web",
@@ -33176,7 +33175,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_start.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_start.py",
     "output_file": "Specifications/cli/web/start.md",
     "use_redis": 0,
     "nouse_webmode": true,
@@ -33249,7 +33248,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": false,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -33755,7 +33754,7 @@
       "結果オブジェクトのキー warn, success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "web",
@@ -33769,7 +33768,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_stop.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_stop.py",
     "output_file": "Specifications/cli/web/stop.md",
     "use_redis": 0,
     "nouse_webmode": true,
@@ -33782,7 +33781,7 @@
         "type": "dir",
         "type_label": "ディレクトリ",
         "required": false,
-        "default": "C:\\Users\\hama\\.cmdbox",
+        "default": "/home/ubuntu/.cmdbox",
         "multi": false,
         "hide": false,
         "fileio": null,
@@ -33927,7 +33926,7 @@
       "結果オブジェクトのキー success が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "web",
@@ -33941,7 +33940,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_user_add.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_user_add.py",
     "output_file": "Specifications/cli/web/user_add.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -34166,7 +34165,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "web",
@@ -34180,7 +34179,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_user_del.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_user_del.py",
     "output_file": "Specifications/cli/web/user_del.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -34322,7 +34321,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "web",
@@ -34336,7 +34335,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_user_edit.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_user_edit.py",
     "output_file": "Specifications/cli/web/user_edit.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -34561,7 +34560,7 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   },
   {
     "mode": "web",
@@ -34575,7 +34574,7 @@
       "Validator",
       "Feature"
     ],
-    "source_file": "F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_user_list.py",
+    "source_file": "/home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_user_list.py",
     "output_file": "Specifications/cli/web/user_list.md",
     "use_redis": 0,
     "nouse_webmode": false,
@@ -34716,6 +34715,6 @@
       "結果オブジェクトのキー success, warn が期待どおり構成されることを確認する",
       "終了コード RESP_SUCCESS, RESP_WARN の到達条件をそれぞれ検証する"
     ],
-    "generated_at": "2026-04-23T23:40:04"
+    "generated_at": "2026-04-26T00:53:09"
   }
 ]

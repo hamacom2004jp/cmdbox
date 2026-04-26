@@ -8,7 +8,7 @@
 | cmd | del |
 | クラス | EmbedDel |
 | モジュール | cmdbox.app.features.cli.cmdbox_embed_del |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_del.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_embed_del.py |
 | 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
@@ -79,7 +79,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_embed_del.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_embed_del.py
 - apprun 実装元: EmbedDel
 - svrun 実装元: EmbedDel
-- 生成日時: 2026-04-23T23:40:00
+- 生成日時: 2026-04-26T00:53:06

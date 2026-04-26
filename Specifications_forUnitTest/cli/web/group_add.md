@@ -8,7 +8,7 @@
 | cmd | group_add |
 | クラス | WebGroupAdd |
 | モジュール | cmdbox.app.features.cli.cmdbox_web_group_add |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_add.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_add.py |
 | 詳細設計書 | Specifications/cli/web/group_add.md |
 | 実装上の必須推定 | - |
 
@@ -48,17 +48,17 @@
 | TC-001 | 正常系 | 最小有効入力 | --group_id=enabled_value、--group_name=enabled_value、--signin_file=.cmdbox/user_list.yml。任意パラメータは省略する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 戻り値以外の副作用がないことを確認する |
 | TC-002 | 必須チェック | group_id 未指定 | --group_id を省略し、他の必須パラメータは有効値を指定する | RESP_WARN | --group_id の不足を示すエラーまたは警告が返る | 処理を継続せず、副作用が発生しないことを確認する |
 | TC-003 | 型境界 | group_id 空文字 | --group_id に空文字を指定する | RESP_WARN | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-004 | 型境界 | group_id 1文字 | --group_id に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-005 | 型境界 | group_id 特殊文字 | --group_id に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-004 | 型境界 | group_id 1文字 | --group_id に 1 文字値 X を指定する | RESP_WARN | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-005 | 型境界 | group_id 特殊文字 | --group_id に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
 | TC-006 | 型境界 | group_id 長文 | --group_id に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-007 | 必須チェック | group_name 未指定 | --group_name を省略し、他の必須パラメータは有効値を指定する | RESP_WARN | --group_name の不足を示すエラーまたは警告が返る | 処理を継続せず、副作用が発生しないことを確認する |
 | TC-008 | 型境界 | group_name 空文字 | --group_name に空文字を指定する | RESP_WARN | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-009 | 型境界 | group_name 1文字 | --group_name に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-010 | 型境界 | group_name 特殊文字 | --group_name に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-009 | 型境界 | group_name 1文字 | --group_name に 1 文字値 X を指定する | RESP_WARN | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-010 | 型境界 | group_name 特殊文字 | --group_name に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
 | TC-011 | 型境界 | group_name 長文 | --group_name に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-012 | 型境界 | group_parent 空文字 | --group_parent に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-013 | 型境界 | group_parent 1文字 | --group_parent に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-014 | 型境界 | group_parent 特殊文字 | --group_parent に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-013 | 型境界 | group_parent 1文字 | --group_parent に 1 文字値 X を指定する | RESP_WARN | 正常終了し、結果オブジェクトに success, warn が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-014 | 型境界 | group_parent 特殊文字 | --group_parent に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
 | TC-015 | 型境界 | group_parent 長文 | --group_parent に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-016 | ファイルI/O | signin_file 有効入力ファイル | --signin_file に存在する妥当なファイルを指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに success, warn が含まれる | 入力ファイル内容が意図どおり読み込まれることを確認する |
 | TC-017 | ファイルI/O | signin_file 存在しない入力ファイル | --signin_file に存在しないパスを指定する | RESP_WARN | ファイル未存在のエラーまたは警告が返る | 後続処理に進まず、副作用が発生しないことを確認する |
@@ -67,6 +67,6 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_add.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_group_add.py
 - 詳細設計書: Specifications/cli/web/group_add.md
-- 生成日時: 2026-04-23T23:40:14
+- 生成日時: 2026-04-26T00:53:18

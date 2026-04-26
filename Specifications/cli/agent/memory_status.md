@@ -8,7 +8,7 @@
 | cmd | memory_status |
 | クラス | AgentMemoryStatus |
 | モジュール | cmdbox.app.features.cli.cmdbox_agent_memory_status |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_status.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_status.py |
 | 継承元 | AgentBase, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
@@ -114,7 +114,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_status.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_memory_status.py
 - apprun 実装元: AgentMemoryStatus
 - svrun 実装元: AgentMemoryStatus
-- 生成日時: 2026-04-23T23:39:58
+- 生成日時: 2026-04-26T00:53:05

@@ -8,7 +8,7 @@
 | cmd | agent_load |
 | クラス | AgentAgentLoad |
 | モジュール | cmdbox.app.features.cli.cmdbox_agent_agent_load |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_load.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_load.py |
 | 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
@@ -81,7 +81,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_load.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_agent_load.py
 - apprun 実装元: AgentAgentLoad
 - svrun 実装元: AgentAgentLoad
-- 生成日時: 2026-04-23T23:39:56
+- 生成日時: 2026-04-26T00:53:04

@@ -8,7 +8,7 @@
 | cmd | user_edit |
 | クラス | WebUserEdit |
 | モジュール | cmdbox.app.features.cli.cmdbox_web_user_edit |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_user_edit.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_user_edit.py |
 | 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | いいえ |
@@ -72,7 +72,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_user_edit.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_user_edit.py
 - apprun 実装元: WebUserEdit
 - svrun 実装元: Feature
-- 生成日時: 2026-04-23T23:40:04
+- 生成日時: 2026-04-26T00:53:09

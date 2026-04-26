@@ -1596,7 +1596,8 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
             selected_options.empty();
             // 全選択・全解除ボタンを追加
             label.removeClass('text-decoration-underline').find('span').addClass('text-decoration-underline');
-            const bots = $(`<div class="d-flex mt-2"></div>`).appendTo(label);
+            label.find('.mlist_bots').remove();
+            const bots = $(`<div class="mlist_bots d-flex mt-2"></div>`).appendTo(label);
             const all_btn = $(`<button class="btn btn-sm btn-outline-secondary me-1" type="button">All</button>`).appendTo(bots);
             all_btn.click(() => {
                 selected_options.find('input[type="checkbox"]').prop('checked', true).trigger('change');
@@ -1605,13 +1606,6 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
             clear_btn.click(() => {
                 selected_options.find('input[type="checkbox"]').prop('checked', false).trigger('change');
             });
-            // チェックボックスの幅を考慮して、selectの幅から他の要素の幅を引いた値をulの幅に設定
-            let width = '100%';
-            select.parent().children().each((i, e) => {
-                if ($(e).is('ul') || $(e).is('select')) return;
-                width += ` - ${e.offsetWidth}px`;
-            });
-            selected_options.css('width', `calc(${width})`);
             // 追加されたノードごとにチェックボックスを作成
             mutations.forEach((mutation, mutationIdx) => {
                 mutation.addedNodes.forEach((n, nodeIdx) => {
@@ -1637,6 +1631,15 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
                     });
                 });
             });
+            // チェックボックスの幅を考慮して、selectの幅から他の要素の幅を引いた値をulの幅に設定
+            window.setTimeout(() => {
+                let width = '100%';
+                select.parent().children().each((i, e) => {
+                    if ($(e).is('ul') || $(e).is('select')) return;
+                    width += ` - ${e.offsetWidth}px`;
+                });
+                selected_options.css('width', `calc(${width})`)
+            },200);
         });
         // select要素の子ノードの変化を監視
         observer.observe(select[0], {childList: true, subtree: true});

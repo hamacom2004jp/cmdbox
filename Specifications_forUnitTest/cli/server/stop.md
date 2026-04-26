@@ -8,7 +8,7 @@
 | cmd | stop |
 | クラス | ServerStop |
 | モジュール | cmdbox.app.features.cli.cmdbox_server_stop |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_server_stop.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_server_stop.py |
 | 詳細設計書 | Specifications/cli/server/stop.md |
 | 実装上の必須推定 | - |
 
@@ -50,6 +50,6 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_server_stop.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_server_stop.py
 - 詳細設計書: Specifications/cli/server/stop.md
-- 生成日時: 2026-04-23T23:40:14
+- 生成日時: 2026-04-26T00:53:18

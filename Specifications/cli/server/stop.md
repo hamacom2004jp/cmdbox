@@ -8,7 +8,7 @@
 | cmd | stop |
 | クラス | ServerStop |
 | モジュール | cmdbox.app.features.cli.cmdbox_server_stop |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_server_stop.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_server_stop.py |
 | 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | はい |
@@ -84,7 +84,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_server_stop.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_server_stop.py
 - apprun 実装元: ServerStop
 - svrun 実装元: ServerStop
-- 生成日時: 2026-04-23T23:40:03
+- 生成日時: 2026-04-26T00:53:09

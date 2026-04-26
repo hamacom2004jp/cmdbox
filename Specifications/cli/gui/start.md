@@ -8,7 +8,7 @@
 | cmd | start |
 | クラス | GuiStart |
 | モジュール | cmdbox.app.features.cli.cmdbox_gui_start |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_gui_start.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_gui_start.py |
 | 継承元 | WebStart, UnsupportEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | はい |
@@ -28,7 +28,7 @@
 | --port | 整数 | はい | いいえ | はい | 6379 | - | Redisサーバーのサービスポートを指定します。 |
 | --password | パスワード | はい | いいえ | はい | password | - | Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。 |
 | --svname | 文字列 | はい | いいえ | はい | cmdbox | - | サーバーのサービス名を指定します。省略時は `server` を使用します。 |
-| --data | ディレクトリ | いいえ | いいえ | いいえ | C:\Users\hama\.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
+| --data | ディレクトリ | いいえ | いいえ | いいえ | /home/ubuntu/.cmdbox | - | 省略した時は `$HONE/.cmdbox` を使用します。 |
 | --allow_host | 文字列 | いいえ | いいえ | いいえ | 0.0.0.0 | - | 省略した時は `0.0.0.0` を使用します。 |
 | --listen_port | 整数 | いいえ | いいえ | いいえ | 8081 | - | 省略した時は `8081` を使用します。 |
 | --ssl_listen_port | 整数 | いいえ | いいえ | いいえ | 8443 | - | 省略した時は `8443` を使用します。 |
@@ -86,7 +86,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_gui_start.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_gui_start.py
 - apprun 実装元: GuiStart
 - svrun 実装元: Feature
-- 生成日時: 2026-04-23T23:40:02
+- 生成日時: 2026-04-26T00:53:08

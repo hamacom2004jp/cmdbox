@@ -8,7 +8,7 @@
 | cmd | start |
 | クラス | EdgeStart |
 | モジュール | cmdbox.app.features.cli.cmdbox_edge_start |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_edge_start.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_edge_start.py |
 | 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | はい |
@@ -24,7 +24,7 @@
 
 | パラメータ | 型 | 必須 | 複数 | 非表示 | デフォルト | 選択肢 | 説明 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| --data | ディレクトリ | はい | いいえ | はい | C:\Users\hama\.cmdbox | - | 省略した時は f`$HONE/.cmdbox` を使用します。 |
+| --data | ディレクトリ | はい | いいえ | はい | /home/ubuntu/.cmdbox | - | 省略した時は f`$HONE/.cmdbox` を使用します。 |
 
 ## 処理内容
 
@@ -85,7 +85,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_edge_start.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_edge_start.py
 - apprun 実装元: EdgeStart
 - svrun 実装元: Feature
-- 生成日時: 2026-04-23T23:40:00
+- 生成日時: 2026-04-26T00:53:06

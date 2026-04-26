@@ -8,7 +8,7 @@
 | cmd | mcp_proxy |
 | クラス | AgentMcpProxy |
 | モジュール | cmdbox.app.features.cli.cmdbox_agent_mcp_proxy |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcp_proxy.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcp_proxy.py |
 | 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 不要 |
 | Web モード禁止 | はい |
@@ -66,7 +66,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcp_proxy.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_mcp_proxy.py
 - apprun 実装元: AgentMcpProxy
 - svrun 実装元: Feature
-- 生成日時: 2026-04-23T23:39:57
+- 生成日時: 2026-04-26T00:53:04

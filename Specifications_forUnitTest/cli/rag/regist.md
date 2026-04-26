@@ -8,7 +8,7 @@
 | cmd | regist |
 | クラス | RagRegist |
 | モジュール | cmdbox.app.features.cli.cmdbox_rag_regist |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_regist.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_regist.py |
 | 詳細設計書 | Specifications/cli/rag/regist.md |
 | 実装上の必須推定 | - |
 
@@ -47,11 +47,11 @@
 
 | ID | 分類 | 観点 | 入力パターン | 期待終了コード | 期待結果 | 追加確認 |
 | --- | --- | --- | --- | --- | --- | --- |
-| TC-001 | 正常系 | 最小有効入力 | --rag_name=enabled_value、--data=C:\Users\hama\.cmdbox、--signin_file=.cmdbox/user_list.yml、--groups=enabled_value。任意パラメータは省略する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
+| TC-001 | 正常系 | 最小有効入力 | --rag_name=enabled_value、--data=/home/ubuntu/.cmdbox、--signin_file=.cmdbox/user_list.yml、--groups=enabled_value。任意パラメータは省略する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
 | TC-002 | 必須チェック | rag_name 未指定 | --rag_name を省略し、他の必須パラメータは有効値を指定する | RESP_WARN | --rag_name の不足を示すエラーまたは警告が返る | 処理を継続せず、副作用が発生しないことを確認する |
 | TC-003 | 型境界 | rag_name 空文字 | --rag_name に空文字を指定する | RESP_WARN | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-004 | 型境界 | rag_name 1文字 | --rag_name に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-005 | 型境界 | rag_name 特殊文字 | --rag_name に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-004 | 型境界 | rag_name 1文字 | --rag_name に 1 文字値 X を指定する | RESP_WARN | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-005 | 型境界 | rag_name 特殊文字 | --rag_name に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
 | TC-006 | 型境界 | rag_name 長文 | --rag_name に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-007 | 型境界 | data 既存空ディレクトリ | --data に既存の空ディレクトリを指定する | RESP_SUCCESS | 空ディレクトリ前提の初期状態が正常に処理される | 必要な初期化ファイルやサブディレクトリが作成される場合は生成を確認する |
 | TC-008 | 型境界 | data 既存データありディレクトリ | --data に既存データを含むディレクトリを指定する | RESP_SUCCESS | 既存データを読み込む経路が正常に処理される | 既存ファイルを意図せず破壊しないことを確認する |
@@ -64,8 +64,8 @@
 | TC-015 | 複数値境界 | groups 1件 | --groups に 1 件だけ指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 単一値で期待したフィルタリングまたは処理が行われることを確認する |
 | TC-016 | 複数値境界 | groups 複数件 | --groups に 2 件以上指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 順序・重複・集約結果が仕様どおりであることを確認する |
 | TC-017 | 型境界 | groups 空文字 | --groups に空文字を指定する | RESP_WARN | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-018 | 型境界 | groups 1文字 | --groups に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-019 | 型境界 | groups 特殊文字 | --groups に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-018 | 型境界 | groups 1文字 | --groups に 1 文字値 X を指定する | RESP_WARN | 正常終了し、結果オブジェクトに warn, success, res が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-019 | 型境界 | groups 特殊文字 | --groups に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
 | TC-020 | 型境界 | groups 長文 | --groups に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-021 | ファイルI/O | output_json 追記保存 | 既存の output_json を用意し、output_json_append=True で 2 回連続実行する | RESP_SUCCESS | 各回の結果が保存され、追記モードで既存内容が失われない | 1 回目より 2 回目のファイルサイズが増加し、追記後も JSON として解釈可能であることを確認する |
 | TC-022 | 副作用確認 | 成果物検証 | 副作用を発生させる有効入力で実行する | RESP_SUCCESS | 戻り値が正常であり、関連する成果物が期待どおり更新される | output_json が作成され、JSON として読めること、append 指定時は既存内容を保持したまま追記されることを確認する |
@@ -73,6 +73,6 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_regist.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_regist.py
 - 詳細設計書: Specifications/cli/rag/regist.md
-- 生成日時: 2026-04-23T23:40:14
+- 生成日時: 2026-04-26T00:53:18

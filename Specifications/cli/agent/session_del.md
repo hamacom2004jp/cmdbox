@@ -8,7 +8,7 @@
 | cmd | session_del |
 | クラス | AgentSessionDel |
 | モジュール | cmdbox.app.features.cli.cmdbox_agent_session_del |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_session_del.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_session_del.py |
 | 継承元 | AgentBase, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
@@ -52,7 +52,7 @@
   - payload に dict の結果を格納する
   - payload_b64 に convert.str2b64str の結果を格納する
   - cl に client.Client の結果を格納する
-  - ret に cl.redis_cli.send_cmd_sse の結果を格納する
+  - ret に cl.redis_cli.send_cmd の結果を格納する
   - common.print_format を呼び出す
   - 条件 'success' not in ret を満たす場合は早期終了し、RESP_WARN
   - 終了コード RESP_SUCCESS を返却する
@@ -81,7 +81,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_session_del.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_session_del.py
 - apprun 実装元: AgentSessionDel
 - svrun 実装元: AgentSessionDel
-- 生成日時: 2026-04-23T23:39:58
+- 生成日時: 2026-04-26T00:53:05

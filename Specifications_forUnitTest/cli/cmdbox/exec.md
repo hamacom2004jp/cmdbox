@@ -8,7 +8,7 @@
 | cmd | exec |
 | クラス | CmdboxExec |
 | モジュール | cmdbox.app.features.cli.cmdbox_cmdbox_exec |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_exec.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_exec.py |
 | 詳細設計書 | Specifications/cli/cmdbox/exec.md |
 | 実装上の必須推定 | - |
 
@@ -44,19 +44,18 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | TC-001 | 正常系 | 最小有効入力 | --command=False。任意パラメータは省略する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 戻り値以外の副作用がないことを確認する |
 | TC-002 | 型境界 | container 空文字 | --container(-C) に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-003 | 型境界 | container 1文字 | --container(-C) に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-004 | 型境界 | container 特殊文字 | --container(-C) に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-003 | 型境界 | container 1文字 | --container(-C) に 1 文字値 X を指定する | RESP_WARN | 正常終了し、戻り値とログが期待どおりである | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-004 | 型境界 | container 特殊文字 | --container(-C) に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
 | TC-005 | 型境界 | container 長文 | --container(-C) に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 | TC-006 | ファイルI/O | compose_path 有効入力ファイル | --compose_path に存在する妥当なファイルを指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 入力ファイル内容が意図どおり読み込まれることを確認する |
 | TC-007 | ファイルI/O | compose_path 存在しない入力ファイル | --compose_path に存在しないパスを指定する | RESP_WARN | ファイル未存在のエラーまたは警告が返る | 後続処理に進まず、副作用が発生しないことを確認する |
 | TC-008 | ファイルI/O | compose_path 空ファイル | --compose_path に 0 byte の空ファイルを指定する | RESP_WARN | フォーマット不正または入力不足として扱われる | 異常終了時のログやエラー文言が十分であることを確認する |
-| TC-009 | 型境界 | command 空文字 | --command に空文字を指定する | RESP_WARN | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-010 | 型境界 | command 1文字 | --command に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、戻り値とログが期待どおりである | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-011 | 型境界 | command 特殊文字 | --command に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-012 | 型境界 | command 長文 | --command に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-009 | 型境界 | command 1文字 | --command に 1 文字値 X を指定する | RESP_WARN | 正常終了し、戻り値とログが期待どおりである | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-010 | 型境界 | command 特殊文字 | --command に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-011 | 型境界 | command 長文 | --command に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_exec.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_cmdbox_exec.py
 - 詳細設計書: Specifications/cli/cmdbox/exec.md
-- 生成日時: 2026-04-23T23:40:13
+- 生成日時: 2026-04-26T00:53:18

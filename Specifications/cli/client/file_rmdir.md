@@ -8,7 +8,7 @@
 | cmd | file_rmdir |
 | クラス | ClientFileRmdir |
 | モジュール | cmdbox.app.features.cli.cmdbox_client_file_rmdir |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_rmdir.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_rmdir.py |
 | 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | いいえ |
@@ -101,7 +101,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_rmdir.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_rmdir.py
 - apprun 実装元: ClientFileRmdir
 - svrun 実装元: ClientFileRmdir
-- 生成日時: 2026-04-23T23:39:59
+- 生成日時: 2026-04-26T00:53:06

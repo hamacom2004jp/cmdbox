@@ -8,7 +8,7 @@
 | cmd | createdb |
 | クラス | AuditCreatedb |
 | モジュール | cmdbox.app.features.cli.cmdbox_audit_createdb |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_audit_createdb.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_audit_createdb.py |
 | 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | はい |
@@ -95,7 +95,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_audit_createdb.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_audit_createdb.py
 - apprun 実装元: AuditCreatedb
 - svrun 実装元: AuditCreatedb
-- 生成日時: 2026-04-23T23:39:58
+- 生成日時: 2026-04-26T00:53:05

@@ -8,7 +8,7 @@
 | cmd | load |
 | クラス | ExtractLoad |
 | モジュール | cmdbox.app.features.cli.cmdbox_extract_load |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_load.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_extract_load.py |
 | 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
@@ -79,7 +79,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_extract_load.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_extract_load.py
 - apprun 実装元: ExtractLoad
 - svrun 実装元: ExtractLoad
-- 生成日時: 2026-04-23T23:40:02
+- 生成日時: 2026-04-26T00:53:07

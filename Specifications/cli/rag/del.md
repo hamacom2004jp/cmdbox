@@ -8,7 +8,7 @@
 | cmd | del |
 | クラス | RagDel |
 | モジュール | cmdbox.app.features.cli.cmdbox_rag_del |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_del.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_del.py |
 | 継承元 | OneshotResultEdgeFeature, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
@@ -79,7 +79,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_rag_del.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_rag_del.py
 - apprun 実装元: RagDel
 - svrun 実装元: RagDel
-- 生成日時: 2026-04-23T23:40:03
+- 生成日時: 2026-04-26T00:53:08

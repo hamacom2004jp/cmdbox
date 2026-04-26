@@ -8,7 +8,7 @@
 | cmd | file_mkdir |
 | クラス | ClientFileMkdir |
 | モジュール | cmdbox.app.features.cli.cmdbox_client_file_mkdir |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_mkdir.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_mkdir.py |
 | 継承元 | UnsupportEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | いいえ |
@@ -101,7 +101,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_mkdir.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_file_mkdir.py
 - apprun 実装元: ClientFileMkdir
 - svrun 実装元: ClientFileMkdir
-- 生成日時: 2026-04-23T23:39:59
+- 生成日時: 2026-04-26T00:53:06

@@ -8,7 +8,7 @@
 | cmd | http |
 | クラス | ClientHttp |
 | モジュール | cmdbox.app.features.cli.cmdbox_client_http |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_http.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_http.py |
 | 継承元 | ResultEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | いいえ |
@@ -83,7 +83,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_client_http.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_client_http.py
 - apprun 実装元: ClientHttp
 - svrun 実装元: Feature
-- 生成日時: 2026-04-23T23:39:59
+- 生成日時: 2026-04-26T00:53:06

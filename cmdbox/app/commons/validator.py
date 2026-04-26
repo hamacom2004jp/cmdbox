@@ -44,7 +44,7 @@ class Validator(feature.Feature):
             val = getattr(args, opt)
             # 必須オプションの検証
             if required and type != options.Options.T_BOOL:
-                if not val and val != 0 and val != 0.0:
+                if not val:
                     msg = dict(warn=f"Please specify --{opt}")
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                     return self.RESP_WARN, msg, None

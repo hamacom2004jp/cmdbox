@@ -37,6 +37,7 @@ class Mcp:
         self.ver = ver
         self.signin = sign
         self.language = language
+
     def create_mcpserver(self, logger:logging.Logger, args:argparse.Namespace, tools) -> Any:
         """
         mcpserverを作成します

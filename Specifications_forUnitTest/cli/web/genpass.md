@@ -8,7 +8,7 @@
 | cmd | genpass |
 | クラス | WebGenpass |
 | モジュール | cmdbox.app.features.cli.cmdbox_web_genpass |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_genpass.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_genpass.py |
 | 詳細設計書 | Specifications/cli/web/genpass.md |
 | 実装上の必須推定 | - |
 
@@ -56,35 +56,19 @@
 | TC-010 | 選択値境界 | use_alphabet 先頭選択肢 | --use_alphabet に選択肢の先頭値 notuse を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 先頭選択肢でも分岐が正しく処理されることを確認する |
 | TC-011 | 選択値境界 | use_alphabet 末尾選択肢 | --use_alphabet に選択肢の末尾値 both を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 末尾選択肢でも分岐が正しく処理されることを確認する |
 | TC-012 | 選択値境界 | use_alphabet 不正選択肢 | --use_alphabet に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
-| TC-013 | 型境界 | use_alphabet 空文字 | --use_alphabet に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-014 | 型境界 | use_alphabet 1文字 | --use_alphabet に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-015 | 型境界 | use_alphabet 特殊文字 | --use_alphabet に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-016 | 型境界 | use_alphabet 長文 | --use_alphabet に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-017 | 選択値境界 | use_number 先頭選択肢 | --use_number に選択肢の先頭値 notuse を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 先頭選択肢でも分岐が正しく処理されることを確認する |
-| TC-018 | 選択値境界 | use_number 末尾選択肢 | --use_number に選択肢の末尾値 use を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 末尾選択肢でも分岐が正しく処理されることを確認する |
-| TC-019 | 選択値境界 | use_number 不正選択肢 | --use_number に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
-| TC-020 | 型境界 | use_number 空文字 | --use_number に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-021 | 型境界 | use_number 1文字 | --use_number に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-022 | 型境界 | use_number 特殊文字 | --use_number に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-023 | 型境界 | use_number 長文 | --use_number に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-024 | 選択値境界 | use_symbol 先頭選択肢 | --use_symbol に選択肢の先頭値 notuse を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 先頭選択肢でも分岐が正しく処理されることを確認する |
-| TC-025 | 選択値境界 | use_symbol 末尾選択肢 | --use_symbol に選択肢の末尾値 use を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 末尾選択肢でも分岐が正しく処理されることを確認する |
-| TC-026 | 選択値境界 | use_symbol 不正選択肢 | --use_symbol に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
-| TC-027 | 型境界 | use_symbol 空文字 | --use_symbol に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-028 | 型境界 | use_symbol 1文字 | --use_symbol に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-029 | 型境界 | use_symbol 特殊文字 | --use_symbol に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-030 | 型境界 | use_symbol 長文 | --use_symbol に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-031 | 選択値境界 | similar 先頭選択肢 | --similar に選択肢の先頭値 exclude を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 先頭選択肢でも分岐が正しく処理されることを確認する |
-| TC-032 | 選択値境界 | similar 末尾選択肢 | --similar に選択肢の末尾値 include を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 末尾選択肢でも分岐が正しく処理されることを確認する |
-| TC-033 | 選択値境界 | similar 不正選択肢 | --similar に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
-| TC-034 | 型境界 | similar 空文字 | --similar に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-035 | 型境界 | similar 1文字 | --similar に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-036 | 型境界 | similar 特殊文字 | --similar に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-037 | 型境界 | similar 長文 | --similar に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-038 | 結果検証 | 結果キー整合性 | 正常系の代表入力で実行する | RESP_SUCCESS | 結果オブジェクトに warn, success, error が含まれる | 不要なキー欠落や型崩れがないことを確認する |
+| TC-013 | 選択値境界 | use_number 先頭選択肢 | --use_number に選択肢の先頭値 notuse を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 先頭選択肢でも分岐が正しく処理されることを確認する |
+| TC-014 | 選択値境界 | use_number 末尾選択肢 | --use_number に選択肢の末尾値 use を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 末尾選択肢でも分岐が正しく処理されることを確認する |
+| TC-015 | 選択値境界 | use_number 不正選択肢 | --use_number に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
+| TC-016 | 選択値境界 | use_symbol 先頭選択肢 | --use_symbol に選択肢の先頭値 notuse を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 先頭選択肢でも分岐が正しく処理されることを確認する |
+| TC-017 | 選択値境界 | use_symbol 末尾選択肢 | --use_symbol に選択肢の末尾値 use を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 末尾選択肢でも分岐が正しく処理されることを確認する |
+| TC-018 | 選択値境界 | use_symbol 不正選択肢 | --use_symbol に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
+| TC-019 | 選択値境界 | similar 先頭選択肢 | --similar に選択肢の先頭値 exclude を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 先頭選択肢でも分岐が正しく処理されることを確認する |
+| TC-020 | 選択値境界 | similar 末尾選択肢 | --similar に選択肢の末尾値 include を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 末尾選択肢でも分岐が正しく処理されることを確認する |
+| TC-021 | 選択値境界 | similar 不正選択肢 | --similar に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
+| TC-022 | 結果検証 | 結果キー整合性 | 正常系の代表入力で実行する | RESP_SUCCESS | 結果オブジェクトに warn, success, error が含まれる | 不要なキー欠落や型崩れがないことを確認する |
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_genpass.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_genpass.py
 - 詳細設計書: Specifications/cli/web/genpass.md
-- 生成日時: 2026-04-23T23:40:14
+- 生成日時: 2026-04-26T00:53:18

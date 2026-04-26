@@ -25,10 +25,10 @@ class TestRunSpec(feature.OneshotResultEdgeFeature, validator.Validator):
             description_en="Runs tests based on the unit test specification JSON and reports results.",
             choice=[
                 dict(opt="mode_filter", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                     choice_fn=lambda o, webmode, opt: op.get_mode_keys(),
+                     choice_fn=lambda o, webmode, opt: ['']+op.get_mode_keys(),
                      description_ja="実行対象をモード名でフィルタします。省略時は全モードを実行します。(例: server, test)",
                      description_en="Filter test targets by mode name. Runs all modes when omitted. (e.g. server, test)"),
-                dict(opt="cmd_filter", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=[],
+                dict(opt="cmd_filter", type=Options.T_MLIST, default=None, required=False, multi=False, hide=False, choice=[],
                      callcmd="async () => {"
                              + "const res = await get_cmds($(\"[name='mode_filter']\").val());"
                              + "const py_load_cmd = await cmdbox.load_cmd($(\"[name='title']\").val());"
@@ -46,12 +46,12 @@ class TestRunSpec(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="use_tempdir", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
                      description_ja="出力系パラメータを一時ディレクトリに置換してテストを実行します。Trueにすると既存ファイルを上書きしません。",
                      description_en="Replace output parameters with temporary directories during test execution. When True, avoids overwriting existing files."),
-                dict(opt="output_dir", type=Options.T_DIR, default="./Specifications_forUnitTest/results/", required=False, multi=False, hide=False, choice=None, fileio="out",
-                     description_ja="テスト実行結果（JSONおよびMD）の出力先ディレクトリを指定します。省略時は ./Specifications_forUnitTest/results を使用します。",
-                     description_en="Specify the output directory for test run results (JSON and MD). Defaults to ./Specifications_forUnitTest/results when omitted."),
+                dict(opt="output_dir", type=Options.T_DIR, default="./Specifications_forUnitTest_results/", required=False, multi=False, hide=False, choice=None, fileio="out",
+                     description_ja="テスト実行結果（JSONおよびMD）の出力先ディレクトリを指定します。省略時は ./Specifications_forUnitTest_results を使用します。",
+                     description_en="Specify the output directory for test run results (JSON and MD). Defaults to ./Specifications_forUnitTest_results when omitted."),
                 dict(opt="clear_output_dir", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
-                     description_ja="Trueを指定すると、出力先ディレクトリが既に存在する場合にクリア（削除して再作成）してから結果を出力します。Falseの場合、存在するとワーニングを返します。",
-                     description_en="If True, clears (deletes and recreates) the output directory before writing results when it already exists. If False, returns a warning when the output directory already exists."),
+                     description_ja="Trueを指定すると、出力先ディレクトリが既に存在する場合にクリア（削除して再作成）してから結果を出力します。Falseの場合（デフォルト）、既存の結果ファイルに今回のテストケース結果をマージして上書きします。",
+                     description_en="If True, clears (deletes and recreates) the output directory before writing results when it already exists. If False (default), merges the current test case results into the existing result files, overwriting only the executed test cases."),
                 dict(opt="app_class", type=Options.T_STR, default=f"{self.appcls.__module__}.{self.appcls.__name__}", required=False, multi=False, hide=False, choice=None,
                      description_ja=f"テスト対象のアプリケーションクラスのモジュールパスを指定します。(例: myapp.app.MyApp) 省略時は {self.appcls.__module__}.{self.appcls.__name__} を使用します。",
                      description_en=f"Specify the module path of the application class to test. (e.g. myapp.app.MyApp) Defaults to {self.appcls.__module__}.{self.appcls.__name__} when omitted."),
@@ -106,13 +106,13 @@ class TestRunSpec(feature.OneshotResultEdgeFeature, validator.Validator):
 
         output_dir = Path(args.output_dir) if args.output_dir else None
         clear_output_dir = bool(args.clear_output_dir)
+        merge_existing = False
 
         if output_dir is not None and output_dir.exists():
-            if not clear_output_dir:
-                msg = dict(warn=f"Output directory already exists: '{output_dir}'. Use --clear_output_dir True to overwrite.")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                return self.RESP_WARN, msg, None
-            shutil.rmtree(output_dir)
+            if clear_output_dir:
+                shutil.rmtree(output_dir)
+            else:
+                merge_existing = True
 
         # app_class の解決
         appcls = self.appcls
@@ -145,6 +145,7 @@ class TestRunSpec(feature.OneshotResultEdgeFeature, validator.Validator):
                 ver=ver,
                 use_tempdir=use_tempdir,
                 output_dir=output_dir,
+                merge_existing=merge_existing,
             )
         except Exception as e:
             logger.warning(f"run_spec failed: {e}", exc_info=True)
@@ -162,7 +163,9 @@ class TestRunSpec(feature.OneshotResultEdgeFeature, validator.Validator):
         if output_dir is not None:
             success_data["output_dir"] = str(output_dir)
             success_data["json_file"] = str(output_dir / "test-run-results.json")
-            success_data["md_file"] = str(output_dir / "test-run-results.md")
+            success_data["index_md_file"] = str(output_dir / "README.md")
+            success_data["error_json_file"] = str(output_dir / "test-run-errors.json")
+            success_data["error_md_file"] = str(output_dir / "ERRORS.md")
         msg: Dict[str, Any] = dict(success=dict(data=success_data))
         if failed_count > 0:
             msg["warn"] = f"{failed_count} test case(s) failed."

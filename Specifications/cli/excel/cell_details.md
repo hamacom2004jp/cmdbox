@@ -8,7 +8,7 @@
 | cmd | cell_details |
 | クラス | ExcelCellDetails |
 | モジュール | cmdbox.app.features.cli.cmdbox_excel_cell_details |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_details.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_details.py |
 | 継承元 | ExcelBase, ResultEdgeFeature, Validator, Feature |
 | Redis | 任意 |
 | Web モード禁止 | いいえ |
@@ -126,7 +126,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_details.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_excel_cell_details.py
 - apprun 実装元: ExcelBase
 - svrun 実装元: ExcelCellDetails
-- 生成日時: 2026-04-23T23:40:01
+- 生成日時: 2026-04-26T00:53:07

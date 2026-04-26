@@ -8,7 +8,7 @@
 | cmd | gencert |
 | クラス | WebGencert |
 | モジュール | cmdbox.app.features.cli.cmdbox_web_gencert |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_gencert.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_gencert.py |
 | 詳細設計書 | Specifications/cli/web/gencert.md |
 | 実装上の必須推定 | - |
 
@@ -49,47 +49,34 @@
 | ID | 分類 | 観点 | 入力パターン | 期待終了コード | 期待結果 | 追加確認 |
 | --- | --- | --- | --- | --- | --- | --- |
 | TC-001 | 正常系 | 最小有効入力 | --webhost=localhost。任意パラメータは省略する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | output_cert で指定した出力ファイルが作成され、内容が空でないことを確認する / output_pkey で指定した出力ファイルが作成され、内容が空でないことを確認する / output_key で指定した出力ファイルが作成され、内容が空でないことを確認する / 生成物が空でなく、フォーマット不整合がないことを確認する |
-| TC-002 | 型境界 | webhost 空文字 | --webhost に空文字を指定する | RESP_WARN | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-003 | 型境界 | webhost 1文字 | --webhost に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-004 | 型境界 | webhost 特殊文字 | --webhost に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-005 | 型境界 | webhost 長文 | --webhost に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-006 | ファイルI/O | output_cert 新規出力 | --output_cert に存在しない新規出力先を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | output_cert で指定した出力ファイルが作成され、内容が空でないことを確認する |
-| TC-007 | ファイルI/O | output_cert 既存出力先 | --output_cert に既存ファイルを指定する | RESP_SUCCESS | 上書きまたは追記の仕様どおりに出力される | output_cert で指定した出力ファイルが作成され、内容が空でないことを確認する |
-| TC-008 | ファイルI/O | output_cert 無効出力先 | --output_cert に親ディレクトリが存在しないパスを指定する | RESP_WARN | 保存失敗が検知され、エラーまたは警告になる | 不完全ファイルが残らないことを確認する |
-| TC-009 | 選択値境界 | output_cert_format 先頭選択肢 | --output_cert_format に選択肢の先頭値 DER を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 先頭選択肢でも分岐が正しく処理されることを確認する |
-| TC-010 | 選択値境界 | output_cert_format 末尾選択肢 | --output_cert_format に選択肢の末尾値 PEM を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 末尾選択肢でも分岐が正しく処理されることを確認する |
-| TC-011 | 選択値境界 | output_cert_format 不正選択肢 | --output_cert_format に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
-| TC-012 | 型境界 | output_cert_format 空文字 | --output_cert_format に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-013 | 型境界 | output_cert_format 1文字 | --output_cert_format に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-014 | 型境界 | output_cert_format 特殊文字 | --output_cert_format に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-015 | 型境界 | output_cert_format 長文 | --output_cert_format に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-016 | ファイルI/O | output_pkey 新規出力 | --output_pkey に存在しない新規出力先を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | output_pkey で指定した出力ファイルが作成され、内容が空でないことを確認する |
-| TC-017 | ファイルI/O | output_pkey 既存出力先 | --output_pkey に既存ファイルを指定する | RESP_SUCCESS | 上書きまたは追記の仕様どおりに出力される | output_pkey で指定した出力ファイルが作成され、内容が空でないことを確認する |
-| TC-018 | ファイルI/O | output_pkey 無効出力先 | --output_pkey に親ディレクトリが存在しないパスを指定する | RESP_WARN | 保存失敗が検知され、エラーまたは警告になる | 不完全ファイルが残らないことを確認する |
-| TC-019 | 選択値境界 | output_pkey_format 先頭選択肢 | --output_pkey_format に選択肢の先頭値 DER を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 先頭選択肢でも分岐が正しく処理されることを確認する |
-| TC-020 | 選択値境界 | output_pkey_format 末尾選択肢 | --output_pkey_format に選択肢の末尾値 PEM を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 末尾選択肢でも分岐が正しく処理されることを確認する |
-| TC-021 | 選択値境界 | output_pkey_format 不正選択肢 | --output_pkey_format に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
-| TC-022 | 型境界 | output_pkey_format 空文字 | --output_pkey_format に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-023 | 型境界 | output_pkey_format 1文字 | --output_pkey_format に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-024 | 型境界 | output_pkey_format 特殊文字 | --output_pkey_format に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-025 | 型境界 | output_pkey_format 長文 | --output_pkey_format に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-026 | ファイルI/O | output_key 新規出力 | --output_key に存在しない新規出力先を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | output_key で指定した出力ファイルが作成され、内容が空でないことを確認する |
-| TC-027 | ファイルI/O | output_key 既存出力先 | --output_key に既存ファイルを指定する | RESP_SUCCESS | 上書きまたは追記の仕様どおりに出力される | output_key で指定した出力ファイルが作成され、内容が空でないことを確認する |
-| TC-028 | ファイルI/O | output_key 無効出力先 | --output_key に親ディレクトリが存在しないパスを指定する | RESP_WARN | 保存失敗が検知され、エラーまたは警告になる | 不完全ファイルが残らないことを確認する |
-| TC-029 | 選択値境界 | output_key_format 先頭選択肢 | --output_key_format に選択肢の先頭値 DER を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 先頭選択肢でも分岐が正しく処理されることを確認する |
-| TC-030 | 選択値境界 | output_key_format 末尾選択肢 | --output_key_format に選択肢の末尾値 PEM を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 末尾選択肢でも分岐が正しく処理されることを確認する |
-| TC-031 | 選択値境界 | output_key_format 不正選択肢 | --output_key_format に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
-| TC-032 | 型境界 | output_key_format 空文字 | --output_key_format に空文字を指定する | RESP_SUCCESS | 空文字の扱いが省略と区別され、検証結果が仕様どおりになる | エラー時は副作用が発生しないことを確認する |
-| TC-033 | 型境界 | output_key_format 1文字 | --output_key_format に 1 文字値 X を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
-| TC-034 | 型境界 | output_key_format 特殊文字 | --output_key_format に a_日本語 space-_.# を指定する | RESP_SUCCESS | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
-| TC-035 | 型境界 | output_key_format 長文 | --output_key_format に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
-| TC-036 | 型境界 | overwrite=False | --overwrite に False を指定する | RESP_SUCCESS | False 分岐が正常に処理される | 既定値との差分がある場合は挙動の変化を確認する |
-| TC-037 | 型境界 | overwrite=True | --overwrite に True を指定する | RESP_SUCCESS | True 分岐が正常に処理される | 副作用がある場合は有効化に伴う成果物の差分を確認する |
-| TC-038 | 副作用確認 | 成果物検証 | 副作用を発生させる有効入力で実行する | RESP_SUCCESS | 戻り値が正常であり、関連する成果物が期待どおり更新される | output_cert で指定した出力ファイルが作成され、内容が空でないことを確認する / output_pkey で指定した出力ファイルが作成され、内容が空でないことを確認する / output_key で指定した出力ファイルが作成され、内容が空でないことを確認する / 生成物が空でなく、フォーマット不整合がないことを確認する |
-| TC-039 | 結果検証 | 結果キー整合性 | 正常系の代表入力で実行する | RESP_SUCCESS | 結果オブジェクトに warn, success, error が含まれる | 不要なキー欠落や型崩れがないことを確認する |
+| TC-002 | 型境界 | webhost 1文字 | --webhost に 1 文字値 X を指定する | RESP_WARN | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 最短相当の入力でも分岐や検索条件が崩れないことを確認する |
+| TC-003 | 型境界 | webhost 特殊文字 | --webhost に a_日本語 space-_.#"'&<> を指定する | RESP_WARN | 日本語・空白・記号を含む入力が正しく受理される | 文字化けやエスケープ漏れがないことを確認する |
+| TC-004 | 型境界 | webhost 長文 | --webhost に 512 文字相当の文字列を指定する | RESP_WARN | 512 文字を超える入力は検証エラーまたは警告になる | エラー時は副作用が発生しないことを確認する |
+| TC-005 | ファイルI/O | output_cert 新規出力 | --output_cert に存在しない新規出力先を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | output_cert で指定した出力ファイルが作成され、内容が空でないことを確認する |
+| TC-006 | ファイルI/O | output_cert 既存出力先 | --output_cert に既存ファイルを指定する | RESP_SUCCESS | 上書きまたは追記の仕様どおりに出力される | output_cert で指定した出力ファイルが作成され、内容が空でないことを確認する |
+| TC-007 | ファイルI/O | output_cert 無効出力先 | --output_cert に親ディレクトリが存在しないパスを指定する | RESP_WARN | 保存失敗が検知され、エラーまたは警告になる | 不完全ファイルが残らないことを確認する |
+| TC-008 | 選択値境界 | output_cert_format 先頭選択肢 | --output_cert_format に選択肢の先頭値 DER を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 先頭選択肢でも分岐が正しく処理されることを確認する |
+| TC-009 | 選択値境界 | output_cert_format 末尾選択肢 | --output_cert_format に選択肢の末尾値 PEM を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 末尾選択肢でも分岐が正しく処理されることを確認する |
+| TC-010 | 選択値境界 | output_cert_format 不正選択肢 | --output_cert_format に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
+| TC-011 | ファイルI/O | output_pkey 新規出力 | --output_pkey に存在しない新規出力先を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | output_pkey で指定した出力ファイルが作成され、内容が空でないことを確認する |
+| TC-012 | ファイルI/O | output_pkey 既存出力先 | --output_pkey に既存ファイルを指定する | RESP_SUCCESS | 上書きまたは追記の仕様どおりに出力される | output_pkey で指定した出力ファイルが作成され、内容が空でないことを確認する |
+| TC-013 | ファイルI/O | output_pkey 無効出力先 | --output_pkey に親ディレクトリが存在しないパスを指定する | RESP_WARN | 保存失敗が検知され、エラーまたは警告になる | 不完全ファイルが残らないことを確認する |
+| TC-014 | 選択値境界 | output_pkey_format 先頭選択肢 | --output_pkey_format に選択肢の先頭値 DER を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 先頭選択肢でも分岐が正しく処理されることを確認する |
+| TC-015 | 選択値境界 | output_pkey_format 末尾選択肢 | --output_pkey_format に選択肢の末尾値 PEM を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 末尾選択肢でも分岐が正しく処理されることを確認する |
+| TC-016 | 選択値境界 | output_pkey_format 不正選択肢 | --output_pkey_format に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
+| TC-017 | ファイルI/O | output_key 新規出力 | --output_key に存在しない新規出力先を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | output_key で指定した出力ファイルが作成され、内容が空でないことを確認する |
+| TC-018 | ファイルI/O | output_key 既存出力先 | --output_key に既存ファイルを指定する | RESP_SUCCESS | 上書きまたは追記の仕様どおりに出力される | output_key で指定した出力ファイルが作成され、内容が空でないことを確認する |
+| TC-019 | ファイルI/O | output_key 無効出力先 | --output_key に親ディレクトリが存在しないパスを指定する | RESP_WARN | 保存失敗が検知され、エラーまたは警告になる | 不完全ファイルが残らないことを確認する |
+| TC-020 | 選択値境界 | output_key_format 先頭選択肢 | --output_key_format に選択肢の先頭値 DER を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 先頭選択肢でも分岐が正しく処理されることを確認する |
+| TC-021 | 選択値境界 | output_key_format 末尾選択肢 | --output_key_format に選択肢の末尾値 PEM を指定する | RESP_SUCCESS | 正常終了し、結果オブジェクトに warn, success, error が含まれる | 末尾選択肢でも分岐が正しく処理されることを確認する |
+| TC-022 | 選択値境界 | output_key_format 不正選択肢 | --output_key_format に選択肢外の値 INVALID_CHOICE を指定する | RESP_WARN | パラメータ検証エラーまたは実行時警告になる | 不正値で副作用が発生しないことを確認する |
+| TC-023 | 型境界 | overwrite=False | --overwrite に False を指定する | RESP_SUCCESS | False 分岐が正常に処理される | 既定値との差分がある場合は挙動の変化を確認する |
+| TC-024 | 型境界 | overwrite=True | --overwrite に True を指定する | RESP_SUCCESS | True 分岐が正常に処理される | 副作用がある場合は有効化に伴う成果物の差分を確認する |
+| TC-025 | 副作用確認 | 成果物検証 | 副作用を発生させる有効入力で実行する | RESP_SUCCESS | 戻り値が正常であり、関連する成果物が期待どおり更新される | output_cert で指定した出力ファイルが作成され、内容が空でないことを確認する / output_pkey で指定した出力ファイルが作成され、内容が空でないことを確認する / output_key で指定した出力ファイルが作成され、内容が空でないことを確認する / 生成物が空でなく、フォーマット不整合がないことを確認する |
+| TC-026 | 結果検証 | 結果キー整合性 | 正常系の代表入力で実行する | RESP_SUCCESS | 結果オブジェクトに warn, success, error が含まれる | 不要なキー欠落や型崩れがないことを確認する |
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_web_gencert.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_web_gencert.py
 - 詳細設計書: Specifications/cli/web/gencert.md
-- 生成日時: 2026-04-23T23:40:14
+- 生成日時: 2026-04-26T00:53:18

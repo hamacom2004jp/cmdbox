@@ -8,7 +8,7 @@
 | cmd | chat |
 | クラス | AgentChat |
 | モジュール | cmdbox.app.features.cli.cmdbox_agent_chat |
-| 実装ファイル | F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_chat.py |
+| 実装ファイル | /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_chat.py |
 | 継承元 | AgentBase, ResultEdgeFeature, Validator, Feature |
 | Redis | 必須 |
 | Web モード禁止 | いいえ |
@@ -140,7 +140,7 @@
 
 ## ソース参照
 
-- 実装ファイル: F:/devenv/cmdbox/cmdbox/app/features/cli/cmdbox_agent_chat.py
+- 実装ファイル: /home/ubuntu/cmdbox/cmdbox/app/features/cli/cmdbox_agent_chat.py
 - apprun 実装元: AgentChat
 - svrun 実装元: AgentChat
-- 生成日時: 2026-04-23T23:39:57
+- 生成日時: 2026-04-26T00:53:04

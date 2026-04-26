@@ -46,11 +46,12 @@ _CONNECTIVITY_KEYWORDS = (
 def run(
     input_json: Path,
     mode_filter: str | None = None,
-    cmd_filter: str | None = None,
+    cmd_filter: list[str] | None = None,
     appcls: Any = None,
     ver: Any = None,
     use_tempdir: bool = True,
     output_dir: Path | None = None,
+    merge_existing: bool = False,
 ) -> dict[str, Any]:
     """テスト仕様JSONに基づいてテストを実行します。
 
@@ -62,6 +63,7 @@ def run(
         ver: フィーチャーインスタンス生成に使用するバージョンモジュール
         use_tempdir: True のとき出力系パラメータを一時ディレクトリに置換する
         output_dir: 結果 JSON / MD ファイルの出力先ディレクトリ。None のとき出力しない
+        merge_existing: True のとき既存の結果ファイルと今回の結果をマージする
 
     Returns:
         summary と results を含む辞書
@@ -71,7 +73,7 @@ def run(
     if mode_filter:
         specs = [s for s in specs if s.get("mode") == mode_filter]
     if cmd_filter:
-        specs = [s for s in specs if s.get("cmd") == cmd_filter]
+        specs = [s for s in specs if s.get("cmd") in cmd_filter]
 
     results: list[dict[str, Any]] = []
     for spec in specs:
@@ -109,17 +111,100 @@ def run(
         "results": results,
     }
 
+    # 既存結果とのマージ
+    if merge_existing and output_dir is not None:
+        json_file = output_dir / "test-run-results.json"
+        if json_file.exists():
+            try:
+                existing = json.loads(json_file.read_text(encoding="utf-8"))
+                existing_map: dict[tuple[str, str], dict[str, Any]] = {
+                    (r["mode"], r["cmd"]): r for r in existing.get("results", [])
+                }
+                for r in results:
+                    existing_map[(r["mode"], r["cmd"])] = r
+                merged_results = list(existing_map.values())
+                merged_total = sum(r["total"] for r in merged_results)
+                merged_passed = sum(r["passed"] for r in merged_results)
+                merged_failed = sum(r["failed"] for r in merged_results)
+                merged_skipped = sum(r["skipped"] for r in merged_results)
+                return_value = {
+                    "summary": {
+                        "commands": len(merged_results),
+                        "total": merged_total,
+                        "passed": merged_passed,
+                        "failed": merged_failed,
+                        "skipped": merged_skipped,
+                    },
+                    "results": merged_results,
+                }
+            except Exception:
+                pass  # 既存ファイルが壊れている場合は新規結果のみ使用
+
     if output_dir is not None:
         output_dir.mkdir(parents=True, exist_ok=True)
         json_file = output_dir / "test-run-results.json"
-        md_file = output_dir / "test-run-results.md"
         json_file.write_text(
             json.dumps(return_value, ensure_ascii=False, indent=2, default=str),
             encoding="utf-8",
         )
-        md_file.write_text(_render_results_markdown(return_value), encoding="utf-8")
         print(json_file)
-        print(md_file)
+
+        # コマンドごとの MD を cli/{mode}/{cmd}.md に出力
+        cli_dir = output_dir / "cli"
+        md_files: list[Path] = []
+        for cmd_result in return_value["results"]:
+            mode_val = cmd_result.get("mode", "")
+            cmd_val = cmd_result.get("cmd", "")
+            cmd_md_path = cli_dir / mode_val / f"{cmd_val}.md"
+            cmd_md_path.parent.mkdir(parents=True, exist_ok=True)
+            cmd_md_path.write_text(
+                _render_command_markdown(cmd_result), encoding="utf-8"
+            )
+            md_files.append(cmd_md_path)
+            print(cmd_md_path)
+
+        # サマリーインデックス MD を README.md に出力
+        index_md_path = output_dir / "README.md"
+        index_md_path.write_text(
+            _render_index_markdown(return_value, output_dir), encoding="utf-8"
+        )
+        print(index_md_path)
+
+        # エラーのみのファイルを生成
+        error_results = []
+        for cmd_result in return_value["results"]:
+            failed_cases = [tc for tc in cmd_result.get("test_cases", []) if tc.get("status") == "failed"]
+            if failed_cases:
+                error_results.append({
+                    "mode": cmd_result.get("mode", ""),
+                    "cmd": cmd_result.get("cmd", ""),
+                    "total": len(failed_cases),
+                    "passed": 0,
+                    "failed": len(failed_cases),
+                    "skipped": 0,
+                    "test_cases": failed_cases,
+                })
+        error_total = sum(r["total"] for r in error_results)
+        error_data = {
+            "summary": {
+                "commands": len(error_results),
+                "total": error_total,
+                "failed": error_total,
+            },
+            "results": error_results,
+        }
+        error_json_file = output_dir / "test-run-errors.json"
+        error_json_file.write_text(
+            json.dumps(error_data, ensure_ascii=False, indent=2, default=str),
+            encoding="utf-8",
+        )
+        print(error_json_file)
+
+        error_md_path = output_dir / "ERRORS.md"
+        error_md_path.write_text(
+            _render_errors_markdown(error_data), encoding="utf-8"
+        )
+        print(error_md_path)
 
     return return_value
 
@@ -174,6 +259,10 @@ def _run_command_spec(
     feat = options.Options.getInstance(appcls, ver).get_cmd_attr(mode, cmd, 'feature')
     if isinstance(feat, validator.Validator):
         feat.init_test()
+
+    # pre_cmds: テスト前の初期化コマンドを実行
+    _run_setup_cmds(spec.get("pre_cmds", []), app_instance, spec, label="pre_cmds")
+
     for tc in test_cases:
         result = _run_test_case(app_instance, spec, tc, use_tempdir)
         case_results.append(result)
@@ -183,6 +272,10 @@ def _run_command_spec(
             failed += 1
         else:
             skipped += 1
+
+    # post_cmds: テスト後のクリーンアップコマンドを実行
+    _run_setup_cmds(spec.get("post_cmds", []), app_instance, spec, label="post_cmds")
+
     if isinstance(feat, validator.Validator):
         feat.cleaning_test()
 
@@ -216,7 +309,17 @@ def _run_test_case(
         "focus": tc.get("focus"),
         "input_pattern": tc.get("input_pattern"),
         "expected_status": expected_status_str,
+        "executed_at": datetime.now().isoformat(timespec="seconds"),
     }
+
+    # nouse_webmodeがTrueの場合はスキップ
+    if tc.get("nouse_webmode", False):
+        return {
+            **base,
+            "status": "skipped",
+            "reason": "Skipped: nouse_webmode is True",
+            "actual_code": None,
+        }
 
     try:
         if use_tempdir:
@@ -261,9 +364,10 @@ def _run_test_case(
         "actual_code": ret_code,
         "actual_status": actual_status,
         "actual_result": _truncate(str(ret_msg), 300) if ret_msg else None,
+        "reason": _truncate(str(ret_msg), 300) if ret_msg else None,
     }
     if not ok:
-        result["reason"] = (
+        result["expected_status_detail"] = (
             f"expected {expected_status_str}({expected_code}) "
             f"but got {actual_status}({ret_code})"
         )
@@ -273,6 +377,52 @@ def _run_test_case(
 # ---------------------------------------------------------------------------
 # ヘルパー関数
 # ---------------------------------------------------------------------------
+
+def _run_setup_cmds(
+    cmds: list[dict[str, Any]],
+    app_instance: Any,
+    spec: dict[str, Any],
+    label: str = "setup",
+) -> None:
+    """pre_cmds / post_cmds を順番に実行します。
+
+    各コマンドは {"mode": str, "cmd": str, "note": str} の辞書で、
+    パラメータのデフォルト値はコマンド仕様JSONの parameters から取得します。
+    エラーが発生しても継続します（セットアップ失敗は警告のみ）。
+
+    Args:
+        cmds: 実行するコマンドの辞書リスト
+        app_instance: アプリインスタンス
+        spec: コマンド仕様辞書（デフォルトパラメータ取得に使用）
+        label: ログ出力用ラベル
+    """
+    for entry in cmds:
+        target_mode = entry.get("mode", "")
+        target_cmd = entry.get("cmd", "")
+        note = entry.get("note", "")
+        parameters = spec.get("parameters", [])
+        args_list: list[str] = ["-m", target_mode, "-c", target_cmd, "--format"]
+        for param in parameters:
+            val = param.get("default")
+            name = param["name"]
+            ptype = param.get("type", "")
+            if val is None:
+                continue
+            if ptype == "bool":
+                if val:
+                    args_list.append(f"--{name}")
+            else:
+                sval = str(val)
+                if sval:
+                    args_list.append(f"--{name}")
+                    args_list.append(sval)
+        try:
+            with patch("cmdbox.app.common.print_format"):
+                app_instance.main(args_list=args_list, webcall=True)
+            print(f"  [{label}] {target_mode} {target_cmd}: ok ({note})")
+        except Exception as e:
+            print(f"  [{label}] {target_mode} {target_cmd}: warning - {e} ({note})")
+
 
 def _is_connectivity_error(err_lower: str) -> bool:
     return any(kw in err_lower for kw in _CONNECTIVITY_KEYWORDS)
@@ -361,7 +511,48 @@ def _truncate(s: str, maxlen: int) -> str:
     return s[:maxlen] + "..." if len(s) > maxlen else s
 
 
-def _render_results_markdown(data: dict[str, Any]) -> str:
+def _render_command_markdown(cmd_result: dict[str, Any]) -> str:
+    """コマンド単体のテスト結果をマークダウンで返します。"""
+    mode = cmd_result.get("mode", "")
+    cmd = cmd_result.get("cmd", "")
+    status_icon = "PASS" if cmd_result["failed"] == 0 else "FAIL"
+    generated_at = datetime.now().isoformat(timespec="seconds")
+
+    lines = [
+        f"# [{status_icon}] {mode} {cmd}",
+        "",
+        f"生成日時: {generated_at}",
+        "",
+        f"- 成功: {cmd_result['passed']} / 失敗: {cmd_result['failed']} / スキップ: {cmd_result['skipped']}",
+        "",
+        "| # | カテゴリ | 観点 | 入力パターン | 入力値 | 期待ステータス | 実際のステータス | 結果 | 理由 | 実行日時 |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for tc in cmd_result.get("test_cases", []):
+        tc_status = tc.get("status", "")
+        icon = {"passed": "OK", "failed": "NG", "skipped": "SKIP"}.get(tc_status, tc_status)
+        reason = _escape_table(str(tc.get("reason", "") or ""))
+        executed_at = _escape_table(str(tc.get("executed_at", "") or ""))
+        input_values = tc.get("input_values") or {}
+        input_values_str = _escape_table(json.dumps(input_values, ensure_ascii=False) if input_values else "")
+        lines.append(
+            f"| {tc.get('id', '')} "
+            f"| {_escape_table(str(tc.get('category', '') or ''))} "
+            f"| {_escape_table(str(tc.get('focus', '') or ''))} "
+            f"| {_escape_table(str(tc.get('input_pattern', '') or ''))} "
+            f"| {input_values_str} "
+            f"| {_escape_table(str(tc.get('expected_status', '') or ''))} "
+            f"| {_escape_table(str(tc.get('actual_status', '') or ''))} "
+            f"| {icon} "
+            f"| {reason} "
+            f"| {executed_at} |"
+        )
+    lines.append("")
+    return "\n".join(lines)
+
+
+def _render_index_markdown(data: dict[str, Any], output_dir: Path) -> str:
+    """全コマンドのサマリーインデックスをマークダウンで返します。"""
     summary = data["summary"]
     results = data["results"]
     generated_at = datetime.now().isoformat(timespec="seconds")
@@ -381,36 +572,78 @@ def _render_results_markdown(data: dict[str, Any]) -> str:
         f"| 失敗 | {summary['failed']} |",
         f"| スキップ | {summary['skipped']} |",
         "",
+        "## コマンド一覧",
+        "",
+        "| モード | コマンド | 成功 | 失敗 | スキップ | 結果 |",
+        "| --- | --- | --- | --- | --- | --- |",
+    ]
+    for cmd_result in results:
+        mode_val = cmd_result.get("mode", "")
+        cmd_val = cmd_result.get("cmd", "")
+        status_icon = "PASS" if cmd_result["failed"] == 0 else "FAIL"
+        rel_path = f"cli/{mode_val}/{cmd_val}.md"
+        lines.append(
+            f"| {mode_val} "
+            f"| [{cmd_val}]({rel_path}) "
+            f"| {cmd_result['passed']} "
+            f"| {cmd_result['failed']} "
+            f"| {cmd_result['skipped']} "
+            f"| {status_icon} |"
+        )
+    lines.append("")
+    return "\n".join(lines)
+
+
+def _render_errors_markdown(error_data: dict[str, Any]) -> str:
+    """エラーになったテストケースのみを一覧するマークダウンを返します。"""
+    summary = error_data["summary"]
+    results = error_data["results"]
+    generated_at = datetime.now().isoformat(timespec="seconds")
+
+    lines = [
+        "# テスト実行結果 - エラー一覧",
+        "",
+        f"生成日時: {generated_at}",
+        "",
+        "## サマリー",
+        "",
+        "| 項目 | 件数 |",
+        "| --- | --- |",
+        f"| 失敗コマンド数 | {summary['commands']} |",
+        f"| 失敗テストケース数 | {summary['total']} |",
+        "",
     ]
 
+    if not results:
+        lines.append("失敗したテストケースはありません。")
+        lines.append("")
+        return "\n".join(lines)
+
+    lines += [
+        "## 失敗テストケース一覧",
+        "",
+        "| モード | コマンド | # | カテゴリ | 観点 | 入力パターン | 期待ステータス | 実際のステータス | 理由 | 実行日時 |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
     for cmd_result in results:
-        mode = cmd_result.get("mode", "")
-        cmd = cmd_result.get("cmd", "")
-        status_icon = "PASS" if cmd_result["failed"] == 0 else "FAIL"
-        lines += [
-            f"## [{status_icon}] {mode} {cmd}",
-            "",
-            f"- 成功: {cmd_result['passed']} / 失敗: {cmd_result['failed']} / スキップ: {cmd_result['skipped']}",
-            "",
-            "| # | カテゴリ | 観点 | 入力パターン | 期待ステータス | 実際のステータス | 結果 | 理由 |",
-            "| --- | --- | --- | --- | --- | --- | --- | --- |",
-        ]
+        mode_val = cmd_result.get("mode", "")
+        cmd_val = cmd_result.get("cmd", "")
         for tc in cmd_result.get("test_cases", []):
-            tc_status = tc.get("status", "")
-            icon = {"passed": "OK", "failed": "NG", "skipped": "SKIP"}.get(tc_status, tc_status)
             reason = _escape_table(str(tc.get("reason", "") or ""))
+            executed_at = _escape_table(str(tc.get("executed_at", "") or ""))
             lines.append(
+                f"| {mode_val} "
+                f"| {cmd_val} "
                 f"| {tc.get('id', '')} "
                 f"| {_escape_table(str(tc.get('category', '') or ''))} "
                 f"| {_escape_table(str(tc.get('focus', '') or ''))} "
                 f"| {_escape_table(str(tc.get('input_pattern', '') or ''))} "
                 f"| {_escape_table(str(tc.get('expected_status', '') or ''))} "
                 f"| {_escape_table(str(tc.get('actual_status', '') or ''))} "
-                f"| {icon} "
-                f"| {reason} |"
+                f"| {reason} "
+                f"| {executed_at} |"
             )
-        lines.append("")
-
+    lines.append("")
     return "\n".join(lines)
 
 
