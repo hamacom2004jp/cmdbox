@@ -122,6 +122,8 @@ dev = [
     "sphinx-sitemap",
     "twine",
     "wheel",
+]
+app = [
     "cmdbox[dev, agent_mcp, agent_adk, agent_mem, rag]"
 ]
 
