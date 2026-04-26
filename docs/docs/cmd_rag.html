@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( rag mode ) &mdash; cmdbox 2026/04/12 documentation</title>
+  <title>Command Reference ( rag mode ) &mdash; cmdbox 2026/04/26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=98fe3048"></script>
+      <script src="../_static/documentation_options.js?v=c9df5a23"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -47,13 +47,13 @@
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_a2asv.html">A2AServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html">Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_audit.html">Audit</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_embed.html">Embed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
@@ -62,15 +62,17 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_llm.html">LLM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">RAG</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#delete-rag-configuration-cmdbox-m-rag-c-del-option">Delete RAG configuration. : <cite>cmdbox -m rag -c del &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#list-rag-configuration-cmdbox-m-rag-c-list-option">List RAG configuration. : <cite>cmdbox -m rag -c list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#load-rag-configuration-cmdbox-m-rag-c-load-option">Load RAG configuration. : <cite>cmdbox -m rag -c load &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#save-rag-configuration-cmdbox-m-rag-c-save-option">Save RAG configuration. : <cite>cmdbox -m rag -c save &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#build-rag-database-cmdbox-m-rag-c-build-option">Build RAG database. : <cite>cmdbox -m rag -c build &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#register-rag-data-cmdbox-m-rag-c-regist-option">Register RAG data. : <cite>cmdbox -m rag -c regist &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rag-build-cmdbox-m-rag-c-build-option">rag ( build ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">rag</span> <span class="pre">-c</span> <span class="pre">build</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rag-del-cmdbox-m-rag-c-del-option">rag ( del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">rag</span> <span class="pre">-c</span> <span class="pre">del</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rag-list-cmdbox-m-rag-c-list-option">rag ( list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">rag</span> <span class="pre">-c</span> <span class="pre">list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rag-load-cmdbox-m-rag-c-load-option">rag ( load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">rag</span> <span class="pre">-c</span> <span class="pre">load</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rag-regist-cmdbox-m-rag-c-regist-option">rag ( regist ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">rag</span> <span class="pre">-c</span> <span class="pre">regist</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rag-save-cmdbox-m-rag-c-save-option">rag ( save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">rag</span> <span class="pre">-c</span> <span class="pre">save</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rag-search-cmdbox-m-rag-c-search-option">rag ( search ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">rag</span> <span class="pre">-c</span> <span class="pre">search</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_test.html">Test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
 </ul>
@@ -111,19 +113,17 @@
              
   <section id="command-reference-rag-mode">
 <h1>Command Reference ( rag mode )<a class="headerlink" href="#command-reference-rag-mode" title="Link to this heading"></a></h1>
+<p>List of rag mode commands.</p>
+<section id="rag-build-cmdbox-m-rag-c-build-option">
+<h2>rag ( build ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">rag</span> <span class="pre">-c</span> <span class="pre">build</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#rag-build-cmdbox-m-rag-c-build-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>List of rag mode commands.</p></li>
-</ul>
-<section id="delete-rag-configuration-cmdbox-m-rag-c-del-option">
-<h2>Delete RAG configuration. : <cite>cmdbox -m rag -c del &lt;Option&gt;</cite><a class="headerlink" href="#delete-rag-configuration-cmdbox-m-rag-c-del-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Deletes RAG (Retrieval-Augmented Generation) configuration.</p></li>
+<li><p>We build the database based on the RAG (Retrieval-Augmented Generation) configuration.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -132,51 +132,63 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--rag_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the RAG configuration to delete.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--rag_name &lt;rag_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the name of the RAG configuration to build.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="list-rag-configuration-cmdbox-m-rag-c-list-option">
-<h2>List RAG configuration. : <cite>cmdbox -m rag -c list &lt;Option&gt;</cite><a class="headerlink" href="#list-rag-configuration-cmdbox-m-rag-c-list-option" title="Link to this heading"></a></h2>
+<section id="rag-del-cmdbox-m-rag-c-del-option">
+<h2>rag ( del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">rag</span> <span class="pre">-c</span> <span class="pre">del</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#rag-del-cmdbox-m-rag-c-del-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Displays a list of saved RAG configurations.</p></li>
+<li><p>Delete the RAG (Retrieval-Augmented Generation) configuration.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -185,51 +197,136 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service name of the inference server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--kwd &lt;keyword&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
-<td><p>Partial match filter for RAG configuration names.</p></td>
+<td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--rag_name &lt;rag_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the name of the RAG configuration to delete.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="load-rag-configuration-cmdbox-m-rag-c-load-option">
-<h2>Load RAG configuration. : <cite>cmdbox -m rag -c load &lt;Option&gt;</cite><a class="headerlink" href="#load-rag-configuration-cmdbox-m-rag-c-load-option" title="Link to this heading"></a></h2>
+<section id="rag-list-cmdbox-m-rag-c-list-option">
+<h2>rag ( list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">rag</span> <span class="pre">-c</span> <span class="pre">list</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#rag-list-cmdbox-m-rag-c-list-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Display a list of saved RAG settings.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--kwd &lt;kwd&gt;</p></td>
+<td></td>
+<td><p>Specify the name you want to search for. Searches for partial matches.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="rag-load-cmdbox-m-rag-c-load-option">
+<h2>rag ( load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">rag</span> <span class="pre">-c</span> <span class="pre">load</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#rag-load-cmdbox-m-rag-c-load-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Loads the settings for RAG (Retrieval-Augmented Generation).</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -238,51 +335,140 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--rag_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the RAG configuration to load.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--rag_name &lt;rag_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the name of the RAG configuration to load.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="save-rag-configuration-cmdbox-m-rag-c-save-option">
-<h2>Save RAG configuration. : <cite>cmdbox -m rag -c save &lt;Option&gt;</cite><a class="headerlink" href="#save-rag-configuration-cmdbox-m-rag-c-save-option" title="Link to this heading"></a></h2>
+<section id="rag-regist-cmdbox-m-rag-c-regist-option">
+<h2>rag ( regist ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">rag</span> <span class="pre">-c</span> <span class="pre">regist</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#rag-regist-cmdbox-m-rag-c-regist-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Execute the RAG (Retrieval-Augmented Generation) registration process.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service name of the inference server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--rag_name &lt;rag_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the name of the RAG configuration to use for registration.</p></td>
+</tr>
+<tr class="row-even"><td><p>--data &lt;data&gt;</p></td>
+<td><p>required</p></td>
+<td><p>When omitted, <cite>$HONE/.cmdbox</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'.</p></td>
+</tr>
+<tr class="row-even"><td><p>--groups &lt;groups&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specifies that <cite>signin_file</cite>, if specified, should return the list of commands allowed for this user group.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="rag-save-cmdbox-m-rag-c-save-option">
+<h2>rag ( save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">rag</span> <span class="pre">-c</span> <span class="pre">save</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#rag-save-cmdbox-m-rag-c-save-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Saves the settings for RAG (Retrieval-Augmented Generation).</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -291,111 +477,123 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--rag_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--rag_name &lt;rag_name&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the name of the RAG configuration.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--rag_type &lt;type&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the type of RAG. Available values: <cite>vector_pg</cite>, <cite>vector_sqlite</cite>, <cite>graph_n4j</cite>, <cite>graph_pg</cite>.</p></td>
+<tr class="row-even"><td><p>--rag_type &lt;rag_type&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the type of RAG.</p></td>
 </tr>
-<tr class="row-even"><td><p>--extract &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the registered name for the Extract process used in RAG (multiple values allowed).</p></td>
+<tr class="row-odd"><td><p>--extract &lt;extract&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the registered name for the Extract process used in RAG. If no candidates exist, you must register a command in extract mode.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--embed &lt;name&gt;</p></td>
+<tr class="row-even"><td><p>--embed &lt;embed&gt;</p></td>
 <td></td>
 <td><p>If rag_type is vector, specify the registration name of the embed model.</p></td>
 </tr>
-<tr class="row-even"><td><p>--embed_vector_dim &lt;dimension&gt;</p></td>
+<tr class="row-odd"><td><p>--embed_vector_dim &lt;embed_vector_dim&gt;</p></td>
 <td></td>
-<td><p>Specify the vector dimension for embedding. Default: 256.</p></td>
+<td><p>Specify the vector dimension for embedding.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--savetype &lt;pattern&gt;</p></td>
+<tr class="row-even"><td><p>--savetype &lt;savetype&gt;</p></td>
 <td></td>
 <td><p>Specify the storage pattern. <cite>per_doc</cite> :per document, <cite>per_service</cite> :per service, <cite>add_only</cite> :add only</p></td>
 </tr>
-<tr class="row-even"><td><p>--vector_store_pghost &lt;host&gt;</p></td>
+<tr class="row-odd"><td><p>--vector_store_pghost &lt;vector_store_pghost&gt;</p></td>
 <td></td>
-<td><p>Specify the postgresql host for VecRAG storage. Default: localhost.</p></td>
+<td><p>Specify the postgresql host for VecRAG storage.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--vector_store_pgport &lt;port&gt;</p></td>
+<tr class="row-even"><td><p>--vector_store_pgport &lt;vector_store_pgport&gt;</p></td>
 <td></td>
-<td><p>Specify the postgresql port for VecRAG storage. Default: 5432.</p></td>
+<td><p>Specify the postgresql port for VecRAG storage.</p></td>
 </tr>
-<tr class="row-even"><td><p>--vector_store_pguser &lt;user&gt;</p></td>
+<tr class="row-odd"><td><p>--vector_store_pguser &lt;vector_store_pguser&gt;</p></td>
 <td></td>
-<td><p>Specify the postgresql user for VecRAG storage. Default: postgres.</p></td>
+<td><p>Specify the postgresql user for VecRAG storage.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--vector_store_pgpass &lt;password&gt;</p></td>
+<tr class="row-even"><td><p>--vector_store_pgpass &lt;vector_store_pgpass&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql password for VecRAG storage.</p></td>
 </tr>
-<tr class="row-even"><td><p>--vector_store_pgdbname &lt;database&gt;</p></td>
+<tr class="row-odd"><td><p>--vector_store_pgdbname &lt;vector_store_pgdbname&gt;</p></td>
 <td></td>
-<td><p>Specify the postgresql database name for VecRAG storage. Default: rag_db.</p></td>
+<td><p>Specify the postgresql database name for VecRAG storage.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--graph_store_pghost &lt;host&gt;</p></td>
+<tr class="row-even"><td><p>--graph_store_pghost &lt;graph_store_pghost&gt;</p></td>
 <td></td>
-<td><p>Specify the postgresql host for GraphRAG storage. Default: localhost.</p></td>
+<td><p>Specify the postgresql host for GraphRAG storage.</p></td>
 </tr>
-<tr class="row-even"><td><p>--graph_store_pgport &lt;port&gt;</p></td>
+<tr class="row-odd"><td><p>--graph_store_pgport &lt;graph_store_pgport&gt;</p></td>
 <td></td>
-<td><p>Specify the postgresql port for GraphRAG storage. Default: 5432.</p></td>
+<td><p>Specify the postgresql port for GraphRAG storage.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--graph_store_pguser &lt;user&gt;</p></td>
+<tr class="row-even"><td><p>--graph_store_pguser &lt;graph_store_pguser&gt;</p></td>
 <td></td>
-<td><p>Specify the postgresql user for GraphRAG storage. Default: postgres.</p></td>
+<td><p>Specify the postgresql user for GraphRAG storage.</p></td>
 </tr>
-<tr class="row-even"><td><p>--graph_store_pgpass &lt;password&gt;</p></td>
+<tr class="row-odd"><td><p>--graph_store_pgpass &lt;graph_store_pgpass&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql password for GraphRAG storage.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--graph_store_pgdbname &lt;database&gt;</p></td>
+<tr class="row-even"><td><p>--graph_store_pgdbname &lt;graph_store_pgdbname&gt;</p></td>
 <td></td>
-<td><p>Specify the postgresql database name for GraphRAG storage. Default: rag_db.</p></td>
+<td><p>Specify the postgresql database name for GraphRAG storage.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of reconnections to the Redis server.</p></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+<td><p>Save the processing result json file by appending.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="build-rag-database-cmdbox-m-rag-c-build-option">
-<h2>Build RAG database. : <cite>cmdbox -m rag -c build &lt;Option&gt;</cite><a class="headerlink" href="#build-rag-database-cmdbox-m-rag-c-build-option" title="Link to this heading"></a></h2>
+<section id="rag-search-cmdbox-m-rag-c-search-option">
+<h2>rag ( search ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">rag</span> <span class="pre">-c</span> <span class="pre">search</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#rag-search-cmdbox-m-rag-c-search-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Builds the database based on the RAG (Retrieval-Augmented Generation) configuration.</p></li>
+<li><p>Execute the RAG (Retrieval-Augmented Generation) search process.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -404,102 +602,85 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--rag_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the RAG configuration to build.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-</tbody>
-</table>
-</section>
-<section id="register-rag-data-cmdbox-m-rag-c-regist-option">
-<h2>Register RAG data. : <cite>cmdbox -m rag -c regist &lt;Option&gt;</cite><a class="headerlink" href="#register-rag-data-cmdbox-m-rag-c-regist-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Executes the RAG (Retrieval-Augmented Generation) registration process.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--rag_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-odd"><td><p>--rag_name &lt;rag_name&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the name of the RAG configuration to use for registration.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--data &lt;path&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the data directory path. When omitted, <cite>$HOME/.cmdbox</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--signin_file &lt;file&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify a file containing users and passwords for signin. Typically, specify <cite>.cmdbox/user_list.yml</cite>.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--groups &lt;group&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify user groups allowed to execute commands (multiple values allowed).</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--query &lt;query&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of reconnections to the Redis server.</p></td>
+<td><p>Specifies a search query.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+<tr class="row-odd"><td><p>--kcount &lt;kcount&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the number of search results. If filter conditions are specified, the results will be filtered from the number of results specified here.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--select &lt;select&gt;</p></td>
 <td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
+<td><p>Specifies the items to be retrieved. If not specified, all items are returned.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--filter_origin_name &lt;filter_origin_name&gt;</p></td>
+<td></td>
+<td><p>Specifies the origin_name of the filter condition.</p></td>
+</tr>
+<tr class="row-even"><td><p>--filter_dict &lt;filter_dict&gt;</p></td>
+<td></td>
+<td><p>Specify arbitrary filter conditions, allowing multiple cmeta item names and values. Item values can be ambiguously searched by using <cite>％</cite>.  You can use the value of the query parameter by including the notation {args.query}.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--sort_dict &lt;sort_dict&gt;</p></td>
+<td></td>
+<td><p>Specifies the sort conditions when no query is specified. Multiple cmeta field names and sort orders (<cite>ASC</cite> (ascending) or <cite>DESC</cite> (descending)) can be specified.</p></td>
+</tr>
+<tr class="row-even"><td><p>--data &lt;data&gt;</p></td>
+<td><p>required</p></td>
+<td><p>When omitted, <cite>$HONE/.cmdbox</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'.</p></td>
+</tr>
+<tr class="row-even"><td><p>--groups &lt;groups&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specifies that <cite>signin_file</cite>, if specified, should return the list of commands allowed for this user group.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
 </tr>
 </tbody>
 </table>

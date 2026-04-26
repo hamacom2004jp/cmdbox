@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/04/12 documentation</title>
+  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/04/26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=98fe3048"></script>
+      <script src="../_static/documentation_options.js?v=c9df5a23"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -47,38 +47,37 @@
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_a2asv.html">A2AServer</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Agent</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#delete-agent-configuration-cmdbox-m-agent-c-agent-del-option">Delete Agent configuration. : <cite>cmdbox -m agent -c agent_del &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#list-agent-configuration-cmdbox-m-agent-c-agent-list-option">List Agent configuration. : <cite>cmdbox -m agent -c agent_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#load-agent-configuration-cmdbox-m-agent-c-agent-load-option">Load Agent configuration. : <cite>cmdbox -m agent -c agent_load &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#save-agent-configuration-cmdbox-m-agent-c-agent-save-option">Save Agent configuration. : <cite>cmdbox -m agent -c agent_save &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#mcp-client-cmdbox-m-agent-c-mcp-client-option">MCP client : <cite>cmdbox -m agent -c mcp_client &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#proxy-to-transport-mcp-cmdbox-m-agent-c-mcp-proxy-option">Proxy to transport MCP : <cite>cmdbox -m agent -c mcp_proxy &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#delete-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-del-option">Delete MCP server configuration. : <cite>cmdbox -m agent -c mcpsv_del &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#lists-mcp-server-configurations-cmdbox-m-agent-c-mcpsv-list-option">Lists MCP server configurations. : <cite>cmdbox -m agent -c mcpsv_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#loads-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-load-option">Loads MCP server configuration. : <cite>cmdbox -m agent -c mcpsv_load &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#saves-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-save-option">Saves MCP server configuration. : <cite>cmdbox -m agent -c mcpsv_save &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#delete-memory-configuration-cmdbox-m-agent-c-memory-del-option">Delete Memory configuration. : <cite>cmdbox -m agent -c memory_del &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#list-memory-configuration-cmdbox-m-agent-c-memory-list-option">List Memory configuration. : <cite>cmdbox -m agent -c memory_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#load-memory-configuration-cmdbox-m-agent-c-memory-load-option">Load Memory configuration. : <cite>cmdbox -m agent -c memory_load &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#save-memory-configuration-cmdbox-m-agent-c-memory-save-option">Save Memory configuration. : <cite>cmdbox -m agent -c memory_save &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#status-memory-configuration-cmdbox-m-agent-c-memory-save-option">Status Memory configuration. : <cite>cmdbox -m agent -c memory_save &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#status-memory-configuration-cmdbox-m-agent-c-memory-status-option">Status Memory configuration. : <cite>cmdbox -m agent -c memory_status &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#delete-runner-configuration-cmdbox-m-agent-c-runner-del-option">Delete runner configuration. : <cite>cmdbox -m agent -c runner_del &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#list-runner-configuration-cmdbox-m-agent-c-runner-list-option">List runner configuration. : <cite>cmdbox -m agent -c runner_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#load-runner-configuration-cmdbox-m-agent-c-runner-load-option">Load runner configuration. : <cite>cmdbox -m agent -c runner_load &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#save-runner-configuration-cmdbox-m-agent-c-runner-save-option">Save runner configuration. : <cite>cmdbox -m agent -c runner_save &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#chat-with-the-agent-cmdbox-m-agent-c-chat-option">Chat with the agent. : <cite>cmdbox -m agent -c chat &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#list-sessions-for-the-agent-cmdbox-m-agent-c-session-list-option">List sessions for the agent. : <cite>cmdbox -m agent -c session_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#delete-sessions-for-the-agent-cmdbox-m-agent-c-session-del-option">Delete sessions for the agent. : <cite>cmdbox -m agent -c session_del &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-agent-del-cmdbox-m-agent-c-agent-del-option">agent ( agent_del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">agent_del</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-agent-list-cmdbox-m-agent-c-agent-list-option">agent ( agent_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">agent_list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-agent-load-cmdbox-m-agent-c-agent-load-option">agent ( agent_load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">agent_load</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-agent-save-cmdbox-m-agent-c-agent-save-option">agent ( agent_save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">agent_save</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-chat-cmdbox-m-agent-c-chat-option">agent ( chat ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">chat</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-mcp-client-cmdbox-m-agent-c-mcp-client-option">agent ( mcp_client ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">mcp_client</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-mcp-proxy-cmdbox-m-agent-c-mcp-proxy-option">agent ( mcp_proxy ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">mcp_proxy</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-mcpsv-del-cmdbox-m-agent-c-mcpsv-del-option">agent ( mcpsv_del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">mcpsv_del</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-mcpsv-list-cmdbox-m-agent-c-mcpsv-list-option">agent ( mcpsv_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">mcpsv_list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-mcpsv-load-cmdbox-m-agent-c-mcpsv-load-option">agent ( mcpsv_load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">mcpsv_load</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-mcpsv-save-cmdbox-m-agent-c-mcpsv-save-option">agent ( mcpsv_save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">mcpsv_save</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-memory-del-cmdbox-m-agent-c-memory-del-option">agent ( memory_del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">memory_del</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-memory-list-cmdbox-m-agent-c-memory-list-option">agent ( memory_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">memory_list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-memory-load-cmdbox-m-agent-c-memory-load-option">agent ( memory_load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">memory_load</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-memory-save-cmdbox-m-agent-c-memory-save-option">agent ( memory_save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">memory_save</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-memory-status-cmdbox-m-agent-c-memory-status-option">agent ( memory_status ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">memory_status</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-runner-del-cmdbox-m-agent-c-runner-del-option">agent ( runner_del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">runner_del</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-runner-list-cmdbox-m-agent-c-runner-list-option">agent ( runner_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">runner_list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-runner-load-cmdbox-m-agent-c-runner-load-option">agent ( runner_load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">runner_load</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-runner-save-cmdbox-m-agent-c-runner-save-option">agent ( runner_save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">runner_save</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-session-del-cmdbox-m-agent-c-session-del-option">agent ( session_del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">session_del</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agent-session-list-cmdbox-m-agent-c-session-list-option">agent ( session_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">session_list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_audit.html">Audit</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_embed.html">Embed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
@@ -88,6 +87,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_rag.html">RAG</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_test.html">Test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
 </ul>
@@ -128,19 +128,17 @@
              
   <section id="command-reference-agent-mode">
 <h1>Command Reference ( agent mode )<a class="headerlink" href="#command-reference-agent-mode" title="Link to this heading"></a></h1>
-<ul class="simple">
-<li><p>List of agent mode commands.</p></li>
-</ul>
-<section id="delete-agent-configuration-cmdbox-m-agent-c-agent-del-option">
-<h2>Delete Agent configuration. : <cite>cmdbox -m agent -c agent_del &lt;Option&gt;</cite><a class="headerlink" href="#delete-agent-configuration-cmdbox-m-agent-c-agent-del-option" title="Link to this heading"></a></h2>
+<p>List of agent mode commands.</p>
+<section id="agent-agent-del-cmdbox-m-agent-c-agent-del-option">
+<h2>agent ( agent_del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">agent_del</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-agent-del-cmdbox-m-agent-c-agent-del-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Deletes agent configuration.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -149,51 +147,71 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--agent_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the agent configuration to delete.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--agent_name &lt;agent_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the name of the agent configuration to delete.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="list-agent-configuration-cmdbox-m-agent-c-agent-list-option">
-<h2>List Agent configuration. : <cite>cmdbox -m agent -c agent_list &lt;Option&gt;</cite><a class="headerlink" href="#list-agent-configuration-cmdbox-m-agent-c-agent-list-option" title="Link to this heading"></a></h2>
+<section id="agent-agent-list-cmdbox-m-agent-c-agent-list-option">
+<h2>agent ( agent_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">agent_list</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-agent-list-cmdbox-m-agent-c-agent-list-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Lists listed agent configurations.</p></li>
+<li><p>Lists saved agent configurations.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -202,51 +220,71 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--kwd &lt;keyword&gt;</p></td>
-<td></td>
-<td><p>Partial match filter for agent names.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--kwd &lt;kwd&gt;</p></td>
+<td></td>
+<td><p>Specify the name you want to search for. Searches for partial matches.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="load-agent-configuration-cmdbox-m-agent-c-agent-load-option">
-<h2>Load Agent configuration. : <cite>cmdbox -m agent -c agent_load &lt;Option&gt;</cite><a class="headerlink" href="#load-agent-configuration-cmdbox-m-agent-c-agent-load-option" title="Link to this heading"></a></h2>
+<section id="agent-agent-load-cmdbox-m-agent-c-agent-load-option">
+<h2>agent ( agent_load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">agent_load</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-agent-load-cmdbox-m-agent-c-agent-load-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Loads agent configuration.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -255,48 +293,71 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--agent_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the agent configuration to load.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--agent_name &lt;agent_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the name of the agent configuration to load.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="save-agent-configuration-cmdbox-m-agent-c-agent-save-option">
-<h2>Save Agent configuration. : <cite>cmdbox -m agent -c agent_save &lt;Option&gt;</cite><a class="headerlink" href="#save-agent-configuration-cmdbox-m-agent-c-agent-save-option" title="Link to this heading"></a></h2>
+<section id="agent-agent-save-cmdbox-m-agent-c-agent-save-option">
+<h2>agent ( agent_save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">agent_save</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-agent-save-cmdbox-m-agent-c-agent-save-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Saves agent configuration.</p></li>
+</ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -305,83 +366,208 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--agent_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--agent_name &lt;agent_name&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the name of the agent configuration to save.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--agent_type &lt;type&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-even"><td><p>--agent_type &lt;agent_type&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the agent type. Specify either <cite>local</cite> or <cite>remote</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--use_planner</p></td>
+<tr class="row-odd"><td><p>--use_planner &lt;use_planner&gt;</p></td>
 <td></td>
 <td><p>Specify whether to use the planning feature of the agent.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--a2asv_baseurl &lt;url&gt;</p></td>
+<tr class="row-even"><td><p>--a2asv_baseurl &lt;a2asv_baseurl&gt;</p></td>
 <td></td>
 <td><p>Specify the base URL for the A2A Server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--llm &lt;name&gt;</p></td>
+<tr class="row-odd"><td><p>--a2asv_delegated_auth &lt;a2asv_delegated_auth&gt;</p></td>
 <td></td>
-<td><p>LLM configuration name or reference.</p></td>
+<td><p>Authenticate the A2A Server using the API Key of the currently logged-in user.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--mcpservers &lt;name&gt;</p></td>
+<tr class="row-even"><td><p>--a2asv_apikey &lt;a2asv_apikey&gt;</p></td>
+<td></td>
+<td><p>Specify the API Key when starting the A2A Server. Additionally, if <cite>a2asv_delegated_auth</cite> is disabled, it will also be used when running the Agent.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--llm &lt;llm&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the LLM configuration name referenced by the Agent.</p></td>
+</tr>
+<tr class="row-even"><td><p>--mcpservers &lt;mcpservers&gt;</p></td>
 <td></td>
 <td><p>Specify the MCP server name used by the Agent.</p></td>
 </tr>
-<tr class="row-even"><td><p>--subagents &lt;name&gt;</p></td>
+<tr class="row-odd"><td><p>--subagents &lt;subagents&gt;</p></td>
 <td></td>
 <td><p>Specify the subagent name used by the agent.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--agent_description &lt;text&gt;</p></td>
+<tr class="row-even"><td><p>--agent_description &lt;agent_description&gt;</p></td>
 <td></td>
 <td><p>Specify a description of the agent's capabilities. The model uses this to determine whether to delegate control to the agent. A single line description is sufficient and recommended.</p></td>
 </tr>
-<tr class="row-even"><td><p>--agent_instruction &lt;text&gt;</p></td>
+<tr class="row-odd"><td><p>--agent_instruction &lt;agent_instruction&gt;</p></td>
 <td></td>
 <td><p>Specify instructions for the LLM model used by the agent. These will guide the agent's behavior.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+<td><p>Save the processing result json file by appending.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="mcp-client-cmdbox-m-agent-c-mcp-client-option">
-<h2>MCP client : <cite>cmdbox -m agent -c mcp_client &lt;Option&gt;</cite><a class="headerlink" href="#mcp-client-cmdbox-m-agent-c-mcp-client-option" title="Link to this heading"></a></h2>
+<section id="agent-chat-cmdbox-m-agent-c-chat-option">
+<h2>agent ( chat ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">chat</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-chat-cmdbox-m-agent-c-chat-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Chat with the agent.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service name of the inference server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--runner_name &lt;runner_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the name of the Runner configuration.</p></td>
+</tr>
+<tr class="row-even"><td><p>--user_name &lt;user_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a user name.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--session_id &lt;session_id&gt;</p></td>
+<td></td>
+<td><p>Specify the session ID to send to the Runner.</p></td>
+</tr>
+<tr class="row-even"><td><p>--a2asv_apikey &lt;a2asv_apikey&gt;</p></td>
+<td></td>
+<td><p>Specify the API Key of the A2A Server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--mcpserver_apikey &lt;mcpserver_apikey&gt;</p></td>
+<td></td>
+<td><p>Specify the API Key of the remote MCP server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--message &lt;message&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the message to send to the Runner.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--call_tts &lt;call_tts&gt;</p></td>
+<td></td>
+<td><p>Specify whether to execute the TTS (Text-to-Speech) feature.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="agent-mcp-client-cmdbox-m-agent-c-mcp-client-option">
+<h2>agent ( mcp_client ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">mcp_client</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-mcp-client-cmdbox-m-agent-c-mcp-client-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Starts an MCP client that makes requests to a remote MCP server.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -390,55 +576,75 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--mcpserver_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-even"><td><p>--mcpserver_name &lt;mcpserver_name&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the name of the MCP server. If omitted, it will be <cite>mcpserver</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--mcpserver_url &lt;url&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-odd"><td><p>--mcpserver_url &lt;mcpserver_url&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specifies the URL of the remote MCP server. If omitted, it will be <cite>http://localhost:8091/mcp</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--mcpserver_apikey &lt;apikey&gt;</p></td>
+<tr class="row-even"><td><p>--mcpserver_apikey &lt;mcpserver_apikey&gt;</p></td>
 <td></td>
 <td><p>Specify the API Key of the remote MCP server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--mcpserver_transport &lt;transport&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-odd"><td><p>--mcpserver_transport &lt;mcpserver_transport&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specifies the transport of the remote MCP server. If omitted, it is <cite>streamable-http</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--operation &lt;op&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-even"><td><p>--operation &lt;operation&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specifies the operations to request from the remote MCP server. If omitted, <cite>list_tools</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--tool_name &lt;name&gt;</p></td>
+<tr class="row-odd"><td><p>--tool_name &lt;tool_name&gt;</p></td>
 <td></td>
 <td><p>Specify the name of the tool to run on the remote MCP server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--tool_args &lt;dict&gt;</p></td>
+<tr class="row-even"><td><p>--tool_args &lt;tool_args&gt;</p></td>
 <td></td>
 <td><p>Specify arguments for the tool to run on the remote MCP server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--mcp_timeout &lt;sec&gt;</p></td>
+<tr class="row-odd"><td><p>--mcp_timeout &lt;mcp_timeout&gt;</p></td>
 <td></td>
 <td><p>Specifies the maximum time to wait for a response from the remote MCP server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--resource_url &lt;url&gt;</p></td>
+<tr class="row-even"><td><p>--resource_url &lt;resource_url&gt;</p></td>
 <td></td>
 <td><p>Specify the URL of the resource to retrieve from the remote MCP server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--prompt_name &lt;name&gt;</p></td>
+<tr class="row-odd"><td><p>--prompt_name &lt;prompt_name&gt;</p></td>
 <td></td>
 <td><p>Specifies the name of the prompt to be retrieved from the remote MCP server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--prompt_args &lt;dict&gt;</p></td>
+<tr class="row-even"><td><p>--prompt_args &lt;prompt_args&gt;</p></td>
 <td></td>
 <td><p>Specifies prompt arguments to be retrieved from the remote MCP server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="proxy-to-transport-mcp-cmdbox-m-agent-c-mcp-proxy-option">
-<h2>Proxy to transport MCP : <cite>cmdbox -m agent -c mcp_proxy &lt;Option&gt;</cite><a class="headerlink" href="#proxy-to-transport-mcp-cmdbox-m-agent-c-mcp-proxy-option" title="Link to this heading"></a></h2>
+<section id="agent-mcp-proxy-cmdbox-m-agent-c-mcp-proxy-option">
+<h2>agent ( mcp_proxy ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">mcp_proxy</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-mcp-proxy-cmdbox-m-agent-c-mcp-proxy-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Starts a Proxy server that accepts standard input and makes requests to a remote MCP server.</p></li>
 </ul>
@@ -455,35 +661,35 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--mcpserver_name &lt;name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--mcpserver_name &lt;mcpserver_name&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the name of the MCP server. If omitted, it will be <cite>mcpserver</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--mcpserver_url &lt;url&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--mcpserver_url &lt;mcpserver_url&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specifies the URL of the remote MCP server. If omitted, it will be <cite>http://localhost:8091/mcp</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--mcpserver_apikey &lt;apikey&gt;</p></td>
+<tr class="row-even"><td><p>--mcpserver_apikey &lt;mcpserver_apikey&gt;</p></td>
 <td></td>
 <td><p>Specify the API Key of the remote MCP server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--mcpserver_transport &lt;transport&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--mcpserver_transport &lt;mcpserver_transport&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specifies the transport of the remote MCP server. If omitted, it is <cite>streamable-http</cite>.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="delete-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-del-option">
-<h2>Delete MCP server configuration. : <cite>cmdbox -m agent -c mcpsv_del &lt;Option&gt;</cite><a class="headerlink" href="#delete-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-del-option" title="Link to this heading"></a></h2>
+<section id="agent-mcpsv-del-cmdbox-m-agent-c-mcpsv-del-option">
+<h2>agent ( mcpsv_del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">mcpsv_del</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-mcpsv-del-cmdbox-m-agent-c-mcpsv-del-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Deletes MCP server configuration.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -492,51 +698,71 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--mcpserver_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the MCP server configuration to delete.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--mcpserver_name &lt;mcpserver_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the name of the MCP server configuration to delete.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="lists-mcp-server-configurations-cmdbox-m-agent-c-mcpsv-list-option">
-<h2>Lists MCP server configurations. : <cite>cmdbox -m agent -c mcpsv_list &lt;Option&gt;</cite><a class="headerlink" href="#lists-mcp-server-configurations-cmdbox-m-agent-c-mcpsv-list-option" title="Link to this heading"></a></h2>
+<section id="agent-mcpsv-list-cmdbox-m-agent-c-mcpsv-list-option">
+<h2>agent ( mcpsv_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">mcpsv_list</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-mcpsv-list-cmdbox-m-agent-c-mcpsv-list-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Lists saved MCP server configurations.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -545,51 +771,71 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--kwd &lt;keyword&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--kwd &lt;kwd&gt;</p></td>
 <td></td>
 <td><p>Specify the name you want to search for. Searches for partial matches.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+<td><p>Save the processing result json file by appending.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="loads-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-load-option">
-<h2>Loads MCP server configuration. : <cite>cmdbox -m agent -c mcpsv_load &lt;Option&gt;</cite><a class="headerlink" href="#loads-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-load-option" title="Link to this heading"></a></h2>
+<section id="agent-mcpsv-load-cmdbox-m-agent-c-mcpsv-load-option">
+<h2>agent ( mcpsv_load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">mcpsv_load</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-mcpsv-load-cmdbox-m-agent-c-mcpsv-load-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Loads MCP server configuration from the agent.</p></li>
+<li><p>Loads MCP server configuration.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -598,51 +844,71 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--mcpserver_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--mcpserver_name &lt;mcpserver_name&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the name of the MCP server configuration to load.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+<td><p>Save the processing result json file by appending.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="saves-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-save-option">
-<h2>Saves MCP server configuration. : <cite>cmdbox -m agent -c mcpsv_save &lt;Option&gt;</cite><a class="headerlink" href="#saves-mcp-server-configuration-cmdbox-m-agent-c-mcpsv-save-option" title="Link to this heading"></a></h2>
+<section id="agent-mcpsv-save-cmdbox-m-agent-c-mcpsv-save-option">
+<h2>agent ( mcpsv_save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">mcpsv_save</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-mcpsv-save-cmdbox-m-agent-c-mcpsv-save-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Saves MCP server configuration via the agent.</p></li>
+<li><p>Saves MCP server configuration.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -651,71 +917,91 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--mcpserver_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--mcpserver_name &lt;mcpserver_name&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the name of the MCP server. If omitted, it will be <cite>mcpserver</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--mcpserver_url &lt;url&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-even"><td><p>--mcpserver_url &lt;mcpserver_url&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specifies the URL of the remote MCP server. If omitted, it will be <cite>http://localhost:8091/mcp</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--mcpserver_delegated_auth</p></td>
+<tr class="row-odd"><td><p>--mcpserver_delegated_auth &lt;mcpserver_delegated_auth&gt;</p></td>
 <td></td>
 <td><p>Authenticate with the remote MCP server using the API key of the currently logged-in user.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--mcpserver_apikey &lt;apikey&gt;</p></td>
+<tr class="row-even"><td><p>--mcpserver_apikey &lt;mcpserver_apikey&gt;</p></td>
 <td></td>
 <td><p>Specifies the API Key for the remote MCP server when starting the A2A Server. If <cite>mcpserver_delegated_auth</cite> is disabled, it is also used when running MCP.</p></td>
 </tr>
-<tr class="row-even"><td><p>--mcpserver_transport &lt;transport&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-odd"><td><p>--mcpserver_transport &lt;mcpserver_transport&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specifies the transport of the remote MCP server. If omitted, it is <cite>streamable-http</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--mcp_tools &lt;list&gt;</p></td>
+<tr class="row-even"><td><p>--mcp_tools &lt;mcp_tools&gt;</p></td>
 <td></td>
 <td><p>Specify the tools provided by the remote server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+<td><p>Save the processing result json file by appending.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="delete-memory-configuration-cmdbox-m-agent-c-memory-del-option">
-<h2>Delete Memory configuration. : <cite>cmdbox -m agent -c memory_del &lt;Option&gt;</cite><a class="headerlink" href="#delete-memory-configuration-cmdbox-m-agent-c-memory-del-option" title="Link to this heading"></a></h2>
+<section id="agent-memory-del-cmdbox-m-agent-c-memory-del-option">
+<h2>agent ( memory_del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">memory_del</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-memory-del-cmdbox-m-agent-c-memory-del-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Delete the memory configuration.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -724,51 +1010,63 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service name of the inference server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+<td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--memory_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the registration name of the memory to delete.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--memory_name &lt;memory_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the registration name of the memory to delete.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="list-memory-configuration-cmdbox-m-agent-c-memory-list-option">
-<h2>List Memory configuration. : <cite>cmdbox -m agent -c memory_list &lt;Option&gt;</cite><a class="headerlink" href="#list-memory-configuration-cmdbox-m-agent-c-memory-list-option" title="Link to this heading"></a></h2>
+<section id="agent-memory-list-cmdbox-m-agent-c-memory-list-option">
+<h2>agent ( memory_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">memory_list</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-memory-list-cmdbox-m-agent-c-memory-list-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Display a list of saved memory configurations.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -777,51 +1075,71 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--kwd &lt;keyword&gt;</p></td>
-<td></td>
-<td><p>Partial match filter for memory names.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--kwd &lt;kwd&gt;</p></td>
+<td></td>
+<td><p>Specify the name you want to search for. Searches for partial matches.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="load-memory-configuration-cmdbox-m-agent-c-memory-load-option">
-<h2>Load Memory configuration. : <cite>cmdbox -m agent -c memory_load &lt;Option&gt;</cite><a class="headerlink" href="#load-memory-configuration-cmdbox-m-agent-c-memory-load-option" title="Link to this heading"></a></h2>
+<section id="agent-memory-load-cmdbox-m-agent-c-memory-load-option">
+<h2>agent ( memory_load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">memory_load</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-memory-load-cmdbox-m-agent-c-memory-load-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Loads the memory configuration.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -830,51 +1148,63 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service name of the inference server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+<td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--memory_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the registration name of the memory to load.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--memory_name &lt;memory_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the registration name of the memory to load.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="save-memory-configuration-cmdbox-m-agent-c-memory-save-option">
-<h2>Save Memory configuration. : <cite>cmdbox -m agent -c memory_save &lt;Option&gt;</cite><a class="headerlink" href="#save-memory-configuration-cmdbox-m-agent-c-memory-save-option" title="Link to this heading"></a></h2>
+<section id="agent-memory-save-cmdbox-m-agent-c-memory-save-option">
+<h2>agent ( memory_save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">memory_save</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-memory-save-cmdbox-m-agent-c-memory-save-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Saves memory configuration.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -883,91 +1213,111 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--memory_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--memory_name &lt;memory_name&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the name of the Memory setting.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--memory_type &lt;type&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-even"><td><p>--memory_type &lt;memory_type&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the type of memory service.</p></td>
 </tr>
-<tr class="row-even"><td><p>--llm &lt;name&gt;</p></td>
+<tr class="row-odd"><td><p>--llm &lt;llm&gt;</p></td>
 <td></td>
 <td><p>Specify the LLM configuration name to use for summarization processing.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--embed &lt;name&gt;</p></td>
+<tr class="row-even"><td><p>--embed &lt;embed&gt;</p></td>
 <td></td>
 <td><p>Specify the Embedding setting name to use for embedding processing.</p></td>
 </tr>
-<tr class="row-even"><td><p>--memory_store_pghost &lt;host&gt;</p></td>
+<tr class="row-odd"><td><p>--memory_store_pghost &lt;memory_store_pghost&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql host for memory service.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--memory_store_pgport &lt;port&gt;</p></td>
+<tr class="row-even"><td><p>--memory_store_pgport &lt;memory_store_pgport&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql port for memory service.</p></td>
 </tr>
-<tr class="row-even"><td><p>--memory_store_pguser &lt;user&gt;</p></td>
+<tr class="row-odd"><td><p>--memory_store_pguser &lt;memory_store_pguser&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql user name for memory service.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--memory_store_pgpass &lt;pass&gt;</p></td>
+<tr class="row-even"><td><p>--memory_store_pgpass &lt;memory_store_pgpass&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql password for memory service.</p></td>
 </tr>
-<tr class="row-even"><td><p>--memory_store_pgdbname &lt;name&gt;</p></td>
+<tr class="row-odd"><td><p>--memory_store_pgdbname &lt;memory_store_pgdbname&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql database name for memory service.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--memory_description &lt;desc&gt;</p></td>
+<tr class="row-even"><td><p>--memory_description &lt;memory_description&gt;</p></td>
 <td></td>
 <td><p>Specify a description of the agent's memory capabilities. The model uses this to determine whether to delegate control to the agent. A single line description is sufficient and recommended.</p></td>
 </tr>
-<tr class="row-even"><td><p>--memory_instruction &lt;inst&gt;</p></td>
+<tr class="row-odd"><td><p>--memory_instruction &lt;memory_instruction&gt;</p></td>
 <td></td>
 <td><p>Specify instructions for the LLM model used by the memory. These will guide the memory's behavior.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+<td><p>Save the processing result json file by appending.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="status-memory-configuration-cmdbox-m-agent-c-memory-save-option">
-<h2>Status Memory configuration. : <cite>cmdbox -m agent -c memory_save &lt;Option&gt;</cite><a class="headerlink" href="#status-memory-configuration-cmdbox-m-agent-c-memory-save-option" title="Link to this heading"></a></h2>
+<section id="agent-memory-status-cmdbox-m-agent-c-memory-status-option">
+<h2>agent ( memory_status ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">memory_status</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-memory-status-cmdbox-m-agent-c-memory-status-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Get the memory status for the agent.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -976,144 +1326,91 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service name of the inference server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+<td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--runner_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the Runner configuration.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--user_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify a user name.</p></td>
-</tr>
-<tr class="row-even"><td><p>--memory_query &lt;query&gt;</p></td>
-<td></td>
-<td><p>Specify a query to search memory contents. Perform semantic search.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--memory_fetch_offset &lt;offset&gt;</p></td>
-<td></td>
-<td><p>Specify the starting position when retrieving memory contents.</p></td>
-</tr>
-<tr class="row-even"><td><p>--memory_fetch_count &lt;count&gt;</p></td>
-<td></td>
-<td><p>Specify the number of memory contents to retrieve.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--memory_fetch_summary</p></td>
-<td></td>
-<td><p>Specify whether to summarize the retrieved memory contents.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--runner_name &lt;runner_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the name of the Runner configuration.</p></td>
+</tr>
+<tr class="row-even"><td><p>--user_name &lt;user_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a user name.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--memory_query &lt;memory_query&gt;</p></td>
+<td></td>
+<td><p>Specify a query to search memory contents. Perform semantic search.</p></td>
+</tr>
+<tr class="row-even"><td><p>--memory_fetch_offset &lt;memory_fetch_offset&gt;</p></td>
+<td></td>
+<td><p>Specify the starting position when retrieving memory contents.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--memory_fetch_count &lt;memory_fetch_count&gt;</p></td>
+<td></td>
+<td><p>Specify the number of memory contents to retrieve.</p></td>
+</tr>
+<tr class="row-even"><td><p>--memory_fetch_summary &lt;memory_fetch_summary&gt;</p></td>
+<td></td>
+<td><p>Specify whether to summarize the retrieved memory contents.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="status-memory-configuration-cmdbox-m-agent-c-memory-status-option">
-<h2>Status Memory configuration. : <cite>cmdbox -m agent -c memory_status &lt;Option&gt;</cite><a class="headerlink" href="#status-memory-configuration-cmdbox-m-agent-c-memory-status-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Get the memory status for the agent.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--runner_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the Runner configuration.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--user_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify a user name.</p></td>
-</tr>
-<tr class="row-even"><td><p>--memory_query &lt;query&gt;</p></td>
-<td></td>
-<td><p>Specify a query to search memory contents. Perform semantic search.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--memory_fetch_offset &lt;offset&gt;</p></td>
-<td></td>
-<td><p>Specify the starting position when retrieving memory contents.</p></td>
-</tr>
-<tr class="row-even"><td><p>--memory_fetch_count &lt;count&gt;</p></td>
-<td></td>
-<td><p>Specify the number of memory contents to retrieve.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--memory_fetch_summary</p></td>
-<td></td>
-<td><p>Specify whether to summarize the retrieved memory contents.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
-<td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="delete-runner-configuration-cmdbox-m-agent-c-runner-del-option">
-<h2>Delete runner configuration. : <cite>cmdbox -m agent -c runner_del &lt;Option&gt;</cite><a class="headerlink" href="#delete-runner-configuration-cmdbox-m-agent-c-runner-del-option" title="Link to this heading"></a></h2>
+<section id="agent-runner-del-cmdbox-m-agent-c-runner-del-option">
+<h2>agent ( runner_del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">runner_del</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-runner-del-cmdbox-m-agent-c-runner-del-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Deletes runner configuration.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -1122,51 +1419,71 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--runner_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the runner configuration to delete.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--runner_name &lt;runner_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the name of the runner configuration to delete.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="list-runner-configuration-cmdbox-m-agent-c-runner-list-option">
-<h2>List runner configuration. : <cite>cmdbox -m agent -c runner_list &lt;Option&gt;</cite><a class="headerlink" href="#list-runner-configuration-cmdbox-m-agent-c-runner-list-option" title="Link to this heading"></a></h2>
+<section id="agent-runner-list-cmdbox-m-agent-c-runner-list-option">
+<h2>agent ( runner_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">runner_list</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-runner-list-cmdbox-m-agent-c-runner-list-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Lists listed runner configurations.</p></li>
+<li><p>Lists saved runner configurations.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -1175,51 +1492,71 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--kwd &lt;keyword&gt;</p></td>
-<td></td>
-<td><p>Partial match filter for runner names.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--kwd &lt;kwd&gt;</p></td>
+<td></td>
+<td><p>Specify the name you want to search for. Searches for partial matches.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="load-runner-configuration-cmdbox-m-agent-c-runner-load-option">
-<h2>Load runner configuration. : <cite>cmdbox -m agent -c runner_load &lt;Option&gt;</cite><a class="headerlink" href="#load-runner-configuration-cmdbox-m-agent-c-runner-load-option" title="Link to this heading"></a></h2>
+<section id="agent-runner-load-cmdbox-m-agent-c-runner-load-option">
+<h2>agent ( runner_load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">runner_load</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-runner-load-cmdbox-m-agent-c-runner-load-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Loads runner configuration.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -1228,48 +1565,71 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--runner_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the runner configuration to load.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--runner_name &lt;runner_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the name of the runner configuration to load.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="save-runner-configuration-cmdbox-m-agent-c-runner-save-option">
-<h2>Save runner configuration. : <cite>cmdbox -m agent -c runner_save &lt;Option&gt;</cite><a class="headerlink" href="#save-runner-configuration-cmdbox-m-agent-c-runner-save-option" title="Link to this heading"></a></h2>
+<section id="agent-runner-save-cmdbox-m-agent-c-runner-save-option">
+<h2>agent ( runner_save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">runner_save</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-runner-save-cmdbox-m-agent-c-runner-save-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Saves runner configuration.</p></li>
+</ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -1278,233 +1638,115 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--runner_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--runner_name &lt;runner_name&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the name of the runner configuration to save.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--agent &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Agent configuration name or reference.</p></td>
+<tr class="row-even"><td><p>--agent &lt;agent&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the Agent configuration name referenced by the Runner.</p></td>
 </tr>
-<tr class="row-even"><td><p>--tts_engine &lt;engine&gt;</p></td>
-<td></td>
-<td><p>Specify the TTS engine to use.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--memory &lt;name&gt;</p></td>
-<td></td>
-<td><p>Specify the Memory configuration name referenced by the Runner.</p></td>
-</tr>
-<tr class="row-even"><td><p>--rag &lt;name&gt;</p></td>
-<td></td>
-<td><p>Specify the RAG configuration name referenced by the Runner.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--voicevox_model &lt;model&gt;</p></td>
-<td></td>
-<td><p>Specify the model of the TTS engine to use.</p></td>
-</tr>
-<tr class="row-even"><td><p>--session_store_type &lt;type&gt;</p></td>
+<tr class="row-odd"><td><p>--session_store_type &lt;session_store_type&gt;</p></td>
 <td></td>
 <td><p>Specify how the bot's session is stored.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--session_store_pghost &lt;host&gt;</p></td>
+<tr class="row-even"><td><p>--tts_engine &lt;tts_engine&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the TTS engine to use.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--memory &lt;memory&gt;</p></td>
+<td></td>
+<td><p>Specify the Memory configuration name referenced by the Runner.</p></td>
+</tr>
+<tr class="row-even"><td><p>--rag &lt;rag&gt;</p></td>
+<td></td>
+<td><p>Specify the RAG configuration name referenced by the Runner.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--voicevox_model &lt;voicevox_model&gt;</p></td>
+<td></td>
+<td><p>Specify the model of the TTS engine to use.</p></td>
+</tr>
+<tr class="row-even"><td><p>--session_store_pghost &lt;session_store_pghost&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql host for session store.</p></td>
 </tr>
-<tr class="row-even"><td><p>--session_store_pgport &lt;port&gt;</p></td>
+<tr class="row-odd"><td><p>--session_store_pgport &lt;session_store_pgport&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql port for session store.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--session_store_pguser &lt;user&gt;</p></td>
+<tr class="row-even"><td><p>--session_store_pguser &lt;session_store_pguser&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql user name for session store.</p></td>
 </tr>
-<tr class="row-even"><td><p>--session_store_pgpass &lt;pass&gt;</p></td>
+<tr class="row-odd"><td><p>--session_store_pgpass &lt;session_store_pgpass&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql password for session store.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--session_store_pgdbname &lt;name&gt;</p></td>
+<tr class="row-even"><td><p>--session_store_pgdbname &lt;session_store_pgdbname&gt;</p></td>
 <td></td>
 <td><p>Specify the postgresql database name for session store.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+<td><p>Save the processing result json file by appending.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="chat-with-the-agent-cmdbox-m-agent-c-chat-option">
-<h2>Chat with the agent. : <cite>cmdbox -m agent -c chat &lt;Option&gt;</cite><a class="headerlink" href="#chat-with-the-agent-cmdbox-m-agent-c-chat-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Chat with the agent.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--runner_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the Runner configuration.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--user_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify a user name.</p></td>
-</tr>
-<tr class="row-even"><td><p>--session_id &lt;id&gt;</p></td>
-<td></td>
-<td><p>Specify the session ID to send to the Runner.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--a2asv_apikey &lt;apikey&gt;</p></td>
-<td></td>
-<td><p>Specify the API Key of the A2A Server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--mcpserver_apikey &lt;apikey&gt;</p></td>
-<td></td>
-<td><p>Specify the API Key of the remote MCP server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--message &lt;text&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the message to send to the Runner.</p></td>
-</tr>
-<tr class="row-even"><td><p>--call_tts</p></td>
-<td></td>
-<td><p>Specify whether to execute the TTS (Text-to-Speech) feature.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
-<td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="list-sessions-for-the-agent-cmdbox-m-agent-c-session-list-option">
-<h2>List sessions for the agent. : <cite>cmdbox -m agent -c session_list &lt;Option&gt;</cite><a class="headerlink" href="#list-sessions-for-the-agent-cmdbox-m-agent-c-session-list-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>List sessions for the agent.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--runner_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the Runner configuration.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--user_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify a user name.</p></td>
-</tr>
-<tr class="row-even"><td><p>--session_id &lt;id&gt;</p></td>
-<td></td>
-<td><p>Specify the session ID to send to the Runner.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
-<td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="delete-sessions-for-the-agent-cmdbox-m-agent-c-session-del-option">
-<h2>Delete sessions for the agent. : <cite>cmdbox -m agent -c session_del &lt;Option&gt;</cite><a class="headerlink" href="#delete-sessions-for-the-agent-cmdbox-m-agent-c-session-del-option" title="Link to this heading"></a></h2>
+<section id="agent-session-del-cmdbox-m-agent-c-session-del-option">
+<h2>agent ( session_del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">session_del</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-session-del-cmdbox-m-agent-c-session-del-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Delete sessions for the agent.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -1513,45 +1755,146 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service name of the inference server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+<td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--runner_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the Runner configuration.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--user_name &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify a user name.</p></td>
-</tr>
-<tr class="row-even"><td><p>--session_id &lt;id&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the session ID to send to the Runner.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--runner_name &lt;runner_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the name of the Runner configuration.</p></td>
+</tr>
+<tr class="row-even"><td><p>--user_name &lt;user_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a user name.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--session_id &lt;session_id&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the session ID to send to the Runner.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="agent-session-list-cmdbox-m-agent-c-session-list-option">
+<h2>agent ( session_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">agent</span> <span class="pre">-c</span> <span class="pre">session_list</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#agent-session-list-cmdbox-m-agent-c-session-list-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>List sessions for the agent.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service name of the inference server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--runner_name &lt;runner_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the name of the Runner configuration.</p></td>
+</tr>
+<tr class="row-even"><td><p>--user_name &lt;user_name&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a user name.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--session_id &lt;session_id&gt;</p></td>
+<td></td>
+<td><p>Specify the session ID to send to the Runner.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>

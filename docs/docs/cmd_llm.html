@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( llm mode ) &mdash; cmdbox 2026/04/12 documentation</title>
+  <title>Command Reference ( llm mode ) &mdash; cmdbox 2026/04/26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=98fe3048"></script>
+      <script src="../_static/documentation_options.js?v=c9df5a23"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -47,28 +47,30 @@
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_a2asv.html">A2AServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html">Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_audit.html">Audit</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_embed.html">Embed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_extract.html">Extract</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">LLM</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#deletes-llm-configuration-cmdbox-m-llm-c-del-option">Deletes LLM configuration. : <cite>cmdbox -m llm -c del &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#lists-llm-configurations-cmdbox-m-llm-c-list-option">Lists LLM configurations. : <cite>cmdbox -m llm -c list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#loads-llm-configuration-cmdbox-m-llm-c-load-option">Loads LLM configuration. : <cite>cmdbox -m llm -c load &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#saves-llm-configuration-cmdbox-m-llm-c-save-option">Saves LLM configuration. : <cite>cmdbox -m llm -c save &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#llm-chat-cmdbox-m-llm-c-chat-option">llm ( chat ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">chat</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#llm-del-cmdbox-m-llm-c-del-option">llm ( del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">del</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#llm-list-cmdbox-m-llm-c-list-option">llm ( list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#llm-load-cmdbox-m-llm-c-load-option">llm ( load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">load</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#llm-save-cmdbox-m-llm-c-save-option">llm ( save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">save</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_rag.html">RAG</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_test.html">Test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
 </ul>
@@ -109,19 +111,17 @@
              
   <section id="command-reference-llm-mode">
 <h1>Command Reference ( llm mode )<a class="headerlink" href="#command-reference-llm-mode" title="Link to this heading"></a></h1>
+<p>List of llm mode commands.</p>
+<section id="llm-chat-cmdbox-m-llm-c-chat-option">
+<h2>llm ( chat ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">chat</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#llm-chat-cmdbox-m-llm-c-chat-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>List of llm mode commands.</p></li>
-</ul>
-<section id="deletes-llm-configuration-cmdbox-m-llm-c-del-option">
-<h2>Deletes LLM configuration. : <cite>cmdbox -m llm -c del &lt;Option&gt;</cite><a class="headerlink" href="#deletes-llm-configuration-cmdbox-m-llm-c-del-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Deletes LLM configuration. This command sends a delete request to the agent via Redis.</p></li>
+<li><p>Send a chat message to the LLM.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -130,157 +130,119 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--llmname &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
-<td><p>Specify the name of the LLM configuration to delete.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-</tbody>
-</table>
-</section>
-<section id="lists-llm-configurations-cmdbox-m-llm-c-list-option">
-<h2>Lists LLM configurations. : <cite>cmdbox -m llm -c list &lt;Option&gt;</cite><a class="headerlink" href="#lists-llm-configurations-cmdbox-m-llm-c-list-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Lists LLM configurations. Sends a list request to the agent and receives matching LLM names.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--kwd &lt;keyword&gt;</p></td>
-<td></td>
-<td><p>Specify a partial match keyword to filter saved LLMs.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
-<td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="loads-llm-configuration-cmdbox-m-llm-c-load-option">
-<h2>Loads LLM configuration. : <cite>cmdbox -m llm -c load &lt;Option&gt;</cite><a class="headerlink" href="#loads-llm-configuration-cmdbox-m-llm-c-load-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Loads LLM configuration from the agent.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 10.0%" />
-<col style="width: 60.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
-</tr>
-<tr class="row-even"><td><p>--llmname &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-odd"><td><p>--llmname &lt;llmname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the name of the LLM configuration to load.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+<tr class="row-even"><td><p>--msg_role &lt;msg_role&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the role of the message sender.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--msg_name &lt;msg_name&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+<td><p>Specify the name of the message sender. Required if msg_role is <cite>function</cite> or <cite>tool</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--msg_text &lt;msg_text&gt;</p></td>
 <td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
+<td><p>Specify the content of the text to be sent.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--msg_text_system &lt;msg_text_system&gt;</p></td>
+<td></td>
+<td><p>Specify the system prompt to send. Using <cite>{{AAA}}</cite> allows you to set the <cite>AAA</cite> parameter. Note that specifying <cite>{{msg_text}}</cite> sets the value of the <cite>msg_text</cite> option.</p></td>
+</tr>
+<tr class="row-even"><td><p>--msg_text_param &lt;msg_text_param&gt;</p></td>
+<td></td>
+<td><p>Specify the parameters for the text.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--msg_image_url &lt;msg_image_url&gt;</p></td>
+<td></td>
+<td><p>Specify the URL of the image to be sent.</p></td>
+</tr>
+<tr class="row-even"><td><p>--msg_audio &lt;msg_audio&gt;</p></td>
+<td></td>
+<td><p>Specify the content of the audio to be sent.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--msg_audio_format &lt;msg_audio_format&gt;</p></td>
+<td></td>
+<td><p>Specify the format of the audio to be sent.</p></td>
+</tr>
+<tr class="row-even"><td><p>--msg_video_url &lt;msg_video_url&gt;</p></td>
+<td></td>
+<td><p>Specify the URL of the video to be sent.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--msg_file_url &lt;msg_file_url&gt;</p></td>
+<td></td>
+<td><p>Specify the URL of the file to be sent.</p></td>
+</tr>
+<tr class="row-even"><td><p>--msg_doc &lt;msg_doc&gt;</p></td>
+<td></td>
+<td><p>Specify the content of the document to be sent.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--msg_doc_mime &lt;msg_doc_mime&gt;</p></td>
+<td></td>
+<td><p>Specify the MIME type of the document to be sent.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="saves-llm-configuration-cmdbox-m-llm-c-save-option">
-<h2>Saves LLM configuration. : <cite>cmdbox -m llm -c save &lt;Option&gt;</cite><a class="headerlink" href="#saves-llm-configuration-cmdbox-m-llm-c-save-option" title="Link to this heading"></a></h2>
+<section id="llm-del-cmdbox-m-llm-c-del-option">
+<h2>llm ( del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">del</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#llm-del-cmdbox-m-llm-c-del-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Saves LLM configuration via the agent.</p></li>
+<li><p>Deletes LLM configuration.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 30.0%" />
+<col style="width: 20.0%" />
 <col style="width: 10.0%" />
-<col style="width: 60.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -289,77 +251,316 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--llmname &lt;name&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--llmname &lt;llmname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the name of the LLM configuration to delete.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="llm-list-cmdbox-m-llm-c-list-option">
+<h2>llm ( list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">list</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#llm-list-cmdbox-m-llm-c-list-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Lists saved LLM configurations.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--kwd &lt;kwd&gt;</p></td>
+<td></td>
+<td><p>Specify the name you want to search for. Searches for partial matches.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="llm-load-cmdbox-m-llm-c-load-option">
+<h2>llm ( load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">load</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#llm-load-cmdbox-m-llm-c-load-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Loads LLM configuration.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--llmname &lt;llmname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the name of the LLM configuration to load.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="llm-save-cmdbox-m-llm-c-save-option">
+<h2>llm ( save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">save</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#llm-save-cmdbox-m-llm-c-save-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Saves LLM configuration.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--llmname &lt;llmname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the name of the LLM configuration to save.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--llmprov &lt;provider&gt;</p></td>
-<td><p>Yes</p></td>
+<tr class="row-even"><td><p>--llmprov &lt;llmprov&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify llm provider.</p></td>
 </tr>
-<tr class="row-even"><td><p>--llmprojectid &lt;id&gt;</p></td>
+<tr class="row-odd"><td><p>--llmprojectid &lt;llmprojectid&gt;</p></td>
 <td></td>
-<td><p>Project ID for provider connection.</p></td>
+<td><p>Specify the project ID for llm's provider connection.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--llmsvaccountfile &lt;file&gt;</p></td>
+<tr class="row-even"><td><p>--llmsvaccountfile &lt;llmsvaccountfile&gt;</p></td>
 <td></td>
-<td><p>Service account file for provider connection.</p></td>
+<td><p>Specifies the service account file for llm's provider connection.</p></td>
 </tr>
-<tr class="row-even"><td><p>--llmlocation &lt;location&gt;</p></td>
+<tr class="row-odd"><td><p>--llmlocation &lt;llmlocation&gt;</p></td>
 <td></td>
-<td><p>Provider location.</p></td>
+<td><p>Specifies the location for llm provider connections.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--llmapikey &lt;key&gt;</p></td>
+<tr class="row-even"><td><p>--llmapikey &lt;llmapikey&gt;</p></td>
 <td></td>
-<td><p>API key for provider connection.</p></td>
+<td><p>Specify API key for llm provider connection.</p></td>
 </tr>
-<tr class="row-even"><td><p>--llmapiversion &lt;version&gt;</p></td>
+<tr class="row-odd"><td><p>--llmapiversion &lt;llmapiversion&gt;</p></td>
 <td></td>
 <td><p>Specifies the API version for llm provider connections.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--llmendpoint &lt;endpoint&gt;</p></td>
+<tr class="row-even"><td><p>--llmendpoint &lt;llmendpoint&gt;</p></td>
 <td></td>
-<td><p>Provider endpoint.</p></td>
+<td><p>Specifies the endpoint for llm provider connections.</p></td>
 </tr>
-<tr class="row-even"><td><p>--llmmodel &lt;model&gt;</p></td>
+<tr class="row-odd"><td><p>--llmmodel &lt;llmmodel&gt;</p></td>
 <td></td>
-<td><p>LLM model name.</p></td>
+<td><p>Specifies the llm model.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--llmseed &lt;int&gt;</p></td>
+<tr class="row-even"><td><p>--llmseed &lt;llmseed&gt;</p></td>
 <td></td>
-<td><p>Seed for model sampling.</p></td>
+<td><p>Specifies the seed value when using llm model.</p></td>
 </tr>
-<tr class="row-even"><td><p>--llmtemperature &lt;float&gt;</p></td>
+<tr class="row-odd"><td><p>--llmtemperature &lt;llmtemperature&gt;</p></td>
 <td></td>
-<td><p>Temperature for model sampling.</p></td>
+<td><p>Specifies the temperature when using llm model.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+<td><p>Save the processing result json file by appending.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>

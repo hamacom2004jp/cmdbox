@@ -1,0 +1,183 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Command Reference ( omni mode ) &mdash; cmdbox 2026/04/26 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=c9df5a23"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Command Reference ( omni mode )</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/cmd_omni.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="command-reference-omni-mode">
+<h1>Command Reference ( omni mode )<a class="headerlink" href="#command-reference-omni-mode" title="Link to this heading"></a></h1>
+<p>List of omni mode commands.</p>
+<section id="omni-pred-cmdbox-m-omni-c-pred-option">
+<h2>omni ( pred ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">omni</span> <span class="pre">-c</span> <span class="pre">pred</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#omni-pred-cmdbox-m-omni-c-pred-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Performs multimodal inference using the Omni model.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

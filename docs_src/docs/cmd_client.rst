@@ -1,13 +1,13 @@
 .. -*- coding: utf-8 -*-
 
-****************************************************
+*********************************
 Command Reference ( client mode )
-****************************************************
+*********************************
 
 List of client mode commands.
 
-client ( Copy File ) : `cmdbox -m client -c file_copy <Option>`
-========================================================================================
+client ( file_copy ) : ``cmdbox -m client -c file_copy <Option>``
+=================================================================
 
 - Copy the files under the data folder on the server side.
 
@@ -16,97 +16,115 @@ client ( Copy File ) : `cmdbox -m client -c file_copy <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--from_path <source path>","","Specify the copy source path under the data folder of the inference server."
-    "--to_path <destination path>","","Specify the path to copy under the data folder of the inference server."
-    "--from_fwpath <source fwpath>","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
-    "--to_fwpath <destination fwpath>","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
-    "--orverwrite","","Overwrites the file even if it exists at the copy destination."
-    "--scope <reference scope>","","Specifies the scope to be referenced. Possible image types are `client` , `current`, and `server`."
-    "--client_data <data folder>","","Specify the path of the data folder when local is referenced."
-    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
-    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "--from_path <from_path>","required","Specify the copy source path under the data folder of the inference server."
+    "--to_path <to_path>","required","Specify the path to copy under the data folder of the inference server."
+    "--from_fwpath <from_fwpath>","required","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
+    "--to_fwpath <to_fwpath>","required","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
+    "--orverwrite <orverwrite>","","Overwrites the copy even if it exists at the destination."
+    "--scope <scope>","required","Specifies the scope to be referenced. Possible image types are `client` , `current`, and `server`."
+    "--client_data <client_data>","","Specify the path of the data folder when local is referenced."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
-client ( Download File ) : `cmdbox -m client -c file_download <Option>`
-==========================================================================================
+client ( file_download ) : ``cmdbox -m client -c file_download <Option>``
+=========================================================================
 
 - Download a file under the data folder on the server.
-- Save the file specified by `--svpath` to the location specified by `--download_file`.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--svpath <server-side path>","","Specify the directory path to get the list of files."
-    "--fwpath <server-side fwpath>","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
-    "--etag <hash>","","Specify the ETag. If the ETag matches the file's ETag on the server, the file content will not be downloaded and an empty response will be returned."
-    "--scope <reference scope>","","Specifies the scope to be referenced. Possible image types are `client` , `current`, and `server`."
-    "--rpath <client-request path>","","Specifies the request path. This value is returned in the response without any modification."
-    "--download_file <client-side path>","","Specify the destination path of the client."
-    "--client_data <data folder>","","Specify the path of the data folder when local is referenced."
-    "--img_thumbnail <Thumbnail size>","","Specifies the size in pixels of the thumbnail if the subject is an image."
-    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
-    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "--svpath <svpath>","required","Specify the directory path to get the list of files."
+    "--fwpath <fwpath>","required","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
+    "--etag <etag>","","Specify the ETag. If the ETag matches the file's ETag on the server, the file content will not be downloaded and an empty response will be returned."
+    "--scope <scope>","required","Specifies the scope to be referenced. When omitted, 'client' is used."
+    "--rpath <rpath>","","Specifies the request path. This value is returned in the response without any modification."
+    "--download_file <download_file>","","Specify the destination path of the client."
+    "--client_data <client_data>","","Specify the path of the data folder when local is referenced."
+    "--img_thumbnail <img_thumbnail>","","Specifies the size in pixels of the thumbnail if the subject is an image."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
-client ( List File ) : `cmdbox -m client -c file_list <Option>`
-========================================================================================
+client ( file_list ) : ``cmdbox -m client -c file_list <Option>``
+=================================================================
 
 - Get a list of files under the data folder.
-- Returns the folder specified by `--svpath` and a list of the folders and files under it.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--svpath <server-side path>","","Specify the directory path to get the list of files."
-    "--fwpath <server-side fwpath>","","Specify a path to determine whether the specified path is out of bounds. If it is not under this path, it is interpreted as having specified this path."
-    "--scope <reference scope>","","Specifies the scope to be referenced. Possible image types are `client` , `current`, and `server`."
-    "--recursive","","Get a list of files recursively for a folder contained in the specified path."
-    "--client_data <data folder>","","Specify the path of the data folder when local is referenced."
-    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
-    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "--svpath <svpath>","required","Specify the directory path to get the list of files."
+    "--fwpath <fwpath>","required","Specify a path to determine whether the specified path is out of bounds. If it is not under this path, it is interpreted as having specified this path."
+    "--listregs <listregs>","","Specify the regular expression conditions to list."
+    "--recursive <recursive>","","Get a list of files recursively for a folder contained in the specified path."
+    "--scope <scope>","required","Specifies the scope to be referenced. When omitted, 'client' is used."
+    "--client_data <client_data>","","Specify the path of the data folder when local is referenced."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
-client ( Create Folder ) : `cmdbox -m client -c file_mkdir <Option>`
-========================================================================================
+client ( file_mkdir ) : ``cmdbox -m client -c file_mkdir <Option>``
+===================================================================
 
 - Create a new folder under the data folder.
-- Creates the folder specified by `--svpath`.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--svpath <server-side path>","","Specify the directory path to get the list of files."
-    "--fwpath <server-side fwpath>","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
-    "--scope <reference scope>","","Specifies the scope to be referenced. Possible image types are `client` , `current`, and `server`."
-    "--client_data <data folder>","","Specify the path of the data folder when local is referenced."
-    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
-    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "--svpath <svpath>","required","Specify the directory path to get the list of files."
+    "--fwpath <fwpath>","required","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
+    "--scope <scope>","required","Specifies the scope to be referenced. When omitted, 'client' is used."
+    "--client_data <client_data>","","Specify the path of the data folder when local is referenced."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
-client ( Move File ) : `cmdbox -m client -c file_move <Option>`
-========================================================================================
+client ( file_move ) : ``cmdbox -m client -c file_move <Option>``
+=================================================================
 
 - Move the files under the data folder.
 
@@ -115,94 +133,135 @@ client ( Move File ) : `cmdbox -m client -c file_move <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--from_path <source path>","","Specify the source path under the data folder."
-    "--to_path <destination path>","","Specify the destination path under the data folder."
-    "--from_fwpath <source fwpath>","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
-    "--to_fwpath <destination fwpath>","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
-    "--scope <reference scope>","","Specifies the scope to be referenced. Possible image types are `client` , `current`, and `server`."
-    "--client_data <data folder>","","Specify the path of the data folder when local is referenced."
-    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
-    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "--from_path <from_path>","required","Specify the source path under the data folder."
+    "--to_path <to_path>","required","Specify the destination path under the data folder."
+    "--from_fwpath <from_fwpath>","required","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
+    "--to_fwpath <to_fwpath>","required","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
+    "--scope <scope>","required","Specifies the scope to be referenced. When omitted, 'client' is used."
+    "--client_data <client_data>","","Specify the path of the data folder when local is referenced."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
-client ( Delete File ) : `cmdbox -m client -c file_remove <Option>`
-========================================================================================
+client ( file_remove ) : ``cmdbox -m client -c file_remove <Option>``
+=====================================================================
 
 - Delete a file under the data folder.
-- Deletes the file specified by `--svpath`.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--svpath <server-side path>","","Specify the directory path to get the list of files."
-    "--fwpath <server-side fwpath>","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
-    "--scope <reference scope>","","Specifies the scope to be referenced. Possible image types are `client` , `current`, and `server`."
-    "--client_data <data folder>","","Specify the path of the data folder when local is referenced."
-    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
-    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "--svpath <svpath>","required","Specify the directory path to get the list of files."
+    "--fwpath <fwpath>","required","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
+    "--scope <scope>","required","Specifies the scope to be referenced. When omitted, 'client' is used."
+    "--client_data <client_data>","","Specify the path of the data folder when local is referenced."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
-client ( Delete Folder ) : `cmdbox -m client -c file_rmdir <Option>`
-========================================================================================
+client ( file_rmdir ) : ``cmdbox -m client -c file_rmdir <Option>``
+===================================================================
 
 - Delete a folder under the data folder.
-- Deletes the folder specified by `--svpath`.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--svpath <server-side path>","","Specify the directory path to get the list of files."
-    "--fwpath <server-side fwpath>","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
-    "--scope <reference scope>","","Specifies the scope to be referenced. Possible image types are `client` , `current`, and `server`."
-    "--client_data <data folder>","","Specify the path of the data folder when local is referenced."
-    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
-    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "--svpath <svpath>","required","Specify the directory path to get the list of files."
+    "--fwpath <fwpath>","required","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
+    "--scope <scope>","required","Specifies the scope to be referenced. When omitted, 'client' is used."
+    "--client_data <client_data>","","Specify the path of the data folder when local is referenced."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
-client ( Upload File ) : `cmdbox -m client -c file_upload <Option>`
-========================================================================================
+client ( file_upload ) : ``cmdbox -m client -c file_upload <Option>``
+=====================================================================
 
 - Upload a file under the data folder.
-- Upload the file specified by `--upload_file` to the location specified by `--svpath`.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--svpath <server-side path>","","Specify the directory path to get the list of files."
-    "--fwpath <server-side fwpath>","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
-    "--scope <reference scope>","","Specifies the scope to be referenced. Possible image types are `client` , `current`, and `server`."
-    "--upload_file <client-side path>","","Specify the source path of the client."
-    "--client_data <data folder>","","Specify the path of the data folder when local is referenced."
-    "--mkdir","","If there is no in between folder, create one."
-    "--orverwrite","","Overwrites the file even if it exists at the upload destination."
-    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
-    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "--svpath <svpath>","required","Specify the directory path to get the list of files."
+    "--fwpath <fwpath>","required","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
+    "--scope <scope>","required","Specifies the scope to be referenced. When omitted, 'client' is used."
+    "--upload_file <upload_file>","","Specify the source path of the client."
+    "--client_data <client_data>","","Specify the path of the data folder when local is referenced."
+    "--mkdir <mkdir>","","If there is no in between folder, create one."
+    "--orverwrite <orverwrite>","","Overwrites the file even if it exists at the upload destination."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
-client ( Server Info ) : `cmdbox -m client -c server_info <Option>`
-========================================================================================
+client ( http ) : ``cmdbox -m client -c http <Option>``
+=======================================================
+
+- Sends a request to the HTTP server and gets a response.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--url <url>","required","Specify the URL to request."
+    "--proxy <proxy>","","Specifies whether or not to send the received request parameters to the destination URL when invoked in web mode."
+    "--send_method <send_method>","required","Specifies the request method."
+    "--send_content_type <send_content_type>","","Specifies the Content-Type of the data to be sent."
+    "--send_apikey <send_apikey>","","Specify the API key to be used for authentication of the request destination."
+    "--send_header <send_header>","","Specifies the request header."
+    "--send_param <send_param>","","Specifies parameters to be sent."
+    "--send_data <send_data>","","Specifies the data to be sent."
+    "--send_verify <send_verify>","","Specifies the timeout before a response is received."
+    "--send_timeout <send_timeout>","","Specifies the timeout before a response is received."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+
+client ( server_info ) : ``cmdbox -m client -c server_info <Option>``
+=====================================================================
 
 - Retrieve server information.
 
@@ -211,37 +270,21 @@ client ( Server Info ) : `cmdbox -m client -c server_info <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
-    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
-client ( Http ) : `cmdbox -m client -c http <Option>`
-========================================================================================
-
-- Retrieve server information.
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--url <url>","","Specify the URL to request."
-    "--proxy <yes|no>","","Specifies whether or not to send the received request parameters to the destination URL when invoked in web mode."
-    "--send_method <method>","","Specifies the request method."
-    "--send_content_type <content_type>","","Specifies the Content-Type of the data to be sent."
-    "--send_apikey <apikey>","","Specify the API key to be used for authentication of the request destination."
-    "--send_header <header>","","Specifies the request header."
-    "--send_param <param>","","Specifies parameters to be sent."
-    "--send_data <data>","","Specifies the data to be sent."
-    "--send_verify","","Specifies the timeout before a response is received."
-    "--send_timeout <time-out>","","Specifies the timeout before a response is received."
-
-client ( Time ) : `cmdbox -m client -c time <Option>`
-========================================================================================
+client ( time ) : ``cmdbox -m client -c time <Option>``
+=======================================================
 
 - Displays the current time at the client side.
 
@@ -250,5 +293,4 @@ client ( Time ) : `cmdbox -m client -c time <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--timedelta <tz>","","Specify the number of hours of time difference."
-
+    "--timedelta <timedelta>","","Specify the number of hours of time difference."

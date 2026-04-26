@@ -1,13 +1,13 @@
 .. -*- coding: utf-8 -*-
 
-****************************************************
+********************************
 Command Reference ( excel mode )
-****************************************************
+********************************
 
 List of excel mode commands.
 
-excel ( Cell Details ) : `cmdbox -m excel -c cell_details <Option>`
-========================================================================================
+excel ( cell_details ) : ``cmdbox -m excel -c cell_details <Option>``
+=====================================================================
 
 - Get the details of the specified cell in the Excel file under the data folder.
 
@@ -16,26 +16,30 @@ excel ( Cell Details ) : `cmdbox -m excel -c cell_details <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--scope <reference scope>","","Specifies the scope to be referenced. Possible image types are `client` , `current`, and `server`."
-    "--svpath <server-side path>","","Specify the directory path to get the list of files."
-    "--client_data <data folder>","","Specify the path of the data folder when local is referenced."
-    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
-    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
-    "--formula_data_only","","Specify whether to get only formula data. This option is valid if cached data exists."
-    "--sheet_name <Sheet Name>","","Specify the sheet name to get the cell value.If omitted, the first sheet will be used."
-    "--cell_name <Cell Name>","","Specify the cell name to get the cell value. For example, `A1`, `B2`, `R5987`."
-    "--cell_top_left <Cell Name>","","Specify the top-left cell name to get the cell value. For example, `A1`, `B2`, `R5987`."
-    "--cell_bottom_right <Cell Name>","","Specify the bottom-right cell name to get the cell value. For example, `A1`, `B2`, `R5987`."
-    "--output_detail_format <format>","","Specify the output format. For example, `json`, `text`."
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "--scope <scope>","required","Specifies the scope to be referenced. When omitted, 'client' is used."
+    "--svpath <svpath>","required","Specify the directory path to get the list of files."
+    "--client_data <client_data>","","Specify the path of the data folder when local is referenced."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+    "--formula_data_only <formula_data_only>","required","Specify whether to get only formula data. This option is valid if cached data exists."
+    "--sheet_name <sheet_name>","","Specify the sheet name to get the cell value.If omitted, the first sheet will be used."
+    "--cell_name <cell_name>","","Specify the cell name to get the cell value. For example, `A1`, `B2`, `R5987`."
+    "--cell_top_left <cell_top_left>","","Specify the top-left cell name to get the cell value. For example, `A1`, `B2`, `R5987`."
+    "--cell_bottom_right <cell_bottom_right>","","Specify the bottom-right cell name to get the cell value. For example, `A1`, `B2`, `R5987`."
+    "--output_detail_format <output_detail_format>","","Specify the output format. For example, `json`, `text`."
 
-
-excel ( Cell Search ) : `cmdbox -m excel -c cell_search <Option>`
-========================================================================================
+excel ( cell_search ) : ``cmdbox -m excel -c cell_search <Option>``
+===================================================================
 
 - Searches for the value in the specified cell of an Excel file located in the data folder.
 
@@ -44,28 +48,32 @@ excel ( Cell Search ) : `cmdbox -m excel -c cell_search <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--scope <reference scope>","","Specifies the scope to be referenced. Possible image types are `client` , `current`, and `server`."
-    "--svpath <server-side path>","","Specify the directory path to get the list of files."
-    "--client_data <data folder>","","Specify the path of the data folder when local is referenced."
-    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
-    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
-    "--formula_data_only","","Specify whether to get only formula data. This option is valid if cached data exists."
-    "--sheet_name <Sheet Name>","","Specify the sheet name to get the cell value.If omitted, the first sheet will be used."
-    "--cell_name <Cell Name>","","Specify the cell name to get the cell value. For example, `A1`, `B2`, `R5987`."
-    "--cell_top_left <Cell Name>","","Specify the top-left cell name to get the cell value. For example, `A1`, `B2`, `R5987`."
-    "--cell_bottom_right <Cell Name>","","Specify the bottom-right cell name to get the cell value. For example, `A1`, `B2`, `R5987`."
-    "--match_type <type>","","Specifies the matching method for the value in the search cell. `full`: Exact match, `partial`: Partial match, `regex`: Regular expression."
-    "--search_value <value>","","Specify the value to search for in the cell. The method of specification depends on `match_type`."
-    "--output_cell_format <format>","","Specify the output format. For example, `json`, `csv`、 `md`、 `html`."
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "--scope <scope>","required","Specifies the scope to be referenced. When omitted, 'client' is used."
+    "--svpath <svpath>","required","Specify the directory path to get the list of files."
+    "--client_data <client_data>","","Specify the path of the data folder when local is referenced."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+    "--formula_data_only <formula_data_only>","required","Specify whether to get only formula data. This option is valid if cached data exists."
+    "--sheet_name <sheet_name>","","Specify the sheet name to get the cell value.If omitted, all sheets will be used."
+    "--cell_name <cell_name>","","Specify the cell name to search for the cell value. For example, `A1`, `B2`, `R5987`."
+    "--cell_top_left <cell_top_left>","","Specify the top-left cell name to search for the cell value. For example, `A1`, `B2`, `R5987`."
+    "--cell_bottom_right <cell_bottom_right>","","Specify the bottom-right cell name to search for the cell value. For example, `A1`, `B2`, `R5987`."
+    "--match_type <match_type>","required","Specifies the matching method for the value in the search cell. `full`: Exact match, `partial`: Partial match, `regex`: Regular expression."
+    "--search_value <search_value>","required","Specify the value to search for in the cell. The method of specification depends on `match_type`."
+    "--output_cell_format <output_cell_format>","","Specify the output format. For example, `json`, `csv`、 `md`、 `html`."
 
-
-excel ( Cell Values ) : `cmdbox -m excel -c cell_values <Option>`
-========================================================================================
+excel ( cell_values ) : ``cmdbox -m excel -c cell_values <Option>``
+===================================================================
 
 - Retrieves or sets the value of a specified cell in an Excel file located within the data folder.
 
@@ -74,20 +82,51 @@ excel ( Cell Values ) : `cmdbox -m excel -c cell_values <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IP address or host name>","","Specify the service host of the Redis server."
-    "--port <port number>","","Specify the service port of the Redis server."
-    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <Service Name>","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--scope <reference scope>","","Specifies the scope to be referenced. Possible image types are `client` , `current`, and `server`."
-    "--svpath <server-side path>","","Specify the directory path to get the list of files."
-    "--client_data <data folder>","","Specify the path of the data folder when local is referenced."
-    "--retry_count <Number of retries>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
-    "--retry_interval <Retry Interval>","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <time-out>","","Specify the maximum waiting time until the server responds."
-    "--formula_data_only","","Specify whether to get only formula data. This option is valid if cached data exists."
-    "--sheet_name <Sheet Name>","","Specify the sheet name to get the cell value.If omitted, the first sheet will be used."
-    "--cell_name <Cell Name>","","Specify the cell name to get the cell value. For example, `A1`, `B2`, `R5987`."
-    "--cell_top_left <Cell Name>","","Specify the top-left cell name to get the cell value. For example, `A1`, `B2`, `R5987`."
-    "--cell_bottom_right <Cell Name>","","Specify the bottom-right cell name to get the cell value. For example, `A1`, `B2`, `R5987`."
-    "--cell_value <value>","","Set a value in a cell. Specify the cell's name and value. Cell names can be, for example, `A1`, `B2`, or `R5987`."
-    "--output_cell_format <format>","","Specify the output format. For example, `json`, `csv`、 `md`、 `html`."
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "--scope <scope>","required","Specifies the scope to be referenced. When omitted, 'client' is used."
+    "--svpath <svpath>","required","Specify the directory path to get the list of files."
+    "--client_data <client_data>","","Specify the path of the data folder when local is referenced."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+    "--formula_data_only <formula_data_only>","required","Specify whether to get only formula data. This option is valid if cached data exists."
+    "--sheet_name <sheet_name>","","Specify the sheet name to get the cell value.If omitted, the first sheet will be used."
+    "--cell_name <cell_name>","","Specify the cell name to get the cell value. For example, `A1`, `B2`, `R5987`."
+    "--cell_top_left <cell_top_left>","","Specify the top-left cell name to get the cell value. For example, `A1`, `B2`, `R5987`."
+    "--cell_bottom_right <cell_bottom_right>","","Specify the bottom-right cell name to get the cell value. For example, `A1`, `B2`, `R5987`."
+    "--cell_value <cell_value>","","Set a value in a cell. Specify the cell's name and value. Cell names can be, for example, `A1`, `B2`, or `R5987`."
+    "--output_cell_format <output_cell_format>","","Specify the output format. For example, `json`, `csv`、 `md`、 `html`."
+
+excel ( sheet_list ) : ``cmdbox -m excel -c sheet_list <Option>``
+=================================================================
+
+- Retrieves the list of sheets in an Excel file located within the data folder.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "--scope <scope>","required","Specifies the scope to be referenced. When omitted, 'client' is used."
+    "--svpath <svpath>","required","Specify the directory path to get the list of files."
+    "--client_data <client_data>","","Specify the path of the data folder when local is referenced."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."

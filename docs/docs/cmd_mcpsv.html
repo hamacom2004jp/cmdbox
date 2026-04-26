@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( mcpsv mode ) &mdash; cmdbox 2026/04/12 documentation</title>
+  <title>Command Reference ( mcpsv mode ) &mdash; cmdbox 2026/04/26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=98fe3048"></script>
+      <script src="../_static/documentation_options.js?v=c9df5a23"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -47,13 +47,13 @@
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_a2asv.html">A2AServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html">Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_audit.html">Audit</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_embed.html">Embed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
@@ -61,12 +61,13 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_llm.html">LLM</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">MCPServer</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#mcpsv-start-cmdbox-m-mcpsv-c-start-option">mcpsv ( start ) : <cite>cmdbox -m mcpsv -c start &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#mcpsv-stop-cmdbox-m-mcpsv-c-stop-option">mcpsv ( stop ) : <cite>cmdbox -m mcpsv -c stop &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mcpsv-start-cmdbox-m-mcpsv-c-start-option">mcpsv ( start ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">mcpsv</span> <span class="pre">-c</span> <span class="pre">start</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mcpsv-stop-cmdbox-m-mcpsv-c-stop-option">mcpsv ( stop ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">mcpsv</span> <span class="pre">-c</span> <span class="pre">stop</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_rag.html">RAG</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_test.html">Test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
 </ul>
@@ -109,9 +110,9 @@
 <h1>Command Reference ( mcpsv mode )<a class="headerlink" href="#command-reference-mcpsv-mode" title="Link to this heading"></a></h1>
 <p>List of mcpsv mode commands.</p>
 <section id="mcpsv-start-cmdbox-m-mcpsv-c-start-option">
-<h2>mcpsv ( start ) : <cite>cmdbox -m mcpsv -c start &lt;Option&gt;</cite><a class="headerlink" href="#mcpsv-start-cmdbox-m-mcpsv-c-start-option" title="Link to this heading"></a></h2>
+<h2>mcpsv ( start ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">mcpsv</span> <span class="pre">-c</span> <span class="pre">start</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#mcpsv-start-cmdbox-m-mcpsv-c-start-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Starts the MCP server.</p></li>
+<li><p>Start MCP server.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -126,73 +127,93 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--data &lt;data folder&gt;</p></td>
+<tr class="row-even"><td><p>--data &lt;data&gt;</p></td>
 <td></td>
-<td><p>When omitted, f`$HONE/.{version.__appid__}` is used.</p></td>
+<td><p>When omitted, <cite>$HONE/.cmdbox</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--allow_host &lt;IP to allow connection&gt;</p></td>
+<tr class="row-odd"><td><p>--allow_host &lt;allow_host&gt;</p></td>
 <td></td>
 <td><p>If omitted, <cite>0.0.0.0</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--mcpsv_listen_port &lt;service port&gt;</p></td>
+<tr class="row-even"><td><p>--mcpsv_listen_port &lt;mcpsv_listen_port&gt;</p></td>
 <td></td>
 <td><p>If omitted, <cite>8091</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--ssl_mcpsv_listen_port &lt;service port&gt;</p></td>
+<tr class="row-odd"><td><p>--ssl_mcpsv_listen_port &lt;ssl_mcpsv_listen_port&gt;</p></td>
 <td></td>
 <td><p>If omitted, <cite>8453</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--ssl_cert &lt;SSL server certificate file&gt;</p></td>
+<tr class="row-even"><td><p>--ssl_cert &lt;ssl_cert&gt;</p></td>
 <td></td>
 <td><p>Specify the SSL server certificate file.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--ssl_key &lt;SSL Server Private Key File&gt;</p></td>
+<tr class="row-odd"><td><p>--ssl_key &lt;ssl_key&gt;</p></td>
 <td></td>
 <td><p>Specify the SSL server private key file.</p></td>
 </tr>
-<tr class="row-even"><td><p>--ssl_keypass &lt;SSL Server Private Key Password&gt;</p></td>
+<tr class="row-even"><td><p>--ssl_keypass &lt;ssl_keypass&gt;</p></td>
 <td></td>
 <td><p>Specify the composite password for the SSL server private key file.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--ssl_ca_certs &lt;SSL Server CA Certificate File&gt;</p></td>
+<tr class="row-odd"><td><p>--ssl_ca_certs &lt;ssl_ca_certs&gt;</p></td>
 <td></td>
 <td><p>Specify the SSL server CA certificate file.</p></td>
 </tr>
-<tr class="row-even"><td><p>--signin_file &lt;user list file&gt;</p></td>
-<td></td>
-<td><p>Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required.</p></td>
+<tr class="row-even"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--gunicorn_workers &lt;second&gt;</p></td>
+<tr class="row-odd"><td><p>--gunicorn_workers &lt;gunicorn_workers&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of gunicorn workers, valid only in Linux environment. If -1 or unspecified, the number of CPUs is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--gunicorn_timeout &lt;second&gt;</p></td>
+<tr class="row-even"><td><p>--gunicorn_timeout &lt;gunicorn_timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the timeout duration of the gunicorn worker in seconds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="mcpsv-stop-cmdbox-m-mcpsv-c-stop-option">
-<h2>mcpsv ( stop ) : <cite>cmdbox -m mcpsv -c stop &lt;Option&gt;</cite><a class="headerlink" href="#mcpsv-stop-cmdbox-m-mcpsv-c-stop-option" title="Link to this heading"></a></h2>
+<h2>mcpsv ( stop ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">mcpsv</span> <span class="pre">-c</span> <span class="pre">stop</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#mcpsv-stop-cmdbox-m-mcpsv-c-stop-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Stops the MCP server.</p></li>
+<li><p>Stop MCP server.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -207,9 +228,29 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--data &lt;data folder&gt;</p></td>
+<tr class="row-even"><td><p>--data &lt;data&gt;</p></td>
 <td></td>
-<td><p>When omitted, f`$HONE/.{version.__appid__}` is used.</p></td>
+<td><p>When omitted, <cite>$HONE/.cmdbox</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( tts mode ) &mdash; cmdbox 2026/04/12 documentation</title>
+  <title>Command Reference ( tts mode ) &mdash; cmdbox 2026/04/26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,14 +14,14 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=98fe3048"></script>
+      <script src="../_static/documentation_options.js?v=c9df5a23"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Command Reference ( web mode )" href="cmd_web.html" />
-    <link rel="prev" title="Command Reference ( server mode )" href="cmd_server.html" /> 
+    <link rel="prev" title="Command Reference ( test mode )" href="cmd_test.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -47,13 +47,13 @@
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_a2asv.html">A2AServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html">Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_audit.html">Audit</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_embed.html">Embed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
@@ -63,11 +63,12 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_rag.html">RAG</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_test.html">Test</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">TTS</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#installs-the-text-to-speech-tts-engine-cmdbox-m-tts-c-install-option">Installs the Text-to-Speech (TTS) engine : <cite>cmdbox -m tts -c install &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#lists-the-text-to-speech-tts-engine-cmdbox-m-tts-c-list-option">Lists the Text-to-Speech (TTS) engine : <cite>cmdbox -m tts -c list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#exec-the-text-to-speech-tts-engine-cmdbox-m-tts-c-say-option">Exec the Text-to-Speech (TTS) engine : <cite>cmdbox -m tts -c say &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#uninstalls-the-text-to-speech-tts-engine-cmdbox-m-tts-c-uninstall-option">Uninstalls the Text-to-Speech (TTS) engine : <cite>cmdbox -m tts -c uninstall &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tts-install-cmdbox-m-tts-c-install-option">tts ( install ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">tts</span> <span class="pre">-c</span> <span class="pre">install</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tts-list-cmdbox-m-tts-c-list-option">tts ( list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">tts</span> <span class="pre">-c</span> <span class="pre">list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tts-say-cmdbox-m-tts-c-say-option">tts ( say ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">tts</span> <span class="pre">-c</span> <span class="pre">say</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tts-uninstall-cmdbox-m-tts-c-uninstall-option">tts ( uninstall ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">tts</span> <span class="pre">-c</span> <span class="pre">uninstall</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
@@ -109,11 +110,9 @@
              
   <section id="command-reference-tts-mode">
 <h1>Command Reference ( tts mode )<a class="headerlink" href="#command-reference-tts-mode" title="Link to this heading"></a></h1>
-<ul class="simple">
-<li><p>List of tts mode commands.</p></li>
-</ul>
-<section id="installs-the-text-to-speech-tts-engine-cmdbox-m-tts-c-install-option">
-<h2>Installs the Text-to-Speech (TTS) engine : <cite>cmdbox -m tts -c install &lt;Option&gt;</cite><a class="headerlink" href="#installs-the-text-to-speech-tts-engine-cmdbox-m-tts-c-install-option" title="Link to this heading"></a></h2>
+<p>List of tts mode commands.</p>
+<section id="tts-install-cmdbox-m-tts-c-install-option">
+<h2>tts ( install ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">tts</span> <span class="pre">-c</span> <span class="pre">install</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#tts-install-cmdbox-m-tts-c-install-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Installs the Text-to-Speech (TTS) engine.</p></li>
 </ul>
@@ -130,71 +129,79 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--data &lt;data&gt;</p></td>
+<td></td>
+<td><p>When omitted, <cite>$HONE/.cmdbox</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--force_install</p></td>
+<tr class="row-even"><td><p>--client_only &lt;client_only&gt;</p></td>
+<td></td>
+<td><p>Do not make connections to the server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--force_install &lt;force_install&gt;</p></td>
 <td></td>
 <td><p>Overwrite the installation even if it is already installed.</p></td>
 </tr>
-<tr class="row-even"><td><p>--tts_engine &lt;TTS Engine&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--tts_engine &lt;tts_engine&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the TTS engine to use.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--voicevox_ver &lt;version&gt;</p></td>
+<tr class="row-odd"><td><p>--voicevox_ver &lt;voicevox_ver&gt;</p></td>
 <td></td>
-<td><p>Specify the version of the TTS engine to use.</p></td>
+<td><p>Specify the version of VOICEVOX to use.</p></td>
 </tr>
-<tr class="row-even"><td><p>--voicevox_whl &lt;whl&gt;</p></td>
+<tr class="row-even"><td><p>--voicevox_whl &lt;voicevox_whl&gt;</p></td>
 <td></td>
-<td><p>Specify the wheel file for the TTS engine.</p></td>
+<td><p>Specify the VOICEVOX wheel file to use.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--openjtalk_ver &lt;ver&gt;</p></td>
+<tr class="row-odd"><td><p>--openjtalk_ver &lt;openjtalk_ver&gt;</p></td>
 <td></td>
 <td><p>Specify the version of openjtalk to use.</p></td>
 </tr>
-<tr class="row-even"><td><p>--openjtalk_dic &lt;file&gt;</p></td>
+<tr class="row-even"><td><p>--openjtalk_dic &lt;openjtalk_dic&gt;</p></td>
 <td></td>
 <td><p>Specify the openjtalk dictionary file to use.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--onnxruntime_ver &lt;ver&gt;</p></td>
+<tr class="row-odd"><td><p>--onnxruntime_ver &lt;onnxruntime_ver&gt;</p></td>
 <td></td>
 <td><p>Specify the version of ONNX Runtime to use.</p></td>
 </tr>
-<tr class="row-even"><td><p>--onnxruntime_lib &lt;file&gt;</p></td>
+<tr class="row-even"><td><p>--onnxruntime_lib &lt;onnxruntime_lib&gt;</p></td>
 <td></td>
 <td><p>Specify the ONNX Runtime library file to use.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="lists-the-text-to-speech-tts-engine-cmdbox-m-tts-c-list-option">
-<h2>Lists the Text-to-Speech (TTS) engine : <cite>cmdbox -m tts -c list &lt;Option&gt;</cite><a class="headerlink" href="#lists-the-text-to-speech-tts-engine-cmdbox-m-tts-c-list-option" title="Link to this heading"></a></h2>
+<section id="tts-list-cmdbox-m-tts-c-list-option">
+<h2>tts ( list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">tts</span> <span class="pre">-c</span> <span class="pre">list</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#tts-list-cmdbox-m-tts-c-list-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Lists the Text-to-Speech (TTS) engines.</p></li>
 </ul>
@@ -211,43 +218,43 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--tts_engine &lt;TTS Engine&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--tts_engine &lt;tts_engine&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the TTS engine to use.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="exec-the-text-to-speech-tts-engine-cmdbox-m-tts-c-say-option">
-<h2>Exec the Text-to-Speech (TTS) engine : <cite>cmdbox -m tts -c say &lt;Option&gt;</cite><a class="headerlink" href="#exec-the-text-to-speech-tts-engine-cmdbox-m-tts-c-say-option" title="Link to this heading"></a></h2>
+<section id="tts-say-cmdbox-m-tts-c-say-option">
+<h2>tts ( say ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">tts</span> <span class="pre">-c</span> <span class="pre">say</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#tts-say-cmdbox-m-tts-c-say-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Converts text to speech using the Text-to-Speech (TTS) engine.</p></li>
 </ul>
@@ -264,55 +271,55 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--tts_engine &lt;TTS Engine&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--tts_engine &lt;tts_engine&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the TTS engine to use.</p></td>
 </tr>
-<tr class="row-even"><td><p>--voicevox_model &lt;model&gt;</p></td>
+<tr class="row-even"><td><p>--voicevox_model &lt;voicevox_model&gt;</p></td>
 <td></td>
 <td><p>Specify the model of the TTS engine to use.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--tts_text &lt;text&gt;</p></td>
-<td></td>
-<td><p>Specifies the text to convert</p></td>
+<tr class="row-odd"><td><p>--tts_text &lt;tts_text&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specifies the text to convert.</p></td>
 </tr>
-<tr class="row-even"><td><p>--tts_output &lt;file&gt;</p></td>
+<tr class="row-even"><td><p>--tts_output &lt;tts_output&gt;</p></td>
 <td></td>
 <td><p>Specifies the output file for the converted audio.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="uninstalls-the-text-to-speech-tts-engine-cmdbox-m-tts-c-uninstall-option">
-<h2>Uninstalls the Text-to-Speech (TTS) engine : <cite>cmdbox -m tts -c uninstall &lt;Option&gt;</cite><a class="headerlink" href="#uninstalls-the-text-to-speech-tts-engine-cmdbox-m-tts-c-uninstall-option" title="Link to this heading"></a></h2>
+<section id="tts-uninstall-cmdbox-m-tts-c-uninstall-option">
+<h2>tts ( uninstall ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">tts</span> <span class="pre">-c</span> <span class="pre">uninstall</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#tts-uninstall-cmdbox-m-tts-c-uninstall-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Uninstalls the Text-to-Speech (TTS) engine.</p></li>
 </ul>
@@ -329,36 +336,44 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--data &lt;data&gt;</p></td>
+<td></td>
+<td><p>When omitted, <cite>$HONE/.cmdbox</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--tts_engine &lt;TTS Engine&gt;</p></td>
+<tr class="row-even"><td><p>--client_only &lt;client_only&gt;</p></td>
 <td></td>
+<td><p>Do not make connections to the server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--tts_engine &lt;tts_engine&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the TTS engine to use.</p></td>
 </tr>
 </tbody>
@@ -370,7 +385,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cmd_server.html" class="btn btn-neutral float-left" title="Command Reference ( server mode )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmd_test.html" class="btn btn-neutral float-left" title="Command Reference ( test mode )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="cmd_web.html" class="btn btn-neutral float-right" title="Command Reference ( web mode )" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

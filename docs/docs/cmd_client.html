@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( client mode ) &mdash; cmdbox 2026/04/12 documentation</title>
+  <title>Command Reference ( client mode ) &mdash; cmdbox 2026/04/26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,13 +14,13 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=98fe3048"></script>
+      <script src="../_static/documentation_options.js?v=c9df5a23"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Command Reference ( cml mode )" href="cmd_cmd.html" />
+    <link rel="next" title="Command Reference ( cmd mode )" href="cmd_cmd.html" />
     <link rel="prev" title="Command Reference ( audit mode )" href="cmd_audit.html" /> 
 </head>
 
@@ -47,26 +47,26 @@
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_a2asv.html">A2AServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html">Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_audit.html">Audit</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Client</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#client-copy-file-cmdbox-m-client-c-file-copy-option">client ( Copy File ) : <cite>cmdbox -m client -c file_copy &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#client-download-file-cmdbox-m-client-c-file-download-option">client ( Download File ) : <cite>cmdbox -m client -c file_download &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#client-list-file-cmdbox-m-client-c-file-list-option">client ( List File ) : <cite>cmdbox -m client -c file_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#client-create-folder-cmdbox-m-client-c-file-mkdir-option">client ( Create Folder ) : <cite>cmdbox -m client -c file_mkdir &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#client-move-file-cmdbox-m-client-c-file-move-option">client ( Move File ) : <cite>cmdbox -m client -c file_move &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#client-delete-file-cmdbox-m-client-c-file-remove-option">client ( Delete File ) : <cite>cmdbox -m client -c file_remove &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#client-delete-folder-cmdbox-m-client-c-file-rmdir-option">client ( Delete Folder ) : <cite>cmdbox -m client -c file_rmdir &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#client-upload-file-cmdbox-m-client-c-file-upload-option">client ( Upload File ) : <cite>cmdbox -m client -c file_upload &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#client-server-info-cmdbox-m-client-c-server-info-option">client ( Server Info ) : <cite>cmdbox -m client -c server_info &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#client-http-cmdbox-m-client-c-http-option">client ( Http ) : <cite>cmdbox -m client -c http &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#client-time-cmdbox-m-client-c-time-option">client ( Time ) : <cite>cmdbox -m client -c time &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-file-copy-cmdbox-m-client-c-file-copy-option">client ( file_copy ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">file_copy</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-file-download-cmdbox-m-client-c-file-download-option">client ( file_download ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">file_download</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-file-list-cmdbox-m-client-c-file-list-option">client ( file_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">file_list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-file-mkdir-cmdbox-m-client-c-file-mkdir-option">client ( file_mkdir ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">file_mkdir</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-file-move-cmdbox-m-client-c-file-move-option">client ( file_move ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">file_move</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-file-remove-cmdbox-m-client-c-file-remove-option">client ( file_remove ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">file_remove</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-file-rmdir-cmdbox-m-client-c-file-rmdir-option">client ( file_rmdir ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">file_rmdir</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-file-upload-cmdbox-m-client-c-file-upload-option">client ( file_upload ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">file_upload</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-http-cmdbox-m-client-c-http-option">client ( http ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">http</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-server-info-cmdbox-m-client-c-server-info-option">client ( server_info ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">server_info</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-time-cmdbox-m-client-c-time-option">client ( time ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">time</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_embed.html">Embed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
@@ -76,6 +76,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_rag.html">RAG</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_test.html">Test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
 </ul>
@@ -117,8 +118,8 @@
   <section id="command-reference-client-mode">
 <h1>Command Reference ( client mode )<a class="headerlink" href="#command-reference-client-mode" title="Link to this heading"></a></h1>
 <p>List of client mode commands.</p>
-<section id="client-copy-file-cmdbox-m-client-c-file-copy-option">
-<h2>client ( Copy File ) : <cite>cmdbox -m client -c file_copy &lt;Option&gt;</cite><a class="headerlink" href="#client-copy-file-cmdbox-m-client-c-file-copy-option" title="Link to this heading"></a></h2>
+<section id="client-file-copy-cmdbox-m-client-c-file-copy-option">
+<h2>client ( file_copy ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">file_copy</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#client-file-copy-cmdbox-m-client-c-file-copy-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Copy the files under the data folder on the server side.</p></li>
 </ul>
@@ -135,70 +136,89 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--from_path &lt;source path&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--from_path &lt;from_path&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the copy source path under the data folder of the inference server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--to_path &lt;destination path&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--to_path &lt;to_path&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the path to copy under the data folder of the inference server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--from_fwpath &lt;source fwpath&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--from_fwpath &lt;from_fwpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--to_fwpath &lt;destination fwpath&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--to_fwpath &lt;to_fwpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
 </tr>
-<tr class="row-even"><td><p>--orverwrite</p></td>
+<tr class="row-even"><td><p>--orverwrite &lt;orverwrite&gt;</p></td>
 <td></td>
-<td><p>Overwrites the file even if it exists at the copy destination.</p></td>
+<td><p>Overwrites the copy even if it exists at the destination.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;reference scope&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="client-download-file-cmdbox-m-client-c-file-download-option">
-<h2>client ( Download File ) : <cite>cmdbox -m client -c file_download &lt;Option&gt;</cite><a class="headerlink" href="#client-download-file-cmdbox-m-client-c-file-download-option" title="Link to this heading"></a></h2>
+<section id="client-file-download-cmdbox-m-client-c-file-download-option">
+<h2>client ( file_download ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">file_download</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#client-file-download-cmdbox-m-client-c-file-download-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Download a file under the data folder on the server.</p></li>
-<li><p>Save the file specified by <cite>--svpath</cite> to the location specified by <cite>--download_file</cite>.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -213,74 +233,93 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--svpath &lt;server-side path&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--svpath &lt;svpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--fwpath &lt;server-side fwpath&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--fwpath &lt;fwpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
 </tr>
-<tr class="row-even"><td><p>--etag &lt;hash&gt;</p></td>
+<tr class="row-even"><td><p>--etag &lt;etag&gt;</p></td>
 <td></td>
 <td><p>Specify the ETag. If the ETag matches the file's ETag on the server, the file content will not be downloaded and an empty response will be returned.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;reference scope&gt;</p></td>
-<td></td>
-<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
+<tr class="row-odd"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--rpath &lt;client-request path&gt;</p></td>
+<tr class="row-even"><td><p>--rpath &lt;rpath&gt;</p></td>
 <td></td>
 <td><p>Specifies the request path. This value is returned in the response without any modification.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--download_file &lt;client-side path&gt;</p></td>
+<tr class="row-odd"><td><p>--download_file &lt;download_file&gt;</p></td>
 <td></td>
 <td><p>Specify the destination path of the client.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--img_thumbnail &lt;Thumbnail size&gt;</p></td>
+<tr class="row-odd"><td><p>--img_thumbnail &lt;img_thumbnail&gt;</p></td>
 <td></td>
 <td><p>Specifies the size in pixels of the thumbnail if the subject is an image.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="client-list-file-cmdbox-m-client-c-file-list-option">
-<h2>client ( List File ) : <cite>cmdbox -m client -c file_list &lt;Option&gt;</cite><a class="headerlink" href="#client-list-file-cmdbox-m-client-c-file-list-option" title="Link to this heading"></a></h2>
+<section id="client-file-list-cmdbox-m-client-c-file-list-option">
+<h2>client ( file_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">file_list</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#client-file-list-cmdbox-m-client-c-file-list-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Get a list of files under the data folder.</p></li>
-<li><p>Returns the folder specified by <cite>--svpath</cite> and a list of the folders and files under it.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -295,62 +334,85 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--svpath &lt;server-side path&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--svpath &lt;svpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--fwpath &lt;server-side fwpath&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--fwpath &lt;fwpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify a path to determine whether the specified path is out of bounds. If it is not under this path, it is interpreted as having specified this path.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
+<tr class="row-even"><td><p>--listregs &lt;listregs&gt;</p></td>
 <td></td>
-<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
+<td><p>Specify the regular expression conditions to list.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--recursive</p></td>
+<tr class="row-odd"><td><p>--recursive &lt;recursive&gt;</p></td>
 <td></td>
 <td><p>Get a list of files recursively for a folder contained in the specified path.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--client_data &lt;client_data&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="client-create-folder-cmdbox-m-client-c-file-mkdir-option">
-<h2>client ( Create Folder ) : <cite>cmdbox -m client -c file_mkdir &lt;Option&gt;</cite><a class="headerlink" href="#client-create-folder-cmdbox-m-client-c-file-mkdir-option" title="Link to this heading"></a></h2>
+<section id="client-file-mkdir-cmdbox-m-client-c-file-mkdir-option">
+<h2>client ( file_mkdir ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">file_mkdir</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#client-file-mkdir-cmdbox-m-client-c-file-mkdir-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Create a new folder under the data folder.</p></li>
-<li><p>Creates the folder specified by <cite>--svpath</cite>.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -365,55 +427,75 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--svpath &lt;server-side path&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--svpath &lt;svpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--fwpath &lt;server-side fwpath&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--fwpath &lt;fwpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
-<td></td>
-<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-odd"><td><p>--client_data &lt;client_data&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="client-move-file-cmdbox-m-client-c-file-move-option">
-<h2>client ( Move File ) : <cite>cmdbox -m client -c file_move &lt;Option&gt;</cite><a class="headerlink" href="#client-move-file-cmdbox-m-client-c-file-move-option" title="Link to this heading"></a></h2>
+<section id="client-file-move-cmdbox-m-client-c-file-move-option">
+<h2>client ( file_move ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">file_move</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#client-file-move-cmdbox-m-client-c-file-move-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Move the files under the data folder.</p></li>
 </ul>
@@ -430,66 +512,85 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--from_path &lt;source path&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--from_path &lt;from_path&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the source path under the data folder.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--to_path &lt;destination path&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--to_path &lt;to_path&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the destination path under the data folder.</p></td>
 </tr>
-<tr class="row-even"><td><p>--from_fwpath &lt;source fwpath&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--from_fwpath &lt;from_fwpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--to_fwpath &lt;destination fwpath&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--to_fwpath &lt;to_fwpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
-<td></td>
-<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-odd"><td><p>--client_data &lt;client_data&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="client-delete-file-cmdbox-m-client-c-file-remove-option">
-<h2>client ( Delete File ) : <cite>cmdbox -m client -c file_remove &lt;Option&gt;</cite><a class="headerlink" href="#client-delete-file-cmdbox-m-client-c-file-remove-option" title="Link to this heading"></a></h2>
+<section id="client-file-remove-cmdbox-m-client-c-file-remove-option">
+<h2>client ( file_remove ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">file_remove</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#client-file-remove-cmdbox-m-client-c-file-remove-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Delete a file under the data folder.</p></li>
-<li><p>Deletes the file specified by <cite>--svpath</cite>.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -504,58 +605,77 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--svpath &lt;server-side path&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--svpath &lt;svpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--fwpath &lt;server-side fwpath&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--fwpath &lt;fwpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
-<td></td>
-<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-odd"><td><p>--client_data &lt;client_data&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="client-delete-folder-cmdbox-m-client-c-file-rmdir-option">
-<h2>client ( Delete Folder ) : <cite>cmdbox -m client -c file_rmdir &lt;Option&gt;</cite><a class="headerlink" href="#client-delete-folder-cmdbox-m-client-c-file-rmdir-option" title="Link to this heading"></a></h2>
+<section id="client-file-rmdir-cmdbox-m-client-c-file-rmdir-option">
+<h2>client ( file_rmdir ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">file_rmdir</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#client-file-rmdir-cmdbox-m-client-c-file-rmdir-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Delete a folder under the data folder.</p></li>
-<li><p>Deletes the folder specified by <cite>--svpath</cite>.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -570,58 +690,77 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--svpath &lt;server-side path&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--svpath &lt;svpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--fwpath &lt;server-side fwpath&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--fwpath &lt;fwpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
-<td></td>
-<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-odd"><td><p>--client_data &lt;client_data&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="client-upload-file-cmdbox-m-client-c-file-upload-option">
-<h2>client ( Upload File ) : <cite>cmdbox -m client -c file_upload &lt;Option&gt;</cite><a class="headerlink" href="#client-upload-file-cmdbox-m-client-c-file-upload-option" title="Link to this heading"></a></h2>
+<section id="client-file-upload-cmdbox-m-client-c-file-upload-option">
+<h2>client ( file_upload ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">file_upload</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#client-file-upload-cmdbox-m-client-c-file-upload-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Upload a file under the data folder.</p></li>
-<li><p>Upload the file specified by <cite>--upload_file</cite> to the location specified by <cite>--svpath</cite>.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -636,118 +775,89 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--svpath &lt;server-side path&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--svpath &lt;svpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--fwpath &lt;server-side fwpath&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--fwpath &lt;fwpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
-<td></td>
-<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--upload_file &lt;client-side path&gt;</p></td>
+<tr class="row-odd"><td><p>--upload_file &lt;upload_file&gt;</p></td>
 <td></td>
 <td><p>Specify the source path of the client.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--mkdir</p></td>
+<tr class="row-odd"><td><p>--mkdir &lt;mkdir&gt;</p></td>
 <td></td>
 <td><p>If there is no in between folder, create one.</p></td>
 </tr>
-<tr class="row-even"><td><p>--orverwrite</p></td>
+<tr class="row-even"><td><p>--orverwrite &lt;orverwrite&gt;</p></td>
 <td></td>
 <td><p>Overwrites the file even if it exists at the upload destination.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-</tbody>
-</table>
-</section>
-<section id="client-server-info-cmdbox-m-client-c-server-info-option">
-<h2>client ( Server Info ) : <cite>cmdbox -m client -c server_info &lt;Option&gt;</cite><a class="headerlink" href="#client-server-info-cmdbox-m-client-c-server-info-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Retrieve server information.</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
 <td></td>
-<td><p>Specify the service host of the Redis server.</p></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
 <td></td>
-<td><p>Specify the service port of the Redis server.</p></td>
+<td><p>Save the processing result json file by appending.</p></td>
 </tr>
-<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
 <td></td>
-<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
 <td></td>
-<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
-<td></td>
-<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
-</tr>
-<tr class="row-even"><td><p>--timeout &lt;time-out&gt;</p></td>
-<td></td>
-<td><p>Specify the maximum waiting time until the server responds.</p></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="client-http-cmdbox-m-client-c-http-option">
-<h2>client ( Http ) : <cite>cmdbox -m client -c http &lt;Option&gt;</cite><a class="headerlink" href="#client-http-cmdbox-m-client-c-http-option" title="Link to this heading"></a></h2>
+<h2>client ( http ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">http</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#client-http-cmdbox-m-client-c-http-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Retrieve server information.</p></li>
+<li><p>Sends a request to the HTTP server and gets a response.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -763,50 +873,131 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--url &lt;url&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the URL to request.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--proxy &lt;yes|no&gt;</p></td>
+<tr class="row-odd"><td><p>--proxy &lt;proxy&gt;</p></td>
 <td></td>
 <td><p>Specifies whether or not to send the received request parameters to the destination URL when invoked in web mode.</p></td>
 </tr>
-<tr class="row-even"><td><p>--send_method &lt;method&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--send_method &lt;send_method&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specifies the request method.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--send_content_type &lt;content_type&gt;</p></td>
+<tr class="row-odd"><td><p>--send_content_type &lt;send_content_type&gt;</p></td>
 <td></td>
 <td><p>Specifies the Content-Type of the data to be sent.</p></td>
 </tr>
-<tr class="row-even"><td><p>--send_apikey &lt;apikey&gt;</p></td>
+<tr class="row-even"><td><p>--send_apikey &lt;send_apikey&gt;</p></td>
 <td></td>
 <td><p>Specify the API key to be used for authentication of the request destination.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--send_header &lt;header&gt;</p></td>
+<tr class="row-odd"><td><p>--send_header &lt;send_header&gt;</p></td>
 <td></td>
 <td><p>Specifies the request header.</p></td>
 </tr>
-<tr class="row-even"><td><p>--send_param &lt;param&gt;</p></td>
+<tr class="row-even"><td><p>--send_param &lt;send_param&gt;</p></td>
 <td></td>
 <td><p>Specifies parameters to be sent.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--send_data &lt;data&gt;</p></td>
+<tr class="row-odd"><td><p>--send_data &lt;send_data&gt;</p></td>
 <td></td>
 <td><p>Specifies the data to be sent.</p></td>
 </tr>
-<tr class="row-even"><td><p>--send_verify</p></td>
+<tr class="row-even"><td><p>--send_verify &lt;send_verify&gt;</p></td>
 <td></td>
 <td><p>Specifies the timeout before a response is received.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--send_timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--send_timeout &lt;send_timeout&gt;</p></td>
 <td></td>
 <td><p>Specifies the timeout before a response is received.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="client-server-info-cmdbox-m-client-c-server-info-option">
+<h2>client ( server_info ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">server_info</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#client-server-info-cmdbox-m-client-c-server-info-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Retrieve server information.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="client-time-cmdbox-m-client-c-time-option">
-<h2>client ( Time ) : <cite>cmdbox -m client -c time &lt;Option&gt;</cite><a class="headerlink" href="#client-time-cmdbox-m-client-c-time-option" title="Link to this heading"></a></h2>
+<h2>client ( time ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">client</span> <span class="pre">-c</span> <span class="pre">time</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#client-time-cmdbox-m-client-c-time-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Displays the current time at the client side.</p></li>
 </ul>
@@ -823,7 +1014,7 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--timedelta &lt;tz&gt;</p></td>
+<tr class="row-even"><td><p>--timedelta &lt;timedelta&gt;</p></td>
 <td></td>
 <td><p>Specify the number of hours of time difference.</p></td>
 </tr>
@@ -837,7 +1028,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="cmd_audit.html" class="btn btn-neutral float-left" title="Command Reference ( audit mode )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cmd_cmd.html" class="btn btn-neutral float-right" title="Command Reference ( cml mode )" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cmd_cmd.html" class="btn btn-neutral float-right" title="Command Reference ( cmd mode )" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

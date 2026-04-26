@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( edge mode ) &mdash; cmdbox 2026/04/12 documentation</title>
+  <title>Command Reference ( edge mode ) &mdash; cmdbox 2026/04/26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,14 +14,14 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=98fe3048"></script>
+      <script src="../_static/documentation_options.js?v=c9df5a23"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Command Reference ( embed mode )" href="cmd_embed.html" />
-    <link rel="prev" title="Command Reference ( cmdbox mode )" href="cmd_cmdbox.html" /> 
+    <link rel="prev" title="Command Reference ( Common )" href="cmd_common.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -47,16 +47,16 @@
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_a2asv.html">A2AServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html">Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_audit.html">Audit</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Edge</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#set-the-edge-mode-cmdbox-m-edge-c-config-option">Set the edge mode. : <cite>cmdbox -m edge -c config &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#start-edge-mode-cmdbox-m-edge-c-start-option">Start Edge mode. : <cite>cmdbox -m edge -c start &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edge-config-cmdbox-m-edge-c-config-option">edge ( config ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">edge</span> <span class="pre">-c</span> <span class="pre">config</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edge-start-cmdbox-m-edge-c-start-option">edge ( start ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">edge</span> <span class="pre">-c</span> <span class="pre">start</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_embed.html">Embed</a></li>
@@ -67,6 +67,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_rag.html">RAG</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_test.html">Test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
 </ul>
@@ -107,13 +108,11 @@
              
   <section id="command-reference-edge-mode">
 <h1>Command Reference ( edge mode )<a class="headerlink" href="#command-reference-edge-mode" title="Link to this heading"></a></h1>
+<p>List of edge mode commands.</p>
+<section id="edge-config-cmdbox-m-edge-c-config-option">
+<h2>edge ( config ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">edge</span> <span class="pre">-c</span> <span class="pre">config</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#edge-config-cmdbox-m-edge-c-config-option" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>List of edge mode commands.</p></li>
-</ul>
-<section id="set-the-edge-mode-cmdbox-m-edge-c-config-option">
-<h2>Set the edge mode. : <cite>cmdbox -m edge -c config &lt;Option&gt;</cite><a class="headerlink" href="#set-the-edge-mode-cmdbox-m-edge-c-config-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Create the configuration necessary to run edge start.</p></li>
+<li><p>Set the edge mode.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -128,19 +127,19 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--endpoint &lt;url&gt;</p></td>
+<tr class="row-even"><td><p>--endpoint &lt;endpoint&gt;</p></td>
 <td></td>
 <td><p>Specify the URL of the endpoint.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--icon_path &lt;path&gt;</p></td>
+<tr class="row-odd"><td><p>--icon_path &lt;icon_path&gt;</p></td>
 <td></td>
 <td><p>Specify the path to the icon image.</p></td>
 </tr>
-<tr class="row-even"><td><p>--auth_type &lt;type&gt;</p></td>
+<tr class="row-even"><td><p>--auth_type &lt;auth_type&gt;</p></td>
 <td></td>
 <td><p>Specifies the authentication method for endpoint connections.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--user &lt;user_name&gt;</p></td>
+<tr class="row-odd"><td><p>--user &lt;user&gt;</p></td>
 <td></td>
 <td><p>Specifies the user connecting to the endpoint.</p></td>
 </tr>
@@ -152,66 +151,65 @@
 <td></td>
 <td><p>Specify the APIKEY to connect to the endpoint.</p></td>
 </tr>
-<tr class="row-even"><td><p>--oauth2 &lt;provider&gt;</p></td>
+<tr class="row-even"><td><p>--oauth2 &lt;oauth2&gt;</p></td>
 <td></td>
 <td><p>Connect to the endpoint using OAuth2 authentication.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--oauth2_port &lt;port&gt;</p></td>
+<tr class="row-odd"><td><p>--oauth2_port &lt;oauth2_port&gt;</p></td>
 <td></td>
 <td><p>Specifies the callback port when OAuth2 authentication is used. If omitted, <cite>8091</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--oauth2_tenant_id &lt;tenant_id&gt;</p></td>
+<tr class="row-even"><td><p>--oauth2_tenant_id &lt;oauth2_tenant_id&gt;</p></td>
 <td></td>
 <td><p>Specifies the tenant ID when OAuth2 authentication is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--oauth2_client_id &lt;client_id&gt;</p></td>
+<tr class="row-odd"><td><p>--oauth2_client_id &lt;oauth2_client_id&gt;</p></td>
 <td></td>
 <td><p>Specifies the client ID when OAuth2 authentication is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--oauth2_client_secret &lt;client_secret&gt;</p></td>
+<tr class="row-even"><td><p>--oauth2_client_secret &lt;oauth2_client_secret&gt;</p></td>
 <td></td>
 <td><p>Specifies the client secret when OAuth2 authentication is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--oauth2_timeout &lt;sec&gt;</p></td>
+<tr class="row-odd"><td><p>--oauth2_timeout &lt;oauth2_timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the timeout period before OAuth2 authentication completes.</p></td>
 </tr>
-<tr class="row-even"><td><p>--saml &lt;provider&gt;</p></td>
+<tr class="row-even"><td><p>--saml &lt;saml&gt;</p></td>
 <td></td>
 <td><p>Connect to the endpoint using SAML authentication.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--saml_port &lt;port&gt;</p></td>
+<tr class="row-odd"><td><p>--saml_port &lt;saml_port&gt;</p></td>
 <td></td>
 <td><p>Specifies the callback port when SAML authentication is used. If omitted, <cite>8091</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--saml_tenant_id &lt;tenant_id&gt;</p></td>
+<tr class="row-even"><td><p>--saml_tenant_id &lt;saml_tenant_id&gt;</p></td>
 <td></td>
 <td><p>Specifies the tenant ID when SAML authentication is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--saml_timeout &lt;sec&gt;</p></td>
+<tr class="row-odd"><td><p>--saml_timeout &lt;saml_timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the timeout period before SAML authentication completes.</p></td>
 </tr>
-<tr class="row-even"><td><p>--data &lt;path&gt;</p></td>
+<tr class="row-even"><td><p>--data &lt;data&gt;</p></td>
 <td></td>
-<td><p>When omitted, <cite>$HONE/.{self.ver.__appid__}</cite> is used.</p></td>
+<td><p>When omitted, f`$HONE/.cmdbox` is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svcert_no_verify</p></td>
+<tr class="row-odd"><td><p>--svcert_no_verify &lt;svcert_no_verify&gt;</p></td>
 <td></td>
 <td><p>Do not verify server certificates during HTTPS requests.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;sec&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specifies the timeout period before the request completes.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="start-edge-mode-cmdbox-m-edge-c-start-option">
-<h2>Start Edge mode. : <cite>cmdbox -m edge -c start &lt;Option&gt;</cite><a class="headerlink" href="#start-edge-mode-cmdbox-m-edge-c-start-option" title="Link to this heading"></a></h2>
+<section id="edge-start-cmdbox-m-edge-c-start-option">
+<h2>edge ( start ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">edge</span> <span class="pre">-c</span> <span class="pre">start</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#edge-start-cmdbox-m-edge-c-start-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Start Edge mode.</p></li>
-<li><p>In the case of windows, it will reside in the task tray.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -226,9 +224,9 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--data &lt;path&gt;</p></td>
-<td></td>
-<td><p>When omitted, <cite>$HONE/.{self.ver.__appid__}</cite> is used.</p></td>
+<tr class="row-even"><td><p>--data &lt;data&gt;</p></td>
+<td><p>required</p></td>
+<td><p>When omitted, f`$HONE/.cmdbox` is used.</p></td>
 </tr>
 </tbody>
 </table>
@@ -239,7 +237,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cmd_cmdbox.html" class="btn btn-neutral float-left" title="Command Reference ( cmdbox mode )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmd_common.html" class="btn btn-neutral float-left" title="Command Reference ( Common )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="cmd_embed.html" class="btn btn-neutral float-right" title="Command Reference ( embed mode )" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

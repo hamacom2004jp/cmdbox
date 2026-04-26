@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( excel mode ) &mdash; cmdbox 2026/04/12 documentation</title>
+  <title>Command Reference ( excel mode ) &mdash; cmdbox 2026/04/26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=98fe3048"></script>
+      <script src="../_static/documentation_options.js?v=c9df5a23"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -47,19 +47,20 @@
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_a2asv.html">A2AServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html">Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_audit.html">Audit</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_embed.html">Embed</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Excel</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#excel-cell-details-cmdbox-m-excel-c-cell-details-option">excel ( Cell Details ) : <cite>cmdbox -m excel -c cell_details &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#excel-cell-search-cmdbox-m-excel-c-cell-search-option">excel ( Cell Search ) : <cite>cmdbox -m excel -c cell_search &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#excel-cell-values-cmdbox-m-excel-c-cell-values-option">excel ( Cell Values ) : <cite>cmdbox -m excel -c cell_values &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#excel-cell-details-cmdbox-m-excel-c-cell-details-option">excel ( cell_details ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">excel</span> <span class="pre">-c</span> <span class="pre">cell_details</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#excel-cell-search-cmdbox-m-excel-c-cell-search-option">excel ( cell_search ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">excel</span> <span class="pre">-c</span> <span class="pre">cell_search</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#excel-cell-values-cmdbox-m-excel-c-cell-values-option">excel ( cell_values ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">excel</span> <span class="pre">-c</span> <span class="pre">cell_values</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#excel-sheet-list-cmdbox-m-excel-c-sheet-list-option">excel ( sheet_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">excel</span> <span class="pre">-c</span> <span class="pre">sheet_list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_extract.html">Extract</a></li>
@@ -68,6 +69,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_rag.html">RAG</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_test.html">Test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
 </ul>
@@ -110,7 +112,7 @@
 <h1>Command Reference ( excel mode )<a class="headerlink" href="#command-reference-excel-mode" title="Link to this heading"></a></h1>
 <p>List of excel mode commands.</p>
 <section id="excel-cell-details-cmdbox-m-excel-c-cell-details-option">
-<h2>excel ( Cell Details ) : <cite>cmdbox -m excel -c cell_details &lt;Option&gt;</cite><a class="headerlink" href="#excel-cell-details-cmdbox-m-excel-c-cell-details-option" title="Link to this heading"></a></h2>
+<h2>excel ( cell_details ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">excel</span> <span class="pre">-c</span> <span class="pre">cell_details</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#excel-cell-details-cmdbox-m-excel-c-cell-details-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Get the details of the specified cell in the Excel file under the data folder.</p></li>
 </ul>
@@ -127,67 +129,87 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
-<td></td>
-<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svpath &lt;server-side path&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svpath &lt;svpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-<tr class="row-even"><td><p>--formula_data_only</p></td>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
 <td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--formula_data_only &lt;formula_data_only&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify whether to get only formula data. This option is valid if cached data exists.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--sheet_name &lt;Sheet Name&gt;</p></td>
+<tr class="row-even"><td><p>--sheet_name &lt;sheet_name&gt;</p></td>
 <td></td>
 <td><p>Specify the sheet name to get the cell value.If omitted, the first sheet will be used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cell_name &lt;Cell Name&gt;</p></td>
+<tr class="row-odd"><td><p>--cell_name &lt;cell_name&gt;</p></td>
 <td></td>
 <td><p>Specify the cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--cell_top_left &lt;Cell Name&gt;</p></td>
+<tr class="row-even"><td><p>--cell_top_left &lt;cell_top_left&gt;</p></td>
 <td></td>
 <td><p>Specify the top-left cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cell_bottom_right &lt;Cell Name&gt;</p></td>
+<tr class="row-odd"><td><p>--cell_bottom_right &lt;cell_bottom_right&gt;</p></td>
 <td></td>
 <td><p>Specify the bottom-right cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--output_detail_format &lt;format&gt;</p></td>
+<tr class="row-even"><td><p>--output_detail_format &lt;output_detail_format&gt;</p></td>
 <td></td>
 <td><p>Specify the output format. For example, <cite>json</cite>, <cite>text</cite>.</p></td>
 </tr>
@@ -195,7 +217,7 @@
 </table>
 </section>
 <section id="excel-cell-search-cmdbox-m-excel-c-cell-search-option">
-<h2>excel ( Cell Search ) : <cite>cmdbox -m excel -c cell_search &lt;Option&gt;</cite><a class="headerlink" href="#excel-cell-search-cmdbox-m-excel-c-cell-search-option" title="Link to this heading"></a></h2>
+<h2>excel ( cell_search ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">excel</span> <span class="pre">-c</span> <span class="pre">cell_search</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#excel-cell-search-cmdbox-m-excel-c-cell-search-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Searches for the value in the specified cell of an Excel file located in the data folder.</p></li>
 </ul>
@@ -212,75 +234,95 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
-<td></td>
-<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svpath &lt;server-side path&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svpath &lt;svpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-<tr class="row-even"><td><p>--formula_data_only</p></td>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
 <td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--formula_data_only &lt;formula_data_only&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify whether to get only formula data. This option is valid if cached data exists.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--sheet_name &lt;Sheet Name&gt;</p></td>
+<tr class="row-even"><td><p>--sheet_name &lt;sheet_name&gt;</p></td>
 <td></td>
-<td><p>Specify the sheet name to get the cell value.If omitted, the first sheet will be used.</p></td>
+<td><p>Specify the sheet name to get the cell value.If omitted, all sheets will be used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cell_name &lt;Cell Name&gt;</p></td>
+<tr class="row-odd"><td><p>--cell_name &lt;cell_name&gt;</p></td>
 <td></td>
-<td><p>Specify the cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
+<td><p>Specify the cell name to search for the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--cell_top_left &lt;Cell Name&gt;</p></td>
+<tr class="row-even"><td><p>--cell_top_left &lt;cell_top_left&gt;</p></td>
 <td></td>
-<td><p>Specify the top-left cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
+<td><p>Specify the top-left cell name to search for the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cell_bottom_right &lt;Cell Name&gt;</p></td>
+<tr class="row-odd"><td><p>--cell_bottom_right &lt;cell_bottom_right&gt;</p></td>
 <td></td>
-<td><p>Specify the bottom-right cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
+<td><p>Specify the bottom-right cell name to search for the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--match_type &lt;type&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--match_type &lt;match_type&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specifies the matching method for the value in the search cell. <cite>full</cite>: Exact match, <cite>partial</cite>: Partial match, <cite>regex</cite>: Regular expression.</p></td>
 </tr>
-<tr class="row-even"><td><p>--search_value &lt;value&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--search_value &lt;search_value&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the value to search for in the cell. The method of specification depends on <cite>match_type</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--output_cell_format &lt;format&gt;</p></td>
+<tr class="row-even"><td><p>--output_cell_format &lt;output_cell_format&gt;</p></td>
 <td></td>
 <td><p>Specify the output format. For example, <cite>json</cite>, <cite>csv</cite>、 <cite>md</cite>、 <cite>html</cite>.</p></td>
 </tr>
@@ -288,7 +330,7 @@
 </table>
 </section>
 <section id="excel-cell-values-cmdbox-m-excel-c-cell-values-option">
-<h2>excel ( Cell Values ) : <cite>cmdbox -m excel -c cell_values &lt;Option&gt;</cite><a class="headerlink" href="#excel-cell-values-cmdbox-m-excel-c-cell-values-option" title="Link to this heading"></a></h2>
+<h2>excel ( cell_values ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">excel</span> <span class="pre">-c</span> <span class="pre">cell_values</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#excel-cell-values-cmdbox-m-excel-c-cell-values-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Retrieves or sets the value of a specified cell in an Excel file located within the data folder.</p></li>
 </ul>
@@ -305,73 +347,174 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;reference scope&gt;</p></td>
-<td></td>
-<td><p>Specifies the scope to be referenced. Possible image types are <cite>client</cite> , <cite>current</cite>, and <cite>server</cite>.</p></td>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svpath &lt;server-side path&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svpath &lt;svpath&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;data folder&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;Number of retries&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;Retry Interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;time-out&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-<tr class="row-even"><td><p>--formula_data_only</p></td>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
 <td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--formula_data_only &lt;formula_data_only&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify whether to get only formula data. This option is valid if cached data exists.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--sheet_name &lt;Sheet Name&gt;</p></td>
+<tr class="row-even"><td><p>--sheet_name &lt;sheet_name&gt;</p></td>
 <td></td>
 <td><p>Specify the sheet name to get the cell value.If omitted, the first sheet will be used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cell_name &lt;Cell Name&gt;</p></td>
+<tr class="row-odd"><td><p>--cell_name &lt;cell_name&gt;</p></td>
 <td></td>
 <td><p>Specify the cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--cell_top_left &lt;Cell Name&gt;</p></td>
+<tr class="row-even"><td><p>--cell_top_left &lt;cell_top_left&gt;</p></td>
 <td></td>
 <td><p>Specify the top-left cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cell_bottom_right &lt;Cell Name&gt;</p></td>
+<tr class="row-odd"><td><p>--cell_bottom_right &lt;cell_bottom_right&gt;</p></td>
 <td></td>
 <td><p>Specify the bottom-right cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--cell_value &lt;value&gt;</p></td>
+<tr class="row-even"><td><p>--cell_value &lt;cell_value&gt;</p></td>
 <td></td>
 <td><p>Set a value in a cell. Specify the cell's name and value. Cell names can be, for example, <cite>A1</cite>, <cite>B2</cite>, or <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--output_cell_format &lt;format&gt;</p></td>
+<tr class="row-odd"><td><p>--output_cell_format &lt;output_cell_format&gt;</p></td>
 <td></td>
 <td><p>Specify the output format. For example, <cite>json</cite>, <cite>csv</cite>、 <cite>md</cite>、 <cite>html</cite>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="excel-sheet-list-cmdbox-m-excel-c-sheet-list-option">
+<h2>excel ( sheet_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">excel</span> <span class="pre">-c</span> <span class="pre">sheet_list</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#excel-sheet-list-cmdbox-m-excel-c-sheet-list-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Retrieves the list of sheets in an Excel file located within the data folder.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svpath &lt;svpath&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify the directory path to get the list of files.</p></td>
+</tr>
+<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
+<td></td>
+<td><p>Specify the path of the data folder when local is referenced.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>

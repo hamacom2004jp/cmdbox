@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( web mode ) &mdash; cmdbox 2026/04/12 documentation</title>
+  <title>Command Reference ( web mode ) &mdash; cmdbox 2026/04/26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=98fe3048"></script>
+      <script src="../_static/documentation_options.js?v=c9df5a23"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -47,13 +47,13 @@
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_a2asv.html">A2AServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_agent.html">Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_audit.html">Audit</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_embed.html">Embed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
@@ -63,22 +63,23 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_rag.html">RAG</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_test.html">Test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Web</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#api-key-generation-cmdbox-m-web-c-apikey-add-option">API Key generation : <cite>cmdbox -m web -c apikey_add &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#api-key-destroy-cmdbox-m-web-c-apikey-del-option">API Key destroy : <cite>cmdbox -m web -c apikey_del &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#self-signed-server-certificate-generation-cmdbox-m-web-c-gencert-option">Self-signed server certificate generation : <cite>cmdbox -m web -c gencert &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#password-generation-cmdbox-m-web-c-genpass-option">Password generation : <cite>cmdbox -m web -c genpass &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#add-group-cmdbox-m-web-c-group-add-option">Add Group : <cite>cmdbox -m web -c group_add &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#delete-group-cmdbox-m-web-c-group-del-option">Delete Group : <cite>cmdbox -m web -c group_del &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#edit-group-cmdbox-m-web-c-group-edit-option">Edit Group : <cite>cmdbox -m web -c group_edit &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#list-group-cmdbox-m-web-c-group-list-option">List Group : <cite>cmdbox -m web -c group_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#web-service-launch-cmdbox-m-web-c-start-option">Web Service Launch : <cite>cmdbox -m web -c start &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#web-service-stops-cmdbox-m-web-c-stop-option">Web Service Stops : <cite>cmdbox -m web -c stop &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#add-user-cmdbox-m-web-c-user-add-option">Add User : <cite>cmdbox -m web -c user_add &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#delete-user-cmdbox-m-web-c-user-del-option">Delete User : <cite>cmdbox -m web -c user_del &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#edit-user-cmdbox-m-web-c-user-edit-option">Edit User : <cite>cmdbox -m web -c user_edit &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#list-user-cmdbox-m-web-c-user-list-option">List User : <cite>cmdbox -m web -c user_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-apikey-add-cmdbox-m-web-c-apikey-add-option">web ( apikey_add ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">apikey_add</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-apikey-del-cmdbox-m-web-c-apikey-del-option">web ( apikey_del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">apikey_del</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-gencert-cmdbox-m-web-c-gencert-option">web ( gencert ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">gencert</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-genpass-cmdbox-m-web-c-genpass-option">web ( genpass ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">genpass</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-group-add-cmdbox-m-web-c-group-add-option">web ( group_add ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">group_add</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-group-del-cmdbox-m-web-c-group-del-option">web ( group_del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">group_del</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-group-edit-cmdbox-m-web-c-group-edit-option">web ( group_edit ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">group_edit</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-group-list-cmdbox-m-web-c-group-list-option">web ( group_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">group_list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-start-cmdbox-m-web-c-start-option">web ( start ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">start</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-stop-cmdbox-m-web-c-stop-option">web ( stop ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">stop</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-user-add-cmdbox-m-web-c-user-add-option">web ( user_add ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">user_add</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-user-del-cmdbox-m-web-c-user-del-option">web ( user_del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">user_del</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-user-edit-cmdbox-m-web-c-user-edit-option">web ( user_edit ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">user_edit</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-user-list-cmdbox-m-web-c-user-list-option">web ( user_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">user_list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -119,11 +120,9 @@
              
   <section id="command-reference-web-mode">
 <h1>Command Reference ( web mode )<a class="headerlink" href="#command-reference-web-mode" title="Link to this heading"></a></h1>
-<ul class="simple">
-<li><p>List of web mode commands.</p></li>
-</ul>
-<section id="api-key-generation-cmdbox-m-web-c-apikey-add-option">
-<h2>API Key generation : <cite>cmdbox -m web -c apikey_add &lt;Option&gt;</cite><a class="headerlink" href="#api-key-generation-cmdbox-m-web-c-apikey-add-option" title="Link to this heading"></a></h2>
+<p>List of web mode commands.</p>
+<section id="web-apikey-add-cmdbox-m-web-c-apikey-add-option">
+<h2>web ( apikey_add ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">apikey_add</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#web-apikey-add-cmdbox-m-web-c-apikey-add-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Add an ApiKey for a user in Web mode.</p></li>
 </ul>
@@ -140,23 +139,35 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--user_name &lt;name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--user_name &lt;user_name&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the target user name.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--apikey_name &lt;name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--apikey_name &lt;apikey_name&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the ApiKey name for this user.</p></td>
 </tr>
-<tr class="row-even"><td><p>--signin_file &lt;user list file&gt;</p></td>
+<tr class="row-even"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify a file containing users and passwords with which they can signin.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="api-key-destroy-cmdbox-m-web-c-apikey-del-option">
-<h2>API Key destroy : <cite>cmdbox -m web -c apikey_del &lt;Option&gt;</cite><a class="headerlink" href="#api-key-destroy-cmdbox-m-web-c-apikey-del-option" title="Link to this heading"></a></h2>
+<section id="web-apikey-del-cmdbox-m-web-c-apikey-del-option">
+<h2>web ( apikey_del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">apikey_del</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#web-apikey-del-cmdbox-m-web-c-apikey-del-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Del an ApiKey for a user in Web mode.</p></li>
 </ul>
@@ -173,23 +184,35 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--user_name &lt;name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--user_name &lt;user_name&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the target user name.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--apikey_name &lt;name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--apikey_name &lt;apikey_name&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the ApiKey name for this user.</p></td>
 </tr>
-<tr class="row-even"><td><p>--signin_file &lt;user list file&gt;</p></td>
+<tr class="row-even"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify a file containing users and passwords with which they can signin.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="self-signed-server-certificate-generation-cmdbox-m-web-c-gencert-option">
-<h2>Self-signed server certificate generation : <cite>cmdbox -m web -c gencert &lt;Option&gt;</cite><a class="headerlink" href="#self-signed-server-certificate-generation-cmdbox-m-web-c-gencert-option" title="Link to this heading"></a></h2>
+<section id="web-gencert-cmdbox-m-web-c-gencert-option">
+<h2>web ( gencert ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">gencert</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#web-gencert-cmdbox-m-web-c-gencert-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Generate a self-signed certificate for simple implementation of SSL in web mode.</p></li>
 </ul>
@@ -206,43 +229,55 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--webhost &lt;Server Name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--webhost &lt;webhost&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the host name to be specified as the CN (Common Name) of the self-signed certificate.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--output_cert &lt;destination file&gt;</p></td>
+<tr class="row-odd"><td><p>--output_cert &lt;output_cert&gt;</p></td>
 <td></td>
 <td><p>Specify the self-signed certificate file to be output.If omitted, the hostname specified in the <cite>webhost option</cite> .crt will be output.</p></td>
 </tr>
-<tr class="row-even"><td><p>--output_cert_format &lt;format&gt;</p></td>
+<tr class="row-even"><td><p>--output_cert_format &lt;output_cert_format&gt;</p></td>
 <td></td>
-<td><p>Specifies the file format of the self-signed certificate to be output.'PEM' and 'DER' can be specified.</p></td>
+<td><p>Specifies the file format of the self-signed certificate to be output.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--output_pkey &lt;destination file&gt;</p></td>
+<tr class="row-odd"><td><p>--output_pkey &lt;output_pkey&gt;</p></td>
 <td></td>
 <td><p>Specifies the public key file of the self-signed certificate to output. If omitted, the output will be in the <cite>hostname specified in the `webhost option</cite> .pkey.</p></td>
 </tr>
-<tr class="row-even"><td><p>--output_pkey_format &lt;format&gt;</p></td>
+<tr class="row-even"><td><p>--output_pkey_format &lt;output_pkey_format&gt;</p></td>
 <td></td>
 <td><p>Specifies the file format of the public key of the self-signed certificate to be output.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--output_key &lt;destination file&gt;</p></td>
+<tr class="row-odd"><td><p>--output_key &lt;output_key&gt;</p></td>
 <td></td>
 <td><p>Specifies the private key file of the self-signed certificate to be output.If omitted, the hostname specified in the <cite>webhost option</cite> .key will be output.</p></td>
 </tr>
-<tr class="row-even"><td><p>--output_key_format &lt;format&gt;</p></td>
+<tr class="row-even"><td><p>--output_key_format &lt;output_key_format&gt;</p></td>
 <td></td>
-<td><p>Specifies the private key file format of the output self-signed certificate.'PEM' and 'DER' can be specified.</p></td>
+<td><p>Specifies the private key file format of the output self-signed certificate.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--overwrite</p></td>
+<tr class="row-odd"><td><p>--overwrite &lt;overwrite&gt;</p></td>
 <td></td>
 <td><p>Overwrites the self-signed certificate file to be output if it exists.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="password-generation-cmdbox-m-web-c-genpass-option">
-<h2>Password generation : <cite>cmdbox -m web -c genpass &lt;Option&gt;</cite><a class="headerlink" href="#password-generation-cmdbox-m-web-c-genpass-option" title="Link to this heading"></a></h2>
+<section id="web-genpass-cmdbox-m-web-c-genpass-option">
+<h2>web ( genpass ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">genpass</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#web-genpass-cmdbox-m-web-c-genpass-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Generates a password string that can be used in web mode.</p></li>
 </ul>
@@ -259,35 +294,47 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--pass_length &lt;length&gt;</p></td>
+<tr class="row-even"><td><p>--pass_length &lt;pass_length&gt;</p></td>
 <td></td>
 <td><p>Specifies the length of the password.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--pass_count &lt;count&gt;</p></td>
+<tr class="row-odd"><td><p>--pass_count &lt;pass_count&gt;</p></td>
 <td></td>
 <td><p>Specify the number of passwords to be generated.</p></td>
 </tr>
-<tr class="row-even"><td><p>--use_alphabet &lt;type&gt;</p></td>
+<tr class="row-even"><td><p>--use_alphabet &lt;use_alphabet&gt;</p></td>
 <td></td>
 <td><p>Specifies the type of alphabet used for the password. <cite>notuse</cite> , <cite>upper</cite> , <cite>lower</cite> , <cite>both</cite> can be specified.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--use_number &lt;type&gt;</p></td>
+<tr class="row-odd"><td><p>--use_number &lt;use_number&gt;</p></td>
 <td></td>
 <td><p>Specify the type of number to be used for the password. <cite>notuse</cite> , <cite>use</cite> can be specified.</p></td>
 </tr>
-<tr class="row-even"><td><p>--use_symbol &lt;type&gt;</p></td>
+<tr class="row-even"><td><p>--use_symbol &lt;use_symbol&gt;</p></td>
 <td></td>
 <td><p>Specifies the type of symbol used in the password. <cite>notuse</cite> , <cite>use</cite> can be specified.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--similar &lt;type&gt;</p></td>
+<tr class="row-odd"><td><p>--similar &lt;similar&gt;</p></td>
 <td></td>
 <td><p>Specifies whether certain similar characters should be used. <cite>exclude</cite> , <cite>include</cite> can be specified.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="add-group-cmdbox-m-web-c-group-add-option">
-<h2>Add Group : <cite>cmdbox -m web -c group_add &lt;Option&gt;</cite><a class="headerlink" href="#add-group-cmdbox-m-web-c-group-add-option" title="Link to this heading"></a></h2>
+<section id="web-group-add-cmdbox-m-web-c-group-add-option">
+<h2>web ( group_add ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">group_add</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#web-group-add-cmdbox-m-web-c-group-add-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Add a group in Web mode.</p></li>
 </ul>
@@ -304,27 +351,39 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--group_id &lt;Group ID&gt;</p></td>
+<tr class="row-even"><td><p>--group_id &lt;group_id&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specify the group ID. Do not duplicate other groups.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--group_name &lt;Group Name&gt;</p></td>
+<tr class="row-odd"><td><p>--group_name &lt;group_name&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specify a group name. Do not duplicate other groups.</p></td>
 </tr>
-<tr class="row-even"><td><p>--group_parent &lt;parent group name&gt;</p></td>
+<tr class="row-even"><td><p>--group_parent &lt;group_parent&gt;</p></td>
 <td></td>
 <td><p>Specifies the parent group name.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--signin_file &lt;user list file&gt;</p></td>
+<tr class="row-odd"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify a file containing users and passwords with which they can signin.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="delete-group-cmdbox-m-web-c-group-del-option">
-<h2>Delete Group : <cite>cmdbox -m web -c group_del &lt;Option&gt;</cite><a class="headerlink" href="#delete-group-cmdbox-m-web-c-group-del-option" title="Link to this heading"></a></h2>
+<section id="web-group-del-cmdbox-m-web-c-group-del-option">
+<h2>web ( group_del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">group_del</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#web-group-del-cmdbox-m-web-c-group-del-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Del a group in Web mode.</p></li>
 </ul>
@@ -341,19 +400,31 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--group_id &lt;Group ID&gt;</p></td>
+<tr class="row-even"><td><p>--group_id &lt;group_id&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specify the group ID. Do not duplicate other groups.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--signin_file &lt;user list file&gt;</p></td>
+<tr class="row-odd"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify a file containing users and passwords with which they can signin.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="edit-group-cmdbox-m-web-c-group-edit-option">
-<h2>Edit Group : <cite>cmdbox -m web -c group_edit &lt;Option&gt;</cite><a class="headerlink" href="#edit-group-cmdbox-m-web-c-group-edit-option" title="Link to this heading"></a></h2>
+<section id="web-group-edit-cmdbox-m-web-c-group-edit-option">
+<h2>web ( group_edit ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">group_edit</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#web-group-edit-cmdbox-m-web-c-group-edit-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Edit a group in Web mode.</p></li>
 </ul>
@@ -370,27 +441,39 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--group_id &lt;Group ID&gt;</p></td>
+<tr class="row-even"><td><p>--group_id &lt;group_id&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specify the group ID. Do not duplicate other groups.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--group_name &lt;Group Name&gt;</p></td>
+<tr class="row-odd"><td><p>--group_name &lt;group_name&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specify a group name. Do not duplicate other groups.</p></td>
 </tr>
-<tr class="row-even"><td><p>--group_parent &lt;parent group name&gt;</p></td>
+<tr class="row-even"><td><p>--group_parent &lt;group_parent&gt;</p></td>
 <td></td>
 <td><p>Specifies the parent group name.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--signin_file &lt;user list file&gt;</p></td>
+<tr class="row-odd"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify a file containing users and passwords with which they can signin.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="list-group-cmdbox-m-web-c-group-list-option">
-<h2>List Group : <cite>cmdbox -m web -c group_list &lt;Option&gt;</cite><a class="headerlink" href="#list-group-cmdbox-m-web-c-group-list-option" title="Link to this heading"></a></h2>
+<section id="web-group-list-cmdbox-m-web-c-group-list-option">
+<h2>web ( group_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">group_list</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#web-group-list-cmdbox-m-web-c-group-list-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Get a list of users in Web mode.</p></li>
 </ul>
@@ -407,19 +490,31 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--group_name &lt;Group Name&gt;</p></td>
+<tr class="row-even"><td><p>--group_name &lt;group_name&gt;</p></td>
 <td></td>
 <td><p>Retrieved by specifying a group name. If omitted, all groups are retrieved.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--signin_file &lt;user list file&gt;</p></td>
+<tr class="row-odd"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify a file containing users and passwords with which they can signin.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="web-service-launch-cmdbox-m-web-c-start-option">
-<h2>Web Service Launch : <cite>cmdbox -m web -c start &lt;Option&gt;</cite><a class="headerlink" href="#web-service-launch-cmdbox-m-web-c-start-option" title="Link to this heading"></a></h2>
+<section id="web-start-cmdbox-m-web-c-start-option">
+<h2>web ( start ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">start</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#web-start-cmdbox-m-web-c-start-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Start Web mode.</p></li>
 </ul>
@@ -436,127 +531,139 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--host &lt;IP address or host name&gt;</p></td>
-<td></td>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--port &lt;port number&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--svname &lt;Service Name&gt;</p></td>
-<td></td>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>required</p></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--data &lt;data folder&gt;</p></td>
+<tr class="row-even"><td><p>--data &lt;data&gt;</p></td>
 <td></td>
-<td><p>When omitted, f`$HONE/.{version.__appid__}` is used.</p></td>
+<td><p>When omitted, <cite>$HONE/.cmdbox</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--allow_host &lt;IP to allow connection&gt;</p></td>
+<tr class="row-odd"><td><p>--allow_host &lt;allow_host&gt;</p></td>
 <td></td>
 <td><p>If omitted, <cite>0.0.0.0</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--listen_port &lt;service port&gt;</p></td>
+<tr class="row-even"><td><p>--listen_port &lt;listen_port&gt;</p></td>
 <td></td>
 <td><p>If omitted, <cite>8081</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--ssl_listen_port &lt;service port&gt;</p></td>
+<tr class="row-odd"><td><p>--ssl_listen_port &lt;ssl_listen_port&gt;</p></td>
 <td></td>
 <td><p>If omitted, <cite>8443</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--ssl_cert &lt;SSL server certificate file&gt;</p></td>
+<tr class="row-even"><td><p>--ssl_cert &lt;ssl_cert&gt;</p></td>
 <td></td>
 <td><p>Specify the SSL server certificate file.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--ssl_key &lt;SSL Server Private Key File&gt;</p></td>
+<tr class="row-odd"><td><p>--ssl_key &lt;ssl_key&gt;</p></td>
 <td></td>
 <td><p>Specify the SSL server private key file.</p></td>
 </tr>
-<tr class="row-even"><td><p>--ssl_keypass &lt;SSL Server Private Key Password&gt;</p></td>
+<tr class="row-even"><td><p>--ssl_keypass &lt;ssl_keypass&gt;</p></td>
 <td></td>
 <td><p>Specify the composite password for the SSL server private key file.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--ssl_ca_certs &lt;SSL Server CA Certificate File&gt;</p></td>
+<tr class="row-odd"><td><p>--ssl_ca_certs &lt;ssl_ca_certs&gt;</p></td>
 <td></td>
 <td><p>Specify the SSL server CA certificate file.</p></td>
 </tr>
-<tr class="row-even"><td><p>--signin_file &lt;user list file&gt;</p></td>
-<td></td>
-<td><p>Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required.</p></td>
+<tr class="row-even"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--session_domain &lt;domain&gt;</p></td>
+<tr class="row-odd"><td><p>--session_domain &lt;session_domain&gt;</p></td>
 <td></td>
 <td><p>Specify the domain for which the signed-in user's session is valid.</p></td>
 </tr>
-<tr class="row-even"><td><p>--session_path &lt;path&gt;</p></td>
+<tr class="row-even"><td><p>--session_path &lt;session_path&gt;</p></td>
 <td></td>
 <td><p>Specify the session timeout in seconds for signed-in users.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--session_secure</p></td>
+<tr class="row-odd"><td><p>--session_secure &lt;session_secure&gt;</p></td>
 <td></td>
 <td><p>Set the Secure flag for the signed-in user's session.</p></td>
 </tr>
-<tr class="row-even"><td><p>--session_timeout &lt;second&gt;</p></td>
+<tr class="row-even"><td><p>--session_timeout &lt;session_timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the session timeout in seconds for signed-in users.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--gunicorn_workers &lt;second&gt;</p></td>
+<tr class="row-odd"><td><p>--gunicorn_workers &lt;gunicorn_workers&gt;</p></td>
 <td></td>
 <td><p>Specifies the number of gunicorn workers, valid only in Linux environment. If -1 or unspecified, the number of CPUs is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--gunicorn_timeout &lt;second&gt;</p></td>
+<tr class="row-even"><td><p>--gunicorn_timeout &lt;gunicorn_timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the timeout duration of the gunicorn worker in seconds.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_only</p></td>
+<tr class="row-odd"><td><p>--client_only &lt;client_only&gt;</p></td>
 <td></td>
 <td><p>Do not make connections to the server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--outputs_key &lt;output key&gt;</p></td>
+<tr class="row-even"><td><p>--outputs_key &lt;outputs_key&gt;</p></td>
 <td></td>
 <td><p>Specify items to be displayed on the showimg and webcap screens. If omitted, all items are displayed.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--doc_root &lt;document root path&gt;</p></td>
+<tr class="row-odd"><td><p>--doc_root &lt;doc_root&gt;</p></td>
 <td></td>
 <td><p>Document root for custom files. URL mapping from the path of a folder-specified custom file with the path of doc_root removed.</p></td>
 </tr>
-<tr class="row-even"><td><p>--gui_html &lt;gui.html file path&gt;</p></td>
+<tr class="row-even"><td><p>--gui_html &lt;gui_html&gt;</p></td>
 <td></td>
 <td><p>Specify <cite>gui.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--filer_html &lt;filer.html file path&gt;</p></td>
+<tr class="row-odd"><td><p>--filer_html &lt;filer_html&gt;</p></td>
 <td></td>
 <td><p>Specify <cite>filer.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--result_html &lt;result.html file path&gt;</p></td>
+<tr class="row-even"><td><p>--result_html &lt;result_html&gt;</p></td>
 <td></td>
 <td><p>Specify <cite>result.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--users_html &lt;users.html file path&gt;</p></td>
+<tr class="row-odd"><td><p>--users_html &lt;users_html&gt;</p></td>
 <td></td>
 <td><p>Specify <cite>users.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--agent_html &lt;agent.html file path&gt;</p></td>
+<tr class="row-even"><td><p>--agent_html &lt;agent_html&gt;</p></td>
 <td></td>
 <td><p>Specify <cite>agent.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--assets &lt;Path to js and css files&gt;</p></td>
+<tr class="row-odd"><td><p>--assets &lt;assets&gt;</p></td>
 <td></td>
 <td><p>Specify the asset file required when using html files.</p></td>
 </tr>
-<tr class="row-even"><td><p>--signin_html &lt;signin.html file path&gt;</p></td>
+<tr class="row-even"><td><p>--signin_html &lt;signin_html&gt;</p></td>
 <td></td>
 <td><p>Specify <cite>signin.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="web-service-stops-cmdbox-m-web-c-stop-option">
-<h2>Web Service Stops : <cite>cmdbox -m web -c stop &lt;Option&gt;</cite><a class="headerlink" href="#web-service-stops-cmdbox-m-web-c-stop-option" title="Link to this heading"></a></h2>
+<section id="web-stop-cmdbox-m-web-c-stop-option">
+<h2>web ( stop ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">stop</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#web-stop-cmdbox-m-web-c-stop-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Stop Web mode.</p></li>
 </ul>
@@ -573,15 +680,35 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--data &lt;data folder&gt;</p></td>
+<tr class="row-even"><td><p>--data &lt;data&gt;</p></td>
 <td></td>
-<td><p>When omitted, f`$HONE/.{version.__appid__}` is used.</p></td>
+<td><p>When omitted, <cite>$HONE/.cmdbox</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="add-user-cmdbox-m-web-c-user-add-option">
-<h2>Add User : <cite>cmdbox -m web -c user_add &lt;Option&gt;</cite><a class="headerlink" href="#add-user-cmdbox-m-web-c-user-add-option" title="Link to this heading"></a></h2>
+<section id="web-user-add-cmdbox-m-web-c-user-add-option">
+<h2>web ( user_add ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">user_add</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#web-user-add-cmdbox-m-web-c-user-add-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Add a user in Web mode.</p></li>
 </ul>
@@ -598,39 +725,51 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--user_id &lt;user ID&gt;</p></td>
+<tr class="row-even"><td><p>--user_id &lt;user_id&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specify the user ID. Do not duplicate other users.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--user_name &lt;username&gt;</p></td>
+<tr class="row-odd"><td><p>--user_name &lt;user_name&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specify a user name. Do not duplicate other users.</p></td>
 </tr>
-<tr class="row-even"><td><p>--user_pass &lt;user password&gt;</p></td>
+<tr class="row-even"><td><p>--user_pass &lt;user_pass&gt;</p></td>
 <td></td>
 <td><p>Specify the user password.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--user_pass_hash &lt;hash algorithm&gt;</p></td>
+<tr class="row-odd"><td><p>--user_pass_hash &lt;user_pass_hash&gt;</p></td>
 <td></td>
-<td><p>Specifies the hash algorithm for user passwords.'oauth2', 'saml', 'plain', 'md5', 'sha1', and 'sha256' can be specified.</p></td>
+<td><p>Specifies the hash algorithm for user passwords.</p></td>
 </tr>
-<tr class="row-even"><td><p>--user_email &lt;user email&gt;</p></td>
+<tr class="row-even"><td><p>--user_email &lt;user_email&gt;</p></td>
 <td></td>
 <td><p>Specify the user email. Required when <cite>user_pass_hash</cite> is <cite>oauth2</cite> or <cite>saml</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--user_group &lt;user group&gt;</p></td>
+<tr class="row-odd"><td><p>--user_group &lt;user_group&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specifies the groups to which the user belongs.</p></td>
 </tr>
-<tr class="row-even"><td><p>--signin_file &lt;user list file&gt;</p></td>
+<tr class="row-even"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify a file containing users and passwords with which they can signin.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="delete-user-cmdbox-m-web-c-user-del-option">
-<h2>Delete User : <cite>cmdbox -m web -c user_del &lt;Option&gt;</cite><a class="headerlink" href="#delete-user-cmdbox-m-web-c-user-del-option" title="Link to this heading"></a></h2>
+<section id="web-user-del-cmdbox-m-web-c-user-del-option">
+<h2>web ( user_del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">user_del</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#web-user-del-cmdbox-m-web-c-user-del-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Delete a user in Web mode.</p></li>
 </ul>
@@ -647,19 +786,31 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--user_id &lt;user ID&gt;</p></td>
+<tr class="row-even"><td><p>--user_id &lt;user_id&gt;</p></td>
 <td><p>required</p></td>
-<td><p>Specify the user ID. Do not duplicate other users.</p></td>
+<td><p>Specify the user ID.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--signin_file &lt;user list file&gt;</p></td>
+<tr class="row-odd"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify a file containing users and passwords with which they can signin.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="edit-user-cmdbox-m-web-c-user-edit-option">
-<h2>Edit User : <cite>cmdbox -m web -c user_edit &lt;Option&gt;</cite><a class="headerlink" href="#edit-user-cmdbox-m-web-c-user-edit-option" title="Link to this heading"></a></h2>
+<section id="web-user-edit-cmdbox-m-web-c-user-edit-option">
+<h2>web ( user_edit ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">user_edit</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#web-user-edit-cmdbox-m-web-c-user-edit-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Edit users in Web mode.</p></li>
 </ul>
@@ -676,39 +827,51 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--user_id &lt;user ID&gt;</p></td>
+<tr class="row-even"><td><p>--user_id &lt;user_id&gt;</p></td>
 <td><p>required</p></td>
-<td><p>Specify the user ID. Do not duplicate other users.</p></td>
+<td><p>Specify the user ID.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--user_name &lt;username&gt;</p></td>
+<tr class="row-odd"><td><p>--user_name &lt;user_name&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specify a user name. Do not duplicate other users.</p></td>
 </tr>
-<tr class="row-even"><td><p>--user_pass &lt;user password&gt;</p></td>
+<tr class="row-even"><td><p>--user_pass &lt;user_pass&gt;</p></td>
 <td></td>
 <td><p>Specify the user password.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--user_pass_hash &lt;hash algorithm&gt;</p></td>
+<tr class="row-odd"><td><p>--user_pass_hash &lt;user_pass_hash&gt;</p></td>
 <td></td>
-<td><p>Specifies the hash algorithm for user passwords.'oauth2', 'saml', 'plain', 'md5', 'sha1', and 'sha256' can be specified.</p></td>
+<td><p>Specifies the hash algorithm for user passwords.</p></td>
 </tr>
-<tr class="row-even"><td><p>--user_email &lt;user email&gt;</p></td>
+<tr class="row-even"><td><p>--user_email &lt;user_email&gt;</p></td>
 <td></td>
 <td><p>Specify the user email. Required when <cite>user_pass_hash</cite> is <cite>oauth2</cite> or <cite>saml</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--user_group &lt;user group&gt;</p></td>
+<tr class="row-odd"><td><p>--user_group &lt;user_group&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specifies the groups to which the user belongs.</p></td>
 </tr>
-<tr class="row-even"><td><p>--signin_file &lt;user list file&gt;</p></td>
+<tr class="row-even"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify a file containing users and passwords with which they can signin.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="list-user-cmdbox-m-web-c-user-list-option">
-<h2>List User : <cite>cmdbox -m web -c user_list &lt;Option&gt;</cite><a class="headerlink" href="#list-user-cmdbox-m-web-c-user-list-option" title="Link to this heading"></a></h2>
+<section id="web-user-list-cmdbox-m-web-c-user-list-option">
+<h2>web ( user_list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">web</span> <span class="pre">-c</span> <span class="pre">user_list</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#web-user-list-cmdbox-m-web-c-user-list-option" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Get a list of users in Web mode.</p></li>
 </ul>
@@ -725,13 +888,25 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--user_name &lt;username&gt;</p></td>
+<tr class="row-even"><td><p>--user_name &lt;user_name&gt;</p></td>
 <td></td>
 <td><p>Retrieved by specifying a user name. If omitted, all users are retrieved.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--signin_file &lt;user list file&gt;</p></td>
+<tr class="row-odd"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<td><p>required</p></td>
+<td><p>Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
 <td></td>
-<td><p>Specify a file containing users and passwords with which they can signin.</p></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>
