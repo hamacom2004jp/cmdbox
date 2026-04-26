@@ -103,25 +103,31 @@ class Validator(feature.Feature):
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                     return self.RESP_WARN, msg, None
             if type == options.Options.T_FILE and val is not None and fileio in ['in']:
-                path = Path(val)
-                if not path.exists():
-                    msg = dict(warn=f"Invalid value for --{opt}: {val} (file does not exist)")
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                    return self.RESP_WARN, msg, None
-                if not path.is_file():
-                    msg = dict(warn=f"Invalid value for --{opt}: {val} (not a file)")
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                    return self.RESP_WARN, msg, None
+                if not isinstance(val, list):
+                    _val = [val,]
+                for v in _val:
+                    path = Path(v)
+                    if not path.exists():
+                        msg = dict(warn=f"Invalid value for --{opt}: {v} (file does not exist)")
+                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                        return self.RESP_WARN, msg, None
+                    if not path.is_file():
+                        msg = dict(warn=f"Invalid value for --{opt}: {v} (not a file)")
+                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                        return self.RESP_WARN, msg, None
             if type == options.Options.T_DIR and val is not None and fileio in ['in']:
-                path = Path(val)
-                if not path.exists():
-                    msg = dict(warn=f"Invalid value for --{opt}: {val} (directory does not exist)")
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                    return self.RESP_WARN, msg, None
-                if not path.is_dir():
-                    msg = dict(warn=f"Invalid value for --{opt}: {val} (not a directory)")
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                    return self.RESP_WARN, msg, None
+                if not isinstance(val, list):
+                    _val = [val,]
+                for v in _val:
+                    path = Path(v)
+                    if not path.exists():
+                        msg = dict(warn=f"Invalid value for --{opt}: {v} (directory does not exist)")
+                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                        return self.RESP_WARN, msg, None
+                    if not path.is_dir():
+                        msg = dict(warn=f"Invalid value for --{opt}: {v} (not a directory)")
+                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                        return self.RESP_WARN, msg, None
             # TODO: type==T_DATE, T_DATETIME, T_MLISTの検証
 
             # Choicesの検証 TODO:type==T_DICTのときのchoice検証が必要
