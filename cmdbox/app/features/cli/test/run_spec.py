@@ -89,6 +89,9 @@ def run(
             f"failed={spec_result['failed']}, "
             f"skipped={spec_result['skipped']}"
         )
+        # コマンドテスト完了直後にコマンド単位の JSON / MD を出力
+        if output_dir is not None:
+            _write_command_result(spec_result, output_dir)
 
     total = sum(r["total"] for r in results)
     passed = sum(r["passed"] for r in results)
@@ -149,20 +152,6 @@ def run(
         )
         print(json_file)
 
-        # コマンドごとの MD を cli/{mode}/{cmd}.md に出力
-        cli_dir = output_dir / "cli"
-        md_files: list[Path] = []
-        for cmd_result in return_value["results"]:
-            mode_val = cmd_result.get("mode", "")
-            cmd_val = cmd_result.get("cmd", "")
-            cmd_md_path = cli_dir / mode_val / f"{cmd_val}.md"
-            cmd_md_path.parent.mkdir(parents=True, exist_ok=True)
-            cmd_md_path.write_text(
-                _render_command_markdown(cmd_result), encoding="utf-8"
-            )
-            md_files.append(cmd_md_path)
-            print(cmd_md_path)
-
         # サマリーインデックス MD を README.md に出力
         index_md_path = output_dir / "README.md"
         index_md_path.write_text(
@@ -207,6 +196,25 @@ def run(
         print(error_md_path)
 
     return return_value
+
+
+def _write_command_result(cmd_result: dict[str, Any], output_dir: Path) -> None:
+    """コマンド単位のテスト結果を cli/{mode}/{cmd}.json と cli/{mode}/{cmd}.md に書き出します。"""
+    mode_val = cmd_result.get("mode", "")
+    cmd_val = cmd_result.get("cmd", "")
+    cmd_dir = output_dir / "cli" / mode_val
+    cmd_dir.mkdir(parents=True, exist_ok=True)
+    cmd_json_path = cmd_dir / f"{cmd_val}.json"
+    cmd_json_path.write_text(
+        json.dumps(cmd_result, ensure_ascii=False, indent=2, default=str),
+        encoding="utf-8",
+    )
+    print(cmd_json_path)
+    cmd_md_path = cmd_dir / f"{cmd_val}.md"
+    cmd_md_path.write_text(
+        _render_command_markdown(cmd_result), encoding="utf-8"
+    )
+    print(cmd_md_path)
 
 
 # ---------------------------------------------------------------------------
