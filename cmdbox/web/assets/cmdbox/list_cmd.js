@@ -20,7 +20,7 @@ const list_cmd_func = async () => {
         if (row.tag && Array.isArray(row.tag)) {
             row.tag.forEach(tag => {
                 if (tag=='') return;
-                tags_elem.append(`<span class="badge text-bg-secondary me-1"><svg class="bi bi-svg_tag" width="16" height="16" fill="currentColor"><use href="#svg_tag"></use></svg>${tag}</span>`);
+                tags_elem.append(`<span class="badge badge_${tag} text-bg-secondary me-1"><svg class="bi bi-svg_tag" width="16" height="16" fill="currentColor"><use href="#svg_tag"></use></svg>${tag}</span>`);
             });
         }
         if (row.tag && Array.isArray(row.tag)) {
@@ -56,6 +56,7 @@ const list_cmd_func = async () => {
             cmd_item_tags.find('.btn-tag').removeClass('btn-secondary').addClass('btn-outline-secondary');
             const attr_names = [...cmd_item_tags.get(0).attributes].map(attr => attr.name)
             attr_names.forEach((name, i) => {
+                if (!name || name=='id' || name=='class') return;
                 cmd_item_tags.removeAttr(name);
             });
             cmd_items.parent().hide();
@@ -124,6 +125,18 @@ const list_cmd_func = async () => {
             elem.click(tag_bot_click);
             cmd_item_tags.append(elem);
         });
+    });
+    // タグボタンの並び替え
+    const badge_tags = [];
+    py_list_cmd.forEach(row => {badge_tags.push(...(row.tag?row.tag:[]))});
+    badge_tags.sort((a, b) => {
+        if (a > b) return 1;
+        else if (a < b) return -1;
+        else return 0;
+    });
+    badge_tags.forEach(tag => {
+        const elem = cmd_item_tags.find(`[data-tag="${tag}"]`);
+        cmd_item_tags.append(elem);
     });
     // タグ未選択ボタンを追加
     const noselect_bot = $(`<button type="button" class="btn btn-outline-secondary btn-sm btn_notag me-2" id="btn_notag">no tag</button>`);

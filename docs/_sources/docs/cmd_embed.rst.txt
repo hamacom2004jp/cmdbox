@@ -24,9 +24,6 @@ embed ( del ) : ``cmdbox -m embed -c del <Option>``
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
     "--embed_name <embed_name>","required","Specify the registration name of the embed model to delete."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
 
 embed ( embedding ) : ``cmdbox -m embed -c embedding <Option>``
 ===============================================================
@@ -47,9 +44,6 @@ embed ( embedding ) : ``cmdbox -m embed -c embedding <Option>``
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
     "--embed_name <embed_name>","required","Specify the registration name of the embed model."
     "--original_data <original_data>","required","Specify the original data to generate feature vectors."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
 
 embed ( list ) : ``cmdbox -m embed -c list <Option>``
 =====================================================
@@ -69,11 +63,6 @@ embed ( list ) : ``cmdbox -m embed -c list <Option>``
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
     "--kwd <kwd>","","Specify the name you want to search for. Searches for partial matches."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 embed ( load ) : ``cmdbox -m embed -c load <Option>``
 =====================================================
@@ -93,9 +82,6 @@ embed ( load ) : ``cmdbox -m embed -c load <Option>``
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
     "--embed_name <embed_name>","required","Specify the registration name of the embed model to load."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
 
 embed ( save ) : ``cmdbox -m embed -c save <Option>``
 =====================================================
@@ -117,9 +103,6 @@ embed ( save ) : ``cmdbox -m embed -c save <Option>``
     "--embed_name <embed_name>","required","Specify the registration name of the embed model."
     "--embed_device <embed_device>","","Specify the execution device of the embed model."
     "--embed_model <embed_model>","required","Specify the name of the huggingface embed model."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
 
 embed ( start ) : ``cmdbox -m embed -c start <Option>``
 =======================================================
@@ -139,9 +122,6 @@ embed ( start ) : ``cmdbox -m embed -c start <Option>``
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
     "--embed_name <embed_name>","required","Specify the registration name of the embed model."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
 
 embed ( stop ) : ``cmdbox -m embed -c stop <Option>``
 =====================================================
@@ -161,6 +141,3 @@ embed ( stop ) : ``cmdbox -m embed -c stop <Option>``
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
     "--embed_name <embed_name>","required","Specify the registration name of the embed model."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."

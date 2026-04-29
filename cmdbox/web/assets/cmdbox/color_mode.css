@@ -959,3 +959,79 @@ body::after {
     --area-bg-color-danger-50: rgba(192, 49, 74, 0.5);
     --area-bg-color-danger-10: rgba(192, 49, 74, 0.9);
 }
+
+/* ハイドランジア(紫陽花)モード */
+[data-bs-theme="hydrangea"] {
+    --bs-body-bg: #f0f8ff; /* アリスブルー */
+    --bs-body-color: #0a2a4c;
+    --bs-emphasis-color: #2a4764;
+    --bs-secondary-color: #4a7fa5; /* ミディアムスカイブルー */
+    --bs-secondary-bg: #d4e9f7;
+    --bs-tertiary-color: #5b8db8; /* スカイブルー */
+    --bs-tertiary-bg: #e8f4fd;
+    --bs-link-color: #2979b8; /* スカイブルー */
+    --bs-link-hover-color: #1a5f9a; /* ディープスカイブルー */
+    --bs-code-color: #b5338a; /* ローズ */
+    --bs-highlight-bg: #d4e9f7;
+    --bs-highlight-border-color: #b3d4ed;
+
+    --bs-primary: #2979b8; /* スカイブルー */
+    --bs-primary-rgb: 41, 121, 184;
+    --bs-primary-text: #fff;
+    --bs-primary-bg-subtle: #c8e1f5;
+    --bs-primary-border-subtle: #a8ceec;
+    --bs-secondary: #6baed6; /* ライトブルー */
+    --bs-secondary-rgb: 107, 174, 214;
+    --bs-secondary-text: #fff;
+    --bs-secondary-bg-subtle: #daeef8;
+    --bs-secondary-border-subtle: #c2e3f4;
+    --bs-success: #2e8b57; /* シーグリーン */
+    --bs-success-rgb: 46, 139, 87;
+    --bs-success-text: #fff;
+    --bs-success-bg-subtle: #c8e6d6;
+    --bs-success-border-subtle: #a8d8be;
+    --bs-info: #0097a7; /* シアン */
+    --bs-info-rgb: 0, 151, 167;
+    --bs-info-text: #fff;
+    --bs-info-bg-subtle: #b2ebf2;
+    --bs-info-border-subtle: #80deea;
+    --bs-warning: #e65100; /* ディープオレンジ */
+    --bs-warning-rgb: 230, 81, 0;
+    --bs-warning-text: #fff;
+    --bs-warning-bg-subtle: #ffe0cc;
+    --bs-warning-border-subtle: #ffcc99;
+    --bs-danger: #c62828; /* レッド */
+    --bs-danger-rgb: 198, 40, 40;
+    --bs-danger-text: #fff;
+    --bs-danger-bg-subtle: #f8d0d0;
+    --bs-danger-border-subtle: #f0aaaa;
+    --bs-light: #f0f8ff; /* アリスブルー */
+    --bs-light-rgb: 240, 248, 255;
+    --bs-light-text: #1a3a5c;
+    --bs-light-bg-subtle: #f8fcff;
+    --bs-light-border-subtle: #e8f4fd;
+    --bs-dark: #1a3a5c; /* ディープネイビー */
+    --bs-dark-rgb: 26, 58, 92;
+    --bs-dark-text: #fff;
+    --bs-dark-bg-subtle: #c8d8e8;
+    --bs-dark-border-subtle: #a8c0d8;
+
+    --bs-gradient: linear-gradient(180deg, rgba(41, 121, 184, 0.08), rgba(41, 121, 184, 0));
+    --bs-border-width: 1px;
+    --bs-border-style: solid;
+    --bs-border-color: #b3d4ed;
+    --bs-border-color-translucent: rgba(41, 121, 184, 0.3);
+
+    --bs-emphasis-color-rgb: var(--bs-card-title-color);
+    --bs-warning-text-emphasis: var(--bs-code-color);
+    --bs-body-color-rgb: var(--bs-body-color);
+    --bs-secondary-rgb: var(--bs-btn-color);
+    --bs-table-bg: var(--bs-tertiary-bg);
+    --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
+
+    --area-border-color: rgba(41, 121, 184, 0.4);
+    --area-bg-color-50: rgba(41, 121, 184, 0.5);
+    --area-bg-color-10: rgba(41, 121, 184, 0.9);
+    --area-bg-color-danger-50: rgba(198, 40, 40, 0.5);
+    --area-bg-color-danger-10: rgba(198, 40, 40, 0.9);
+}

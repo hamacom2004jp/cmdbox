@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( Common ) &mdash; cmdbox 2026/04/26 documentation</title>
+  <title>Command Reference ( Common ) &mdash; cmdbox 2026/04/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=c9df5a23"></script>
+      <script src="../_static/documentation_options.js?v=21c5f9e1"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -123,65 +123,57 @@
 </tr>
 </thead>
 <tbody>
+<tr class="row-even"><td><p>-m, --mode</p></td>
+<td></td>
+<td><p>Specify the startup mode.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-c, --cmd</p></td>
+<td></td>
+<td><p>Specify the command.</p></td>
+</tr>
 <tr class="row-even"><td><p>-h</p></td>
 <td></td>
 <td><p>help display</p></td>
 </tr>
-<tr class="row-odd"><td><p>-u,--useopt &lt;Option File to save&gt;</p></td>
-<td><p>Required if <cite>-s</cite> is specified.</p></td>
-<td><p>Use the file that stores the options.</p></td>
-</tr>
-<tr class="row-even"><td><p>-s,--saveopt</p></td>
-<td></td>
-<td><p>Save the specified options to the file specified by <cite>-u</cite>.</p></td>
-</tr>
-<tr class="row-odd"><td><p>-d,--debug</p></td>
-<td></td>
-<td><p>Starts in debug mode.</p></td>
-</tr>
-<tr class="row-even"><td><p>--debug_attach</p></td>
-<td></td>
-<td><p>Specify whether to enable attaching to the debug process.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--debug_attach_port</p></td>
-<td></td>
-<td><p>Specify the port number to attach to the debug process.</p></td>
-</tr>
-<tr class="row-even"><td><p>-f,--format</p></td>
-<td></td>
-<td><p>Output the processing result in an easy-to-read format. If not specified, output in json format.</p></td>
-</tr>
-<tr class="row-odd"><td><p>-o, --output_json &lt;Destination file for processing result json&gt;</p></td>
-<td></td>
-<td><p>Specify the destination file for saving the processing result json.</p></td>
-</tr>
-<tr class="row-even"><td><p>-a, --output_json_append</p></td>
-<td></td>
-<td><p>Save the processing result json file by appending.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--stdout_log</p></td>
-<td></td>
-<td><p>Available only in GUI mode. Outputs standard output to Console log when executing commands.</p></td>
-</tr>
-<tr class="row-even"><td><p>--capture_stdout</p></td>
-<td></td>
-<td><p>Available in GUI mode only. Captures standard output during command execution and displays it on the execution result screen.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--capture_maxsize &lt;size&gt;</p></td>
-<td></td>
-<td><p>Available in GUI mode only. Specifies the maximum capture size of standard output when executing commands.</p></td>
-</tr>
-<tr class="row-even"><td><p>-v, --version</p></td>
+<tr class="row-odd"><td><p>-v, --version</p></td>
 <td></td>
 <td><p>Display version</p></td>
 </tr>
-<tr class="row-odd"><td><p>-t,--tag &lt;tag&gt;</p></td>
+<tr class="row-even"><td><p>-u,--useopt &lt;Option File to save&gt;</p></td>
+<td><p>Required if <cite>-s</cite> is specified.</p></td>
+<td><p>Specify the file where the options are saved.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-s,--saveopt</p></td>
+<td></td>
+<td><p>Save the specified options to the file specified by <cite>-u</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p>-d,--debug</p></td>
+<td></td>
+<td><p>Starts in debug mode.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--debug_attach</p></td>
+<td></td>
+<td><p>Specify whether to enable attaching to the debug process.</p></td>
+</tr>
+<tr class="row-even"><td><p>--debug_attach_port</p></td>
+<td></td>
+<td><p>Specify the port number to attach to the debug process.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-f,--format</p></td>
+<td></td>
+<td><p>Output the processing result in an easy-to-read format. If not specified, output in json format.</p></td>
+</tr>
+<tr class="row-even"><td><p>-t,--tag &lt;tag&gt;</p></td>
 <td></td>
 <td><p>Specify the tag for this command.</p></td>
 </tr>
-<tr class="row-even"><td><p>--clmsg_id &lt;id&gt;</p></td>
+<tr class="row-odd"><td><p>--clmsg_id &lt;id&gt;</p></td>
 <td></td>
 <td><p>Specifies the message ID of the client. If omitted, uuid4 will be generated.</p></td>
+</tr>
+<tr class="row-even"><td><p>--language &lt;language&gt;</p></td>
+<td></td>
+<td><p>Specify the language at the time of command execution.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--description &lt;description&gt;</p></td>
 <td></td>
@@ -190,6 +182,30 @@
 <tr class="row-even"><td><p>--logsv</p></td>
 <td></td>
 <td><p>Enables logsv. Logsv is a feature that synchronizes log file writing among multiple processes. If there is already an active process with logsv enabled, it will be ignored.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--output_raw</p></td>
+<td></td>
+<td><p>If the operation is successful, the result is output to standard output in base64-decoded form. If multiple results are returned, only the first one is output.</p></td>
+</tr>
+<tr class="row-even"><td><p>-o, --output_json &lt;Destination file for processing result json&gt;</p></td>
+<td></td>
+<td><p>Specify the destination file for saving the processing result json.</p></td>
+</tr>
+<tr class="row-odd"><td><p>-a, --output_json_append</p></td>
+<td></td>
+<td><p>Save the processing result json file by appending.</p></td>
+</tr>
+<tr class="row-even"><td><p>--stdout_log</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_stdout</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_maxsize &lt;size&gt;</p></td>
+<td></td>
+<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>

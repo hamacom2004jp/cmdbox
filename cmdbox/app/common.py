@@ -866,7 +866,7 @@ def perf_counter() -> float:
     return time.perf_counter()
 
 def update_performance(key:str, tm:float, res_json:Dict[str, Any]) -> None:
-    if "success" not in res_json: return
+    if type(res_json) is not dict or "success" not in res_json: return
     if type(res_json["success"]) is not dict:
         res_json["success"] = dict(data=res_json["success"])
     if "performance" not in res_json["success"]:

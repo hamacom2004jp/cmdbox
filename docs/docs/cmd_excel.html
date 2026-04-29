@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( excel mode ) &mdash; cmdbox 2026/04/26 documentation</title>
+  <title>Command Reference ( excel mode ) &mdash; cmdbox 2026/04/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=c9df5a23"></script>
+      <script src="../_static/documentation_options.js?v=21c5f9e1"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -169,47 +169,27 @@
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
-<td></td>
-<td><p>Specify the destination file for saving the processing result json.</p></td>
-</tr>
-<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
-<td></td>
-<td><p>Save the processing result json file by appending.</p></td>
-</tr>
-<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
-<td></td>
-<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
-<td></td>
-<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
-</tr>
-<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
-<td></td>
-<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--formula_data_only &lt;formula_data_only&gt;</p></td>
+<tr class="row-even"><td><p>--formula_data_only &lt;formula_data_only&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specify whether to get only formula data. This option is valid if cached data exists.</p></td>
 </tr>
-<tr class="row-even"><td><p>--sheet_name &lt;sheet_name&gt;</p></td>
+<tr class="row-odd"><td><p>--sheet_name &lt;sheet_name&gt;</p></td>
 <td></td>
 <td><p>Specify the sheet name to get the cell value.If omitted, the first sheet will be used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--cell_name &lt;cell_name&gt;</p></td>
+<tr class="row-even"><td><p>--cell_name &lt;cell_name&gt;</p></td>
 <td></td>
 <td><p>Specify the cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cell_top_left &lt;cell_top_left&gt;</p></td>
+<tr class="row-odd"><td><p>--cell_top_left &lt;cell_top_left&gt;</p></td>
 <td></td>
 <td><p>Specify the top-left cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--cell_bottom_right &lt;cell_bottom_right&gt;</p></td>
+<tr class="row-even"><td><p>--cell_bottom_right &lt;cell_bottom_right&gt;</p></td>
 <td></td>
 <td><p>Specify the bottom-right cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--output_detail_format &lt;output_detail_format&gt;</p></td>
+<tr class="row-odd"><td><p>--output_detail_format &lt;output_detail_format&gt;</p></td>
 <td></td>
 <td><p>Specify the output format. For example, <cite>json</cite>, <cite>text</cite>.</p></td>
 </tr>
@@ -274,55 +254,35 @@
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
-<td></td>
-<td><p>Specify the destination file for saving the processing result json.</p></td>
-</tr>
-<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
-<td></td>
-<td><p>Save the processing result json file by appending.</p></td>
-</tr>
-<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
-<td></td>
-<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
-<td></td>
-<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
-</tr>
-<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
-<td></td>
-<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--formula_data_only &lt;formula_data_only&gt;</p></td>
+<tr class="row-even"><td><p>--formula_data_only &lt;formula_data_only&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specify whether to get only formula data. This option is valid if cached data exists.</p></td>
 </tr>
-<tr class="row-even"><td><p>--sheet_name &lt;sheet_name&gt;</p></td>
+<tr class="row-odd"><td><p>--sheet_name &lt;sheet_name&gt;</p></td>
 <td></td>
 <td><p>Specify the sheet name to get the cell value.If omitted, all sheets will be used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--cell_name &lt;cell_name&gt;</p></td>
+<tr class="row-even"><td><p>--cell_name &lt;cell_name&gt;</p></td>
 <td></td>
 <td><p>Specify the cell name to search for the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cell_top_left &lt;cell_top_left&gt;</p></td>
+<tr class="row-odd"><td><p>--cell_top_left &lt;cell_top_left&gt;</p></td>
 <td></td>
 <td><p>Specify the top-left cell name to search for the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--cell_bottom_right &lt;cell_bottom_right&gt;</p></td>
+<tr class="row-even"><td><p>--cell_bottom_right &lt;cell_bottom_right&gt;</p></td>
 <td></td>
 <td><p>Specify the bottom-right cell name to search for the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--match_type &lt;match_type&gt;</p></td>
+<tr class="row-odd"><td><p>--match_type &lt;match_type&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specifies the matching method for the value in the search cell. <cite>full</cite>: Exact match, <cite>partial</cite>: Partial match, <cite>regex</cite>: Regular expression.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--search_value &lt;search_value&gt;</p></td>
+<tr class="row-even"><td><p>--search_value &lt;search_value&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specify the value to search for in the cell. The method of specification depends on <cite>match_type</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--output_cell_format &lt;output_cell_format&gt;</p></td>
+<tr class="row-odd"><td><p>--output_cell_format &lt;output_cell_format&gt;</p></td>
 <td></td>
 <td><p>Specify the output format. For example, <cite>json</cite>, <cite>csv</cite>、 <cite>md</cite>、 <cite>html</cite>.</p></td>
 </tr>
@@ -387,51 +347,31 @@
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
-<td></td>
-<td><p>Specify the destination file for saving the processing result json.</p></td>
-</tr>
-<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
-<td></td>
-<td><p>Save the processing result json file by appending.</p></td>
-</tr>
-<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
-<td></td>
-<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
-<td></td>
-<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
-</tr>
-<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
-<td></td>
-<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--formula_data_only &lt;formula_data_only&gt;</p></td>
+<tr class="row-even"><td><p>--formula_data_only &lt;formula_data_only&gt;</p></td>
 <td><p>required</p></td>
 <td><p>Specify whether to get only formula data. This option is valid if cached data exists.</p></td>
 </tr>
-<tr class="row-even"><td><p>--sheet_name &lt;sheet_name&gt;</p></td>
+<tr class="row-odd"><td><p>--sheet_name &lt;sheet_name&gt;</p></td>
 <td></td>
 <td><p>Specify the sheet name to get the cell value.If omitted, the first sheet will be used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--cell_name &lt;cell_name&gt;</p></td>
+<tr class="row-even"><td><p>--cell_name &lt;cell_name&gt;</p></td>
 <td></td>
 <td><p>Specify the cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cell_top_left &lt;cell_top_left&gt;</p></td>
+<tr class="row-odd"><td><p>--cell_top_left &lt;cell_top_left&gt;</p></td>
 <td></td>
 <td><p>Specify the top-left cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--cell_bottom_right &lt;cell_bottom_right&gt;</p></td>
+<tr class="row-even"><td><p>--cell_bottom_right &lt;cell_bottom_right&gt;</p></td>
 <td></td>
 <td><p>Specify the bottom-right cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cell_value &lt;cell_value&gt;</p></td>
+<tr class="row-odd"><td><p>--cell_value &lt;cell_value&gt;</p></td>
 <td></td>
 <td><p>Set a value in a cell. Specify the cell's name and value. Cell names can be, for example, <cite>A1</cite>, <cite>B2</cite>, or <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--output_cell_format &lt;output_cell_format&gt;</p></td>
+<tr class="row-even"><td><p>--output_cell_format &lt;output_cell_format&gt;</p></td>
 <td></td>
 <td><p>Specify the output format. For example, <cite>json</cite>, <cite>csv</cite>、 <cite>md</cite>、 <cite>html</cite>.</p></td>
 </tr>
@@ -495,26 +435,6 @@
 <tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
-</tr>
-<tr class="row-even"><td><p>-o, --output_json &lt;output_json&gt;</p></td>
-<td></td>
-<td><p>Specify the destination file for saving the processing result json.</p></td>
-</tr>
-<tr class="row-odd"><td><p>-a, --output_json_append &lt;output_json_append&gt;</p></td>
-<td></td>
-<td><p>Save the processing result json file by appending.</p></td>
-</tr>
-<tr class="row-even"><td><p>--stdout_log &lt;stdout_log&gt;</p></td>
-<td></td>
-<td><p>Available only in GUI mode. Outputs standard output during command execution to Console log.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--capture_stdout &lt;capture_stdout&gt;</p></td>
-<td></td>
-<td><p>Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.</p></td>
-</tr>
-<tr class="row-even"><td><p>--capture_maxsize &lt;capture_maxsize&gt;</p></td>
-<td></td>
-<td><p>Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.</p></td>
 </tr>
 </tbody>
 </table>

@@ -6,6 +6,22 @@ Command Reference ( test mode )
 
 List of test mode commands.
 
+test ( gen_cli_docs ) : ``cmdbox -m test -c gen_cli_docs <Option>``
+===================================================================
+
+- Generates command reference RST files from detailed design documents.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--specs_dir <specs_dir>","","Specify the Specifications directory containing cli-command-specifications.json. Defaults to ./Specifications when omitted."
+    "--docs_dir <docs_dir>","","Specify the output directory for cmd_*.rst files. Defaults to ./docs_src/docs when omitted."
+    "--mode_filter <mode_filter>","","Filter generation targets by mode name. All modes are targeted when omitted. (e.g. server, client)"
+    "--cmd_filter <cmd_filter>","","Filter generation targets by command name. All commands are targeted when omitted. (e.g. list, start)"
+    "--dry_run <dry_run>","","If True, does not actually write files but only shows what would be generated."
+
 test ( gen_cli_spec ) : ``cmdbox -m test -c gen_cli_spec <Option>``
 ===================================================================
 
@@ -23,11 +39,6 @@ test ( gen_cli_spec ) : ``cmdbox -m test -c gen_cli_spec <Option>``
     "--clear_output_dir <clear_output_dir>","","If True, clears (deletes and recreates) the output directory before generating specifications when it already exists. If False, returns a warning when the output directory already exists."
     "--app_class <app_class>","","Specify the module path of the application class.(e.g. myapp.app.MyApp) Defaults to cmdbox.app.app.CmdBoxApp when omitted."
     "--ver_module <ver_module>","","Specify the path of the version module.(e.g. myapp.version) Defaults to cmdbox.version when omitted."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 test ( gen_test_spec ) : ``cmdbox -m test -c gen_test_spec <Option>``
 =====================================================================
@@ -43,11 +54,6 @@ test ( gen_test_spec ) : ``cmdbox -m test -c gen_test_spec <Option>``
     "--output_dir <output_dir>","","Specify the output directory for test specifications. Defaults to ./Specifications_forUnitTest when omitted."
     "--root_dir <root_dir>","","Specify the project root directory used for referencing design document markdowns. Defaults to the current directory when omitted."
     "--clear_output_dir <clear_output_dir>","","If True, clears (deletes and recreates) the output directory before generating specifications when it already exists. If False, returns a warning when the output directory already exists."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 test ( run_spec ) : ``cmdbox -m test -c run_spec <Option>``
 ===========================================================
@@ -67,8 +73,3 @@ test ( run_spec ) : ``cmdbox -m test -c run_spec <Option>``
     "--clear_output_dir <clear_output_dir>","","If True, clears (deletes and recreates) the output directory before writing results when it already exists. If False (default), merges the current test case results into the existing result files, overwriting only the executed test cases."
     "--app_class <app_class>","","Specify the module path of the application class to test. (e.g. myapp.app.MyApp) Defaults to cmdbox.app.app.CmdBoxApp when omitted."
     "--ver_module <ver_module>","","Specify the path of the version module. (e.g. myapp.version) Defaults to cmdbox.version when omitted."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."

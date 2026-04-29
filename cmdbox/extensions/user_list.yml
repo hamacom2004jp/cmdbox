@@ -6,6 +6,20 @@ users:                         # A list of users, each of which is a map that co
   groups: [admin]              # A list of groups to which the user belongs, as specified in the groups field.
   email: admin@aaa.bbb.jp      # The email address of the user, used when authenticating using the provider specified in the oauth2 or saml field.
   home: /.users/admin          # The home directory of the user, used for file operations.
+- uid: 2
+  name: develop
+  password: develop
+  hash: plain
+  groups: [develop]
+  email: develop@aaa.bbb.jp
+  home: /.users/develop
+- uid: 3
+  name: master
+  password: master
+  hash: plain
+  groups: [master]
+  email: master@aaa.bbb.jp
+  home: /.users/master
 - uid: 101
   name: user01
   password: b75705d7e35e7014521a46b532236ec3
@@ -32,6 +46,12 @@ groups:                        # A list of groups, each of which is a map that c
   name: admin                  # A name that identifies the group. No two groups can have the same name.
   home: /.groups/admin         # The home directory of the group, used for file operations.
 - gid: 2
+  name: develop
+  home: /.groups/develop
+- gid: 3
+  name: master
+  home: /.groups/master
+- gid: 4
   name: guest
   home: /.groups/guest
 - gid: 101
@@ -50,10 +70,19 @@ cmdrule:                       # A list of command rules, Specify a rule that de
   rules:                       # Specify rules to allow or deny execution of the command, depending on the group the user belongs to.
   - groups: [admin]
     coercion:
+      fwpath: "['/.users','/.groups']"
+      from_fwpath: "['/.users','/.groups']"
+      to_fwpath: "['/.users','/.groups']"
+    rule: allow
+  - groups: [develop, master]
+    coercion:
       fwpath: "['/']"
       from_fwpath: "['/']"
       to_fwpath: "['/']"
     rule: allow
+  - groups: [admin, master]
+    mode: test
+    rule: deny
   - groups: [user]             # Specify the groups to which the rule applies.
     mode: client               # Specify the "mode" as the condition for applying the rule.
     cmds: [file_download, file_list, server_info, time] # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
@@ -132,7 +161,10 @@ cmdrule:                       # A list of command rules, Specify a rule that de
 pathrule:                      # List of RESTAPI rules, rules that determine whether or not a RESTAPI can be executed when a user in web mode accesses it.
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
   rules:                       # Specify rules to allow or deny execution of the RESTAPI, depending on the group the user belongs to.
-  - groups: [admin]            # Specify the groups to which the rule applies.
+  - groups:                    # Specify the groups to which the rule applies.
+    - admin
+    - develop
+    - master
     paths: [/]                 # Specify the "path" to which the rule applies. Multiple items can be specified in a list.
     rule: allow                # Specifies whether or not the specified RESTAPI is allowed for the specified group. The value can be allow or deny.
   - groups: [guest]

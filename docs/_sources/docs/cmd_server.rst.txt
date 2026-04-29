@@ -21,11 +21,6 @@ server ( list ) : ``cmdbox -m server -c list <Option>``
     "--port <port>","required","Specify the service port of the Redis server."
     "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 server ( start ) : ``cmdbox -m server -c start <Option>``
 =========================================================
@@ -45,11 +40,6 @@ server ( start ) : ``cmdbox -m server -c start <Option>``
     "--data <data>","","When omitted, `$HONE/.cmdbox` is used."
     "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 server ( stop ) : ``cmdbox -m server -c stop <Option>``
 =======================================================
@@ -69,8 +59,3 @@ server ( stop ) : ``cmdbox -m server -c stop <Option>``
     "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."

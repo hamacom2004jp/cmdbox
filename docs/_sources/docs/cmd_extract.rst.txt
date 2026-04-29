@@ -32,9 +32,6 @@ extract ( chunklet ) : ``cmdbox -m extract -c chunklet <Option>``
     "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server."
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
 
 extract ( del ) : ``cmdbox -m extract -c del <Option>``
 =======================================================
@@ -54,9 +51,6 @@ extract ( del ) : ``cmdbox -m extract -c del <Option>``
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
     "--extract_name <extract_name>","required","Specify the name of the extraction configuration to delete."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
 
 extract ( list ) : ``cmdbox -m extract -c list <Option>``
 =========================================================
@@ -76,11 +70,6 @@ extract ( list ) : ``cmdbox -m extract -c list <Option>``
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
     "--kwd <kwd>","","Specify the name you want to search for. Searches for partial matches."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 extract ( load ) : ``cmdbox -m extract -c load <Option>``
 =========================================================
@@ -100,9 +89,6 @@ extract ( load ) : ``cmdbox -m extract -c load <Option>``
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
     "--extract_name <extract_name>","required","Specify the name of the extraction configuration to load."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
 
 extract ( pdfplumber ) : ``cmdbox -m extract -c pdfplumber <Option>``
 =====================================================================
@@ -133,9 +119,6 @@ extract ( pdfplumber ) : ``cmdbox -m extract -c pdfplumber <Option>``
     "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server."
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
 
 extract ( save ) : ``cmdbox -m extract -c save <Option>``
 =========================================================
@@ -161,6 +144,3 @@ extract ( save ) : ``cmdbox -m extract -c save <Option>``
     "--client_data <client_data>","","Specify the path of the data folder when local is referenced."
     "--loadpath <loadpath>","required","Specify the source path."
     "--loadregs <loadregs>","required","Specifies a load regular expression pattern."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."

@@ -268,8 +268,8 @@ class Options:
             description_en="Display version")
         self._options["useopt"] = dict(
             short="u", type=Options.T_STR, default=None, required=False, multi=False, hide=True, choice=None,
-            description_ja="オプションを保存しているファイルを使用します。",
-            description_en="Use the file that saves the options.")
+            description_ja="オプションが保存されているファイルを指定します。",
+            description_en="Specify the file where the options are saved.")
         self._options["saveopt"] = dict(
             short="s", type=Options.T_BOOL, default=None, required=False, multi=False, hide=True, choice=[True, False],
             description_ja="指定しているオプションを `-u` で指定したファイルに保存します。",
@@ -287,53 +287,77 @@ class Options:
             description_ja="デバックプロセスにアタッチするポート番号を指定します。",
             description_en="Specify the port number to attach to the debug process.")
         self._options["format"] = dict(
-            short="f", type=Options.T_BOOL, default=None, required=False, multi=False, hide=True,
+            short="f", type=Options.T_BOOL, default=None, required=False, multi=False, hide=True, choice=None,
             description_ja="処理結果を見やすい形式で出力します。指定しない場合json形式で出力します。",
-            description_en="Output the processing result in an easy-to-read format. If not specified, output in json format.",
-            choice=None)
+            description_en="Output the processing result in an easy-to-read format. If not specified, output in json format.",)
         self._options["mode"] = dict(
-            short="m", type=Options.T_STR, default=None, required=True, multi=False, hide=True,
+            short="m", type=Options.T_STR, default=None, required=True, multi=False, hide=True, choice=[],
             description_ja="起動モードを指定します。",
-            description_en="Specify the startup mode.",
-            choice=[])
+            description_en="Specify the startup mode.",)
         self._options["cmd"] = dict(
-            short="c", type=Options.T_STR, default=None, required=True, multi=False, hide=True,
+            short="c", type=Options.T_STR, default=None, required=True, multi=False, hide=True, choice=[],
             description_ja="コマンドを指定します。",
-            description_en="Specify the command.",
-            choice=[])
+            description_en="Specify the command.",)
         self._options["tag"] = dict(
-            short="t", type=Options.T_STR, default=None, required=False, multi=True, hide=True,
+            short="t", type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=None,
             description_ja="このコマンドのタグを指定します。",
-            description_en="Specify the tag for this command.",
-            choice=None)
+            description_en="Specify the tag for this command.",)
         self._options["clmsg_id"] = dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=True,
+            type=Options.T_STR, default=None, required=False, multi=False, hide=True, choice=None,
             description_ja="クライアントのメッセージIDを指定します。省略した場合はuuid4で生成されます。",
-            description_en="Specifies the message ID of the client. If omitted, uuid4 will be generated.",
-            choice=None)
+            description_en="Specifies the message ID of the client. If omitted, uuid4 will be generated.",)
         self._options["language"] = dict(
-            type=Options.T_STR, default="ja_JP", required=False, multi=False, hide=True,
+            type=Options.T_STR, default="ja_JP", required=False, multi=False, hide=True, choice=["ja_JP", "en_US"],
             description_ja="コマンド実行時の言語を指定します。",
-            description_en="Specify the language at the time of command execution.",
-            choice=["ja_JP", "en_US"])
+            description_en="Specify the language at the time of command execution.",)
         self._options["description"] = dict(
-            type=Options.T_TEXT, default=None, required=False, multi=False, hide=True,
+            type=Options.T_TEXT, default=None, required=False, multi=False, hide=True, choice=None,
             description_ja="このコマンド登録の説明文を指定します。Agentがこのコマンドの用途を理解するのに使用します。",
-            description_en="Specifies a description of this command registration, used to help the Agent understand the use of this command.",
-            choice=None)
+            description_en="Specifies a description of this command registration, used to help the Agent understand the use of this command.",)
         self._options["logsv"] = dict(
-            type=Options.T_BOOL, default=False, required=False, multi=False, hide=True,
+            type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[False, True],
             description_ja="logsvを有効にします。logsvは複数のプロセスがログファイルへの書き込みを同期するための機能です。すでにlogsvが有効なプロセスがある場合は無視されます。",
-            description_en="Enables logsv. Logsv is a feature that synchronizes log file writing among multiple processes. If there is already an active process with logsv enabled, it will be ignored.",
-            choice=[False, True])
+            description_en="Enables logsv. Logsv is a feature that synchronizes log file writing among multiple processes. If there is already an active process with logsv enabled, it will be ignored.",)
+        self._options["output_raw"] = dict(
+            type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[False, True],
+            description_ja="処理が成功した場合に、処理結果をbase64デコードした状態で標準出力します。複数の結果が含まれる場合は最初の一つだけ出力します。",
+            description_en="If the operation is successful, the result is output to standard output in base64-decoded form. If multiple results are returned, only the first one is output.",)
+        self._options["output_json"] = dict(
+            short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
+            description_ja="処理結果jsonの保存先ファイルを指定。",
+            description_en="Specify the destination file for saving the processing result json.",)
+        self._options["output_json_append"] = dict(
+            short="a", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
+            description_ja="処理結果jsonファイルを追記保存します。",
+            description_en="Save the processing result json file by appending.",)
+        self._options["stdout_log"] = dict(
+            type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
+            description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
+            description_en="Available only in GUI mode. Outputs standard output during command execution to Console log.",)
+        self._options["capture_stdout"] = dict(
+            type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
+            description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
+            description_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen.",)
+        self._options["capture_maxsize"] = dict(
+            type=Options.T_INT, default=feature.Feature.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choice=None,
+            description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+            description_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.",)
 
     def init_debugoption(self):
         # デバックオプションを追加
         self._options["debug"]["opt"] = "debug"
         self._options["tag"]["opt"] = "tag"
-        self._options["language"]["opt"] = "language"
         self._options["clmsg_id"]["opt"] = "clmsg_id"
+        self._options["language"]["opt"] = "language"
         self._options["description"]["opt"] = "description"
+
+        self._options["output_raw"]["opt"] = "output_raw"
+        self._options["output_json"]["opt"] = "output_json"
+        self._options["output_json_append"]["opt"] = "output_json_append"
+        self._options["stdout_log"]["opt"] = "stdout_log"
+        self._options["capture_stdout"]["opt"] = "capture_stdout"
+        self._options["capture_maxsize"]["opt"] = "capture_maxsize"
+
         for key, mode in self._options["cmd"].items():
             if type(mode) is not dict:
                 continue
@@ -348,10 +372,24 @@ class Options:
                     c["choice"].append(self._options["tag"])
                 if "clmsg_id" not in [_o['opt'] for _o in c["choice"]]:
                     c["choice"].append(self._options["clmsg_id"])
-                if "description" not in [_o['opt'] for _o in c["choice"]]:
-                    c["choice"].append(self._options["description"])
                 if "language" not in [_o['opt'] for _o in c["choice"]]:
                     c["choice"].append(self._options["language"])
+                if "description" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["description"])
+
+                if "output_raw" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["output_raw"])
+                if "output_json" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["output_json"])
+                if "output_json_append" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["output_json_append"])
+                if "stdout_log" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["stdout_log"])
+                if "capture_stdout" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["capture_stdout"])
+                if "capture_maxsize" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["capture_maxsize"])
+
                 if c["opt"] not in [_o['opt'] for _o in self._options["cmd"]["choice"]]:
                     self._options["cmd"]["choice"] += [c]
             self._options["mode"][key] = mode

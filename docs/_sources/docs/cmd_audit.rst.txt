@@ -109,11 +109,6 @@ audit ( search ) : ``cmdbox -m audit -c search <Option>``
     "--offset <offset>","","Specifies the starting position of the row to be retrieved."
     "--limit <limit>","","Specifies the number of rows to retrieve."
     "--csv <csv>","","Output search results in csv."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 audit ( write ) : ``cmdbox -m audit -c write <Option>``
 =======================================================

@@ -93,15 +93,6 @@ class ExtractSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="loadregs", type=Options.T_STR, default=".*", required=True, multi=False, hide=False, choice=None,
                      description_ja="読込み正規表現パターンを指定します。",
                      description_en="Specifies a load regular expression pattern."),
-                dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
-                    description_ja="処理結果jsonの保存先ファイルを指定。",
-                    description_en="Specify the destination file for saving the processing result json."),
-                dict(opt="output_json_append", short="a", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
-                    description_ja="処理結果jsonファイルを追記保存します。",
-                    description_en="Save the processing result json file by appending."),
-                dict(opt="stdout_log", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
-                    description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
-                    description_en="Available only in GUI mode. Outputs standard output during command execution to Console log."),
             ]
         )
 

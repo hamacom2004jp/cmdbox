@@ -45,9 +45,6 @@ gui ( start ) : ``cmdbox -m gui -c start <Option>``
     "--agent_html <agent_html>","","Specify `agent.html`. If omitted, the cmdbox built-in HTML file is used."
     "--assets <assets>","","Specify the asset file required when using html files."
     "--signin_html <signin_html>","","Specify `signin.html`. If omitted, the cmdbox built-in HTML file is used."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 gui ( stop ) : ``cmdbox -m gui -c stop <Option>``
 =================================================
@@ -60,8 +57,3 @@ gui ( stop ) : ``cmdbox -m gui -c stop <Option>``
 
     "Option","Required","Description"
     "--data <data>","","When omitted, `$HONE/.cmdbox` is used."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."

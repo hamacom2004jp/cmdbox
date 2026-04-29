@@ -101,15 +101,6 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="timeout", type=Options.T_INT, default=120, required=False, multi=False, hide=True, choice=None,
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                      description_en="Specify the maximum waiting time until the server responds."),
-                dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
-                     description_ja="処理結果jsonの保存先ファイルを指定。",
-                     description_en="Specify the destination file for saving the processing result json."),
-                dict(opt="output_json_append", short="a", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
-                     description_ja="処理結果jsonファイルを追記保存します。",
-                     description_en="Save the processing result json file by appending."),
-                dict(opt="stdout_log", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
-                     description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
-                     description_en="Available only in GUI mode. Outputs standard output during command execution to Console log."),
             ])
 
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:

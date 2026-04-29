@@ -19,9 +19,6 @@ web ( apikey_add ) : ``cmdbox -m web -c apikey_add <Option>``
     "--user_name <user_name>","required","Specify the target user name."
     "--apikey_name <apikey_name>","required","Specify the ApiKey name for this user."
     "--signin_file <signin_file>","required","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 web ( apikey_del ) : ``cmdbox -m web -c apikey_del <Option>``
 =============================================================
@@ -36,9 +33,6 @@ web ( apikey_del ) : ``cmdbox -m web -c apikey_del <Option>``
     "--user_name <user_name>","required","Specify the target user name."
     "--apikey_name <apikey_name>","required","Specify the ApiKey name for this user."
     "--signin_file <signin_file>","required","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 web ( gencert ) : ``cmdbox -m web -c gencert <Option>``
 =======================================================
@@ -58,9 +52,6 @@ web ( gencert ) : ``cmdbox -m web -c gencert <Option>``
     "--output_key <output_key>","","Specifies the private key file of the self-signed certificate to be output.If omitted, the hostname specified in the `webhost option` .key will be output."
     "--output_key_format <output_key_format>","","Specifies the private key file format of the output self-signed certificate."
     "--overwrite <overwrite>","","Overwrites the self-signed certificate file to be output if it exists."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 web ( genpass ) : ``cmdbox -m web -c genpass <Option>``
 =======================================================
@@ -78,9 +69,6 @@ web ( genpass ) : ``cmdbox -m web -c genpass <Option>``
     "--use_number <use_number>","","Specify the type of number to be used for the password. `notuse` , `use` can be specified."
     "--use_symbol <use_symbol>","","Specifies the type of symbol used in the password. `notuse` , `use` can be specified."
     "--similar <similar>","","Specifies whether certain similar characters should be used. `exclude` , `include` can be specified."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 web ( group_add ) : ``cmdbox -m web -c group_add <Option>``
 ===========================================================
@@ -96,9 +84,6 @@ web ( group_add ) : ``cmdbox -m web -c group_add <Option>``
     "--group_name <group_name>","required","Specify a group name. Do not duplicate other groups."
     "--group_parent <group_parent>","","Specifies the parent group name."
     "--signin_file <signin_file>","required","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 web ( group_del ) : ``cmdbox -m web -c group_del <Option>``
 ===========================================================
@@ -112,9 +97,6 @@ web ( group_del ) : ``cmdbox -m web -c group_del <Option>``
     "Option","Required","Description"
     "--group_id <group_id>","required","Specify the group ID. Do not duplicate other groups."
     "--signin_file <signin_file>","required","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 web ( group_edit ) : ``cmdbox -m web -c group_edit <Option>``
 =============================================================
@@ -130,9 +112,6 @@ web ( group_edit ) : ``cmdbox -m web -c group_edit <Option>``
     "--group_name <group_name>","required","Specify a group name. Do not duplicate other groups."
     "--group_parent <group_parent>","","Specifies the parent group name."
     "--signin_file <signin_file>","required","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 web ( group_list ) : ``cmdbox -m web -c group_list <Option>``
 =============================================================
@@ -146,9 +125,6 @@ web ( group_list ) : ``cmdbox -m web -c group_list <Option>``
     "Option","Required","Description"
     "--group_name <group_name>","","Retrieved by specifying a group name. If omitted, all groups are retrieved."
     "--signin_file <signin_file>","required","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 web ( start ) : ``cmdbox -m web -c start <Option>``
 ===================================================
@@ -189,9 +165,6 @@ web ( start ) : ``cmdbox -m web -c start <Option>``
     "--agent_html <agent_html>","","Specify `agent.html`. If omitted, the cmdbox built-in HTML file is used."
     "--assets <assets>","","Specify the asset file required when using html files."
     "--signin_html <signin_html>","","Specify `signin.html`. If omitted, the cmdbox built-in HTML file is used."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 web ( stop ) : ``cmdbox -m web -c stop <Option>``
 =================================================
@@ -204,11 +177,6 @@ web ( stop ) : ``cmdbox -m web -c stop <Option>``
 
     "Option","Required","Description"
     "--data <data>","","When omitted, `$HONE/.cmdbox` is used."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 web ( user_add ) : ``cmdbox -m web -c user_add <Option>``
 =========================================================
@@ -227,9 +195,6 @@ web ( user_add ) : ``cmdbox -m web -c user_add <Option>``
     "--user_email <user_email>","","Specify the user email. Required when `user_pass_hash` is `oauth2` or `saml`."
     "--user_group <user_group>","required","Specifies the groups to which the user belongs."
     "--signin_file <signin_file>","required","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 web ( user_del ) : ``cmdbox -m web -c user_del <Option>``
 =========================================================
@@ -243,9 +208,6 @@ web ( user_del ) : ``cmdbox -m web -c user_del <Option>``
     "Option","Required","Description"
     "--user_id <user_id>","required","Specify the user ID."
     "--signin_file <signin_file>","required","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 web ( user_edit ) : ``cmdbox -m web -c user_edit <Option>``
 ===========================================================
@@ -264,9 +226,6 @@ web ( user_edit ) : ``cmdbox -m web -c user_edit <Option>``
     "--user_email <user_email>","","Specify the user email. Required when `user_pass_hash` is `oauth2` or `saml`."
     "--user_group <user_group>","required","Specifies the groups to which the user belongs."
     "--signin_file <signin_file>","required","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 web ( user_list ) : ``cmdbox -m web -c user_list <Option>``
 ===========================================================
@@ -280,6 +239,3 @@ web ( user_list ) : ``cmdbox -m web -c user_list <Option>``
     "Option","Required","Description"
     "--user_name <user_name>","","Retrieved by specifying a user name. If omitted, all users are retrieved."
     "--signin_file <signin_file>","required","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."

@@ -36,11 +36,6 @@ llm ( chat ) : ``cmdbox -m llm -c chat <Option>``
     "--msg_file_url <msg_file_url>","","Specify the URL of the file to be sent."
     "--msg_doc <msg_doc>","","Specify the content of the document to be sent."
     "--msg_doc_mime <msg_doc_mime>","","Specify the MIME type of the document to be sent."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 llm ( del ) : ``cmdbox -m llm -c del <Option>``
 ===============================================
@@ -60,11 +55,6 @@ llm ( del ) : ``cmdbox -m llm -c del <Option>``
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
     "--llmname <llmname>","required","Specify the name of the LLM configuration to delete."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 llm ( list ) : ``cmdbox -m llm -c list <Option>``
 =================================================
@@ -84,11 +74,6 @@ llm ( list ) : ``cmdbox -m llm -c list <Option>``
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
     "--kwd <kwd>","","Specify the name you want to search for. Searches for partial matches."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 llm ( load ) : ``cmdbox -m llm -c load <Option>``
 =================================================
@@ -108,11 +93,6 @@ llm ( load ) : ``cmdbox -m llm -c load <Option>``
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
     "--llmname <llmname>","required","Specify the name of the LLM configuration to load."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 llm ( save ) : ``cmdbox -m llm -c save <Option>``
 =================================================
@@ -142,8 +122,3 @@ llm ( save ) : ``cmdbox -m llm -c save <Option>``
     "--llmmodel <llmmodel>","","Specifies the llm model."
     "--llmseed <llmseed>","","Specifies the seed value when using llm model."
     "--llmtemperature <llmtemperature>","","Specifies the temperature when using llm model."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."

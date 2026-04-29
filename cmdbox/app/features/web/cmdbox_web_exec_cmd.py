@@ -216,7 +216,10 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     self.callback_return_pipe_exec_func(web, title, output)
                     return output
 
+                output_raw = 'output_raw' in opt and opt['output_raw']
+                opt['output_raw'] = False
                 opt_list, file_dict = web.options.mk_opt_list(opt)
+                opt['output_raw'] = True
                 old_stdout = sys.stdout
                 old_stdin = sys.stdin
                 if 'capture_stdout' in opt and opt['capture_stdout'] and 'stdin' in opt and opt['stdin'] and _stdin_body is None:
@@ -293,10 +296,48 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     if nothread:
                         if isinstance(ret, str):
                             return PlainTextResponse(ret, media_type='text/plain')
+                        elif isinstance(ret, bytes):
+                            return StreamingResponse(io.BytesIO(ret), media_type='application/octet-stream')
+                        elif output_raw:
+                            if isinstance(ret, list):
+                                if len(ret) > 0:
+                                    ret = ret[0]
+                                else:
+                                    return dict(warn='No output.')
+                            if not isinstance(ret, dict):
+                                return ret
+                            success = ret.get('success', {})
+                            filename = success.get('name', None)
+                            if filename is None:
+                                if title is not None:
+                                    filename = f"output_{title.replace(' ', '_').strip()}"
+                                else:
+                                    filename = "output"
+                            mimetype = success.get('mime_type', None)
+                            content_b64 = success.get('data', None)
+                            # content_b64がNoneの場合はsuccess全体を出力する
+                            if content_b64 is None: content_b64 = success
+                            if type(content_b64) is dict:
+                                # content_b64が辞書型の場合はJSON文字列に変換する
+                                content_b64 = common.to_str(content_b64)
+                                mimetype = 'application/json'
+                                filename = f"{filename}.json"
+                            try:
+                                # content_b64をbase64デコードしてbytesに変換する。
+                                # content_b64がbase64エンコードされていない場合はそのままcontent_b64をcontentとして扱う。
+                                content = io.BytesIO(convert.b64str2bytes(content_b64))
+                            except:
+                                content = io.StringIO(content_b64)
+                            headers = {}
+                            if filename:
+                                headers['Content-Disposition'] = f'attachment; filename="{convert.urlencode(filename)}"'
+                            return StreamingResponse(content,
+                                                     media_type=(mimetype if mimetype else 'application/octet-stream'),
+                                                     headers=headers)
                         return ret
                     self.callback_return_cmd_exec_func(web, title, ret)
                 except:
-                    web.logger.warning(f'exec_cmd error.', exec_info=True)
+                    web.logger.warning(f'exec_cmd error.', exc_info=True)
                     self.put_queue(resqueue, output)
                     if nothread:
                         return output

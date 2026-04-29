@@ -5,6 +5,7 @@ from PIL.Image import Resampling
 from typing import Tuple
 import base64
 import numpy as np
+import urllib.parse
 
 
 def npyfile2npy(fp) -> np.ndarray:
@@ -258,3 +259,15 @@ def b64str2str(b64str:str) -> str:
     if b64str == 'None':
         return None
     return base64.b64decode(b64str).decode('utf-8')
+
+def urlencode(s:str) -> str:
+    """
+    文字列をURLエンコードします。
+
+    Args:
+        s (str): 文字列
+
+    Returns:
+        str: URLエンコードされた文字列
+    """
+    return urllib.parse.quote(s, safe='')

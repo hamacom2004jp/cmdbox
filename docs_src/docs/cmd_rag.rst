@@ -24,9 +24,6 @@ rag ( build ) : ``cmdbox -m rag -c build <Option>``
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
     "--rag_name <rag_name>","required","Specify the name of the RAG configuration to build."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
 
 rag ( del ) : ``cmdbox -m rag -c del <Option>``
 ===============================================
@@ -46,9 +43,6 @@ rag ( del ) : ``cmdbox -m rag -c del <Option>``
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
     "--rag_name <rag_name>","required","Specify the name of the RAG configuration to delete."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
 
 rag ( list ) : ``cmdbox -m rag -c list <Option>``
 =================================================
@@ -68,11 +62,6 @@ rag ( list ) : ``cmdbox -m rag -c list <Option>``
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
     "--kwd <kwd>","","Specify the name you want to search for. Searches for partial matches."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 rag ( load ) : ``cmdbox -m rag -c load <Option>``
 =================================================
@@ -92,9 +81,6 @@ rag ( load ) : ``cmdbox -m rag -c load <Option>``
     "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
     "--rag_name <rag_name>","required","Specify the name of the RAG configuration to load."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
 
 rag ( regist ) : ``cmdbox -m rag -c regist <Option>``
 =====================================================
@@ -117,9 +103,6 @@ rag ( regist ) : ``cmdbox -m rag -c regist <Option>``
     "--data <data>","required","When omitted, `$HONE/.cmdbox` is used."
     "--signin_file <signin_file>","required","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
     "--groups <groups>","required","Specifies that `signin_file`, if specified, should return the list of commands allowed for this user group."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
 
 rag ( save ) : ``cmdbox -m rag -c save <Option>``
 =================================================
@@ -154,9 +137,6 @@ rag ( save ) : ``cmdbox -m rag -c save <Option>``
     "--graph_store_pguser <graph_store_pguser>","","Specify the postgresql user for GraphRAG storage."
     "--graph_store_pgpass <graph_store_pgpass>","","Specify the postgresql password for GraphRAG storage."
     "--graph_store_pgdbname <graph_store_pgdbname>","","Specify the postgresql database name for GraphRAG storage."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
 
 rag ( search ) : ``cmdbox -m rag -c search <Option>``
 =====================================================
@@ -185,6 +165,3 @@ rag ( search ) : ``cmdbox -m rag -c search <Option>``
     "--data <data>","required","When omitted, `$HONE/.cmdbox` is used."
     "--signin_file <signin_file>","required","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
     "--groups <groups>","required","Specifies that `signin_file`, if specified, should return the list of commands allowed for this user group."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."

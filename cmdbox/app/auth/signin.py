@@ -856,7 +856,7 @@ class Signin(object):
             if rule['mode'] is not None:
                 if rule['mode'] != mode:
                     continue
-                if len([c for c in rule['cmds'] if cmd == c]) <= 0:
+                if rule['cmds'] and len([c for c in rule['cmds'] if cmd == c]) <= 0:
                     continue
             # コマンドオプションの強制設定
             if 'coercion' in rule:

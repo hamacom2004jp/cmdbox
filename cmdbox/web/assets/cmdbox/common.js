@@ -23,6 +23,7 @@ cmdbox.change_color_mode = (color_mode) => {
     select_elem.append('<option value="light">Light</option>');
     select_elem.append('<option value="spaceship">Spaceship</option>');
     select_elem.append('<option value="sakura">Sakura</option>');
+    select_elem.append('<option value="hydrangea">Hydrangea</option>');
     color_mode = !color_mode ? localStorage.getItem('color_mode') : color_mode;
     if(color_mode == 'light') html.attr('data-bs-theme','light');
     else if(color_mode == 'midnight') html.attr('data-bs-theme','midnight');
@@ -32,6 +33,7 @@ cmdbox.change_color_mode = (color_mode) => {
     else if(color_mode == 'crimson') html.attr('data-bs-theme','crimson');
     else if(color_mode == 'spaceship') html.attr('data-bs-theme','spaceship');
     else if(color_mode == 'sakura') html.attr('data-bs-theme','sakura');
+    else if(color_mode == 'hydrangea') html.attr('data-bs-theme','hydrangea');
     else html.attr('data-bs-theme','dark');
     localStorage.setItem('color_mode', color_mode);
     if (color_mode) {

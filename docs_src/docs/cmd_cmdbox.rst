@@ -82,11 +82,6 @@ cmdbox ( pgsql_install ) : ``cmdbox -m cmdbox -c pgsql_install <Option>``
     "--no_install_pgcron <no_install_pgcron>","","Specify whether not to install the pg_cron extension."
     "--install_pgcron_tag <install_pgcron_tag>","","Specify the tag name in the pg_cron extension repository `https://github.com/citusdata/pg_cron.git`."
     "--compose_path <compose_path>","","Specify the `docker-compose.yml` file."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 cmdbox ( pgsql_load ) : ``cmdbox -m cmdbox -c pgsql_load <Option>``
 ===================================================================
@@ -184,11 +179,6 @@ cmdbox ( server_install ) : ``cmdbox -m cmdbox -c server_install <Option>``
     "--run_extra_post <run_extra_post>","","Specify additional commands to run after install_extra execution."
     "--install_extra <install_extra>","","Specify additional packages to install."
     "--compose_path <compose_path>","","Specify the `docker-compose.yml` file."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 cmdbox ( server_load ) : ``cmdbox -m cmdbox -c server_load <Option>``
 =====================================================================
@@ -205,11 +195,6 @@ cmdbox ( server_load ) : ``cmdbox -m cmdbox -c server_load <Option>``
     "--install_tag <install_tag>","","If specified, you can add to the tag name of the docker image to create."
     "--install_use_gpu <install_use_gpu>","","Install with a module configuration that uses the GPU."
     "--compose_path <compose_path>","","Specify the `docker-compose.yml` file."
-    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
-    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
-    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
-    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
-    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
 cmdbox ( uninstall ) : ``cmdbox -m cmdbox -c uninstall <Option>``
 =================================================================
