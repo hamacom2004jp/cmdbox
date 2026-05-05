@@ -80,6 +80,7 @@ class AuditDelete(audit_base.AuditBase, validator.Validator):
         ]
         return opt
 
+    @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -93,10 +94,6 @@ class AuditDelete(audit_base.AuditBase, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        st, msg, cl = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, cl
-
         delete_audit_type_b64 = convert.str2b64str(args.delete_audit_type)
         delete_clmsg_id_b64 = convert.str2b64str(args.delete_clmsg_id)
         delete_clmsg_sdate = args.delete_clmsg_sdate+common.get_tzoffset_str() if args.delete_clmsg_sdate else None

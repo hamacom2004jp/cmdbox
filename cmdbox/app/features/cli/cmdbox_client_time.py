@@ -1,5 +1,5 @@
 from cmdbox.app import common, feature
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, Union, List
 import argparse
@@ -43,6 +43,7 @@ class ClientTime(feature.OneshotResultEdgeFeature, validator.Validator):
                         description_en="Specify the number of hours of time difference."),
             ])
 
+    @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -56,9 +57,6 @@ class ClientTime(feature.OneshotResultEdgeFeature, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        st, msg, cl = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, cl
         tz = datetime.timezone(datetime.timedelta(hours=args.timedelta))
         dt = datetime.datetime.now(tz)
         ret = dict(success=dict(data=dt.strftime('%Y-%m-%d %H:%M:%S'), timezone=str(dt.tzinfo), timestamp=dt.timestamp()))
@@ -66,6 +64,21 @@ class ClientTime(feature.OneshotResultEdgeFeature, validator.Validator):
         if 'success' not in ret:
             return self.RESP_WARN, ret, None
         return self.RESP_SUCCESS, ret, None
+
+    def output_schema(self) -> type:
+        """
+        コマンドの実行結果スキーマを表すクラスを返します
+
+        Returns:
+            type: 結果のスキーマクラス
+        """
+        class Data(resdata.Data):
+            data: Union[str, None] = None
+            timezone: Union[str, None] = None
+            timestamp: Union[float, None] = None
+        class Result(resdata.Result):
+            success: Data
+        return Result
 
     def edgerun(self, opt, tool, logger, timeout, prevres = None):
         """

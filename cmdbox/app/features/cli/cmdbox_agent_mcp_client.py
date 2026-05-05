@@ -77,6 +77,7 @@ class AgentMcpClient(feature.UnsupportEdgeFeature, validator.Validator):
                      description_en="Specifies prompt arguments to be retrieved from the remote MCP server."),
             ])
 
+    @validator.async_apprun_check
     async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -90,10 +91,6 @@ class AgentMcpClient(feature.UnsupportEdgeFeature, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        st, msg, cl = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, cl
-
         from fastmcp import Client
         config = dict(
             mcpServers=dict(

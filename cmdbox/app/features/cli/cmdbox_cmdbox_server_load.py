@@ -62,6 +62,7 @@ class CmdboxServerLoad(cmdbox_base.CmdboxBase, validator.Validator):
             ]
         )
 
+    @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -75,10 +76,6 @@ class CmdboxServerLoad(cmdbox_base.CmdboxBase, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        st, msg, obj = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, obj
-
         if platform.system() == 'Windows':
             msg = dict(warn=f"Load command is Unsupported in windows platform.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

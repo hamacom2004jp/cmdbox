@@ -56,10 +56,8 @@ class AgentSessionDel(agant_base.AgentBase, validator.Validator):
             ]
         )
 
+    @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        st, msg, cl = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, cl
 
         payload = dict(runner_name=args.runner_name, session_id=args.session_id, user_name=args.user_name)
         payload_b64 = convert.str2b64str(common.to_str(payload))

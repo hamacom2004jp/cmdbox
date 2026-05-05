@@ -12,6 +12,7 @@ import asyncio
 import html
 import io
 import json
+import logging
 import queue
 import threading
 import traceback
@@ -272,7 +273,8 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                                 output = [dict(warn=f'The captured stdout was discarded because its size was larger than {capture_maxsize} bytes.')]
                     else:
                         output = [dict(warn='capture_stdout is off.')]
-                    old_stdout.write(f'EXEC OUTPUT => {output}'[:logsize]+'\n') # コマンド実行時のアウトプットはカラーリングしない
+                    if web.logger.level == logging.DEBUG:
+                        old_stdout.write(f'EXEC OUTPUT => {output}'[:logsize]+'\n') # コマンド実行時のアウトプットはカラーリングしない
                 except Exception as e:
                     msg = f'exec_cmd error. {traceback.format_exc()}'
                     common.console_log(console, message=f'EXEC  - {msg}'[:logsize], highlight=(len(msg)<logsize-10))

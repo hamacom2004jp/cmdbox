@@ -50,6 +50,7 @@ class WebApikeyAdd(feature.UnsupportEdgeFeature, validator.Validator):
             ]
         )
 
+    @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -63,10 +64,6 @@ class WebApikeyAdd(feature.UnsupportEdgeFeature, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        st, msg, obj = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, obj
-
         w = None
         try:
             w = web.Web(logger, self.default_data, appcls=self.appcls, ver=self.ver,

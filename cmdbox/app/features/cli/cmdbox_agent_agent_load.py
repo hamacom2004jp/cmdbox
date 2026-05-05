@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -49,10 +49,8 @@ class AgentAgentLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             ]
        )
 
+    @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        st, msg, obj = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, obj
         if not re.match(r'^[\w\-]+$', args.agent_name):
             msg = dict(warn="Agent name can only contain alphanumeric characters, underscores, and hyphens.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -68,6 +66,28 @@ class AgentAgentLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl
+
+    def output_schema(self) -> type:
+        """
+        コマンドの実行結果スキーマを表すクラスを返します
+
+        Returns:
+            type: 結果のスキーマクラス
+        """
+        class Data(resdata.Data):
+            agent_name: str = None
+            agent_type: str = None
+            a2asv_baseurl: Union[str, None] = None
+            a2asv_delegated_auth: Union[bool, None] = None
+            a2asv_apikey: Union[str, None] = None
+            llm: Union[str, None] = None
+            mcpservers: Union[List[str], None] = None
+            subagents: Union[List[str], None] = None
+            agent_description: Union[str, None] = None
+            agent_instruction: Union[str, None] = None
+        class Result(resdata.Result):
+            success: Data
+        return Result
 
     def is_cluster_redirect(self):
         return False
@@ -87,6 +107,7 @@ class AgentAgentLoad(feature.OneshotResultEdgeFeature, validator.Validator):
 
             with configure_path.open('r', encoding='utf-8') as f:
                 data = json.load(f)
+                data['abc'] = 123  # for test
 
             msg = dict(success=data)
             redis_cli.rpush(reskey, msg)

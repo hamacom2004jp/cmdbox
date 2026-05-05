@@ -130,6 +130,7 @@ class WebStart(feature.UnsupportEdgeFeature, validator.Validator):
             ]
         )
 
+    @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -143,10 +144,6 @@ class WebStart(feature.UnsupportEdgeFeature, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        st, msg, obj = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, obj
-
         signin_file = Path(args.signin_file)
         if signin_file is not None and not signin_file.is_file():
             msg = dict(warn=f"Signin file '{signin_file}' is not found.")

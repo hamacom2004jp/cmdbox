@@ -77,10 +77,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator):
             ]
         )
 
+    @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        st, msg, cl = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, cl
         if not re.match(r'^[\w\-]+$', args.runner_name):
             msg = dict(warn="Runner name can only contain alphanumeric characters, underscores, and hyphens.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -141,6 +139,12 @@ class AgentChat(agant_base.AgentBase, validator.Validator):
         msg = dict(success=[], warn=[])
         for res in cl.redis_cli.send_cmd_sse(self.get_svcmd(), [payload_b64],
                                              retry_count=retry_count, retry_interval=retry_interval, timeout=timeout, nowait=False):
+            cls = self.output_schema()
+            try:
+                cls.model_validate(msg)  # 結果のスキーマ検証
+            except Exception as e:
+                info = cls.get_model_info()
+                res = dict(warn=dict(msg=f"Invalid result format: {e}.", output=res, schema=info))
             if 'success' in res:
                 yield self.RESP_SUCCESS, res['success']
             elif 'warn' in res:

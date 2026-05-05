@@ -81,6 +81,7 @@ class ClientHttp(feature.ResultEdgeFeature, validator.Validator):
             ]
         )
 
+    @validator.async_apprun_check
     async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -94,10 +95,6 @@ class ClientHttp(feature.ResultEdgeFeature, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        st, msg, cl = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, cl
-
         query_param = {}
         if args.proxy == 'yes':
             from cmdbox.app.auth import signin

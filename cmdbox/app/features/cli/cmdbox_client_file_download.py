@@ -107,6 +107,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator):
         """
         return 'file_download'
 
+    @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -120,10 +121,6 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        st, msg, cl = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, cl
-
         if args.etag is not None and args.download_file is not None:
             msg = dict(warn=f"Cannot specify both --etag and --download_file options.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

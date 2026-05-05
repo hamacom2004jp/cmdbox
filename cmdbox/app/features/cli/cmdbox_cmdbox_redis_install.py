@@ -54,6 +54,7 @@ class CmdboxRedisInstall(cmdbox_base.CmdboxBase, validator.Validator):
         ]
         return opt
 
+    @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -69,10 +70,6 @@ class CmdboxRedisInstall(cmdbox_base.CmdboxBase, validator.Validator):
         """
         common.set_debug(logger, True)
         try:
-            st, msg, obj = self.valid(logger, args, tm, pf)
-            if st != self.RESP_SUCCESS:
-                return st, msg, obj
-
             ret = self.redis_install(logger, args)
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 

@@ -1,10 +1,10 @@
 import datetime
 
-dt_now = datetime.datetime(2026, 4, 29)
+dt_now = datetime.datetime(2026, 5, 6)
 days_ago = (datetime.datetime.now() - dt_now).days
 __appid__ = 'cmdbox'
 __title__ = 'cmdbox (Command Development Application)'
-__version__ = '0.7.9.1'
+__version__ = '0.7.10'
 __copyright__ = f'Copyright © 2023-{dt_now.strftime("%Y")} hamacom2004jp'
 __pypiurl__ = 'https://pypi.org/project/cmdbox/'
 __srcurl__ = 'https://github.com/hamacom2004jp/cmdbox'

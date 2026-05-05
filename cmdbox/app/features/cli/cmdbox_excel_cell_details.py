@@ -1,5 +1,5 @@
 from cmdbox.app import common, filer
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client
 from cmdbox.app.features.cli.excel import excel_base
 from cmdbox.app.options import Options
 from datetime import datetime, timedelta, time
@@ -10,7 +10,7 @@ import logging
 import json
 
 
-class ExcelCellDetails(excel_base.ExcelBase, validator.Validator):
+class ExcelCellDetails(excel_base.ExcelBase):
     def get_cmd(self):
         """
         この機能のコマンドを返します
@@ -51,21 +51,6 @@ class ExcelCellDetails(excel_base.ExcelBase, validator.Validator):
                  description_en="Specify the output format. For example, `json`, `text`."),
         ]
         return opt
-
-    def chk_args(self, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[bool, str, Any]:
-        """
-        引数のチェックを行います
-
-        Args:
-            args (argparse.Namespace): 引数
-
-        Returns:
-            Tuple[bool, str]: チェック結果, メッセージ
-        """
-        st, msg, cl = super().chk_args(args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, cl
-        return self.RESP_SUCCESS, None, None
 
     def excel_proc(self, abspath:Path, args:argparse.Namespace, logger:logging.Logger, tm:float, pf:List[Dict[str, float]]=[]) -> Dict[str, Any]:
         """

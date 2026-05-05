@@ -49,6 +49,7 @@ class TestGenCliDocs(feature.OneshotResultEdgeFeature, validator.Validator):
             ]
         )
 
+    @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float,
                pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         """
@@ -63,10 +64,6 @@ class TestGenCliDocs(feature.OneshotResultEdgeFeature, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        st, msg, cl = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, cl
-
         specs_dir = Path(args.specs_dir) if args.specs_dir else Path.cwd() / "Specifications"
         docs_dir = Path(args.docs_dir) if args.docs_dir else Path.cwd() / "docs_src" / "docs"
         mode_filter = args.mode_filter or None

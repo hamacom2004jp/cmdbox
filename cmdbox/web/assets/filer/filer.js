@@ -728,9 +728,6 @@ fsapi.editer = (svpath, data, mime, is_local) => {
     });
     viewer.find('.modal-title').text(`[Edit] ${svpath} ( ${detectedEncoding} -> UNICODE )`);
     const textarea = $(`<textarea class="editer_code" style="width: calc(100% - 50px)"></textarea>`);
-    let line_num = unicodeString.split('\n').length;
-    line_num = line_num < 10 ? 10 : line_num;
-    textarea.css('height', `${line_num*1.2}em`);
     viewer_body.append(textarea);
     textarea.html(unicodeString.replace(/\r/g, ''));
     const view_footer = viewer.find('.modal-footer');
@@ -773,10 +770,12 @@ fsapi.editer = (svpath, data, mime, is_local) => {
       });
     }
     viewer.modal('show');
-    textarea.linedtextarea();
-    viewer_body.find('.linedwrap').css('width','100%').css('height','100%');
-    viewer_body.find('.lines').css('height','100%');
-    textarea.css('width','calc(100% - 60px)').css('resize','');
+    viewer.off('shown.bs.modal').on('shown.bs.modal', () => {
+        textarea.linedtextarea();
+        viewer_body.find('.linedwrap').css('width','100%').css('max-height','calc(100vh - 230px)').css('overflow','auto');
+        viewer_body.find('.linedtextarea').css('height','100%');
+        textarea.css('width','calc(100% - 60px)').css('resize','').css('height','100%').css('overflow','');
+    });
   }
 };
 fsapi.onload = () => {

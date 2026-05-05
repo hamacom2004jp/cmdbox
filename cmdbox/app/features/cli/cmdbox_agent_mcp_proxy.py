@@ -51,6 +51,7 @@ class AgentMcpProxy(feature.UnsupportEdgeFeature, validator.Validator):
                      description_en="Specifies the transport of the remote MCP server. If omitted, it is `streamable-http`.",),
             ])
 
+    @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -64,10 +65,6 @@ class AgentMcpProxy(feature.UnsupportEdgeFeature, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        st, msg, cl = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, cl
-
         from fastmcp import FastMCP
         config = dict(
             mcpServers=dict(

@@ -103,6 +103,7 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_en="Specify the maximum waiting time until the server responds."),
             ])
 
+    @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -116,10 +117,6 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        st, msg, cl = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, cl
-
         try:
             client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
             if args.scope == "client":

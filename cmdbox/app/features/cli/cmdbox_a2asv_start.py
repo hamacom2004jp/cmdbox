@@ -93,13 +93,11 @@ class A2aSvStart(feature.UnsupportEdgeFeature, validator.Validator):
             ]
         )
 
+    @validator.async_apprun_check
     async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
         """
-        st, msg, obj = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, obj
         try:
             # Signin 準備
             signin_file = None if not hasattr(args, 'signin_file') or args.signin_file is None else Path(args.signin_file)

@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import json
 
 
 class ClientFileMove(feature.UnsupportEdgeFeature, validator.Validator):
@@ -102,6 +103,7 @@ class ClientFileMove(feature.UnsupportEdgeFeature, validator.Validator):
         """
         return 'file_move'
 
+    @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -115,10 +117,6 @@ class ClientFileMove(feature.UnsupportEdgeFeature, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        st, msg, cl = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, cl
-
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
         client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
@@ -159,7 +157,7 @@ class ClientFileMove(feature.UnsupportEdgeFeature, validator.Validator):
         Returns:
             int: 終了コード
         """
-        payload = convert.b64str2str(msg[2])
+        payload = json.loads(convert.b64str2str(msg[2]))
         from_path = payload.get("from_path")
         to_path = payload.get("to_path")
         from_fwpaths = payload.get("from_fwpaths")

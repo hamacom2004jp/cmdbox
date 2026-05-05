@@ -139,10 +139,8 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator):
             ret.append(svname)
         return ret
 
+    @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        st, msg, cl = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, cl
 
         if not re.match(r'^[\w\-]+$', args.runner_name):
             msg = dict(warn="Runner name can only contain alphanumeric characters, underscores, and hyphens.")

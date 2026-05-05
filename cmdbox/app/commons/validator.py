@@ -1,11 +1,73 @@
 from cmdbox.app import common, feature, options
+from cmdbox.app.commons import resdata
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 
+
+def apprun_check(func):
+    """
+    コマンドの引数の妥当性を検証するデコレーター
+    """
+    def wrapper(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+        st, msg, obj = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, obj
+        st, msg, obj = func(self, logger, args, tm, pf)
+        cls = self.output_schema()
+        try:
+            cls.model_validate(msg)  # 結果のスキーマ検証
+            return st, msg, obj
+        except Exception as e:
+            info = cls.get_model_info()
+            msg = dict(warn=f"Invalid result format: {e}", output=msg, schema=info)
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
+    return wrapper
+
+def async_apprun_check(func):
+    """
+    コマンドの引数の妥当性を検証するデコレーター
+    """
+    async def wrapper(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+        st, msg, obj = self.valid(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            return st, msg, obj
+        st, msg, obj = await func(self, logger, args, tm, pf)
+        cls = self.output_schema()
+        try:
+            cls.model_validate(msg)  # 結果のスキーマ検証
+            return st, msg, obj
+        except Exception as e:
+            info = cls.get_model_info()
+            msg = dict(warn=f"Invalid result format: {e}", schema=info)
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, None
+    return wrapper
+
 LONG_TEXT_BOUNDARY = 512
 class Validator(feature.Feature):
+    def output_schema(self) -> type:
+        """
+        コマンドの実行結果スキーマを表すクラスを返します
+
+        Returns:
+            type: 結果のスキーマクラス
+        """
+        return resdata.Result
+
+    def parse_output(self, output:Any) -> Any:
+        """
+        コマンドの実行結果をパースします
+
+        Args:
+            output (Any): コマンドの実行結果
+        Returns:
+            Any: パース後の結果
+        """
+        cls = self.output_schema()
+        return cls.model_validate(output)
 
     def valid(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
@@ -76,11 +138,11 @@ class Validator(feature.Feature):
                     return self.RESP_WARN, msg, None
             if type in [options.Options.T_STR] and val is not None:
                 if multi and isinstance(val, list):
-                    if not all(isinstance(v, str) for v in val):
+                    if val and not all(isinstance(v, str) for v in val):
                         msg = dict(warn=f"Invalid value for --{opt}: {val} (must be a list of strings)")
                         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                         return self.RESP_WARN, msg, None
-                    if all(len(v)>=LONG_TEXT_BOUNDARY for v in val):
+                    if val and all(len(v)>=LONG_TEXT_BOUNDARY for v in val):
                         msg = dict(warn=f"Invalid value for --{opt}: {val} (each string must be less than {LONG_TEXT_BOUNDARY} characters)")
                         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                         return self.RESP_WARN, msg, None
@@ -94,7 +156,7 @@ class Validator(feature.Feature):
                     return self.RESP_WARN, msg, None
             if type in [options.Options.T_TEXT, options.Options.T_PASSWD] and val is not None:
                 if multi and isinstance(val, list):
-                    if not all(isinstance(v, str) for v in val):
+                    if val and not all(isinstance(v, str) for v in val):
                         msg = dict(warn=f"Invalid value for --{opt}: {val} (must be a list of strings)")
                         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                         return self.RESP_WARN, msg, None

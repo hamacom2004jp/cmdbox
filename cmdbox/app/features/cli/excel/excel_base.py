@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, filer, feature
-from cmdbox.app.commons import convert
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -9,7 +9,7 @@ import html
 import re
 
 
-class ExcelBase(feature.ResultEdgeFeature):
+class ExcelBase(feature.ResultEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -80,6 +80,7 @@ class ExcelBase(feature.ResultEdgeFeature):
         "e": "error",
     }
 
+    @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -93,11 +94,6 @@ class ExcelBase(feature.ResultEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        chk, msg, _ = self.chk_args(args, tm, pf)
-        if chk != self.RESP_SUCCESS:
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-
         try:
             client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
             if args.scope == "client":
@@ -155,18 +151,6 @@ class ExcelBase(feature.ResultEdgeFeature):
         Returns:
             Tuple[bool, str]: チェック結果, メッセージ
         """
-        if args.svname is None:
-            msg = dict(warn=f"Please specify the --svname option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if args.scope is None:
-            msg = dict(warn=f"Please specify the --scope option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-        if args.svpath is None:
-            msg = dict(warn=f"Please specify the --svpath option.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
         return self.RESP_SUCCESS, None, None
 
     def excel_proc(self, abspath:Path, args:argparse.Namespace, logger:logging.Logger, tm:float, pf:List[Dict[str, float]]=[]) -> Dict[str, Any]:

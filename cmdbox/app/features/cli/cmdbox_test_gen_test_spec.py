@@ -37,6 +37,7 @@ class TestGenTestSpec(feature.OneshotResultEdgeFeature, validator.Validator):
             ]
         )
 
+    @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float,
                pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         """
@@ -51,10 +52,6 @@ class TestGenTestSpec(feature.OneshotResultEdgeFeature, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        st, msg, cl = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, cl
-
         input_json = Path(args.input_json)
         if not input_json.exists():
             msg = dict(warn=f"input_json not found: {input_json}")

@@ -107,7 +107,7 @@ const render_result_func = (target_elem, result, res_size) => {
         Object.keys(data).forEach(key => {
             let val = data[key];
             if(table_head)table_head.append($(`<th class="th" scope="col">${key}</th>`));
-            if (key != 'warn' && val) {
+            if (val) {
                 if(Array.isArray(val)){
                     if(val.length > 0 && typeof val[0] == "object"){
                         const tbl = mk_table_func()
@@ -127,7 +127,7 @@ const render_result_func = (target_elem, result, res_size) => {
                     val = td.html();
                 }
                 else if (typeof val === 'string' || val instanceof String) {
-                    val = cell_chop(val, res_size);
+                    val = cell_chop(val, (key=='warn'?-1:res_size));
                 }
             }
             tr.append($(`<td style="overflow-wrap:break-word;word-break:break-all;">${val}</td>`));

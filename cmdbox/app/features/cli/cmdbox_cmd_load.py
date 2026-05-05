@@ -63,6 +63,7 @@ class CmdLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             ]
         )
 
+    @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -76,10 +77,6 @@ class CmdLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        st, msg, cl = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, cl
-
         if not hasattr(self, 'signin_file_data') or self.signin_file_data is None:
             self.signin_file_data = signin.Signin.load_signin_file(args.signin_file, None, self=self, logger=logger)
         opt_path = Path(args.data) / ".cmds" / f"cmd-{args.cmd_title}.json"

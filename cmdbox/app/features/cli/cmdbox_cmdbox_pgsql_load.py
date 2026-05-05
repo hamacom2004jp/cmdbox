@@ -57,6 +57,7 @@ class CmdboxPgsqlLoad(cmdbox_base.CmdboxBase, validator.Validator):
         ]
         return opt
 
+    @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -72,10 +73,6 @@ class CmdboxPgsqlLoad(cmdbox_base.CmdboxBase, validator.Validator):
         """
         common.set_debug(logger, True)
         try:
-            st, msg, obj = self.valid(logger, args, tm, pf)
-            if st != self.RESP_SUCCESS:
-                return st, msg, obj
-
             if platform.system() == 'Windows':
                 return {"warn": f"load PostgreSQL command is Unsupported in windows platform."}
 
