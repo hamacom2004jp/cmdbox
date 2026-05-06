@@ -158,13 +158,15 @@ pip uninstall -y cmdbox
 
 ```python
 from cmdbox.app import common, feature
+from cmdbox.app.commons import validator
+from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, Union, List
 import argparse
 import datetime
 import logging
 
 
-class ClientTime(feature.Feature):
+class ClientTime(feature.Feature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         return "client"
 
@@ -173,7 +175,7 @@ class ClientTime(feature.Feature):
 
     def get_option(self):
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
             description_ja="クライアント側の現在時刻を表示します。",
             description_en="Displays the current time at the client side.",
             choice=[
@@ -182,6 +184,7 @@ class ClientTime(feature.Feature):
                         description_en="Specify the number of hours of time difference."),
             ])
 
+    @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         tz = datetime.timezone(datetime.timedelta(hours=args.timedelta))
         dt = datetime.datetime.now(tz)
@@ -195,13 +198,14 @@ class ClientTime(feature.Feature):
         status, res = tool.exec_cmd(opt, logger, timeout, prevres)
         tool.notify(res)
         yield 1, res
+
 ```
 
 - If you want to implement server-side processing, please refer to ```sample_server_time```.
 
 ```python
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import redis_client
+from cmdbox.app.commons import redis_client, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, Union, List
@@ -210,7 +214,7 @@ import datetime
 import logging
 
 
-class ServerTime(feature.Feature):
+class ServerTime(feature.Feature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         return "server"
 
@@ -219,7 +223,7 @@ class ServerTime(feature.Feature):
 
     def get_option(self):
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="サーバー側の現在時刻を表示します。",
             description_en="Displays the current time at the server side.",
             choice=[
@@ -249,6 +253,7 @@ class ServerTime(feature.Feature):
                         description_en="Specify the maximum waiting time until the server responds."),
             ])
 
+    @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.redis_cli.send_cmd(self.get_svcmd(), [str(args.timedelta)],
@@ -346,10 +351,10 @@ audit:
     retry_interval: 1                   # Specifies the number of seconds before reconnecting to the audit Redis server.
     timeout: 15                         # Specify the maximum waiting time until the server responds.
     pg_enabled: False                   # Specify True if using the postgresql database server.
-    pg_host: localhost                  # Specify the postgresql host.
+    pg_host: pgsql                      # Specify the postgresql host.
     pg_port: 5432                       # Specify the postgresql port.
-    pg_user: postgres                   # Specify the postgresql user name.
-    pg_password: password               # Specify the postgresql password.
+    pg_user: pgsql                      # Specify the postgresql user name.
+    pg_password: pgsql                  # Specify the postgresql password.
     pg_dbname: audit                    # Specify the postgresql database name.
     retention_period_days: 365          # Specify the number of days to retain audit logs.
 ```
@@ -364,28 +369,42 @@ audit:
 users:                         # A list of users, each of which is a map that contains the following fields.
 - uid: 1                       # An ID that identifies a user. No two users can have the same ID.
   name: admin                  # A name that identifies the user. No two users can have the same name.
-  password: XXXXXXXXXXXXXXX    # The user's password. The value is hashed with the hash function specified in the next hash field.
+  password: XXXXXXXXXXXXXXXX   # The user's password. The value is hashed with the hash function specified in the next hash field.
   hash: plain                  # The hash function used to hash the password, which can be plain, md5, sha1, or sha256, or oauth2, or saml.
   groups: [admin]              # A list of groups to which the user belongs, as specified in the groups field.
   email: admin@aaa.bbb.jp      # The email address of the user, used when authenticating using the provider specified in the oauth2 or saml field.
   home: /.users/admin          # The home directory of the user, used for file operations.
+- uid: 2
+  name: develop
+  password: XXXXXXXXXXXXXXXX
+  hash: plain
+  groups: [develop]
+  email: develop@aaa.bbb.jp
+  home: /.users/develop
+- uid: 3
+  name: master
+  password: XXXXXXXXXXXXXXXX
+  hash: plain
+  groups: [master]
+  email: master@aaa.bbb.jp
+  home: /.users/master
 - uid: 101
   name: user01
-  password: XXXXXXXXXXXXXXX
+  password: XXXXXXXXXXXXXXXX
   hash: md5
   groups: [user]
   email: user01@aaa.bbb.jp
   home: /.users/user01
 - uid: 102
   name: user02
-  password: XXXXXXXXXXXXXXX
+  password: XXXXXXXXXXXXXXXX
   hash: sha1
   groups: [readonly]
   email: user02@aaa.bbb.jp
   home: /.users/user02
 - uid: 103
   name: user03
-  password: XXXXXXXXXXXXXXX
+  password: XXXXXXXXXXXXXXXX
   hash: sha256
   groups: [editor]
   email: user03@aaa.bbb.jp
@@ -395,6 +414,12 @@ groups:                        # A list of groups, each of which is a map that c
   name: admin                  # A name that identifies the group. No two groups can have the same name.
   home: /.groups/admin         # The home directory of the group, used for file operations.
 - gid: 2
+  name: develop
+  home: /.groups/develop
+- gid: 3
+  name: master
+  home: /.groups/master
+- gid: 4
   name: guest
   home: /.groups/guest
 - gid: 101
@@ -412,7 +437,20 @@ cmdrule:                       # A list of command rules, Specify a rule that de
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
   rules:                       # Specify rules to allow or deny execution of the command, depending on the group the user belongs to.
   - groups: [admin]
+    coercion:
+      fwpath: "['/.users','/.groups']"
+      from_fwpath: "['/.users','/.groups']"
+      to_fwpath: "['/.users','/.groups']"
     rule: allow
+  - groups: [develop, master]
+    coercion:
+      fwpath: "['/']"
+      from_fwpath: "['/']"
+      to_fwpath: "['/']"
+    rule: allow
+  - groups: [admin, master]
+    mode: test
+    rule: deny
   - groups: [user]             # Specify the groups to which the rule applies.
     mode: client               # Specify the "mode" as the condition for applying the rule.
     cmds: [file_download, file_list, server_info, time] # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
@@ -425,6 +463,7 @@ cmdrule:                       # A list of command rules, Specify a rule that de
   - groups: [user]
     mode: agent
     cmds: [chat, agent_list, mcp_client, mcpsv_list, memory_list, runner_list,
+           memory_status, runner_load,
            session_list, session_del, start, stop]
     rule: allow
   - groups: [user]
@@ -437,7 +476,9 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     rule: allow
   - groups: [user]
     mode: extract
-    cmds: [list]
+    cmds: [list, pdfplumber, chunklet]
+    coercion:
+      fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
     rule: allow
   - groups: [user]
     mode: llm
@@ -459,7 +500,7 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     mode: web
     cmds: [genpass]
     rule: allow
-  - groups: [editor]
+  - groups: [user]
     mode: client
     cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
     coercion:
@@ -488,7 +529,10 @@ cmdrule:                       # A list of command rules, Specify a rule that de
 pathrule:                      # List of RESTAPI rules, rules that determine whether or not a RESTAPI can be executed when a user in web mode accesses it.
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
   rules:                       # Specify rules to allow or deny execution of the RESTAPI, depending on the group the user belongs to.
-  - groups: [admin]            # Specify the groups to which the rule applies.
+  - groups:                    # Specify the groups to which the rule applies.
+    - admin
+    - develop
+    - master
     paths: [/]                 # Specify the "path" to which the rule applies. Multiple items can be specified in a list.
     rule: allow                # Specifies whether or not the specified RESTAPI is allowed for the specified group. The value can be allow or deny.
   - groups: [guest]

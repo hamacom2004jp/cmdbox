@@ -15,28 +15,42 @@ Configuration items in `user_list.yml`
     users:                         # A list of users, each of which is a map that contains the following fields.
     - uid: 1                       # An ID that identifies a user. No two users can have the same ID.
       name: admin                  # A name that identifies the user. No two users can have the same name.
-      password: XXXXXXXXXXXXXXX    # The user's password. The value is hashed with the hash function specified in the next hash field.
+      password: XXXXXXXXXXXXXX     # The user's password. The value is hashed with the hash function specified in the next hash field.
       hash: plain                  # The hash function used to hash the password, which can be plain, md5, sha1, or sha256, or oauth2, or saml.
       groups: [admin]              # A list of groups to which the user belongs, as specified in the groups field.
       email: admin@aaa.bbb.jp      # The email address of the user, used when authenticating using the provider specified in the oauth2 or saml field.
       home: /.users/admin          # The home directory of the user, used for file operations.
+    - uid: 2
+      name: develop
+      password: XXXXXXXXXXXXXX
+      hash: plain
+      groups: [develop]
+      email: develop@aaa.bbb.jp
+      home: /.users/develop
+    - uid: 3
+      name: master
+      password: XXXXXXXXXXXXXX
+      hash: plain
+      groups: [master]
+      email: master@aaa.bbb.jp
+      home: /.users/master
     - uid: 101
       name: user01
-      password: XXXXXXXXXXXXXXX
+      password: XXXXXXXXXXXXXX
       hash: md5
       groups: [user]
       email: user01@aaa.bbb.jp
       home: /.users/user01
     - uid: 102
       name: user02
-      password: XXXXXXXXXXXXXXX
+      password: XXXXXXXXXXXXXX
       hash: sha1
       groups: [readonly]
       email: user02@aaa.bbb.jp
       home: /.users/user02
     - uid: 103
       name: user03
-      password: XXXXXXXXXXXXXXX
+      password: XXXXXXXXXXXXXX
       hash: sha256
       groups: [editor]
       email: user03@aaa.bbb.jp
@@ -46,6 +60,12 @@ Configuration items in `user_list.yml`
       name: admin                  # A name that identifies the group. No two groups can have the same name.
       home: /.groups/admin         # The home directory of the group, used for file operations.
     - gid: 2
+      name: develop
+      home: /.groups/develop
+    - gid: 3
+      name: master
+      home: /.groups/master
+    - gid: 4
       name: guest
       home: /.groups/guest
     - gid: 101
@@ -63,7 +83,20 @@ Configuration items in `user_list.yml`
       policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
       rules:                       # Specify rules to allow or deny execution of the command, depending on the group the user belongs to.
       - groups: [admin]
+        coercion:
+          fwpath: "['/.users','/.groups']"
+          from_fwpath: "['/.users','/.groups']"
+          to_fwpath: "['/.users','/.groups']"
         rule: allow
+      - groups: [develop, master]
+        coercion:
+          fwpath: "['/']"
+          from_fwpath: "['/']"
+          to_fwpath: "['/']"
+        rule: allow
+      - groups: [admin, master]
+        mode: test
+        rule: deny
       - groups: [user]             # Specify the groups to which the rule applies.
         mode: client               # Specify the "mode" as the condition for applying the rule.
         cmds: [file_download, file_list, server_info, time] # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
@@ -76,6 +109,7 @@ Configuration items in `user_list.yml`
       - groups: [user]
         mode: agent
         cmds: [chat, agent_list, mcp_client, mcpsv_list, memory_list, runner_list,
+               memory_status, runner_load,
                session_list, session_del, start, stop]
         rule: allow
       - groups: [user]
@@ -88,7 +122,9 @@ Configuration items in `user_list.yml`
         rule: allow
       - groups: [user]
         mode: extract
-        cmds: [list]
+        cmds: [list, pdfplumber, chunklet]
+        coercion:
+          fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
         rule: allow
       - groups: [user]
         mode: llm
@@ -110,7 +146,7 @@ Configuration items in `user_list.yml`
         mode: web
         cmds: [genpass]
         rule: allow
-      - groups: [editor]
+      - groups: [user]
         mode: client
         cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
         coercion:
@@ -139,7 +175,10 @@ Configuration items in `user_list.yml`
     pathrule:                      # List of RESTAPI rules, rules that determine whether or not a RESTAPI can be executed when a user in web mode accesses it.
       policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
       rules:                       # Specify rules to allow or deny execution of the RESTAPI, depending on the group the user belongs to.
-      - groups: [admin]            # Specify the groups to which the rule applies.
+      - groups:                    # Specify the groups to which the rule applies.
+        - admin
+        - develop
+        - master
         paths: [/]                 # Specify the "path" to which the rule applies. Multiple items can be specified in a list.
         rule: allow                # Specifies whether or not the specified RESTAPI is allowed for the specified group. The value can be allow or deny.
       - groups: [guest]

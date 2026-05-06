@@ -65,6 +65,7 @@ class ServerTime(feature.Feature, validator.Validator):
                         description_en="Specify the maximum waiting time until the server responds."),
             ])
 
+    @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
@@ -78,10 +79,6 @@ class ServerTime(feature.Feature, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        st, msg, cl = self.valid(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            return st, msg, cl
-
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.redis_cli.send_cmd(self.get_svcmd(), [str(args.timedelta)],
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
