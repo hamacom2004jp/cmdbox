@@ -1,11 +1,12 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from cmdbox.app.features.cli import cmdbox_tts_say
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import pydantic
 
 
 class TtsList(feature.UnsupportEdgeFeature, validator.Validator):
@@ -90,6 +91,19 @@ class TtsList(feature.UnsupportEdgeFeature, validator.Validator):
         if 'success' not in ret:
             return self.RESP_WARN, ret, None
         return self.RESP_SUCCESS, ret, None
+
+    def output_schema(self) -> type:
+        class TtsRecord(resdata.Base):
+            engine: Union[str, None] = pydantic.Field(default=None, description="TTSエンジン名")
+            model: Union[str, None] = pydantic.Field(default=None, description="モデル名")
+            character: Union[str, None] = pydantic.Field(default=None, description="キャラクター名")
+            style: Union[str, None] = pydantic.Field(default=None, description="スタイル名")
+        class Data(resdata.Data):
+            data: Union[List[TtsRecord], None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            error: Union[str, None] = pydantic.Field(default=None, description="エラーが発生した場合の結果")
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
 
     def is_cluster_redirect(self):
         """

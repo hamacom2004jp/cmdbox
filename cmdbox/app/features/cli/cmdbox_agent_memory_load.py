@@ -1,11 +1,12 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
+import pydantic
 import re
 
 
@@ -85,6 +86,23 @@ class AgentMemoryLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            memory_name: Union[str, None] = pydantic.Field(default=None, description="メモリ名")
+            memory_type: Union[str, None] = pydantic.Field(default=None, description="メモリタイプ")
+            llm: Union[str, None] = pydantic.Field(default=None, description="LLM名")
+            embed: Union[str, None] = pydantic.Field(default=None, description="エンベッディング名")
+            memory_store_pghost: Union[str, None] = pydantic.Field(default=None, description="メモリストアPostgreSQLホスト")
+            memory_store_pgport: Union[int, None] = pydantic.Field(default=None, description="メモリストアPostgreSQLポート")
+            memory_store_pguser: Union[str, None] = pydantic.Field(default=None, description="メモリストアPostgreSQLユーザー")
+            memory_store_pgpass: Union[str, None] = pydantic.Field(default=None, description="メモリストアPostgreSQLパスワード")
+            memory_store_pgdbname: Union[str, None] = pydantic.Field(default=None, description="メモリストアPostgreSQLデータベース名")
+            memory_description: Union[str, None] = pydantic.Field(default=None, description="メモリの説明")
+            memory_instruction: Union[str, None] = pydantic.Field(default=None, description="メモリへの指示")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
 
     def is_cluster_redirect(self):
         return False

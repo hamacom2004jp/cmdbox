@@ -1,10 +1,11 @@
 from cmdbox.app import common, feature, web
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import pydantic
 
 
 class WebStop(feature.UnsupportEdgeFeature, validator.Validator):
@@ -63,3 +64,10 @@ class WebStop(feature.UnsupportEdgeFeature, validator.Validator):
         msg = dict(success="web complate.")
         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         return self.RESP_SUCCESS, msg, w
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

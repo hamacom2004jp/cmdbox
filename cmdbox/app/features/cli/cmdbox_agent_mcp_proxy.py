@@ -1,9 +1,10 @@
 from cmdbox.app import common, feature
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import pydantic
 
 
 class AgentMcpProxy(feature.UnsupportEdgeFeature, validator.Validator):
@@ -86,3 +87,10 @@ class AgentMcpProxy(feature.UnsupportEdgeFeature, validator.Validator):
             logger.error(f"Failed to start MCP proxy: {e}", exc_info=True)
             return self.RESP_ERROR, dict(warn=f"Failed to start MCP proxy: {e}"), None
         return self.RESP_SUCCESS, dict(info="MCP proxy successfully."), None
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

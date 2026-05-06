@@ -1,5 +1,5 @@
 from cmdbox.app import common, feature
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from cmdbox.app.features.cli.test import run_spec
 from pathlib import Path
@@ -7,6 +7,7 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import importlib
 import logging
+import pydantic
 import shutil
 
 
@@ -154,6 +155,49 @@ class TestRunSpec(feature.OneshotResultEdgeFeature, validator.Validator):
 
         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         return self.RESP_SUCCESS if failed_count == 0 else self.RESP_WARN, msg, None
+
+    def output_schema(self) -> type:
+        class TestcaseData(resdata.Base):
+            id: Union[str, None] = pydantic.Field(default=None, description="ID")
+            category: Union[str, None] = pydantic.Field(default=None, description="カテゴリ")
+            focus: Union[str, None] = pydantic.Field(default=None, description="フォーカス")
+            input_pattern: Union[str, None] = pydantic.Field(default=None, description="入力パターン")
+            expected_status: Union[str, None] = pydantic.Field(default=None, description="期待するステータス")
+            executed_at: Union[str, None] = pydantic.Field(default=None, description="実行日時")
+            status: Union[str, None] = pydantic.Field(default=None, description="ステータス")
+            input_values: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="入力値")
+            ret_msg: Union[List[Any], Any, None] = pydantic.Field(default=None, description="戻りメッセージ")
+            actual_code: Union[int, None] = pydantic.Field(default=None, description="実際の終了コード")
+            actual_status: Union[str, None] = pydantic.Field(default=None, description="実際のステータス")
+            actual_result: Union[Any, None] = pydantic.Field(default=None, description="実際の結果")
+            reason: Union[Any, None] = pydantic.Field(default=None, description="理由")
+            expected_status_detail: Union[Any, None] = pydantic.Field(default=None, description="期待するステータスの詳細")
+        class ResultData(resdata.Base):
+            mode: Union[str, None] = pydantic.Field(default=None, description="モード")
+            cmd: Union[str, None] = pydantic.Field(default=None, description="コマンド")
+            total: Union[int, None] = pydantic.Field(default=None, description="合計件数")
+            passed: Union[int, None] = pydantic.Field(default=None, description="成功件数")
+            failed: Union[int, None] = pydantic.Field(default=None, description="失敗件数")
+            skipped: Union[int, None] = pydantic.Field(default=None, description="スキップされたファイルまたはスキップ件数")
+            test_cases: Union[List[TestcaseData], None] = pydantic.Field(default=None, description="テストケースのリスト")
+        class Summary(resdata.Base):
+            message: Union[str, None] = pydantic.Field(default=None, description="メッセージ")
+            commands: Union[int, None] = pydantic.Field(default=None, description="コマンド数")
+            total: Union[int, None] = pydantic.Field(default=None, description="合計件数")
+            passed: Union[int, None] = pydantic.Field(default=None, description="成功件数")
+            failed: Union[int, None] = pydantic.Field(default=None, description="失敗件数")
+            skipped: Union[int, None] = pydantic.Field(default=None, description="スキップされたファイルまたはスキップ件数")
+            results: Union[List[ResultData], None] = pydantic.Field(default=None, description="結果のリスト")
+            output_dir: Union[Path, str, None] = pydantic.Field(default=None, description="出力先ディレクトリ")
+            json_file: Union[Path, str, None] = pydantic.Field(default=None, description="JSONファイルパス")
+            index_md_file: Union[Path, str, None] = pydantic.Field(default=None, description="インデックスMarkdownファイルパス")
+            error_json_file: Union[Path, str, None] = pydantic.Field(default=None, description="エラーJSONファイルパス")
+            error_md_file: Union[Path, str, None] = pydantic.Field(default=None, description="エラーMarkdownファイルパス")
+        class Data(resdata.Data):
+            data: Union[Summary, None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
 
     def is_cluster_redirect(self) -> bool:
         return False

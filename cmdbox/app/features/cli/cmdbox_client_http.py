@@ -1,10 +1,11 @@
 from cmdbox.app import common, feature
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import pydantic
 import requests
 import urllib.parse
 
@@ -141,3 +142,8 @@ class ClientHttp(feature.ResultEdgeFeature, validator.Validator):
         common.print_format(res.content, False, tm, None, False, pf=pf)
 
         return self.RESP_SUCCESS, res.content, None
+
+    def output_schema(self) -> type:
+        class Result(resdata.Result):
+            success: Union[Any, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

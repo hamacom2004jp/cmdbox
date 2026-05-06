@@ -1,10 +1,11 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import redis_client, validator
+from cmdbox.app.commons import redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import pydantic
 
 
 class ClientServerInfo(feature.OneshotResultEdgeFeature, validator.Validator):
@@ -94,6 +95,17 @@ class ClientServerInfo(feature.OneshotResultEdgeFeature, validator.Validator):
             return self.RESP_WARN, ret, cl
 
         return self.RESP_SUCCESS, ret, cl
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            svname: Union[str, None] = pydantic.Field(default=None, description="サーバー名")
+            redis_host: Union[str, None] = pydantic.Field(default=None, description="Redisサーバーホスト")
+            redis_port: Union[int, None] = pydantic.Field(default=None, description="Redisサーバーポート")
+            redis_password: Union[str, None] = pydantic.Field(default=None, description="Redisサーバーパスワード")
+            data_dir: Union[str, None] = pydantic.Field(default=None, description="データディレクトリ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
 
     def is_cluster_redirect(self):
         """

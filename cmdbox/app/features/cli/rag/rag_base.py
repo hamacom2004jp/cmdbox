@@ -183,10 +183,11 @@ class RAGBase(feature.ResultEdgeFeature):
         if 'success' not in cmd_res:
             common.print_format(cmd_res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, cmd_res, cl
-        extract_opt:dict = cmd_res['success']
+        extract_opt:dict = cmd_res['success']['data']
         extract_feat = options.get_cmd_attr(extract_opt.get('mode'), extract_opt.get('cmd'), 'feature')
         extract_opt.update(dict(data=args.data, signin_file=args.signin_file, groups=args.groups,
-            format=args.format, output_json=args.output_json, output_json_append=args.output_json_append))
+                                host=args.host, port=args.port, password=args.password, svname=args.svname, client_data=args.client_data,
+                                format=args.format, output_json=args.output_json, output_json_append=args.output_json_append))
         extract_args = argparse.Namespace(**extract_opt)
         msg = dict(success=dict(extract_feat=extract_feat, extract_opt=extract_opt, extract_args=extract_args))
         return self.RESP_SUCCESS, msg, cl

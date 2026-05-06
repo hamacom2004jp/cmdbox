@@ -1,5 +1,5 @@
 from cmdbox.app import common, feature, web
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -7,6 +7,7 @@ from urllib.request import pathname2url
 import argparse
 import logging
 import multiprocessing
+import pydantic
 
 
 class WebStart(feature.UnsupportEdgeFeature, validator.Validator):
@@ -198,3 +199,10 @@ class WebStart(feature.UnsupportEdgeFeature, validator.Validator):
                 session_domain=args.session_domain, session_path=args.session_path,
                 session_secure=args.session_secure, session_timeout=args.session_timeout,
                 outputs_key=args.outputs_key, gunicorn_workers=args.gunicorn_workers, gunicorn_timeout=args.gunicorn_timeout)
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

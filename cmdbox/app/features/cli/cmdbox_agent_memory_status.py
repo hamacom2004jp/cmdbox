@@ -1,13 +1,14 @@
 from cmdbox.app import common, client
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.features.cli import cmdbox_embed_start, cmdbox_llm_chat
 from cmdbox.app.features.cli.agent import agant_base
 from cmdbox.app.options import Options
 from pathlib import Path
-from typing import Dict, Any, Tuple, List
+from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
+import pydantic
 import re
 
 
@@ -56,7 +57,7 @@ class AgentMemoryStatus(agant_base.AgentBase, validator.Validator):
                 dict(opt="user_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="ユーザー名を指定します。",
                      description_en="Specify a user name."),
-                dict(opt="memory_query", type=Options.T_TEXT, default=None, required=False, multi=False, hide=False, choice=None,
+                dict(opt="memory_query", type=Options.T_TEXT, default="", required=False, multi=False, hide=False, choice=None,
                      description_ja="メモリ内容を検索するクエリを指定します。意味検索を行います。",
                      description_en="Specify a query to search memory contents. Perform semantic search."),
                 dict(opt="memory_fetch_offset", type=Options.T_INT, default=0, required=False, multi=False, hide=False, choice=None,
@@ -92,6 +93,22 @@ class AgentMemoryStatus(agant_base.AgentBase, validator.Validator):
             return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl
 
+    def output_schema(self) -> type:
+        class MemoryRecord(resdata.Base):
+            event_id: Union[str, None] = pydantic.Field(default=None, description="イベントID")
+            distance: Union[float, None] = pydantic.Field(default=None, description="距離")
+            role: Union[str, None] = pydantic.Field(default=None, description="ロール")
+            my_cnt: Union[int, None] = pydantic.Field(default=None, description="自分のカウント")
+            ts_start: Union[str, None] = pydantic.Field(default=None, description="開始タイムスタンプ")
+            ts_end: Union[str, None] = pydantic.Field(default=None, description="終了タイムスタンプ")
+            all_cnt: Union[int, None] = pydantic.Field(default=None, description="全カウント")
+            text: Union[str, None] = pydantic.Field(default=None, description="テキスト")
+        class Data(resdata.Data):
+            data: Union[List[MemoryRecord], None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
+
     def is_cluster_redirect(self):
         return False
 
@@ -105,7 +122,7 @@ class AgentMemoryStatus(agant_base.AgentBase, validator.Validator):
             payload = json.loads(convert.b64str2str(msg[2]))
             runner_name = payload.get('runner_name')
             user_name = payload.get('user_name')
-            memory_query = payload.get('memory_query')
+            memory_query = payload.get('memory_query', '.*')
             memory_fetch_offset = payload.get('memory_fetch_offset', 0)
             memory_fetch_count = payload.get('memory_fetch_count', 10)
             memory_fetch_summary = payload.get('memory_fetch_summary', False)
@@ -115,6 +132,8 @@ class AgentMemoryStatus(agant_base.AgentBase, validator.Validator):
             memory_conf["memory_fetch_offset"] = memory_fetch_offset
             memory_conf["memory_fetch_count"] = memory_fetch_count
             memory_conf["memory_fetch_summary"] = memory_fetch_summary
+            if memory_conf.get('memory_type', 'memory') == 'memory' and memory_query == '':
+                memory_query = '.*'
             from google.adk.memory import BaseMemoryService
             memory_service:BaseMemoryService = self.create_memory_service(
                 data_dir, logger, memory_conf, memory_llm_conf, memory_embed_conf, sessions)
@@ -135,9 +154,11 @@ class AgentMemoryStatus(agant_base.AgentBase, validator.Validator):
                 # 取得したメモリーを要約する
                 all_text = memory_conf.get('memory_instruction', '') + "\n\n"
                 all_text+= "---\n".join([f"{r['text']}" for r in res])
-                st, all_text = self.chat(data_dir, logger, llm_conf.get("llmname"), msg_role="system", msg_text=all_text)
+                st, all_text = self.llm_chat.chat(data_dir, logger, llm_conf.get("llmname"),
+                                                  msg_role="system", msg_text=all_text)
                 if st != self.RESP_SUCCESS:
                     raise Exception(f"Failed to summarize memory contents: {all_text}")
+                all_text = all_text.get('success', {}).get('data', [])
                 all_text = "\n\n".join([r['content'] for r in all_text])
                 res = [dict(event_id=common.random_string(),
                             score=1,

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/04/29 documentation</title>
+  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/05/06 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=21c5f9e1"></script>
+      <script src="../_static/documentation_options.js?v=1286c6b1"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -137,47 +137,179 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--agent_name &lt;agent_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the name of the agent configuration to delete.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -190,47 +322,196 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--kwd &lt;kwd&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the name you want to search for. Searches for partial matches.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;class &#39;pathlib.Path&#39;&gt;&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data</p></td>
+<td><p>yes</p></td>
+<td><p>(必須)</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>list[NamePath]</p></td>
+<td><p>no</p></td>
+<td><p>(必須)</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.name</p></td>
+<td><p>str</p></td>
+<td><p>yes</p></td>
+<td><p>(必須)</p></td>
+<td><p>名前</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.path</p></td>
+<td><p>Path | str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パス</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -243,47 +524,253 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--agent_name &lt;agent_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the name of the agent configuration to load.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;agent_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;agent_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;use_planner&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;a2asv_baseurl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;a2asv_delegated_auth&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;a2asv_apikey&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;llm&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;mcpservers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;subagents&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;agent_description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;agent_instruction&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data</p></td>
+<td><p>yes</p></td>
+<td><p>(必須)</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.agent_name</p></td>
+<td><p>str</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エージェント名</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.agent_type</p></td>
+<td><p>str</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エージェントタイプ</p></td>
+</tr>
+<tr class="row-even"><td><p>success.use_planner</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>プランナー使用フラグ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.a2asv_baseurl</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>A2AサーバーのベースURL</p></td>
+</tr>
+<tr class="row-even"><td><p>success.a2asv_delegated_auth</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>A2Aサーバーの委任認証フラグ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.a2asv_apikey</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>A2AサーバーのAPIキー</p></td>
+</tr>
+<tr class="row-even"><td><p>success.llm</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>LLM名</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.mcpservers</p></td>
+<td><p>list[str] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>MCPサーバーリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.subagents</p></td>
+<td><p>list[str] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>サブエージェントリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.agent_description</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エージェントの説明</p></td>
+</tr>
+<tr class="row-even"><td><p>success.agent_instruction</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エージェントへの指示</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -296,87 +783,259 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--agent_name &lt;agent_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the name of the agent configuration to save.</p></td>
 </tr>
 <tr class="row-even"><td><p>--agent_type &lt;agent_type&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>local</p></td>
+<td><p>local | remote</p></td>
 <td><p>Specify the agent type. Specify either <cite>local</cite> or <cite>remote</cite>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--use_planner &lt;use_planner&gt;</p></td>
+<td><p>bool</p></td>
 <td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>False | True</p></td>
 <td><p>Specify whether to use the planning feature of the agent.</p></td>
 </tr>
 <tr class="row-even"><td><p>--a2asv_baseurl &lt;a2asv_baseurl&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td><p><a class="reference external" href="http://localhost:8071/a2a">http://localhost:8071/a2a</a>/&lt;agent_name&gt;</p></td>
 <td></td>
 <td><p>Specify the base URL for the A2A Server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--a2asv_delegated_auth &lt;a2asv_delegated_auth&gt;</p></td>
+<td><p>bool</p></td>
 <td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
 <td><p>Authenticate the A2A Server using the API Key of the currently logged-in user.</p></td>
 </tr>
 <tr class="row-even"><td><p>--a2asv_apikey &lt;a2asv_apikey&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the API Key when starting the A2A Server. Additionally, if <cite>a2asv_delegated_auth</cite> is disabled, it will also be used when running the Agent.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--llm &lt;llm&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the LLM configuration name referenced by the Agent.</p></td>
 </tr>
 <tr class="row-even"><td><p>--mcpservers &lt;mcpservers&gt;</p></td>
+<td><p>str</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the MCP server name used by the Agent.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--subagents &lt;subagents&gt;</p></td>
+<td><p>str</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the subagent name used by the agent.</p></td>
 </tr>
 <tr class="row-even"><td><p>--agent_description &lt;agent_description&gt;</p></td>
+<td><p>text</p></td>
+<td></td>
+<td></td>
+<td><p>cmdboxに登録されているコマンド提供</p></td>
 <td></td>
 <td><p>Specify a description of the agent's capabilities. The model uses this to determine whether to delegate control to the agent. A single line description is sufficient and recommended.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--agent_instruction &lt;agent_instruction&gt;</p></td>
+<td><p>text</p></td>
+<td></td>
+<td></td>
+<td><p>あなたはコマンドの意味を熟知しているエキスパートです。ユーザーがコマンドを実行したいとき、あなたは以下の手順に従ってコマンドを確実に実行してください。&lt;br&gt;1. ユーザーのクエリからが実行したいコマンドを特定します。&lt;br&gt;2. コマンド実行に必要なパラメータのなかで、ユーザーのクエリから取得できないものは、特にパラメータを指定せず実行してください。&lt;br&gt;3. もしエラーが発生した場合は、ユーザーにコマンド名とパラメータとエラー内容を提示してください。&lt;br&gt;4. コマンドの実行結果は、json文字列で出力するようにしてください。この時json文字列は「<code class="docutils literal notranslate"><span class="pre">`json」と「`</span></code>」で囲んだ文字列にしてください。&lt;br&gt;</p></td>
 <td></td>
 <td><p>Specify instructions for the LLM model used by the agent. These will guide the agent's behavior.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -389,71 +1048,292 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>600</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--runner_name &lt;runner_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the name of the Runner configuration.</p></td>
 </tr>
 <tr class="row-even"><td><p>--user_name &lt;user_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify a user name.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--session_id &lt;session_id&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the session ID to send to the Runner.</p></td>
 </tr>
 <tr class="row-even"><td><p>--a2asv_apikey &lt;a2asv_apikey&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the API Key of the A2A Server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--mcpserver_apikey &lt;mcpserver_apikey&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the API Key of the remote MCP server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--message &lt;message&gt;</p></td>
+<td><p>text</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the message to send to the Runner.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--call_tts &lt;call_tts&gt;</p></td>
+<td><p>bool</p></td>
 <td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
 <td><p>Specify whether to execute the TTS (Text-to-Speech) feature.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;ids&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;agent_session_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;event_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;invocation_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;flags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;final_response&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;function_call&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;function_response&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;wav_b64&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.ids</p></td>
+<td><p>Ids | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>セッション・イベントID情報</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.ids.agent_session_id</p></td>
+<td><p>str</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エージェントセッションID</p></td>
+</tr>
+<tr class="row-even"><td><p>success.ids.event_id</p></td>
+<td><p>str</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>イベントID</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.ids.invocation_id</p></td>
+<td><p>str</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>呼び出しID</p></td>
+</tr>
+<tr class="row-even"><td><p>success.flags</p></td>
+<td><p>Flags | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>フラグ情報</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.flags.final_response</p></td>
+<td><p>bool</p></td>
+<td><p>no</p></td>
+<td><p>False</p></td>
+<td><p>最終レスポンスフラグ</p></td>
+</tr>
+<tr class="row-even"><td><p>success.flags.function_call</p></td>
+<td><p>bool</p></td>
+<td><p>no</p></td>
+<td><p>False</p></td>
+<td><p>関数呼び出しフラグ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.flags.function_response</p></td>
+<td><p>bool</p></td>
+<td><p>no</p></td>
+<td><p>False</p></td>
+<td><p>関数レスポンスフラグ</p></td>
+</tr>
+<tr class="row-even"><td><p>success.message</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>メッセージ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.wav_b64</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>Base64エンコードされたWAVデータ</p></td>
+</tr>
+<tr class="row-even"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-odd"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -466,59 +1346,210 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--mcpserver_name &lt;mcpserver_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>mcpserver</p></td>
+<td></td>
 <td><p>Specify the name of the MCP server. If omitted, it will be <cite>mcpserver</cite>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--mcpserver_url &lt;mcpserver_url&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p><a class="reference external" href="http://localhost:8091/mcp">http://localhost:8091/mcp</a></p></td>
+<td></td>
 <td><p>Specifies the URL of the remote MCP server. If omitted, it will be <cite>http://localhost:8091/mcp</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p>--mcpserver_apikey &lt;mcpserver_apikey&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the API Key of the remote MCP server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--mcpserver_transport &lt;mcpserver_transport&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>streamable-http</p></td>
+<td><blockquote>
+<div><div class="line-block">
+<div class="line">streamable-http | sse | http</div>
+</div>
+</div></blockquote>
+</td>
 <td><p>Specifies the transport of the remote MCP server. If omitted, it is <cite>streamable-http</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p>--operation &lt;operation&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>list_tools</p></td>
+<td><p>list_tools | call_tool | list_resources | read_resource | list_prompts | get_prompt</p></td>
 <td><p>Specifies the operations to request from the remote MCP server. If omitted, <cite>list_tools</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--tool_name &lt;tool_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the name of the tool to run on the remote MCP server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--tool_args &lt;tool_args&gt;</p></td>
+<td><p>dict</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify arguments for the tool to run on the remote MCP server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--mcp_timeout &lt;mcp_timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specifies the maximum time to wait for a response from the remote MCP server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--resource_url &lt;resource_url&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the URL of the resource to retrieve from the remote MCP server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--prompt_name &lt;prompt_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specifies the name of the prompt to be retrieved from the remote MCP server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--prompt_args &lt;prompt_args&gt;</p></td>
+<td><p>dict</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specifies prompt arguments to be retrieved from the remote MCP server.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="kc">null</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>list[any] | any</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -531,31 +1562,152 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--mcpserver_name &lt;mcpserver_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>mcpserver</p></td>
+<td></td>
 <td><p>Specify the name of the MCP server. If omitted, it will be <cite>mcpserver</cite>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--mcpserver_url &lt;mcpserver_url&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p><a class="reference external" href="http://localhost:8091/mcp">http://localhost:8091/mcp</a></p></td>
+<td></td>
 <td><p>Specifies the URL of the remote MCP server. If omitted, it will be <cite>http://localhost:8091/mcp</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p>--mcpserver_apikey &lt;mcpserver_apikey&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the API Key of the remote MCP server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--mcpserver_transport &lt;mcpserver_transport&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>streamable-http</p></td>
+<td><blockquote>
+<div><div class="line-block">
+<div class="line">streamable-http | sse | http</div>
+</div>
+</div></blockquote>
+</td>
 <td><p>Specifies the transport of the remote MCP server. If omitted, it is <cite>streamable-http</cite>.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -568,47 +1720,179 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--mcpserver_name &lt;mcpserver_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the name of the MCP server configuration to delete.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -621,47 +1905,196 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--kwd &lt;kwd&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the name you want to search for. Searches for partial matches.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;class &#39;pathlib.Path&#39;&gt;&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>list[NamePath]</p></td>
+<td><p>no</p></td>
+<td><p>(必須)</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.name</p></td>
+<td><p>str</p></td>
+<td><p>yes</p></td>
+<td><p>(必須)</p></td>
+<td><p>名前</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.path</p></td>
+<td><p>Path | str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パス</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -674,47 +2107,216 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--mcpserver_name &lt;mcpserver_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the name of the MCP server configuration to load.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;mcpserver_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;mcpserver_url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;mcpserver_apikey&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;mcpserver_delegated_auth&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;mcpserver_transport&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;mcpserver_mcp_tools&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.mcpserver_name</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>MCPサーバー名</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.mcpserver_url</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>MCPサーバーURL</p></td>
+</tr>
+<tr class="row-even"><td><p>success.mcpserver_apikey</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>MCPサーバーAPIキー</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.mcpserver_delegated_auth</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>MCPサーバー委任認証フラグ</p></td>
+</tr>
+<tr class="row-even"><td><p>success.mcpserver_transport</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>MCPサーバートランスポート</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.mcpserver_mcp_tools</p></td>
+<td><p>list[str] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>MCPツールリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-odd"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -727,67 +2329,224 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--mcpserver_name &lt;mcpserver_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>mcpserver</p></td>
+<td></td>
 <td><p>Specify the name of the MCP server. If omitted, it will be <cite>mcpserver</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p>--mcpserver_url &lt;mcpserver_url&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p><a class="reference external" href="http://localhost:8091/mcp">http://localhost:8091/mcp</a></p></td>
+<td></td>
 <td><p>Specifies the URL of the remote MCP server. If omitted, it will be <cite>http://localhost:8091/mcp</cite>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--mcpserver_delegated_auth &lt;mcpserver_delegated_auth&gt;</p></td>
+<td><p>bool</p></td>
 <td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
 <td><p>Authenticate with the remote MCP server using the API key of the currently logged-in user.</p></td>
 </tr>
 <tr class="row-even"><td><p>--mcpserver_apikey &lt;mcpserver_apikey&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specifies the API Key for the remote MCP server when starting the A2A Server. If <cite>mcpserver_delegated_auth</cite> is disabled, it is also used when running MCP.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--mcpserver_transport &lt;mcpserver_transport&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>streamable-http</p></td>
+<td><blockquote>
+<div><div class="line-block">
+<div class="line">streamable-http | sse</div>
+</div>
+</div></blockquote>
+</td>
 <td><p>Specifies the transport of the remote MCP server. If omitted, it is <cite>streamable-http</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p>--mcp_tools &lt;mcp_tools&gt;</p></td>
+<td><p>mlist</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the tools provided by the remote server.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -800,47 +2559,179 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>120</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--memory_name &lt;memory_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the registration name of the memory to delete.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -853,47 +2744,196 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--kwd &lt;kwd&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the name you want to search for. Searches for partial matches.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;class &#39;pathlib.Path&#39;&gt;&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>list[NamePath]</p></td>
+<td><p>no</p></td>
+<td><p>(必須)</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.name</p></td>
+<td><p>str</p></td>
+<td><p>yes</p></td>
+<td><p>(必須)</p></td>
+<td><p>名前</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.path</p></td>
+<td><p>Path | str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パス</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -906,47 +2946,249 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>120</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--memory_name &lt;memory_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the registration name of the memory to load.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;memory_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;memory_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;llm&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;embed&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;memory_store_pghost&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;memory_store_pgport&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;memory_store_pguser&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;memory_store_pgpass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;memory_store_pgdbname&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;memory_description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;memory_instruction&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.memory_name</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>メモリ名</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.memory_type</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>メモリタイプ</p></td>
+</tr>
+<tr class="row-even"><td><p>success.llm</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>LLM名</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.embed</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エンベッディング名</p></td>
+</tr>
+<tr class="row-even"><td><p>success.memory_store_pghost</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>メモリストアPostgreSQLホスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.memory_store_pgport</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>メモリストアPostgreSQLポート</p></td>
+</tr>
+<tr class="row-even"><td><p>success.memory_store_pguser</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>メモリストアPostgreSQLユーザー</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.memory_store_pgpass</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>メモリストアPostgreSQLパスワード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.memory_store_pgdbname</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>メモリストアPostgreSQLデータベース名</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.memory_description</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>メモリの説明</p></td>
+</tr>
+<tr class="row-even"><td><p>success.memory_instruction</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>メモリへの指示</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -959,87 +3201,264 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--memory_name &lt;memory_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the name of the Memory setting.</p></td>
 </tr>
 <tr class="row-even"><td><p>--memory_type &lt;memory_type&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>memory</p></td>
+<td><blockquote>
+<div><div class="line-block">
+<div class="line">memory | sqlite | postgresql</div>
+</div>
+</div></blockquote>
+</td>
 <td><p>Specify the type of memory service.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--llm &lt;llm&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the LLM configuration name to use for summarization processing.</p></td>
 </tr>
 <tr class="row-even"><td><p>--embed &lt;embed&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the Embedding setting name to use for embedding processing.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--memory_store_pghost &lt;memory_store_pghost&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td><p>pgsql</p></td>
 <td></td>
 <td><p>Specify the postgresql host for memory service.</p></td>
 </tr>
 <tr class="row-even"><td><p>--memory_store_pgport &lt;memory_store_pgport&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5432</p></td>
 <td></td>
 <td><p>Specify the postgresql port for memory service.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--memory_store_pguser &lt;memory_store_pguser&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td><p>pgsql</p></td>
 <td></td>
 <td><p>Specify the postgresql user name for memory service.</p></td>
 </tr>
 <tr class="row-even"><td><p>--memory_store_pgpass &lt;memory_store_pgpass&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td></td>
+<td><p>pgsql</p></td>
 <td></td>
 <td><p>Specify the postgresql password for memory service.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--memory_store_pgdbname &lt;memory_store_pgdbname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td><p>pgsql</p></td>
 <td></td>
 <td><p>Specify the postgresql database name for memory service.</p></td>
 </tr>
 <tr class="row-even"><td><p>--memory_description &lt;memory_description&gt;</p></td>
+<td><p>text</p></td>
+<td></td>
+<td></td>
+<td><p>cmdboxのメモリ設定</p></td>
 <td></td>
 <td><p>Specify a description of the agent's memory capabilities. The model uses this to determine whether to delegate control to the agent. A single line description is sufficient and recommended.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--memory_instruction &lt;memory_instruction&gt;</p></td>
+<td><p>text</p></td>
+<td></td>
+<td></td>
+<td><p>あなたはユーザーの期待値を推測することが出来るメモリ管理のエキスパートです。ユーザーとエージェントとの会話の内容のみを根拠に、発言傾向と行動パターンから確認できる事実だけを500文字程度で要約してください。&lt;br&gt;ただし、不明な時は『確認できない』と答えてください。&lt;br&gt;さらに、得た内容を根拠に以下の点を提示してください。&lt;br&gt;１．一貫した思考傾向&lt;br&gt;２．強みの思考パターン&lt;br&gt;３．内面ギャップの可能性&lt;br&gt;</p></td>
 <td></td>
 <td><p>Specify instructions for the LLM model used by the memory. These will guide the memory's behavior.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -1052,67 +3471,230 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>120</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--runner_name &lt;runner_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the name of the Runner configuration.</p></td>
 </tr>
 <tr class="row-even"><td><p>--user_name &lt;user_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify a user name.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--memory_query &lt;memory_query&gt;</p></td>
+<td><p>text</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify a query to search memory contents. Perform semantic search.</p></td>
 </tr>
 <tr class="row-even"><td><p>--memory_fetch_offset &lt;memory_fetch_offset&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>0</p></td>
 <td></td>
 <td><p>Specify the starting position when retrieving memory contents.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--memory_fetch_count &lt;memory_fetch_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>10</p></td>
 <td></td>
 <td><p>Specify the number of memory contents to retrieve.</p></td>
 </tr>
 <tr class="row-even"><td><p>--memory_fetch_summary &lt;memory_fetch_summary&gt;</p></td>
+<td><p>bool</p></td>
 <td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>False | True</p></td>
 <td><p>Specify whether to summarize the retrieved memory contents.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;event_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;distance&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;my_cnt&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;ts_start&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;ts_end&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;all_cnt&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>list[MemoryRecord] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -1125,47 +3707,179 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--runner_name &lt;runner_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the name of the runner configuration to delete.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -1178,47 +3892,196 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--kwd &lt;kwd&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the name you want to search for. Searches for partial matches.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;class &#39;pathlib.Path&#39;&gt;&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>list[NamePath]</p></td>
+<td><p>no</p></td>
+<td><p>(必須)</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.name</p></td>
+<td><p>str</p></td>
+<td><p>yes</p></td>
+<td><p>(必須)</p></td>
+<td><p>名前</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.path</p></td>
+<td><p>Path | str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パス</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -1231,47 +4094,258 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--runner_name &lt;runner_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the name of the runner configuration to load.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;runner_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;agent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;session_store_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;tts_engine&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;memory&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;rag&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;voicevox_model&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;session_store_pghost&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;session_store_pgport&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;session_store_pguser&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;session_store_pgpass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;session_store_pgdbname&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.runner_name</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>ランナー名</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.agent</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エージェント名</p></td>
+</tr>
+<tr class="row-even"><td><p>success.session_store_type</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>セッションストアタイプ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.tts_engine</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>TTSエンジン名</p></td>
+</tr>
+<tr class="row-even"><td><p>success.memory</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>メモリ名</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.rag</p></td>
+<td><p>list[str] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>RAG設定リスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.voicevox_model</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>VOICEVOXモデル</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.session_store_pghost</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>セッションストアPostgreSQLホスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.session_store_pgport</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>セッションストアPostgreSQLポート</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.session_store_pguser</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>セッションストアPostgreSQLユーザー</p></td>
+</tr>
+<tr class="row-even"><td><p>success.session_store_pgpass</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>セッションストアPostgreSQLパスワード</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.session_store_pgdbname</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>セッションストアPostgreSQLデータベース名</p></td>
+</tr>
+<tr class="row-even"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-odd"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -1284,91 +4358,272 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--runner_name &lt;runner_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the name of the runner configuration to save.</p></td>
 </tr>
 <tr class="row-even"><td><p>--agent &lt;agent&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the Agent configuration name referenced by the Runner.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--session_store_type &lt;session_store_type&gt;</p></td>
+<td><p>str</p></td>
 <td></td>
+<td></td>
+<td><p>memory</p></td>
+<td><p>memory | sqlite | postgresql</p></td>
 <td><p>Specify how the bot's session is stored.</p></td>
 </tr>
 <tr class="row-even"><td><p>--tts_engine &lt;tts_engine&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>voicevox</p></td>
+<td><blockquote>
+<div><div class="line-block">
+<div class="line">voicevox</div>
+</div>
+</div></blockquote>
+</td>
 <td><p>Specify the TTS engine to use.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--memory &lt;memory&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the Memory configuration name referenced by the Runner.</p></td>
 </tr>
 <tr class="row-even"><td><p>--rag &lt;rag&gt;</p></td>
+<td><p>str</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the RAG configuration name referenced by the Runner.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--voicevox_model &lt;voicevox_model&gt;</p></td>
+<td><p>str</p></td>
 <td></td>
+<td></td>
+<td></td>
+<td><p>No.7アナウンス | No.7ノーマル | No.7読み聞かせ | Voidollノーマル | WhiteCULかなしい | WhiteCULたのしい | WhiteCULびえーん | WhiteCULノーマル | †聖騎士 紅桜†ノーマル | あいえるたんノーマル | ずんだもんあまあま | ずんだもんささやき | ずんだもんなみだめ | ずんだもんセクシー | ずんだもんツンツン | ずんだもんノーマル | ずんだもんヒソヒソ | ずんだもんヘロヘロ | ぞん子ノーマル | ぞん子低血圧 | ぞん子実況風 | ぞん子覚醒 | ちび式じいノーマル | もち子さんのんびり | もち子さんセクシー／あん子 | もち子さんノーマル | もち子さん喜び | もち子さん怒り | もち子さん泣き | ナースロボ＿タイプＴノーマル | ナースロボ＿タイプＴ内緒話 | ナースロボ＿タイプＴ恐怖 | ナースロボ＿タイプＴ楽々 | ユーレイちゃんささやき | ユーレイちゃんツクモちゃん | ユーレイちゃんノーマル | ユーレイちゃん哀しみ | ユーレイちゃん甘々 | 中国うさぎおどろき | 中国うさぎこわがり | 中国うさぎへろへろ | 中国うさぎノーマル | 中部つるぎおどおど | 中部つるぎノーマル | 中部つるぎヒソヒソ | 中部つるぎ怒り | 中部つるぎ絶望と敗北 | 九州そらあまあま | 九州そらささやき | 九州そらセクシー | 九州そらツンツン | 九州そらノーマル | 冥鳴ひまりノーマル | 剣崎雌雄ノーマル | 四国めたんあまあま | 四国めたんささやき | 四国めたんセクシー | 四国めたんツンツン | 四国めたんノーマル | 四国めたんヒソヒソ | 小夜/SAYOノーマル | 後鬼ぬいぐるみver. | 後鬼人間ver. | 後鬼人間（怒り）ver. | 後鬼鬼ver. | 春日部つむぎノーマル | 春歌ナナノーマル | 東北きりたんノーマル | 東北ずん子ノーマル | 東北イタコノーマル | 栗田まろんノーマル | 櫻歌ミコノーマル | 櫻歌ミコロリ | 櫻歌ミコ第二形態 | 波音リツクイーン | 波音リツノーマル | 満別花丸ささやき | 満別花丸ぶりっ子 | 満別花丸ノーマル | 満別花丸ボーイ | 満別花丸元気 | 猫使アルうきうき | 猫使アルおちつき | 猫使アルつよつよ | 猫使アルへろへろ | 猫使アルノーマル | 猫使ビィおちつき | 猫使ビィつよつよ | 猫使ビィノーマル | 猫使ビィ人見知り | 玄野武宏ツンギレ | 玄野武宏ノーマル | 玄野武宏喜び | 玄野武宏悲しみ | 琴詠ニアノーマル | 白上虎太郎おこ | 白上虎太郎びえーん | 白上虎太郎びくびく | 白上虎太郎ふつう | 白上虎太郎わーい | 雀松朱司ノーマル | 離途シリアス | 離途ノーマル | 雨晴はうノーマル | 青山龍星かなしみ | 青山龍星しっとり | 青山龍星ノーマル | 青山龍星不機嫌 | 青山龍星喜び | 青山龍星囁き | 青山龍星熱血 | 麒ヶ島宗麟ノーマル | 黒沢冴白ノーマル</p></td>
 <td><p>Specify the model of the TTS engine to use.</p></td>
 </tr>
 <tr class="row-even"><td><p>--session_store_pghost &lt;session_store_pghost&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td><p>pgsql</p></td>
 <td></td>
 <td><p>Specify the postgresql host for session store.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--session_store_pgport &lt;session_store_pgport&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5432</p></td>
 <td></td>
 <td><p>Specify the postgresql port for session store.</p></td>
 </tr>
 <tr class="row-even"><td><p>--session_store_pguser &lt;session_store_pguser&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td><p>pgsql</p></td>
 <td></td>
 <td><p>Specify the postgresql user name for session store.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--session_store_pgpass &lt;session_store_pgpass&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td></td>
+<td><p>pgsql</p></td>
 <td></td>
 <td><p>Specify the postgresql password for session store.</p></td>
 </tr>
 <tr class="row-even"><td><p>--session_store_pgdbname &lt;session_store_pgdbname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td><p>pgsql</p></td>
 <td></td>
 <td><p>Specify the postgresql database name for session store.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -1381,55 +4636,197 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>120</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--runner_name &lt;runner_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the name of the Runner configuration.</p></td>
 </tr>
 <tr class="row-even"><td><p>--user_name &lt;user_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify a user name.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--session_id &lt;session_id&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the session ID to send to the Runner.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>list[str] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -1442,55 +4839,211 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
 <td><p>Specify the service host of the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
 <td><p>Specify the service port of the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
 <td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
 <td><p>Specify the service name of the inference server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>120</p></td>
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--runner_name &lt;runner_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify the name of the Runner configuration.</p></td>
 </tr>
 <tr class="row-even"><td><p>--user_name &lt;user_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
 <td><p>required</p></td>
+<td></td>
+<td></td>
 <td><p>Specify a user name.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--session_id &lt;session_id&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the session ID to send to the Runner.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;runner_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;session_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;user_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;last_update_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;events&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;final_response&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;function_call&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;function_response&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>list[SessionRecord] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>

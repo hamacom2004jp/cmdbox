@@ -1,12 +1,13 @@
 from cmdbox.app import common, feature
 from cmdbox.app.auth import signin
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import glob
 import logging
+import pydantic
 
 
 class CmdList(feature.OneshotResultEdgeFeature, validator.Validator):
@@ -106,9 +107,9 @@ class CmdList(feature.OneshotResultEdgeFeature, validator.Validator):
                        mode=r['mode'],
                        cmd=r['cmd'],
                        description=r.get('description','') + str(options.get_cmd_attr(r['mode'], r['cmd'], 'description_ja' if is_japan else 'description_en')),
-                       tag=r.get('tag',''))
+                       tag=r.get('tag',[]))
             ret_list.append(row)
-        ret = dict(success=ret_list)
+        ret = dict(success=dict(data=ret_list))
 
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
@@ -116,3 +117,16 @@ class CmdList(feature.OneshotResultEdgeFeature, validator.Validator):
             return self.RESP_WARN, ret, None
 
         return self.RESP_SUCCESS, ret, None
+
+    def output_schema(self) -> type:
+        class CmdRecord(resdata.Base):
+            title: Union[str, None] = pydantic.Field(default=None, description="タイトル")
+            mode: Union[str, None] = pydantic.Field(default=None, description="モード")
+            cmd: Union[str, None] = pydantic.Field(default=None, description="コマンド")
+            description: Union[str, None] = pydantic.Field(default=None, description="説明")
+            tag: Union[List[str], None] = pydantic.Field(default=None, description="タグリスト")
+        class Data(resdata.Data):
+            data: Union[List[CmdRecord], None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, List[CmdRecord], None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

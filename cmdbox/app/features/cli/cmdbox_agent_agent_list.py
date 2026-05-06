@@ -6,6 +6,7 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
+import pydantic
 
 
 class AgentAgentList(feature.OneshotResultEdgeFeature, validator.Validator):
@@ -69,9 +70,9 @@ class AgentAgentList(feature.OneshotResultEdgeFeature, validator.Validator):
             type: 結果のスキーマクラス
         """
         class Data(resdata.Data):
-            data: List[resdata.NamePath] = []
+            data: List[resdata.NamePath] = pydantic.Field(default_factory=list, description="処理結果のデータ")
         class Result(resdata.Result):
-            success: Data
+            success: Data = pydantic.Field(description="成功した場合の結果")
         return Result
 
     def is_cluster_redirect(self):

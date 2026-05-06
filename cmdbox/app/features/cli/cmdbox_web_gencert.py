@@ -1,5 +1,5 @@
 from cmdbox.app import common, feature
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import pydantic
 
 
 class WebGencert(feature.UnsupportEdgeFeature, validator.Validator):
@@ -167,3 +168,10 @@ class WebGencert(feature.UnsupportEdgeFeature, validator.Validator):
         with open(output_cert, "wb") as f:
             f.write(self_cert.public_bytes(serialization.Encoding.DER if output_cert_format == "DER" else serialization.Encoding.PEM))
             logger.info(f"Save self-signed certificate. {output_cert}")
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

@@ -1,5 +1,5 @@
 from cmdbox.app import common, client
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.features.cli.audit import audit_base
 from cmdbox.app.options import Options
 from datetime import datetime
@@ -8,6 +8,7 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
+import pydantic
 import uuid
 
 
@@ -125,6 +126,11 @@ class AuditWrite(audit_base.AuditBase, validator.Validator):
         ret = dict(success=True)
         #common.print_format(ret, False, tm, None, False, pf=pf)
         return self.RESP_SUCCESS, ret, cl
+
+    def output_schema(self) -> type:
+        class Result(resdata.Result):
+            success: Union[bool, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
 
     def is_cluster_redirect(self):
         """

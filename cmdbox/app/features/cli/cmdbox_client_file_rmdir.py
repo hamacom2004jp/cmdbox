@@ -1,11 +1,12 @@
 from cmdbox.app import common, client, feature, filer
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
+import pydantic
 
 
 class ClientFileRmdir(feature.UnsupportEdgeFeature, validator.Validator):
@@ -120,6 +121,14 @@ class ClientFileRmdir(feature.UnsupportEdgeFeature, validator.Validator):
             return self.RESP_WARN, ret, cl
 
         return self.RESP_SUCCESS, ret, cl
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            path: Union[str, None] = pydantic.Field(default=None, description="パス")
+            msg: Union[str, None] = pydantic.Field(default=None, description="処理結果のメッセージ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
 
     def is_cluster_redirect(self):
         """

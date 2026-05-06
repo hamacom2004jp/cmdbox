@@ -1,7 +1,9 @@
+from cmdbox.app.commons import resdata
 from cmdbox.app.features.cli import cmdbox_web_start
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import pydantic
 
 
 class GuiStart(cmdbox_web_start.WebStart):
@@ -42,3 +44,10 @@ class GuiStart(cmdbox_web_start.WebStart):
         """
         args.gui_mode = True
         return super().apprun(logger, args, tm, pf)
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

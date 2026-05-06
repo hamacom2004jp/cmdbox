@@ -1,12 +1,13 @@
 from cmdbox.app import common, feature
 from cmdbox.app.auth import signin
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import glob
 import logging
+import pydantic
 
 
 class CmdLoad(feature.OneshotResultEdgeFeature, validator.Validator):
@@ -90,7 +91,7 @@ class CmdLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             ret = dict(warn=f"You do not have permission to execute this command.")
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, ret, None
-        ret = dict(success=opt)
+        ret = dict(success=dict(data=opt))
 
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
@@ -98,3 +99,10 @@ class CmdLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             return self.RESP_WARN, ret, None
 
         return self.RESP_SUCCESS, ret, None
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

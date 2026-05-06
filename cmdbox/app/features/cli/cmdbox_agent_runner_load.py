@@ -1,11 +1,12 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
+import pydantic
 import re
 
 
@@ -67,6 +68,24 @@ class AgentRunnerLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            runner_name: Union[str, None] = pydantic.Field(default=None, description="ランナー名")
+            agent: Union[str, None] = pydantic.Field(default=None, description="エージェント名")
+            session_store_type: Union[str, None] = pydantic.Field(default=None, description="セッションストアタイプ")
+            tts_engine: Union[str, None] = pydantic.Field(default=None, description="TTSエンジン名")
+            memory: Union[str, None] = pydantic.Field(default=None, description="メモリ名")
+            rag: Union[List[str], None] = pydantic.Field(default=None, description="RAG設定リスト")
+            voicevox_model: Union[str, None] = pydantic.Field(default=None, description="VOICEVOXモデル")
+            session_store_pghost: Union[str, None] = pydantic.Field(default=None, description="セッションストアPostgreSQLホスト")
+            session_store_pgport: Union[int, None] = pydantic.Field(default=None, description="セッションストアPostgreSQLポート")
+            session_store_pguser: Union[str, None] = pydantic.Field(default=None, description="セッションストアPostgreSQLユーザー")
+            session_store_pgpass: Union[str, None] = pydantic.Field(default=None, description="セッションストアPostgreSQLパスワード")
+            session_store_pgdbname: Union[str, None] = pydantic.Field(default=None, description="セッションストアPostgreSQLデータベース名")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
 
     def is_cluster_redirect(self):
         return False

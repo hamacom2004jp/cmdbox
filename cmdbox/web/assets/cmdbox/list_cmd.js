@@ -31,6 +31,8 @@ const list_cmd_func = async () => {
     };
     py_list_cmd.forEach(row => {card_func(row, true)});
     py_list_cmd.forEach(row => {card_func(row, false)});
+    // 画面のフラッシュ防止の対策
+    window.setTimeout(() => {$('#cmd_items').find('.card').css('background-color', '');}, 500);
     const cmd_item_tags = $('#cmd_item_tags').html('');
     const tag_bot_click = (e) => {
         const ct = $(e.currentTarget);

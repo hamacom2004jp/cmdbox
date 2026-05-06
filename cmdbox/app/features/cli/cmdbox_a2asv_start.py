@@ -1,5 +1,5 @@
 from cmdbox.app import common, feature, web
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from cmdbox.app import a2a as a2a_mod
 from cmdbox.app.auth import signin
@@ -12,6 +12,7 @@ import argparse
 import logging
 import multiprocessing
 import os
+import pydantic
 
 
 class A2aSvStart(feature.UnsupportEdgeFeature, validator.Validator):
@@ -154,3 +155,10 @@ class A2aSvStart(feature.UnsupportEdgeFeature, validator.Validator):
             msg = dict(warn=f"A2A server start error. {e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

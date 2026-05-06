@@ -1,11 +1,12 @@
 from cmdbox.app import common, feature
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from cmdbox.app.features.cli.test import gen_cli_docs
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import pydantic
 
 
 class TestGenCliDocs(feature.OneshotResultEdgeFeature, validator.Validator):
@@ -80,13 +81,13 @@ class TestGenCliDocs(feature.OneshotResultEdgeFeature, validator.Validator):
             )
         except Exception as e:
             logger.warning(f"gen_cli_docs failed: {e}", exc_info=True)
-            msg = dict(warn=str(e))
+            msg = dict(warn=dict(message=str(e)))
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
 
         errors = result.get("errors", [])
         if errors:
-            msg = dict(warn=f"Completed with errors: {errors}", **result)
+            msg = dict(warn=dict(message=f"Completed with errors: {errors}", **result))
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
 
@@ -100,3 +101,13 @@ class TestGenCliDocs(feature.OneshotResultEdgeFeature, validator.Validator):
         )
         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         return self.RESP_SUCCESS, msg, None
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            message: Union[str, None] = pydantic.Field(default=None, description="メッセージ")
+            generated: Union[List[str], None] = pydantic.Field(default=None, description="生成されたファイルのリスト")
+            skipped: Union[List[str], None] = pydantic.Field(default=None, description="スキップされたファイルまたはスキップ件数")
+            dry_run: Union[bool, None] = pydantic.Field(default=None, description="ドライランフラグ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

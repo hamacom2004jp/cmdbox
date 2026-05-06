@@ -127,7 +127,7 @@ const render_result_func = (target_elem, result, res_size) => {
                     val = td.html();
                 }
                 else if (typeof val === 'string' || val instanceof String) {
-                    val = cell_chop(val, (key=='warn'?-1:res_size));
+                    val = cell_chop(val, (key=='warn'||key=='error'?-1:res_size));
                 }
             }
             tr.append($(`<td style="overflow-wrap:break-word;word-break:break-all;">${val}</td>`));

@@ -1,10 +1,10 @@
 from cmdbox.app import common, feature, web
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
-from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import pydantic
 
 
 class WebUserAdd(feature.UnsupportEdgeFeature, validator.Validator):
@@ -56,6 +56,9 @@ class WebUserAdd(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="user_group", type=Options.T_STR, default=None, required=True, multi=True, hide=False, choice=None,
                      description_ja="ユーザーが所属するグループを指定します。",
                      description_en="Specifies the groups to which the user belongs."),
+                dict(opt="user_home", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                     description_ja="ユーザーのホームディレクトリを指定します。",
+                     description_en="Specify the home directory for the user."),
                 dict(opt="signin_file", type=Options.T_FILE, default=f'.{self.ver.__appid__}/user_list.yml', required=True, multi=False, hide=False, choice=None, fileio="in", web="mask",
                      description_ja=f"サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.{self.ver.__appid__}/user_list.yml' を指定します。",
                      description_en=f"Specify a file containing users and passwords with which they can signin.Typically, specify '.{self.ver.__appid__}/user_list.yml'."),
@@ -82,7 +85,7 @@ class WebUserAdd(feature.UnsupportEdgeFeature, validator.Validator):
                         redis_host=self.default_host, redis_port=self.default_port, redis_password=self.default_pass, svname=self.default_svname,
                         signin_file=args.signin_file)
             user = dict(uid=args.user_id, name=args.user_name, password=args.user_pass, hash=args.user_pass_hash,
-                        email=args.user_email, groups=args.user_group)
+                        email=args.user_email, groups=args.user_group, home=args.user_home)
             w.user_add(user)
             msg = dict(success=f"User ID {args.user_id} has been added.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -91,3 +94,10 @@ class WebUserAdd(feature.UnsupportEdgeFeature, validator.Validator):
             msg = dict(warn=f"{e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, w
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

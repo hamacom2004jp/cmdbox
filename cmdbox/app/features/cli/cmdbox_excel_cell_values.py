@@ -1,12 +1,13 @@
 from cmdbox.app import common, filer
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.commons import convert, resdata, redis_client
 from cmdbox.app.features.cli.excel import excel_base
 from cmdbox.app.options import Options
 from pathlib import Path
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Union
 import argparse
 import logging
 import json
+import pydantic
 
 
 class ExcelCellValues(excel_base.ExcelBase):
@@ -89,6 +90,16 @@ class ExcelCellValues(excel_base.ExcelBase):
                convert.str2b64str(cell_name), convert.str2b64str(args.cell_top_left), convert.str2b64str(args.cell_bottom_right),
                convert.str2b64str(cell_value), convert.str2b64str(args.output_cell_format)]
         return ret
+
+    def output_schema(self) -> type:
+        class Row(resdata.Base):
+            sheet_name: str = pydantic.Field(description="シート名")
+            cellinfos: Union[Dict[str, Any], str] = pydantic.Field(description="セル情報")
+        class Data(resdata.Data):
+            data: Union[List[Row], None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
 
     def is_cluster_redirect(self):
         """
@@ -220,8 +231,8 @@ class ExcelCellValues(excel_base.ExcelBase):
                     celltxt = self.format_newline(output_cell_format, celltxt, logger)
                 celltxt = self.format_table(output_cell_format, celltxt, logger)
 
-            cellinfos = {sheet_name: cellinfo if output_cell_format=='json' else celltxt}
-            res = dict(success=cellinfos)
+            rows = [dict(sheet_name=sheet_name, cellinfos=cellinfo if output_cell_format=='json' else celltxt)]
+            res = dict(success=dict(data=rows))
             return res
         except Exception as e:
             msg = dict(warn=f"Failed to cell values: {e}")

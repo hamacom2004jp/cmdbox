@@ -224,7 +224,7 @@ class Options:
         opt_list = ['-m', opt['mode'], '-c', opt['cmd']]
         file_dict = dict()
         for key, val in opt.items():
-            if key in ['stdout_log', 'capture_stdout']:
+            if key in ['stdout_log', 'capture_stdout', 'capture_maxsize']:
                 continue
             schema = [schema for schema in opt_schema if type(schema) is dict and schema['opt'] == key]
             if len(schema) == 0 or val == '':
@@ -330,6 +330,10 @@ class Options:
             short="a", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
             description_ja="処理結果jsonファイルを追記保存します。",
             description_en="Save the processing result json file by appending.",)
+        self._options["output_no_validate"] = dict(
+            type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
+            description_ja="処理結果のバリデーションを無効にします。",
+            description_en="Disable validation of the processing result.",)
         self._options["stdout_log"] = dict(
             type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
             description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
@@ -354,6 +358,7 @@ class Options:
         self._options["output_raw"]["opt"] = "output_raw"
         self._options["output_json"]["opt"] = "output_json"
         self._options["output_json_append"]["opt"] = "output_json_append"
+        self._options["output_no_validate"]["opt"] = "output_no_validate"
         self._options["stdout_log"]["opt"] = "stdout_log"
         self._options["capture_stdout"]["opt"] = "capture_stdout"
         self._options["capture_maxsize"]["opt"] = "capture_maxsize"
@@ -383,6 +388,8 @@ class Options:
                     c["choice"].append(self._options["output_json"])
                 if "output_json_append" not in [_o['opt'] for _o in c["choice"]]:
                     c["choice"].append(self._options["output_json_append"])
+                if "output_no_validate" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["output_no_validate"])
                 if "stdout_log" not in [_o['opt'] for _o in c["choice"]]:
                     c["choice"].append(self._options["stdout_log"])
                 if "capture_stdout" not in [_o['opt'] for _o in c["choice"]]:
@@ -899,7 +906,7 @@ class Options:
                 if mode is not None and cmd is not None:
                     opt_schema = self.get_cmd_choices(mode, cmd, True)
                     for key, val in arg.__dict__.items():
-                        if key in ['stdout_log', 'capture_stdout']:
+                        if key in ['stdout_log', 'capture_stdout', 'capture_maxsize']:
                             continue
                         schema = [schema for schema in opt_schema if type(schema) is dict and schema['opt'] == key]
                         if len(schema) == 0 or val == '' or val is None:

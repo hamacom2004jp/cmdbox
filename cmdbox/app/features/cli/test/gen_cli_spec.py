@@ -27,6 +27,7 @@ import importlib
 import inspect
 import json
 import textwrap
+import typing
 from collections import OrderedDict, defaultdict
 from dataclasses import dataclass
 from datetime import datetime
@@ -220,6 +221,7 @@ def build_command_spec(
             for key, info in method_infos.items()
         },
         "helper_methods": helper_methods,
+        "output_schema": _extract_output_schema(feature_obj),
         "test_viewpoints": _build_test_viewpoints(parameter_specs, method_infos),
         "generated_at": datetime.now().isoformat(timespec="seconds"),
     }
@@ -623,6 +625,36 @@ def _render_markdown(spec: dict[str, Any]) -> str:
         ]
     )
 
+    output_schema = spec.get("output_schema")
+    if output_schema:
+        lines.extend(["## 出力スキーマ (output_schema)", ""])
+        lines.append(
+            f"このコマンドは `Validator` を継承しており、`output_schema()` が返す "
+            f"`{output_schema['class_name']}` モデルで出力を検証します。"
+        )
+        lines.append("")
+        lines.append("### JSON 属性構造")
+        lines.append("")
+        lines.append("```json")
+        lines.append(json.dumps(output_schema["json_example"], ensure_ascii=False, indent=2, default=_json_default))
+        lines.append("```")
+        lines.append("")
+        if output_schema["fields"]:
+            lines.extend(["### フィールド一覧", ""])
+            lines.append("| フィールド | 型 | 必須 | デフォルト | 説明 |")
+            lines.append("| --- | --- | --- | --- | --- |")
+            for field in output_schema["fields"]:
+                lines.append(
+                    "| {name} | {type} | {required} | {default} | {description} |".format(
+                        name=_escape_table(field["name"]),
+                        type=_escape_table(field["type"]),
+                        required="はい" if field["required"] else "いいえ",
+                        default=_escape_table(field["default"]),
+                        description=_escape_table(field["description"]) if field.get("description") else "-",
+                    )
+                )
+            lines.append("")
+
     if spec["helper_methods"]:
         lines.extend(["## 主な補助メソッド", ""])
         for helper in spec["helper_methods"]:
@@ -772,6 +804,171 @@ def _json_default(value: Any) -> Any:
     if isinstance(value, Path):
         return str(value)
     return str(value)
+
+
+# ---------------------------------------------------------------------------
+# output_schema (Validator) ヘルパー
+# ---------------------------------------------------------------------------
+
+def _annotation_to_str(annotation: Any) -> str:
+    """型アノテーションを人間が読みやすい文字列に変換します。"""
+    if annotation is None or annotation is type(None):
+        return "null"
+    if annotation is typing.Any:
+        return "any"
+    origin = typing.get_origin(annotation)
+    args = typing.get_args(annotation)
+    if origin is typing.Union:
+        parts = [_annotation_to_str(a) for a in args]
+        return " | ".join(parts)
+    if origin in (list, ) or (hasattr(typing, "List") and origin is getattr(typing, "List", None)):
+        if args:
+            return f"list[{_annotation_to_str(args[0])}]"
+        return "list"
+    if origin in (dict, ) or (hasattr(typing, "Dict") and origin is getattr(typing, "Dict", None)):
+        if len(args) >= 2:
+            return f"dict[{_annotation_to_str(args[0])}, {_annotation_to_str(args[1])}]"
+        return "dict"
+    try:
+        import pydantic
+        if isinstance(annotation, type) and issubclass(annotation, pydantic.BaseModel):
+            return annotation.__name__
+    except Exception:
+        pass
+    if isinstance(annotation, type):
+        return annotation.__name__
+    return str(annotation)
+
+
+def _annotation_to_example(annotation: Any, visited: frozenset) -> Any:
+    """型アノテーションからJSON例の値を生成します。"""
+    if annotation is None or annotation is type(None):
+        return None
+    if annotation is typing.Any:
+        return None
+    origin = typing.get_origin(annotation)
+    args = typing.get_args(annotation)
+    # Union型: Noneでない最初の型を使用
+    if origin is typing.Union:
+        non_none = [a for a in args if a is not type(None)]
+        if non_none:
+            return _annotation_to_example(non_none[0], visited)
+        return None
+    # List型
+    if origin is list:
+        if args:
+            return [_annotation_to_example(args[0], visited)]
+        return []
+    # Dict型
+    if origin is dict:
+        return {}
+    try:
+        import pydantic
+        if isinstance(annotation, type) and issubclass(annotation, pydantic.BaseModel):
+            return _pydantic_to_example(annotation, visited)
+    except Exception:
+        pass
+    type_map: dict = {
+        str: "string",
+        int: 0,
+        float: 0.0,
+        bool: False,
+    }
+    return type_map.get(annotation, str(annotation) if annotation is not None else None)
+
+
+def _pydantic_to_example(cls: type, visited: frozenset = frozenset()) -> Any:
+    """pydanticモデルクラスからJSON構造例を生成します（型名を値として使用）。"""
+    try:
+        import pydantic
+    except ImportError:
+        return {}
+    if not isinstance(cls, type) or not issubclass(cls, pydantic.BaseModel):
+        return _annotation_to_example(cls, visited)
+    if cls.__name__ in visited:
+        return f"<{cls.__name__} (循環参照)>"
+    visited = visited | {cls.__name__}
+    result = {}
+    for name, field in cls.model_fields.items():
+        result[name] = _annotation_to_example(field.annotation, visited)
+    return result
+
+
+def _pydantic_to_fields(cls: type, prefix: str = "", visited: frozenset = frozenset()) -> list[dict[str, Any]]:
+    """pydanticモデルのフィールド情報をフラットなリストで返します。"""
+    try:
+        import pydantic
+        from pydantic_core import PydanticUndefined
+    except ImportError:
+        return []
+    if not isinstance(cls, type) or not issubclass(cls, pydantic.BaseModel):
+        return []
+    if cls.__name__ in visited:
+        return []
+    visited = visited | {cls.__name__}
+    fields = []
+    for name, field in cls.model_fields.items():
+        full_name = f"{prefix}.{name}" if prefix else name
+        raw_default = field.default
+        if raw_default is PydanticUndefined:
+            default_str = "(必須)"
+        elif raw_default is None:
+            default_str = "null"
+        else:
+            default_str = str(raw_default)
+        fields.append({
+            "name": full_name,
+            "type": _annotation_to_str(field.annotation),
+            "required": field.is_required(),
+            "default": default_str,
+            "description": field.description or "",
+        })
+        # ネストされたpydanticモデルを再帰的に展開
+        ann = field.annotation
+        origin = typing.get_origin(ann)
+        args = typing.get_args(ann)
+        candidates = []
+        if origin is typing.Union:
+            candidates = [a for a in args if a is not type(None)]
+        elif isinstance(ann, type) and issubclass(ann, pydantic.BaseModel):
+            candidates = [ann]
+        elif origin is list and args:
+            item = args[0]
+            if isinstance(item, type) and issubclass(item, pydantic.BaseModel):
+                candidates = [item]
+        for nested_cls in candidates:
+            if isinstance(nested_cls, type) and issubclass(nested_cls, pydantic.BaseModel):
+                if nested_cls.__name__ not in visited:
+                    fields.extend(_pydantic_to_fields(nested_cls, prefix=full_name, visited=visited))
+    return fields
+
+
+def _extract_output_schema(feature_obj: Any) -> dict[str, Any] | None:
+    """Validatorを継承したフィーチャーオブジェクトの出力スキーマ情報を抽出します。
+
+    Args:
+        feature_obj: フィーチャーオブジェクトのインスタンス
+
+    Returns:
+        スキーマ情報の辞書。Validatorでない場合はNone。
+    """
+    try:
+        import pydantic
+        from cmdbox.app.commons import validator as _validator
+        if not isinstance(feature_obj, _validator.Validator):
+            return None
+        schema_cls = feature_obj.output_schema()
+        if not (isinstance(schema_cls, type) and issubclass(schema_cls, pydantic.BaseModel)):
+            return None
+        example = _pydantic_to_example(schema_cls)
+        fields = _pydantic_to_fields(schema_cls)
+        return {
+            "class_name": schema_cls.__name__,
+            "fields": fields,
+            "json_example": example,
+        }
+    except Exception:
+        return None
 
 
 # ---------------------------------------------------------------------------

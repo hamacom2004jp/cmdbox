@@ -1,10 +1,10 @@
 from cmdbox.app import common, feature, web
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
-from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import pydantic
 
 
 class WebGroupAdd(feature.UnsupportEdgeFeature, validator.Validator):
@@ -44,6 +44,9 @@ class WebGroupAdd(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="group_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="グループ名を指定します。他のグループと重複しないようにしてください。",
                      description_en="Specify a group name. Do not duplicate other groups."),
+                dict(opt="group_home", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                     description_ja="グループのホームディレクトリを指定します。",
+                     description_en="Specify the home directory for the group."),
                 dict(opt="group_parent", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="親グループ名を指定します。",
                      description_en="Specifies the parent group name."),
@@ -72,7 +75,7 @@ class WebGroupAdd(feature.UnsupportEdgeFeature, validator.Validator):
             w = web.Web(logger, self.default_data, appcls=self.appcls, ver=self.ver,
                         redis_host=self.default_host, redis_port=self.default_port, redis_password=self.default_pass, svname=self.default_svname,
                         signin_file=args.signin_file)
-            group = dict(gid=args.group_id, name=args.group_name, parent=args.group_parent)
+            group = dict(gid=args.group_id, name=args.group_name, home=args.group_home, parent=args.group_parent)
             w.group_add(group)
             msg = dict(success=f"group ID {args.group_id} has been added.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -81,3 +84,10 @@ class WebGroupAdd(feature.UnsupportEdgeFeature, validator.Validator):
             msg = dict(warn=f"{e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, w
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

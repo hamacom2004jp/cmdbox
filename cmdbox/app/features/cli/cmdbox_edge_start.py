@@ -1,9 +1,10 @@
 from cmdbox.app import common, edge, feature
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import pydantic
 
 
 class EdgeStart(feature.UnsupportEdgeFeature, validator.Validator):
@@ -100,3 +101,10 @@ class EdgeStart(feature.UnsupportEdgeFeature, validator.Validator):
         pipes = res.json()
         return self.RESP_SUCCESS, pipes
     
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

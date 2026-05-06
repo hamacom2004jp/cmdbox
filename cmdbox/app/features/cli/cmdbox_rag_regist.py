@@ -1,12 +1,12 @@
-from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, validator
+from cmdbox.app import common, client
+from cmdbox.app.commons import convert, resdata, validator
 from cmdbox.app.features.cli.rag import rag_base, rag_store
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
-import json
+import pydantic
 import re
 
 
@@ -179,6 +179,8 @@ class RagRegist(rag_base.RAGBase, validator.Validator):
                                 continue
                             if kv['is_dir']:
                                 continue
+                            if not kv['path'].startswith(marge_opt['loadpath']):
+                                continue
                             marge_opt['loadpath'] = kv['path']
                             marge_args = argparse.Namespace(**marge_opt)
                             # Extractコマンドの実行の実行
@@ -249,3 +251,10 @@ class RagRegist(rag_base.RAGBase, validator.Validator):
             self.put_resqueue(args, msg)
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, cl
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

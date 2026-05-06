@@ -1,5 +1,5 @@
 from cmdbox.app import common
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.features.cli.cmdbox import cmdbox_base
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -7,6 +7,7 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import platform
+import pydantic
 import shutil
 import yaml
 
@@ -122,3 +123,10 @@ class CmdboxLoad(cmdbox_base.CmdboxBase, validator.Validator):
         """
         start_sh_hst = Path(self.ver.__appid__) / container / 'scripts'
         return start_sh_hst
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

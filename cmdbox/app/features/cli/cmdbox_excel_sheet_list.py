@@ -1,10 +1,11 @@
-from cmdbox.app import common, filer
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app import filer
+from cmdbox.app.commons import convert, resdata, redis_client
 from cmdbox.app.features.cli.excel import excel_base
 from pathlib import Path
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Union
 import argparse
 import logging
+import pydantic
 
 
 class ExcelSheetList(excel_base.ExcelBase):
@@ -58,6 +59,16 @@ class ExcelSheetList(excel_base.ExcelBase):
         """
         ret = [convert.str2b64str(str(args.svpath))]
         return ret
+
+    def output_schema(self) -> type:
+        class Row(resdata.Base):
+            sheet_name: str = pydantic.Field(description="シート名")
+            sheetinfos: Union[Dict[str, Any], str, None] = pydantic.Field(default=None, description="シート情報")
+        class Data(resdata.Data):
+            data: Union[List[Row], None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
 
     def is_cluster_redirect(self):
         """
@@ -118,11 +129,11 @@ class ExcelSheetList(excel_base.ExcelBase):
             import openpyxl
 
             wb:Workbook = openpyxl.load_workbook(filename=filepath, read_only=True)
-            sheetinfo = {}
+            rows = []
             for sheet in wb.worksheets:
-                sheetinfo[sheet.title] = dict(max_row=sheet.max_row, max_column=sheet.max_column, sheet_state=sheet.sheet_state)
+                rows.append(dict(sheet_name=sheet.title, sheetinfos=dict(max_row=sheet.max_row, max_column=sheet.max_column, sheet_state=sheet.sheet_state)))
 
-            res = dict(success=sheetinfo)
+            res = dict(success=dict(data=rows))
             return res
         except Exception as e:
             msg = dict(warn=f"Failed to sheet list: {e}")

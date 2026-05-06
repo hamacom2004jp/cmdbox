@@ -1,11 +1,12 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
+import pydantic
 import re
 
 
@@ -66,6 +67,24 @@ class LLMLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            llmname: Union[str, None] = pydantic.Field(default=None, description="LLM名")
+            llmprov: Union[str, None] = pydantic.Field(default=None, description="LLMプロバイダ")
+            llmprojectid: Union[str, None] = pydantic.Field(default=None, description="LLMプロジェクトID")
+            llmsvaccountfile: Union[str, None] = pydantic.Field(default=None, description="LLMサービスアカウントファイル")
+            llmlocation: Union[str, None] = pydantic.Field(default=None, description="LLMロケーション")
+            llmapikey: Union[str, None] = pydantic.Field(default=None, description="LLM APIキー")
+            llmapiversion: Union[str, None] = pydantic.Field(default=None, description="LLM APIバージョン")
+            llmendpoint: Union[str, None] = pydantic.Field(default=None, description="LLMエンドポイント")
+            llmmodel: Union[str, None] = pydantic.Field(default=None, description="LLMモデル名")
+            llmseed: Union[int, None] = pydantic.Field(default=None, description="LLMシード値")
+            llmtemperature: Union[float, None] = pydantic.Field(default=None, description="LLM温度パラメータ")
+            llmsvaccountfile_data: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="LLMサービスアカウントファイルデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
 
     def is_cluster_redirect(self):
         """

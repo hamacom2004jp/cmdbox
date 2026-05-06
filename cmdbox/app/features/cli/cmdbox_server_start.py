@@ -1,10 +1,11 @@
-from cmdbox.app import common, feature, server
-from cmdbox.app.commons import validator
+from cmdbox.app import feature, server
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import pydantic
 
 
 class ServerStart(feature.UnsupportEdgeFeature, validator.Validator):
@@ -80,3 +81,10 @@ class ServerStart(feature.UnsupportEdgeFeature, validator.Validator):
         sv.start_server(args.retry_count, args.retry_interval)
 
         return self.RESP_SUCCESS, dict(success=f"server stoped. svname={sv.svname}"), sv
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

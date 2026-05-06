@@ -6,6 +6,7 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
+import pydantic
 import re
 
 
@@ -75,18 +76,19 @@ class AgentAgentLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             type: 結果のスキーマクラス
         """
         class Data(resdata.Data):
-            agent_name: str = None
-            agent_type: str = None
-            a2asv_baseurl: Union[str, None] = None
-            a2asv_delegated_auth: Union[bool, None] = None
-            a2asv_apikey: Union[str, None] = None
-            llm: Union[str, None] = None
-            mcpservers: Union[List[str], None] = None
-            subagents: Union[List[str], None] = None
-            agent_description: Union[str, None] = None
-            agent_instruction: Union[str, None] = None
+            agent_name: str = pydantic.Field(default=None, description="エージェント名")
+            agent_type: str = pydantic.Field(default=None, description="エージェントタイプ")
+            use_planner: Union[bool, None] = pydantic.Field(default=None, description="プランナー使用フラグ")
+            a2asv_baseurl: Union[str, None] = pydantic.Field(default=None, description="A2AサーバーのベースURL")
+            a2asv_delegated_auth: Union[bool, None] = pydantic.Field(default=None, description="A2Aサーバーの委任認証フラグ")
+            a2asv_apikey: Union[str, None] = pydantic.Field(default=None, description="A2AサーバーのAPIキー")
+            llm: Union[str, None] = pydantic.Field(default=None, description="LLM名")
+            mcpservers: Union[List[str], None] = pydantic.Field(default=None, description="MCPサーバーリスト")
+            subagents: Union[List[str], None] = pydantic.Field(default=None, description="サブエージェントリスト")
+            agent_description: Union[str, None] = pydantic.Field(default=None, description="エージェントの説明")
+            agent_instruction: Union[str, None] = pydantic.Field(default=None, description="エージェントへの指示")
         class Result(resdata.Result):
-            success: Data
+            success: Data = pydantic.Field(description="成功した場合の結果")
         return Result
 
     def is_cluster_redirect(self):
@@ -107,7 +109,6 @@ class AgentAgentLoad(feature.OneshotResultEdgeFeature, validator.Validator):
 
             with configure_path.open('r', encoding='utf-8') as f:
                 data = json.load(f)
-                data['abc'] = 123  # for test
 
             msg = dict(success=data)
             redis_cli.rpush(reskey, msg)

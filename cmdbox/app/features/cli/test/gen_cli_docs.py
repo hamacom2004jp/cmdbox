@@ -23,6 +23,11 @@ from pathlib import Path
 from typing import Any
 
 
+def _json_default(obj: Any) -> Any:
+    """json.dumps の default 関数。シリアライズ不可なオブジェクトを文字列化します。"""
+    return str(obj)
+
+
 def generate(
     specs_dir: Path,
     docs_dir: Path,
@@ -131,15 +136,19 @@ def _render_command_section(mode: str, spec: dict[str, Any]) -> list[str]:
 
     # csv-table
     lines.append(".. csv-table::\n")
-    lines.append("    :widths: 20, 10, 70\n")
+    lines.append("    :widths: 20, 8, 8, 8, 12, 18, 26\n")
     lines.append("    :header-rows: 1\n")
     lines.append("\n")
-    lines.append('    "Option","Required","Description"\n')
+    lines.append('    "Option","Type","Multi","Required","Default","Choices","Description"\n')
 
     for param in parameters:
         name = param.get("name", "")
         short = param.get("short")
         required = param.get("required", False)
+        ptype = param.get("type", "") or ""
+        multi = param.get("multi", False)
+        default = param.get("default")
+        choices = param.get("choices") or []
         desc = param.get("description_en", "").strip()
 
         if short:
@@ -148,7 +157,53 @@ def _render_command_section(mode: str, spec: dict[str, Any]) -> list[str]:
             opt_display = f"--{name} <{name}>"
 
         required_str = "required" if required else ""
-        lines.append(f'    "{_escape_csv(opt_display)}","{required_str}","{_escape_csv(desc)}"\n')
+        multi_str = "multi" if multi else ""
+        default_str = "" if default is None else str(default).replace("\n", "<br>")
+        choices_str = " | ".join(str(c) for c in choices) if choices else ""
+        lines.append(
+            f'    "{_escape_csv(opt_display)}","{_escape_csv(ptype)}",'
+            f'"{multi_str}","{required_str}",'
+            f'"{_escape_csv(default_str)}","{_escape_csv(choices_str)}",'
+            f'"{_escape_csv(desc)}"\n'
+        )
+
+    # 出力スキーマ
+    output_schema = spec.get("output_schema")
+    if output_schema:
+        lines.append("\n")
+        schema_title = "Output Schema"
+        lines.append(f"**{schema_title}**\n")
+        lines.append("\n")
+        class_name = output_schema.get("class_name", "Result")
+        lines.append(
+            f"This command implements ``output_schema()`` returning ``{class_name}`` model.\n"
+        )
+        lines.append("\n")
+        json_example = output_schema.get("json_example")
+        if json_example is not None:
+            lines.append(".. code-block:: json\n")
+            lines.append("\n")
+            for json_line in json.dumps(json_example, ensure_ascii=False, indent=2, default=_json_default).splitlines():
+                lines.append(f"    {json_line}\n")
+            lines.append("\n")
+        fields = output_schema.get("fields") or []
+        if fields:
+            lines.append(".. csv-table::\n")
+            lines.append("    :widths: 25, 10, 10, 15, 40\n")
+            lines.append("    :header-rows: 1\n")
+            lines.append("\n")
+            lines.append('    "Field","Type","Required","Default","Description"\n')
+            for field in fields:
+                fname = field.get("name", "")
+                ftype = field.get("type", "")
+                frequired = "yes" if field.get("required") else "no"
+                fdefault = str(field.get("default", ""))
+                fdesc = field.get("description", "") or ""
+                lines.append(
+                    f'    "{_escape_csv(fname)}","{_escape_csv(ftype)}",'
+                    f'"{frequired}","{_escape_csv(fdefault)}","{_escape_csv(fdesc)}"\n'
+                )
+            lines.append("\n")
 
     return lines
 

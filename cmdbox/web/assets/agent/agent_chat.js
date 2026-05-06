@@ -131,6 +131,11 @@ agentView.chat = (session_id) => {
             console.warn('JSON parse error:', error);
             return;
         }
+        if (packet && packet['end']) {
+            agentView.message_id = null;
+            console.log(packet);
+            return;
+        }
         let msg_container = $(`#${agentView.message_id}`);
         if (!agentView.message_id || msg_container.length <= 0) {
             // エージェント側の表示枠が無かったら追加
@@ -139,21 +144,23 @@ agentView.chat = (session_id) => {
         // チャットリスナーにメッセージを渡す
         agentView.chat_listeners && agentView.chat_listeners.forEach(listener => listener(packet));
         if (packet && packet['warn']) {
+            console.log(packet);
             const txt = agentView.create_agent_message(agentView.message_id);
             await agentView.format_agent_message(txt, `${packet['warn']}`);
             agentView.message_id = null;
             return;
         }
-        if (packet.turn_complete) {
+        const success = packet && packet['success'] || {};
+        if (success.turn_complete) {
             agentView.message_id = null;
             return;
         }
-        if (!packet.message || packet.message.length <= 0) {
+        if (!success.message || success.message.length <= 0) {
             agentView.message_id = null;
             return;
         }
         console.log(packet);
-        if (packet.flags && !packet.flags['final_response']) {
+        if (success.flags && !success.flags['final_response']) {
             // 「考え中」を表示
             if (!agentView.message_id) {
                 agentView.message_id = cmdbox.random_string(16);
@@ -171,7 +178,7 @@ agentView.chat = (session_id) => {
                 msg_content.addClass('collapsed');
                 msg_container.find('.btn-toggle-message').text('▶');
             }
-            await agentView.format_agent_message(msg_content, packet.message);
+            await agentView.format_agent_message(msg_content, success.message);
             agentView.scrollToBottom();
             return;
         }
@@ -183,12 +190,12 @@ agentView.chat = (session_id) => {
             msg_content = agentView.create_agent_message(agentView.message_id);
             msg_container = $(`#${agentView.message_id}`);
         }
-        await agentView.format_agent_message(msg_content, packet.message);
+        await agentView.format_agent_message(msg_content, success.message);
         if (msg_container.find('.message-thinking').length <= 0) {
             msg_container.find('.btn-toggle-message').remove();
         }
         msg_container.find('.spinner-grow').remove();
-        await agentView.say.play(packet.wav_b64);
+        await agentView.say.play(success.wav_b64);
         agentView.message_id = null;
     };
     agentView.ws.onopen = () => {

@@ -1,11 +1,12 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
+import pydantic
 import re
 
 
@@ -84,6 +85,20 @@ class ExtractLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            extract_name: Union[str, None] = pydantic.Field(default=None, description="エクストラクト名")
+            extract_type: Union[str, None] = pydantic.Field(default=None, description="エクストラクトタイプ")
+            extract_cmd: Union[str, None] = pydantic.Field(default=None, description="エクストラクトコマンド")
+            scope: Union[str, None] = pydantic.Field(default=None, description="スコープ")
+            client_data: Union[str, None] = pydantic.Field(default=None, description="クライアントデータ")
+            loadpath: Union[str, None] = pydantic.Field(default=None, description="読み込みパス")
+            loadregs: Union[str, None] = pydantic.Field(default=None, description="読み込み正規表現")
+
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
 
     def is_cluster_redirect(self):
         return False

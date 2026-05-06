@@ -1,12 +1,12 @@
-from cmdbox import version
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import pip
+import pydantic
 import shutil
 
 
@@ -111,6 +111,13 @@ class TtsUninstall(feature.UnsupportEdgeFeature, validator.Validator):
                 return self.RESP_WARN, ret, None
         return self.RESP_SUCCESS, ret, None
 
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, str, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
+
     def is_cluster_redirect(self):
         """
         クラスター宛のメッセージの場合、メッセージを転送するかどうかを返します
@@ -184,7 +191,7 @@ class TtsUninstall(feature.UnsupportEdgeFeature, validator.Validator):
 
                 #===============================================================
                 # 成功時の処理
-                rescode, _msg = (self.RESP_SUCCESS, dict(success=f'Success to uninstall VoiceVox.'))
+                rescode, _msg = (self.RESP_SUCCESS, f'Success to uninstall VoiceVox.')
                 return dict(success=_msg)
             else:
                  return dict(warn=f"Unknown tts_engine: {tts_engine}")

@@ -1,5 +1,5 @@
 from cmdbox.app import common, client
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.features.cli.audit import audit_base
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -10,6 +10,7 @@ import csv
 import logging
 import io
 import json
+import pydantic
 import sys
 
 
@@ -199,6 +200,13 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
 
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         return self.RESP_SUCCESS, ret, cl
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[List[Any], None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
 
     def is_cluster_redirect(self):
         """

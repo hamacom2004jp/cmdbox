@@ -80,7 +80,7 @@ class Edge(object):
             if 'opt' not in r or r['opt'] is None:
                 continue
             opt = r['opt']
-            if opt in ['tag', 'clmsg_id', 'output_json', 'output_json_append', 'stdout_log', 'capture_stdout', 'capture_maxsize']:
+            if opt in ['tag', 'clmsg_id', 'output_json', 'output_json_append', 'output_no_validate', 'stdout_log', 'capture_stdout', 'capture_maxsize']:
                 continue
             if opt in skip_opts and opt not in input_opts:
                 continue

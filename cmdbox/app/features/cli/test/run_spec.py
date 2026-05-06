@@ -363,6 +363,15 @@ def _run_test_case(
     else:
         ok = ret_code == expected_code
 
+    # output_schema に基づく結果構造の検証
+    schema_errors: list[str] = []
+    if ok and expected_code == 0 and isinstance(ret_msg, dict):
+        expected_schema = tc.get("expected_schema")
+        if expected_schema:
+            schema_errors = _validate_result_schema(ret_msg, expected_schema, expected_status_str)
+            if schema_errors:
+                ok = False
+
     actual_status = _code_to_status(ret_code)
     result: dict[str, Any] = {
         **base,
@@ -374,7 +383,10 @@ def _run_test_case(
         "actual_result": _truncate(str(ret_msg), 300) if ret_msg else None,
         "reason": _truncate(str(ret_msg), 300) if ret_msg else None,
     }
-    if not ok:
+    if schema_errors:
+        result["schema_errors"] = schema_errors
+        result["reason"] = "スキーマ検証エラー: " + " / ".join(schema_errors)
+    elif not ok:
         result["expected_status_detail"] = (
             f"expected {expected_status_str}({expected_code}) "
             f"but got {actual_status}({ret_code})"
@@ -518,6 +530,63 @@ def _build_args_list(
 def _truncate(s: str, maxlen: int) -> str:
     return s[:maxlen] + "..." if len(s) > maxlen else s
 
+
+def _validate_result_schema(
+    actual: dict[str, Any],
+    expected_schema: dict[str, Any],
+    expected_status_str: str,
+) -> list[str]:
+    """実行結果が output_schema の定義する構造に準拠しているか検証します。
+
+    Args:
+        actual: コマンドの実行結果辞書
+        expected_schema: テストケースの expected_schema (gen_test_spec.py が埋め込んだ output_schema)
+        expected_status_str: テストケースの expected_status 文字列
+
+    Returns:
+        検証エラーメッセージのリスト。空リストは検証成功を意味します。
+    """
+    errors: list[str] = []
+    json_example = expected_schema.get("json_example")
+    if not json_example or not isinstance(json_example, dict):
+        return []
+
+    # RESP_SUCCESS / INT_0 のとき success キーを検証対象とする
+    if expected_status_str not in ("RESP_SUCCESS", "INT_0", "正常終了ステータス"):
+        return []
+
+    # success キーが存在するか
+    if "success" not in actual:
+        errors.append(
+            f"'success' キーが結果に見つかりません。実際のキー: {sorted(actual.keys())}"
+        )
+        return errors
+
+    actual_success = actual["success"]
+    if actual_success is None:
+        errors.append("'success' の値が null です")
+        return errors
+
+    # success が辞書のとき、スキーマに定義されていないキーを検出
+    expected_success = json_example.get("success")
+    if isinstance(actual_success, dict) and isinstance(expected_success, dict):
+        expected_keys = {k for k in expected_success if k != "performance"}
+        actual_keys = {k for k in actual_success if k != "performance"}
+        # スキーマにカスタムフィールドが定義されている場合のみ、予期しないキーをチェック
+        if expected_keys:
+            unexpected = actual_keys - expected_keys
+            if unexpected:
+                errors.append(
+                    f"スキーマに定義されていないキーが success に含まれています: {sorted(unexpected)}"
+                )
+            # 必須フィールドの存在チェック
+            fields = {f["name"]: f for f in expected_schema.get("fields", [])}
+            for key in expected_keys:
+                field_info = fields.get(f"success.{key}")
+                if field_info and field_info.get("required") and key not in actual_success:
+                    errors.append(f"必須フィールド 'success.{key}' が結果に含まれていません")
+
+    return errors
 
 def _render_command_markdown(cmd_result: dict[str, Any]) -> str:
     """コマンド単体のテスト結果をマークダウンで返します。"""

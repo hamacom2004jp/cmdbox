@@ -36,7 +36,11 @@ SPECIAL_TEXT = "a_日本語 space-_.#\"'&<>"
 EXCLUDED_PARAM_NAMES = {"host", "port", "password", "svname",
                         "retry_count", "retry_interval", "timeout",
                         "capture_stdout", "capture_maxsize",
-                        "stdout_log", "output_json", "output_json_append"}
+                        "stdout_log", "output_json", "output_json_append", "output_no_validate"}
+
+
+# groups パラメータに指定するテスト用グループ値
+GROUPS_TEST_VALUES = ["admin", "develop", "master", "user"]
 
 
 @dataclass
@@ -47,6 +51,7 @@ class TestCase:
     expected_status: str
     expected_result: str
     post_checks: str
+    input_values: dict[str, Any] | None = None
 
 
 def generate(
@@ -185,11 +190,13 @@ def build_unit_test_spec(
         else []
     )
 
+    output_schema = command_spec.get("output_schema")
+
     if extracted_cases:
         test_cases = _dedupe_test_cases(extracted_cases)
     else:
         test_cases = _dedupe_test_cases(
-            _build_test_cases(command_spec, artifact_checks, inferred_required)
+            _build_test_cases(command_spec, artifact_checks, inferred_required, output_schema)
         )
 
     try:
@@ -217,6 +224,7 @@ def build_unit_test_spec(
         "test_viewpoints": command_spec.get("test_viewpoints", []),
         "artifact_checks": artifact_checks,
         "boundary_policy": _build_boundary_policy(parameters),
+        "output_schema": output_schema,
         **_infer_pre_post_cmds(command_spec, all_specs or []),
         "test_cases": [
             {
@@ -228,6 +236,8 @@ def build_unit_test_spec(
                 "expected_result": case.expected_result,
                 "post_checks": case.post_checks,
                 "nouse_webmode": nouse_webmode,
+                "expected_schema": output_schema,
+                **(  {"input_values": case.input_values} if case.input_values else {}),
             }
             for index, case in enumerate(test_cases, start=1)
         ],
@@ -243,6 +253,7 @@ def _build_test_cases(
     command_spec: dict[str, Any],
     artifact_checks: list[str],
     inferred_required: list[str],
+    output_schema: dict[str, Any] | None = None,
 ) -> list[TestCase]:
     """コマンド仕様からテストケース一覧を構築します。
 
@@ -250,6 +261,7 @@ def _build_test_cases(
         command_spec: CLI仕様JSONからのコマンド仕様
         artifact_checks: 成果物確認項目のリスト
         inferred_required: コードから推定した必須パラメータ名のリスト
+        output_schema: output_schema情報（あれば結果の構造説明に使用）
 
     Returns:
         生成されたTestCaseのリスト
@@ -270,7 +282,7 @@ def _build_test_cases(
             focus="最小有効入力",
             input_pattern=_build_minimum_valid_pattern(parameters, required_names),
             expected_status=success_status,
-            expected_result=_build_success_result_text(result_keys),
+            expected_result=_build_success_result_text(result_keys, output_schema),
             post_checks=_join_items(
                 artifact_checks, fallback="戻り値以外の副作用がないことを確認する"
             ),
@@ -332,15 +344,19 @@ def _build_test_cases(
             )
         )
 
-    if result_keys:
+    if result_keys or output_schema:
         cases.append(
             TestCase(
                 category="結果検証",
-                focus="結果キー整合性",
+                focus="出力スキーマ整合性",
                 input_pattern="正常系の代表入力で実行する",
                 expected_status=success_status,
-                expected_result=f"結果オブジェクトに {', '.join(result_keys)} が含まれる",
-                post_checks="不要なキー欠落や型崩れがないことを確認する",
+                expected_result=(
+                    _build_schema_result_text(output_schema)
+                    if output_schema
+                    else f"結果オブジェクトに {', '.join(result_keys)} が含まれる"
+                ),
+                post_checks="output_schema() が定義するJSON属性構造（フィールド名・型）に準拠していることを確認する",
             )
         )
 
@@ -372,6 +388,32 @@ def _build_parameter_boundary_cases(
     name = parameter["name"]
     param_type = parameter.get("type")
     choices = parameter.get("choices") or []
+
+    # groups パラメータ専用: 既定グループ値ごとのテストケースを生成
+    if name == "groups":
+        for group_val in GROUPS_TEST_VALUES:
+            cases.append(
+                TestCase(
+                    category="グループ値指定",
+                    focus=f"groups={group_val}",
+                    input_pattern=f"{_format_parameter_name(parameter)} に {group_val} を指定する",
+                    expected_status=success_status,
+                    expected_result=_build_success_result_text(result_keys),
+                    post_checks=f"{group_val} グループに許可されたコマンド一覧または結果が返ることを確認する",
+                    input_values={name: [group_val]},
+                )
+            )
+        cases.append(
+            TestCase(
+                category="グループ値指定",
+                focus="groups 複数指定",
+                input_pattern=f"{_format_parameter_name(parameter)} に {', '.join(GROUPS_TEST_VALUES)} を全て指定する",
+                expected_status=success_status,
+                expected_result=_build_success_result_text(result_keys),
+                post_checks="複数グループ指定時に全てのグループの結果が返ることを確認する",
+                input_values={name: list(GROUPS_TEST_VALUES)},
+            )
+        )
 
     if choices and param_type != "bool":
         first_choice = choices[0]
@@ -794,6 +836,10 @@ def _generate_input_values_from_pattern(
             if param["required"]:
                 input_values[param_name] = _get_default_value(param)
 
+    # groups パラメータが存在するコマンドは required でなくても全テストケースで必ず値を追加
+    if "groups" in param_map and "groups" not in input_values:
+        input_values["groups"] = list(GROUPS_TEST_VALUES)
+
     return input_values
 
 
@@ -1004,18 +1050,53 @@ def _infer_required_parameters(
     return inferred
 
 
-def _build_success_result_text(result_keys: list[str]) -> str:
+def _build_success_result_text(result_keys: list[str], output_schema: dict[str, Any] | None = None) -> str:
     """正常終了時の期待結果テキストを生成します。
 
     Args:
         result_keys: 期待する結果キーのリスト
+        output_schema: output_schema情報（あれば結果の構造説明に使用）
 
     Returns:
         期待結果の説明文字列
     """
+    if output_schema:
+        example = output_schema.get("json_example", {})
+        class_name = output_schema.get("class_name", "Result")
+        success_val = example.get("success")
+        if isinstance(success_val, dict):
+            sub_keys = [k for k in success_val if k != "performance"]
+            if sub_keys:
+                return f"正常終了し、{class_name} の success に {', '.join(sub_keys[:5])} 等のフィールドを含む結果が返る"
+        return f"正常終了し、{class_name} 形式の結果が返る"
     if result_keys:
         return f"正常終了し、結果オブジェクトに {', '.join(result_keys)} が含まれる"
     return "正常終了し、戻り値とログが期待どおりである"
+
+
+def _build_schema_result_text(output_schema: dict[str, Any]) -> str:
+    """output_schema に基づく結果検証テキストを生成します。
+
+    Args:
+        output_schema: output_schema情報
+
+    Returns:
+        スキーマ検証用の期待結果説明文字列
+    """
+    example = output_schema.get("json_example", {})
+    class_name = output_schema.get("class_name", "Result")
+    success_val = example.get("success")
+    fields = output_schema.get("fields", [])
+    top_level_fields = [f["name"] for f in fields if "." not in f["name"]]
+    if isinstance(success_val, dict):
+        sub_keys = [k for k in success_val if k != "performance"]
+        parts = [f"{class_name} 構造で返ること"]
+        if sub_keys:
+            parts.append(f"success に {', '.join(sub_keys[:8])} を含むこと")
+        if top_level_fields:
+            parts.append(f"トップレベルキー: {', '.join(top_level_fields)}")
+        return " / ".join(parts)
+    return f"{class_name} 形式の結果が返ること"
 
 
 def _choose_success_status(statuses: list[str]) -> str:

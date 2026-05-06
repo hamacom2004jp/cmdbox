@@ -1,5 +1,5 @@
 from cmdbox.app import common, feature
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from cmdbox.app.features.cli.test import gen_cli_spec
 from pathlib import Path
@@ -7,6 +7,7 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import importlib
 import logging
+import pydantic
 import shutil
 
 
@@ -111,10 +112,22 @@ class TestGenCliSpec(feature.OneshotResultEdgeFeature, validator.Validator):
             return self.RESP_WARN, msg, None
 
         msg = dict(
-            success=f"Generated {len(documents)} command specifications.",
-            output_dir=str(output_dir),
-            json_file=str(output_dir / "cli-command-specifications.json"),
-            count=len(documents),
+            success=dict(
+                message=f"Generated {len(documents)} command specifications.",
+                output_dir=str(output_dir),
+                json_file=str(output_dir / "cli-command-specifications.json"),
+                count=len(documents),
+            )
         )
         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         return self.RESP_SUCCESS, msg, None
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            message: Union[str, None] = pydantic.Field(default=None, description="メッセージ")
+            output_dir: Union[str, None] = pydantic.Field(default=None, description="出力先ディレクトリ")
+            json_file: Union[str, None] = pydantic.Field(default=None, description="JSONファイルパス")
+            count: Union[int, None] = pydantic.Field(default=None, description="件数")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

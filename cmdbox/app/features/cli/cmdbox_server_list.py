@@ -1,10 +1,11 @@
 from cmdbox.app import common, feature, server
-from cmdbox.app.commons import validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
+import pydantic
 
 
 class ServerList(feature.OneshotResultEdgeFeature, validator.Validator):
@@ -73,3 +74,18 @@ class ServerList(feature.OneshotResultEdgeFeature, validator.Validator):
         if 'success' not in ret:
                 return self.RESP_WARN, ret, sv
         return self.RESP_SUCCESS, ret, sv
+
+    def output_schema(self) -> type:
+        class ServerRecord(resdata.Base):
+            svname: Union[str, None] = pydantic.Field(default=None, description="サーバー名")
+            status: Union[str, None] = pydantic.Field(default=None, description="ステータス")
+            ctime: Union[str, None] = pydantic.Field(default=None, description="作成日時")
+            receive_cnt: Union[int, None] = pydantic.Field(default=None, description="受信件数")
+            success_cnt: Union[int, None] = pydantic.Field(default=None, description="成功件数")
+            warn_cnt: Union[int, None] = pydantic.Field(default=None, description="警告件数")
+            error_cnt: Union[int, None] = pydantic.Field(default=None, description="エラー件数")
+        class Data(resdata.Data):
+            data: Union[List[ServerRecord], None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result

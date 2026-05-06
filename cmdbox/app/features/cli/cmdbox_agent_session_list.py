@@ -1,12 +1,13 @@
 from cmdbox.app import common, client
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.features.cli import cmdbox_agent_chat
 from cmdbox.app.options import Options
 from pathlib import Path
-from typing import Dict, Any, Tuple, List
+from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
+import pydantic
 import re
 
 
@@ -75,6 +76,25 @@ class AgentSessionList(cmdbox_agent_chat.AgentChat, validator.Validator):
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl
+
+    def output_schema(self) -> type:
+        class SessionEvent(resdata.Base):
+            author: Union[str, None] = pydantic.Field(default=None, description="作成者")
+            text: Union[str, None] = pydantic.Field(default=None, description="テキスト")
+            final_response: Union[bool, None] = pydantic.Field(default=None, description="最終レスポンスフラグ")
+            function_call: Union[bool, None] = pydantic.Field(default=None, description="関数呼び出しフラグ")
+            function_response: Union[bool, None] = pydantic.Field(default=None, description="関数レスポンスフラグ")
+        class SessionRecord(resdata.Base):
+            runner_name: Union[str, None] = pydantic.Field(default=None, description="ランナー名")
+            session_id: Union[str, None] = pydantic.Field(default=None, description="セッションID")
+            user_name: Union[str, None] = pydantic.Field(default=None, description="ユーザー名")
+            last_update_time: Union[Any, None] = pydantic.Field(default=None, description="最終更新日時")
+            events: Union[List[SessionEvent], None] = pydantic.Field(default=None, description="イベントリスト")
+        class Data(resdata.Data):
+            data: Union[List[SessionRecord], None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
 
     def is_cluster_redirect(self):
         return False

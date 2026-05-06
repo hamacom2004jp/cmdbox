@@ -1,47 +1,108 @@
 from cmdbox.app import common, feature, options
 from cmdbox.app.commons import resdata
 from pathlib import Path
-from typing import Dict, Any, Tuple, List, Union
+from typing import Any, Callable, Dict, Tuple, List, Union
 import argparse
+import functools
 import logging
+import pydantic
 
 
-def apprun_check(func):
+def apprun_check(func:Callable) -> Callable:
     """
     コマンドの引数の妥当性を検証するデコレーター
+
+    Args:
+        func (Callable): コマンドの実行関数
+    Returns:
+        Callable: デコレーターでラップされた関数
     """
-    def wrapper(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+    @functools.wraps(func)
+    def wrapper(self:Validator, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+        """
+        コマンドの引数の妥当性を検証し、実行結果のスキーマを検証します
+
+        Args:
+            logger (logging.Logger): ロガー
+            args (argparse.Namespace): 引数
+            tm (float): 実行開始時間
+            pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報
+        Returns:
+            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
+        """
+        if not isinstance(self, Validator):
+            logger.warning(f"apprun_check decorator is applied to a function whose self is not an instance of Validator. Skipping validation. args: {args}")
+            return func(self, logger, args, tm, pf)
+        
+        # 引数の妥当性検証
         st, msg, obj = self.valid(logger, args, tm, pf)
         if st != self.RESP_SUCCESS:
             return st, msg, obj
+        # コマンドの実行
         st, msg, obj = func(self, logger, args, tm, pf)
+        if getattr(args, 'output_no_validate', False):
+            return st, msg, obj
+        # 結果のスキーマ検証
         cls = self.output_schema()
         try:
-            cls.model_validate(msg)  # 結果のスキーマ検証
+            if issubclass(cls, pydantic.BaseModel):
+                cls.model_validate(msg)
             return st, msg, obj
         except Exception as e:
-            info = cls.get_model_info()
-            msg = dict(warn=f"Invalid result format: {e}", output=msg, schema=info)
+            if issubclass(cls, resdata.Base):
+                info = cls.get_model_info()
+                msg = dict(warn=f"Invalid result format: {e}", output=msg, schema=info)
+            else:
+                msg = dict(warn=f"Invalid result format: {e}", output=msg)
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
     return wrapper
 
-def async_apprun_check(func):
+def async_apprun_check(func:Callable) -> Callable:
     """
     コマンドの引数の妥当性を検証するデコレーター
+
+    Args:
+        func (Callable): コマンドの実行関数
+    Returns:
+        Callable: デコレーターでラップされた関数
     """
-    async def wrapper(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+    @functools.wraps(func)
+    async def wrapper(self:Validator, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
+        """
+        コマンドの引数の妥当性を検証し、実行結果のスキーマを検証します
+
+        Args:
+            logger (logging.Logger): ロガー
+            args (argparse.Namespace): 引数
+            tm (float): 実行開始時間
+            pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報
+        Returns:
+            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
+        """
+        if not isinstance(self, Validator):
+            logger.warning(f"async_apprun_check decorator is applied to a function whose self is not an instance of Validator. Skipping validation. args: {args}")
+            return await func(self, logger, args, tm, pf)
+        # 引数の妥当性検証
         st, msg, obj = self.valid(logger, args, tm, pf)
         if st != self.RESP_SUCCESS:
             return st, msg, obj
+        # コマンドの実行
         st, msg, obj = await func(self, logger, args, tm, pf)
+        if getattr(args, 'output_no_validate', False):
+            return st, msg, obj
+        # 結果のスキーマ検証
         cls = self.output_schema()
         try:
-            cls.model_validate(msg)  # 結果のスキーマ検証
+            if issubclass(cls, pydantic.BaseModel):
+                cls.model_validate(msg)
             return st, msg, obj
         except Exception as e:
-            info = cls.get_model_info()
-            msg = dict(warn=f"Invalid result format: {e}", schema=info)
+            if issubclass(cls, resdata.Base):
+                info = cls.get_model_info()
+                msg = dict(warn=f"Invalid result format: {e}", output=msg, schema=info)
+            else:
+                msg = dict(warn=f"Invalid result format: {e}", output=msg)
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
     return wrapper

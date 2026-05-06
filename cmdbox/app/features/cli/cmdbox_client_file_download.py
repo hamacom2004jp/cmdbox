@@ -1,11 +1,12 @@
 from cmdbox.app import common, client, feature, filer
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
+import pydantic
 
 
 class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator):
@@ -139,6 +140,17 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator):
             return self.RESP_WARN, ret, cl
 
         return self.RESP_SUCCESS, ret, cl
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            name: Union[str, None] = pydantic.Field(default=None, description="名前")
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+            mime_type: Union[str, None] = pydantic.Field(default=None, description="MIMEタイプ")
+            etag: Union[str, None] = pydantic.Field(default=None, description="ETag")
+            not_modified: Union[bool, None] = pydantic.Field(default=None, description="未更新フラグ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
 
     def is_cluster_redirect(self):
         """

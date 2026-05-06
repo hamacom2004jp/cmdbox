@@ -1,6 +1,6 @@
 from cmdbox.app import common, client, options
 from cmdbox.app.auth import signin
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.features.cli import cmdbox_agent_memory_status, cmdbox_tts_say
 from cmdbox.app.features.cli.agent import agant_base
 from cmdbox.app.options import Options
@@ -10,6 +10,7 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
+import pydantic
 import re
 
 
@@ -136,21 +137,37 @@ class AgentChat(agant_base.AgentBase, validator.Validator):
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=host, redis_port=port, redis_password=password, svname=svname)
-        msg = dict(success=[], warn=[])
         for res in cl.redis_cli.send_cmd_sse(self.get_svcmd(), [payload_b64],
                                              retry_count=retry_count, retry_interval=retry_interval, timeout=timeout, nowait=False):
             cls = self.output_schema()
             try:
-                cls.model_validate(msg)  # 結果のスキーマ検証
+                cls.model_validate(res)  # 結果のスキーマ検証
             except Exception as e:
                 info = cls.get_model_info()
                 res = dict(warn=dict(msg=f"Invalid result format: {e}.", output=res, schema=info))
+                logger.warning(f"Invalid result format: {res}", exc_info=True)
             if 'success' in res:
-                yield self.RESP_SUCCESS, res['success']
-            elif 'warn' in res:
-                yield self.RESP_WARN, res['warn']
+                yield self.RESP_SUCCESS, res
             else:
                 yield self.RESP_WARN, res
+
+    def output_schema(self) -> type:
+        class Ids(resdata.Base):
+            agent_session_id: str = pydantic.Field(default=None, description="エージェントセッションID")
+            event_id: str = pydantic.Field(default=None, description="イベントID")
+            invocation_id: str = pydantic.Field(default=None, description="呼び出しID")
+        class Flags(resdata.Base):
+            final_response: bool = pydantic.Field(default=False, description="最終レスポンスフラグ")
+            function_call: bool = pydantic.Field(default=False, description="関数呼び出しフラグ")
+            function_response: bool = pydantic.Field(default=False, description="関数レスポンスフラグ")
+        class Data(resdata.Data):
+            ids: Union[Ids, None] = pydantic.Field(default=None, description="セッション・イベントID情報")
+            flags: Union[Flags, None] = pydantic.Field(default=None, description="フラグ情報")
+            message: Union[str, None] = pydantic.Field(default=None, description="メッセージ")
+            wav_b64: Union[str, None] = pydantic.Field(default=None, description="Base64エンコードされたWAVデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
 
     def is_cluster_redirect(self):
         return False
@@ -535,7 +552,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator):
                                     sammary_msg = await self.memory.summary(data_dir=data_dir, logger=logger,
                                                                             llmname=memory_conf['llm'], short_mem_msg=short_mem_msg,
                                                                             msg_text_system=memory_conf['memory_instruction'])
-                                    sammary_msg = sammary_msg[-1] if sammary_msg and isinstance(sammary_msg, list) and len(sammary_msg) > 0 else None
+                                    sdata = sammary_msg.get('success', {}).get('data', None) if sammary_msg else None
+                                    sammary_msg = sdata[-1] if sdata and isinstance(sdata, list) and len(sdata) > 0 else None
                                     # メモリーにセッションを保存する
                                     if sammary_msg:
                                         await self.memory.add_memory(memory_service, agent_session, sammary_msg.get('content', ''))
@@ -547,7 +565,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator):
                                                 ids=dict(agent_session_id=agent_session.id)),)
                     redis_cli.rpush(reskey, outputs)
                     raise e
-            msg = dict(success=f"Chat '{name}' successfully.", end=True)
+            msg = dict(success=dict(message=f"Chat '{name}' successfully."), end=True)
             redis_cli.rpush(reskey, msg)
             await run_iter.aclose()
             return self.RESP_SUCCESS

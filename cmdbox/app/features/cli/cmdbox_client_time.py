@@ -5,6 +5,7 @@ from typing import Dict, Any, Tuple, Union, List
 import argparse
 import datetime
 import logging
+import pydantic
 
 
 class ClientTime(feature.OneshotResultEdgeFeature, validator.Validator):
@@ -73,11 +74,11 @@ class ClientTime(feature.OneshotResultEdgeFeature, validator.Validator):
             type: 結果のスキーマクラス
         """
         class Data(resdata.Data):
-            data: Union[str, None] = None
-            timezone: Union[str, None] = None
-            timestamp: Union[float, None] = None
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+            timezone: Union[str, None] = pydantic.Field(default=None, description="タイムゾーン")
+            timestamp: Union[float, None] = pydantic.Field(default=None, description="タイムスタンプ")
         class Result(resdata.Result):
-            success: Data
+            success: Data = pydantic.Field(description="成功した場合の結果")
         return Result
 
     def edgerun(self, opt, tool, logger, timeout, prevres = None):

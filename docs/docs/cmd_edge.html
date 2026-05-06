@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( edge mode ) &mdash; cmdbox 2026/04/29 documentation</title>
+  <title>Command Reference ( edge mode ) &mdash; cmdbox 2026/05/06 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=21c5f9e1"></script>
+      <script src="../_static/documentation_options.js?v=1286c6b1"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -117,91 +117,277 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--endpoint &lt;endpoint&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td><p><a class="reference external" href="http://localhost:8081">http://localhost:8081</a></p></td>
 <td></td>
 <td><p>Specify the URL of the endpoint.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--icon_path &lt;icon_path&gt;</p></td>
+<td><p>file</p></td>
+<td></td>
+<td></td>
+<td><p>F:devenvcmdboxcmdboxwebassetscmdboxfavicon.ico</p></td>
 <td></td>
 <td><p>Specify the path to the icon image.</p></td>
 </tr>
 <tr class="row-even"><td><p>--auth_type &lt;auth_type&gt;</p></td>
+<td><p>str</p></td>
 <td></td>
+<td></td>
+<td><p>idpw</p></td>
+<td><p>noauth | idpw | apikey | oauth2 | saml</p></td>
 <td><p>Specifies the authentication method for endpoint connections.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--user &lt;user&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td><p>user</p></td>
 <td></td>
 <td><p>Specifies the user connecting to the endpoint.</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td></td>
+<td><p>password</p></td>
 <td></td>
 <td><p>Specify the password for connecting to the endpoint.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--apikey &lt;apikey&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specify the APIKEY to connect to the endpoint.</p></td>
 </tr>
 <tr class="row-even"><td><p>--oauth2 &lt;oauth2&gt;</p></td>
+<td><p>str</p></td>
 <td></td>
+<td></td>
+<td></td>
+<td><blockquote>
+<div><div class="line-block">
+<div class="line">google | github | azure</div>
+</div>
+</div></blockquote>
+</td>
 <td><p>Connect to the endpoint using OAuth2 authentication.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--oauth2_port &lt;oauth2_port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>8091</p></td>
 <td></td>
 <td><p>Specifies the callback port when OAuth2 authentication is used. If omitted, <cite>8091</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--oauth2_tenant_id &lt;oauth2_tenant_id&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specifies the tenant ID when OAuth2 authentication is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--oauth2_client_id &lt;oauth2_client_id&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specifies the client ID when OAuth2 authentication is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--oauth2_client_secret &lt;oauth2_client_secret&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specifies the client secret when OAuth2 authentication is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--oauth2_timeout &lt;oauth2_timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specify the timeout period before OAuth2 authentication completes.</p></td>
 </tr>
 <tr class="row-even"><td><p>--saml &lt;saml&gt;</p></td>
+<td><p>str</p></td>
 <td></td>
+<td></td>
+<td></td>
+<td><blockquote>
+<div><div class="line-block">
+<div class="line">azure</div>
+</div>
+</div></blockquote>
+</td>
 <td><p>Connect to the endpoint using SAML authentication.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--saml_port &lt;saml_port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>8091</p></td>
 <td></td>
 <td><p>Specifies the callback port when SAML authentication is used. If omitted, <cite>8091</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--saml_tenant_id &lt;saml_tenant_id&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 <td><p>Specifies the tenant ID when SAML authentication is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--saml_timeout &lt;saml_timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
 <td></td>
 <td><p>Specify the timeout period before SAML authentication completes.</p></td>
 </tr>
 <tr class="row-even"><td><p>--data &lt;data&gt;</p></td>
+<td><p>dir</p></td>
+<td></td>
+<td></td>
+<td><p>C:Usershama.cmdbox</p></td>
 <td></td>
 <td><p>When omitted, f`$HONE/.cmdbox` is used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svcert_no_verify &lt;svcert_no_verify&gt;</p></td>
+<td><p>bool</p></td>
 <td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>False | True</p></td>
 <td><p>Do not verify server certificates during HTTPS requests.</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>30</p></td>
 <td></td>
 <td><p>Specifies the timeout period before the request completes.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>
@@ -214,19 +400,123 @@
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
 <th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>--data &lt;data&gt;</p></td>
+<td><p>dir</p></td>
+<td></td>
 <td><p>required</p></td>
+<td><p>C:Usershama.cmdbox</p></td>
+<td></td>
 <td><p>When omitted, f`$HONE/.cmdbox` is used.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
 </tr>
 </tbody>
 </table>

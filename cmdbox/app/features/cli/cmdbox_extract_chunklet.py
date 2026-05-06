@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature, filer
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -7,6 +7,7 @@ import argparse
 import logging
 import json
 import platform
+import pydantic
 
 
 class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator):
@@ -185,6 +186,17 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator):
             logger.warning(f"Exception occurred. {e}", exc_info=True)
             return self.RESP_WARN, dict(warn=f"Exception occurred. {e}"), None
 
+    def output_schema(self) -> type:
+        class ContentRecord(resdata.Base):
+            content: Union[str, None] = pydantic.Field(default=None, description="コンテンツ")
+            metadata: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="メタデータ")
+        class Data(resdata.Data):
+            file: Union[Path, str, None] = pydantic.Field(default=None, description="ファイルパス")
+            data: Union[List[ContentRecord], None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
+
     def is_cluster_redirect(self):
         return False
 
@@ -274,7 +286,7 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator):
                 )
             res_data = []
             for i, chunk in enumerate(chunks):
-                data = dict(content=chunk.content, metadata=chunk.metadata)
+                data = dict(content=chunk.content, metadata=chunk.metadata.to_dict())
                 res_data.append(data)
             ret = dict(success=dict(file=abspath, data=res_data))
             logger.info(f"extract success. abspath={abspath}")

@@ -1,12 +1,12 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, validator
+from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import json
-import re
+import pydantic
 
 
 class ExtractSave(feature.OneshotResultEdgeFeature, validator.Validator):
@@ -65,7 +65,7 @@ class ExtractSave(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_ja="抽出設定の名前を指定します。",
                      description_en="Specify the name of the extraction configuration."),
                 dict(opt="extract_cmd", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
-                     callcmd="async () => {await cmdbox.callcmd('cmd','list',{match_opt:['scope','loadpath']},"
+                     callcmd="async () => {await cmdbox.callcmd('cmd','list',{match_mode:'extract',match_opt:['scope','loadpath']},"
                             + "(res)=>{const val = $(\"[name='extract_cmd']\").val();"
                             + "$(\"[name='extract_cmd']\").empty().append('<option></option>');"
                             + "res['data'].forEach(elm=>{$(\"[name='extract_cmd']\").append('<option value=\"'+elm[\"title\"]+'\">'+elm[\"title\"]+'</option>');});"
@@ -117,6 +117,13 @@ class ExtractSave(feature.OneshotResultEdgeFeature, validator.Validator):
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
         return self.RESP_SUCCESS, ret, cl
+
+    def output_schema(self) -> type:
+        class Data(resdata.Data):
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+        class Result(resdata.Result):
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        return Result
 
     def is_cluster_redirect(self):
         return False
