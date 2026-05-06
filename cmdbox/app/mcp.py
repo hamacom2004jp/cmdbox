@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature
+from cmdbox.app.commons import validator
 from cmdbox.app.options import Options
 from cmdbox.app.auth import signin
 from pathlib import Path
@@ -6,10 +7,7 @@ from typing import Callable, List, Dict, Any, Tuple
 import argparse
 import glob
 import logging
-import locale
-import json
 import time
-import re
 import os
 
 
@@ -417,7 +415,14 @@ class ToolList(object):
                 properties={o['opt']: self._to_schema(o, is_japan, params) for o in choices},
                 required=[],
             )
+
+            # output_schemaを生成
             output_schema = dict(type="object", properties=dict())
+            feat:feature.Feature = options.get_cmd_attr(mode, cmd, 'feature')
+            if feat is not None and isinstance(feat, validator.Validator):
+                schema = feat.output_schema()
+                if schema is not None:
+                    output_schema = schema.model_json_schema()
             func_tool = FunctionTool(fn=func_ctx[0], name=func_name, title=func_name.title(), description=description, 
                                      tags=[f"mode={mode}", f"cmd={cmd}"],
                                      parameters=input_schema, output_schema=output_schema,)
