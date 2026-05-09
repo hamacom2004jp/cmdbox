@@ -22,6 +22,7 @@ agentView.list_mcpsv = async () => {
         agentView.build_mcpsv_form();
         $('#form_mcpsv_edit [name="mcpserver_name"]').prop('readonly', false);
         $('#btn_del_mcpsv').hide();
+        cmdbox.process_i18n($('#mcpsv_edit_modal'));
         $('#mcpsv_edit_modal').modal('show');
     });
 
@@ -37,14 +38,14 @@ agentView.list_mcpsv = async () => {
         const res = await agentView.exec_cmd('agent', 'mcpsv_list');
         container.html('');
         if (!res || !res.success) {
-            container.html('<div class="text-danger p-3">Failed to load MCPSV list.</div>');
+            container.html('<div class="text-danger i18n p-3">Failed to load MCPSV list.</div>');
             console.warn(res);
             return;
         }
         
         const list = res.success['data'] || [];
         if (list.length === 0) {
-            container.html('<div class="p-3">No MCPSV connections found.</div>');
+            container.html('<div class="p-3 i18n">No MCPSV connections found.</div>');
             return;
         }
         const container_ul = $(`<ul class="sf-list-group"/>`).appendTo(container);
@@ -101,7 +102,7 @@ agentView.list_mcpsv = async () => {
                         cmdbox.message(res);
                     }
                 });
-
+                cmdbox.process_i18n($('#mcpsv_edit_modal'));
                 $('#mcpsv_edit_modal').modal('show');
                 // コマンド実行
                 const user = await cmdbox.user_info();

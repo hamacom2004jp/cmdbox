@@ -22,6 +22,7 @@ agentView.list_extract = async () => {
         $('#form_extract_edit [name="extract_name"]').prop('readonly', false);
         $('#form_extract_edit [name="extract_type"]').trigger('change');
         $('#btn_del_extract').hide();
+        cmdbox.process_i18n($('#extract_edit_modal'));
         $('#extract_edit_modal').modal('show');
 
         // extract_cmdをロード
@@ -44,14 +45,14 @@ agentView.list_extract = async () => {
         const res = await agentView.exec_cmd('extract', 'list');
         container.html('');
         if (!res || !res.success) {
-            container.html('<div class="text-danger p-3">Failed to load Extract list.</div>');
+            container.html('<div class="text-danger i18n p-3">Failed to load Extract list.</div>');
             console.warn(res);
             return;
         }
         
         const list = res.success['data'] || [];
         if (list.length === 0) {
-            container.html('<div class="p-3">No Extract configurations are loaded.</div>');
+            container.html('<div class="p-3 i18n">No Extract configurations are loaded.</div>');
             return;
         }
         const container_ul = $(`<ul class="sf-list-group"/>`).appendTo(container);
@@ -121,6 +122,7 @@ agentView.list_extract = async () => {
                     res['data'].forEach(elm=>{$('[name="extract_cmd"]').append('<option value="'+elm["title"]+'">'+elm["title"]+'</option>');});
                     form.find('[name="extract_cmd"]').val(config.extract_cmd);
                 },$('[name="title"]').val(),'extract_cmd');
+                cmdbox.process_i18n($('#extract_edit_modal'));
                 $('#extract_edit_modal').modal('show');
             });
 

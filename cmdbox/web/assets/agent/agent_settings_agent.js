@@ -25,6 +25,7 @@ agentView.list_agent = async () => {
         $('#form_agent_edit [name="agent_name"]').prop('readonly', false);
         $('#btn_del_agent').hide();
         $('[name="agent_type"]').trigger('change');
+        cmdbox.process_i18n($('#agent_edit_modal'));
         $('#agent_edit_modal').modal('show');
         // LLMリストをロード
         await cmdbox.callcmd('llm','list',{},(res)=>{
@@ -55,14 +56,14 @@ agentView.list_agent = async () => {
         const res = await agentView.exec_cmd('agent', 'agent_list');
         container.html('');
         if (!res || !res.success) {
-            container.html('<div class="text-danger p-3">Failed to load Agent list.</div>');
+            container.html('<div class="text-danger i18n p-3">Failed to load Agent list.</div>');
             console.warn(res);
             return;
         }
         
         const list = res.success['data'] || [];
         if (list.length === 0) {
-            container.html('<div class="p-3">No Agent configurations found.</div>');
+            container.html('<div class="p-3 i18n">No Agent configurations found.</div>');
             return;
         }
 
@@ -129,7 +130,7 @@ agentView.list_agent = async () => {
                         cmdbox.message(res);
                     }
                 });
-
+                cmdbox.process_i18n($('#agent_edit_modal'));
                 $('#agent_edit_modal').modal('show');
                 // LLMリストをロード
                 await cmdbox.callcmd('llm','list',{},(res)=>{

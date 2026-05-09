@@ -83,6 +83,9 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="llmtemperature", type=Options.T_FLOAT, default=0.1, required=False, multi=False, hide=False, choice=None,
                      description_ja="llmのモデルを使用するときのtemperatureを指定します。",
                      description_en="Specifies the temperature when using llm model."),
+                dict(opt="llmpriority", type=Options.T_INT, default=1, required=True, multi=False, hide=False, choice=None,
+                     description_ja="llmモデルを使用するときの優先度を指定します。小さい値ほど優先されます。",
+                     description_en="Specifies the priority when using llm model. Lower values indicate higher priority."),
             ]
         )
 
@@ -105,6 +108,7 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator):
             llmmodel=args.llmmodel if hasattr(args, 'llmmodel') else None,
             llmseed=args.llmseed if hasattr(args, 'llmseed') else None,
             llmtemperature=args.llmtemperature if hasattr(args, 'llmtemperature') else None,
+            llmpriority=args.llmpriority if hasattr(args, 'llmpriority') else None,
         )
 
         if hasattr(args, 'llmsvaccountfile') and args.llmsvaccountfile is not None:
@@ -168,8 +172,8 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator):
 
             configure_path = data_dir / ".agent" / f"llm-{configure['llmname']}.json"
             configure_path.parent.mkdir(parents=True, exist_ok=True)
-            with configure_path.open('w', encoding='utf-8') as f:
-                json.dump(configure, f, indent=4)
+            common.save_file(configure_path, lambda f: json.dump(configure, f, indent=4),
+                             encoding='utf-8', nolock=False)
             msg = dict(success=f"LLM configuration saved to '{str(configure_path)}'.")
             redis_cli.rpush(reskey, msg)
             return self.RESP_SUCCESS

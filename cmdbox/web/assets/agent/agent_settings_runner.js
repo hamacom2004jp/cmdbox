@@ -24,6 +24,7 @@ agentView.list_runner = async () => {
         $('#form_runner_edit [name="runner_name"]').prop('readonly', false);
         $('#form_runner_edit [name="session_store_type"]').trigger('change');
         $('#btn_del_runner').hide();
+        cmdbox.process_i18n($('#runner_edit_modal'));
         $('#runner_edit_modal').modal('show');
         // Agentリストをロード
         await cmdbox.callcmd('agent','agent_list',{},(res)=>{
@@ -59,14 +60,14 @@ agentView.list_runner = async () => {
         const res = await agentView.exec_cmd('agent', 'runner_list');
         container.html('');
         if (!res || !res.success) {
-            container.html('<div class="text-danger p-3">Failed to load Runner list.</div>');
+            container.html('<div class="text-danger p-3 i18n">Failed to load Runner list.</div>');
             console.warn(res);
             return;
         }
 
         const list = res.success['data'] || [];
         if (list.length === 0) {
-            container.html('<div class="p-3">No Runner connections found.</div>');
+            container.html('<div class="p-3 i18n">No Runner connections found.</div>');
             return;
         }
 
@@ -128,7 +129,7 @@ agentView.list_runner = async () => {
                         cmdbox.message(res);
                     }
                 });
-
+                cmdbox.process_i18n($('#runner_edit_modal'));
                 $('#runner_edit_modal').modal('show');
                 // コマンド実行
                 await cmdbox.callcmd('agent','agent_list',{},(res)=>{

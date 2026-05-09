@@ -60,7 +60,7 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="loadpath", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="読み込みファイルパスを指定します。",
                      description_en="Specify the source file path."),
-                dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None,
+                dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None, web="mask",
                      description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合エラーにします。",
                      description_en="Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.",),
                 dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None, web="mask",

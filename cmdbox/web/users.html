@@ -22,19 +22,19 @@
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="viewMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle i18n" href="#" id="viewMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             View
                         </a>
                         <ul class="dropdown-menu viewmenu">
-                            <li><a class="dropdown-item" href="#" onclick="$(`#console_modal`).modal(`show`);">Console log</a></li>
+                            <li><a class="dropdown-item i18n" href="#" onclick="$(`#console_modal`).modal(`show`);">Console log</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="aboutMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle i18n" href="#" id="aboutMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             About
                         </a>
                         <ul class="dropdown-menu aboutmenu" aria-labelledby="aboutMenuLink">
-                            <li><a class="dropdown-item" href="#" onclick="$(`#versions_modal`).modal(`show`);">Versions</a></li>
+                            <li><a class="dropdown-item i18n" href="#" onclick="$(`#versions_modal`).modal(`show`);">Versions</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -64,19 +64,19 @@
         </form>
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <a class="nav-link active" id="users-tab" data-bs-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="true">Users</a>
+                <a class="nav-link i18n active" id="users-tab" data-bs-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="true">Users</a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link" id="groups-tab" data-bs-toggle="tab" href="#groups" role="tab" aria-controls="groups" aria-selected="false">Groups</a>
+                <a class="nav-link i18n" id="groups-tab" data-bs-toggle="tab" href="#groups" role="tab" aria-controls="groups" aria-selected="false">Groups</a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link" id="cmdrules-tab" data-bs-toggle="tab" href="#cmdrules" role="tab" aria-controls="cmdrules" aria-selected="false">Command Rules</a>
+                <a class="nav-link i18n" id="cmdrules-tab" data-bs-toggle="tab" href="#cmdrules" role="tab" aria-controls="cmdrules" aria-selected="false">Command Rules</a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link" id="pathrules-tab" data-bs-toggle="tab" href="#pathrules" role="tab" aria-controls="pathrules" aria-selected="false">Path Rules</a>
+                <a class="nav-link i18n" id="pathrules-tab" data-bs-toggle="tab" href="#pathrules" role="tab" aria-controls="pathrules" aria-selected="false">Path Rules</a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link" id="passsetting-tab" data-bs-toggle="tab" href="#passsetting" role="tab" aria-controls="passsetting" aria-selected="false">Password Settings</a>
+                <a class="nav-link i18n" id="passsetting-tab" data-bs-toggle="tab" href="#passsetting" role="tab" aria-controls="passsetting" aria-selected="false">Password Settings</a>
             </li>
         </ul>
         <div class="tab-content">
@@ -152,11 +152,11 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                    <button id="cmd_add_apikey" type="button" class="btn btn-outline-info">Add apikey</button>
-                    <button id="cmd_del_apikey" type="button" class="btn btn-outline-warning">Del apikey</button>
-                    <button id="cmd_save" type="button" class="btn btn-outline-success">Save</button>
-                    <button id="cmd_del" type="button" class="btn btn-outline-danger">Delete</button>
+                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>
+                    <button id="cmd_add_apikey" type="button" class="btn btn-outline-info i18n">Add apikey</button>
+                    <button id="cmd_del_apikey" type="button" class="btn btn-outline-warning i18n">Del apikey</button>
+                    <button id="cmd_save" type="button" class="btn btn-outline-success i18n">Save</button>
+                    <button id="cmd_del" type="button" class="btn btn-outline-danger i18n">Delete</button>
                 </div>
             </form>
         </div>
@@ -166,7 +166,7 @@
         <div class="modal-dialog modal-lg">
             <form id="version_form" class="modal-content novalidate">
                 <div class="modal-header doc-header">
-                    <h5 class="modal-title glow-text-cyan system-font">
+                    <h5 class="modal-title glow-text-cyan system-font i18n">
                         Versions
                     </h5>
                     <button type="button" class="btn btn-sf-icon btn_window_stack">
@@ -184,7 +184,7 @@
                     <div class="tab-content version-content"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>

@@ -22,11 +22,11 @@
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="aboutMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle i18n" href="#" id="aboutMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             About
                         </a>
                         <ul class="dropdown-menu aboutmenu" aria-labelledby="aboutMenuLink">
-                            <li><a class="dropdown-item" href="#" onclick="$(`#versions_modal`).modal(`show`);">Versions</a></li>
+                            <li><a class="dropdown-item i18n" href="#" onclick="$(`#versions_modal`).modal(`show`);">Versions</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -53,7 +53,7 @@
                 <div class="split-pane-component filer-pane-left-top" style="height:45%;">
                     <!-- ローカル側アドレスバー -->
                     <div class="input-group p-1" style="top:0%;">
-                        <button class="btn btn-outline-secondary filer_local_bot" type="button">Local</button>'
+                        <button class="btn btn-outline-secondary filer_local_bot i18n" type="button">Local</button>'
                         <input type="text" class="form-control filer_address" readonly>
                     </div>
                     <!-- ローカル側ツリー -->
@@ -63,7 +63,7 @@
                                 <i class="fa-solid fa-computer fa-4x glow-text-cyan"></i>
                             </div>
                             <h5 class="system-font glow-text-cyan mb-2">
-                                <button type="button" class="btn btn-outline-secondary filer_local_bot">
+                                <button type="button" class="btn btn-outline-secondary filer_local_bot i18n">
                                     SELECT LOCAL FOLDER
                                 </button>
                             </h5>
@@ -119,9 +119,9 @@
     <!-- ビューアモーダル -->
     <div id="viewer_modal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <dic class="modal-content novalidate">
+            <div class="modal-content novalidate">
                 <div class="modal-header doc-header">
-                    <h5 class="modal-title glow-text-cyan system-font">Versions</h5>
+                    <h5 class="modal-title glow-text-cyan system-font">Viewer</h5>
                     <button type="button" class="btn btn-sf-icon btn_window_stack">
                         <i class="fa-regular fa-window-restore"></i>
                     </button>

@@ -26,6 +26,7 @@ agentView.list_rag = async () => {
         $('#form_rag_edit [name="rag_type"]').trigger('change');
         $('#btn_del_rag').hide();
         $('#btn_build_rag').hide();
+        cmdbox.process_i18n($('#rag_edit_modal'));
         $('#rag_edit_modal').modal('show');
         // Embedリストをロード
         await cmdbox.callcmd('embed','list',{},(res)=>{
@@ -51,14 +52,14 @@ agentView.list_rag = async () => {
         const res = await agentView.exec_cmd('rag', 'list');
         container.html('');
         if (!res || !res.success) {
-            container.html('<div class="text-danger p-3">Failed to load RAG list.</div>');
+            container.html('<div class="text-danger i18n p-3">Failed to load RAG list.</div>');
             console.warn(res);
             return;
         }
         
         const list = res.success['data'] || [];
         if (list.length === 0) {
-            container.html('<div class="p-3">No RAG configurations are loaded.</div>');
+            container.html('<div class="p-3 i18n">No RAG configurations are loaded.</div>');
             return;
         }
         const container_ul = $(`<ul class="sf-list-group"/>`).appendTo(container);
@@ -138,7 +139,7 @@ agentView.list_rag = async () => {
                     res['data'].map(elm=>{$("[name='extract']").append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
                     form.find('[name="extract"]').val(config.extract);
                 },$('[name="title"]').val(),'extract');
-
+                cmdbox.process_i18n($('#rag_edit_modal'));
                 $('#rag_edit_modal').modal('show');
             });
 

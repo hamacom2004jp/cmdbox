@@ -63,8 +63,12 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
         return self.RESP_SUCCESS, ret, cl
 
     def output_schema(self) -> type:
+        class NamedRecoard(resdata.Base):
+            name: str = pydantic.Field(..., description="名前")
+            path: str = pydantic.Field(..., description="パス")
+            priority: int = pydantic.Field(..., description="優先度")
         class Data(resdata.Data):
-            data: List[resdata.NamePath] = pydantic.Field(default_factory=list, description="処理結果のデータ")
+            data: List[NamedRecoard] = pydantic.Field(default_factory=list, description="処理結果のデータ")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
@@ -98,9 +102,11 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
                     name = p.name
                     if not name.startswith('llm-') or not name.endswith('.json'):
                         continue
-                    results.append(dict(name=name[4:-5], path=str(p)))
+                    configure = common.load_file(p, lambda f: json.load(f), encoding='utf-8', nolock=False)
+                    priority = configure.get('priority', 0)
+                    results.append(dict(name=name[4:-5], path=str(p), priority=priority if priority is not None else 9999))
 
-            msg = dict(success=results)
+            msg = dict(success=dict(data=sorted(results, key=lambda x: x.get('priority', 9999))))
             redis_cli.rpush(reskey, msg)
             return self.RESP_SUCCESS
 

@@ -188,7 +188,7 @@ cmdbox.editapikey = async () => {
     const daialog = $(`<div class="modal-dialog modal-lg ui-draggable ui-draggable-handle"/>`).appendTo(editapikey_modal);
     const form = $(`<form id="editapikey_form" class="modal-content novalidate"/>`).appendTo(daialog);
     const header = $(`<div class="modal-header doc-header"/>`).appendTo(form);
-    header.append('<h5 class="modal-title glow-text-cyan system-font">Edit ApiKey</h5>');
+    header.append('<h5 class="modal-title glow-text-cyan system-font i18n">Edit ApiKey</h5>');
     header.append('<button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">'
                  +'<svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>'
                  +'</button>');
@@ -197,10 +197,10 @@ cmdbox.editapikey = async () => {
     const table = $(`<table class="table table-bordered table-hover"/>`).appendTo(row_content);
     const thead = $(`<thead><tr/></thead>`).appendTo(table);
     thead.find('tr').append(`<th class="th" scope="col" width="40">-</th>`);
-    thead.find('tr').append(`<th class="th" scope="col">apikey name</th>`);
-    thead.find('tr').append(`<th class="th" scope="col" width="112">key</th>`);
-    thead.find('tr').append(`<th class="th" scope="col">expiration</th>`);
-    thead.find('tr').append(`<th class="th" scope="col">note</th>`);
+    thead.find('tr').append(`<th class="th i18n" scope="col">apikey name</th>`);
+    thead.find('tr').append(`<th class="th i18n" scope="col">key</th>`);
+    thead.find('tr').append(`<th class="th i18n" scope="col">expiration</th>`);
+    thead.find('tr').append(`<th class="th i18n" scope="col">note</th>`);
     const tbody = $(`<tbody/>`).appendTo(table);
     if (user['apikeys']) {
         Object.keys(user['apikeys']).forEach((name, i) => {
@@ -247,8 +247,8 @@ cmdbox.editapikey = async () => {
         const exp = user['apikeys'][name];
     });*/
     const footer = $(`<div class="modal-footer"/>`).appendTo(form);
-    $('<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>').appendTo(footer);
-    const delapikey_btn = $(`<button type="button" class="btn btn-outline-danger">Del apikey</button>`).appendTo(footer);
+    $('<button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>').appendTo(footer);
+    const delapikey_btn = $(`<button type="button" class="btn btn-outline-danger i18n">Del apikey</button>`).appendTo(footer);
     delapikey_btn.off('click').on('click', async (event) => {
         const apikey_name = window.prompt('Please enter the apikey name.');
         if (!apikey_name) return;
@@ -265,7 +265,7 @@ cmdbox.editapikey = async () => {
         editapikey_modal.modal('hide');
         cmdbox.editapikey();
     });
-    const addapikey_btn = $(`<button type="button" class="btn btn-outline-primary">Add apikey</button>`).appendTo(footer);
+    const addapikey_btn = $(`<button type="button" class="btn btn-outline-primary i18n">Add apikey</button>`).appendTo(footer);
     addapikey_btn.off('click').on('click', async (event) => {
         const apikey_name = window.prompt('Please enter the apikey name.');
         if (!apikey_name) return;
@@ -284,6 +284,7 @@ cmdbox.editapikey = async () => {
     });
     editapikey_modal.appendTo('body');
     daialog.draggable({cursor:'move',cancel:'.modal-body'});
+    cmdbox.process_i18n(editapikey_modal);
     editapikey_modal.modal('show');
 };
 cmdbox.getUserLanguage = async () => {
@@ -302,7 +303,7 @@ cmdbox.editUserLanguage = async () => {
     const daialog = $(`<div class="modal-dialog ui-draggable ui-draggable-handle"/>`).appendTo(editlang_modal);
     const form = $(`<form id="editlang_form" class="modal-content novalidate"/>`).appendTo(daialog);
     const header = $(`<div class="modal-header doc-header"/>`).appendTo(form);
-    header.append('<h5 class="modal-title glow-text-cyan system-font">Edit Language</h5>');
+    header.append('<h5 class="modal-title glow-text-cyan system-font i18n">Edit Language</h5>');
     header.append('<button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">'
                  +'<svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>'
                  +'</button>');
@@ -311,28 +312,35 @@ cmdbox.editUserLanguage = async () => {
     
     // 言語選択ドロップダウン
     const lang_select = $(`<div class="col-12 mb-3"><div class="input-group">`+
-        `<label class="input-group-text">Language</label>`+
+        `<label class="input-group-text i18n">Display Language</label>`+
         `<select class="form-select" name="language">`+
         `<option value=""></option>`+
-        `<option value="ja_JP" ${language === 'ja_JP' ? 'selected' : ''}>日本語</option>`+
-        `<option value="en_US" ${language === 'en_US' ? 'selected' : ''}>English</option>`+
+        `<option value="ja_JP" ${language === 'ja_JP' ? 'selected' : ''}>ja_JP : 日本語</option>`+
+        `<option value="en_US" ${language === 'en_US' ? 'selected' : ''}>en_US : English</option>`+
+        `<option value="zh_CN" ${language === 'zh_CN' ? 'selected' : ''}>zh_CN : 简体中文</option>`+
+        `<option value="zh_TW" ${language === 'zh_TW' ? 'selected' : ''}>zh_TW : 繁體中文</option>`+
+        `<option value="ko_KR" ${language === 'ko_KR' ? 'selected' : ''}>ko_KR : 한국어</option>`+
+        `<option value="fr_FR" ${language === 'fr_FR' ? 'selected' : ''}>fr_FR : Français</option>`+
+        `<option value="it_IT" ${language === 'it_IT' ? 'selected' : ''}>it_IT : Italiano</option>`+
         `</select>`+
         `</div>`).appendTo(row_content);
     
     const footer = $(`<div class="modal-footer"/>`).appendTo(form);
-    footer.append('<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>');
-    const save_btn = $(`<button type="button" class="btn btn-outline-primary">Save</button>`).appendTo(footer);
+    footer.append('<button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>');
+    const save_btn = $(`<button type="button" class="btn btn-outline-primary i18n">Save</button>`).appendTo(footer);
     
     save_btn.off('click').on('click', async (event) => {
         cmdbox.show_loading();
         const selectedLang = lang_select.find('select').val();
         const result = await cmdbox.save_user_data('language', 'default', selectedLang);
         cmdbox.message(result);
+        cmdbox.process_i18n();
         cmdbox.hide_loading();
         editlang_modal.modal('hide');
     });
     editlang_modal.appendTo('body');
     daialog.draggable({cursor:'move',cancel:'.modal-body'});
+    cmdbox.process_i18n(editlang_modal);
     editlang_modal.modal('show');
 };
 /**
@@ -357,14 +365,14 @@ cmdbox.passchange = async () => {
     const daialog = $(`<div class="modal-dialog ui-draggable ui-draggable-handle"/>`).appendTo(chpass_modal);
     const form = $(`<form id="chpass_form" class="modal-content novalidate"/>`).appendTo(daialog);
     const header = $(`<div class="modal-header doc-header"/>`).appendTo(form);
-    header.append('<h5 class="modal-title glow-text-cyan system-font">Change Password</h5>');
+    header.append('<h5 class="modal-title glow-text-cyan system-font i18n">Change Password</h5>');
     header.append('<button type="button" class="btn btn_close p-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;">'
                  +'<svg class="bi bi-x" width="24" height="24" fill="currentColor"><use href="#btn_x"></use></svg>'
                  +'</button>');
     const body = $(`<div class="modal-body"/>`).appendTo(form);
     const row_content = $(`<div class="row row_content"/>`).appendTo(body);
     const crrent_pass = $(`<div class="col-12 mb-3"><div class="input-group">`+
-        `<label class="input-group-text">Current Password</label>`+
+        `<label class="input-group-text i18n">Current Password</label>`+
         `<input type="password" class="form-control" name="password"/>`+
         `<button class="btn btn-secondary eye_buton" type="button"><svg width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16"><use href="#svg_eyeslash_btn"></use></svg></button>`+
         `</div>`).appendTo(row_content);
@@ -380,7 +388,7 @@ cmdbox.passchange = async () => {
         }
     });
     const new_pass = $(`<div class="col-12 mb-3"><div class="input-group">`+
-        `<label class="input-group-text">New Password</label>`+
+        `<label class="input-group-text i18n">New Password</label>`+
         `<input type="password" class="form-control" name="new_password"/>`+
         `<button class="btn btn-secondary gen_buton" type="button"><svg width="16" height="16" fill="currentColor" class="bi bi-magic" viewBox="0 0 16 16"><use href="#svg_magic_btn"></use></svg></button>`+
         `<button class="btn btn-secondary eye_buton" type="button"><svg width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16"><use href="#svg_eyeslash_btn"></use></svg></button>`+
@@ -397,7 +405,7 @@ cmdbox.passchange = async () => {
         }
     });
     const confirm_pass = $(`<div class="col-12 mb-3"><div class="input-group">`+
-        `<label class="input-group-text">Confirm Password</label>`+
+        `<label class="input-group-text i18n">Confirm Password</label>`+
         `<input type="password" class="form-control" name="confirm_password"/>`+
         `<button class="btn btn-secondary eye_buton" type="button"><svg width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16"><use href="#svg_eyeslash_btn"></use></svg></button>`+
         `</div>`).appendTo(row_content);
@@ -422,8 +430,8 @@ cmdbox.passchange = async () => {
         });
     });
     const footer = $(`<div class="modal-footer"/>`).appendTo(form);
-    footer.append('<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>');
-    const change = $(`<button type="button" class="btn btn-outline-success">Change</button>`).appendTo(footer);
+    footer.append('<button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>');
+    const change = $(`<button type="button" class="btn btn-outline-success i18n">Change</button>`).appendTo(footer);
     change.off('click').on('click', async (event) => {
         cmdbox.show_loading();
         const res = await fetch('password/change', {
@@ -441,6 +449,7 @@ cmdbox.passchange = async () => {
     });
     chpass_modal.appendTo('body');
     daialog.draggable({cursor:'move',cancel:'.modal-body'});
+    cmdbox.process_i18n(chpass_modal);
     chpass_modal.modal('show');
 };
 $(()=>{
@@ -457,19 +466,19 @@ $(()=>{
             user_info_menu.removeClass('d-none').addClass('d-flex');
 
             if (!user_info_menu.find('.dropdown-menu .changepass-menu-item').length) {
-                const changepass_item = $(`<li><a class="dropdown-item changepass-menu-item" href="#" onclick="cmdbox.passchange();">Change Password</a></li>`);
+                const changepass_item = $(`<li><a class="dropdown-item changepass-menu-item i18n" href="#" onclick="cmdbox.passchange();">Change Password</a></li>`);
                 user_info_menu.find('.dropdown-menu').append(changepass_item);
             }
             if (!user_info_menu.find('.dropdown-menu .edituserlanguage-menu-item').length) {
-                const edituserlanguage_item = $(`<li><a class="dropdown-item edituserlanguage-menu-item" href="#" onclick="cmdbox.editUserLanguage();">Change Language</a></li>`);
+                const edituserlanguage_item = $(`<li><a class="dropdown-item edituserlanguage-menu-item i18n" href="#" onclick="cmdbox.editUserLanguage();">Change Language</a></li>`);
                 user_info_menu.find('.dropdown-menu').append(edituserlanguage_item);
             }
             if (!user_info_menu.find('.dropdown-menu .editapikey-menu-item').length) {
-                const editapikey_item = $(`<li><a class="dropdown-item editapikey-menu-item" href="#" onclick="cmdbox.editapikey();">Edit ApiKey</a></li>`);
+                const editapikey_item = $(`<li><a class="dropdown-item editapikey-menu-item i18n" href="#" onclick="cmdbox.editapikey();">Edit ApiKey</a></li>`);
                 user_info_menu.find('.dropdown-menu').append(editapikey_item);
             }
             if (!user_info_menu.find('.dropdown-menu .changecolor-menu-item').length) {
-                const changecolor_item = $(`<li><span class="dropdown-item changecolor-menu-item">Change Color : `
+                const changecolor_item = $(`<li><span class="dropdown-item changecolor-menu-item"><span class="i18n">Change Color : </span>`
                     + `<select class="d-inline-block change_color_mode" onchange="cmdbox.change_color_mode($(this).val());"></select>`
                     + `</span></li>`);
                 user_info_menu.find('.dropdown-menu').append(changecolor_item);
@@ -479,11 +488,12 @@ $(()=>{
             if (!user_info_menu.find('.dropdown-menu .signout-menu-item').length) {
                 const parts = location.pathname.split('/');
                 const sitepath = parts[parts.length-1];
-                const signout_item = $(`<li><a class="dropdown-item signout-menu-item" href="#" onclick="cmdbox.signout('${sitepath}');">Sign out</a></li>`);
+                const signout_item = $(`<li><a class="dropdown-item signout-menu-item i18n" href="#" onclick="cmdbox.signout('${sitepath}');">Sign out</a></li>`);
                 user_info_menu.find('.dropdown-menu').append(`<li><hr class="dropdown-divider"></li>`).append(signout_item);
             }
-            user_info_menu.find('.user_info_note').html(`Groups: ${user['groups'].join(', ')}`);
+            user_info_menu.find('.user_info_note').html(`<span class="i18n">Groups: </span>${user['groups'].join(', ')}`);
             user_info_menu.find('.username').text(user['name']);
+            cmdbox.process_i18n(user_info_menu);
         } catch (e) {}
     });
     cmdbox.appid('.navbar-brand');
@@ -494,7 +504,7 @@ $(()=>{
         const params = new URLSearchParams(window.location.search);
         if (params.has('error') || params.has('warn')) {
             const elem = $(`<div class="alert alert-warning alert-dismissible d-block position-absolute start-50 translate-middle-x" role="alert">`).css('z-index', '10000');
-            const msgelem = $('<div>Sign in faild: The ID or PW is incorrect or the user is not authorized.</div>').appendTo(elem);
+            const msgelem = $('<div class="i18n">Sign in faild: The ID or PW is incorrect or the user is not authorized.</div>').appendTo(elem);
             if (params.get('error') == 'noauth') msgelem.text('Sign in faild: No credentials are available. Please sign in.');
             if (params.get('error') == 'expirationofpassword') msgelem.text('Sign in faild: The password has expired.');
             if (params.get('error') == 'appdeny') msgelem.text('OAuth2 succeeded but app not allowed.');
@@ -576,7 +586,7 @@ cmdbox.init_version_modal = () => {
             vu.forEach((row, i) => {
                 const tr = $('<tr></tr>');
                 row.forEach((cel, j) => {
-                    const td = $('<td></td>').text(cel);
+                    const td = $('<td></td>').addClass('i18n').text(cel);
                     tr.append(td);
                 });
                 if(i==0) table_head.append(tr);
@@ -1692,32 +1702,32 @@ cmdbox.callcmd = async (mode, cmd, params, callback, title, opt_name) => {
     if (res.status != 200) {
         cmdbox.message({'error':`${res.status}: ${res.statusText}`});
         console.log({'error':`${res.status}: ${res.statusText}`});
-        return;
+        return res;
     }
     try {
         res = await res.json();
     } catch (e) {
         cmdbox.message({'error':`JSON parse error: ${e}`});
         console.log({'error':`JSON parse error: ${e}`});
-        return;
+        return res;
     }
     if (res && res['success']) res = [res];
     if (!res[0] || !res[0]['success']) {
         cmdbox.message(res);
         console.log({'error':res});
-        return;
+        return res;
     }
     if (!title || !opt_name) {
         if (callback) callback(res[0]['success']);
-        return;
+        return res;
     }
     return cmdbox.load_cmd(title).then(cmd_opt => {
         if (!cmd_opt || cmd_opt['error']) {
             cmdbox.message(cmd_opt);
             console.log({'error':cmd_opt});
-            return;
+            return res;
         }
-        if (!cmd_opt[opt_name]) return;
+        if (!cmd_opt[opt_name]) return res;
         if (callback) callback(res[0]['success']);
         $(`[name="${opt_name}"]`).val(cmd_opt[opt_name]);
     });
@@ -1747,7 +1757,11 @@ cmdbox.get_cmd_choices = async (mode, cmd) => {
     if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
     return await res.json();
 }
-// コマンドフォームからパラメータを取得
+/**
+ * コマンドフォームからパラメータを取得
+ * @param {$} modal_elem 
+ * @returns {object} - パラメータオブジェクト
+ */
 cmdbox.get_param = (modal_elem) => {
     modal_elem.find('.is-invalid, .is-valid').removeClass('is-invalid').removeClass('is-valid');
     const opt = {};
@@ -1852,4 +1866,50 @@ cmdbox.get_param = (modal_elem) => {
         }
     });
     return [title, opt];
+}
+/**
+ * テキスト翻訳を処理する
+ * @param {Array<string>} words - 翻訳対象のテキストの配列
+ * @param {boolean} nosave - 翻訳結果を保存しないかどうか
+ * @param {string} llmname - 使用するLLM設定の名前(省略可能)
+ * @returns {Promise<Object>}
+ */
+cmdbox.translation = async (words, nosave, llmname) => {
+    const targetLang = await cmdbox.getUserLanguage();
+    let res = await cmdbox.callcmd('llm', 'translation', {
+        llmname: llmname?llmname:'',
+        words: words,
+        target_lang: targetLang,
+        nosave: nosave ? true : false
+    });
+    if (!res) return words;
+    if (Array.isArray(res) && res.length > 0) res = res[0];
+    if (!res['success'] || !res['success']['data']) return words;
+    return res['success']['data'];
+}
+/**
+ * 多言語対応のためのテキスト翻訳を処理する
+ * @param {$} target - 翻訳対象の要素を含む祖先要素。指定しない場合は全ての.i18nクラスを対象とする
+ * @param {bool} nosave - 翻訳結果を保存しないかどうか
+ * @param {string} llmname - 使用するLLM設定の名前(省略可能)
+ * @returns {Promise<void>}
+ */
+cmdbox.process_i18n = async (target, nosave, llmname) => {
+    const targetElems = target ? $(target).find('.i18n') : $('.i18n');
+    const words = [];
+    targetElems.each((i, elem) => {
+        const elm = $(elem);
+        const text = elm.attr('data-i18n')?elm.attr('data-i18n'):elm.text().trim();
+        if (!text) return;
+        !elm.attr('data-i18n') && elm.attr('data-i18n', text);
+        words.push(text);
+    });
+    if (words.length <= 0) return;
+    cmdbox.translation(words, nosave, llmname).then((data) => {
+        targetElems.each((i, elem) => {
+            const elm = $(elem);
+            const text = elm.attr('data-i18n');
+            if (text && data[text]) elm.text(data[text]);
+        });
+    });
 }

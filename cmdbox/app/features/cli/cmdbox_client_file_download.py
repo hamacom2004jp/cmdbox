@@ -58,7 +58,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator):
                      test_true={"server":"/file_server",
                                 "client":"/file_client",
                                 "current":"/file_current"}),
-                dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None,
+                dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None, web="mask",
                      description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合エラーにします。",
                      description_en="Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.",),
                 dict(opt="etag", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
@@ -148,6 +148,8 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator):
             mime_type: Union[str, None] = pydantic.Field(default=None, description="MIMEタイプ")
             etag: Union[str, None] = pydantic.Field(default=None, description="ETag")
             not_modified: Union[bool, None] = pydantic.Field(default=None, description="未更新フラグ")
+            rpath: Union[str, None] = pydantic.Field(default=None, description="リクエストパス")
+            svpath: Union[str, None] = pydantic.Field(default=None, description="サーバーパス")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result

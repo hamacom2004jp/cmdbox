@@ -56,6 +56,8 @@ $(() => {
         };
     };
     gui_callback();
+    // 多言語対応のためのテキスト翻訳を処理
+    setTimeout(() => {cmdbox.process_i18n();}, 100);
 });
 const result_func = (content_elem, title, result, res_size) => {
     content_elem.find('.modal-title').text(title);

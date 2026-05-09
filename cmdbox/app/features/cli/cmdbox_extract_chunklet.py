@@ -57,7 +57,7 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_ja="参照先スコープを指定します。指定可能な画像タイプは `client` , `current` , `server` です。",
                      description_en="Specifies the scope to be referenced. When omitted, 'client' is used.",
                      choice_show=dict(client=["client_data"]),),
-                dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None,
+                dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None, web="mask",
                      description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合エラーにします。",
                      description_en="Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.",),
                 dict(opt="loadpath", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None,

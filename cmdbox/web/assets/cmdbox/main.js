@@ -94,6 +94,8 @@ $(() => {
         };
     };
     gui_callback();
+    // 多言語対応のためのテキスト翻訳を処理
+    setTimeout(() => {cmdbox.process_i18n();}, 100);
     const menu = async (sel, url) => {
         const res = await fetch(url, {method: 'GET'});
         const menu = await res.json();
@@ -105,10 +107,12 @@ $(() => {
             const target = m["target"] ? m["target"] : '_self';
             const onclick = m["onclick"] ? m["onclick"] : '';
             const html = m["html"] ? m["html"] : '';
-            const a = $('<a>').attr('class', css_class).attr('href', href).attr('onclick', onclick).attr('target', target).html(html);
+            const a = $('<a>').attr('class', css_class).attr('href', href).attr('onclick', onclick).attr('target', target);
+            a.addClass('i18n').html(html);
             li.append(a);
             $(sel).append(li);
         }
+        cmdbox.process_i18n($(sel));
     };
     menu('.filemenu', 'gui/filemenu');
     menu('.toolmenu', 'gui/toolmenu');

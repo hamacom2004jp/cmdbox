@@ -157,7 +157,8 @@ audit.metrics = async () => {
 // メトリクスのモーダルダイアログを表示
 audit.metrics_modal_func = (title) => {
     const modal = $('#metrics_modal');
-    modal.find('.modal-title').text(title ? `Edit Metrics : ${title}` : 'New Metrics');
+    modal.find('.modal-title').html(title ? `<span class="i18n">Edit Metrics : </span>${title}` : '<span class="i18n">New Metrics</span>');
+    cmdbox.process_i18n(modal);
     const row_content = modal.find('.row_content');
     row_content.empty();
     audit.load_audit_metrics(title?title:null).then(async (res) => {
@@ -399,4 +400,6 @@ $(() => {
             audit.metrics_modal_func();
         });
     });
+    // 多言語対応のためのテキスト翻訳を処理
+    setTimeout(() => {cmdbox.process_i18n();}, 100);
 });

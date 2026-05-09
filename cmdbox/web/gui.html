@@ -22,34 +22,34 @@
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="fileMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle i18n" href="#" id="fileMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             File
                         </a>
                         <ul class="dropdown-menu filemenu" aria-labelledby="fileMenuLink">
-                            <li><a class="dropdown-item" href="#" onclick="$(`.cmd_add`).click();">New Command</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="$(`.pipe_add`).click();">New Pipeline</a></li>
+                            <li><a class="dropdown-item i18n" href="#" onclick="$(`.cmd_add`).click();">New Command</a></li>
+                            <li><a class="dropdown-item i18n" href="#" onclick="$(`.pipe_add`).click();">New Pipeline</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="toolMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle i18n" href="#" id="toolMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Tool
                         </a>
                         <ul class="dropdown-menu toolmenu" aria-labelledby="toolMenuLink"></ul>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="viewMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle i18n" href="#" id="viewMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             View
                         </a>
                         <ul class="dropdown-menu viewmenu">
-                            <li><a class="dropdown-item" href="#" onclick="$(`#console_modal`).modal(`show`);">Console log</a></li>
+                            <li><a class="dropdown-item i18n" href="#" onclick="$(`#console_modal`).modal(`show`);">Console log</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="aboutMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle i18n" href="#" id="aboutMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             About
                         </a>
                         <ul class="dropdown-menu aboutmenu" aria-labelledby="aboutMenuLink">
-                            <li><a class="dropdown-item" href="#" onclick="$(`#versions_modal`).modal(`show`);">Versions</a></li>
+                            <li><a class="dropdown-item i18n" href="#" onclick="$(`#versions_modal`).modal(`show`);">Versions</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -69,7 +69,7 @@
     <div id="main_container" class="container-fluid overflow-auto" style="margin-top:66px;height:calc(100vh - 120px);">
         <!-- コマンドリスト -->
         <h2 class="pb-2 border-bottom">
-            Commands : 
+            <span class="i18n">Commands :</span>
             <input id="cmd_kwd" name="cmd_kwd" type="text" class="form-control d-inline-block" style="width:200px;" placeholder="Search title">
         </h2>
         <div id="cmd_item_tags" class="mb-2"></div>
@@ -101,7 +101,7 @@
         </div>
         <!-- パイプラインリスト -->
         <h2 class="pb-2 border-bottom">
-            Pipeline : 
+            <span class="i18n">Pipeline :</span>
             <input id="pipe_kwd" name="pipe_kwd" type="text" class="form-control d-inline-block" style="width:200px;" placeholder="Search title">
         </h2>
         <div id="pipe_items" class="row">
@@ -192,12 +192,12 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                    <button id="cmd_raw" type="button" class="btn btn-outline-secondary">Raw</button>
-                    <button id="cmd_copy" type="button" class="btn btn-outline-info">Copy</button>
-                    <button id="cmd_save" type="button" class="btn btn-outline-success">Save</button>
-                    <button id="cmd_del" type="button" class="btn btn-outline-danger">Delete</button>
-                    <button id="cmd_exec" type="button" class="btn btn-outline-primary">Execute</button>
+                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>
+                    <button id="cmd_raw" type="button" class="btn btn-outline-secondary i18n">API</button>
+                    <button id="cmd_copy" type="button" class="btn btn-outline-info i18n">Copy</button>
+                    <button id="cmd_save" type="button" class="btn btn-outline-success i18n">Save</button>
+                    <button id="cmd_del" type="button" class="btn btn-outline-danger i18n">Delete</button>
+                    <button id="cmd_exec" type="button" class="btn btn-outline-primary i18n">Execute</button>
                 </div>
             </form>
         </div>
@@ -230,7 +230,7 @@
                             <div class="input-group">
                                 <label class="input-group-text text-decoration-underline">
                                     <span class="text-danger">*</span>
-                                    title
+                                    <span class="i18n">title</span>
                                 </label>
                                 <input name="title" type="text" class="form-control" param_data_type="str" param_data_multi="false" required>
                                 <input name="title_disabled" type="text" class="form-control" disabled="disabled" style="display:none;">
@@ -238,7 +238,7 @@
                         </div>
                         <div class="col-6 mb-3">
                             <div class="input-group">
-                                <label class="input-group-text text-decoration-underline">
+                                <label class="input-group-text text-decoration-underline i18n">
                                     description
                                 </label>
                                 <input name="description" type="text" class="form-control" param_data_type="str" param_data_multi="false"/>
@@ -264,11 +264,11 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                    <button id="pipe_raw" type="button" class="btn btn-outline-secondary">Raw</button>
-                    <button id="pipe_save" type="button" class="btn btn-outline-success">Save</button>
-                    <button id="pipe_del" type="button" class="btn btn-outline-danger">Delete</button>
-                    <button id="pipe_exec" type="button" class="btn btn-outline-primary">Execute</button>
+                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>
+                    <button id="pipe_raw" type="button" class="btn btn-outline-secondary i18n">API</button>
+                    <button id="pipe_save" type="button" class="btn btn-outline-success i18n">Save</button>
+                    <button id="pipe_del" type="button" class="btn btn-outline-danger i18n">Delete</button>
+                    <button id="pipe_exec" type="button" class="btn btn-outline-primary i18n">Execute</button>
                 </div>
             </form>
         </div>
@@ -291,7 +291,7 @@
                 </div>
                 <div class="modal-body overflow-auto"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>
@@ -329,7 +329,7 @@
                 <div class="modal-body row">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>
@@ -354,8 +354,8 @@
                     <textarea id="console_modal_log" class="form-control overflow-auto w-100" rows="10"></textarea>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-outline-success" onclick="$(`#console_modal_log`).val(``);">Clear</button>
+                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-success i18n" onclick="$(`#console_modal_log`).val(``);">Clear</button>
                 </div>
             </form>
         </div>
@@ -365,7 +365,7 @@
         <div class="modal-dialog modal-lg">
             <form id="version_form" class="modal-content novalidate">
                 <div class="modal-header doc-header">
-                    <h5 class="modal-title glow-text-cyan system-font">
+                    <h5 class="modal-title glow-text-cyan system-font i18n">
                         Versions
                     </h5>
                     <button type="button" class="btn btn-sf-icon btn_window_stack">
@@ -383,7 +383,7 @@
                     <div class="tab-content version-content"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>

@@ -45,18 +45,22 @@ agentView.initView = () => {
     // 設定モーダルの shown.bs.modal イベントハンドラ
     agentView.settingsModal.off('shown.bs.modal').on('shown.bs.modal', async () => {
         await agentView.list_agent();
+        cmdbox.process_i18n(agentView.settingsModal);
     });
     // メモリーモーダルの shown.bs.modal イベントハンドラ
     agentView.memoryModal.off('shown.bs.modal').on('shown.bs.modal', async () => {
         await agentView.show_memories();
+        cmdbox.process_i18n(agentView.memoryModal);
     });
     // ヒストリーモーダルの shown.bs.modal イベントハンドラ
     agentView.historyModal.off('shown.bs.modal').on('shown.bs.modal', async () => {
         await agentView.list_sessions();
+        cmdbox.process_i18n(agentView.historyModal);
     });
     // ファイル転送モーダルの shown.bs.modal イベントハンドラ
     agentView.fileTranceferModal.off('shown.bs.modal').on('shown.bs.modal', async () => {
         fsapi.onload();
+        cmdbox.process_i18n(agentView.fileTranceferModal);
     });
     // --- 音声出力と録音の状態 ---
     agentView.isRecording = false;
@@ -164,13 +168,19 @@ agentView.initView = () => {
     });
 
     // 初期メッセージ表示
-    const message_id = cmdbox.random_string(16);
-    const txt = agentView.create_agent_message(message_id);
-    agentView.format_agent_message(txt,
-        `インターフェースの初期化完了。<br/>` +
-        `画面右上のタイトル「Click Here」をクリックしてAgent Runnerを選択してください。<br/>` + 
-        `Agent Runnerが登録されていない場合は「CONFIG」をクリックして設定を追加してください。`);
-    $(`#${message_id} .btn-toggle-message`).remove();
+    const org_msgs = [
+        'Interface initialization complete.',
+        'Click the title "Click Here" at the top right of the screen to select an Agent Runner.', 
+        'If no Agent Runner is registered, click "config" to add a configuration.'
+    ];
+    cmdbox.translation(org_msgs, false).then(data => {
+        const new_msgs = [];
+        org_msgs.forEach((m, i) => {new_msgs.push(data[m]);});
+        const message_id = cmdbox.random_string(16);
+        const txt = agentView.create_agent_message(message_id);
+        agentView.format_agent_message(txt, new_msgs.join('<br/>'));
+        $(`#${message_id} .btn-toggle-message`).remove();
+    });
 
     // モーダルのドラッグ対応
     $('.modal-dialog').draggable({cursor:'move',cancel:'button, .modal-body, .modal-footer'});

@@ -5,7 +5,7 @@
             <div class="modal-header doc-header">
                 <h5 class="modal-title glow-text-cyan system-font">
                     <i class="fas fa-cog fa-lg me-2"></i>
-                    Settings
+                    <span class="i18n">Settings</span>
                 </h5>
                 <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
                     <i class="fas fa-times fa-lg"></i>
@@ -16,15 +16,15 @@
                     <!-- 左側ペイン: 設定項目リスト -->
                     <div class="split-pane-component" style="width:200px;">
                         <div class="list-group list-group-flush">
-                            <a href="#" class="list-group-item list-group-item-action active" data-bs-target="#agent_settings">Agent Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#llm_settings">LLM Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#embedding_settings">Embedding Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#memory_settings">Memory Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#mcpsv_settings">MCPSV Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#extract_settings">Extract Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#rag_settings">RAG Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#runner_settings">Runner Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action" data-bs-target="#tts_settings">TTS Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action i18n active" data-bs-target="#agent_settings">Agent Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#llm_settings">LLM Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#embedding_settings">Embedding Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#memory_settings">Memory Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#mcpsv_settings">MCPSV Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#extract_settings">Extract Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#rag_settings">RAG Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#runner_settings">Runner Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#tts_settings">TTS Settings</a>
                         </div>
                     </div>
                     <!-- スプリッター -->
@@ -34,10 +34,10 @@
                         <div class="p-3 h-100 overflow-auto">
                             <div id="agent_settings" class="settings-content">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">Agent Settings</h6>
+                                    <h6 class="m-0 glow-text-cyan system-font i18n">Agent Settings</h6>
                                     <button id="btn_add_agent" class="btn btn-sf ms-3">
                                         <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        Add Setting
+                                        <span class="i18n">Add Setting</span>
                                     </button>
                                 </div>
                                 <div id="agent_list_container" class="list-group">
@@ -46,10 +46,10 @@
                             </div>
                             <div id="llm_settings" class="settings-content d-none">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">LLM Settings</h6>
+                                    <h6 class="m-0 glow-text-cyan system-font i18n">LLM Settings</h6>
                                     <button id="btn_add_llm" class="btn btn-sf ms-3">
                                         <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        Add Setting
+                                        <span class="i18n">Add Setting</span>
                                     </button>
                                 </div>
                                 <div id="llm_list_container" class="list-group">
@@ -58,10 +58,10 @@
                             </div>
                             <div id="mcpsv_settings" class="settings-content d-none">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">MCPSV Settings</h6>
+                                    <h6 class="m-0 glow-text-cyan system-font i18n">MCPSV Settings</h6>
                                     <button id="btn_add_mcpsv" class="btn btn-sf ms-3">
                                         <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        Add Setting
+                                        <span class="i18n">Add Setting</span>
                                     </button>
                                 </div>
                                 <div id="mcpsv_list_container" class="list-group">
@@ -70,10 +70,10 @@
                             </div>
                             <div id="runner_settings" class="settings-content d-none">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">Runner Settings</h6>
+                                    <h6 class="m-0 glow-text-cyan system-font i18n">Runner Settings</h6>
                                     <button id="btn_add_runner" class="btn btn-sf ms-3">
                                         <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        Add Setting
+                                        <span class="i18n">Add Setting</span>
                                     </button>
                                 </div>
                                 <div id="runner_list_container" class="list-group">
@@ -82,10 +82,10 @@
                             </div>
                             <div id="embedding_settings" class="settings-content d-none">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">Embedding Settings</h6>
+                                    <h6 class="m-0 glow-text-cyan system-font i18n">Embedding Settings</h6>
                                     <button id="btn_add_embedding" class="btn btn-sf ms-3">
                                         <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        Add Setting
+                                        <span class="i18n">Add Setting</span>
                                     </button>
                                 </div>
                                 <div id="embedding_list_container" class="list-group">
@@ -94,10 +94,10 @@
                             </div>
                             <div id="rag_settings" class="settings-content d-none">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">RAG Settings</h6>
+                                    <h6 class="m-0 glow-text-cyan system-font i18n">RAG Settings</h6>
                                     <button id="btn_add_rag" class="btn btn-sf ms-3">
                                         <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        Add Setting
+                                        <span class="i18n">Add Setting</span>
                                     </button>
                                 </div>
                                 <div id="rag_list_container" class="list-group">
@@ -106,10 +106,10 @@
                             </div>
                             <div id="extract_settings" class="settings-content d-none">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">Extract Settings</h6>
+                                    <h6 class="m-0 glow-text-cyan system-font i18n">Extract Settings</h6>
                                     <button id="btn_add_extract" class="btn btn-sf ms-3">
                                         <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        Add Setting
+                                        <span class="i18n">Add Setting</span>
                                     </button>
                                 </div>
                                 <div id="extract_list_container" class="list-group">
@@ -118,10 +118,10 @@
                             </div>
                             <div id="memory_settings" class="settings-content d-none">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">Memory Settings</h6>
+                                    <h6 class="m-0 glow-text-cyan system-font i18n">Memory Settings</h6>
                                     <button id="btn_add_memory" class="btn btn-sf ms-3">
                                         <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        Add Setting
+                                        <span class="i18n">Add Setting</span>
                                     </button>
                                 </div>
                                 <div id="memory_list_container" class="list-group">
@@ -130,23 +130,23 @@
                             </div>
                             <div id="tts_settings" class="settings-content d-none">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font">TTS Settings</h6>
+                                    <h6 class="m-0 glow-text-cyan system-font i18n">TTS Settings</h6>
                                 </div>
                                 <div class="card">
                                     <div class="card-body">
-                                        <h6 class="card-title">Install TTS Engine</h6>
+                                        <h6 class="card-title i18n">Install TTS Engine</h6>
                                         <form id="form_tts_install" class="row"></form>
                                         <div class="mt-3 text-end">
-                                            <button id="btn_install_tts" class="btn btn-sf">Install</button>
+                                            <button id="btn_install_tts" class="btn btn-sf i18n">Install</button>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="card mt-3">
                                     <div class="card-body">
-                                        <h6 class="card-title">Uninstall TTS Engine</h6>
+                                        <h6 class="card-title i18n">Uninstall TTS Engine</h6>
                                         <form id="form_tts_uninstall" class="row"></form>
                                         <div class="mt-3 text-end">
-                                            <button id="btn_uninstall_tts" class="btn btn-sf-danger">Uninstall</button>
+                                            <button id="btn_uninstall_tts" class="btn btn-sf-danger i18n">Uninstall</button>
                                         </div>
                                     </div>
                                 </div>
@@ -156,7 +156,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">CLOSE</button>
             </div>
         </div>
     </div>
@@ -194,7 +194,7 @@
             <div class="modal-body row">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>
             </div>
         </form>
     </div>

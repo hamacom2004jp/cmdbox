@@ -29,24 +29,6 @@
                 <i class="fas fa-bars fa-xl"></i>
             </button>
         </div>
-        <div class="nav-sidebar-content">
-            <button id="btn_histories" class="btn btn-nav-action" data-bs-toggle="modal" data-bs-target="#historyModal" title="Histories" style="border:none;">
-                <i class="fas fa-history fa-2xl"></i>
-                <span class="nav-label">Histories</span>
-            </button>
-            <button id="btn_filetrancefer" class="btn btn-nav-action" data-bs-toggle="modal" data-bs-target="#fileTranceferModal" title="Files" style="border:none;">
-                <i class="fa-solid fa-folder-open fa-2xl"></i>
-                <span class="nav-label">Files</span>
-            </button>
-            <button id="btn_memories" class="btn btn-nav-action" data-bs-toggle="modal" data-bs-target="#memoryModal" title="Memory" style="border:none;">
-                <i class="fas fa-brain fa-2xl"></i>
-                <span class="nav-label">MEMORY</span>
-            </button>
-            <button id="btn_config" class="btn btn-nav-action" data-bs-toggle="modal" data-bs-target="#agent_settings_modal" title="Config" style="border:none;">
-                <i class="fas fa-cog fa-2xl"></i>
-                <span class="nav-label">SETTINGS</span>
-            </button>
-        </div>
     </nav>
     <div class="split-pane fixed-left" style="display:flex;">
         <!-- LEFT PANEL: Console / Chat Interface -->
@@ -55,22 +37,20 @@
                 <h5 class="d-inline-block m-0 glow-text-cyan system-font">
                     <span class="d-flex align-items-center">
                         <i class="fas fa-terminal me-2"></i>
-                        <span id="display_runner_name" style="cursor: pointer;" title="Click to select runner">
+                        <span id="display_runner_name" class="i18n" style="cursor:pointer;" title="Click to select runner">
                             Click Here
                         </span>
                     </span>
                 </h5>
-                <div class="d-none dropdown user_info" style="font-size: 0.8rem;">
-                    <a href="#" class="d-block text-decoration-none dropdown-toggle show" data-bs-toggle="dropdown" aria-expanded="true">
+                <div class="d-none dropdown user_info">
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle show" data-bs-toggle="dropdown" aria-expanded="true">
                         <div class="d-inline-block me-1">
                             <svg width="24" height="24" viewBox="0 0 16 16" style="fill:var(--bs-link-color);vertical-align:inherit;">
                                 <use href="#svg_signin_ico"></use>
                             </svg>
                         </div>
                         <div class="d-inline-block">
-                            <span class="user_info_color">USER: <span class="username glow-text-magenta">UserName</span></span>
-                            <br/>
-                            <span class="user_info_color">STATUS: <span style="color:var(--bs-success)">ONLINE</span></span>
+                            <span class="user_info_color"><span class="username glow-text-magenta ms-1">UserName</span></span>
                         </div>
                     </a>
                     <ul class="dropdown-menu text-small shadow" style="position:absolute;inset:0px 0px auto auto;margin:0px;transform:translate(0px, 34px);" data-popper-placement="bottom-end">
@@ -137,7 +117,7 @@
         <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
             <div class="modal-content sf-modal doc-card" style="height:auto;">
                 <div class="modal-header doc-header">
-                    <h5 class="modal-title glow-text-cyan system-font">Select Runner</h5>
+                    <h5 class="modal-title glow-text-cyan system-font i18n">Select Runner</h5>
                     <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
                         <i class="fas fa-times fa-lg"></i>
                     </button>
@@ -148,7 +128,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">CLOSE</button>
                 </div>
             </div>
         </div>
@@ -161,7 +141,7 @@
                 <div class="modal-header doc-header">
                     <h5 class="modal-title glow-text-cyan system-font">
                         <i class="fas fa-brain fa-lg me-2"></i>
-                        MEMORY
+                        <span class="i18n">MEMORY</span>
                     </h5>
                     <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
                         <i class="fas fa-times fa-lg"></i>
@@ -170,7 +150,7 @@
                 <div class="modal-body">
                     <div class="sf-param-grid mb-3">
                         <div class="sf-param-box">
-                            <div class="text-white-50" style="font-size: 0.8rem;">REFERENCE_RANGE</div>
+                            <div class="text-white-50 i18n" style="font-size: 0.8rem;">REFERENCE RANGE</div>
                             <div class="d-flex fs-5 system-font glow-text-cyan mt-2">
                                 <div id="memory_range_start">---</div>
                                 <div class="mx-1">~</div>
@@ -178,21 +158,21 @@
                             </div>
                         </div>
                         <div class="sf-param-box">
-                            <div class="text-white-50" style="font-size: 0.8rem;">USAGE_RATIO</div>
+                            <div class="text-white-50 i18n" style="font-size: 0.8rem;">USAGE RATIO</div>
                             <div class="fs-2 text-end system-font glow-text-magenta d-flex">
                                 <div id="memory_performance">---</div>
                             </div>
                         </div>
                     </div>
                     <h6 class="glow-text-cyan system-font mt-4 mb-2">
-                        <i class="fa-regular fa-address-card fa-lg mx-2"></i>USER_PROFILE_ANALYSIS
+                        <i class="fa-regular fa-address-card fa-lg mx-2"></i><span class="i18n">USER PROFILE ANALYSIS</span>
                     </h6>
                     <div class="p-3 border border-secondary bg-black bg-opacity-25" style="font-family: var(--font-body);">
                         <p id="memory_content" class="mb-2"><strong>Loading..</strong></p>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">CLOSE</button>
                 </div>
             </div>
         </div>
@@ -204,8 +184,7 @@
             <div class="modal-content sf-modal doc-card" style="height:auto;">
                 <div class="modal-header doc-header">
                     <h5 class="modal-title glow-text-cyan system-font">
-                        <i class="fas fa-history fa-lg me-2"></i>
-                        HISTORIES
+                        <i class="fas fa-history fa-lg me-2"></i><span class="i18n">HISTORIES</span>
                     </h5>
                     <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
                         <i class="fas fa-times fa-lg"></i>
@@ -218,7 +197,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">CLOSE</button>
                 </div>
             </div>
         </div>
@@ -230,7 +209,7 @@
         <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
             <form id="version_form" class="modal-content novalidate">
                 <div class="modal-header doc-header">
-                    <h5 class="modal-title glow-text-cyan system-font">Versions</h5>
+                    <h5 class="modal-title glow-text-cyan system-font i18n">Versions</h5>
                     <button type="button" class="btn btn-sf-icon btn_window_stack">
                         <i class="fa-regular fa-window-restore"></i>
                     </button>
@@ -246,7 +225,7 @@
                     <div class="tab-content version-content"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
+                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">CLOSE</button>
                 </div>
             </form>
         </div>

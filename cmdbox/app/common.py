@@ -112,7 +112,7 @@ def save_yml(yml_path:Path, data:dict, nolock=True) -> None:
         yaml.dump(data, f, default_flow_style=False, sort_keys=False)
     save_file(yml_path, _w, nolock=nolock)
 
-def load_file(file_path:Path, func, mode='r', encoding='utf-8', nolock=True) -> None:
+def load_file(file_path:Path, func, mode='r', encoding='utf-8', nolock=True) -> Any:
     """
     ファイルを読み込みます。読み込み時に排他ロックします。
 

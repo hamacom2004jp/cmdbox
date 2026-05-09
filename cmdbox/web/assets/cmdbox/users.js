@@ -20,7 +20,7 @@ users.users_list = async () => {
     // モーダル生成関数
     const users_modal_func = (cols, user) => {
         const modal = $('#users_modal');
-        modal.find('.modal-title').text(user && user['name'] ? `Edit User : ${user['name']}` : 'New User');
+        modal.find('.modal-title').html(user && user['name'] ? `<span class="i18n">Edit User : </span>${user['name']}` : '<span class="i18n">New User</span>');
         const row_content = modal.find('.row_content');
         row_content.empty();
         for (const col of cols) {
@@ -204,6 +204,7 @@ users.users_list = async () => {
         !user ? modal.find('#cmd_add_apikey').hide() : modal.find('#cmd_add_apikey').show();
         !user ? modal.find('#cmd_del_apikey').hide() : modal.find('#cmd_del_apikey').show();
         !user ? modal.find('#cmd_del').hide() : modal.find('#cmd_del').show();
+        cmdbox.process_i18n(modal);
         modal.modal('show');
     };
     // ユーザー一覧を表示
@@ -578,4 +579,6 @@ $(() => {
         users.pathrules_list();
         users.passsetting_list();
     });
+    // 多言語対応のためのテキスト翻訳を処理
+    setTimeout(() => {cmdbox.process_i18n();}, 100);
 });

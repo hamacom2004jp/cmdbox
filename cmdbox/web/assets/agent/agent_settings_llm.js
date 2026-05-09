@@ -1,7 +1,7 @@
 agentView.get_llm_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('llm', 'save');
     const vform_names = ['llmname', 'llmprov', 'llmapikey', 'llmendpoint', 'llmmodel', 'llmapiversion',
-                        'llmprojectid', 'llmsvaccountfile', 'llmlocation', 'llmtemperature', 'llmseed'];
+                        'llmprojectid', 'llmsvaccountfile', 'llmlocation', 'llmtemperature', 'llmseed', 'llmpriority'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };
@@ -23,6 +23,7 @@ agentView.list_llm = async () => {
         $('#form_llm_edit [name="llmname"]').prop('readonly', false);
         $('#form_llm_edit [name="llmprov"]').trigger('change');
         $('#btn_del_llm').hide();
+        cmdbox.process_i18n($('#llm_edit_modal'));
         $('#llm_edit_modal').modal('show');
     });
 
@@ -38,14 +39,14 @@ agentView.list_llm = async () => {
         const res = await agentView.exec_cmd('llm', 'list');
         container.html('');
         if (!res || !res.success) {
-            container.html('<div class="text-danger p-3">Failed to load LLM list.</div>');
+            container.html('<div class="text-danger i18n p-3">Failed to load LLM list.</div>');
             console.warn(res);
             return;
         }
         
         const list = res.success['data'] || [];
         if (list.length === 0) {
-            container.html('<div class="p-3">No LLM configurations found.</div>');
+            container.html('<div class="p-3 i18n">No LLM configurations found.</div>');
             return;
         }
         const container_ul = $(`<ul class="sf-list-group"/>`).appendTo(container);
@@ -102,7 +103,7 @@ agentView.list_llm = async () => {
                         cmdbox.message(res);
                     }
                 });
-
+                cmdbox.process_i18n($('#llm_edit_modal'));
                 $('#llm_edit_modal').modal('show');
             });
 

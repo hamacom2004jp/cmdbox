@@ -25,6 +25,7 @@ agentView.list_memory = async () => {
         $('#form_memory_edit [name="memory_name"]').prop('readonly', false);
         $('#form_memory_edit [name="memory_type"]').trigger('change');
         $('#btn_del_memory').hide();
+        cmdbox.process_i18n($('#memory_edit_modal'));
         $('#memory_edit_modal').modal('show');
         // LLMリストをロード
         await cmdbox.callcmd('llm','list',{},(res)=>{
@@ -50,14 +51,14 @@ agentView.list_memory = async () => {
         const res = await agentView.exec_cmd('agent', 'memory_list');
         container.html('');
         if (!res || !res.success) {
-            container.html('<div class="text-danger p-3">Failed to load Memory list.</div>');
+            container.html('<div class="text-danger i18n p-3">Failed to load Memory list.</div>');
             console.warn(res);
             return;
         }
         
         const list = res.success['data'] || [];
         if (list.length === 0) {
-            container.html('<div class="p-3">No Memory configurations are loaded.</div>');
+            container.html('<div class="p-3 i18n">No Memory configurations are loaded.</div>');
             return;
         }
         const container_ul = $(`<ul class="sf-list-group"/>`).appendTo(container);
@@ -119,7 +120,7 @@ agentView.list_memory = async () => {
                         cmdbox.message(res);
                     }
                 });
-
+                cmdbox.process_i18n($('#memory_edit_modal'));
                 $('#memory_edit_modal').modal('show');
                 // コマンド実行
                 await cmdbox.callcmd('llm','list',{},(res)=>{

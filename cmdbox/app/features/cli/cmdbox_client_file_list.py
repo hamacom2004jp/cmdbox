@@ -56,7 +56,7 @@ class ClientFileList(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_ja="サーバーのデータフォルダ以下のパスを指定します。省略時は `/` を使用します。",
                      description_en="Specify the directory path to get the list of files.",
                      test_true={"server":"/"}),
-                dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None,
+                dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None, web="mask",
                      description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合、このパスを指定したと解釈します。",
                      description_en="Specify a path to determine whether the specified path is out of bounds. If it is not under this path, it is interpreted as having specified this path.",),
                 dict(opt="listregs", type=Options.T_STR, default=".*", required=False, multi=False, hide=False, choice=None,

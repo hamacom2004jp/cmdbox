@@ -21,6 +21,7 @@ agentView.list_embedding = async () => {
         await agentView.build_embedding_form();
         $('#form_embedding_edit [name="embedding_name"]').prop('readonly', false);
         $('#btn_del_embedding').hide();
+        cmdbox.process_i18n($('#embedding_edit_modal'));
         $('#embedding_edit_modal').modal('show');
     });
 
@@ -36,14 +37,14 @@ agentView.list_embedding = async () => {
         const res = await agentView.exec_cmd('embed', 'list');
         container.html('');
         if (!res || !res.success) {
-            container.html('<div class="text-danger p-3">Failed to load Embedding list.</div>');
+            container.html('<div class="text-danger i18n p-3">Failed to load Embedding list.</div>');
             console.warn(res);
             return;
         }
         
         const list = res.success['data'] || [];
         if (list.length === 0) {
-            container.html('<div class="p-3">No Embedding models are loaded.</div>');
+            container.html('<div class="p-3 i18n">No Embedding models are loaded.</div>');
             return;
         }
         const container_ul = $(`<ul class="sf-list-group"/>`).appendTo(container);
@@ -101,7 +102,7 @@ agentView.list_embedding = async () => {
                         cmdbox.message(res);
                     }
                 });
-
+                cmdbox.process_i18n($('#embedding_edit_modal'));
                 $('#embedding_edit_modal').modal('show');
             });
 

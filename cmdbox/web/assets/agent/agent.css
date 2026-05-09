@@ -357,7 +357,7 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     border: 1px solid var(--bs-emphasis-color);
     color: var(--bs-emphasis-color);
     font-family: var(--font-header);
-    font-size: 0.8rem;
+    font-size: 1rem;
     padding: 8px 5px;
     transition: all 0.3s;
     text-align: center;
@@ -910,4 +910,5 @@ a.list-group-item.active {
 
 .nav-sidebar.expanded .nav-label {
     display: inline;
+    font-size: var(--bs-btn-font-size);
 }

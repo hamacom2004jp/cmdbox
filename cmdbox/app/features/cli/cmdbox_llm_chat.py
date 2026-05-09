@@ -1,6 +1,7 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
+from cmdbox.app.features.cli import cmdbox_client_file_download
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -11,6 +12,10 @@ import re
 
 
 class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator):
+    def __init__(self, appcls, ver, language = None):
+        super().__init__(appcls, ver, language)
+        self.file_download = cmdbox_client_file_download.ClientFileDownload(appcls, ver, language)
+
     def get_mode(self) -> Union[str, List[str]]:
         return 'llm'
 
@@ -72,6 +77,16 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="msg_image_url", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                     description_ja="送信する画像のURLを指定します。",
                     description_en="Specify the URL of the image to be sent."),
+                dict(opt="scope", type=Options.T_STR, default="client", required=False, multi=False, hide=False, choice=["client", "current", "server"],
+                     description_ja="参照先スコープを指定します。指定可能な画像タイプは `client` , `current` , `server` です。",
+                     description_en="Specifies the scope to be referenced. When omitted, 'client' is used.",
+                     choice_show=dict(client=["client_data"]),),
+                dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None, web="mask",
+                     description_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
+                     description_en="Specify the path of the data folder when local is referenced."),
+                dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None, web="mask",
+                     description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合エラーにします。",
+                     description_en="Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.",),
                 dict(opt="msg_audio", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None,
                     description_ja="送信する音声の内容を指定します。",
                     description_en="Specify the content of the audio to be sent."),
@@ -84,12 +99,12 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="msg_file_url", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                     description_ja="送信するファイルのURLを指定します。",
                     description_en="Specify the URL of the file to be sent."),
-                dict(opt="msg_doc", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None,
-                    description_ja="送信するドキュメントの内容を指定します。",
-                    description_en="Specify the content of the document to be sent."),
-                dict(opt="msg_doc_mime", type=Options.T_STR, default="application/pdf", required=False, multi=False, hide=False, choice=None,
-                    description_ja="送信するドキュメントのMIMEタイプを指定します。",
-                    description_en="Specify the MIME type of the document to be sent."),
+                dict(opt="msg_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None,
+                    description_ja="送信するファイルの内容を指定します。",
+                    description_en="Specify the content of the file to be sent."),
+                dict(opt="msg_file_mime", type=Options.T_STR, default="application/pdf", required=False, multi=False, hide=False, choice=None,
+                    description_ja="送信するファイルのMIMEタイプを指定します。",
+                    description_en="Specify the MIME type of the file to be sent."),
             ]
         )
 
@@ -102,18 +117,29 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator):
 
         if args.msg_audio:
             try:
-                with open(args.msg_audio, 'rb') as f:
-                    args.msg_audio = convert.bytes2b64str(f.read())
+                args.svpath = args.msg_audio
+                st, msg, cl = self.file_download.apprun(logger, args, tm, pf)
+                if st != self.RESP_SUCCESS:
+                    return st, msg, cl
+                success = msg.get("success", None)
+                args.msg_audio = success.get("data", None) if success else None
+                args.msg_audio_format = success.get("mime_type", None) if success else None
             except Exception as e:
                 msg = dict(warn=f"Failed to read audio file: {e}")
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, msg, None
-        if args.msg_doc:
+        if args.msg_file:
             try:
-                with open(args.msg_doc, 'rb') as f:
-                    args.msg_doc = convert.bytes2b64str(f.read())
+                args.svpath = args.msg_file
+                st, msg, cl = self.file_download.apprun(logger, args, tm, pf)
+                if st != self.RESP_SUCCESS:
+                    return st, msg, cl
+                success = msg.get("success", None)
+                args.msg_file = success.get("data", None) if success else None
+                args.msg_file_mime = success.get("mime_type", None) if success else 'application/octet-stream'
+                args.msg_file_name = success.get("name", None) if success else None
             except Exception as e:
-                msg = dict(warn=f"Failed to read document file: {e}")
+                msg = dict(warn=f"Failed to read file: {e}")
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, msg, None
 
@@ -128,8 +154,9 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator):
                        msg_audio_format=args.msg_audio_format,
                        msg_video_url=args.msg_video_url,
                        msg_file_url=args.msg_file_url,
-                       msg_doc=args.msg_doc,
-                       msg_doc_mime=args.msg_doc_mime,
+                       msg_file=args.msg_file,
+                       msg_file_mime=args.msg_file_mime,
+                       msg_file_name=args.msg_file_name,
                        )
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
@@ -178,8 +205,9 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator):
                             msg_audio_format=payload.get('msg_audio_format', None),
                             msg_video_url=payload.get('msg_video_url', None),
                             msg_file_url=payload.get('msg_file_url', None),
-                            msg_doc=payload.get('msg_doc', None),
-                            msg_doc_mime=payload.get('msg_doc_mime', None),
+                            msg_file=payload.get('msg_file', None),
+                            msg_file_mime=payload.get('msg_file_mime', None),
+                            msg_file_name=payload.get('msg_file_name', None),
                             )
             redis_cli.rpush(reskey, msg)
             return st
@@ -193,7 +221,7 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator):
     def chat(self, data_dir:Path, logger:logging.Logger, llmname:str, *,
              msg_role:str=None, msg_name:str=None, msg_text:str=None, msg_text_system:str=None, msg_text_param:Dict[str, Any]=None,
              msg_image_url:str=None, msg_audio:str=None, msg_audio_format:str=None, msg_video_url:str=None, msg_file_url:str=None,
-             msg_doc:str=None, msg_doc_mime:str=None) -> Tuple[int, List[Dict[str, Any]]]:
+             msg_file:str=None, msg_file_mime:str=None, msg_file_name:str=None) -> Tuple[int, List[Dict[str, Any]]]:
         """
         LLMにチャットメッセージを送信します。
 
@@ -211,8 +239,9 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator):
             msg_audio_format (str, optional): 送信する音声のフォーマット。 `wav`, `mp3`, `ogg`, `flac` のいずれかを指定します。
             msg_video_url (str, optional): 送信する動画のURL。
             msg_file_url (str, optional): 送信するファイルのURL。
-            msg_doc (str, optional): 送信するドキュメントの内容。Base64エンコードされた文字列で指定します。
-            msg_doc_mime (str, optional): 送信するドキュメントのMIMEタイプ。
+            msg_file (str, optional): 送信するファイルの内容。Base64エンコードされた文字列で指定します。
+            msg_file_mime (str, optional): 送信するファイルのMIMEタイプ。
+            msg_file_name (str, optional): 送信するファイルの名前。
         Returns:
             Tuple[int, List[Dict[str, Any]]]: (ステータスコード, LLMからの応答メッセージのリスト)
         """
@@ -249,8 +278,9 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator):
             message['content'].append(dict(type="video_url", video_url=dict(url=msg_video_url)))
         if msg_file_url:
             message['content'].append(dict(type="file", file=dict(file_id=msg_file_url)))
-        if msg_doc:
-            message['content'].append(dict(type="document", source=dict(type="text", data=msg_doc, media_type=msg_doc_mime)))
+        if msg_file:
+            message['content'].append(dict(type="file", file=dict(file_id=common.hash_password(msg_file_name, 'md5'),
+                                                                  file_data=f"data:{msg_file_mime};base64,{msg_file}")))
 
         import litellm
         llmprov = configure.get('llmprov', None)

@@ -82,6 +82,7 @@ class LLMLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             llmseed: Union[int, None] = pydantic.Field(default=None, description="LLMシード値")
             llmtemperature: Union[float, None] = pydantic.Field(default=None, description="LLM温度パラメータ")
             llmsvaccountfile_data: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="LLMサービスアカウントファイルデータ")
+            llmpriority: Union[int, None] = pydantic.Field(default=None, description="LLM優先度")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result

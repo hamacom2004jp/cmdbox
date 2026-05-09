@@ -5,7 +5,7 @@
             <div class="modal-header doc-header">
                 <h5 class="modal-title glow-text-cyan system-font">
                     <i class="fa-solid fa-folder-open fa-lg me-2"></i>
-                    Files
+                    <span class="i18n">Files</span>
                 </h5>
                 <button type="button" class="btn btn-sf-icon btn_window_stack">
                     <i class="fa-regular fa-window-restore"></i>
@@ -22,12 +22,12 @@
                 <ul class="nav nav-tabs" id="fileTransferTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload-content" type="button" role="tab" aria-controls="upload-content" aria-selected="true">
-                            <i class="fa-solid fa-cloud-arrow-up fa-lg me-2"></i>Upload
+                            <i class="fa-solid fa-cloud-arrow-up fa-lg me-2"></i><span class="i18n">Upload</span>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="transfer-tab" data-bs-toggle="tab" data-bs-target="#transfer-content" type="button" role="tab" aria-controls="transfer-content" aria-selected="false">
-                            <i class="fa-solid fa-exchange fa-lg me-2"></i>File Transfer
+                            <i class="fa-solid fa-exchange fa-lg me-2"></i><span class="i18n">File Transfer</span>
                         </button>
                     </li>
                 </ul>
@@ -43,23 +43,23 @@
                                 <div class="mb-3">
                                     <i class="fa-solid fa-cloud-arrow-up fa-4x glow-text-cyan"></i>
                                 </div>
-                                <h5 class="system-font glow-text-cyan mb-2">DRAG AND DROP FILES</h5>
-                                <p class="text-white-50 mb-3">OR CLICK TO SELECT</p>
+                                <h5 class="system-font glow-text-cyan i18n mb-2">DRAG AND DROP FILES</h5>
+                                <p class="text-white-50 i18n mb-3">OR CLICK TO SELECT</p>
                                 <input id="upload_file_input" type="file" multiple class="d-none">
                                 <button type="button" id="upload_file_select_btn" class="btn btn-outline-secondary">
-                                    <i class="fa-solid fa-folder-open me-2"></i>SELECT FILES
+                                    <i class="fa-solid fa-folder-open me-2"></i><span class="i18n">SELECT FILES</span>
                                 </button>
                             </div>
 
                             <!-- ファイルリスト -->
                             <div class="d-flex flex-column">
                                 <h6 class="system-font glow-text-cyan mb-2">
-                                    <i class="fa-solid fa-list me-2"></i>FILES TO BE UPLOADED
+                                    <i class="fa-solid fa-list me-2"></i><span class="i18n">FILES TO BE UPLOADED</span>
                                 </h6>
                                 <div class="upload-file-list-container flex-grow-1">
                                     <ul id="upload_file_list" class="list-group list-group-flush h-100">
-                                        <li class="list-group-item text-white-50 text-center py-3">
-                                            FILES NOT SELECTED
+                                        <li class="list-group-item text-white-50 text-center i18n py-3">
+                                            NOT SELECTED
                                         </li>
                                     </ul>
                                 </div>
@@ -69,10 +69,10 @@
                         <!-- ボタンエリア -->
                         <div class="upload-button-area d-flex gap-2 pt-3">
                             <button type="button" id="upload_clear_btn" class="btn btn-outline-danger">
-                                <i class="fa-solid fa-trash me-2"></i>CLEAR
+                                <i class="fa-solid fa-trash me-2"></i><span class="i18n">CLEAR</span>
                             </button>
                             <button type="button" id="upload_start_btn" class="btn btn-footer-action ms-auto">
-                                <i class="fa-solid fa-upload me-2"></i>START UPLOADING
+                                <i class="fa-solid fa-upload me-2"></i><span class="i18n">START UPLOADING</span>
                             </button>
                         </div>
                     </div>
@@ -86,7 +86,7 @@
                                     <div class="split-pane-component filer-pane-left-top" style="height:45%;">
                                         <!-- ローカル側アドレスバー -->
                                         <div class="input-group p-1" style="top:0%;">
-                                            <button class="btn btn-outline-secondary filer_local_bot" type="button">Local</button>'
+                                            <button class="btn btn-outline-secondary filer_local_bot i18n" type="button">Local</button>'
                                             <input type="text" class="form-control filer_address" readonly>
                                         </div>
                                         <!-- ローカル側ツリー -->
@@ -96,7 +96,7 @@
                                                     <i class="fa-solid fa-computer fa-4x glow-text-cyan"></i>
                                                 </div>
                                                 <h5 class="system-font glow-text-cyan mb-2">
-                                                    <button type="button" class="btn btn-outline-secondary filer_local_bot">
+                                                    <button type="button" class="btn btn-outline-secondary filer_local_bot i18n">
                                                         SELECT LOCAL FOLDER
                                                     </button>
                                                 </h5>
@@ -173,8 +173,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">CLOSE</button>
-                <button type="button" class="btn btn-footer-action d-none" id="btn_regist_rag">Start registering files to RAG</button>
+                <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-footer-action d-none i18n" id="btn_regist_rag">Start registering files to RAG</button>
             </div>
         </div>
     </div>
@@ -186,7 +186,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content novalidate">
             <div class="modal-header doc-header">
-                <h5 class="modal-title glow-text-cyan system-font">Viewer</h5>
+                <h5 class="modal-title glow-text-cyan system-font i18n">Viewer</h5>
                 <button type="button" class="btn btn-sf-icon btn_window_stack">
                     <i class="fa-regular fa-window-restore"></i>
                 </button>
@@ -199,7 +199,7 @@
             </div>
             <div class="modal-body"></div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

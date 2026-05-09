@@ -170,6 +170,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 feat = _options.get_cmd_attr(opt['mode'], opt['cmd'], "feature")
                 loaded = common.loadopt(opt_path, False)
                 for o in opt.keys():
+                    if 'fwpath' in o and opt[o]: continue # fwpathはアクセスコントロールで使用するため、コマンドファイルから読み込まない
                     found = False
                     for s in schema:
                         if 'opt' not in s or s['opt'] != o: continue
@@ -319,8 +320,8 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                             content_b64 = success.get('data', None)
                             # content_b64がNoneの場合はsuccess全体を出力する
                             if content_b64 is None: content_b64 = success
-                            if type(content_b64) is dict:
-                                # content_b64が辞書型の場合はJSON文字列に変換する
+                            if type(content_b64) in [dict, list]:
+                                # content_b64が辞書型又はリスト型の場合はJSON文字列に変換する
                                 content_b64 = common.to_str(content_b64)
                                 mimetype = 'application/json'
                                 filename = f"{filename}.json"

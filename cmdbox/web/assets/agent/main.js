@@ -69,6 +69,8 @@ $(() => {
             cmdbox.init_version_modal();
             // モーダルボタン初期化
             cmdbox.init_modal_button();
+            // 多言語対応のためのテキスト翻訳を処理
+            setTimeout(() => {cmdbox.process_i18n();}, 100);
         } finally {
             cmdbox.hide_loading();
         }
