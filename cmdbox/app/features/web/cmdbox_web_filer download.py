@@ -29,7 +29,7 @@ class FilerDownload(cmdbox_web_exec_cmd.ExecCmd):
                 data_dir = web.data if scope == 'client' else Path.cwd()
                 data_dir = None if scope == 'server' else data_dir
                 opt = dict(host=host, port=port, svname=svname, password=password, svpath=path, scope=scope,
-                           img_thumbnail=img_thumbnail, mode='client', cmd='file_download', client_data=data_dir, stdout_log=False)
+                           img_thumbnail=img_thumbnail, mode='client', cmd='file_download', client_data=data_dir)
                 opt['capture_stdout'] = nothread = True
                 web.options.audit_exec(req, res, web)
                 ret = await self.exec_cmd(req, res, web, 'file_download', opt, nothread, self.appcls)

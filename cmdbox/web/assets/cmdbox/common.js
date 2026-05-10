@@ -313,17 +313,12 @@ cmdbox.editUserLanguage = async () => {
     // 言語選択ドロップダウン
     const lang_select = $(`<div class="col-12 mb-3"><div class="input-group">`+
         `<label class="input-group-text i18n">Display Language</label>`+
-        `<select class="form-select" name="language">`+
-        `<option value=""></option>`+
-        `<option value="ja_JP" ${language === 'ja_JP' ? 'selected' : ''}>ja_JP : 日本語</option>`+
-        `<option value="en_US" ${language === 'en_US' ? 'selected' : ''}>en_US : English</option>`+
-        `<option value="zh_CN" ${language === 'zh_CN' ? 'selected' : ''}>zh_CN : 简体中文</option>`+
-        `<option value="zh_TW" ${language === 'zh_TW' ? 'selected' : ''}>zh_TW : 繁體中文</option>`+
-        `<option value="ko_KR" ${language === 'ko_KR' ? 'selected' : ''}>ko_KR : 한국어</option>`+
-        `<option value="fr_FR" ${language === 'fr_FR' ? 'selected' : ''}>fr_FR : Français</option>`+
-        `<option value="it_IT" ${language === 'it_IT' ? 'selected' : ''}>it_IT : Italiano</option>`+
-        `</select>`+
-        `</div>`).appendTo(row_content);
+        `<select class="form-select" name="language"></select></div>`).appendTo(row_content);
+    const select_elem = lang_select.find('select');
+    select_elem.append('<option class="i18n" value="">Select language</option>');
+    cmdbox.language_list().forEach(lang => {
+        select_elem.append(`<option value="${lang.code}" ${language === lang.code ? 'selected' : ''}>${lang.code} : ${lang.name}</option>`);
+    });
     
     const footer = $(`<div class="modal-footer"/>`).appendTo(form);
     footer.append('<button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>');
@@ -342,6 +337,21 @@ cmdbox.editUserLanguage = async () => {
     daialog.draggable({cursor:'move',cancel:'.modal-body'});
     cmdbox.process_i18n(editlang_modal);
     editlang_modal.modal('show');
+};
+/**
+ * 言語リストを取得
+ * @returns {Array} 言語リスト
+ */
+cmdbox.language_list = () => {
+    return [
+        {code: 'ja_JP', name: '日本語'},
+        {code: 'en_US', name: 'English'},
+        {code: 'zh_CN', name: '简体中文'},
+        {code: 'zh_TW', name: '繁體中文'},
+        {code: 'ko_KR', name: '한국어'},
+        {code: 'fr_FR', name: 'Français'},
+        {code: 'it_IT', name: 'Italiano'},
+    ];
 };
 /**
  * 現在のユーザーのパスワード変更

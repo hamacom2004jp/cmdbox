@@ -122,9 +122,10 @@ list_pipe_func_then = () => {
             pipe_modal.find('.btn_pin_fill').hide();
             pipe_modal.find('.btn_pin_angle').hide();
         }
-        pipe_modal.find('.modal-title').text(`Pipeline : ${modal_title}`);
+        pipe_modal.find('.modal-title').html(`<span class="i18n">Pipeline : </span>${modal_title}`);
         pipe_modal.modal('show');
         pipe_modal.find('.btn_window_stack').click();
+        cmdbox.process_i18n(pipe_modal);
         cmdbox.hide_loading();
     }
     $('.pipe_card').off('click').on('click', pipe_card_func);

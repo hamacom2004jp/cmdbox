@@ -20,8 +20,11 @@ cmdboxを拡張して作成したコマンドでも利用できるよう、
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
+import logging
 import re
+import time
 from cmdbox.app.commons import validator
 from collections import defaultdict
 from dataclasses import dataclass
@@ -36,7 +39,7 @@ SPECIAL_TEXT = "a_日本語 space-_.#\"'&<>"
 EXCLUDED_PARAM_NAMES = {"host", "port", "password", "svname",
                         "retry_count", "retry_interval", "timeout",
                         "capture_stdout", "capture_maxsize",
-                        "stdout_log", "output_json", "output_json_append", "output_no_validate"}
+                        "output_json", "output_json_append", "output_no_validate"}
 
 
 # groups パラメータに指定するテスト用グループ値
@@ -52,12 +55,82 @@ class TestCase:
     expected_result: str
     post_checks: str
     input_values: dict[str, Any] | None = None
+    from_create_tests: bool = False
+    create_tests_name: str | None = None
+
+
+_CODE_TO_STATUS: dict[int, str] = {0: "RESP_SUCCESS", 1: "RESP_WARN", 2: "RESP_ERROR"}
+
+
+def _collect_create_tests_cases(
+    command_spec: dict[str, Any],
+    appcls: Any,
+    ver: Any,
+) -> list[TestCase]:
+    """UnitTestable.create_tests() からテストケースを収集し、TestCase に変換します。
+
+    Args:
+        command_spec: CLI仕様JSONからのコマンド仕様
+        appcls: アプリケーションクラス
+        ver: バージョンモジュール
+
+    Returns:
+        create_tests から生成した TestCase のリスト
+    """
+    module_name = command_spec.get("module_name", "")
+    class_name = command_spec.get("class_name", "")
+    if not module_name or not class_name:
+        return []
+
+    try:
+        mod = importlib.import_module(module_name)
+        cls = getattr(mod, class_name, None)
+    except Exception:
+        return []
+
+    if cls is None:
+        return []
+
+    try:
+        from cmdbox.app.commons import testable as testable_mod
+        if not issubclass(cls, testable_mod.UnitTestable):
+            return []
+    except Exception:
+        return []
+
+    try:
+        inst = cls(appcls, ver)
+        logger = logging.getLogger(__name__)
+        base_args = inst.create_base_args(logger, argparse.Namespace())
+        tm = time.time()
+        tests = inst.create_tests(logger, base_args, tm, [])
+    except Exception as e:
+        logger.warning(f"create_tests failed: {e}", exc_info=True)
+        return []
+
+    cases: list[TestCase] = []
+    for tc in tests:
+        code = tc.output[0] if tc.output else 0
+        status_str = _CODE_TO_STATUS.get(code, f"INT_{code}")
+        cases.append(TestCase(
+            category="カスタムテスト",
+            focus=tc.name,
+            input_pattern=tc.description or "create_tests で定義されたテストケース",
+            expected_status=status_str,
+            expected_result=str(tc.output[1]) if tc.output and len(tc.output) > 1 else "",
+            post_checks="",
+            from_create_tests=True,
+            create_tests_name=tc.name,
+        ))
+    return cases
 
 
 def generate(
     input_json: Path,
     output_dir: Path,
     root_dir: Path,
+    appcls: Any = None,
+    ver: Any = None,
 ) -> list[dict[str, Any]]:
     """CLIコマンド仕様JSONからユニットテスト仕様を生成します。
 
@@ -66,6 +139,8 @@ def generate(
         output_dir: テスト仕様書の出力先ディレクトリ
         root_dir: プロジェクトルートディレクトリ
                   (詳細設計書マークダウンの参照に使用)
+        appcls: UnitTestable.create_tests() 呼び出し用アプリケーションクラス (省略可)
+        ver: UnitTestable.create_tests() 呼び出し用バージョンモジュール (省略可)
 
     Returns:
         生成されたテスト仕様書の辞書リスト
@@ -81,7 +156,7 @@ def generate(
 
     documents: list[dict[str, Any]] = []
     for command_spec in command_specs:
-        document = build_unit_test_spec(command_spec, docs_dir, root_dir, all_specs=command_specs)
+        document = build_unit_test_spec(command_spec, docs_dir, root_dir, all_specs=command_specs, appcls=appcls, ver=ver)
         _write_document(document, root_dir)
         documents.append(document)
 
@@ -162,6 +237,8 @@ def build_unit_test_spec(
     docs_dir: Path,
     root_dir: Path,
     all_specs: list[dict[str, Any]] | None = None,
+    appcls: Any = None,
+    ver: Any = None,
 ) -> dict[str, Any]:
     """コマンドの完全なユニットテスト仕様を構築します。
 
@@ -169,6 +246,9 @@ def build_unit_test_spec(
         command_spec: CLI仕様JSONからのコマンド仕様
         docs_dir: マークダウン出力先ディレクトリ
         root_dir: プロジェクトルートディレクトリ
+        all_specs: 全コマンド仕様のリスト (pre/post_cmds 推定用)
+        appcls: UnitTestable.create_tests() 呼び出し用アプリケーションクラス (省略可)
+        ver: UnitTestable.create_tests() 呼び出し用バージョンモジュール (省略可)
 
     Returns:
         完全なユニットテスト仕様の辞書
@@ -198,6 +278,11 @@ def build_unit_test_spec(
         test_cases = _dedupe_test_cases(
             _build_test_cases(command_spec, artifact_checks, inferred_required, output_schema)
         )
+
+    # UnitTestable.create_tests() が実装されている場合はそのテストケースを追加
+    if appcls is not None:
+        create_tests_cases = _collect_create_tests_cases(command_spec, appcls, ver)
+        test_cases = test_cases + create_tests_cases
 
     try:
         output_file_rel = output_file.relative_to(root_dir).as_posix()
@@ -238,6 +323,8 @@ def build_unit_test_spec(
                 "nouse_webmode": nouse_webmode,
                 "expected_schema": output_schema,
                 **(  {"input_values": case.input_values} if case.input_values else {}),
+                **(  {"from_create_tests": True, "create_tests_name": case.create_tests_name}
+                     if case.from_create_tests else {}),
             }
             for index, case in enumerate(test_cases, start=1)
         ],
@@ -711,6 +798,9 @@ def _add_input_values_to_test_cases(documents: list[dict[str, Any]]) -> None:
         parameters = spec.get("parameters", [])
 
         for tc in test_cases:
+            # from_create_tests ケースは run_spec で直接実行するため input_values は不要
+            if tc.get("from_create_tests", False):
+                continue
             if "input_values" not in tc or not tc["input_values"]:
                 tc["input_values"] = _generate_input_values_from_pattern(
                     tc.get("input_pattern", ""),

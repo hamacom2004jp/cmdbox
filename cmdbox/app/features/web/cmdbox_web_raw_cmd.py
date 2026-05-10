@@ -41,7 +41,6 @@ class RawCmd(cmdbox_web_gui.Gui):
         if web.logger.level == logging.DEBUG:
             web.logger.debug(f"web.raw_cmd: title={title}, opt={opt}")
         opt_list, _ = web.options.mk_opt_list(opt)
-        if 'stdout_log' in opt: del opt['stdout_log']
         if 'capture_stdout' in opt: del opt['capture_stdout']
         curl_cmd_file = self.mk_curl_fileup(web, opt)
         return [dict(type='cmdline',raw=' '.join(['python','-m',self.ver.__appid__]+opt_list)),

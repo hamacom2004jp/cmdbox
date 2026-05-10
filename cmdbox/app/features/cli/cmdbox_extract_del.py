@@ -70,10 +70,6 @@ class ExtractDel(feature.OneshotResultEdgeFeature, validator.Validator):
 
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        if not re.match(r'^[\w\-]+$', args.extract_name):
-            msg = dict(warn="Extract name can only contain alphanumeric characters, underscores, and hyphens.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
 
         payload = dict(extract_name=args.extract_name)
         payload_b64 = convert.str2b64str(common.to_str(payload))

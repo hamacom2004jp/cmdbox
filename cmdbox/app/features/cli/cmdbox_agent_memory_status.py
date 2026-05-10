@@ -75,11 +75,6 @@ class AgentMemoryStatus(agant_base.AgentBase, validator.Validator):
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
 
-        if not re.match(r'^[\w\-]+$', args.runner_name):
-            msg = dict(warn="Runner name can only contain alphanumeric characters, underscores, and hyphens.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
-
         payload = dict(runner_name=args.runner_name, user_name=args.user_name, memory_query=args.memory_query,
                        memory_fetch_offset=args.memory_fetch_offset, memory_fetch_count=args.memory_fetch_count,
                        memory_fetch_summary=args.memory_fetch_summary)

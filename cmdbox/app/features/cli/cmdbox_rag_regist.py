@@ -80,10 +80,6 @@ class RagRegist(rag_base.RAGBase, validator.Validator):
 
     @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        if not re.match(r'^[\w\-]+$', args.rag_name):
-            msg = dict(warn="RAG name can only contain alphanumeric characters, underscores, and hyphens.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
 
         options = Options.getInstance(appcls=self.appcls, ver=self.ver)
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)

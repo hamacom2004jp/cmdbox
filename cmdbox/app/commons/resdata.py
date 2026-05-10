@@ -24,7 +24,7 @@ class Base(BaseModel):
                 'description': field.description,
             }
         return info
-    
+
     @classmethod
     def forbid_on(cls):
         """

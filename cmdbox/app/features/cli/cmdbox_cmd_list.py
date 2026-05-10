@@ -1,6 +1,6 @@
 from cmdbox.app import common, feature
 from cmdbox.app.auth import signin
-from cmdbox.app.commons import resdata, validator
+from cmdbox.app.commons import resdata, testable, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -10,7 +10,7 @@ import logging
 import pydantic
 
 
-class CmdList(feature.OneshotResultEdgeFeature, validator.Validator):
+class CmdList(feature.OneshotResultEdgeFeature, validator.Validator, testable.UnitTestable):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -130,3 +130,38 @@ class CmdList(feature.OneshotResultEdgeFeature, validator.Validator):
         class Result(resdata.Result):
             success: Union[Data, List[CmdRecord], None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
+
+    def create_tests(self, logger:logging.Logger, base_args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]) -> List[testable.TestCase]:
+        """
+        テストケースを作成するためのメソッド
+        Returns:
+            List[testable.TestCase]: テストケースのリスト
+        """
+        tests = []
+        _0_args = argparse.Namespace(**vars(base_args))
+        tests.append(testable.TestCase(
+            name="正常系テスト",
+            description="これは正常系のケースです。",
+            args=_0_args,
+            output=(0, dict(success=dict(data="")), None),
+        ))
+        return tests
+
+    def assertion(self, logger:logging.Logger, test_args:argparse.Namespace, tm:float, pf:List[Dict[str, float]], _bef:Any, _res:Tuple[int, Dict[str, Any], Any], output:Tuple[int, Dict[str, Any], Any]) -> None:
+        """
+        テスト結果を検証するためのメソッド
+        Args:
+            logger (logging.Logger): ロガーオブジェクト
+            test_args (argparse.Namespace): コマンドの引数を含むNamespaceオブジェクト
+            tm (float): コマンドの実行時間を測定するためのタイムスタンプ
+            pf (List[Dict[str, float]]): コマンドの実行時間を測定するためのパフォーマンスデータのリスト
+            _bef (Any): 前処理の結果
+            _res (Tuple[int, Dict[str, Any], Any]): コマンドの実行結果(リターンコード、メッセージ、オブジェクト)
+            output (Tuple[int, Dict[str, Any], Any]): 期待される出力(リターンコード、メッセージ、オブジェクト)
+        Returns:
+            None
+        """
+        logger.info("Running assertion...")
+        assert output.get('success') is not None, "Output must contain 'success' key"
+        assert output.get('success',{}).get('data',None) is not None, "Output 'success' must contain 'data' key"
+        assert len(output.get('success',{}).get('data',[])) > 0, "Output 'success' 'data' must contain at least one command record"

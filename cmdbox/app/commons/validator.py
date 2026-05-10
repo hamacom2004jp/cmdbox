@@ -6,6 +6,7 @@ import argparse
 import functools
 import logging
 import pydantic
+import re
 
 
 def apprun_check(func:Callable) -> Callable:
@@ -207,6 +208,10 @@ class Validator(feature.Feature):
                         msg = dict(warn=f"Invalid value for --{opt}: {val} (each string must be less than {LONG_TEXT_BOUNDARY} characters)")
                         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                         return self.RESP_WARN, msg, None
+                    if 'name' in opt and all(not re.match(r'^[\w\-]+$', v) for v in val):
+                        msg = dict(warn=f"{opt} can only contain alphanumeric characters, underscores, and hyphens.")
+                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                        return self.RESP_WARN, msg, None
                 elif not isinstance(val, str):
                     msg = dict(warn=f"Invalid value for --{opt}: {val} (must be a string)")
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -215,6 +220,11 @@ class Validator(feature.Feature):
                     msg = dict(warn=f"Invalid value for --{opt}: {val} (must be less than {LONG_TEXT_BOUNDARY} characters)")
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                     return self.RESP_WARN, msg, None
+                elif 'name' in opt and not re.match(r'^[\w\-]+$', val):
+                    msg = dict(warn=f"{opt} can only contain alphanumeric characters, underscores, and hyphens.")
+                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                    return self.RESP_WARN, msg, None
+
             if type in [options.Options.T_TEXT, options.Options.T_PASSWD] and val is not None:
                 if multi and isinstance(val, list):
                     if val and not all(isinstance(v, str) for v in val):

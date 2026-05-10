@@ -324,18 +324,19 @@ const list_cmd_func_then = () => {
             cmd_modal.find('.btn_pin_fill').hide();
             cmd_modal.find('.btn_pin_angle').hide();
         }
-        cmd_modal.find('.modal-title').text(`Command : ${modal_title}`);
+        cmd_modal.find('.modal-title').html(`<span class="i18n">Command : </span>${modal_title}`);
         cmd_modal.find('.row_content_hide').hide();
         cmd_modal.find('.btn_window_stack').click();
         cmd_modal.find('.choice_show').change();
         cmd_modal.modal('show');
+        cmdbox.process_i18n(cmd_modal);
         cmdbox.hide_loading();
     }
     $('.cmd_card').off('click').on('click', cmd_card_func);
     $('#cmd_copy').off('click').on('click', async () => {
         const cmd_modal = $('#cmd_modal');
         modal_title = 'New Command';
-        cmd_modal.find('.modal-title').text(`Command : ${modal_title}`);
+        cmd_modal.find('.modal-title').html(`<span class="i18n">Command : </span>${modal_title}`);
         cmd_modal.find('[name="modal_mode"]').val('add');
         cmd_modal.find('#cmd_copy').hide();
         cmd_modal.find('[name="title"]').val(cmd_modal.find('[name="title"]').val() + '_copy');
@@ -347,6 +348,7 @@ const list_cmd_func_then = () => {
         cmd_modal.find('[name="cmd_disabled"]').val('').hide();
         cmd_modal.find('[name="name"]').show();
         cmd_modal.find('[name="name_disabled"]').val('').hide();
+        cmdbox.process_i18n(cmd_modal);
     });
     // コマンドファイルの保存
     $('#cmd_save').off('click').on('click', async () => {

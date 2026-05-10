@@ -33,6 +33,5 @@ Common Options
     "--output_raw","","If the operation is successful, the result is output to standard output in base64-decoded form. If multiple results are returned, only the first one is output."
     "-o, --output_json <Destination file for processing result json>","","Specify the destination file for saving the processing result json."
     "-a, --output_json_append","","Save the processing result json file by appending."
-    "--stdout_log","","Available only in GUI mode. Outputs standard output during command execution to Console log."
     "--capture_stdout","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
     "--capture_maxsize <size>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."

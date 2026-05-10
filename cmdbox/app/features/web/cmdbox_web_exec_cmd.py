@@ -108,7 +108,6 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         if 'mode' not in opt or 'cmd' not in opt:
             raise HTTPException(status_code=404, detail='mode or cmd is not found.')
         opt['capture_stdout'] = opt['capture_stdout'] if 'capture_stdout' in opt else False
-        opt['stdout_log'] = False
         return opt
 
     def chk_client_only(self, web:Web, opt):
@@ -285,7 +284,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     web.logger.disabled = False # ログ出力を有効にする
                     sys.stdout = old_stdout
                     sys.stdin = old_stdin
-                if 'stdout_log' in opt and opt['stdout_log']:
+                if 'capture_stdout' in opt and opt['capture_stdout']:
                     self.callback_console_modal_log_func(web, output)
                 try:
                     try:

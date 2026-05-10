@@ -86,10 +86,6 @@ class AgentMcpSave(feature.OneshotResultEdgeFeature, validator.Validator):
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
 
-        if not re.match(r'^[\w\-]+$', args.mcpserver_name):
-            msg = dict(warn="MCP server name can only contain alphanumeric characters, underscores, and hyphens.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
         if not args.mcpserver_delegated_auth and (not hasattr(args, 'mcpserver_apikey') or args.mcpserver_apikey is None):
             msg = dict(warn="Please specify --mcpserver_apikey or enable --mcpserver_delegated_auth")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

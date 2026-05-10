@@ -76,7 +76,6 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                             self.callback_return_pipe_exec_func(web, title, dict(warn=msg))
                             raise HTTPException(401, detail=msg)
                 opt['capture_stdout'] = nothread = False
-                opt['stdout_log'] = False
                 return common.to_str(self.exec_pipe(req, res, web, title, opt, nothread))
             except:
                 return common.to_str(dict(warn=f'Pipeline "{title}" failed. {traceback.format_exc()}'))
@@ -172,7 +171,7 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
                     output = [dict(warn='capture_stdout is off.')]
             except Exception as e:
                 output = [dict(warn=f'<pre>{html.escape(traceback.format_exc())}</pre>')]
-            if 'stdout_log' in opt and opt['stdout_log']:
+            if 'capture_stdout' in opt and opt['capture_stdout']:
                 self.callback_console_modal_log_func(web, output)
             try:
                 try:

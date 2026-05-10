@@ -121,7 +121,9 @@ This command implements ``output_schema()`` returning ``Result`` model.
         "data": "string",
         "mime_type": "string",
         "etag": "string",
-        "not_modified": false
+        "not_modified": false,
+        "rpath": "string",
+        "svpath": "string"
       },
       "warn": {},
       "error": {},
@@ -141,6 +143,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.mime_type","str | null","no","null","MIMEタイプ"
     "success.etag","str | null","no","null","ETag"
     "success.not_modified","bool | null","no","null","未更新フラグ"
+    "success.rpath","str | null","no","null","リクエストパス"
+    "success.svpath","str | null","no","null","サーバーパス"
     "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"

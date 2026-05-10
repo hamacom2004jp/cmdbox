@@ -101,10 +101,6 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
             if data:
                 data = sorted(data, key=lambda x: x.get('llmpriority', 9999))
                 args.llmname = data[0].get('name')
-        if not re.match(r'^[\w\-]+$', args.llmname):
-            msg = dict(warn="LLM name can only contain alphanumeric characters, underscores, and hyphens.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
 
         payload = dict(
             llmname=args.llmname,
@@ -227,6 +223,11 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
         missing = [w for w in unique_words if w not in lang_cache]
 
         if missing:
+            if not llmname:
+                # 利用可能なLLM設定が見つからない場合は翻訳できないため、キャッシュがあるものをマージして返す
+                result = {w: lang_cache.get(w, w) for w in words}
+                return self.RESP_SUCCESS, dict(success=dict(data=result))
+
             words_json = json.dumps(missing, ensure_ascii=False)
             prompt = (
                 f"Translate the following words into {target_lang}.\n"

@@ -75,6 +75,8 @@ class TestGenTestSpec(feature.OneshotResultEdgeFeature, validator.Validator):
                 input_json=input_json,
                 output_dir=output_dir,
                 root_dir=root_dir,
+                appcls=self.appcls,
+                ver=self.ver,
             )
         except Exception as e:
             logger.warning(f"gen_unit_test_spec failed: {e}", exc_info=True)

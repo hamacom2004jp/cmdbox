@@ -91,10 +91,6 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator):
 
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        if not re.match(r'^[\w\-]+$', args.llmname):
-            msg = dict(warn="LLM name can only contain alphanumeric characters, underscores, and hyphens.")
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, None
 
         configure = dict(
             llmname=args.llmname,

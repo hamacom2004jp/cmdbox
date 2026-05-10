@@ -15,8 +15,11 @@ cmdboxを拡張して作成したコマンドでも利用できるよう、
 """
 from __future__ import annotations
 
+import argparse
 import json
+import logging
 import tempfile
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -271,7 +274,10 @@ def _run_command_spec(
     # pre_cmds: テスト前の初期化コマンドを実行
     _run_setup_cmds(spec.get("pre_cmds", []), app_instance, spec, label="pre_cmds")
 
-    for tc in test_cases:
+    # from_create_tests マーカーケースと通常ケースを分離する
+    regular_cases = [tc for tc in test_cases if not tc.get("from_create_tests", False)]
+
+    for tc in regular_cases:
         result = _run_test_case(app_instance, spec, tc, use_tempdir)
         case_results.append(result)
         if result["status"] == "passed":
@@ -280,6 +286,22 @@ def _run_command_spec(
             failed += 1
         else:
             skipped += 1
+
+    # UnitTestable.create_tests() が実装されている場合はそのテストも実行する
+    try:
+        from cmdbox.app.commons import testable as testable_mod
+        if isinstance(feat, testable_mod.UnitTestable):
+            create_tests_results = _run_create_tests(feat, mode, cmd)
+            for r in create_tests_results:
+                case_results.append(r)
+                if r["status"] == "passed":
+                    passed += 1
+                elif r["status"] == "failed":
+                    failed += 1
+                else:
+                    skipped += 1
+    except Exception as e:
+        print(f"  [create_tests] {mode} {cmd}: warning - {e}")
 
     # post_cmds: テスト後のクリーンアップコマンドを実行
     _run_setup_cmds(spec.get("post_cmds", []), app_instance, spec, label="post_cmds")
@@ -299,8 +321,110 @@ def _run_command_spec(
 
 
 # ---------------------------------------------------------------------------
-# テストケース単体の実行
+# UnitTestable.create_tests() テストの実行
 # ---------------------------------------------------------------------------
+
+def _run_create_tests(
+    feat: Any,
+    mode: str,
+    cmd: str,
+) -> list[dict[str, Any]]:
+    """UnitTestable.create_tests() に定義されたテストケースを実行します。
+
+    Args:
+        feat: UnitTestable を実装したフィーチャーインスタンス
+        mode: モード名 (ログ出力用)
+        cmd: コマンド名 (ログ出力用)
+
+    Returns:
+        テストケースの実行結果リスト
+    """
+    logger = logging.getLogger(__name__)
+    tm = time.time()
+
+    try:
+        base_args = feat.create_base_args(logger, argparse.Namespace())
+        tests = feat.create_tests(logger, base_args, tm, [])
+    except Exception as e:
+        return [{
+            "id": "CT-000",
+            "category": "カスタムテスト",
+            "focus": "create_tests",
+            "input_pattern": "create_tests の呼び出し",
+            "expected_status": "RESP_SUCCESS",
+            "executed_at": datetime.now().isoformat(timespec="seconds"),
+            "status": "failed",
+            "reason": f"create_tests の呼び出しに失敗しました: {e}",
+            "actual_code": None,
+        }]
+
+    _bef: Any = None
+    try:
+        _bef = feat.exec_before(logger, base_args, tm, [])
+    except Exception:
+        pass
+
+    results: list[dict[str, Any]] = []
+    for i, test in enumerate(tests, start=1):
+        tc_id = f"CT-{i:03d}"
+        base_info: dict[str, Any] = {
+            "id": tc_id,
+            "category": "カスタムテスト",
+            "focus": test.name,
+            "input_pattern": test.description or "create_tests で定義されたテストケース",
+            "expected_status": _code_to_status(test.output[0]) if test.output else "RESP_SUCCESS",
+            "executed_at": datetime.now().isoformat(timespec="seconds"),
+        }
+        try:
+            with patch("cmdbox.app.common.print_format"):
+                if test.exec_cmd:
+                    _res = test.exec_cmd(logger, test.args, tm, [], _bef)
+                else:
+                    _res = feat.exec_cmd(logger, test.args, tm, [], _bef)
+
+            if test.assertion:
+                test.assertion(logger, test.args, tm, [], _bef, _res, test.output)
+            else:
+                feat.assertion(logger, test.args, tm, [], _bef, _res, test.output)
+
+            results.append({
+                **base_info,
+                "status": "passed",
+                "actual_code": _res[0] if _res else None,
+                "actual_status": _code_to_status(_res[0]) if _res else None,
+                "actual_result": _truncate(str(_res[1]), 300) if _res and _res[1] else None,
+                "reason": None,
+            })
+        except AssertionError as e:
+            results.append({
+                **base_info,
+                "status": "failed",
+                "reason": f"AssertionError: {e}",
+                "actual_code": None,
+            })
+        except Exception as e:
+            err_lower = str(e).lower()
+            if _is_connectivity_error(err_lower):
+                results.append({
+                    **base_info,
+                    "status": "skipped",
+                    "reason": f"External dependency unavailable: {e}",
+                    "actual_code": None,
+                })
+            else:
+                results.append({
+                    **base_info,
+                    "status": "failed",
+                    "reason": f"{type(e).__name__}: {e}",
+                    "actual_code": None,
+                })
+
+    try:
+        feat.exec_after(logger, base_args, tm, [], _bef)
+    except Exception:
+        pass
+
+    return results
 
 def _run_test_case(
     app_instance: Any,
