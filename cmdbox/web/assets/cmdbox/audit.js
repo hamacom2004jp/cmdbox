@@ -69,18 +69,18 @@ audit.query = async (opt) => {
     const res = await fetch(`audit/rawlog`,
         {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(opt)});
     if (res.status != 200) {
-        cmdbox.message(`${res.status}: ${res.statusText}`);
+        cmdbox.message(`${res.status}: ${res.statusText}`, true);
         return;
     }
     try {
         const content = JSON.parse(await res.text());
         if (!content['success']) {
-            cmdbox.message(content);
+            cmdbox.message(content, true);
             return;
         }
         return content['success']['data'];
     } catch (e) {
-        cmdbox.message({'error': e.message});
+        cmdbox.message({'error': e.message}, true);
         return;
     }
 };
@@ -241,23 +241,23 @@ audit.metrics_modal_func = (title) => {
     modal.find('#metrics_save').off('click').on('click', async () => {
         const [title, opt] = cmdbox.get_param(modal);
         if (!title || title == '') {
-            cmdbox.message({'warn': 'Title is required'});
+            cmdbox.message({'warn': 'Title is required'}, true);
             return;
         }
         if (!opt['chart_type'] || opt['chart_type'] == '') {
-            cmdbox.message({'warn': 'chart_type is required'});
+            cmdbox.message({'warn': 'chart_type is required'}, true);
             return;
         }
         if (!opt['col_size'] || opt['col_size'] == '') {
-            cmdbox.message({'warn': 'col_size is required'});
+            cmdbox.message({'warn': 'col_size is required'}, true);
             return;
         }
         if (!opt['horizontal'] || opt['horizontal'] == '') {
-            cmdbox.message({'warn': 'horizontal is required'});
+            cmdbox.message({'warn': 'horizontal is required'}, true);
             return;
         }
         if (!opt['vertical'] || opt['vertical'] == '') {
-            cmdbox.message({'warn': 'vertical is required'});
+            cmdbox.message({'warn': 'vertical is required'}, true);
             return;
         }
         if (!window.confirm('Do you want to save?')) return;
@@ -282,10 +282,10 @@ audit.init_form = async () => {
     const modal = $('#search_modal');
     const row_content = modal.find('.row_content');
     const res = await fetch('audit/mode_cmd', {method: 'GET'});
-    if (res.status != 200) cmdbox.message(`${res.status}: ${res.statusText}`);
+    if (res.status != 200) cmdbox.message(`${res.status}: ${res.statusText}`, true);
     const msg = await res.json();
     if (!msg['success']) {
-        cmdbox.message(msg);
+        cmdbox.message(msg, true);
         return;
     }
     const args = msg['success'];
@@ -355,14 +355,14 @@ audit.init_form = async () => {
 audit.list_audit_metrics = async () => {
     const formData = new FormData();
     const res = await fetch('audit/metrics/list', {method: 'POST', body: formData});
-    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
     return await res.json();
 }
 audit.load_audit_metrics = async (title) => {
     const formData = new FormData();
     formData.append('title', title);
     const res = await fetch('audit/metrics/load', {method: 'POST', body: formData});
-    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
     return await res.json();
 }
 audit.save_audit_metrics = async (title, opt) => {
@@ -370,14 +370,14 @@ audit.save_audit_metrics = async (title, opt) => {
     formData.append('title', title);
     formData.append('opt', JSON.stringify(opt));
     const res = await fetch('audit/metrics/save', {method: 'POST', body: formData});
-    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
     return await res.json();
 };
 audit.del_audit_metrics = async (title) => {
     const formData = new FormData();
     formData.append('title', title);
     const res = await fetch('audit/metrics/delete', {method: 'POST', body: formData});
-    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
     return await res.json();
 }
 $(() => {

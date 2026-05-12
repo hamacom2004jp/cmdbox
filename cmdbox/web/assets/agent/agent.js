@@ -191,7 +191,7 @@ agentView.disabled = false;
 agentView.exec_cmd = async (mode, cmd, opt={}, error_func=null, loading=true, sse_cb=null) => {
     if(!agentView.user) {
         if (!agentView.disabled) {
-            cmdbox.message({'error':'User information could not be retrieved. AI features are unavailable.'});
+            cmdbox.message({'error':'User information could not be retrieved. AI features are unavailable.'}, true);
             agentView.disabled = true;
             $('#ai_chat_button').hide();
         }
@@ -268,11 +268,11 @@ agentView.list_sessions = async (session_id) => {
 
 agentView.regist_rag = async () => {
     if (!agentView.runner_conf || !agentView.runner_conf.rag) {
-        cmdbox.message({ 'error': 'Please select an Agent Runner first.' });
+        cmdbox.message({ 'error': 'Please select an Agent Runner first.' }, true);
         return false;
     }
     if (agentView.runner_conf.rag.length <= 0) {
-        cmdbox.message({ 'error': 'No RAGs are selected for registration.' });
+        cmdbox.message({ 'error': 'No RAGs are selected for registration.' }, true);
         return false;
     }
     if (!confirm(`Are you sure you want to register RAG '${agentView.runner_conf.rag}' to the system?`)){

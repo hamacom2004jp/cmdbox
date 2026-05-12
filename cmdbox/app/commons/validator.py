@@ -131,6 +131,20 @@ class Validator(feature.Feature):
         cls = self.output_schema()
         return cls.model_validate(output)
 
+    validator_types = {
+        options.Options.T_BOOL: [bool],
+        options.Options.T_DATE: [str],
+        options.Options.T_DATETIME: [str],
+        options.Options.T_DICT: [dict],
+        options.Options.T_DIR: [str, Path],
+        options.Options.T_FILE: [str, Path],
+        options.Options.T_FLOAT: [float],
+        options.Options.T_INT: [int],
+        options.Options.T_PASSWD: [str],
+        options.Options.T_STR: [str],
+        options.Options.T_TEXT: [str],
+    }
+
     def valid(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         コマンドの引数の妥当性を検証します
@@ -145,10 +159,14 @@ class Validator(feature.Feature):
         """
         def_opt = self.get_option()
         choices = def_opt.get('choice',[])
-        validators = {
-            'data': self.valid_data,
-            'signin_file': self.valid_signin_file,
-        }
+        validators = [
+            self.valid_type,
+            self.valid_name,
+            self.valid_str_max_length,
+            self.valid_file_exist,
+            self.valid_data,
+            self.valid_signin_file,
+        ]
         # 共通の引数のデフォルト値を設定
         if not hasattr(args, 'format'): setattr(args, 'format', False)
         if not hasattr(args, 'output_json'): setattr(args, 'output_json', None)
@@ -172,97 +190,7 @@ class Validator(feature.Feature):
                     msg = dict(warn=f"Please specify --{opt}")
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                     return self.RESP_WARN, msg, None
-            # 型の検証
-            if type == options.Options.T_BOOL and val is not None:
-                if not isinstance(val, bool):
-                    msg = dict(warn=f"Invalid value for --{opt}: {val} (must be a boolean)")
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                    return self.RESP_WARN, msg, None
-            if type == options.Options.T_INT and val is not None:
-                try:
-                    if multi and isinstance(val, list):
-                        val = [int(v) for v in val]
-                    else:
-                        val = int(val)
-                except Exception as e:
-                    msg = dict(warn=f"Invalid value for --{opt}: {val} (must be an integer)")
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                    return self.RESP_WARN, msg, None
-            if type == options.Options.T_FLOAT and val is not None:
-                try:
-                    if multi and isinstance(val, list):
-                        val = [float(v) for v in val]
-                    else:
-                        val = float(val)
-                except Exception as e:
-                    msg = dict(warn=f"Invalid value for --{opt}: {val} (must be a float)")
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                    return self.RESP_WARN, msg, None
-            if type in [options.Options.T_STR] and val is not None:
-                if multi and isinstance(val, list):
-                    if val and not all(isinstance(v, str) for v in val):
-                        msg = dict(warn=f"Invalid value for --{opt}: {val} (must be a list of strings)")
-                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                        return self.RESP_WARN, msg, None
-                    if val and all(len(v)>=LONG_TEXT_BOUNDARY for v in val):
-                        msg = dict(warn=f"Invalid value for --{opt}: {val} (each string must be less than {LONG_TEXT_BOUNDARY} characters)")
-                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                        return self.RESP_WARN, msg, None
-                    if 'name' in opt and all(not re.match(r'^[\w\-]+$', v) for v in val):
-                        msg = dict(warn=f"{opt} can only contain alphanumeric characters, underscores, and hyphens.")
-                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                        return self.RESP_WARN, msg, None
-                elif not isinstance(val, str):
-                    msg = dict(warn=f"Invalid value for --{opt}: {val} (must be a string)")
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                    return self.RESP_WARN, msg, None
-                elif len(val)>=LONG_TEXT_BOUNDARY:
-                    msg = dict(warn=f"Invalid value for --{opt}: {val} (must be less than {LONG_TEXT_BOUNDARY} characters)")
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                    return self.RESP_WARN, msg, None
-                elif 'name' in opt and not re.match(r'^[\w\-]+$', val):
-                    msg = dict(warn=f"{opt} can only contain alphanumeric characters, underscores, and hyphens.")
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                    return self.RESP_WARN, msg, None
-
-            if type in [options.Options.T_TEXT, options.Options.T_PASSWD] and val is not None:
-                if multi and isinstance(val, list):
-                    if val and not all(isinstance(v, str) for v in val):
-                        msg = dict(warn=f"Invalid value for --{opt}: {val} (must be a list of strings)")
-                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                        return self.RESP_WARN, msg, None
-                elif not isinstance(val, str):
-                    msg = dict(warn=f"Invalid value for --{opt}: {val} (must be a string)")
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                    return self.RESP_WARN, msg, None
-            if type == options.Options.T_FILE and val is not None and fileio in ['in']:
-                if not isinstance(val, list):
-                    _val = [val,]
-                for v in _val:
-                    path = Path(v)
-                    if not path.exists():
-                        msg = dict(warn=f"Invalid value for --{opt}: {v} (file does not exist)")
-                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                        return self.RESP_WARN, msg, None
-                    if not path.is_file():
-                        msg = dict(warn=f"Invalid value for --{opt}: {v} (not a file)")
-                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                        return self.RESP_WARN, msg, None
-            if type == options.Options.T_DIR and val is not None and fileio in ['in']:
-                if not isinstance(val, list):
-                    _val = [val,]
-                for v in _val:
-                    path = Path(v)
-                    if not path.exists():
-                        msg = dict(warn=f"Invalid value for --{opt}: {v} (directory does not exist)")
-                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                        return self.RESP_WARN, msg, None
-                    if not path.is_dir():
-                        msg = dict(warn=f"Invalid value for --{opt}: {v} (not a directory)")
-                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                        return self.RESP_WARN, msg, None
             # TODO: type==T_DATE, T_DATETIME, T_MLISTの検証
-
             # Choicesの検証 TODO:type==T_DICTのときのchoice検証が必要
             if type != options.Options.T_DICT:
                 opt_choices = choice.get('choice', None)
@@ -281,27 +209,128 @@ class Validator(feature.Feature):
                                 msg = dict(warn=f"Invalid value for --{opt}: {v} (must be one of {valid_values})")
                                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                                 return self.RESP_WARN, msg, None
+
             # オプション固有のバリデーション
-            validator = validators.get(opt, None)
-            if validator:
-                st, msg, obj = validator(logger, opt, val)
-                if st != self.RESP_SUCCESS:
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                    return st, msg, None
+            for validator in validators:
+                if multi and isinstance(val, list):
+                    for v in val:
+                        st, msg, obj = validator(logger, opt, type, v, fileio)
+                        if st != self.RESP_SUCCESS:
+                            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                            return st, msg, None
+                else:
+                    st, msg, obj = validator(logger, opt, type, val, fileio)
+                    if st != self.RESP_SUCCESS:
+                        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                        return st, msg, None
         return self.RESP_SUCCESS, {}, None
 
-    def valid_data(self, logger:logging.Logger, opt:str, val:Any) -> Tuple[int, Dict[str, Any], Any]:
+    def valid_name(self, logger:logging.Logger, opt:str, type:str, val:Any, fileio:str) -> Tuple[int, Dict[str, Any], Any]:
+        """
+        --nameオプションの値の妥当性を検証します
+
+        Args:
+            logger (logging.Logger): ロガー
+            opt (str): オプション名
+            type (str): オプションの型
+            val (Any): オプションの値
+            fileio (str): ファイル入出力の種別 ('in' or 'out')
+        Returns:
+            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
+        """
+        if 'name' not in opt or not val: return self.RESP_SUCCESS, {}, None
+        if not re.match(r'^[\w\-]+$', val):
+            msg = dict(warn=f"{opt} can only contain alphanumeric characters, underscores, and hyphens.")
+            return self.RESP_WARN, msg, None
+        return self.RESP_SUCCESS, {}, None
+
+    def valid_str_max_length(self, logger:logging.Logger, opt:str, type:str, val:Any, fileio:str) -> Tuple[int, Dict[str, Any], Any]:
+        """
+        文字列の最大長の妥当性を検証します
+
+        Args:
+            logger (logging.Logger): ロガー
+            opt (str): オプション名
+            type (str): オプションの型
+            val (Any): オプションの値
+            fileio (str): ファイル入出力の種別 ('in' or 'out')
+        Returns:
+            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
+        """
+        if type not in [options.Options.T_STR] or val is None:
+            return self.RESP_SUCCESS, {}, None
+        if len(val)>=LONG_TEXT_BOUNDARY:
+            msg = dict(warn=f"Invalid value for --{opt}: {val} (must be less than {LONG_TEXT_BOUNDARY} characters)")
+            return self.RESP_WARN, msg, None
+        return self.RESP_SUCCESS, {}, None
+
+    def valid_type(self, logger:logging.Logger, opt:str, type:str, val:Any, fileio:str) -> Tuple[int, Dict[str, Any], Any]:
+        """
+        オプションの型の妥当性を検証します
+
+        Args:
+            logger (logging.Logger): ロガー
+            opt (str): オプション名
+            type (str): オプションの型
+            val (Any): オプションの値
+            fileio (str): ファイル入出力の種別 ('in' or 'out')
+        Returns:
+            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
+        """
+        if type in self.validator_types and val is not None:
+            if not any([isinstance(val, t) for t in self.validator_types[type]]):
+                msg = dict(warn=f"Invalid value for --{opt}: {val} (must be a {type})")
+                return self.RESP_WARN, msg, None
+        if type == options.Options.T_MLIST and val:
+            if not all(isinstance(v, str) for v in val):
+                msg = dict(warn=f"Invalid value for --{opt}: {val} (must be a list of strings)")
+                return self.RESP_WARN, msg, None
+        return self.RESP_SUCCESS, {}, None
+
+    def valid_file_exist(self, logger:logging.Logger, opt:str, type:str, val:Any, fileio:str) -> Tuple[int, Dict[str, Any], Any]:
+        """
+        ファイルの存在の妥当性を検証します
+
+        Args:
+            logger (logging.Logger): ロガー
+            opt (str): オプション名
+            type (str): オプションの型
+            val (Any): オプションの値
+            fileio (str): ファイル入出力の種別 ('in' or 'out')
+        Returns:
+            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
+        """
+        if type not in [options.Options.T_FILE, options.Options.T_DIR] or val is None or fileio not in ['in']:
+            return self.RESP_SUCCESS, {}, None
+        path = Path(val)
+        if not path.exists():
+            msg = dict(warn=f"The path specified for '--{opt}' does not exist.")
+            return self.RESP_WARN, msg, None
+        if type == options.Options.T_FILE:
+            if not path.is_file():
+                msg = dict(warn=f"The path specified for '--{opt}' is not a file.")
+                return self.RESP_WARN, msg, None
+        if type == options.Options.T_DIR:
+            if not path.is_dir():
+                msg = dict(warn=f"The path specified for '--{opt}' is not a directory.")
+                return self.RESP_WARN, msg, None
+        return self.RESP_SUCCESS, {}, None
+
+    def valid_data(self, logger:logging.Logger, opt:str, type:str, val:Any, fileio:str) -> Tuple[int, Dict[str, Any], Any]:
         """
         --dataオプションの値の妥当性を検証します
 
         Args:
             logger (logging.Logger): ロガー
             opt (str): オプション名
+            type (str): オプションの型
             val (Any): オプションの値
+            fileio (str): ファイル入出力の種別 ('in' or 'out')
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if opt!='data': return self.RESP_SUCCESS, {}, None
+        if opt!='data' or not val:
+            return self.RESP_SUCCESS, {}, None
         path = Path(val)
         if not path.exists():
             msg = dict(warn=f"The path specified for '--data' does not exist.")
@@ -311,18 +340,21 @@ class Validator(feature.Feature):
             return self.RESP_WARN, msg, None
         return self.RESP_SUCCESS, {}, None
 
-    def valid_signin_file(self, logger:logging.Logger, opt:str, val:Any) -> Tuple[int, Dict[str, Any], Any]:
+    def valid_signin_file(self, logger:logging.Logger, opt:str, type:str, val:Any, fileio:str) -> Tuple[int, Dict[str, Any], Any]:
         """
         --signin_fileオプションの値の妥当性を検証します
 
         Args:
             logger (logging.Logger): ロガー
             opt (str): オプション名
+            type (str): オプションの型
             val (Any): オプションの値
+            fileio (str): ファイル入出力の種別 ('in' or 'out')
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        if opt!='signin_file': return self.RESP_SUCCESS, {}, None
+        if opt!='signin_file' or not val:
+            return self.RESP_SUCCESS, {}, None
         path = Path(val)
         if not path.exists():
             msg = dict(warn=f"The path specified for '--signin_file' does not exist.")

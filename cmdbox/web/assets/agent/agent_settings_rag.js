@@ -168,7 +168,7 @@ agentView.save_rag = async () => {
         }
     } catch (e) {
         console.error(e);
-        cmdbox.message(`Error: ${e.message}`);
+        cmdbox.message(`Error: ${e.message}`, true);
     }
 };
 
@@ -189,6 +189,6 @@ agentView.build_rag = async () => {
         }
     } catch (e) {
         console.error(e);
-        cmdbox.message(`Error: ${e.message}`);
+        cmdbox.message(`Error: ${e.message}`, true);
     }
 };

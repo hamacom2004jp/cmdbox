@@ -87,7 +87,7 @@ fsapi.filer = (svpath, is_local) => {
       cmdbox.progress(0, e.total, e.loaded, '', true, e.total==e.loaded);
     }, success_func=(target, svpath, data) => {
       if (data != "upload success") {
-        cmdbox.message(data);
+        cmdbox.message(data, true);
         return;
       }
       fsapi.tree(target, svpath, target.find('.tree-menu'), false);
@@ -98,7 +98,7 @@ fsapi.filer = (svpath, is_local) => {
   // ファイルダウンロード ==============================================================
   const download = (event) => {
     if (!fsapi.left.find('.filer_address').val()) {
-      cmdbox.message({warn: 'Please select a local directory before downloading.'});
+      cmdbox.message({warn: 'Please select a local directory before downloading.'}, true);
       return;
     }
     cmdbox.show_loading();
@@ -149,7 +149,7 @@ fsapi.filer = (svpath, is_local) => {
           if (!res[0] || !res[0]['success']) {
             fsapi.download_now ++;
             cmdbox.progress(0, list_downloads.length, fsapi.download_now, '', true, false)
-            cmdbox.message(res);
+            cmdbox.message(res, true);
             return;
           }
           const mk_blob = (base64) => {
@@ -279,7 +279,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
     }
     if (res && res['success']) res = [res];
     if(!res[0] || !res[0]['success']) {
-      cmdbox.message(res);
+      cmdbox.message(res, true);
       target.find('.file-list').html('');
       return;
     }
@@ -403,7 +403,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
         const mk_view = (_p, _mime, _size, _l) => {return ()=>{
           let bigfile = false;
           if (_size.indexOf('G') >= 0 || _size.indexOf('T') >= 0) {
-            cmdbox.message({warn: `The file size is too large to view. (${_size})`});
+            cmdbox.message({warn: `The file size is too large to view. (${_size})`}, true);
             return;
           }
           else if (_size.indexOf('M') >= 0 && parseInt(_size.replace('M','')) > 5) {
@@ -416,7 +416,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
           cmdbox.file_download(fsapi.right, _p, undefined, exec_cmd).then(res => {
             if(!res) return;
             if (_l) {
-              if (bigfile) cmdbox.message({warn: `Files that are too large may cause display errors in the viewer.`});
+              if (bigfile) cmdbox.message({warn: `Files that are too large may cause display errors in the viewer.`}, true);
               fsapi.viewer(_p, res['data'], null, _mime);
             } else {
               const opt = cmdbox.get_server_opt(false, fsapi.right);
@@ -431,7 +431,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
         // エディター関数の生成
         const mk_editer = (_p, _mime, _size, _l) => {return ()=>{
           if (_size.indexOf('G') >= 0 || _size.indexOf('T') >= 0) {
-            cmdbox.message({warn: `The file size is too large to view. (${_size})`});
+            cmdbox.message({warn: `The file size is too large to view. (${_size})`}, true);
             return;
           }
           else if (_size.indexOf('M') >= 0 && parseInt(_size.replace('M','')) > 5) {
@@ -599,7 +599,7 @@ fsapi.opendir = async () => {
   try {
     fsapi.dh = await window.showDirectoryPicker();
   } catch (e) {
-    cmdbox.message('The local folder could not be opened.\nThis connection may not be protected by SSL or similar encryption.');
+    cmdbox.message('The local folder could not be opened.\nThis connection may not be protected by SSL or similar encryption.', true);
     return;
   }
   fsapi.filer("/", true);
@@ -707,13 +707,13 @@ fsapi.editer = (svpath, data, mime, is_local) => {
   const viewer_body = viewer.find('.modal-body');
   viewer_body.html('');
   if (mime.indexOf('image') >= 0) {
-    cmdbox.message({warn: 'This file is not text data.'});
+    cmdbox.message({warn: 'This file is not text data.'}, true);
     return;
   } else {
     const txt = atob(data);
     const istxt = cmdbox.is_text(new TextEncoder().encode(txt));
     if (!istxt) {
-      cmdbox.message({warn: 'This file is not text data.'});
+      cmdbox.message({warn: 'This file is not text data.'}, true);
       return;
     }
     // 文字コード判定
@@ -763,7 +763,7 @@ fsapi.editer = (svpath, data, mime, is_local) => {
             cmdbox.message('Save successed.');
             viewer.modal('hide');
           } catch (e) {
-            cmdbox.message(e);
+            cmdbox.message(e, true);
             viewer.modal('hide');
           }
         }

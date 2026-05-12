@@ -8,9 +8,12 @@
         box-shadow: 0 0 8px gray;
         cursor: pointer;
     }
+    .noflash {
+        background-color: rgb(33, 37, 41)!important;
+    }
     </style>
 </head>
-<body lang="ja" class="overflow-hidden p-2" style="background-color:rgb(33, 37, 41)">
+<body lang="ja" class="overflow-hidden p-2 noflash">
     <script type="text/javascript" src="assets/cmdbox/svgicon.js"></script>
     <!-- ナビゲーションバー -->
     <nav class="navbar navbar-expand-sm console-header fixed-top p-2">
@@ -70,7 +73,7 @@
         <!-- コマンドリスト -->
         <h2 class="pb-2 border-bottom">
             <span class="i18n">Commands :</span>
-            <input id="cmd_kwd" name="cmd_kwd" type="text" class="form-control d-inline-block" style="width:200px;" placeholder="Search title">
+            <input id="cmd_kwd" name="cmd_kwd" type="text" class="form-control d-inline-block noflash" style="width:200px;" placeholder="Search title">
         </h2>
         <div id="cmd_item_tags" class="mb-2"></div>
         <div id="cmd_items" class="row">
@@ -78,7 +81,7 @@
         <div class="d-none">
             <div id="cmd_add">
                 <div class="col-4 p-1">
-                    <div class="card card-hover cmd_card cmd_add" style="background-color:#212529;">
+                    <div class="card card-hover cmd_card cmd_add noflash">
                         <div class="card-body">
                             <h4 class="card-title text-center">[ + ]</h5>
                         </div>
@@ -87,7 +90,7 @@
             </div>
             <div id="cmd_template">
                 <div class="col-4 p-1">
-                    <div class="card card-hover cmd_card" style="background-color:#212529;">
+                    <div class="card card-hover cmd_card noflash">
                         <div class="card-body">
                             <div class="d-flex">
                                 <h5 class="cmd_title card-title d-inline-block">Card title</h5>
@@ -102,14 +105,14 @@
         <!-- パイプラインリスト -->
         <h2 class="pb-2 border-bottom">
             <span class="i18n">Pipeline :</span>
-            <input id="pipe_kwd" name="pipe_kwd" type="text" class="form-control d-inline-block" style="width:200px;" placeholder="Search title">
+            <input id="pipe_kwd" name="pipe_kwd" type="text" class="form-control d-inline-block noflash" style="width:200px;" placeholder="Search title">
         </h2>
         <div id="pipe_items" class="row">
         </div>
         <div class="d-none">
             <div id="pipe_add">
                 <div class="col-4 p-1">
-                    <div class="card card-hover pipe_card pipe_add">
+                    <div class="card card-hover pipe_card pipe_add noflash">
                         <div class="card-body">
                             <h4 class="card-title text-center">[ + ]</h5>
                         </div>
@@ -118,7 +121,7 @@
             </div>
             <div id="pipe_template">
                 <div class="col-4 p-1">
-                    <div class="card card-hover pipe_card">
+                    <div class="card card-hover pipe_card noflash">
                         <div class="card-body">
                             <div class="d-flex">
                                 <h5 class="pipe_title card-title">Pipeline title</h5>
@@ -403,7 +406,7 @@
     <footer class="fixed-bottom text-center p-2 copyright"></footer>
 </body>
 <script type="text/javascript">
-    // jqueryの読込み完了までbodyの背景色を設定
+    /*// jqueryの読込み完了までbodyの背景色を設定
     document.querySelector(`body`).style.setProperty(`--bs-body-bg`, `#212529`);
     document.querySelector(`body`).style.setProperty(`--bs-card-bg`, `#212529`);
     document.querySelector(`body`).style.setProperty(`--bs-tertiary-bg`, `#2b3035`);
@@ -414,7 +417,7 @@
         document.querySelector(`body`).style.setProperty(`--bs-tertiary-bg`, null);
         document.querySelector(`body`).style.setProperty(`--bs-tertiary-bg-rgb`, null);
         document.querySelector(`body`).style.setProperty(`--bs-secondary-bg`, null);
-    });
+    });*/
 </script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">

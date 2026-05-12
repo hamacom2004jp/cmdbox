@@ -179,6 +179,8 @@ class Options:
                     raise ValueError(f'list_options: The multi must be True if type is dict. key={key}, val={val}')
                 opt['action'] = 'append'
             elif val['type'] == Options.T_MLIST:
+                if val['multi']:
+                    raise ValueError(f'list_options: The multi must be False if type is mlist. key={key}, val={val}')
                 opt['type'] = str
                 opt['action'] = 'append'
             else:

@@ -132,6 +132,6 @@ agentView.save_llm = async () => {
         }
     } catch (e) {
         console.error(e);
-        cmdbox.message(`Error: ${e.message}`);
+        cmdbox.message(`Error: ${e.message}`, true);
     }
 };

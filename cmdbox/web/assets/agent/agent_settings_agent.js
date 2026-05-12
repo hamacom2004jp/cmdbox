@@ -204,6 +204,6 @@ agentView.save_agent = async () => {
         }
     } catch (e) {
         console.error(e);
-        cmdbox.message(`Error: ${e.message}`);
+        cmdbox.message(`Error: ${e.message}`, true);
     }
 };

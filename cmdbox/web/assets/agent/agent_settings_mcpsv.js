@@ -149,6 +149,6 @@ agentView.save_mcpsv = async () => {
         }
     } catch (e) {
         console.error(e);
-        cmdbox.message(`Error: ${e.message}`);
+        cmdbox.message(`Error: ${e.message}`, true);
     }
 };

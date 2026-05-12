@@ -65,7 +65,7 @@ agentView.fileuploader.initUploadPanel = () => {
     startBtn.off('click').on('click', async (e) => {
         e.preventDefault();
         if (agentView.fileuploader.uploadFiles.length === 0) {
-            cmdbox.message({ 'error': 'ファイルが選択されていません' });
+            cmdbox.message({'error': 'No file has been selected'}, true);
             return;
         }
         await agentView.fileuploader.uploadFiles_execute(
@@ -144,7 +144,7 @@ agentView.fileuploader.uploadFiles_execute = async (successCallback, errorCallba
     const fileList = $('#upload_file_list');
     
     if (!agentView.fileuploader.uploadFiles || agentView.fileuploader.uploadFiles.length === 0) {
-        cmdbox.message({ 'error': 'ファイルが選択されていません' });
+        cmdbox.message({'error': 'No file has been selected'}, true);
         return;
     }
 
@@ -189,7 +189,7 @@ agentView.fileuploader.uploadFiles_execute = async (successCallback, errorCallba
                     successCallback && successCallback(opt, files, data);
                     setTimeout(reset, 1000);
                 } catch (err) {
-                    cmdbox.message(err);
+                    cmdbox.message(err, true);
                 } finally {
                     cmdbox.hide_loading();
                 }
@@ -205,7 +205,7 @@ agentView.fileuploader.uploadFiles_execute = async (successCallback, errorCallba
     } catch (err) {
         console.error('Upload error:', err);
         cmdbox.hide_loading();
-        cmdbox.message({ 'error': 'アップロード中にエラーが発生しました' });
+        cmdbox.message({'error': 'An error occurred during the upload'}, true);
     }
 };
 

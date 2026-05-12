@@ -32,7 +32,7 @@ agentView.chat = (session_id) => {
             cmdbox.show_loading(txt);
         }
         if (!agentView.ws) {
-            cmdbox.message({'warn':'The connection to the runner has not yet been established.'});
+            cmdbox.message({'warn':'The connection to the runner has not yet been established.'}, true);
             return;
         }
         // メッセージを送信
@@ -58,7 +58,7 @@ agentView.chat = (session_id) => {
         // 録音を開始
         const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
         if (!SpeechRecognition) {
-            cmdbox.message({'error':'Speech Recognition API is not supported in this browser.'});
+            cmdbox.message({'error':'Speech Recognition API is not supported in this browser.'}, true);
             return;
         }
         agentView.btn_rec.addClass('rec_on');
@@ -90,7 +90,7 @@ agentView.chat = (session_id) => {
             }
             agentView.btn_rec.removeClass('rec_on');
             agentView.btn_rec.find('use').attr('href', '#btn_mic');
-            cmdbox.message({'error':`Speech Recognition error: ${event.error}`});
+            cmdbox.message({'error':`Speech Recognition error: ${event.error}`}, true);
         };
         agentView.recognition.onend = () => {
             // 連続認識を無効にしているので、認識が終了したら再稼働させる。
@@ -216,7 +216,7 @@ agentView.chat = (session_id) => {
         clearInterval(agentView.chat_callback_ping_handler);
         if (agentView.chat_reconnect_count >= max_reconnect_count) {
             clearInterval(agentView.chat_reconnectInterval_handler);
-            cmdbox.message({'error':'Connection to the agent has failed for several minutes. Please reload to resume reconnection.'});
+            cmdbox.message({'error':'Connection to the agent has failed for several minutes. Please reload to resume reconnection.'}, true);
             location.reload(true);
             return;
         }

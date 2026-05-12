@@ -144,7 +144,7 @@ fmodal.list_tree_server = async (current_path) => {
         let success = res && res['success'];
         success = !success ? res[0] && res[0]['success'] : success;
         if(!success) {
-            cmdbox.message(res);
+            cmdbox.message(res, true);
             return {};
         }
         const data = Object.entries(success).sort();

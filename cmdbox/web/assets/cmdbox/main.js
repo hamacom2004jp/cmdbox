@@ -1,6 +1,9 @@
 $(() => {
     // コマンド一覧の取得と表示
-    list_cmd_func().then(list_cmd_func_then);
+    list_cmd_func().then(list_cmd_func_then).then(() => {
+        // 画面のフラッシュ防止の対策
+        $('.noflash').removeClass('noflash');
+    });
     // コマンド一覧の検索
     $('#cmd_kwd').off('change').on('change', (e) => list_cmd_func().then(list_cmd_func_then));
     // パイプライン一覧の取得と表示
@@ -83,7 +86,7 @@ $(() => {
             clearInterval(cmdbox.gui_callback_ping_handler);
             if (cmdbox.callback_reconnect_count >= max_reconnect_count) {
                 clearInterval(cmdbox.gui_callback_reconnectInterval_handler);
-                cmdbox.message({'error':'Connection to the agent has failed for several minutes. Please reload to resume reconnection.'});
+                cmdbox.message({'error':'Connection to the agent has failed for several minutes. Please reload to resume reconnection.'}, true);
                 location.reload(true);
                 return;
             }

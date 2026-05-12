@@ -112,7 +112,7 @@ class WebGencert(feature.UnsupportEdgeFeature, validator.Validator):
                           output_cert, args.output_cert_format,
                           output_pkey, args.output_pkey_format,
                           output_key, args.output_key_format)
-            ret = dict(success=f"Generate certificate. {output_cert}, {output_pkey}, {output_key}")
+            ret = dict(success=dict(data=f"Generate certificate. {output_cert}, {output_pkey}, {output_key}"))
         except Exception as e:
             msg = dict(error=f"Failed to generate certificate. {e}")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -171,7 +171,7 @@ class WebGencert(feature.UnsupportEdgeFeature, validator.Validator):
 
     def output_schema(self) -> type:
         class Data(resdata.Data):
-            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のデータ")
+            data: Union[str, None] = pydantic.Field(default=None, description="処理結果のメッセージ")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result

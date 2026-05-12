@@ -160,14 +160,14 @@ agentView.save_memory = async () => {
         }
     } catch (e) {
         console.error(e);
-        cmdbox.message(`Error: ${e.message}`);
+        cmdbox.message(`Error: ${e.message}`, true);
     }
 };
 
 agentView.show_memories = async () => {
     const runner_name = agentView.agent_runner ? agentView.agent_runner['runner_name'] : null;
     if (!runner_name || runner_name.length <= 0) {
-        cmdbox.message({'error':'Runner name is not available.'});
+        cmdbox.message({'error':'Runner name is not available.'}, true);
         console.log('Runner name is not available.');
         return;
     }
@@ -182,7 +182,7 @@ agentView.show_memories = async () => {
         const memoryContent = $('#memory_content');
         const memory_performance = $('#memory_performance');
         if (!res || !res['success'] || !res['success']['data']) {
-            cmdbox.message({'error':'Failed to load memory status.'});
+            cmdbox.message({'error':'Failed to load memory status.'}, true);
             console.log('Failed to load memory status.', res);
             memoryContent.html('Failed to load memory status.');
             return;

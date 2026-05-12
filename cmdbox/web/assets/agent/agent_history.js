@@ -42,12 +42,12 @@ agentView.create_history = (session_id, runner_name, user_name, update_time, msg
         agentView.chat(session_id);
         const data = await agentView.list_sessions(session_id);
         if (data.length<=0) {
-            cmdbox.message({'error':'No messages found for this session.'});
+            cmdbox.message({'error':'No messages found for this session.'}, true);
             return;
         }
         const session = data[0];
         if (!session['events'] || session['events'].length <= 0) {
-            cmdbox.message({'error':'No messages found for this session.'});
+            cmdbox.message({'error':'No messages found for this session.'}, true);
             return;
         }
         agentView.chatMessages.html('');

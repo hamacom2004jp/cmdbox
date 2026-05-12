@@ -101,10 +101,55 @@ cmdbox.range = (start, stop, step) => {
 /**
  * アラートメッセージ表示
  * @param {object} res - レスポンス
+ * @param {boolean} i18n - 国際化を有効にするかどうか
  */
-cmdbox.message = (res) => {
-    msg = JSON.stringify(res)
-    alert(msg.replace(/\\n/g, '\n'));
+cmdbox.message = (res, i18n=false) => {
+    const msg = JSON.stringify(res).replace(/\\n/g, '<br/>').replace(/\\t/g, '&emsp;');
+    const modal = $(`<div id="message_modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <form class="modal-content novalidate">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font me-auto i18n">Message</h5>
+                    <button type="button" class="btn btn-sf-icon btn_window_stack">
+                        <i class="fa-regular fa-window-restore"></i>
+                    </button>
+                    <button type="button" class="btn btn-sf-icon btn_window">
+                        <i class="fa-regular fa-window-maximize"></i>
+                    </button>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control overflow-auto w-100 h-100" rows="10" readonly>${msg}</textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>`);
+    modal.find('.modal-dialog').draggable({cursor:'move',cancel:'.modal-body, .modal-footer, button'});
+    modal.find('.btn_window_stack').off('click').on('click', (ev) => {
+        const modal_dialog = $(ev.currentTarget).parents('.modal-dialog');
+        modal_dialog.find('.btn_window_stack').css('margin-left', '0px').hide();
+        modal_dialog.find('.btn_window').css('margin-left', 'auto').show();
+        modal_dialog.removeClass('modal-fullscreen');
+    });
+    modal.find('.btn_window').off('click').on('click', (ev) => {
+        const modal_dialog = $(ev.currentTarget).parents('.modal-dialog');
+        modal_dialog.find('.btn_window_stack').css('margin-left', 'auto').show();
+        modal_dialog.find('.btn_window').css('margin-left', '0px').hide();
+        modal_dialog.css('top', '').css('left', '').addClass('modal-fullscreen');
+    });
+    modal.find('.btn_window_stack').css('margin-left', '0px').hide();
+    modal.find('.btn_window').css('margin-left', 'auto').show();
+    cmdbox.process_i18n(modal);
+    if (i18n) {
+        cmdbox.process_i18n(modal.find('textarea').addClass('i18n').parent());
+    }
+    modal.modal('show');
+    modal.on('hidden.bs.modal', () => {modal.remove();});
     cmdbox.hide_loading();
 };
 /**
@@ -180,7 +225,7 @@ cmdbox.signout = (sitepath) => {
 cmdbox.editapikey = async () => {
     const user = await cmdbox.user_info();
     if (!user) {
-        cmdbox.message('user not found');
+        cmdbox.message('user not found', true);
         return;
     }
     const editapikey_modal = $('#editapikey_modal').length?$('#editapikey_modal'):$(`<div id="editapikey_modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
@@ -215,13 +260,13 @@ cmdbox.editapikey = async () => {
             td_btn_copy.off('click').on('click', (event) => {
                 const key = user['apikeys'][name][0];
                 if (!key) {
-                    cmdbox.message({'error': 'No key available for this apikey.'});
+                    cmdbox.message({'error': 'No key available for this apikey.'}, true);
                     return;
                 }
                 navigator.clipboard.writeText(key).then(() => {
-                    cmdbox.message({'success': 'Key copied to clipboard.'});
+                    cmdbox.message({'success': 'Key copied to clipboard.'}, true);
                 }).catch((err) => {
-                    cmdbox.message({'error': `Failed to copy key: ${err}`});
+                    cmdbox.message({'error': `Failed to copy key: ${err}`}, true);
                 });
             });
             // ダウンロードボタン
@@ -258,7 +303,7 @@ cmdbox.editapikey = async () => {
             body: JSON.stringify({'name': user['name'], 'apikey_name': apikey_name})
         });
         if (res.status != 200) {
-            cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+            cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
             return;
         }
         cmdbox.message(await res.json());
@@ -275,7 +320,7 @@ cmdbox.editapikey = async () => {
             body: JSON.stringify({'name': user['name'], 'apikey_name': apikey_name})
         });
         if (res.status != 200) {
-            cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+            cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
             return;
         }
         cmdbox.message(await res.json());
@@ -359,15 +404,15 @@ cmdbox.language_list = () => {
 cmdbox.passchange = async () => {
     const user = await cmdbox.user_info();
     if (!user) {
-        cmdbox.message('user not found');
+        cmdbox.message('user not found', true);
         return;
     }
     if (user['hash']=='oauth2') {
-        cmdbox.message('This account is an OAuth2 account and cannot be changed.');
+        cmdbox.message('This account is an OAuth2 account and cannot be changed.', true);
         return;
     }
     if (user['hash']=='saml') {
-        cmdbox.message('This account is an SAML account and cannot be changed.');
+        cmdbox.message('This account is an SAML account and cannot be changed.', true);
         return;
     }
     const chpass_modal = $('#chpass_modal').length?$('#chpass_modal'):$(`<div id="chpass_modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true"/>`);
@@ -466,7 +511,7 @@ $(()=>{
     // サインアウトメニューを表示
     fetch('usesignout', {method: 'GET'}).then(async res => {
         try {
-            if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+            if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
             const json = await res.json();
             const usesignout = json['success']['usesignout'];
             if (!usesignout) return;
@@ -547,7 +592,7 @@ cmdbox.init_version_modal = () => {
             const tabcont = $(`<div class="tab-pane fade" id="${tabid}" role="tabpanel" aria-labelledby="${tabid}-tab"/>`);
             $('.version-content').prepend(tabcont);
             const res = await fetch(url, {method: 'GET'});
-            if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+            if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
             const vi = await res.json();
             vi.forEach((v, i) => {
                 v = v.replace(/<([^>]+)>/g, '<a href="$1" target="_blank">$1</a>');
@@ -574,7 +619,7 @@ cmdbox.init_version_modal = () => {
         $('.version-content').html('<div class="tab-pane fade" id="versions_used" role="tabpanel" aria-labelledby="versions_used-tab">versions_used</div>');
         await versions_func('versions_used', 'Used software', null, null);
         const res = await fetch('gui/version_info', {method: 'GET'});
-        if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+        if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
         const verinfos = await res.json();
         for (const v of verinfos) {
             await versions_func(v['tabid'], v['title'], v['icon'], v['url']);
@@ -582,7 +627,7 @@ cmdbox.init_version_modal = () => {
         // usedのバージョン情報取得
         const versions_used_func = async () => {
             const res = await fetch('versions_used', {method: 'GET'});
-            if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+            if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
             const vu =  await res.json();
             $('#versions_used').html('');
             const div = $('<div class="overflow-auto" style="height:calc(100vh - 260px);"></div>');
@@ -812,7 +857,7 @@ cmdbox.load_server_list = (parent_elem, call_back_func, server_only, current_onl
         cmdbox.sv_exec_cmd(opt).then(res => {
             if(res && res['success']) res = [res];
             if(!res[0] || !res[0]['success']) {
-                cmdbox.message(res);
+                cmdbox.message(res, true);
                 return;
             }
             if(res.length<=0 || !res[0]['success']) {
@@ -882,7 +927,7 @@ cmdbox.deploy_list = (target, error_func=undefined) => {
                 return;
             }
             cmdbox.hide_loading();
-            cmdbox.message(res);
+            cmdbox.message(res, true);
             return;
         }
         if (!res[0]['success']['data']) {
@@ -910,7 +955,7 @@ cmdbox.current_time = (error_func=undefined) => {
                 return;
             }
             cmdbox.hide_loading();
-            cmdbox.message(result);
+            cmdbox.message(result, true);
             return;
         }
         if (!result[0]['success']['data']) {
@@ -960,7 +1005,7 @@ cmdbox.genpass = (pass_length=16, pass_count=1, use_alphabet="both", use_number=
                 error_func(res);
                 return;
             }
-            cmdbox.message(res);
+            cmdbox.message(res, true);
             return res[0];
         }
         const ret = res[0]['success'];
@@ -994,7 +1039,7 @@ cmdbox.file_list = (target, svpath, recursive=false, error_func=undefined, exec_
                 return;
             }
             cmdbox.hide_loading();
-            cmdbox.message(res);
+            cmdbox.message(res, true);
             return;
         }
         return res[0]['success'];
@@ -1025,7 +1070,7 @@ cmdbox.file_download = (target, svpath, error_func=undefined, exec_cmd=undefined
                 return;
             }
             cmdbox.hide_loading();
-            cmdbox.message(res);
+            cmdbox.message(res, true);
             return;
         }
         return res[0]['success'];
@@ -1078,7 +1123,7 @@ cmdbox.file_upload = (target, svpath, formData, orverwrite=false, progress_func=
         },
         error: function(data) {
             console.log(data);
-            cmdbox.message(data);
+            cmdbox.message(data, true);
             if (error_func) {
                 error_func(target, svpath, data);
             }
@@ -1113,7 +1158,7 @@ cmdbox.file_copy = (target, from_path, to_path, orverwrite=false, error_func=und
                 return;
             }
             cmdbox.hide_loading();
-            cmdbox.message(res);
+            cmdbox.message(res, true);
             return;
         }
         return res[0]['success'];
@@ -1145,7 +1190,7 @@ cmdbox.file_move = (target, from_path, to_path, error_func=undefined, exec_cmd=u
                 return;
             }
             cmdbox.hide_loading();
-            cmdbox.message(res);
+            cmdbox.message(res, true);
             return;
         }
         return res[0]['success'];
@@ -1175,7 +1220,7 @@ cmdbox.file_remove = (target, svpath, error_func=undefined, exec_cmd=undefined) 
                 return;
             }
             cmdbox.hide_loading();
-            cmdbox.message(res);
+            cmdbox.message(res, true);
             return;
         }
         return res[0]['success'];
@@ -1205,7 +1250,7 @@ cmdbox.file_rmdir = (target, svpath, error_func=undefined, exec_cmd=undefined) =
                 return;
             }
             cmdbox.hide_loading();
-            cmdbox.message(res);
+            cmdbox.message(res, true);
             return;
         }
         return res[0]['success'];
@@ -1235,7 +1280,7 @@ cmdbox.file_mkdir = (target, svpath, error_func=undefined, exec_cmd=undefined) =
                 return;
             }
             cmdbox.hide_loading();
-            cmdbox.message(res);
+            cmdbox.message(res, true);
             return;
         }
         return res[0]['success'];
@@ -1292,7 +1337,7 @@ cmdbox.save_user_data = async (cat, key, val) => {
     formData.append('key', key);
     formData.append('val', val);
     const res = await fetch('gui/user_data/save', {method:'POST', body:formData});
-    if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+    if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
     const msg = await res.json()
     return msg;
 };
@@ -1307,7 +1352,7 @@ cmdbox.load_user_data = async (cat, key) => {
     formData.append('categoly', cat);
     if (key) formData.append('key', key);
     const res = await fetch('gui/user_data/load', {method:'POST', body:formData});
-    if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+    if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
     const data = await res.json();
     return data;
 };
@@ -1322,7 +1367,7 @@ cmdbox.delete_user_data = async (cat, key) => {
     formData.append('categoly', cat);
     formData.append('key', key);
     const res = await fetch('gui/user_data/delete', {method:'POST', body:formData});
-    if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+    if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
     const data = await res.json();
     return data;
 };
@@ -1710,20 +1755,20 @@ cmdbox.callcmd = async (mode, cmd, params, callback, title, opt_name) => {
         body: JSON.stringify(opt)
     });
     if (res.status != 200) {
-        cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+        cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
         console.log({'error':`${res.status}: ${res.statusText}`});
         return res;
     }
     try {
         res = await res.json();
     } catch (e) {
-        cmdbox.message({'error':`JSON parse error: ${e}`});
+        cmdbox.message({'error':`JSON parse error: ${e}`}, true);
         console.log({'error':`JSON parse error: ${e}`});
         return res;
     }
     if (res && res['success']) res = [res];
     if (!res[0] || !res[0]['success']) {
-        cmdbox.message(res);
+        cmdbox.message(res, true);
         console.log({'error':res});
         return res;
     }
@@ -1733,7 +1778,7 @@ cmdbox.callcmd = async (mode, cmd, params, callback, title, opt_name) => {
     }
     return cmdbox.load_cmd(title).then(cmd_opt => {
         if (!cmd_opt || cmd_opt['error']) {
-            cmdbox.message(cmd_opt);
+            cmdbox.message(cmd_opt, true);
             console.log({'error':cmd_opt});
             return res;
         }
@@ -1749,7 +1794,7 @@ cmdbox.load_cmd = async (title) => {
     const formData = new FormData();
     formData.append('title', title);
     const res = await fetch('gui/load_cmd', {method: 'POST', body: formData});
-    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
     return await res.json();
 }
 /**
@@ -1764,7 +1809,7 @@ cmdbox.get_cmd_choices = async (mode, cmd) => {
     formData.append('cmd', cmd);
     formData.append('language', await cmdbox.getUserLanguage());
     const res = await fetch('gui/get_cmd_choices', {method: 'POST', body: formData});
-    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`});
+    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
     return await res.json();
 }
 /**
