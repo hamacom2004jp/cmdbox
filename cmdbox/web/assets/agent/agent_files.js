@@ -178,7 +178,7 @@ agentView.fileuploader.uploadFiles_execute = async (successCallback, errorCallba
             },
             success_func=(target, svpath, data) => {
                 if (data && !data.success && data!="upload success") {
-                    cmdbox.message(data);
+                    cmdbox.message(data, true, true);
                     errorCallback && errorCallback(opt, files, data);
                     cmdbox.hide_loading();
                     return;
@@ -189,7 +189,7 @@ agentView.fileuploader.uploadFiles_execute = async (successCallback, errorCallba
                     successCallback && successCallback(opt, files, data);
                     setTimeout(reset, 1000);
                 } catch (err) {
-                    cmdbox.message(err, true);
+                    cmdbox.message(err, true, true);
                 } finally {
                     cmdbox.hide_loading();
                 }

@@ -121,13 +121,13 @@ agentView.list_agent = async () => {
                 });
                 // Delete button handler
                 $('#btn_del_agent').show().off('click').on('click', async () => {
-                    if (!confirm(`Are you sure you want to delete '${config.agent_name}'?`)) return;
+                    if (!await cmdbox.confirm(`Are you sure you want to delete '${config.agent_name}'?`, true, true)) return;
                     const res = await agentView.exec_cmd('agent', 'agent_del', { agent_name: config.agent_name });
                     if (res && res.success) {
                         $('#agent_edit_modal').modal('hide');
                         agentView.list_agent();
                     } else {
-                        cmdbox.message(res);
+                        cmdbox.message(res, true, true);
                     }
                 });
                 cmdbox.process_i18n($('#agent_edit_modal'));
@@ -200,10 +200,10 @@ agentView.save_agent = async () => {
             $('#agent_edit_modal').modal('hide');
             agentView.list_agent();
         } else {
-            cmdbox.message(res);
+            cmdbox.message(res, true, true);
         }
     } catch (e) {
         console.error(e);
-        cmdbox.message(`Error: ${e.message}`, true);
+        cmdbox.message(`Error: ${e.message}`, true, true);
     }
 };

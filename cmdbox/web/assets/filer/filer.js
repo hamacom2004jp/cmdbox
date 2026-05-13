@@ -87,7 +87,7 @@ fsapi.filer = (svpath, is_local) => {
       cmdbox.progress(0, e.total, e.loaded, '', true, e.total==e.loaded);
     }, success_func=(target, svpath, data) => {
       if (data != "upload success") {
-        cmdbox.message(data, true);
+        cmdbox.message(data, true, true);
         return;
       }
       fsapi.tree(target, svpath, target.find('.tree-menu'), false);
@@ -149,7 +149,7 @@ fsapi.filer = (svpath, is_local) => {
           if (!res[0] || !res[0]['success']) {
             fsapi.download_now ++;
             cmdbox.progress(0, list_downloads.length, fsapi.download_now, '', true, false)
-            cmdbox.message(res, true);
+            cmdbox.message(res, true, true);
             return;
           }
           const mk_blob = (base64) => {
@@ -279,7 +279,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
     }
     if (res && res['success']) res = [res];
     if(!res[0] || !res[0]['success']) {
-      cmdbox.message(res, true);
+      cmdbox.message(res, true, true);
       target.find('.file-list').html('');
       return;
     }
@@ -329,8 +329,8 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
         // ツリー表示関数の生成
         const mk_tree = (_t, _p, _e, _l) => {return ()=>fsapi.tree(_t, _p, _e, _l)}
         // 削除関数の生成
-        const mk_delete = (_p, _e, is_dir, _l) => {return ()=>{
-          if(confirm(`Do you want to delete "${_p}"？${is_dir?"\nNote: In the case of directories, the contents will also be deleted.":""}`)) {
+        const mk_delete = (_p, _e, is_dir, _l) => {return async ()=>{
+          if(await cmdbox.confirm(`Do you want to delete "${_p}"？${is_dir?"\nNote: In the case of directories, the contents will also be deleted.":""}`, true, true)) {
             const remote = is_dir ? cmdbox.file_rmdir : cmdbox.file_remove;
             const exec_cmd = _l ? fsapi.local_exec_cmd : cmdbox.sv_exec_cmd;
             cmdbox.show_loading();
@@ -400,14 +400,14 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
           }
         }};
         // ビューアー関数の生成
-        const mk_view = (_p, _mime, _size, _l) => {return ()=>{
+        const mk_view = (_p, _mime, _size, _l) => {return async ()=>{
           let bigfile = false;
           if (_size.indexOf('G') >= 0 || _size.indexOf('T') >= 0) {
-            cmdbox.message({warn: `The file size is too large to view. (${_size})`}, true);
+            cmdbox.message({warn: `The file size is too large to view. (${_size})`}, true, true);
             return;
           }
           else if (_size.indexOf('M') >= 0 && parseInt(_size.replace('M','')) > 5) {
-            if (!window.confirm(`The file size is too large to view. (${_size} > 5M)\nDo you still want to open the Viewer?`)) {
+            if (!await cmdbox.confirm(`The file size is too large to view. (${_size} > 5M)\nDo you still want to open the Viewer?`, true, true)) {
               return;
             }
             bigfile = true;
@@ -429,13 +429,13 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
           });
         }};
         // エディター関数の生成
-        const mk_editer = (_p, _mime, _size, _l) => {return ()=>{
+        const mk_editer = (_p, _mime, _size, _l) => {return async ()=>{
           if (_size.indexOf('G') >= 0 || _size.indexOf('T') >= 0) {
-            cmdbox.message({warn: `The file size is too large to view. (${_size})`}, true);
+            cmdbox.message({warn: `The file size is too large to view. (${_size})`}, true, true);
             return;
           }
           else if (_size.indexOf('M') >= 0 && parseInt(_size.replace('M','')) > 5) {
-            if (!window.confirm(`The file size is too large to view. (${_size} > 5M)\nDo you still want to open the Viewer?`)) {
+            if (!await cmdbox.confirm(`The file size is too large to view. (${_size} > 5M)\nDo you still want to open the Viewer?`, true, true)) {
               return;
             }
           }
@@ -657,7 +657,7 @@ fsapi.local_exec_cmd = async (opt) => {
 };
 fsapi.viewer = (title, data, path, mime) => {
   const viewer = $('#viewer_modal');
-  viewer.find('.modal-title').text(title);
+  viewer.find('.modal-title').html(`<span class="i18n">${title}</span>`);
   viewer.find('.btn-save').remove();
   const viewer_body = viewer.find('.modal-body');
   viewer_body.html('');
@@ -692,13 +692,14 @@ fsapi.viewer = (title, data, path, mime) => {
         type: 'string'
       });
       pre.find('code').text(unicodeString.replace(/\r/g, ''));
-      viewer.find('.modal-title').text(`[View] ${title} ( ${detectedEncoding} -> UNICODE )`);
+      viewer.find('.modal-title').html(`<span class="i18n">[View]</span> ${title} ( ${detectedEncoding} -> UNICODE )`);
     } else {
       pre.find('code').text('< This file is not text or image data. >');
     }
   }
   hljs.initHighlightingOnLoad();
   viewer.modal('show');
+  cmdbox.process_i18n(viewer);
 };
 fsapi.editer = (svpath, data, mime, is_local) => {
   const viewer = $('#viewer_modal');
@@ -726,16 +727,16 @@ fsapi.editer = (svpath, data, mime, is_local) => {
       from: detectedEncoding,
       type: 'string'
     });
-    viewer.find('.modal-title').text(`[Edit] ${svpath} ( ${detectedEncoding} -> UNICODE )`);
+    viewer.find('.modal-title').html(`<span class="i18n">[Edit]</span> ${svpath} ( ${detectedEncoding} -> UNICODE )`);
     const textarea = $(`<textarea class="editer_code" style="width: calc(100% - 50px)"></textarea>`);
     viewer_body.append(textarea);
     textarea.html(unicodeString.replace(/\r/g, ''));
     const view_footer = viewer.find('.modal-footer');
     if (view_footer.find('.btn-save').length <= 0) {
-      const btn_save = $('<button type="button" class="btn btn-outline-success btn-save">Save</button>');
+      const btn_save = $('<button type="button" class="btn btn-outline-success btn-save i18n">Save</button>');
       view_footer.append(btn_save);
       btn_save.off('click').on('click', async () => {
-        if (!window.confirm('Do you want to save the changes?')) return;
+        if (!await cmdbox.confirm('Do you want to save the changes?', true)) return;
         // 保存処理
         const text = textarea.val();
         const ppath = svpath.slice(0, svpath.lastIndexOf('/'));
@@ -746,10 +747,10 @@ fsapi.editer = (svpath, data, mime, is_local) => {
           const formData = new FormData();
           formData.append('files', blob, fpath);
           cmdbox.file_upload(fsapi.right, ppath, formData, true, undefined, (target, svpath, data) => {
-            cmdbox.message(data);
+            cmdbox.message(data, true, true);
             viewer.modal('hide');
           }, (target, svpath, data) => {
-            cmdbox.message(data);
+            cmdbox.message(data, true, true);
             viewer.modal('hide');
           });
         } else {
@@ -760,16 +761,17 @@ fsapi.editer = (svpath, data, mime, is_local) => {
             const writable = await down_file.createWritable();
             await writable.write(blob);
             await writable.close();
-            cmdbox.message('Save successed.');
+            cmdbox.message('Save successed.', true);
             viewer.modal('hide');
           } catch (e) {
-            cmdbox.message(e, true);
+            cmdbox.message(e, true, true);
             viewer.modal('hide');
           }
         }
       });
     }
     viewer.modal('show');
+    cmdbox.process_i18n(viewer);
     viewer.off('shown.bs.modal').on('shown.bs.modal', () => {
         textarea.linedtextarea();
         viewer_body.find('.linedwrap').css('width','100%').css('max-height','calc(100vh - 230px)').css('overflow','auto');

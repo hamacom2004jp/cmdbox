@@ -115,17 +115,17 @@ agentView.list_rag = async () => {
                 });
                 // Delete button handler
                 $('#btn_del_rag').show().off('click').on('click', async () => {
-                    if (!confirm(`Are you sure you want to delete '${config.rag_name}'?`)) return;
+                    if (!await cmdbox.confirm(`Are you sure you want to delete '${config.rag_name}'?`, true, true)) return;
                     const res = await agentView.exec_cmd('rag', 'del', { rag_name: config.rag_name });
                     if (res && res.success) {
                         $('#rag_edit_modal').modal('hide');
                         agentView.list_rag();
                     } else {
-                        cmdbox.message(res);
+                        cmdbox.message(res, true, true);
                     }
                 });
                 $('#btn_build_rag').show().off('click').on('click', async () => {
-                    if (!confirm(`Are you sure you want to build '${config.rag_name}'?`)) return;
+                    if (!await cmdbox.confirm(`Are you sure you want to build '${config.rag_name}'?`, true, true)) return;
                     await agentView.build_rag();
                 });
                 // コマンド実行
@@ -164,11 +164,11 @@ agentView.save_rag = async () => {
             $('#rag_edit_modal').modal('hide');
             agentView.list_rag();
         } else {
-            cmdbox.message(res);
+            cmdbox.message(res, true, true);
         }
     } catch (e) {
         console.error(e);
-        cmdbox.message(`Error: ${e.message}`, true);
+        cmdbox.message(`Error: ${e.message}`, true, true);
     }
 };
 
@@ -185,10 +185,10 @@ agentView.build_rag = async () => {
             $('#rag_edit_modal').modal('hide');
             agentView.list_rag();
         } else {
-            cmdbox.message(res);
+            cmdbox.message(res, true, true);
         }
     } catch (e) {
         console.error(e);
-        cmdbox.message(`Error: ${e.message}`, true);
+        cmdbox.message(`Error: ${e.message}`, true, true);
     }
 };

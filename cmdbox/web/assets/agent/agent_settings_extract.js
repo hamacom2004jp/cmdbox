@@ -105,13 +105,13 @@ agentView.list_extract = async () => {
                 });
                 // Delete button handler
                 $('#btn_del_extract').show().off('click').on('click', async () => {
-                    if (!confirm(`Are you sure you want to delete '${config.extract_name}'?`)) return;
+                    if (!await cmdbox.confirm(`Are you sure you want to delete '${config.extract_name}'?`, true, true)) return;
                     const res = await agentView.exec_cmd('extract', 'del', {extract_name: config.extract_name});
                     if (res && res.success) {
                         $('#extract_edit_modal').modal('hide');
                         agentView.list_extract();
                     } else {
-                        cmdbox.message(res);
+                        cmdbox.message(res, true, true);
                     }
                 });
 
@@ -147,10 +147,10 @@ agentView.save_extract = async () => {
             $('#extract_edit_modal').modal('hide');
             agentView.list_extract();
         } else {
-            cmdbox.message(res);
+            cmdbox.message(res, true, true);
         }
     } catch (e) {
         console.error(e);
-        cmdbox.message(`Error: ${e.message}`, true);
+        cmdbox.message(`Error: ${e.message}`, true, true);
     }
 };

@@ -18,8 +18,8 @@ agentView.create_history = (session_id, runner_name, user_name, update_time, msg
     body.html(msg);
     const div2 = $(`<div class="d-inline-block"/>`).appendTo(li);
     const btn_del = $(`<button class="btn btn-danger ms-auto i18n">Delete</button>`).appendTo(div2);
-    btn_del.off('click').on('click',(e)=>{
-        if (!window.confirm('Are you sure you want to delete this session?')) return;
+    btn_del.off('click').on('click', async (e)=>{
+        if (!await cmdbox.confirm('Are you sure you want to delete this session?', true)) return;
         // セッション削除ボタンのクリックイベント
         e.preventDefault();
         e.stopPropagation();

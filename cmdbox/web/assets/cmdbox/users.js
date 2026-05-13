@@ -3,14 +3,14 @@ const users = {};
 users.users_list = async () => {
     const groups_res = await fetch('groups/list', {method: 'GET'});
     if (groups_res.status != 200) {
-        cmdbox.message({'error':`${groups_res.status}: ${groups_res.statusText}`}, true);
+        cmdbox.message({'error':`${groups_res.status}: ${groups_res.statusText}`}, true, true);
         return;
     }
     const groups_data = await groups_res.json();
 
     const users_res = await fetch('users/list', {method: 'GET'});
     if (users_res.status != 200) {
-        cmdbox.message({'error':`${users_res.status}: ${users_res.statusText}`}, true);
+        cmdbox.message({'error':`${users_res.status}: ${users_res.statusText}`}, true, true);
         return;
     }
     const users_data = await users_res.json();
@@ -104,9 +104,9 @@ users.users_list = async () => {
                     btn_m.append('<svg width="16" height="16" fill="currentColor" class="bi bi-copy" viewBox="0 0 16 16"><use href="#btn_copy"></use></svg>');
                     btn_m.off('click').on('click', (event) => {
                         navigator.clipboard.writeText(apikeys[apikey][0]).then(() => {
-                            cmdbox.message({'success': 'Key copied to clipboard.'});
+                            cmdbox.message({'success': 'Key copied to clipboard.'}, true);
                         }).catch((err) => {
-                            cmdbox.message({'error': `Failed to copy key: ${err}`}, true);
+                            cmdbox.message({'error': `Failed to copy key: ${err}`}, true, true);
                         });
                     });
                 };
@@ -128,10 +128,10 @@ users.users_list = async () => {
                 body: JSON.stringify({'name': row_content.find('[name="name"]').val(), 'apikey_name': apikey_name})
             });
             if (res.status != 200) {
-                cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
+                cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
                 return;
             }
-            cmdbox.message(await res.json());
+            cmdbox.message(await res.json(), true, true);
             users.users_list();
             users.groups_list();
             modal.modal('hide');
@@ -146,24 +146,24 @@ users.users_list = async () => {
                 body: JSON.stringify({'name': row_content.find('[name="name"]').val(), 'apikey_name': apikey_name})
             });
             if (res.status != 200) {
-                cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
+                cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
                 return;
             }
-            cmdbox.message(await res.json());
+            cmdbox.message(await res.json(), true, true);
             users.users_list();
             users.groups_list();
             modal.modal('hide');
         });
         // 削除実行
         modal.find('#cmd_del').off('click').on('click', async () => {
-            if (!window.confirm('Do you want to delete?')) return;
+            if (!await cmdbox.confirm('Do you want to delete?', true)) return;
             const res = await fetch('users/del', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({'uid': user['uid']})
             });
             if (res.status != 200) {
-                cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
+                cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
                 return;
             }
             users.users_list();
@@ -172,7 +172,7 @@ users.users_list = async () => {
         });
         // 保存実行
         modal.find('#cmd_save').off('click').on('click', async () => {
-            if (!window.confirm('Do you want to save?')) return;
+            if (!await cmdbox.confirm('Do you want to save?', true)) return;
             const data = {};
             row_content.find('[name]').each((i, p) => {
                 const name = $(p).attr('name');
@@ -191,11 +191,11 @@ users.users_list = async () => {
                 body: JSON.stringify(data)
             });
             if (res.status != 200) {
-                cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
+                cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
                 return;
             }
             const ret = await res.json();
-            cmdbox.message(ret);
+            cmdbox.message(ret, true, true);
             if (!ret['success']) return
             users.users_list();
             users.groups_list();
@@ -269,7 +269,7 @@ users.users_list = async () => {
 users.groups_list = async () => {
     const groups_res = await fetch('groups/list', {method: 'GET'});
     if (groups_res.status != 200) {
-        cmdbox.message({'error':`${groups_res.status}: ${groups_res.statusText}`}, true);
+        cmdbox.message({'error':`${groups_res.status}: ${groups_res.statusText}`}, true, true);
         return;
     }
     const groups_data = await groups_res.json();
@@ -310,24 +310,24 @@ users.groups_list = async () => {
         }
         // 削除実行
         modal.find('#cmd_del').off('click').on('click', async () => {
-            if (!window.confirm('Do you want to delete?')) return;
+            if (!await cmdbox.confirm('Do you want to delete?', true)) return;
             const res = await fetch('groups/del', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({'gid': group['gid']})
             });
             if (res.status != 200) {
-                cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
+                cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
                 return;
             }
-            cmdbox.message(await res.json());
+            cmdbox.message(await res.json(), true, true);
             users.users_list();
             users.groups_list();
             modal.modal('hide');
         });
         // 保存実行
         modal.find('#cmd_save').off('click').on('click', async () => {
-            if (!window.confirm('Do you want to save?')) return;
+            if (!await cmdbox.confirm('Do you want to save?', true)) return;
             const data = {};
             row_content.find('[name]').each((i, p) => {
                 const name = $(p).attr('name');
@@ -340,10 +340,10 @@ users.groups_list = async () => {
                 body: JSON.stringify(data)
             });
             if (res.status != 200) {
-                cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true);
+                cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
                 return;
             }
-            cmdbox.message(await res.json());
+            cmdbox.message(await res.json(), true, true);
             users.users_list();
             users.groups_list();
             modal.modal('hide');
@@ -414,7 +414,7 @@ users.groups_list = async () => {
 users.cmdrules_list = async () => {
     const cmdrules_res = await fetch('cmdrules/list', {method: 'GET'});
     if (cmdrules_res.status != 200) {
-        cmdbox.message({'error':`${cmdrules_res.status}: ${cmdrules_res.statusText}`}, true);
+        cmdbox.message({'error':`${cmdrules_res.status}: ${cmdrules_res.statusText}`}, true, true);
         return;
     }
     const cmdrules_root_data = await cmdrules_res.json();
@@ -475,7 +475,7 @@ users.cmdrules_list = async () => {
 users.pathrules_list = async () => {
     const pathrules_res = await fetch('pathrules/list', {method: 'GET'});
     if (pathrules_res.status != 200) {
-        cmdbox.message({'error':`${pathrules_res.status}: ${pathrules_res.statusText}`}, true);
+        cmdbox.message({'error':`${pathrules_res.status}: ${pathrules_res.statusText}`}, true, true);
         return;
     }
     const pathrules_root_data = await pathrules_res.json();
@@ -536,7 +536,7 @@ users.pathrules_list = async () => {
 users.passsetting_list = async () => {
     const passsetting_res = await fetch('passsetting/list', {method: 'GET'});
     if (passsetting_res.status != 200) {
-        cmdbox.message({'error':`${passsetting_res.status}: ${passsetting_res.statusText}`}, true);
+        cmdbox.message({'error':`${passsetting_res.status}: ${passsetting_res.statusText}`}, true, true);
         return;
     }
     const passsetting_root_data = await passsetting_res.json();

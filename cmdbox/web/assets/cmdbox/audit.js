@@ -69,18 +69,18 @@ audit.query = async (opt) => {
     const res = await fetch(`audit/rawlog`,
         {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(opt)});
     if (res.status != 200) {
-        cmdbox.message(`${res.status}: ${res.statusText}`, true);
+        cmdbox.message(`${res.status}: ${res.statusText}`, true, true);
         return;
     }
     try {
         const content = JSON.parse(await res.text());
         if (!content['success']) {
-            cmdbox.message(content, true);
+            cmdbox.message(content, true, true);
             return;
         }
         return content['success']['data'];
     } catch (e) {
-        cmdbox.message({'error': e.message}, true);
+        cmdbox.message({'error': e.message}, true, true);
         return;
     }
 };
@@ -260,14 +260,14 @@ audit.metrics_modal_func = (title) => {
             cmdbox.message({'warn': 'vertical is required'}, true);
             return;
         }
-        if (!window.confirm('Do you want to save?')) return;
+        if (!await cmdbox.confirm('Do you want to save?', true)) return;
         await audit.save_audit_metrics(title, opt);
         await audit.metrics();
         modal.modal('hide');
     });
     // 削除実行
     modal.find('#metrics_del').off('click').on('click', async () => {
-        if (!window.confirm('Do you want to delete?')) return;
+        if (!await cmdbox.confirm('Do you want to delete?', true)) return;
         await audit.del_audit_metrics(title);
         await audit.metrics();
         modal.modal('hide');
@@ -282,10 +282,10 @@ audit.init_form = async () => {
     const modal = $('#search_modal');
     const row_content = modal.find('.row_content');
     const res = await fetch('audit/mode_cmd', {method: 'GET'});
-    if (res.status != 200) cmdbox.message(`${res.status}: ${res.statusText}`, true);
+    if (res.status != 200) cmdbox.message(`${res.status}: ${res.statusText}`, true, true);
     const msg = await res.json();
     if (!msg['success']) {
-        cmdbox.message(msg, true);
+        cmdbox.message(msg, true, true);
         return;
     }
     const args = msg['success'];

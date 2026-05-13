@@ -42,4 +42,4 @@ class SavePipe(feature.WebFeature):
         opt_path = web.pipes_path / f"pipe-{title}.json"
         web.logger.info(f"save_pipe: opt_path={opt_path}, opt={opt}")
         common.saveopt(opt, opt_path)
-        return dict(success=f'Pipeline "{title}" saved in "{opt_path}".')
+        return dict(success=f'Pipeline "{title}" saved.')

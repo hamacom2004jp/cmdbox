@@ -52,4 +52,4 @@ class SaveCmd(feature.WebFeature):
         if 'modal_mode' in opt: del opt['modal_mode']
         if 'help' in opt: del opt['help']
         common.saveopt(opt, opt_path, True)
-        return dict(success=f'Command "{title}" saved in "{opt_path}".')
+        return dict(success=f'Command "{title}" saved.')

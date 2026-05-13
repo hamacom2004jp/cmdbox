@@ -159,14 +159,7 @@ class Validator(feature.Feature):
         """
         def_opt = self.get_option()
         choices = def_opt.get('choice',[])
-        validators = [
-            self.valid_type,
-            self.valid_name,
-            self.valid_str_max_length,
-            self.valid_file_exist,
-            self.valid_data,
-            self.valid_signin_file,
-        ]
+        validators = self.custom_validators()
         # 共通の引数のデフォルト値を設定
         if not hasattr(args, 'format'): setattr(args, 'format', False)
         if not hasattr(args, 'output_json'): setattr(args, 'output_json', None)
@@ -185,8 +178,13 @@ class Validator(feature.Feature):
                 setattr(args, opt, default)
             val = getattr(args, opt)
             # 必須オプションの検証
-            if required and type != options.Options.T_BOOL:
+            if required and type not in [options.Options.T_BOOL, options.Options.T_INT, options.Options.T_FLOAT]:
                 if not val:
+                    msg = dict(warn=f"Please specify --{opt}")
+                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                    return self.RESP_WARN, msg, None
+            elif required and type in [options.Options.T_INT, options.Options.T_FLOAT]:
+                if val is None:
                     msg = dict(warn=f"Please specify --{opt}")
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                     return self.RESP_WARN, msg, None
@@ -223,6 +221,44 @@ class Validator(feature.Feature):
                     if st != self.RESP_SUCCESS:
                         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                         return st, msg, None
+        return self.RESP_SUCCESS, {}, None
+
+    def custom_validators(self) -> List[Callable[[logging.Logger, str, str, Any, str], Tuple[int, Dict[str, Any], Any]]]:
+        """
+        オプションの値の妥当性を検証するカスタムバリデータのリストを返します
+
+        Returns:
+            List[Callable[[logging.Logger, str, str, Any, str], Tuple[int, Dict[str, Any], Any]]]: バリデータのリスト
+        """
+        return [
+            self.valid_type,
+            self.valid_name,
+            self.valid_str_max_length,
+            self.valid_data,
+            self.valid_signin_file,
+        ]
+
+    def valid_type(self, logger:logging.Logger, opt:str, type:str, val:Any, fileio:str) -> Tuple[int, Dict[str, Any], Any]:
+        """
+        オプションの型の妥当性を検証します
+
+        Args:
+            logger (logging.Logger): ロガー
+            opt (str): オプション名
+            type (str): オプションの型
+            val (Any): オプションの値
+            fileio (str): ファイル入出力の種別 ('in' or 'out')
+        Returns:
+            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
+        """
+        if type in self.validator_types and val is not None:
+            if not any([isinstance(val, t) for t in self.validator_types[type]]):
+                msg = dict(warn=f"Invalid value for --{opt}: {val} (must be a {type})")
+                return self.RESP_WARN, msg, None
+        if type == options.Options.T_MLIST and val:
+            if not all(isinstance(v, str) for v in val):
+                msg = dict(warn=f"Invalid value for --{opt}: {val} (must be a list of strings)")
+                return self.RESP_WARN, msg, None
         return self.RESP_SUCCESS, {}, None
 
     def valid_name(self, logger:logging.Logger, opt:str, type:str, val:Any, fileio:str) -> Tuple[int, Dict[str, Any], Any]:
@@ -262,29 +298,6 @@ class Validator(feature.Feature):
         if len(val)>=LONG_TEXT_BOUNDARY:
             msg = dict(warn=f"Invalid value for --{opt}: {val} (must be less than {LONG_TEXT_BOUNDARY} characters)")
             return self.RESP_WARN, msg, None
-        return self.RESP_SUCCESS, {}, None
-
-    def valid_type(self, logger:logging.Logger, opt:str, type:str, val:Any, fileio:str) -> Tuple[int, Dict[str, Any], Any]:
-        """
-        オプションの型の妥当性を検証します
-
-        Args:
-            logger (logging.Logger): ロガー
-            opt (str): オプション名
-            type (str): オプションの型
-            val (Any): オプションの値
-            fileio (str): ファイル入出力の種別 ('in' or 'out')
-        Returns:
-            Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
-        """
-        if type in self.validator_types and val is not None:
-            if not any([isinstance(val, t) for t in self.validator_types[type]]):
-                msg = dict(warn=f"Invalid value for --{opt}: {val} (must be a {type})")
-                return self.RESP_WARN, msg, None
-        if type == options.Options.T_MLIST and val:
-            if not all(isinstance(v, str) for v in val):
-                msg = dict(warn=f"Invalid value for --{opt}: {val} (must be a list of strings)")
-                return self.RESP_WARN, msg, None
         return self.RESP_SUCCESS, {}, None
 
     def valid_file_exist(self, logger:logging.Logger, opt:str, type:str, val:Any, fileio:str) -> Tuple[int, Dict[str, Any], Any]:

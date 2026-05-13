@@ -87,8 +87,8 @@ agentView.initView = () => {
         }
     });
     // 新しいチャットを始めるボタン
-    agentView.btn_new_chat.off('click').on('click', () => {
-        if (!window.confirm('Start a new chat? This will clear the current chat history.')) return;
+    agentView.btn_new_chat.off('click').on('click', async () => {
+        if (!await cmdbox.confirm('Start a new chat? This will clear the current chat history.', true)) return;
         // メッセージ一覧をクリア
         agentView.chatMessages.html('');
         // 新しいセッションを作成
@@ -236,7 +236,7 @@ agentView.exec_cmd = async (mode, cmd, opt={}, error_func=null, loading=true, ss
                 return;
             }
             console.warn(res);
-            //cmdbox.message(res);
+            //cmdbox.message(res, true, true);
             return res;
         }
         return res[0];
@@ -275,7 +275,7 @@ agentView.regist_rag = async () => {
         cmdbox.message({ 'error': 'No RAGs are selected for registration.' }, true);
         return false;
     }
-    if (!confirm(`Are you sure you want to register RAG '${agentView.runner_conf.rag}' to the system?`)){
+    if (!await cmdbox.confirm(`Are you sure you want to register RAG '${agentView.runner_conf.rag}' to the system?`, true, true)) {
         return false;
     }
     const n = agentView.runner_conf.rag.length;

@@ -94,13 +94,13 @@ agentView.list_llm = async () => {
                 });
                 // Delete button handler
                 $('#btn_del_llm').show().off('click').on('click', async () => {
-                    if (!confirm(`Are you sure you want to delete '${config.llmname}'?`)) return;
+                    if (!await cmdbox.confirm(`Are you sure you want to delete '${config.llmname}'?`, true, true)) return;
                     const res = await agentView.exec_cmd('llm', 'del', { llmname: config.llmname });
                     if (res && res.success) {
                         $('#llm_edit_modal').modal('hide');
                         agentView.list_llm();
                     } else {
-                        cmdbox.message(res);
+                        cmdbox.message(res, true, true);
                     }
                 });
                 cmdbox.process_i18n($('#llm_edit_modal'));
@@ -128,10 +128,10 @@ agentView.save_llm = async () => {
             $('#llm_edit_modal').modal('hide');
             agentView.list_llm();
         } else {
-            cmdbox.message(res);
+            cmdbox.message(res, true, true);
         }
     } catch (e) {
         console.error(e);
-        cmdbox.message(`Error: ${e.message}`, true);
+        cmdbox.message(`Error: ${e.message}`, true, true);
     }
 };

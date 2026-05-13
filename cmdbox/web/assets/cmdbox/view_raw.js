@@ -31,8 +31,8 @@ const view_raw_func = (title, result) => {
                             const ctx_Path = ctx_Path_mt && ctx_Path_mt.length>0 ? ctx_Path_mt[1] : '/';
                             const href = `${window.location.protocol}//${window.location.host}${ctx_Path}${url.pathname.replace(new RegExp(`^${ctx_Path}`), '')}`;
                             const anc = $(`<a href="#">${href}</a>`).appendTo(td);
-                            anc.off('click').on('click', (e) => {
-                                if (!window.confirm(`May I execute '${title}' ?`)) return;
+                            anc.off('click').on('click', async(e) => {
+                                if (!await cmdbox.confirm(`May I execute '${title}' ?`, true, true)) return;
                                 window.open(href, '_blank');
                             });
                             found = false;

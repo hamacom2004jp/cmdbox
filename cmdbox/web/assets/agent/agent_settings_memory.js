@@ -111,13 +111,13 @@ agentView.list_memory = async () => {
                 });
                 // Delete button handler
                 $('#btn_del_memory').show().off('click').on('click', async () => {
-                    if (!confirm(`Are you sure you want to delete '${config.memory_name}'?`)) return;
+                    if (!await cmdbox.confirm(`Are you sure you want to delete '${config.memory_name}'?`, true, true)) return;
                     const res = await agentView.exec_cmd('agent', 'memory_del', { memory_name: config.memory_name });
                     if (res && res.success) {
                         $('#memory_edit_modal').modal('hide');
                         agentView.list_memory();
                     } else {
-                        cmdbox.message(res);
+                        cmdbox.message(res, true, true);
                     }
                 });
                 cmdbox.process_i18n($('#memory_edit_modal'));
@@ -156,11 +156,11 @@ agentView.save_memory = async () => {
             $('#memory_edit_modal').modal('hide');
             agentView.list_memory();
         } else {
-            cmdbox.message(res);
+            cmdbox.message(res, true, true);
         }
     } catch (e) {
         console.error(e);
-        cmdbox.message(`Error: ${e.message}`, true);
+        cmdbox.message(`Error: ${e.message}`, true, true);
     }
 };
 

@@ -93,13 +93,13 @@ agentView.list_mcpsv = async () => {
                 });
                 // Delete button handler
                 $('#btn_del_mcpsv').show().off('click').on('click', async () => {
-                    if (!confirm(`Are you sure you want to delete '${config.mcpserver_name}'?`)) return;
+                    if (!await cmdbox.confirm(`Are you sure you want to delete '${config.mcpserver_name}'?`, true, true)) return;
                     const res = await agentView.exec_cmd('agent', 'mcpsv_del', { mcpserver_name: config.mcpserver_name });
                     if (res && res.success) {
                         $('#mcpsv_edit_modal').modal('hide');
                         agentView.list_mcpsv();
                     } else {
-                        cmdbox.message(res);
+                        cmdbox.message(res, true, true);
                     }
                 });
                 cmdbox.process_i18n($('#mcpsv_edit_modal'));
@@ -145,10 +145,10 @@ agentView.save_mcpsv = async () => {
             $('#mcpsv_edit_modal').modal('hide');
             agentView.list_mcpsv();
         } else {
-            cmdbox.message(res);
+            cmdbox.message(res, true, true);
         }
     } catch (e) {
         console.error(e);
-        cmdbox.message(`Error: ${e.message}`, true);
+        cmdbox.message(`Error: ${e.message}`, true, true);
     }
 };

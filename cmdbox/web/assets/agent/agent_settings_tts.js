@@ -52,7 +52,7 @@ agentView.install_tts = async () => {
     });
     if (data['force_install'] != 'true') delete data['force_install'];
 
-    if (!confirm('Are you sure you want to install the TTS engine? This may take a while.')) return;
+    if (!await cmdbox.confirm('Are you sure you want to install the TTS engine? This may take a while.', true, true)) return;
 
     try {
         cmdbox.show_loading();
@@ -64,12 +64,12 @@ agentView.install_tts = async () => {
             cmdbox.message('TTS engine installation started/completed successfully. Check server logs for details.', true);
         } else {
             const msg = res && res.warn ? res.warn : 'Failed to install TTS engine.';
-            cmdbox.message(msg, true);
+            cmdbox.message(msg, true, true);
         }
     } catch (e) {
         cmdbox.hide_loading();
         console.error(e);
-        cmdbox.message(`Error: ${e.message}`, true);
+        cmdbox.message(`Error: ${e.message}`, true, true);
     }
 };
 
@@ -97,7 +97,7 @@ agentView.uninstall_tts = async () => {
         if (item.value) data[item.name] = item.value;
     });
 
-    if (!confirm('Are you sure you want to uninstall the TTS engine?')) return;
+    if (!await cmdbox.confirm('Are you sure you want to uninstall the TTS engine?', true)) return;
 
     try {
         cmdbox.show_loading();
@@ -109,11 +109,11 @@ agentView.uninstall_tts = async () => {
             cmdbox.message('TTS engine uninstallation started/completed successfully. Check server logs for details.', true);
         } else {
             const msg = res && res.warn ? res.warn : 'Failed to uninstall TTS engine.';
-            cmdbox.message(msg, true);
+            cmdbox.message(msg, true, true);
         }
     } catch (e) {
         cmdbox.hide_loading();
         console.error(e);
-        cmdbox.message(`Error: ${e.message}`, true);
+        cmdbox.message(`Error: ${e.message}`, true, true);
     }
 };
