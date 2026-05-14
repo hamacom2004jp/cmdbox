@@ -61,6 +61,9 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None, web="mask",
                      description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合エラーにします。",
                      description_en="Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.",),
+                dict(opt="rjpath", type=Options.T_FILE, default=None, required=False, multi=True, hide=False, choice=None, web="mask",
+                     description_ja="指定したパスが要求されたパスにマッチする場合、アクセスが拒否されます。正規表現として解釈します。",
+                     description_en="If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."),
                 dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="参照先スコープを指定します。指定可能な画像タイプは `client` , `current` , `server` です。",
                      description_en="Specifies the scope to be referenced. When omitted, 'client' is used.",
@@ -125,8 +128,9 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator):
         client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
         upload_file = Path(args.upload_file.replace('"','')) if args.upload_file is not None else None
         fwpaths = [p.replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
+        rjpaths = [p.replace('"','') for p in args.rjpath] if args.rjpath is not None else []
         ret = cl.file_upload(args.svpath.replace('"',''), upload_file, scope=args.scope, client_data=client_data,
-                             fwpaths=fwpaths, mkdir=args.mkdir, orverwrite=args.orverwrite,
+                             fwpaths=fwpaths, rjpaths=rjpaths, mkdir=args.mkdir, orverwrite=args.orverwrite,
                              retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
@@ -171,10 +175,11 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator):
         mkdir = payload.get("mkdir") == 'True'
         orverwrite = payload.get("orverwrite") == 'True'
         fwpaths = payload.get("fwpaths")
-        st = self.file_upload(msg[1], svpath, file_name, file_data, mkdir, orverwrite, fwpaths, data_dir, logger, redis_cli, sessions)
+        rjpaths = payload.get("rjpaths")
+        st = self.file_upload(msg[1], svpath, file_name, file_data, mkdir, orverwrite, fwpaths, rjpaths, data_dir, logger, redis_cli, sessions)
         return st
 
-    def file_upload(self, reskey:str, current_path:str, file_name:str, file_data:bytes, mkdir:bool, orverwrite:bool, fwpaths:List[str],
+    def file_upload(self, reskey:str, current_path:str, file_name:str, file_data:bytes, mkdir:bool, orverwrite:bool, fwpaths:List[str], rjpaths:List[str],
                     data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ファイルをアップロードする
@@ -186,7 +191,8 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator):
             file_data (bytes): ファイルデータ
             mkdir (bool): ディレクトリを作成するかどうか
             orverwrite (bool): 上書きするかどうか
-            fwpaths (List[str]): 範囲外パスのリスト
+            fwpaths (List[str]): 範囲内パスのリスト
+            rjpaths (List[str]): 範囲外パスのリスト
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
@@ -197,7 +203,7 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator):
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_upload(current_path, file_name, file_data, mkdir, orverwrite, fwpaths)
+            rescode, msg = f.file_upload(current_path, file_name, file_data, mkdir, orverwrite, fwpaths, rjpaths)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

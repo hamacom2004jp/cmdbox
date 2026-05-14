@@ -728,7 +728,7 @@ fsapi.editer = (svpath, data, mime, is_local) => {
       type: 'string'
     });
     viewer.find('.modal-title').html(`<span class="i18n">[Edit]</span> ${svpath} ( ${detectedEncoding} -> UNICODE )`);
-    const textarea = $(`<textarea class="editer_code" style="width: calc(100% - 50px)"></textarea>`);
+    const textarea = $(`<textarea class="editer_code" style="width: calc(100% - 50px);height:100%;"></textarea>`);
     viewer_body.append(textarea);
     textarea.html(unicodeString.replace(/\r/g, ''));
     const view_footer = viewer.find('.modal-footer');

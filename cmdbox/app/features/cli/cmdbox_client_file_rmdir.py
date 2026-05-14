@@ -61,6 +61,9 @@ class ClientFileRmdir(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None, web="mask",
                      description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合エラーにします。",
                      description_en="Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.",),
+                dict(opt="rjpath", type=Options.T_FILE, default=None, required=False, multi=True, hide=False, choice=None, web="mask",
+                     description_ja="指定したパスが要求されたパスにマッチする場合、アクセスが拒否されます。正規表現として解釈します。",
+                     description_en="If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."),
                 dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="参照先スコープを指定します。指定可能な画像タイプは `client` , `current` , `server` です。",
                      description_en="Specifies the scope to be referenced. When omitted, 'client' is used.",
@@ -113,7 +116,8 @@ class ClientFileRmdir(feature.UnsupportEdgeFeature, validator.Validator):
 
         client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
         fwpaths = [p.replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
-        ret = cl.file_rmdir(args.svpath.replace('"',''), scope=args.scope, client_data=client_data, fwpaths=fwpaths,
+        rjpaths = [p.replace('"','') for p in args.rjpath] if args.rjpath is not None else []
+        ret = cl.file_rmdir(args.svpath.replace('"',''), scope=args.scope, client_data=client_data, fwpaths=fwpaths, rjpaths=rjpaths,
                             retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
@@ -157,10 +161,11 @@ class ClientFileRmdir(feature.UnsupportEdgeFeature, validator.Validator):
         payload = json.loads(convert.b64str2str(msg[2]))
         svpath = payload.get("svpath")
         fwpaths = payload.get("fwpaths")
-        st = self.file_rmdir(msg[1], svpath, data_dir, fwpaths, logger, redis_cli, sessions)
+        rjpaths = payload.get("rjpaths")
+        st = self.file_rmdir(msg[1], svpath, data_dir, fwpaths, rjpaths, logger, redis_cli, sessions)
         return st
 
-    def file_rmdir(self, reskey:str, current_path:str, data_dir:Path, fwpaths:List[str],
+    def file_rmdir(self, reskey:str, current_path:str, data_dir:Path, fwpaths:List[str], rjpaths:List[str],
                    logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ディレクトリを削除する
@@ -169,7 +174,8 @@ class ClientFileRmdir(feature.UnsupportEdgeFeature, validator.Validator):
             reskey (str): レスポンスキー
             current_path (str): ディレクトリパス
             data_dir (Path): データディレクトリ
-            fwpaths (List[str]): 指定したパスが範囲外であるかどうかを判定するパスのリスト
+            fwpaths (List[str]): 指定したパスが範囲内であるかどうかを判定するパスのリスト
+            rjpaths (List[str]): 指定したパスが範囲外であるかどうかを判定するパスのリスト
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
             sessions (Dict[str, Dict[str, Any]]): セッション情報
@@ -179,7 +185,7 @@ class ClientFileRmdir(feature.UnsupportEdgeFeature, validator.Validator):
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_rmdir(current_path, fwpaths)
+            rescode, msg = f.file_rmdir(current_path, fwpaths, rjpaths)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

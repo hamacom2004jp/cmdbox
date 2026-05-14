@@ -160,7 +160,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "Field","Type","Required","Default","Description"
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.data","str | null","no","null","処理結果のデータ"
+    "success.data","str | null","no","null","処理結果のメッセージ"
     "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
@@ -201,7 +201,9 @@ This command implements ``output_schema()`` returning ``Result`` model.
           }
         ],
         "passwords": [
-          "string"
+          {
+            "password": "string"
+          }
         ]
       },
       "warn": {},
@@ -217,7 +219,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "Field","Type","Required","Default","Description"
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.passwords","list[str] | null","no","null","生成されたパスワードリスト"
+    "success.passwords","list[PasswordData] | null","no","null","生成されたパスワードリスト"
     "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"

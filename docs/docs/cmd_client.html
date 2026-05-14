@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( client mode ) &mdash; cmdbox 2026/05/10 documentation</title>
+  <title>Command Reference ( client mode ) &mdash; cmdbox 2026/05/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=19b80221"></script>
+      <script src="../_static/documentation_options.js?v=41b19c9f"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -207,6 +207,22 @@
 <td></td>
 <td></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
+</tr>
+<tr class="row-even"><td><p>--from_rjpath &lt;from_rjpath&gt;</p></td>
+<td><p>file</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>If the specified path matches the requested path, access will be denied. Interpreted as a regular expression.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--to_rjpath &lt;to_rjpath&gt;</p></td>
+<td><p>file</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>If the specified path matches the requested path, access will be denied. Interpreted as a regular expression.</p></td>
 </tr>
 <tr class="row-even"><td><p>--orverwrite &lt;orverwrite&gt;</p></td>
 <td><p>bool</p></td>
@@ -721,7 +737,7 @@
 <td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--svpath &lt;svpath&gt;</p></td>
-<td><p>file</p></td>
+<td><p>dir</p></td>
 <td></td>
 <td><p>required</p></td>
 <td><p>/</p></td>
@@ -736,7 +752,15 @@
 <td></td>
 <td><p>Specify a path to determine whether the specified path is out of bounds. If it is not under this path, it is interpreted as having specified this path.</p></td>
 </tr>
-<tr class="row-even"><td><p>--listregs &lt;listregs&gt;</p></td>
+<tr class="row-even"><td><p>--rjpath &lt;rjpath&gt;</p></td>
+<td><p>file</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>If the specified path matches the requested path, access will be denied. Interpreted as a regular expression.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--listregs &lt;listregs&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -744,7 +768,7 @@
 <td></td>
 <td><p>Specify the regular expression conditions to list.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--recursive &lt;recursive&gt;</p></td>
+<tr class="row-even"><td><p>--recursive &lt;recursive&gt;</p></td>
 <td><p>bool</p></td>
 <td></td>
 <td></td>
@@ -752,7 +776,7 @@
 <td><p>True | False</p></td>
 <td><p>Get a list of files recursively for a folder contained in the specified path.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<tr class="row-odd"><td><p>--scope &lt;scope&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -760,7 +784,7 @@
 <td><p>client | current | server</p></td>
 <td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_data &lt;client_data&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -768,7 +792,7 @@
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -776,7 +800,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -784,7 +808,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -941,7 +965,15 @@
 <td></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<tr class="row-even"><td><p>--rjpath &lt;rjpath&gt;</p></td>
+<td><p>file</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>If the specified path matches the requested path, access will be denied. Interpreted as a regular expression.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--scope &lt;scope&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -949,7 +981,7 @@
 <td><p>client | current | server</p></td>
 <td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_data &lt;client_data&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -957,7 +989,7 @@
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -965,7 +997,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -973,7 +1005,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1172,6 +1204,22 @@
 <td></td>
 <td></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
+</tr>
+<tr class="row-even"><td><p>--from_rjpath &lt;from_rjpath&gt;</p></td>
+<td><p>file</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>If the specified path matches the requested path, access will be denied. Interpreted as a regular expression.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--to_rjpath &lt;to_rjpath&gt;</p></td>
+<td><p>file</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>If the specified path matches the requested path, access will be denied. Interpreted as a regular expression.</p></td>
 </tr>
 <tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
 <td><p>str</p></td>
@@ -1410,7 +1458,15 @@
 <td></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<tr class="row-even"><td><p>--rjpath &lt;rjpath&gt;</p></td>
+<td><p>file</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>If the specified path matches the requested path, access will be denied. Interpreted as a regular expression.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--scope &lt;scope&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -1418,7 +1474,7 @@
 <td><p>client | current | server</p></td>
 <td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_data &lt;client_data&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -1426,7 +1482,7 @@
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1434,7 +1490,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1442,7 +1498,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1626,7 +1682,15 @@
 <td></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<tr class="row-even"><td><p>--rjpath &lt;rjpath&gt;</p></td>
+<td><p>file</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>If the specified path matches the requested path, access will be denied. Interpreted as a regular expression.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--scope &lt;scope&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -1634,7 +1698,7 @@
 <td><p>client | current | server</p></td>
 <td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_data &lt;client_data&gt;</p></td>
+<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -1642,7 +1706,7 @@
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1650,7 +1714,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1658,7 +1722,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1842,7 +1906,15 @@
 <td></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<tr class="row-even"><td><p>--rjpath &lt;rjpath&gt;</p></td>
+<td><p>file</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>If the specified path matches the requested path, access will be denied. Interpreted as a regular expression.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--scope &lt;scope&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -1850,7 +1922,7 @@
 <td><p>client | current | server</p></td>
 <td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--upload_file &lt;upload_file&gt;</p></td>
+<tr class="row-even"><td><p>--upload_file &lt;upload_file&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -1858,7 +1930,7 @@
 <td></td>
 <td><p>Specify the source path of the client.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
+<tr class="row-odd"><td><p>--client_data &lt;client_data&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -1866,7 +1938,7 @@
 <td></td>
 <td><p>Specify the path of the data folder when local is referenced.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--mkdir &lt;mkdir&gt;</p></td>
+<tr class="row-even"><td><p>--mkdir &lt;mkdir&gt;</p></td>
 <td><p>bool</p></td>
 <td></td>
 <td></td>
@@ -1874,7 +1946,7 @@
 <td><p>True | False</p></td>
 <td><p>If there is no in between folder, create one.</p></td>
 </tr>
-<tr class="row-even"><td><p>--orverwrite &lt;orverwrite&gt;</p></td>
+<tr class="row-odd"><td><p>--orverwrite &lt;orverwrite&gt;</p></td>
 <td><p>bool</p></td>
 <td></td>
 <td></td>
@@ -1882,7 +1954,7 @@
 <td><p>True | False</p></td>
 <td><p>Overwrites the file even if it exists at the upload destination.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1890,7 +1962,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1898,7 +1970,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>

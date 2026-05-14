@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( web mode ) &mdash; cmdbox 2026/05/10 documentation</title>
+  <title>Command Reference ( web mode ) &mdash; cmdbox 2026/05/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=19b80221"></script>
+      <script src="../_static/documentation_options.js?v=41b19c9f"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -562,7 +562,7 @@
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
-<td><p>処理結果のデータ</p></td>
+<td><p>処理結果のメッセージ</p></td>
 </tr>
 <tr class="row-odd"><td><p>warn</p></td>
 <td><p>dict[str, any] | Data | str | bool | null</p></td>
@@ -690,7 +690,9 @@
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
 <span class="w">    </span><span class="nt">&quot;passwords&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">      </span><span class="s2">&quot;string&quot;</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">]</span>
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
@@ -730,7 +732,7 @@
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
 <tr class="row-even"><td><p>success.passwords</p></td>
-<td><p>list[str] | null</p></td>
+<td><p>list[PasswordData] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>生成されたパスワードリスト</p></td>

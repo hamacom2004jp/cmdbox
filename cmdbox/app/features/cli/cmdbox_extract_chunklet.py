@@ -60,6 +60,9 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None, web="mask",
                      description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合エラーにします。",
                      description_en="Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.",),
+                dict(opt="rjpath", type=Options.T_FILE, default=None, required=False, multi=True, hide=False, choice=None, web="mask",
+                     description_ja="指定したパスが要求されたパスにマッチする場合、アクセスが拒否されます。正規表現として解釈します。",
+                     description_en="If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."),
                 dict(opt="loadpath", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="読み込みファイルパスを指定します。",
                      description_en="Specify the source file path."),
@@ -133,7 +136,7 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator):
                     if not chk:
                         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                         return self.RESP_WARN, msg, None
-                    chk, msg = f.check_fwpath(args.loadpath, args.fwpath)
+                    chk, msg = f.check_fwpath(args.loadpath, args.fwpath, args.rjpath)
                     if not chk:
                         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                         return self.RESP_WARN, msg, None
@@ -152,7 +155,7 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator):
                 if not chk:
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                     return self.RESP_WARN, msg, None
-                chk, msg = f.check_fwpath(args.loadpath, args.fwpath)
+                chk, msg = f.check_fwpath(args.loadpath, args.fwpath, args.rjpath)
                 if not chk:
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                     return self.RESP_WARN, msg, None
@@ -166,6 +169,7 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator):
                 payload = dict(
                     loadpath=args.loadpath,
                     fwpath=args.fwpath,
+                    rjpath=args.rjpath,
                     client_data=args.client_data,
                     chunk_lang=args.chunk_lang,
                     chunk_max_tokens=args.chunk_max_tokens,
@@ -224,7 +228,7 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator):
                 logger.warning(f"File not found. {payload.get('loadpath')}")
                 redis_cli.rpush(reskey, res)
                 return self.RESP_WARN
-            chk, msg = f.check_fwpath(payload.get('loadpath'), payload.get('fwpath'))
+            chk, msg = f.check_fwpath(payload.get('loadpath'), payload.get('fwpath'), payload.get('rjpath'))
             if not chk:
                 logger.warning(f"F{msg}. {payload.get('loadpath')}")
                 redis_cli.rpush(reskey, res)

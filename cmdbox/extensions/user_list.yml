@@ -72,8 +72,11 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     coercion:                  # Specify a coercion value for each item to be set when a rule is matched.
                                # e.g. wpath: f"/users/{user_name}"
       fwpath: "['/.users','/.groups']"
+      rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
       from_fwpath: "['/.users','/.groups']"
       to_fwpath: "['/.users','/.groups']"
+      from_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
+      to_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
     rule: allow
   - groups: [develop, master]
     coercion:
@@ -84,8 +87,11 @@ cmdrule:                       # A list of command rules, Specify a rule that de
   - groups: [guest, user, readonly, editor]
     coercion:
       fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
+      rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
       from_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
       to_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
+      from_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
+      to_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
     rule: deny
   - groups: [admin, master]
     mode: test

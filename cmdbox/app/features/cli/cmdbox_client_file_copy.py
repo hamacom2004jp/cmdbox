@@ -70,6 +70,12 @@ class ClientFileCopy(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="to_fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None, web="mask",
                      description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合エラーにします。",
                      description_en="Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.",),
+                dict(opt="from_rjpath", type=Options.T_FILE, default=None, required=False, multi=True, hide=False, choice=None, web="mask",
+                     description_ja="指定したパスが要求されたパスにマッチする場合、アクセスが拒否されます。正規表現として解釈します。",
+                     description_en="If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."),
+                dict(opt="to_rjpath", type=Options.T_FILE, default=None, required=False, multi=True, hide=False, choice=None, web="mask",
+                     description_ja="指定したパスが要求されたパスにマッチする場合、アクセスが拒否されます。正規表現として解釈します。",
+                     description_en="If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."),
                 dict(opt="orverwrite", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
                      description_ja="コピー先に存在していても上書きします。",
                      description_en="Overwrites the copy even if it exists at the destination.",
@@ -129,8 +135,11 @@ class ClientFileCopy(feature.UnsupportEdgeFeature, validator.Validator):
         client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
         from_fwpaths = [p.replace('"','') for p in args.from_fwpath] if args.from_fwpath is not None else ["/"]
         to_fwpaths = [p.replace('"','') for p in args.to_fwpath] if args.to_fwpath is not None else ["/"]
+        from_rjpaths = [p.replace('"','') for p in args.from_rjpath] if args.from_rjpath is not None else []
+        to_rjpaths = [p.replace('"','') for p in args.to_rjpath] if args.to_rjpath is not None else []
         ret = cl.file_copy(args.from_path.replace('"',''), args.to_path.replace('"',''), orverwrite=args.orverwrite,
                            from_fwpaths=from_fwpaths, to_fwpaths=to_fwpaths,
+                           from_rjpaths=from_rjpaths, to_rjpaths=to_rjpaths,
                            scope=args.scope, client_data=client_data,
                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -181,10 +190,16 @@ class ClientFileCopy(feature.UnsupportEdgeFeature, validator.Validator):
         orverwrite = payload.get("orverwrite", False)
         from_fwpaths = payload.get("from_fwpaths", None)
         to_fwpaths = payload.get("to_fwpaths", None)
-        st = self.file_copy(msg[1], from_path, to_path, orverwrite, from_fwpaths, to_fwpaths, data_dir, logger, redis_cli, sessions)
+        from_rjpaths = payload.get("from_rjpaths", None)
+        to_rjpaths = payload.get("to_rjpaths", None)
+        st = self.file_copy(msg[1], from_path, to_path, orverwrite,
+                            from_fwpaths, to_fwpaths, from_rjpaths, to_rjpaths,
+                            data_dir, logger, redis_cli, sessions)
         return st
 
-    def file_copy(self, reskey:str, from_path:str, to_path:str, orverwrite:bool, from_fwpaths:List[str], to_fwpaths:List[str], 
+    def file_copy(self, reskey:str, from_path:str, to_path:str, orverwrite:bool,
+                  from_fwpaths:List[str], to_fwpaths:List[str], 
+                  from_rjpaths:List[str], to_rjpaths:List[str],
                   data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ファイルをコピーする
@@ -196,6 +211,8 @@ class ClientFileCopy(feature.UnsupportEdgeFeature, validator.Validator):
             orverwrite (bool): 上書きするかどうか
             from_fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             to_fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
+            from_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            to_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
@@ -206,7 +223,7 @@ class ClientFileCopy(feature.UnsupportEdgeFeature, validator.Validator):
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_copy(from_path, to_path, orverwrite, from_fwpaths, to_fwpaths)
+            rescode, msg = f.file_copy(from_path, to_path, orverwrite, from_fwpaths, to_fwpaths, from_rjpaths, to_rjpaths)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

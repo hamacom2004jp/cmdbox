@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.filer &mdash; cmdbox 2026/03/29 documentation</title>
+  <title>cmdbox.app.filer &mdash; cmdbox 2026/05/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=5d974da7"></script>
+      <script src="../../../_static/documentation_options.js?v=41b19c9f"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -134,12 +134,13 @@
 
 <div class="viewcode-block" id="Filer.check_fwpath">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.filer.Filer.check_fwpath">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">check_fwpath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_fwpath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">rjpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        パスが範囲内かどうかを確認する</span>
 <span class="sd">        Args:</span>
 <span class="sd">            path (str): パス</span>
 <span class="sd">            fwpaths (List[str]): 範囲内かどうかを示すパスのリスト</span>
+<span class="sd">            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト, by default None</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            int: レスポンスコード</span>
 <span class="sd">            dict: メッセージ</span>
@@ -149,13 +150,15 @@
             <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;fwpaths is None.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">from_abspath</span><span class="o">.</span><span class="n">is_relative_to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">fwpath</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">fwpath</span> <span class="ow">in</span> <span class="n">fwpaths</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;The specified path ( </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> ) is out of bounds. Permitted path: </span><span class="si">{</span><span class="n">fwpaths</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rjpaths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">rjpath</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">from_abspath</span><span class="p">))</span> <span class="k">for</span> <span class="n">rjpath</span> <span class="ow">in</span> <span class="n">rjpaths</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;The specified path ( </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> ) is rejected by rjpaths. Rejected path pattern: </span><span class="si">{</span><span class="n">rjpaths</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="Filer.file_list">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.filer.Filer.file_list">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">file_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">recursive</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                  <span class="n">fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">listregs</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;.*&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+                  <span class="n">fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rjpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">listregs</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;.*&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ファイルリストを取得する</span>
 
@@ -163,6 +166,7 @@
 <span class="sd">            path (str): ファイルパス</span>
 <span class="sd">            recursive (bool, optional): 再帰的に取得するかどうか, by default False</span>
 <span class="sd">            fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト, by default None</span>
+<span class="sd">            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト, by default None</span>
 <span class="sd">            listregs (str, optional): リストアップするgrep条件, by default &quot;.*&quot;</span>
 <span class="sd">    </span>
 <span class="sd">        Returns:</span>
@@ -201,7 +205,10 @@
                 <span class="n">cpart</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span> <span class="k">if</span> <span class="n">cpart</span><span class="o">==</span><span class="s1">&#39;&#39;</span> <span class="k">else</span> <span class="n">cpart</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">file_list</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
                     <span class="k">return</span> <span class="n">tpath_key</span><span class="p">,</span> <span class="kc">None</span>
-                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">fwpath</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">tpath</span><span class="p">)</span> <span class="ow">or</span> <span class="n">tpath</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">fwpath</span><span class="p">)</span> <span class="k">for</span> <span class="n">fwpath</span> <span class="ow">in</span> <span class="n">fwpaths</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">fwpath</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">tpath</span><span class="p">)</span> <span class="ow">or</span> <span class="n">tpath</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">fwpath</span><span class="p">)</span> <span class="k">for</span> <span class="n">fwpath</span> <span class="ow">in</span> <span class="n">fwpaths</span><span class="p">)</span> \
+                    <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">rjpath</span><span class="p">,</span> <span class="n">tpath</span><span class="p">)</span> <span class="k">for</span> <span class="n">rjpath</span> <span class="ow">in</span> <span class="n">rjpaths</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">listregs_pt</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">file_list</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="n">tpath_key</span><span class="p">,</span> <span class="kc">None</span>
                     <span class="k">return</span> <span class="n">tpath_key</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">cpart</span><span class="p">,</span>
                                     <span class="n">is_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                     <span class="n">path</span><span class="o">=</span><span class="n">tpath</span><span class="p">,</span>
@@ -225,7 +232,8 @@
                     <span class="k">continue</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
                     <span class="k">continue</span>
-                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">fwpath</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">or</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">fwpath</span><span class="p">)</span> <span class="k">for</span> <span class="n">fwpath</span> <span class="ow">in</span> <span class="n">fwpaths</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">fwpath</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">or</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">fwpath</span><span class="p">)</span> <span class="k">for</span> <span class="n">fwpath</span> <span class="ow">in</span> <span class="n">fwpaths</span><span class="p">)</span> \
+                    <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">rjpath</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">rjpath</span> <span class="ow">in</span> <span class="n">rjpaths</span><span class="p">):</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">listregs_pt</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
                         <span class="k">continue</span>
                     <span class="n">children</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
@@ -263,13 +271,14 @@
     
 <div class="viewcode-block" id="Filer.file_mkdir">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.filer.Filer.file_mkdir">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">file_mkdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">file_mkdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rjpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ディレクトリを作成する</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            current_path (str): ディレクトリパス</span>
 <span class="sd">            fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.</span>
+<span class="sd">            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            int: レスポンスコード</span>
@@ -278,7 +287,7 @@
         <span class="n">chk</span><span class="p">,</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="n">not_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
-        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">)</span>
+        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">,</span> <span class="n">rjpaths</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
 
@@ -293,13 +302,14 @@
     
 <div class="viewcode-block" id="Filer.file_rmdir">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.filer.Filer.file_rmdir">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">file_rmdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">file_rmdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rjpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ディレクトリを削除する</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            current_path (str): ディレクトリパス</span>
 <span class="sd">            fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.</span>
+<span class="sd">            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            int: レスポンスコード</span>
@@ -308,7 +318,7 @@
         <span class="n">chk</span><span class="p">,</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
-        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">)</span>
+        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">,</span> <span class="n">rjpaths</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
         <span class="k">if</span> <span class="n">abspath</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">:</span>
@@ -327,7 +337,7 @@
 <div class="viewcode-block" id="Filer.file_download">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.filer.Filer.file_download">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">file_download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">img_thumbnail</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-                      <span class="n">fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">etag</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+                      <span class="n">fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rjpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">etag</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ファイルをダウンロードする</span>
 
@@ -335,6 +345,7 @@
 <span class="sd">            current_path (str): ファイルパス</span>
 <span class="sd">            img_thumbnail (float, optional): サムネイルのサイズ, by default 0.0</span>
 <span class="sd">            fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.</span>
+<span class="sd">            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.</span>
 <span class="sd">            etag (str, optional): ETag. Defaults to None.</span>
 
 <span class="sd">        Returns:</span>
@@ -345,7 +356,7 @@
         <span class="n">chk</span><span class="p">,</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
-        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">)</span>
+        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">,</span> <span class="n">rjpaths</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
         <span class="k">if</span> <span class="n">abspath</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
@@ -376,7 +387,7 @@
 
 <div class="viewcode-block" id="Filer.file_upload">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.filer.Filer.file_upload">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">file_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">file_data</span><span class="p">:</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">mkdir</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="n">orverwrite</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">file_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">file_data</span><span class="p">:</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">mkdir</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="n">orverwrite</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rjpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ファイルをアップロードする</span>
 
@@ -387,6 +398,7 @@
 <span class="sd">            mkdir (bool): ディレクトリを作成するかどうか</span>
 <span class="sd">            orverwrite (bool): 上書きするかどうか</span>
 <span class="sd">            fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.</span>
+<span class="sd">            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            int: レスポンスコード</span>
@@ -395,7 +407,7 @@
         <span class="n">chk</span><span class="p">,</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="n">exists_chk</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
-        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">)</span>
+        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">,</span> <span class="n">rjpaths</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
 
@@ -425,13 +437,14 @@
 
 <div class="viewcode-block" id="Filer.file_remove">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.filer.Filer.file_remove">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">file_remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">file_remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rjpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ファイルを削除する</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            current_path (str): ファイルパス</span>
 <span class="sd">            fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.</span>
+<span class="sd">            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            int: レスポンスコード</span>
@@ -440,7 +453,7 @@
         <span class="n">chk</span><span class="p">,</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
-        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">)</span>
+        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="n">fwpaths</span><span class="p">,</span> <span class="n">rjpaths</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
         <span class="k">if</span> <span class="n">abspath</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
@@ -458,7 +471,8 @@
 
 <div class="viewcode-block" id="Filer.file_copy">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.filer.Filer.file_copy">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">file_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">to_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">orverwrite</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="n">from_fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">file_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">to_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">orverwrite</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="n">from_fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">from_rjpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_rjpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ファイルをコピーする</span>
 
@@ -468,6 +482,8 @@
 <span class="sd">            orverwrite (bool): 上書きするかどうか</span>
 <span class="sd">            from_fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.</span>
 <span class="sd">            to_fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.</span>
+<span class="sd">            from_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.</span>
+<span class="sd">            to_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            int: レスポンスコード</span>
@@ -476,14 +492,14 @@
         <span class="n">chk</span><span class="p">,</span> <span class="n">from_abspath</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">from_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
-        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">from_path</span><span class="p">,</span> <span class="n">from_fwpaths</span><span class="p">)</span>
+        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">from_path</span><span class="p">,</span> <span class="n">from_fwpaths</span><span class="p">,</span> <span class="n">from_rjpaths</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
 
         <span class="n">chk</span><span class="p">,</span> <span class="n">to_abspath</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">to_path</span><span class="p">,</span> <span class="n">not_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">orverwrite</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
-        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">to_path</span><span class="p">,</span> <span class="n">to_fwpaths</span><span class="p">)</span>
+        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">to_path</span><span class="p">,</span> <span class="n">to_fwpaths</span><span class="p">,</span> <span class="n">to_rjpaths</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
         <span class="k">if</span> <span class="n">orverwrite</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">to_abspath</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
@@ -506,7 +522,8 @@
 
 <div class="viewcode-block" id="Filer.file_move">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.filer.Filer.file_move">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">file_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">to_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">from_fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">file_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">to_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">from_fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">from_rjpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_rjpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ファイルを移動する</span>
 
@@ -515,6 +532,8 @@
 <span class="sd">            to_path (str): 移動先パス</span>
 <span class="sd">            from_fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.</span>
 <span class="sd">            to_fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.</span>
+<span class="sd">            from_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.</span>
+<span class="sd">            to_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            int: レスポンスコード</span>
@@ -523,14 +542,14 @@
         <span class="n">chk</span><span class="p">,</span> <span class="n">from_abspath</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">from_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
-        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">from_path</span><span class="p">,</span> <span class="n">from_fwpaths</span><span class="p">)</span>
+        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">from_path</span><span class="p">,</span> <span class="n">from_fwpaths</span><span class="p">,</span> <span class="n">from_rjpaths</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
 
         <span class="n">chk</span><span class="p">,</span> <span class="n">to_abspath</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">to_path</span><span class="p">,</span> <span class="n">not_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
-        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">to_path</span><span class="p">,</span> <span class="n">to_fwpaths</span><span class="p">)</span>
+        <span class="n">chk</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_fwpath</span><span class="p">(</span><span class="n">to_path</span><span class="p">,</span> <span class="n">to_fwpaths</span><span class="p">,</span> <span class="n">to_rjpaths</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span><span class="p">,</span> <span class="n">msg</span>
 

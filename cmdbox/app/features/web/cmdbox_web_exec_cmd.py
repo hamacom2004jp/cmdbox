@@ -170,6 +170,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 loaded = common.loadopt(opt_path, False)
                 for o in opt.keys():
                     if 'fwpath' in o and opt[o]: continue # fwpathはアクセスコントロールで使用するため、コマンドファイルから読み込まない
+                    if 'rjpath' in o and opt[o]: continue # rjpathはアクセスコントロールで使用するため、コマンドファイルから読み込まない
                     found = False
                     for s in schema:
                         if 'opt' not in s or s['opt'] != o: continue

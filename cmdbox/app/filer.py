@@ -50,12 +50,13 @@ class Filer(object):
             return False, abspath, dict(warn=f"Path {abspath} exist. param={current_path}")
         return True, abspath, dict(success=f"Path {abspath} exists.")
 
-    def check_fwpath(self, path:str, fwpaths:List[str]) -> Tuple[int, Dict[str, Any]]:
+    def check_fwpath(self, path:str, fwpaths:List[str], rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
         """
         パスが範囲内かどうかを確認する
         Args:
             path (str): パス
             fwpaths (List[str]): 範囲内かどうかを示すパスのリスト
+            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト, by default None
         Returns:
             int: レスポンスコード
             dict: メッセージ
@@ -65,10 +66,12 @@ class Filer(object):
             return False, dict(warn=f"fwpaths is None.")
         if not any(from_abspath.is_relative_to(self._file_exists(fwpath)[1]) for fwpath in fwpaths):
             return False, dict(warn=f"The specified path ( {path} ) is out of bounds. Permitted path: {fwpaths}")
+        if rjpaths is not None and any(re.match(rjpath, str(from_abspath)) for rjpath in rjpaths):
+            return False, dict(warn=f"The specified path ( {path} ) is rejected by rjpaths. Rejected path pattern: {rjpaths}")
         return True, None
 
     def file_list(self, current_path:str, recursive:bool=False,
-                  fwpaths:List[str]=None, listregs:str=".*") -> Tuple[int, Dict[str, Any]]:
+                  fwpaths:List[str]=None, rjpaths:List[str]=None, listregs:str=".*") -> Tuple[int, Dict[str, Any]]:
         """
         ファイルリストを取得する
 
@@ -76,6 +79,7 @@ class Filer(object):
             path (str): ファイルパス
             recursive (bool, optional): 再帰的に取得するかどうか, by default False
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト, by default None
+            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト, by default None
             listregs (str, optional): リストアップするgrep条件, by default ".*"
     
         Returns:
@@ -114,7 +118,10 @@ class Filer(object):
                 cpart = '/' if cpart=='' else cpart
                 if not file_list.exists():
                     return tpath_key, None
-                if any(fwpath.startswith(tpath) or tpath.startswith(fwpath) for fwpath in fwpaths):
+                if any(fwpath.startswith(tpath) or tpath.startswith(fwpath) for fwpath in fwpaths) \
+                    and not any(re.match(rjpath, tpath) for rjpath in rjpaths):
+                    if not listregs_pt.match(file_list.name):
+                        return tpath_key, None
                     return tpath_key, dict(name=cpart,
                                     is_dir=False,
                                     path=tpath,
@@ -138,7 +145,8 @@ class Filer(object):
                     continue
                 if not f.exists():
                     continue
-                if any(fwpath.startswith(path) or path.startswith(fwpath) for fwpath in fwpaths):
+                if any(fwpath.startswith(path) or path.startswith(fwpath) for fwpath in fwpaths) \
+                    and not any(re.match(rjpath, path) for rjpath in rjpaths):
                     if not listregs_pt.match(f.name):
                         continue
                     children[key] = dict(name=f.name,
@@ -173,13 +181,14 @@ class Filer(object):
             path_tree[tpath_key] = pt
         return self.RESP_SUCCESS, dict(success=path_tree)
     
-    def file_mkdir(self, current_path:str, fwpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+    def file_mkdir(self, current_path:str, fwpaths:List[str]=None, rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
         """
         ディレクトリを作成する
 
         Args:
             current_path (str): ディレクトリパス
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
+            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
 
         Returns:
             int: レスポンスコード
@@ -188,7 +197,7 @@ class Filer(object):
         chk, abspath, msg = self._file_exists(current_path, not_exists=True)
         if not chk:
             return self.RESP_WARN, msg
-        chk, msg = self.check_fwpath(current_path, fwpaths)
+        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths)
         if not chk:
             return self.RESP_WARN, msg
 
@@ -200,13 +209,14 @@ class Filer(object):
             self.logger.warning(f"Failed to create {abspath}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to create {abspath}. {e}")
     
-    def file_rmdir(self, current_path:str, fwpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+    def file_rmdir(self, current_path:str, fwpaths:List[str]=None, rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
         """
         ディレクトリを削除する
 
         Args:
             current_path (str): ディレクトリパス
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
+            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
 
         Returns:
             int: レスポンスコード
@@ -215,7 +225,7 @@ class Filer(object):
         chk, abspath, msg = self._file_exists(current_path)
         if not chk:
             return self.RESP_WARN, msg
-        chk, msg = self.check_fwpath(current_path, fwpaths)
+        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths)
         if not chk:
             return self.RESP_WARN, msg
         if abspath == self.data_dir:
@@ -231,7 +241,7 @@ class Filer(object):
             return self.RESP_WARN, dict(warn=f"Failed to remove {abspath}. {e}")
 
     def file_download(self, current_path:str, img_thumbnail:float=0.0,
-                      fwpaths:List[str]=None, etag:str=None) -> Tuple[int, Dict[str, Any]]:
+                      fwpaths:List[str]=None, rjpaths:List[str]=None, etag:str=None) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルをダウンロードする
 
@@ -239,6 +249,7 @@ class Filer(object):
             current_path (str): ファイルパス
             img_thumbnail (float, optional): サムネイルのサイズ, by default 0.0
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
+            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
             etag (str, optional): ETag. Defaults to None.
 
         Returns:
@@ -249,7 +260,7 @@ class Filer(object):
         chk, abspath, msg = self._file_exists(current_path)
         if not chk:
             return self.RESP_WARN, msg
-        chk, msg = self.check_fwpath(current_path, fwpaths)
+        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths)
         if not chk:
             return self.RESP_WARN, msg
         if abspath.is_dir():
@@ -277,7 +288,7 @@ class Filer(object):
             self.logger.warning(f"Failed to download {abspath}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to download {abspath}. {e}")
 
-    def file_upload(self, current_path:str, file_name:str, file_data:bytes, mkdir:bool, orverwrite:bool, fwpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+    def file_upload(self, current_path:str, file_name:str, file_data:bytes, mkdir:bool, orverwrite:bool, fwpaths:List[str]=None, rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルをアップロードする
 
@@ -288,6 +299,7 @@ class Filer(object):
             mkdir (bool): ディレクトリを作成するかどうか
             orverwrite (bool): 上書きするかどうか
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
+            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
 
         Returns:
             int: レスポンスコード
@@ -296,7 +308,7 @@ class Filer(object):
         chk, abspath, msg = self._file_exists(current_path, exists_chk=False)
         if not chk:
             return self.RESP_WARN, msg
-        chk, msg = self.check_fwpath(current_path, fwpaths)
+        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths)
         if not chk:
             return self.RESP_WARN, msg
 
@@ -323,13 +335,14 @@ class Filer(object):
             self.logger.warning(f"Failed to upload {save_path}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to upload {save_path}. {e}")
 
-    def file_remove(self, current_path:str, fwpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+    def file_remove(self, current_path:str, fwpaths:List[str]=None, rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルを削除する
 
         Args:
             current_path (str): ファイルパス
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
+            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
 
         Returns:
             int: レスポンスコード
@@ -338,7 +351,7 @@ class Filer(object):
         chk, abspath, msg = self._file_exists(current_path)
         if not chk:
             return self.RESP_WARN, msg
-        chk, msg = self.check_fwpath(current_path, fwpaths)
+        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths)
         if not chk:
             return self.RESP_WARN, msg
         if abspath.is_dir():
@@ -353,7 +366,8 @@ class Filer(object):
             self.logger.warning(f"Failed to remove {abspath}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to remove {abspath}. {e}")
 
-    def file_copy(self, from_path:str, to_path:str, orverwrite:bool, from_fwpaths:List[str]=None, to_fwpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+    def file_copy(self, from_path:str, to_path:str, orverwrite:bool, from_fwpaths:List[str]=None, to_fwpaths:List[str]=None,
+                  from_rjpaths:List[str]=None, to_rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルをコピーする
 
@@ -363,6 +377,8 @@ class Filer(object):
             orverwrite (bool): 上書きするかどうか
             from_fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             to_fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
+            from_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            to_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
 
         Returns:
             int: レスポンスコード
@@ -371,14 +387,14 @@ class Filer(object):
         chk, from_abspath, msg = self._file_exists(from_path)
         if not chk:
             return self.RESP_WARN, msg
-        chk, msg = self.check_fwpath(from_path, from_fwpaths)
+        chk, msg = self.check_fwpath(from_path, from_fwpaths, from_rjpaths)
         if not chk:
             return self.RESP_WARN, msg
 
         chk, to_abspath, msg = self._file_exists(to_path, not_exists=True)
         if not chk and not orverwrite:
             return self.RESP_WARN, msg
-        chk, msg = self.check_fwpath(to_path, to_fwpaths)
+        chk, msg = self.check_fwpath(to_path, to_fwpaths, to_rjpaths)
         if not chk:
             return self.RESP_WARN, msg
         if orverwrite and not to_abspath.parent.exists():
@@ -398,7 +414,8 @@ class Filer(object):
                                                     ret_path=ret_path,
                                                     msg=f"Copy from '{from_path}' to '{to_path}'. write '{ret_path}'"))
 
-    def file_move(self, from_path:str, to_path:str, from_fwpaths:List[str]=None, to_fwpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+    def file_move(self, from_path:str, to_path:str, from_fwpaths:List[str]=None, to_fwpaths:List[str]=None,
+                  from_rjpaths:List[str]=None, to_rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルを移動する
 
@@ -407,6 +424,8 @@ class Filer(object):
             to_path (str): 移動先パス
             from_fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             to_fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
+            from_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            to_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
 
         Returns:
             int: レスポンスコード
@@ -415,14 +434,14 @@ class Filer(object):
         chk, from_abspath, msg = self._file_exists(from_path)
         if not chk:
             return self.RESP_WARN, msg
-        chk, msg = self.check_fwpath(from_path, from_fwpaths)
+        chk, msg = self.check_fwpath(from_path, from_fwpaths, from_rjpaths)
         if not chk:
             return self.RESP_WARN, msg
 
         chk, to_abspath, msg = self._file_exists(to_path, not_exists=True)
         if not chk:
             return self.RESP_WARN, msg
-        chk, msg = self.check_fwpath(to_path, to_fwpaths)
+        chk, msg = self.check_fwpath(to_path, to_fwpaths, to_rjpaths)
         if not chk:
             return self.RESP_WARN, msg
 

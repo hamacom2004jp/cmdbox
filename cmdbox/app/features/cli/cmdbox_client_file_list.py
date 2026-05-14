@@ -52,13 +52,16 @@ class ClientFileList(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",
                      description_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
                      description_en="Specify the service name of the inference server. If omitted, `server` is used."),
-                dict(opt="svpath", type=Options.T_FILE, default="/", required=True, multi=False, hide=False, choice=None,
+                dict(opt="svpath", type=Options.T_DIR, default="/", required=True, multi=False, hide=False, choice=None,
                      description_ja="サーバーのデータフォルダ以下のパスを指定します。省略時は `/` を使用します。",
                      description_en="Specify the directory path to get the list of files.",
                      test_true={"server":"/"}),
                 dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None, web="mask",
                      description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合、このパスを指定したと解釈します。",
                      description_en="Specify a path to determine whether the specified path is out of bounds. If it is not under this path, it is interpreted as having specified this path.",),
+                dict(opt="rjpath", type=Options.T_FILE, default=None, required=False, multi=True, hide=False, choice=None, web="mask",
+                     description_ja="指定したパスが要求されたパスにマッチする場合、アクセスが拒否されます。正規表現として解釈します。",
+                     description_en="If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."),
                 dict(opt="listregs", type=Options.T_STR, default=".*", required=False, multi=False, hide=False, choice=None,
                      description_ja="リストアップする条件を正規表現で指定します。",
                      description_en="Specify the regular expression conditions to list."),
@@ -118,9 +121,10 @@ class ClientFileList(feature.OneshotResultEdgeFeature, validator.Validator):
 
         client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
         fwpaths = [p.replace('"','') for p in args.fwpath]
+        rjpaths = [p.replace('"','') for p in args.rjpath] if args.rjpath is not None else []
         listregs = args.listregs if args.listregs is not None else ".*"
         ret = cl.file_list(svpath=args.svpath.replace('"',''), recursive=args.recursive, scope=args.scope,
-                           client_data=client_data, fwpaths=fwpaths, listregs=listregs,
+                           client_data=client_data, fwpaths=fwpaths, rjpaths=rjpaths, listregs=listregs,
                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
@@ -162,11 +166,12 @@ class ClientFileList(feature.OneshotResultEdgeFeature, validator.Validator):
         svpath = payload.get('svpath', '/')
         recursive = payload.get('recursive', False)
         fwpaths = payload.get('fwpaths', None)
+        rjpaths = payload.get('rjpaths', None)
         listregs = payload.get('listregs', ".*")
-        st = self.file_list(msg[1], svpath, recursive, fwpaths, listregs, data_dir, logger, redis_cli, sessions)
+        st = self.file_list(msg[1], svpath, recursive, fwpaths, rjpaths, listregs, data_dir, logger, redis_cli, sessions)
         return st
 
-    def file_list(self, reskey:str, current_path:str, recursive:bool, fwpaths:List[str], listregs:str,
+    def file_list(self, reskey:str, current_path:str, recursive:bool, fwpaths:List[str], rjpaths:List[str], listregs:str,
                   data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ファイルリストを取得する
@@ -176,6 +181,7 @@ class ClientFileList(feature.OneshotResultEdgeFeature, validator.Validator):
             current_path (str): ファイルパス
             recursive (bool): 再帰的に取得するかどうか
             fwpaths (List[str]): 範囲内かどうかを示すパスのリスト
+            rjpaths (List[str]): 範囲外かどうかを示すパスのリスト
             listregs (str): リストアップする正規表現条件
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
@@ -187,7 +193,7 @@ class ClientFileList(feature.OneshotResultEdgeFeature, validator.Validator):
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_list(current_path, recursive, fwpaths, listregs)
+            rescode, msg = f.file_list(current_path, recursive, fwpaths, rjpaths, listregs)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

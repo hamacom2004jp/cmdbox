@@ -117,7 +117,7 @@ cmdbox.confirm = (res, i18n=false, nosave=false) => {
  */
 cmdbox.message = (res, i18n=false, nosave=false, enable_closebot=true, enable_confirm=false) => {
     return new Promise((resolve) => {
-        const msg = JSON.stringify(res).replace(/\\n/g, '<br/>').replace(/\\/g, '').replace(/^"|"$/g, '').replace(/\\t/g, '&emsp;');
+        const msg = JSON.stringify(res).replace(/\\n/g, '\n').replace(/\\/g, '').replace(/^"|"$/g, '').replace(/\\t/g, '&emsp;');
         const modal = $(`<div class="modal fade" tabindex="-1" style="z-index:5000;">
             <div class="modal-dialog">
                 <form class="modal-content novalidate">
@@ -244,8 +244,8 @@ cmdbox.set_logoicon = async (sel) => {
  * サインアウト
  * @param {string} sitepath - サイトパス
  **/
-cmdbox.signout = (sitepath) => {
-    if (confirm('Sign out ok ?')) {
+cmdbox.signout = async (sitepath) => {
+    if (await cmdbox.confirm('Sign out ok ?', true)) {
         const rand = cmdbox.random_string(8);
         location.href = `dosignout/${sitepath}?r=${rand}`;
     }
@@ -1453,7 +1453,7 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
             elem = $(`<div class="col-${lcolsize} mb-3">` // row_content_template_text
                     +'<div class="input-group">'
                     +'<label class="input-group-text row_content_template_title">title</label>'
-                    +'<textarea class="form-control row_content_template_input" rows="1" style="field-sizing:content;"></textarea>'
+                    +'<textarea class="form-control row_content_template_input" rows="1" style="field-sizing:content;max-height:300px;"></textarea>'
                     +'</div></div>');
         } else if(row.type=='dict') {
             elem = $(`<div class="col-${lcolsize} mb-3">` // row_content_template_dict
