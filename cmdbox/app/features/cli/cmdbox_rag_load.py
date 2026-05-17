@@ -85,21 +85,11 @@ class RagLoad(feature.OneshotResultEdgeFeature, validator.Validator):
     def output_schema(self) -> type:
         class Data(resdata.Data):
             rag_name: Union[str, None] = pydantic.Field(default=None, description="RAG名")
-            rag_type: Union[str, None] = pydantic.Field(default=None, description="RAGタイプ")
+            rag_datasource: Union[str, None] = pydantic.Field(default=None, description="RAGのデータソース識別名")
             savetype: Union[str, None] = pydantic.Field(default=None, description="保存タイプ")
             extract: Union[List[str], None] = pydantic.Field(default=None, description="エクストラクト設定リスト")
             embed: Union[str, None] = pydantic.Field(default=None, description="エンベッディング名")
             embed_vector_dim: Union[int, None] = pydantic.Field(default=None, description="エンベッディングベクトル次元数")
-            vector_store_pghost: Union[str, None] = pydantic.Field(default=None, description="ベクトルストアPostgreSQLホスト")
-            vector_store_pgport: Union[int, None] = pydantic.Field(default=None, description="ベクトルストアPostgreSQLポート")
-            vector_store_pguser: Union[str, None] = pydantic.Field(default=None, description="ベクトルストアPostgreSQLユーザー")
-            vector_store_pgpass: Union[str, None] = pydantic.Field(default=None, description="ベクトルストアPostgreSQLパスワード")
-            vector_store_pgdbname: Union[str, None] = pydantic.Field(default=None, description="ベクトルストアPostgreSQLデータベース名")
-            graph_store_pghost: Union[str, None] = pydantic.Field(default=None, description="グラフストアPostgreSQLホスト")
-            graph_store_pgport: Union[int, None] = pydantic.Field(default=None, description="グラフストアPostgreSQLポート")
-            graph_store_pguser: Union[str, None] = pydantic.Field(default=None, description="グラフストアPostgreSQLユーザー")
-            graph_store_pgpass: Union[str, None] = pydantic.Field(default=None, description="グラフストアPostgreSQLパスワード")
-            graph_store_pgdbname: Union[str, None] = pydantic.Field(default=None, description="グラフストアPostgreSQLデータベース名")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result

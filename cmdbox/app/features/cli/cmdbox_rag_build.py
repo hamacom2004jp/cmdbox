@@ -104,8 +104,10 @@ class RagBuild(rag_base.RAGBase, validator.Validator):
             rag_conf = payload.get('rag_conf')
             rag_name = rag_conf.get('rag_name')
             embed_vector_dim = rag_conf.get('embed_vector_dim')
+            ds_conf = self.ds_load.load_datasource(data_dir, rag_conf.get('rag_datasource'))
 
-            store = rag_store.RagStore.create(rag_conf, logger)
+            store = rag_store.RagStore.create(ds_conf, logger,
+                                              appcls=self.appcls, ver=self.ver, language=self.language)
             store.install()
             store.create_tables(rag_name, embed_vector_dim=embed_vector_dim)
 

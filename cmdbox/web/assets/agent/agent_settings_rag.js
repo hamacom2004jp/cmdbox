@@ -1,9 +1,6 @@
 agentView.get_rag_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('rag', 'save');
-    const vform_names = ['rag_name', 'rag_type', 'source_dir', 'extract', 'embed', 'embed_vector_dim', 'savetype',
-                         'vector_store_pghost', 'vector_store_pgport', 'vector_store_pguser', 'vector_store_pgpass', 'vector_store_pgdbname',
-                         'graph_store_pghost', 'graph_store_pgport', 'graph_store_pguser', 'graph_store_pgpass', 'graph_store_pgdbname',
-                        ];
+    const vform_names = ['rag_name', 'rag_datasource', 'source_dir', 'extract', 'embed', 'embed_vector_dim', 'savetype',];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };
@@ -23,7 +20,7 @@ agentView.list_rag = async () => {
     $('#btn_add_rag').off('click').on('click', async () => {
         await agentView.build_rag_form();
         $('#form_rag_edit [name="rag_name"]').prop('readonly', false);
-        $('#form_rag_edit [name="rag_type"]').trigger('change');
+        $('#form_rag_edit [name="rag_datasource"]').trigger('change');
         $('#btn_del_rag').hide();
         $('#btn_build_rag').hide();
         cmdbox.process_i18n($('#rag_edit_modal'));
@@ -33,6 +30,11 @@ agentView.list_rag = async () => {
             $("[name='embed']").empty().append('<option></option>');
             res['data'].map(elm=>{$('[name="embed"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
         },$('[name="title"]').val(),'embed');
+        // RAG Datasourceリストをロード
+        await cmdbox.callcmd('datasource','list',{},(res)=>{
+            $("[name='rag_datasource']").empty().append('<option></option>');
+            res['data'].map(elm=>{$('[name="rag_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+        },$('[name="title"]').val(),'rag_datasource');
         // Extractリストをロード
         await cmdbox.callcmd('extract','list',{match_mode:'extract'},(res)=>{
             $("[name='extract']").empty().append('<option></option>');
@@ -82,7 +84,7 @@ agentView.list_rag = async () => {
                 <li class="sf-list-item" style="cursor: pointer;">
                     <div>
                         <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.rag_name}</span>
-                        <span>${config.rag_type} / ${config.extract} / ${config.embed}</span>
+                        <span>${config.rag_datasource} / ${config.extract} / ${config.embed}</span>
                     </div>
                 </li>
             `).appendTo(container_ul);
@@ -134,6 +136,11 @@ agentView.list_rag = async () => {
                     res['data'].map(elm=>{$('[name="embed"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
                     form.find('[name="embed"]').val(config.embed);
                 },$('[name="title"]').val(),'embed');
+                await cmdbox.callcmd('datasource','list',{},(res)=>{
+                    $("[name='rag_datasource']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="rag_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                    form.find('[name="rag_datasource"]').val(config.rag_datasource);
+                },$('[name="title"]').val(),'rag_datasource');
                 await cmdbox.callcmd('extract','list',{match_mode:'extract'},(res)=>{
                     $("[name='extract']").empty().append('<option></option>');
                     res['data'].map(elm=>{$("[name='extract']").append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});

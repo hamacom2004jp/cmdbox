@@ -21,10 +21,6 @@ $(() => {
             const embed_edit_html = await fetch('assets/agent/agent_settings_embed.html').then(res => res.text());
             $('.layout-grid').append(embed_edit_html);
 
-            // memory追加/編集モーダルの読込み
-            const memory_edit_html = await fetch('assets/agent/agent_settings_memory.html').then(res => res.text());
-            $('.layout-grid').append(memory_edit_html);
-
             // rag追加/編集モーダルの読込み
             const rag_edit_html = await fetch('assets/agent/agent_settings_rag.html').then(res => res.text());
             $('.layout-grid').append(rag_edit_html);
@@ -36,6 +32,10 @@ $(() => {
             // runner追加/編集モーダルの読込み
             const runner_edit_html = await fetch('assets/agent/agent_settings_runner.html').then(res => res.text());
             $('.layout-grid').append(runner_edit_html);
+
+            // datasource追加/編集モーダルの読込み
+            const datasource_edit_html = await fetch('assets/agent/agent_settings_datasource.html').then(res => res.text());
+            $('.layout-grid').append(datasource_edit_html);
 
             // ファイラー画面の読込み
             const files_html = await fetch('assets/agent/agent_files.html').then(res => res.text());

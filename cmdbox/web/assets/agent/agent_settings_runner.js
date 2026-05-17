@@ -1,8 +1,7 @@
 agentView.get_runner_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('agent', 'runner_save');
-    const vform_names = ['runner_name', 'agent', 'session_store_type', 'session_store_pghost',
-                        'session_store_pgport', 'session_store_pguser', 'session_store_pgpass', 'session_store_pgdbname',
-                        'memory', 'rag', 'tts_engine', 'voicevox_model'];
+    const vform_names = ['runner_name', 'agent', 'session_datasource',
+                        'rag', 'tts_engine', 'voicevox_model'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };
@@ -22,7 +21,7 @@ agentView.list_runner = async () => {
     $('#btn_add_runner').off('click').on('click', async () => {
         await agentView.build_runner_form();
         $('#form_runner_edit [name="runner_name"]').prop('readonly', false);
-        $('#form_runner_edit [name="session_store_type"]').trigger('change');
+        $('#form_runner_edit [name="session_datasource"]').trigger('change');
         $('#btn_del_runner').hide();
         cmdbox.process_i18n($('#runner_edit_modal'));
         $('#runner_edit_modal').modal('show');
@@ -31,11 +30,11 @@ agentView.list_runner = async () => {
             $("[name='agent']").empty().append('<option></option>');
             res['data'].map(elm=>{$('[name="agent"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
         },$('[name="title"]').val(),'agent');
-        // メモリーリストをロード
-        await cmdbox.callcmd('agent','memory_list',{},(res)=>{
-            $("[name='memory']").empty().append('<option></option>');
-            res['data'].map(elm=>{$('[name="memory"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-        },$('[name="title"]').val(),'memory');
+        // Session Datasourceリストをロード
+        await cmdbox.callcmd('datasource','list',{},(res)=>{
+            $("[name='session_datasource']").empty().append('<option></option>');
+            res['data'].map(elm=>{$('[name="session_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+        },$('[name="title"]').val(),'session_datasource');
         // RAGリストをロード
         await cmdbox.callcmd('rag','list',{},(res)=>{
             $("[name='rag']").empty().append('<option></option>');
@@ -92,7 +91,7 @@ agentView.list_runner = async () => {
                         <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.runner_name}</span>
                         <span>
                             Agent: ${config.agent || 'None'},
-                            Session Store: ${config.session_store_type || 'None'},
+                            Session Store: ${config.session_datasource || 'None'},
                             VOICEVOX: ${config.voicevox_model || 'N/A'}
                         </span>
                     </div>
@@ -137,11 +136,11 @@ agentView.list_runner = async () => {
                     res['data'].map(elm=>{$('[name="agent"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
                     form.find('[name="agent"]').val(config.agent);
                 },$('[name="title"]').val(),'agent');
-                await cmdbox.callcmd('agent','memory_list',{},(res)=>{
-                    $("[name='memory']").empty().append('<option></option>');
-                    res['data'].map(elm=>{$('[name="memory"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                    form.find('[name="memory"]').val(config.memory);
-                },$('[name="title"]').val(),'memory');
+                await cmdbox.callcmd('datasource','list',{},(res)=>{
+                    $("[name='session_datasource']").empty().append('<option></option>');
+                    res['data'].map(elm=>{$('[name="session_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                    form.find('[name="session_datasource"]').val(config.session_datasource);
+                },$('[name="title"]').val(),'session_datasource');
                 await cmdbox.callcmd('rag','list',{},(res)=>{
                     $("[name='rag']").empty().append('<option></option>');
                     res['data'].map(elm=>{$('[name="rag"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
@@ -233,7 +232,7 @@ agentView.show_runner_select_modal = async () => {
             head.html(`${config.runner_name}`);
             const body = $(`<span></span>`).appendTo(div1);
             body.html(`Agent: ${config.agent || 'None'},
-                       Session Store: ${config.session_store_type || 'None'},
+                       Session Store: ${config.session_datasource || 'None'},
                        VOICEVOX: ${config.voicevox_model || 'None'}`);
             // リストアイテムクリックでrunner選択
             li.on('click', async () => {
@@ -267,8 +266,6 @@ agentView.select_runner = async (runner_name) => {
         agentView.btn_new_chat.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
         // ファイル転送ボタンも有効化
         agentView.btn_filetrancefer.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
-        // MEMORYボタンも有効化
-        agentView.btn_memories.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
         // Historiesボタンも有効化
         agentView.btn_histories.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
         // 音声入力ボタンも有効化

@@ -108,14 +108,25 @@ cmdbox.confirm = (res, i18n=false, nosave=false) => {
     return cmdbox.message(res, i18n, nosave, false, true);
 };
 /**
+ * プロンプトメッセージ表示
+ * @param {object} res - レスポンス
+ * @param {boolean} i18n - 翻訳を有効にするかどうか
+ * @param {boolean} nosave - 翻訳メッセージを保存しないかどうか
+ * @returns {Promise<string|null>} - 入力された値、またはキャンセルされた場合はnull
+ */
+cmdbox.prompt = (res, i18n=false, nosave=false) => {
+    return cmdbox.message(res, i18n, nosave, false, false, true);
+};
+/**
  * アラートメッセージ表示
  * @param {object} res - レスポンス
  * @param {boolean} i18n - 翻訳を有効にするかどうか
  * @param {boolean} nosave - 翻訳メッセージを保存しないかどうか
  * @param {boolean} enable_closebot - 閉じるボタンを有効にするかどうか
  * @param {boolean} enable_confirm - 確認ダイアログを有効にするかどうか（このオプションが有効な場合、enable_closebotは無効になります）
+ * @param {boolean} enable_prompt - プロンプトを有効にするかどうか
  */
-cmdbox.message = (res, i18n=false, nosave=false, enable_closebot=true, enable_confirm=false) => {
+cmdbox.message = (res, i18n=false, nosave=false, enable_closebot=true, enable_confirm=false, enable_prompt=false) => {
     return new Promise((resolve) => {
         const msg = JSON.stringify(res).replace(/\\n/g, '\n').replace(/\\/g, '').replace(/^"|"$/g, '').replace(/\\t/g, '&emsp;');
         const modal = $(`<div class="modal fade" tabindex="-1" style="z-index:5000;">
@@ -150,8 +161,27 @@ cmdbox.message = (res, i18n=false, nosave=false, enable_closebot=true, enable_co
             ok_btn.off('click').on('click', () => {resolve(true);});
             cancel_btn.off('click').on('click', () => {resolve(false);});
         }
+        else if (enable_prompt) {
+            const input = $(`<input type="text" class="form-control mt-2" placeholder="Input here...">`);
+            modal.find('.modal-body').append(input);
+            const ok_btn = $(`<button type="button" class="btn btn-outline-primary i18n" data-bs-dismiss="modal">OK</button>`);
+            const cancel_btn = $(`<button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Cancel</button>`);
+            modal.find('.modal-footer').append(ok_btn).append(cancel_btn);
+            ok_btn.off('click').on('click', () => {resolve(input.val());});
+            cancel_btn.off('click').on('click', () => {resolve(null);});
+            input.off('keypress').on('keypress', (ev) => {
+                if (ev.which === 13) {
+                    ev.preventDefault();
+                    ok_btn.click();
+                }
+            });
+            modal.on('shown.bs.modal', () => {input.focus();});
+        }
         else if (enable_closebot) {
             modal.find('.modal-footer .btn-outline-secondary').on('click', () => {resolve(true);});
+            modal.on('shown.bs.modal', () => {
+                modal.find('.modal-footer .btn-outline-secondary').focus();
+            });
         }
         if (i18n) {
             cmdbox.process_i18n(modal, nosave);
@@ -323,7 +353,7 @@ cmdbox.editapikey = async () => {
     $('<button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>').appendTo(footer);
     const delapikey_btn = $(`<button type="button" class="btn btn-outline-danger i18n">Del apikey</button>`).appendTo(footer);
     delapikey_btn.off('click').on('click', async (event) => {
-        const apikey_name = window.prompt('Please enter the apikey name.');
+        const apikey_name = await cmdbox.prompt('Please enter the apikey name.', true);
         if (!apikey_name) return;
         const res = await fetch('gui/apikey/del', {
             method: 'POST',
@@ -340,7 +370,7 @@ cmdbox.editapikey = async () => {
     });
     const addapikey_btn = $(`<button type="button" class="btn btn-outline-primary i18n">Add apikey</button>`).appendTo(footer);
     addapikey_btn.off('click').on('click', async (event) => {
-        const apikey_name = window.prompt('Please enter the apikey name.');
+        const apikey_name = await cmdbox.prompt('Please enter the apikey name.', true);
         if (!apikey_name) return;
         const res = await fetch('gui/apikey/add', {
             method: 'POST',
@@ -351,7 +381,7 @@ cmdbox.editapikey = async () => {
             cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
             return;
         }
-        cmdbox.message(await res.json(), true, true);
+        cmdbox.message(await res.json(), false);
         editapikey_modal.modal('hide');
         cmdbox.editapikey();
     });
@@ -1380,7 +1410,7 @@ cmdbox.load_user_data = async (cat, key) => {
     formData.append('categoly', cat);
     if (key) formData.append('key', key);
     const res = await fetch('gui/user_data/load', {method:'POST', body:formData});
-    if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
+    if (!res.ok) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, false);
     const data = await res.json();
     return data;
 };
@@ -1811,8 +1841,8 @@ cmdbox.callcmd = async (mode, cmd, params, callback, title, opt_name, err_i18n=t
             console.log({'error':cmd_opt});
             return res;
         }
-        if (!cmd_opt[opt_name]) return res;
         if (callback) callback(res[0]['success']);
+        else if (!cmd_opt[opt_name]) return res;
         $(`[name="${opt_name}"]`).val(cmd_opt[opt_name]);
     });
 };
@@ -1959,6 +1989,7 @@ cmdbox.get_param = (modal_elem) => {
  * @returns {Promise<Object>}
  */
 cmdbox.translation = async (words, nosave, llmname) => {
+    if (!words || words.length <= 0) return words;
     const targetLang = await cmdbox.getUserLanguage();
     let res = await cmdbox.callcmd('llm', 'translation', {
         llmname: llmname?llmname:'',

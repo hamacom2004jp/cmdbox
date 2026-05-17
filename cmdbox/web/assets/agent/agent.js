@@ -14,13 +14,11 @@ agentView.initView = () => {
     agentView.settingsModal = $('#agent_settings_modal');
     agentView.chatMessages = $('#messages');
     agentView.chatContainer = $('#chatContainer');
-    agentView.memoryModal = $('#memoryModal');
     agentView.historyModal = $('#historyModal');
     agentView.chatHistories = $('#session_tab ul.sf-list-group');
     agentView.fileTranceferModal = $('#fileTranceferModal');
     agentView.btn_new_chat = $('#btn_new_chat');
     agentView.btn_filetrancefer = $('#btn_filetrancefer');
-    agentView.btn_memories = $('#btn_memories');
     agentView.btn_histories = $('#btn_histories');
     agentView.chat_reconnect_count = 0;
 
@@ -47,11 +45,6 @@ agentView.initView = () => {
         await agentView.list_agent();
         cmdbox.process_i18n(agentView.settingsModal);
     });
-    // メモリーモーダルの shown.bs.modal イベントハンドラ
-    agentView.memoryModal.off('shown.bs.modal').on('shown.bs.modal', async () => {
-        await agentView.show_memories();
-        cmdbox.process_i18n(agentView.memoryModal);
-    });
     // ヒストリーモーダルの shown.bs.modal イベントハンドラ
     agentView.historyModal.off('shown.bs.modal').on('shown.bs.modal', async () => {
         await agentView.list_sessions();
@@ -72,8 +65,6 @@ agentView.initView = () => {
     agentView.btn_new_chat.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
     // ファイル転送ボタンも同様に無効化
     agentView.btn_filetrancefer.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
-    // MEMORYボタンも同様に無効化
-    agentView.btn_memories.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
     // Historiesボタンも同様に無効化
     agentView.btn_histories.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
     // 音声入力ボタンも同様に無効化
@@ -139,8 +130,6 @@ agentView.initView = () => {
             agentView.list_mcpsv();
         } else if (target === '#embedding_settings') {
             agentView.list_embedding();
-        } else if (target === '#memory_settings') {
-            agentView.list_memory();
         } else if (target === '#runner_settings') {
             agentView.list_runner();
         } else if (target === '#rag_settings') {
@@ -149,6 +138,8 @@ agentView.initView = () => {
             agentView.list_extract();
         } else if (target === '#tts_settings') {
             agentView.list_tts();
+        } else if (target === '#datasource_settings') {
+            agentView.list_datasource();
         }
     });
 

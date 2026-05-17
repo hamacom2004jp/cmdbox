@@ -218,23 +218,13 @@ This command implements ``output_schema()`` returning ``Result`` model.
           }
         ],
         "rag_name": "string",
-        "rag_type": "string",
+        "rag_datasource": "string",
         "savetype": "string",
         "extract": [
           "string"
         ],
         "embed": "string",
-        "embed_vector_dim": 0,
-        "vector_store_pghost": "string",
-        "vector_store_pgport": 0,
-        "vector_store_pguser": "string",
-        "vector_store_pgpass": "string",
-        "vector_store_pgdbname": "string",
-        "graph_store_pghost": "string",
-        "graph_store_pgport": 0,
-        "graph_store_pguser": "string",
-        "graph_store_pgpass": "string",
-        "graph_store_pgdbname": "string"
+        "embed_vector_dim": 0
       },
       "warn": {},
       "error": {},
@@ -250,21 +240,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.rag_name","str | null","no","null","RAG名"
-    "success.rag_type","str | null","no","null","RAGタイプ"
+    "success.rag_datasource","str | null","no","null","RAGのデータソース識別名"
     "success.savetype","str | null","no","null","保存タイプ"
     "success.extract","list[str] | null","no","null","エクストラクト設定リスト"
     "success.embed","str | null","no","null","エンベッディング名"
     "success.embed_vector_dim","int | null","no","null","エンベッディングベクトル次元数"
-    "success.vector_store_pghost","str | null","no","null","ベクトルストアPostgreSQLホスト"
-    "success.vector_store_pgport","int | null","no","null","ベクトルストアPostgreSQLポート"
-    "success.vector_store_pguser","str | null","no","null","ベクトルストアPostgreSQLユーザー"
-    "success.vector_store_pgpass","str | null","no","null","ベクトルストアPostgreSQLパスワード"
-    "success.vector_store_pgdbname","str | null","no","null","ベクトルストアPostgreSQLデータベース名"
-    "success.graph_store_pghost","str | null","no","null","グラフストアPostgreSQLホスト"
-    "success.graph_store_pgport","int | null","no","null","グラフストアPostgreSQLポート"
-    "success.graph_store_pguser","str | null","no","null","グラフストアPostgreSQLユーザー"
-    "success.graph_store_pgpass","str | null","no","null","グラフストアPostgreSQLパスワード"
-    "success.graph_store_pgdbname","str | null","no","null","グラフストアPostgreSQLデータベース名"
     "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
@@ -351,21 +331,11 @@ rag ( save ) : ``cmdbox -m rag -c save <Option>``
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","120","","Specify the maximum waiting time until the server responds."
     "--rag_name <rag_name>","str","","required","","","Specify the name of the RAG configuration."
-    "--rag_type <rag_type>","str","","required","vector"," | vector_pg | vector_sqlite | graph_n4j | graph_pg","Specify the type of RAG."
+    "--rag_datasource <rag_datasource>","str","","required","","","Specify the data source where RAG will be stored."
     "--extract <extract>","str","multi","required","","","Specify the registered name for the Extract process used in RAG. If no candidates exist, you must register a command in extract mode."
-    "--embed <embed>","str","","","","","If rag_type is vector, specify the registration name of the embed model."
+    "--embed <embed>","str","","","","","Specify the registration name of the embed model."
     "--embed_vector_dim <embed_vector_dim>","int","","","256","","Specify the vector dimension for embedding."
     "--savetype <savetype>","str","","","per_doc","per_doc | per_service | add_only","Specify the storage pattern. `per_doc` :per document, `per_service` :per service, `add_only` :add only"
-    "--vector_store_pghost <vector_store_pghost>","str","","","pgsql","","Specify the postgresql host for VecRAG storage."
-    "--vector_store_pgport <vector_store_pgport>","int","","","5432","","Specify the postgresql port for VecRAG storage."
-    "--vector_store_pguser <vector_store_pguser>","str","","","pgsql","","Specify the postgresql user for VecRAG storage."
-    "--vector_store_pgpass <vector_store_pgpass>","passwd","","","pgsql","","Specify the postgresql password for VecRAG storage."
-    "--vector_store_pgdbname <vector_store_pgdbname>","str","","","pgsql","","Specify the postgresql database name for VecRAG storage."
-    "--graph_store_pghost <graph_store_pghost>","str","","","pgsql","","Specify the postgresql host for GraphRAG storage."
-    "--graph_store_pgport <graph_store_pgport>","int","","","5432","","Specify the postgresql port for GraphRAG storage."
-    "--graph_store_pguser <graph_store_pguser>","str","","","pgsql","","Specify the postgresql user for GraphRAG storage."
-    "--graph_store_pgpass <graph_store_pgpass>","passwd","","","pgsql","","Specify the postgresql password for GraphRAG storage."
-    "--graph_store_pgdbname <graph_store_pgdbname>","str","","","pgsql","","Specify the postgresql database name for GraphRAG storage."
 
 **Output Schema**
 

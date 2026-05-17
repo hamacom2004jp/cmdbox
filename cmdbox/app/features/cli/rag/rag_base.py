@@ -4,6 +4,7 @@ from cmdbox.app.commons import convert
 from cmdbox.app.features.cli import (
     cmdbox_client_file_list,
     cmdbox_cmd_load,
+    cmdbox_datasource_load,
     cmdbox_embed_start,
     cmdbox_embed_embedding,
     cmdbox_extract_load,
@@ -26,6 +27,7 @@ class RAGBase(feature.ResultEdgeFeature):
         self.embedembedding = cmdbox_embed_embedding.EmbedEmbedding(appcls, ver, language)
         self.extractload = cmdbox_extract_load.ExtractLoad(appcls, ver, language)
         self.client_file_list = cmdbox_client_file_list.ClientFileList(appcls, ver, language)
+        self.ds_load = cmdbox_datasource_load.DatasourceLoad(appcls, ver, language)
 
     def load_rag_config(self, args:argparse.Namespace, cl:client.Client, tm:float, pf, logger:logging.Logger) -> Tuple[int, Dict[str, Any], client.Client]:
         """
@@ -53,6 +55,26 @@ class RAGBase(feature.ResultEdgeFeature):
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, cl
         return self.RESP_SUCCESS, rag_config, cl
+
+    def load_datasource_config(self, args:argparse.Namespace, cl:client.Client, tm:float, pf, logger:logging.Logger) -> Tuple[int, Dict[str, Any], client.Client]:
+        """
+        データソース接続設定の読込みを行います
+
+        Args:
+            args (argparse.Namespace): 引数
+            cl (client.Client): クライアント
+            tm (float): 実行開始時間
+            pf: パフォーマンス情報
+            logger (logging.Logger): ロガー
+        Returns:
+            Tuple[int, Dict[str, Any], client.Client]: 終了コード, データソース接続設定, クライアント
+        """
+        st, res, _ = self.ds_load.apprun(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return st, res, cl
+        conf = res.get('success',{}).get('data',{})
+        return self.RESP_SUCCESS, conf, cl
 
     def check_signin(self, args:argparse.Namespace, tm:float, pf, logger:logging.Logger) -> Tuple[int, Dict[str, Any], None]:
         """

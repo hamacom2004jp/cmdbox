@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja" data-bs-theme="spaceship">
+<html lang="ja" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,7 +24,7 @@
 <div class="layout-grid">
     <!-- NAVIGATION SIDEBAR -->
     <nav class="nav-sidebar" id="navSidebar" style="z-index:51;">
-        <div class="nav-sidebar-header ps-2 pt-3 pb-3">
+        <div class="nav-sidebar-header ps-2 pt-3 pb-3" style="height:74px;">
             <button id="btn_toggle_sidebar" class="btn btn-nav-toggle me-auto" title="Toggle sidebar" style="width:53px;border:none;">
                 <i class="fas fa-bars fa-xl"></i>
             </button>
@@ -33,7 +33,7 @@
     <div class="split-pane fixed-left" style="display:flex;">
         <!-- LEFT PANEL: Console / Chat Interface -->
         <aside class="console-panel split-pane-component" style="z-index:52;">
-            <div class="d-flex align-items-center console-header justify-content-between">
+            <div class="d-flex align-items-center console-header justify-content-between" style="height:74px;">
                 <h5 class="d-inline-block m-0 glow-text-cyan system-font">
                     <span class="d-flex align-items-center">
                         <i class="fas fa-terminal me-2"></i>
@@ -125,50 +125,6 @@
                 <div class="modal-body">
                     <div id="runner_select_list" class="list-group">
                         <!-- Runner List Items will be injected here -->
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">CLOSE</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- メモリーモーダル -->
-    <div id="memoryModal" class="modal fade" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-            <div class="modal-content sf-modal doc-card" style="height:auto;">
-                <div class="modal-header doc-header">
-                    <h5 class="modal-title glow-text-cyan system-font">
-                        <i class="fas fa-brain fa-lg me-2"></i>
-                        <span class="i18n">MEMORY</span>
-                    </h5>
-                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
-                        <i class="fas fa-times fa-lg"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="sf-param-grid mb-3">
-                        <div class="sf-param-box">
-                            <div class="text-white-50 i18n" style="font-size: 0.8rem;">REFERENCE RANGE</div>
-                            <div class="d-flex fs-5 system-font glow-text-cyan mt-2">
-                                <div id="memory_range_start">---</div>
-                                <div class="mx-1">~</div>
-                                <div id="memory_range_end">---</div>
-                            </div>
-                        </div>
-                        <div class="sf-param-box">
-                            <div class="text-white-50 i18n" style="font-size: 0.8rem;">USAGE RATIO</div>
-                            <div class="fs-2 text-end system-font glow-text-magenta d-flex">
-                                <div id="memory_performance">---</div>
-                            </div>
-                        </div>
-                    </div>
-                    <h6 class="glow-text-cyan system-font mt-4 mb-2">
-                        <i class="fa-regular fa-address-card fa-lg mx-2"></i><span class="i18n">USER PROFILE ANALYSIS</span>
-                    </h6>
-                    <div class="p-3 border border-secondary bg-black bg-opacity-25" style="font-family: var(--font-body);">
-                        <p id="memory_content" class="mb-2"><strong>Loading..</strong></p>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -273,9 +229,9 @@
 <script type="text/javascript" defer src="assets/agent/agent_settings_extract.js"></script>
 <script type="text/javascript" defer src="assets/agent/agent_settings_llm.js"></script>
 <script type="text/javascript" defer src="assets/agent/agent_settings_mcpsv.js"></script>
-<script type="text/javascript" defer src="assets/agent/agent_settings_memory.js"></script>
 <script type="text/javascript" defer src="assets/agent/agent_settings_rag.js"></script>
 <script type="text/javascript" defer src="assets/agent/agent_settings_runner.js"></script>
+<script type="text/javascript" defer src="assets/agent/agent_settings_datasource.js"></script>
 <script type="text/javascript" defer src="assets/agent/agent_settings_tts.js"></script>
 <script type="text/javascript" defer src="assets/filer/filer.js"></script>
 <script type="text/javascript" defer src="assets/agent/main.js"></script>

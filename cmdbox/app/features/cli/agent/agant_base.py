@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature, options
-from cmdbox.app.features.cli import cmdbox_llm_chat
+from cmdbox.app.features.cli import cmdbox_llm_chat, cmdbox_datasource_load
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import logging
@@ -12,6 +12,7 @@ class AgentBase(feature.ResultEdgeFeature):
     def __init__(self, appcls, ver, language:str=None):
         super().__init__(appcls, ver, language=language)
         self.llm_chat = cmdbox_llm_chat.LLMChat(appcls, ver, language=language)
+        self.ds_load = cmdbox_datasource_load.DatasourceLoad(appcls, ver, language=language)
 
     def load_conf(self, runner_name:str, data_dir:Path, logger:logging.Logger):
         runner_conf_path = data_dir / ".agent" / f"runner-{runner_name}.json"
@@ -30,24 +31,13 @@ class AgentBase(feature.ResultEdgeFeature):
             mcpsv_confs = self._load_mcpsv_config(data_dir, agent_conf['mcpservers'])
         else:
             mcpsv_confs = []
-
-        if 'memory' in runner_conf and runner_conf['memory'] is not None:
-            memory_conf = self._load_memory_config(data_dir, runner_conf['memory'])
-            if memory_conf.get('llm', None) is not None:
-                memory_llm_conf = self._load_llm_config(data_dir, memory_conf['llm'])
-            else:
-                memory_llm_conf = {}
-
-            if memory_conf.get('embed', None) is not None:
-                memory_embed_conf = self._load_embed_config(data_dir, memory_conf['embed'])
-            else:
-                memory_embed_conf = {}
+        
+        if runner_conf.get('session_datasource', None) is not None:
+            ds_conf = self._load_ds_config(data_dir, runner_conf['session_datasource'])
         else:
-            memory_conf = {}
-            memory_llm_conf = {}
-            memory_embed_conf = {}
+            ds_conf = {}
 
-        return runner_conf, agent_conf, llm_conf, memory_conf, memory_llm_conf, memory_embed_conf, mcpsv_confs
+        return runner_conf, agent_conf, llm_conf, mcpsv_confs, ds_conf
 
     def _load_agent_config(self, data_dir:Path, agent_name:str) -> Dict[str, Any]:
         agent_conf_path = data_dir / ".agent" / f"agent-{agent_name}.json"
@@ -85,39 +75,33 @@ class AgentBase(feature.ResultEdgeFeature):
             embed_conf = json.load(f)
         return embed_conf
 
-    def _load_memory_config(self, data_dir:Path, memory_name:str) -> Dict[str, Any]:
-        memory_conf_path = data_dir / ".agent" / f"memory-{memory_name}.json"
-        if not memory_conf_path.exists():
-            raise FileNotFoundError(f"Specified memory configuration '{memory_name}' not found on server at '{str(memory_conf_path)}'.")
-        with memory_conf_path.open('r', encoding='utf-8') as f:
-            memory_conf = json.load(f)
-        return memory_conf
+    def _load_ds_config(self, data_dir:Path, dsname:str) -> Dict[str, Any]:
+        ds_conf = self.ds_load.load_datasource(data_dir, dsname)
+        return ds_conf
 
-    def create_session_service(self, data_dir:Path, logger:logging.Logger, runner_conf:Dict[str, Any]) -> Any:
+    def create_session_service(self, logger:logging.Logger, ds_conf:Dict[str, Any]) -> Any:
         """
         セッションサービスを作成します
 
         Args:
-            runner_conf (Dict[str, Any]): Runnerの設定
+            logger (logging.Logger): ロガー
+            ds_conf (Dict[str, Any]): データソースの設定
 
         Returns:
             BaseSessionService: セッションサービス
         """
-        if runner_conf.get('session_store_type') == 'sqlite':
-            uri = (data_dir / '.agent' / 'session.db').as_uri()
-            if platform.system() == 'Windows':
-                runner_conf['agent_session_dburl'] = f"sqlite+aiosqlite:{uri.replace('file:///', '///')}"
-            else:
-                runner_conf['agent_session_dburl'] = f"sqlite+aiosqlite:{uri.replace('file:///', '////')}"
-        elif runner_conf.get('session_store_type') == 'postgresql':
-            runner_conf['agent_session_dburl'] = f"postgresql+psycopg://{runner_conf['session_store_pguser']}:{runner_conf['session_store_pgpass']}@{runner_conf['session_store_pghost']}:{runner_conf['session_store_pgport']}/{runner_conf['session_store_pgdbname']}"
+        if ds_conf.get('dbtype') == 'sqlite':
+            uri = Path(ds_conf['db_fullpath']).as_uri()
+            agent_session_dburl = f"sqlite+aiosqlite:{uri.replace('file:///', '///')}"
+        elif ds_conf.get('dbtype') == 'postgresql':
+            agent_session_dburl = f"postgresql+psycopg://{ds_conf['pguser']}:{ds_conf['pgpass']}@{ds_conf['pghost']}:{ds_conf['pgport']}/{ds_conf['pgdbname']}"
         else:
-            runner_conf['agent_session_dburl'] = None
+            agent_session_dburl = None
         from google.adk.sessions import InMemorySessionService
         from google.adk.sessions.database_session_service import DatabaseSessionService
-        if runner_conf['agent_session_dburl'] is not None:
-            logger.info(f"Using DatabaseSessionService: {runner_conf['agent_session_dburl']}")
-            dss = DatabaseSessionService(db_url=runner_conf['agent_session_dburl'])
+        if agent_session_dburl is not None:
+            logger.info(f"Using DatabaseSessionService: {agent_session_dburl}")
+            dss = DatabaseSessionService(db_url=agent_session_dburl)
             return dss
         else:
             logger.info(f"Using InMemorySessionService")
@@ -164,7 +148,14 @@ class AgentBase(feature.ResultEdgeFeature):
             responses = event.get_function_responses()
             if responses:
                 is_func_response = True
-                msg += '\n```json{"function_responses":'+common.to_str([dict(fn=r.name, res=r.response) for r in responses])+'}```'
+                structuredContent = []
+                for r in responses:
+                    row = dict()
+                    structuredContent.append(row)
+                    if r.response:
+                        row['res'] = r.response.get('structuredContent', 'No Response.')
+                    row['fn'] = r.name
+                msg += '\n```json{"function_responses":'+common.to_str(structuredContent)+'}```'
             is_final_response = event.is_final_response()
         elif event.actions and event.actions.escalate:
             msg = f"Agent escalated: {event.error_message or 'No specific message.'}"

@@ -6,7 +6,7 @@ import psycopg
 from psycopg import Connection, sql
 
 
-class RagApacheAGE(rag_store.RagStore):
+class RagPostgresql(rag_store.RagStore):
     def __init__(self, dbhost:str, dbport:int, dbname:str, dbuser:str, dbpass:str, dbtimeout:int, logger:logging.Logger):
         """
         コンストラクタ
@@ -44,7 +44,7 @@ class RagApacheAGE(rag_store.RagStore):
 
     def install(self) -> None:
         """
-        apacheage拡張機能をインストールします
+        pgvector拡張機能とAGE拡張機能をインストールします
         """
         with psycopg.connect(
             host=self.dbhost,
@@ -62,6 +62,8 @@ class RagApacheAGE(rag_store.RagStore):
                 cur.execute(sql.SQL("GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA {} TO {}").format(I(self.dbuser), I(self.dbuser)))
                 cur.execute(sql.SQL("GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA {} TO {}").format(I(self.dbuser), I(self.dbuser)))
                 cur.execute(sql.SQL("GRANT ALL PRIVILEGES ON SCHEMA {} TO {}").format(I(self.dbuser), I(self.dbuser)))
+                cur.execute(sql.SQL("CREATE EXTENSION IF NOT EXISTS vector"))
+                cur.execute(sql.SQL("SELECT extversion FROM pg_extension WHERE extname = 'vector'"))
                 cur.execute(sql.SQL("CREATE EXTENSION IF NOT EXISTS age"))
                 cur.execute(sql.SQL("SELECT extversion FROM pg_extension WHERE extname = 'age'"))
                 for record in cur:
@@ -69,7 +71,7 @@ class RagApacheAGE(rag_store.RagStore):
 
     def create_tables(self, servicename:str, embed_vector_dim:int=256) -> None:
         """
-        テーブル（グラフ）を作成します
+        テーブルを作成します
 
         Args:
             servicename (str): サービス名
@@ -79,11 +81,8 @@ class RagApacheAGE(rag_store.RagStore):
 
         with self.connect() as conn:
             conn.autocommit = False
+            # 特徴量テーブルを作成
             with conn.cursor() as cur:
-                # グラフを作成
-                graph_name = f"{servicename}"
-                cur.execute(sql.SQL("SELECT create_graph({})").format(sql.Literal(graph_name)))
-                # 特徴量テーブルを作成
                 table_name = f"{self.dbuser}.{servicename}_embedding"
                 I = sql.Identifier
                 cur.execute(sql.SQL(
@@ -111,18 +110,6 @@ class RagApacheAGE(rag_store.RagStore):
                     "USING ivfflat (vec_data vector_l2_ops) WITH (lists = 100)"
                     ).format(I(f"{table_name}_vec_data_idx"), I(table_name)))
                 conn.commit()
-
-    def connect(self) -> Any:
-        """
-        データベースに接続します
-        """
-        return psycopg.connect(
-            host=self.dbhost,
-            port=self.dbport,
-            dbname=self.dbname,
-            user=self.dbuser,
-            password=self.dbpass,
-            connect_timeout=self.dbtimeout)
 
     def insert_doc(self, *, connection:Connection=None, servicename:str=None,
                    vec_id:str=None, content_text:str=None, content_type:str=None, content_blob:bytes=None,

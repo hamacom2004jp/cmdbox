@@ -66,6 +66,7 @@ class Filer(object):
             return False, dict(warn=f"fwpaths is None.")
         if not any(from_abspath.is_relative_to(self._file_exists(fwpath)[1]) for fwpath in fwpaths):
             return False, dict(warn=f"The specified path ( {path} ) is out of bounds. Permitted path: {fwpaths}")
+        rjpaths = rjpaths if isinstance(rjpaths, list) else [rjpaths] if rjpaths is not None and rjpaths != "********" else []
         if rjpaths is not None and any(re.match(rjpath, str(from_abspath)) for rjpath in rjpaths):
             return False, dict(warn=f"The specified path ( {path} ) is rejected by rjpaths. Rejected path pattern: {rjpaths}")
         return True, None

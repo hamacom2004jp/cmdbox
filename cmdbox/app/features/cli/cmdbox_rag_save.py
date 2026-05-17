@@ -65,30 +65,16 @@ class RagSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="rag_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="RAG設定の名前を指定します。",
                      description_en="Specify the name of the RAG configuration."),
-                dict(opt="rag_type", type=Options.T_STR, default='vector', required=True, multi=False, hide=False,
-                     choice=['', 'vector_pg', 'vector_sqlite', 'graph_n4j', 'graph_pg'],
-                     choice_show=dict(
-                            vector_pg=[
-                                "vector_store_pghost",
-                                "vector_store_pgport",
-                                "vector_store_pguser",
-                                "vector_store_pgpass",
-                                "vector_store_pgdbname"
-                            ],
-                            vector_sqlite=[
-                            ],
-                            graph_n4j=[
-                            ],
-                            graph_pg=[
-                                "graph_store_pghost",
-                                "graph_store_pgport",
-                                "graph_store_pguser",
-                                "graph_store_pgpass",
-                                "graph_store_pgdbname"
-                            ],
-                     ),
-                     description_ja="RAGの種類を指定します。",
-                     description_en="Specify the type of RAG."),
+                dict(opt="rag_datasource", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
+                    callcmd="async () => {await cmdbox.callcmd('datasource','list',{},(res)=>{"
+                            + "const val = $(\"[name='rag_datasource']\").val();"
+                            + "$(\"[name='rag_datasource']\").empty().append('<option></option>');"
+                            + "res['data'].map(elm=>{$(\"[name='rag_datasource']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
+                            + "$(\"[name='rag_datasource']\").val(val);"
+                            + "},$(\"[name='title']\").val(),'rag_datasource');"
+                            + "}",
+                    description_ja="RAGの保存先データソースを指定します。",
+                    description_en="Specify the data source where RAG will be stored."),
                 dict(opt="extract", type=Options.T_STR, default=None, required=True, multi=True, hide=False, choice=[],
                      callcmd="async () => {await cmdbox.callcmd('extract','list',{},(res)=>{"
                              + "const val = $(\"[name='extract']\").val();"
@@ -107,44 +93,14 @@ class RagSave(feature.OneshotResultEdgeFeature, validator.Validator):
                              + "$(\"[name='embed']\").val(val);"
                              + "},$(\"[name='title']\").val(),'embed');"
                              + "}",
-                     description_ja="rag_typeがvectorの場合、エンベッドモデルの登録名を指定します。",
-                     description_en="If rag_type is vector, specify the registration name of the embed model."),
+                     description_ja="エンベッドモデルの登録名を指定します。",
+                     description_en="Specify the registration name of the embed model."),
                 dict(opt="embed_vector_dim", type=Options.T_INT, default=256, required=False, multi=False, hide=False, choice=None,
                      description_ja="Embed時のベクトル次元数を指定します。",
                      description_en="Specify the vector dimension for embedding."),
                 dict(opt="savetype", type=Options.T_STR, default="per_doc", required=False, multi=False, hide=False, choice=["per_doc", "per_service", "add_only"],
                     description_ja="保存パターンを指定します。 `per_doc` :ドキュメント単位、 `per_service` :サービス単位、 `add_only` :追加のみ",
                     description_en="Specify the storage pattern. `per_doc` :per document, `per_service` :per service, `add_only` :add only",),
-                dict(opt="vector_store_pghost", type=Options.T_STR, default='pgsql', required=False, multi=False, hide=False, choice=None,
-                     description_ja="VecRAG保存先用PostgreSQLホストを指定します。",
-                     description_en="Specify the postgresql host for VecRAG storage."),
-                dict(opt="vector_store_pgport", type=Options.T_INT, default=5432, required=False, multi=False, hide=False, choice=None,
-                     description_ja="VecRAG保存先用PostgreSQLポートを指定します。",
-                     description_en="Specify the postgresql port for VecRAG storage."),
-                dict(opt="vector_store_pguser", type=Options.T_STR, default='pgsql', required=False, multi=False, hide=False, choice=None,
-                     description_ja="VecRAG保存先用PostgreSQLユーザー名を指定します。",
-                     description_en="Specify the postgresql user for VecRAG storage."),
-                dict(opt="vector_store_pgpass", type=Options.T_PASSWD, default='pgsql', required=False, multi=False, hide=False, choice=None,
-                     description_ja="VecRAG保存先用PostgreSQLパスワードを指定します。",
-                     description_en="Specify the postgresql password for VecRAG storage."),
-                dict(opt="vector_store_pgdbname", type=Options.T_STR, default='pgsql', required=False, multi=False, hide=False, choice=None,
-                     description_ja="VecRAG保存先用PostgreSQLデータベース名を指定します。",
-                     description_en="Specify the postgresql database name for VecRAG storage."),
-                dict(opt="graph_store_pghost", type=Options.T_STR, default='pgsql', required=False, multi=False, hide=False, choice=None,
-                     description_ja="GraphRAG保存先用PostgreSQLホストを指定します。",
-                     description_en="Specify the postgresql host for GraphRAG storage."),
-                dict(opt="graph_store_pgport", type=Options.T_INT, default=5432, required=False, multi=False, hide=False, choice=None,
-                     description_ja="GraphRAG保存先用PostgreSQLポートを指定します。",
-                     description_en="Specify the postgresql port for GraphRAG storage."),
-                dict(opt="graph_store_pguser", type=Options.T_STR, default='pgsql', required=False, multi=False, hide=False, choice=None,
-                     description_ja="GraphRAG保存先用PostgreSQLユーザー名を指定します。",
-                     description_en="Specify the postgresql user for GraphRAG storage."),
-                dict(opt="graph_store_pgpass", type=Options.T_PASSWD, default='pgsql', required=False, multi=False, hide=False, choice=None,
-                     description_ja="GraphRAG保存先用PostgreSQLパスワードを指定します。",
-                     description_en="Specify the postgresql password for GraphRAG storage."),
-                dict(opt="graph_store_pgdbname", type=Options.T_STR, default='pgsql', required=False, multi=False, hide=False, choice=None,
-                     description_ja="GraphRAG保存先用PostgreSQLデータベース名を指定します。",
-                     description_en="Specify the postgresql database name for GraphRAG storage."),
             ]
         )
 
@@ -153,21 +109,11 @@ class RagSave(feature.OneshotResultEdgeFeature, validator.Validator):
 
         payload = dict(
             rag_name=args.rag_name,
-            rag_type=args.rag_type,
+            rag_datasource=args.rag_datasource if hasattr(args, 'rag_datasource') else None,
             savetype=args.savetype,
             extract=list(set(args.extract)) if hasattr(args, 'extract') and args.extract is not None else None,
             embed=args.embed if hasattr(args, 'embed') else None,
             embed_vector_dim=args.embed_vector_dim if hasattr(args, 'embed_vector_dim') else None,
-            vector_store_pghost=args.vector_store_pghost if hasattr(args, 'vector_store_pghost') else None,
-            vector_store_pgport=args.vector_store_pgport if hasattr(args, 'vector_store_pgport') else None,
-            vector_store_pguser=args.vector_store_pguser if hasattr(args, 'vector_store_pguser') else None,
-            vector_store_pgpass=args.vector_store_pgpass if hasattr(args, 'vector_store_pgpass') else None,
-            vector_store_pgdbname=args.vector_store_pgdbname if hasattr(args, 'vector_store_pgdbname') else None,
-            graph_store_pghost=args.graph_store_pghost if hasattr(args, 'graph_store_pghost') else None,
-            graph_store_pgport=args.graph_store_pgport if hasattr(args, 'graph_store_pgport') else None,
-            graph_store_pguser=args.graph_store_pguser if hasattr(args, 'graph_store_pguser') else None,
-            graph_store_pgpass=args.graph_store_pgpass if hasattr(args, 'graph_store_pgpass') else None,
-            graph_store_pgdbname=args.graph_store_pgdbname if hasattr(args, 'graph_store_pgdbname') else None
         )
 
         payload_b64 = convert.str2b64str(common.to_str(payload))

@@ -1,7 +1,7 @@
 from cmdbox.app import common, client, options
 from cmdbox.app.auth import signin
 from cmdbox.app.commons import convert, redis_client, resdata, validator
-from cmdbox.app.features.cli import cmdbox_agent_memory_status, cmdbox_tts_say
+from cmdbox.app.features.cli import cmdbox_tts_say
 from cmdbox.app.features.cli.agent import agant_base
 from cmdbox.app.options import Options
 from contextlib import aclosing
@@ -18,7 +18,6 @@ class AgentChat(agant_base.AgentBase, validator.Validator):
 
     def __init__(self, appcls, ver, language:str=None):
         super().__init__(appcls, ver, language=language)
-        self.memory = cmdbox_agent_memory_status.AgentMemoryStatus(appcls, ver, language=language)
         self.call_a2asv_start:bool = False
 
     def get_mode(self) -> Union[str, List[str]]:
@@ -401,10 +400,9 @@ class AgentChat(agant_base.AgentBase, validator.Validator):
         from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset
         from google.adk.tools.mcp_tool.mcp_session_manager import SseConnectionParams, StreamableHTTPConnectionParams
         from google.adk.agents.readonly_context import ReadonlyContext
-        from google.adk.tools.preload_memory_tool import PreloadMemoryTool
 
         auth_scheme = HTTPBearer()
-        tools = [PreloadMemoryTool()]
+        tools = []
         for mcpsv_conf in mcpsv_confs:
             mcpserver_url = mcpsv_conf.get('mcpserver_url', None)
             mcpserver_apikey = mcpsv_conf.get('mcpserver_apikey', None)
@@ -474,14 +472,12 @@ class AgentChat(agant_base.AgentBase, validator.Validator):
             from google.genai import types
 
             json_pattern = re.compile(r'\{.*?\}')
-            runner_conf, agent_conf, llm_conf, memory_conf, memory_llm_conf, memory_embed_conf, mcpsv_confs = self.load_conf(name, data_dir, logger)
+            runner_conf, agent_conf, llm_conf, mcpsv_confs, ds_conf = self.load_conf(name, data_dir, logger)
             agent = self.create_agent(logger, data_dir, False, agent_conf, llm_conf, mcpsv_confs)
-            memory_service = self.memory.create_memory_service(data_dir, logger, memory_conf, memory_llm_conf, memory_embed_conf, sessions)
             runner = Runner(
                 app_name=runner_conf.get('runner_name', self.ver.__appid__),
                 agent=agent,
-                session_service=self.create_session_service(data_dir, logger, runner_conf),
-                memory_service=memory_service,
+                session_service=self.create_session_service(logger, ds_conf),
             )
             content = types.Content(role='user', parts=[types.Part(text=message)])
             tts_engine = runner_conf.get('tts_engine', None)
@@ -495,7 +491,6 @@ class AgentChat(agant_base.AgentBase, validator.Validator):
                     logger.warning(f"Failed to prepare TTS model: {e}", exc_info=True)
                     enable_tts = False
 
-            short_mem_msg = f"The following is an instruction from {user_name}: {message}\n\n=====\n\n"
             # セッションを作成する
             agent_session = await self.create_agent_session(runner.session_service, runner.app_name,
                                                        user_name, session_id=session_id)
@@ -536,23 +531,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator):
                                     success['wav_b64'] = wav_b64
                                 except Exception as e:
                                     success['wav_b64'] = None
-                            if msg is not None and msg.strip() != '':
-                                mem_msg = re.sub(r'```json.*?```', '', msg, flags=re.DOTALL) # json表現部分を除去
-                                short_mem_msg += f"The following is an instruction from {event.author}: {mem_msg}\n\n=====\n\n" \
-                                    if mem_msg is not None and mem_msg.strip() != '' else ''
                             redis_cli.rpush(reskey, outputs)
                             if flags['final_response']:
-                                if 'llm' in memory_conf and memory_conf['llm'] is not None \
-                                    and 'memory_instruction' in memory_conf and memory_conf['memory_instruction'] is not None:
-                                    # 要約文生成
-                                    sammary_msg = await self.memory.summary(data_dir=data_dir, logger=logger,
-                                                                            llmname=memory_conf['llm'], short_mem_msg=short_mem_msg,
-                                                                            msg_text_system=memory_conf['memory_instruction'])
-                                    sdata = sammary_msg.get('success', {}).get('data', None) if sammary_msg else None
-                                    sammary_msg = sdata[-1] if sdata and isinstance(sdata, list) and len(sdata) > 0 else None
-                                    # メモリーにセッションを保存する
-                                    if sammary_msg:
-                                        await self.memory.add_memory(memory_service, agent_session, sammary_msg.get('content', ''))
                                 break
 
                 except Exception as e:

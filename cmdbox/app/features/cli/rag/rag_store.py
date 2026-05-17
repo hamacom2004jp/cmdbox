@@ -4,35 +4,38 @@ import logging
 
 class RagStore:
     @classmethod
-    def create(cls, rag_conf:dict, logger:logging.Logger) -> 'RagStore':
+    def create(cls, ds_conf:dict, logger:logging.Logger, appcls, ver, language:str=None) -> 'RagStore':
         """
         RagStoreのインスタンスを作成します
 
         Args:
-            rag_conf (dict): RAG設定
+            ds_conf (dict): データソース設定
             logger (logging.Logger): ロガー
 
         Returns:
             RagStore: RagStoreのインスタンス
         """
-        rag_type = rag_conf.get('rag_type')
-        if rag_type=='vector_pg':
-            from . import rag_pgvector
-            return rag_pgvector.RagPgvector(dbhost=rag_conf.get('vector_store_pghost'),
-                                    dbport=rag_conf.get('vector_store_pgport'),
-                                    dbname=rag_conf.get('vector_store_pgdbname'),
-                                    dbuser=rag_conf.get('vector_store_pguser'),
-                                    dbpass=rag_conf.get('vector_store_pgpass'),
-                                    dbtimeout=rag_conf.get('vector_store_pgtimeout', 120),
+        from cmdbox.app.features.cli import cmdbox_datasource_load
+        dbtype = ds_conf.get('dbtype')
+        if dbtype=='postgresql':
+            from cmdbox.app.features.cli.rag import rag_postgresql
+            ret = rag_postgresql.RagPostgresql(dbhost=ds_conf.get('db_host'),
+                                    dbport=ds_conf.get('db_port'),
+                                    dbname=ds_conf.get('db_name'),
+                                    dbuser=ds_conf.get('db_user'),
+                                    dbpass=ds_conf.get('db_password'),
+                                    dbtimeout=ds_conf.get('db_timeout', 120),
                                     logger=logger)
-        elif rag_type=='vector_sqlite':
-            raise NotImplementedError(f"Unsupported RAG type: {rag_type}")
-        elif rag_type=='graph_n4j':
-            raise NotImplementedError(f"Unsupported RAG type: {rag_type}")
-        elif rag_type=='graph_pg':
-            raise NotImplementedError(f"Unsupported RAG type: {rag_type}")
+        elif dbtype=='sqlite':
+            from cmdbox.app.features.cli.rag import rag_sqlite
+            ret = rag_sqlite.RagSqlite(dbpath=ds_conf.get('db_path'),
+                                        dbtimeout=ds_conf.get('db_timeout', 120),
+                                        logger=logger)
         else:
-            raise NotImplementedError(f"Unsupported RAG type: {rag_type}")
+            raise NotImplementedError(f"Unsupported datasource type: {dbtype}")
+        ret.ds_load = cmdbox_datasource_load.DatasourceLoad(appcls, ver=ver, language=language)
+        ret.ds_conf = ds_conf
+        return ret
 
     def install(self) -> None:
         """
@@ -54,7 +57,8 @@ class RagStore:
         """
         データベースに接続します
         """
-        raise NotImplementedError("connect method is not implemented.")
+        conn, dbtype = self.ds_load.get_connection(self.ds_conf)
+        return conn
 
     def insert_doc(self, *, connection:Any=None, servicename:str=None,
                    content_text:str=None, content_type:str=None, content_blob:bytes=None,

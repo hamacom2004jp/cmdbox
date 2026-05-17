@@ -93,8 +93,8 @@ class AgentSessionDel(agant_base.AgentBase, validator.Validator):
             session_id = payload.get('session_id')
             user_name = payload.get('user_name')
 
-            runner_conf, _, _, _, _, _, _ = self.load_conf(runner_name, data_dir, logger)
-            session_service = self.create_session_service(data_dir, logger, runner_conf=runner_conf)
+            runner_conf, _, _, _, ds_conf = self.load_conf(runner_name, data_dir, logger)
+            session_service = self.create_session_service(logger, ds_conf)
             if session_service is None:
                 out = dict(warn="Runner does not expose a session_service.", end=True)
                 redis_cli.rpush(reskey, out)

@@ -16,6 +16,7 @@ See below for available options for the various commands.
    Cmd <cmd_cmd.rst>
    Cmdbox <cmd_cmdbox.rst>
    Common Options <cmd_common.rst>
+   Datasource <cmd_datasource.rst>
    Edge <cmd_edge.rst>
    Embed <cmd_embed.rst>
    Excel <cmd_excel.rst>

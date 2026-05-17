@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( rag mode ) &mdash; cmdbox 2026/05/15 documentation</title>
+  <title>Command Reference ( rag mode ) &mdash; cmdbox 2026/05/17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=41b19c9f"></script>
+      <script src="../_static/documentation_options.js?v=d23192ec"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -54,6 +54,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_datasource.html">Datasource</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_embed.html">Embed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
@@ -789,23 +790,13 @@
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
 <span class="w">    </span><span class="nt">&quot;rag_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;rag_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;rag_datasource&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;savetype&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;extract&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="s2">&quot;string&quot;</span>
 <span class="w">    </span><span class="p">],</span>
 <span class="w">    </span><span class="nt">&quot;embed&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;embed_vector_dim&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;vector_store_pghost&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;vector_store_pgport&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;vector_store_pguser&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;vector_store_pgpass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;vector_store_pgdbname&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;graph_store_pghost&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;graph_store_pgport&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;graph_store_pguser&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;graph_store_pgpass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;graph_store_pgdbname&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">&quot;embed_vector_dim&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
@@ -849,11 +840,11 @@
 <td><p>null</p></td>
 <td><p>RAG名</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.rag_type</p></td>
+<tr class="row-odd"><td><p>success.rag_datasource</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
-<td><p>RAGタイプ</p></td>
+<td><p>RAGのデータソース識別名</p></td>
 </tr>
 <tr class="row-even"><td><p>success.savetype</p></td>
 <td><p>str | null</p></td>
@@ -878,66 +869,6 @@
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エンベッディングベクトル次元数</p></td>
-</tr>
-<tr class="row-even"><td><p>success.vector_store_pghost</p></td>
-<td><p>str | null</p></td>
-<td><p>no</p></td>
-<td><p>null</p></td>
-<td><p>ベクトルストアPostgreSQLホスト</p></td>
-</tr>
-<tr class="row-odd"><td><p>success.vector_store_pgport</p></td>
-<td><p>int | null</p></td>
-<td><p>no</p></td>
-<td><p>null</p></td>
-<td><p>ベクトルストアPostgreSQLポート</p></td>
-</tr>
-<tr class="row-even"><td><p>success.vector_store_pguser</p></td>
-<td><p>str | null</p></td>
-<td><p>no</p></td>
-<td><p>null</p></td>
-<td><p>ベクトルストアPostgreSQLユーザー</p></td>
-</tr>
-<tr class="row-odd"><td><p>success.vector_store_pgpass</p></td>
-<td><p>str | null</p></td>
-<td><p>no</p></td>
-<td><p>null</p></td>
-<td><p>ベクトルストアPostgreSQLパスワード</p></td>
-</tr>
-<tr class="row-even"><td><p>success.vector_store_pgdbname</p></td>
-<td><p>str | null</p></td>
-<td><p>no</p></td>
-<td><p>null</p></td>
-<td><p>ベクトルストアPostgreSQLデータベース名</p></td>
-</tr>
-<tr class="row-odd"><td><p>success.graph_store_pghost</p></td>
-<td><p>str | null</p></td>
-<td><p>no</p></td>
-<td><p>null</p></td>
-<td><p>グラフストアPostgreSQLホスト</p></td>
-</tr>
-<tr class="row-even"><td><p>success.graph_store_pgport</p></td>
-<td><p>int | null</p></td>
-<td><p>no</p></td>
-<td><p>null</p></td>
-<td><p>グラフストアPostgreSQLポート</p></td>
-</tr>
-<tr class="row-odd"><td><p>success.graph_store_pguser</p></td>
-<td><p>str | null</p></td>
-<td><p>no</p></td>
-<td><p>null</p></td>
-<td><p>グラフストアPostgreSQLユーザー</p></td>
-</tr>
-<tr class="row-even"><td><p>success.graph_store_pgpass</p></td>
-<td><p>str | null</p></td>
-<td><p>no</p></td>
-<td><p>null</p></td>
-<td><p>グラフストアPostgreSQLパスワード</p></td>
-</tr>
-<tr class="row-odd"><td><p>success.graph_store_pgdbname</p></td>
-<td><p>str | null</p></td>
-<td><p>no</p></td>
-<td><p>null</p></td>
-<td><p>グラフストアPostgreSQLデータベース名</p></td>
 </tr>
 <tr class="row-even"><td><p>warn</p></td>
 <td><p>dict[str, any] | Data | str | bool | null</p></td>
@@ -1277,18 +1208,13 @@
 <td></td>
 <td><p>Specify the name of the RAG configuration.</p></td>
 </tr>
-<tr class="row-even"><td><p>--rag_type &lt;rag_type&gt;</p></td>
+<tr class="row-even"><td><p>--rag_datasource &lt;rag_datasource&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
-<td><p>vector</p></td>
-<td><blockquote>
-<div><div class="line-block">
-<div class="line">vector_pg | vector_sqlite | graph_n4j | graph_pg</div>
-</div>
-</div></blockquote>
-</td>
-<td><p>Specify the type of RAG.</p></td>
+<td></td>
+<td></td>
+<td><p>Specify the data source where RAG will be stored.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--extract &lt;extract&gt;</p></td>
 <td><p>str</p></td>
@@ -1304,7 +1230,7 @@
 <td></td>
 <td></td>
 <td></td>
-<td><p>If rag_type is vector, specify the registration name of the embed model.</p></td>
+<td><p>Specify the registration name of the embed model.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--embed_vector_dim &lt;embed_vector_dim&gt;</p></td>
 <td><p>int</p></td>
@@ -1321,86 +1247,6 @@
 <td><p>per_doc</p></td>
 <td><p>per_doc | per_service | add_only</p></td>
 <td><p>Specify the storage pattern. <cite>per_doc</cite> :per document, <cite>per_service</cite> :per service, <cite>add_only</cite> :add only</p></td>
-</tr>
-<tr class="row-odd"><td><p>--vector_store_pghost &lt;vector_store_pghost&gt;</p></td>
-<td><p>str</p></td>
-<td></td>
-<td></td>
-<td><p>pgsql</p></td>
-<td></td>
-<td><p>Specify the postgresql host for VecRAG storage.</p></td>
-</tr>
-<tr class="row-even"><td><p>--vector_store_pgport &lt;vector_store_pgport&gt;</p></td>
-<td><p>int</p></td>
-<td></td>
-<td></td>
-<td><p>5432</p></td>
-<td></td>
-<td><p>Specify the postgresql port for VecRAG storage.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--vector_store_pguser &lt;vector_store_pguser&gt;</p></td>
-<td><p>str</p></td>
-<td></td>
-<td></td>
-<td><p>pgsql</p></td>
-<td></td>
-<td><p>Specify the postgresql user for VecRAG storage.</p></td>
-</tr>
-<tr class="row-even"><td><p>--vector_store_pgpass &lt;vector_store_pgpass&gt;</p></td>
-<td><p>passwd</p></td>
-<td></td>
-<td></td>
-<td><p>pgsql</p></td>
-<td></td>
-<td><p>Specify the postgresql password for VecRAG storage.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--vector_store_pgdbname &lt;vector_store_pgdbname&gt;</p></td>
-<td><p>str</p></td>
-<td></td>
-<td></td>
-<td><p>pgsql</p></td>
-<td></td>
-<td><p>Specify the postgresql database name for VecRAG storage.</p></td>
-</tr>
-<tr class="row-even"><td><p>--graph_store_pghost &lt;graph_store_pghost&gt;</p></td>
-<td><p>str</p></td>
-<td></td>
-<td></td>
-<td><p>pgsql</p></td>
-<td></td>
-<td><p>Specify the postgresql host for GraphRAG storage.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--graph_store_pgport &lt;graph_store_pgport&gt;</p></td>
-<td><p>int</p></td>
-<td></td>
-<td></td>
-<td><p>5432</p></td>
-<td></td>
-<td><p>Specify the postgresql port for GraphRAG storage.</p></td>
-</tr>
-<tr class="row-even"><td><p>--graph_store_pguser &lt;graph_store_pguser&gt;</p></td>
-<td><p>str</p></td>
-<td></td>
-<td></td>
-<td><p>pgsql</p></td>
-<td></td>
-<td><p>Specify the postgresql user for GraphRAG storage.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--graph_store_pgpass &lt;graph_store_pgpass&gt;</p></td>
-<td><p>passwd</p></td>
-<td></td>
-<td></td>
-<td><p>pgsql</p></td>
-<td></td>
-<td><p>Specify the postgresql password for GraphRAG storage.</p></td>
-</tr>
-<tr class="row-even"><td><p>--graph_store_pgdbname &lt;graph_store_pgdbname&gt;</p></td>
-<td><p>str</p></td>
-<td></td>
-<td></td>
-<td><p>pgsql</p></td>
-<td></td>
-<td><p>Specify the postgresql database name for GraphRAG storage.</p></td>
 </tr>
 </tbody>
 </table>

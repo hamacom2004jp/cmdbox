@@ -105,8 +105,8 @@ class AgentSessionList(cmdbox_agent_chat.AgentChat, validator.Validator):
             name = payload.get('runner_name')
             session_id = payload.get('session_id')
             user_name = payload.get('user_name')
-            runner_conf, agent_conf, llm_conf, memory_conf, memory_llm_conf, memory_embed_conf, mcpsv_confs = self.load_conf(name, data_dir, logger)
-            session_service = self.create_session_service(data_dir, logger, runner_conf)
+            _, _, _, _, ds_conf = self.load_conf(name, data_dir, logger)
+            session_service = self.create_session_service(logger, ds_conf)
             if session_id is None:
                 sessions = await session_service.list_sessions(app_name=name, user_id=user_name)
                 data = []

@@ -3,6 +3,32 @@
     // 既存の属性の説明をホバーして表示します。
     // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.0.1",
+    "compounds": [
+        {
+            "name": "server + web",
+            "configurations": [
+                "Python: cmdbox server",
+                "Python: cmdbox web"]
+        },
+        {
+            "name": "server + web + mcp",
+            "configurations": [
+                "Python: cmdbox server",
+                "Python: cmdbox server",
+                "Python: cmdbox web",
+                "Python: cmdbox mcpsv"]
+        },
+        {
+            "name": "server + web + mcp + a2a",
+            "configurations": [
+                "Python: cmdbox server",
+                "Python: cmdbox server",
+                "Python: cmdbox web",
+                "Python: cmdbox mcpsv",
+                "Python: cmdbox a2asv"
+            ]
+        }
+    ],
     "configurations": [
         {
             "name": "Python: cmdbox server",

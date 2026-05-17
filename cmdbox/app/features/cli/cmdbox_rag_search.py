@@ -115,6 +115,10 @@ class RagSearch(rag_base.RAGBase, validator.Validator):
             if st != self.RESP_SUCCESS:
                 return st, rag_config, cl
 
+            # データソース設定の読込み
+            args.dsname = rag_config.get('rag_datasource')
+            st, ds_config, _ = self.load_datasource_config(args, cl, tm, pf, logger)
+
             # サインイン情報を取得
             st, signin_res, _ = self.check_signin(args, tm, pf, logger)
             if st != self.RESP_SUCCESS:
@@ -129,7 +133,8 @@ class RagSearch(rag_base.RAGBase, validator.Validator):
                 return st, embedstart_res, cl
 
             # RagStoreの作成
-            store = rag_store.RagStore.create(rag_config, logger)
+            store = rag_store.RagStore.create(ds_config, logger,
+                                              appcls=self.appcls, ver=self.ver, language=self.language)
 
             # Extract結果のRAGストアの検索を実行
             with store.connect() as conn:

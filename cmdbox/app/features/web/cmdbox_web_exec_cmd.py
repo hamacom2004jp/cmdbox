@@ -37,7 +37,16 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 if options.Options.getInstance().get_cmd_attr(opt['mode'], opt['cmd'], "nouse_webmode"):
                     return dict(warn=f'Command "{title}" failed. This command is not available in web mode.')
                 return await self.exec_cmd(req, res, web, title, opt, True)
+            except HTTPException as e:
+                web.logger.warning(f"{e}: {e.detail}", exc_info=True)
+                if not title:
+                    return dict(warn=f'Command execution failed. {e.detail}')
+                return dict(warn=f'Command "{title}" failed. {e.detail}')
             except:
+                msg = f'Command execution failed. {traceback.format_exc()}'
+                web.logger.warning(msg, exc_info=True)
+                if not title:
+                    return dict(warn=f'Command execution failed. {traceback.format_exc()}')
                 return dict(warn=f'Command "{title}" failed. {traceback.format_exc()}')
 
         @app.get('/exec_sse_cmd')
@@ -61,7 +70,11 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     except queue.Empty:
                         yield f"data: {common.to_str(dict(warn='Command execution timed out.'))}\n\n"
                 return StreamingResponse(sse_event_generator(req, res, title, opt), media_type='text/event-stream')
+            except HTTPException as e:
+                web.logger.warning(f"HTTPException: {e.detail}", exc_info=True)
+                return dict(warn=f'Command execution failed. {e.detail}')
             except:
+                web.logger.warning(f"Exception: {traceback.format_exc()}", exc_info=True)
                 return dict(warn=f'Command "{title}" failed. {traceback.format_exc()}')
 
     async def _preprocess(self, web:Web, app:FastAPI, req:Request, res:Response, title:str) -> Dict[str, Any]:

@@ -725,344 +725,6 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "end","bool | null","no","null","終了フラグ"
 
 
-agent ( memory_del ) : ``cmdbox -m agent -c memory_del <Option>``
-=================================================================
-
-- Delete the memory configuration.
-
-.. csv-table::
-    :widths: 20, 8, 8, 8, 12, 18, 26
-    :header-rows: 1
-
-    "Option","Type","Multi","Required","Default","Choices","Description"
-    "--host <host>","str","","required","localhost","","Specify the service host of the Redis server."
-    "--port <port>","int","","required","6379","","Specify the service port of the Redis server."
-    "--password <password>","passwd","","required","password","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <svname>","str","","required","cmdbox","","Specify the service name of the inference server."
-    "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server."
-    "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <timeout>","int","","","120","","Specify the maximum waiting time until the server responds."
-    "--memory_name <memory_name>","str","","required","","","Specify the registration name of the memory to delete."
-
-**Output Schema**
-
-This command implements ``output_schema()`` returning ``Result`` model.
-
-.. code-block:: json
-
-    {
-      "success": {
-        "performance": [
-          {
-            "key": "string",
-            "value": null
-          }
-        ],
-        "data": "string"
-      },
-      "warn": {},
-      "error": {},
-      "schema": {},
-      "end": false
-    }
-
-.. csv-table::
-    :widths: 25, 10, 10, 15, 40
-    :header-rows: 1
-
-    "Field","Type","Required","Default","Description"
-    "success","Data | null","no","null","成功した場合の結果"
-    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.data","str | null","no","null","処理結果のデータ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
-    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
-    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
-    "end","bool | null","no","null","終了フラグ"
-
-
-agent ( memory_list ) : ``cmdbox -m agent -c memory_list <Option>``
-===================================================================
-
-- Display a list of saved memory configurations.
-
-.. csv-table::
-    :widths: 20, 8, 8, 8, 12, 18, 26
-    :header-rows: 1
-
-    "Option","Type","Multi","Required","Default","Choices","Description"
-    "--host <host>","str","","required","localhost","","Specify the service host of the Redis server."
-    "--port <port>","int","","required","6379","","Specify the service port of the Redis server."
-    "--password <password>","passwd","","required","password","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <svname>","str","","required","cmdbox","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
-    "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
-    "--kwd <kwd>","str","","","","","Specify the name you want to search for. Searches for partial matches."
-
-**Output Schema**
-
-This command implements ``output_schema()`` returning ``Result`` model.
-
-.. code-block:: json
-
-    {
-      "success": {
-        "performance": [
-          {
-            "key": "string",
-            "value": null
-          }
-        ],
-        "data": [
-          {
-            "name": "string",
-            "path": "<class 'pathlib.Path'>"
-          }
-        ]
-      },
-      "warn": {},
-      "error": {},
-      "schema": {},
-      "end": false
-    }
-
-.. csv-table::
-    :widths: 25, 10, 10, 15, 40
-    :header-rows: 1
-
-    "Field","Type","Required","Default","Description"
-    "success","Data | null","no","null","成功した場合の結果"
-    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.data","list[NamePath]","no","(必須)","処理結果のデータ"
-    "success.data.name","str","yes","(必須)","名前"
-    "success.data.path","Path | str | null","no","null","パス"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
-    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
-    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
-    "end","bool | null","no","null","終了フラグ"
-
-
-agent ( memory_load ) : ``cmdbox -m agent -c memory_load <Option>``
-===================================================================
-
-- Loads the memory configuration.
-
-.. csv-table::
-    :widths: 20, 8, 8, 8, 12, 18, 26
-    :header-rows: 1
-
-    "Option","Type","Multi","Required","Default","Choices","Description"
-    "--host <host>","str","","required","localhost","","Specify the service host of the Redis server."
-    "--port <port>","int","","required","6379","","Specify the service port of the Redis server."
-    "--password <password>","passwd","","required","password","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <svname>","str","","required","cmdbox","","Specify the service name of the inference server."
-    "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server."
-    "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <timeout>","int","","","120","","Specify the maximum waiting time until the server responds."
-    "--memory_name <memory_name>","str","","required","","","Specify the registration name of the memory to load."
-
-**Output Schema**
-
-This command implements ``output_schema()`` returning ``Result`` model.
-
-.. code-block:: json
-
-    {
-      "success": {
-        "performance": [
-          {
-            "key": "string",
-            "value": null
-          }
-        ],
-        "memory_name": "string",
-        "memory_type": "string",
-        "llm": "string",
-        "embed": "string",
-        "memory_store_pghost": "string",
-        "memory_store_pgport": 0,
-        "memory_store_pguser": "string",
-        "memory_store_pgpass": "string",
-        "memory_store_pgdbname": "string",
-        "memory_description": "string",
-        "memory_instruction": "string"
-      },
-      "warn": {},
-      "error": {},
-      "schema": {},
-      "end": false
-    }
-
-.. csv-table::
-    :widths: 25, 10, 10, 15, 40
-    :header-rows: 1
-
-    "Field","Type","Required","Default","Description"
-    "success","Data | null","no","null","成功した場合の結果"
-    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.memory_name","str | null","no","null","メモリ名"
-    "success.memory_type","str | null","no","null","メモリタイプ"
-    "success.llm","str | null","no","null","LLM名"
-    "success.embed","str | null","no","null","エンベッディング名"
-    "success.memory_store_pghost","str | null","no","null","メモリストアPostgreSQLホスト"
-    "success.memory_store_pgport","int | null","no","null","メモリストアPostgreSQLポート"
-    "success.memory_store_pguser","str | null","no","null","メモリストアPostgreSQLユーザー"
-    "success.memory_store_pgpass","str | null","no","null","メモリストアPostgreSQLパスワード"
-    "success.memory_store_pgdbname","str | null","no","null","メモリストアPostgreSQLデータベース名"
-    "success.memory_description","str | null","no","null","メモリの説明"
-    "success.memory_instruction","str | null","no","null","メモリへの指示"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
-    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
-    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
-    "end","bool | null","no","null","終了フラグ"
-
-
-agent ( memory_save ) : ``cmdbox -m agent -c memory_save <Option>``
-===================================================================
-
-- Saves memory configuration.
-
-.. csv-table::
-    :widths: 20, 8, 8, 8, 12, 18, 26
-    :header-rows: 1
-
-    "Option","Type","Multi","Required","Default","Choices","Description"
-    "--host <host>","str","","required","localhost","","Specify the service host of the Redis server."
-    "--port <port>","int","","required","6379","","Specify the service port of the Redis server."
-    "--password <password>","passwd","","required","password","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <svname>","str","","required","cmdbox","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
-    "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
-    "--memory_name <memory_name>","str","","required","","","Specify the name of the Memory setting."
-    "--memory_type <memory_type>","str","","required","memory"," | memory | sqlite | postgresql","Specify the type of memory service."
-    "--llm <llm>","str","","","","","Specify the LLM configuration name to use for summarization processing."
-    "--embed <embed>","str","","","","","Specify the Embedding setting name to use for embedding processing."
-    "--memory_store_pghost <memory_store_pghost>","str","","","pgsql","","Specify the postgresql host for memory service."
-    "--memory_store_pgport <memory_store_pgport>","int","","","5432","","Specify the postgresql port for memory service."
-    "--memory_store_pguser <memory_store_pguser>","str","","","pgsql","","Specify the postgresql user name for memory service."
-    "--memory_store_pgpass <memory_store_pgpass>","passwd","","","pgsql","","Specify the postgresql password for memory service."
-    "--memory_store_pgdbname <memory_store_pgdbname>","str","","","pgsql","","Specify the postgresql database name for memory service."
-    "--memory_description <memory_description>","text","","","cmdboxのメモリ設定","","Specify a description of the agent's memory capabilities. The model uses this to determine whether to delegate control to the agent. A single line description is sufficient and recommended."
-    "--memory_instruction <memory_instruction>","text","","","あなたはユーザーの期待値を推測することが出来るメモリ管理のエキスパートです。ユーザーとエージェントとの会話の内容のみを根拠に、発言傾向と行動パターンから確認できる事実だけを500文字程度で要約してください。<br>ただし、不明な時は『確認できない』と答えてください。<br>さらに、得た内容を根拠に以下の点を提示してください。<br>１．一貫した思考傾向<br>２．強みの思考パターン<br>３．内面ギャップの可能性<br>","","Specify instructions for the LLM model used by the memory. These will guide the memory's behavior."
-
-**Output Schema**
-
-This command implements ``output_schema()`` returning ``Result`` model.
-
-.. code-block:: json
-
-    {
-      "success": {
-        "performance": [
-          {
-            "key": "string",
-            "value": null
-          }
-        ],
-        "data": "string"
-      },
-      "warn": {},
-      "error": {},
-      "schema": {},
-      "end": false
-    }
-
-.. csv-table::
-    :widths: 25, 10, 10, 15, 40
-    :header-rows: 1
-
-    "Field","Type","Required","Default","Description"
-    "success","Data | null","no","null","成功した場合の結果"
-    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.data","str | null","no","null","処理結果のデータ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
-    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
-    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
-    "end","bool | null","no","null","終了フラグ"
-
-
-agent ( memory_status ) : ``cmdbox -m agent -c memory_status <Option>``
-=======================================================================
-
-- Get the memory status for the agent.
-
-.. csv-table::
-    :widths: 20, 8, 8, 8, 12, 18, 26
-    :header-rows: 1
-
-    "Option","Type","Multi","Required","Default","Choices","Description"
-    "--host <host>","str","","required","localhost","","Specify the service host of the Redis server."
-    "--port <port>","int","","required","6379","","Specify the service port of the Redis server."
-    "--password <password>","passwd","","required","password","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
-    "--svname <svname>","str","","required","cmdbox","","Specify the service name of the inference server."
-    "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server."
-    "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
-    "--timeout <timeout>","int","","","120","","Specify the maximum waiting time until the server responds."
-    "--runner_name <runner_name>","str","","required","","","Specify the name of the Runner configuration."
-    "--user_name <user_name>","str","","required","","","Specify a user name."
-    "--memory_query <memory_query>","text","","","","","Specify a query to search memory contents. Perform semantic search."
-    "--memory_fetch_offset <memory_fetch_offset>","int","","","0","","Specify the starting position when retrieving memory contents."
-    "--memory_fetch_count <memory_fetch_count>","int","","","10","","Specify the number of memory contents to retrieve."
-    "--memory_fetch_summary <memory_fetch_summary>","bool","","","False","False | True","Specify whether to summarize the retrieved memory contents."
-
-**Output Schema**
-
-This command implements ``output_schema()`` returning ``Result`` model.
-
-.. code-block:: json
-
-    {
-      "success": {
-        "performance": [
-          {
-            "key": "string",
-            "value": null
-          }
-        ],
-        "data": [
-          {
-            "event_id": "string",
-            "distance": 0.0,
-            "role": "string",
-            "my_cnt": 0,
-            "ts_start": "string",
-            "ts_end": "string",
-            "all_cnt": 0,
-            "text": "string"
-          }
-        ]
-      },
-      "warn": {},
-      "error": {},
-      "schema": {},
-      "end": false
-    }
-
-.. csv-table::
-    :widths: 25, 10, 10, 15, 40
-    :header-rows: 1
-
-    "Field","Type","Required","Default","Description"
-    "success","Data | null","no","null","成功した場合の結果"
-    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.data","list[MemoryRecord] | null","no","null","処理結果のデータ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
-    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
-    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
-    "end","bool | null","no","null","終了フラグ"
-
-
 agent ( runner_del ) : ``cmdbox -m agent -c runner_del <Option>``
 =================================================================
 
@@ -1219,18 +881,12 @@ This command implements ``output_schema()`` returning ``Result`` model.
         ],
         "runner_name": "string",
         "agent": "string",
-        "session_store_type": "string",
+        "session_datasource": "string",
         "tts_engine": "string",
-        "memory": "string",
         "rag": [
           "string"
         ],
-        "voicevox_model": "string",
-        "session_store_pghost": "string",
-        "session_store_pgport": 0,
-        "session_store_pguser": "string",
-        "session_store_pgpass": "string",
-        "session_store_pgdbname": "string"
+        "voicevox_model": "string"
       },
       "warn": {},
       "error": {},
@@ -1247,16 +903,10 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.runner_name","str | null","no","null","ランナー名"
     "success.agent","str | null","no","null","エージェント名"
-    "success.session_store_type","str | null","no","null","セッションストアタイプ"
+    "success.session_datasource","str | null","no","null","セッションデータソース"
     "success.tts_engine","str | null","no","null","TTSエンジン名"
-    "success.memory","str | null","no","null","メモリ名"
     "success.rag","list[str] | null","no","null","RAG設定リスト"
     "success.voicevox_model","str | null","no","null","VOICEVOXモデル"
-    "success.session_store_pghost","str | null","no","null","セッションストアPostgreSQLホスト"
-    "success.session_store_pgport","int | null","no","null","セッションストアPostgreSQLポート"
-    "success.session_store_pguser","str | null","no","null","セッションストアPostgreSQLユーザー"
-    "success.session_store_pgpass","str | null","no","null","セッションストアPostgreSQLパスワード"
-    "success.session_store_pgdbname","str | null","no","null","セッションストアPostgreSQLデータベース名"
     "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
@@ -1284,16 +934,10 @@ agent ( runner_save ) : ``cmdbox -m agent -c runner_save <Option>``
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
     "--runner_name <runner_name>","str","","required","","","Specify the name of the runner configuration to save."
     "--agent <agent>","str","","required","","","Specify the Agent configuration name referenced by the Runner."
-    "--session_store_type <session_store_type>","str","","","memory","memory | sqlite | postgresql","Specify how the bot's session is stored."
+    "--session_datasource <session_datasource>","str","","required","","","Specify the data source where sessions will be saved."
     "--tts_engine <tts_engine>","str","","required","voicevox"," | voicevox","Specify the TTS engine to use."
-    "--memory <memory>","str","","","","","Specify the Memory configuration name referenced by the Runner."
     "--rag <rag>","str","multi","","","","Specify the RAG configuration name referenced by the Runner."
     "--voicevox_model <voicevox_model>","str","","","","No.7アナウンス | No.7ノーマル | No.7読み聞かせ | Voidollノーマル | WhiteCULかなしい | WhiteCULたのしい | WhiteCULびえーん | WhiteCULノーマル | †聖騎士 紅桜†ノーマル | あいえるたんノーマル | ずんだもんあまあま | ずんだもんささやき | ずんだもんなみだめ | ずんだもんセクシー | ずんだもんツンツン | ずんだもんノーマル | ずんだもんヒソヒソ | ずんだもんヘロヘロ | ぞん子ノーマル | ぞん子低血圧 | ぞん子実況風 | ぞん子覚醒 | ちび式じいノーマル | もち子さんのんびり | もち子さんセクシー／あん子 | もち子さんノーマル | もち子さん喜び | もち子さん怒り | もち子さん泣き | ナースロボ＿タイプＴノーマル | ナースロボ＿タイプＴ内緒話 | ナースロボ＿タイプＴ恐怖 | ナースロボ＿タイプＴ楽々 | ユーレイちゃんささやき | ユーレイちゃんツクモちゃん | ユーレイちゃんノーマル | ユーレイちゃん哀しみ | ユーレイちゃん甘々 | 中国うさぎおどろき | 中国うさぎこわがり | 中国うさぎへろへろ | 中国うさぎノーマル | 中部つるぎおどおど | 中部つるぎノーマル | 中部つるぎヒソヒソ | 中部つるぎ怒り | 中部つるぎ絶望と敗北 | 九州そらあまあま | 九州そらささやき | 九州そらセクシー | 九州そらツンツン | 九州そらノーマル | 冥鳴ひまりノーマル | 剣崎雌雄ノーマル | 四国めたんあまあま | 四国めたんささやき | 四国めたんセクシー | 四国めたんツンツン | 四国めたんノーマル | 四国めたんヒソヒソ | 小夜/SAYOノーマル | 後鬼ぬいぐるみver. | 後鬼人間ver. | 後鬼人間（怒り）ver. | 後鬼鬼ver. | 春日部つむぎノーマル | 春歌ナナノーマル | 東北きりたんノーマル | 東北ずん子ノーマル | 東北イタコノーマル | 栗田まろんノーマル | 櫻歌ミコノーマル | 櫻歌ミコロリ | 櫻歌ミコ第二形態 | 波音リツクイーン | 波音リツノーマル | 満別花丸ささやき | 満別花丸ぶりっ子 | 満別花丸ノーマル | 満別花丸ボーイ | 満別花丸元気 | 猫使アルうきうき | 猫使アルおちつき | 猫使アルつよつよ | 猫使アルへろへろ | 猫使アルノーマル | 猫使ビィおちつき | 猫使ビィつよつよ | 猫使ビィノーマル | 猫使ビィ人見知り | 玄野武宏ツンギレ | 玄野武宏ノーマル | 玄野武宏喜び | 玄野武宏悲しみ | 琴詠ニアノーマル | 白上虎太郎おこ | 白上虎太郎びえーん | 白上虎太郎びくびく | 白上虎太郎ふつう | 白上虎太郎わーい | 雀松朱司ノーマル | 離途シリアス | 離途ノーマル | 雨晴はうノーマル | 青山龍星かなしみ | 青山龍星しっとり | 青山龍星ノーマル | 青山龍星不機嫌 | 青山龍星喜び | 青山龍星囁き | 青山龍星熱血 | 麒ヶ島宗麟ノーマル | 黒沢冴白ノーマル","Specify the model of the TTS engine to use."
-    "--session_store_pghost <session_store_pghost>","str","","","pgsql","","Specify the postgresql host for session store."
-    "--session_store_pgport <session_store_pgport>","int","","","5432","","Specify the postgresql port for session store."
-    "--session_store_pguser <session_store_pguser>","str","","","pgsql","","Specify the postgresql user name for session store."
-    "--session_store_pgpass <session_store_pgpass>","passwd","","","pgsql","","Specify the postgresql password for session store."
-    "--session_store_pgdbname <session_store_pgdbname>","str","","","pgsql","","Specify the postgresql database name for session store."
 
 **Output Schema**
 

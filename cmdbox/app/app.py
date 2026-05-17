@@ -130,7 +130,7 @@ class CmdBoxApp:
                     d = dict()
                     for v in args_dict[key]:
                         kv = v.split('=')
-                        d[kv[0]] = kv[1]
+                        d[kv[0]] = kv[1] if len(kv) > 1 else None
                     args_dict[key] = d
         # featuresの初期値を適用する
         self.options.load_features_args(args_dict)

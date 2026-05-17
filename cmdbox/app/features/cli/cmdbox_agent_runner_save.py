@@ -74,25 +74,21 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator):
                             + "}",
                     description_ja="Runnerが参照するAgent設定名を指定します。",
                     description_en="Specify the Agent configuration name referenced by the Runner."),
-                dict(opt="session_store_type", type=Options.T_STR, default='memory', required=False, multi=False, hide=False, choice=['memory', 'sqlite', 'postgresql'],
-                    description_ja="セッションの保存方法を指定します。",
-                    description_en="Specify how the bot's session is stored.",
-                    choice_show=dict(postgresql=["session_store_pghost", "session_store_pgport", "session_store_pguser", "session_store_pgpass", "session_store_pgdbname"]),),
+                dict(opt="session_datasource", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
+                    callcmd="async () => {await cmdbox.callcmd('datasource','list',{},(res)=>{"
+                            + "const val = $(\"[name='session_datasource']\").val();"
+                            + "$(\"[name='session_datasource']\").empty().append('<option></option>');"
+                            + "res['data'].map(elm=>{$(\"[name='session_datasource']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
+                            + "$(\"[name='session_datasource']\").val(val);"
+                            + "},$(\"[name='title']\").val(),'session_datasource');"
+                            + "}",
+                    description_ja="セッションの保存先データソースを指定します。",
+                    description_en="Specify the data source where sessions will be saved."),
                 dict(opt="tts_engine", type=Options.T_STR, default="voicevox", required=True, multi=False, hide=False,
                      choice=["", "voicevox"],
                      choice_show=dict(voicevox=["voicevox_ver", "voicevox_whl"]),
                      description_ja="使用するTTSエンジンを指定します。",
                      description_en="Specify the TTS engine to use."),
-                dict(opt="memory", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=[],
-                    callcmd="async () => {await cmdbox.callcmd('agent','memory_list',{},(res)=>{"
-                            + "const val = $(\"[name='memory']\").val();"
-                            + "$(\"[name='memory']\").empty().append('<option></option>');"
-                            + "res['data'].map(elm=>{$(\"[name='memory']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
-                            + "$(\"[name='memory']\").val(val);"
-                            + "},$(\"[name='title']\").val(),'memory');"
-                            + "}",
-                    description_ja="Runnerが参照するメモリー設定名を指定します。",
-                    description_en="Specify the Memory configuration name referenced by the Runner."),
                 dict(opt="rag", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=[],
                     callcmd="async () => {await cmdbox.callcmd('rag','list',{},(res)=>{"
                             + "const val = $(\"[name='rag']\").val();"
@@ -108,21 +104,6 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator):
                      choice_edit=True,
                      description_ja="使用するTTSエンジンのモデルを指定します。",
                      description_en="Specify the model of the TTS engine to use."),
-                dict(opt="session_store_pghost", type=Options.T_STR, default='pgsql', required=False, multi=False, hide=False, choice=None,
-                    description_ja="セッション保存用PostgreSQLホストを指定します。",
-                    description_en="Specify the postgresql host for session store."),
-                dict(opt="session_store_pgport", type=Options.T_INT, default=5432, required=False, multi=False, hide=False, choice=None,
-                    description_ja="セッション保存用PostgreSQLポートを指定します。",
-                    description_en="Specify the postgresql port for session store."),
-                dict(opt="session_store_pguser", type=Options.T_STR, default='pgsql', required=False, multi=False, hide=False, choice=None,
-                    description_ja="セッション保存用PostgreSQLのユーザー名を指定します。",
-                    description_en="Specify the postgresql user name for session store."),
-                dict(opt="session_store_pgpass", type=Options.T_PASSWD, default='pgsql', required=False, multi=False, hide=False, choice=None,
-                    description_ja="セッション保存用PostgreSQLのパスワードを指定します。",
-                    description_en="Specify the postgresql password for session store."),
-                dict(opt="session_store_pgdbname", type=Options.T_STR, default='pgsql', required=False, multi=False, hide=False, choice=None,
-                    description_ja="セッション保存用PostgreSQLのデータベース名を指定します。",
-                    description_en="Specify the postgresql database name for session store."),
             ]
         )
     
@@ -148,14 +129,8 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator):
             agent=args.agent if hasattr(args, 'agent') else None,
             tts_engine=args.tts_engine if hasattr(args, 'tts_engine') else None,
             voicevox_model=args.voicevox_model if hasattr(args, 'voicevox_model') else None,
-            memory=args.memory if hasattr(args, 'memory') else None,
             rag=list(set(args.rag)) if hasattr(args, 'rag') and args.rag is not None else None,
-            session_store_type=args.session_store_type if hasattr(args, 'session_store_type') else None,
-            session_store_pghost=args.session_store_pghost if hasattr(args, 'session_store_pghost') else None,
-            session_store_pgport=args.session_store_pgport if hasattr(args, 'session_store_pgport') else None,
-            session_store_pguser=args.session_store_pguser if hasattr(args, 'session_store_pguser') else None,
-            session_store_pgpass=args.session_store_pgpass if hasattr(args, 'session_store_pgpass') else None,
-            session_store_pgdbname=args.session_store_pgdbname if hasattr(args, 'session_store_pgdbname') else None,
+            session_datasource=args.session_datasource if hasattr(args, 'session_datasource') else None,
         )
 
         payload_b64 = convert.str2b64str(common.to_str(configure))

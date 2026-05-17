@@ -1,45 +1,27 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.features.cli.datasource import datasource_base
 from cmdbox.app.options import Options
 from pathlib import Path
-from typing import Dict, Any, Tuple, List, Union
+from typing import Any, Dict, List, Tuple, Union
 import argparse
-import logging
 import json
+import logging
 import pydantic
-import re
 
 
-class AgentMemoryLoad(feature.OneshotResultEdgeFeature, validator.Validator):
+class DatasourceLoad(datasource_base.DatasourceBase, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
-        """
-        この機能のモードを返します
-
-        Returns:
-            Union[str, List[str]]: モード
-        """
-        return 'agent'
+        return 'datasource'
 
     def get_cmd(self) -> str:
-        """
-        この機能のコマンドを返します
-
-        Returns:
-            str: コマンド
-        """
-        return 'memory_load'
+        return 'load'
 
     def get_option(self) -> Dict[str, Any]:
-        """
-        この機能のオプションを返します
-
-        Returns:
-            Dict[str, Any]: オプション
-        """
         return dict(
             use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
-            description_ja="Memory設定を読み込みます。",
-            description_en="Loads the memory configuration.",
+            description_ja="データソース接続設定を読み込みます。",
+            description_en="Loads a datasource connection configuration.",
             choice=[
                 dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
                      description_ja="Redisサーバーのサービスホストを指定します。",
@@ -51,29 +33,27 @@ class AgentMemoryLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_ja=f"Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `{self.default_pass}` を使用します。",
                      description_en=f"Specify the access password of the Redis server (optional). If omitted, `{self.default_pass}` is used."),
                 dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",
-                     description_ja="サーバーのサービス名を指定します。",
-                     description_en="Specify the service name of the inference server."),
+                     description_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
+                     description_en="Specify the service name of the inference server. If omitted, `server` is used."),
                 dict(opt="retry_count", type=Options.T_INT, default=3, required=False, multi=False, hide=True, choice=None,
-                     description_ja="Redisサーバーへの再接続回数を指定します。",
-                     description_en="Specifies the number of reconnections to the Redis server."),
+                     description_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",
+                     description_en="Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever."),
                 dict(opt="retry_interval", type=Options.T_INT, default=5, required=False, multi=False, hide=True, choice=None,
                      description_ja="Redisサーバーに再接続までの秒数を指定します。",
                      description_en="Specifies the number of seconds before reconnecting to the Redis server."),
-                dict(opt="timeout", type=Options.T_INT, default=120, required=False, multi=False, hide=True, choice=None,
+                dict(opt="timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=True, choice=None,
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                      description_en="Specify the maximum waiting time until the server responds."),
-                dict(opt="memory_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
-                     description_ja="ロードするMemoryの登録名を指定します。",
-                     description_en="Specify the registration name of the memory to load."),
+                dict(opt="dsname", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                     description_ja="読み込むデータソース接続設定の識別名を指定します。",
+                     description_en="Specify the identifier name of the datasource configuration to load."),
             ]
         )
 
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-
-        payload = dict(memory_name=args.memory_name)
+        payload = dict(dsname=args.dsname)
         payload_b64 = convert.str2b64str(common.to_str(payload))
-
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.redis_cli.send_cmd(self.get_svcmd(), [payload_b64],
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
@@ -83,18 +63,20 @@ class AgentMemoryLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         return self.RESP_SUCCESS, ret, cl
 
     def output_schema(self) -> type:
+        class Configure(resdata.Base):
+            dsname: Union[str, None] = pydantic.Field(default=None, description="データソース名")
+            dbtype: Union[str, None] = pydantic.Field(default=None, description="データベース種別")
+            scope: Union[str, None] = pydantic.Field(default=None, description="参照スコープ")
+            client_data: Union[str, None] = pydantic.Field(default=None, description="クライアントスコープの場合のローカルデータパス")
+            db_host: Union[str, None] = pydantic.Field(default=None, description="データベースホスト")
+            db_port: Union[int, None] = pydantic.Field(default=None, description="データベースポート")
+            db_user: Union[str, None] = pydantic.Field(default=None, description="データベースユーザー名")
+            db_password: Union[str, None] = pydantic.Field(default=None, description="データベースパスワード")
+            db_name: Union[str, None] = pydantic.Field(default=None, description="データベース名")
+            db_timeout: Union[int, None] = pydantic.Field(default=None, description="データベース接続のタイムアウト（秒）")
+            db_path: Union[str, None] = pydantic.Field(default=None, description="SQLiteデータベースファイルパス")
         class Data(resdata.Data):
-            memory_name: Union[str, None] = pydantic.Field(default=None, description="メモリ名")
-            memory_type: Union[str, None] = pydantic.Field(default=None, description="メモリタイプ")
-            llm: Union[str, None] = pydantic.Field(default=None, description="LLM名")
-            embed: Union[str, None] = pydantic.Field(default=None, description="エンベッディング名")
-            memory_store_pghost: Union[str, None] = pydantic.Field(default=None, description="メモリストアPostgreSQLホスト")
-            memory_store_pgport: Union[int, None] = pydantic.Field(default=None, description="メモリストアPostgreSQLポート")
-            memory_store_pguser: Union[str, None] = pydantic.Field(default=None, description="メモリストアPostgreSQLユーザー")
-            memory_store_pgpass: Union[str, None] = pydantic.Field(default=None, description="メモリストアPostgreSQLパスワード")
-            memory_store_pgdbname: Union[str, None] = pydantic.Field(default=None, description="メモリストアPostgreSQLデータベース名")
-            memory_description: Union[str, None] = pydantic.Field(default=None, description="メモリの説明")
-            memory_instruction: Union[str, None] = pydantic.Field(default=None, description="メモリへの指示")
+            data: Union[Configure, None] = pydantic.Field(default=None, description="処理結果のデータ")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
@@ -102,28 +84,17 @@ class AgentMemoryLoad(feature.OneshotResultEdgeFeature, validator.Validator):
     def is_cluster_redirect(self):
         return False
 
-    def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
-              sessions:Dict[str, Dict[str, Any]]) -> int:
+    def svrun(self, data_dir: Path, logger: logging.Logger, redis_cli: redis_client.RedisClient, msg: List[str],
+              sessions: Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
         try:
             payload = json.loads(convert.b64str2str(msg[2]))
-
-            memory_name = payload.get('memory_name')
-            configure_path = data_dir / ".agent" / f"memory-{memory_name}.json"
-            if not configure_path.exists():
-                msg = dict(warn=f"Specified memory configuration '{memory_name}' not found on server at '{str(configure_path)}'.")
-                redis_cli.rpush(reskey, msg)
-                return self.RESP_WARN
-
-            with configure_path.open('r', encoding='utf-8') as f:
-                configure = json.load(f)
-
-            msg = dict(success=configure)
-            redis_cli.rpush(reskey, msg)
+            configure = self.load_datasource(data_dir, payload['dsname'])
+            result = dict(success=dict(data=configure))
+            redis_cli.rpush(reskey, result)
             return self.RESP_SUCCESS
-
         except Exception as e:
-            msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
+            result = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
-            redis_cli.rpush(reskey, msg)
+            redis_cli.rpush(reskey, result)
             return self.RESP_WARN

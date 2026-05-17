@@ -17,14 +17,14 @@
                     <div class="split-pane-component" style="width:200px;">
                         <div class="list-group list-group-flush">
                             <a href="#" class="list-group-item list-group-item-action i18n active" data-bs-target="#agent_settings">Agent Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#datasource_settings">Datasource Settings</a>
                             <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#llm_settings">LLM Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#embedding_settings">Embedding Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#memory_settings">Memory Settings</a>
                             <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#mcpsv_settings">MCPSV Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#extract_settings">Extract Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#rag_settings">RAG Settings</a>
-                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#runner_settings">Runner Settings</a>
                             <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#tts_settings">TTS Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#runner_settings">Runner Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#rag_settings">RAG Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#embedding_settings">Embedding Settings</a>
+                            <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#extract_settings">Extract Settings</a>
                         </div>
                     </div>
                     <!-- スプリッター -->
@@ -42,6 +42,18 @@
                                 </div>
                                 <div id="agent_list_container" class="list-group">
                                     <!-- Agent List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="datasource_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font i18n">Datasource Settings</h6>
+                                    <button id="btn_add_datasource" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        <span class="i18n">Add Setting</span>
+                                    </button>
+                                </div>
+                                <div id="datasource_list_container" class="list-group">
+                                    <!-- Datasource List Items will be injected here -->
                                 </div>
                             </div>
                             <div id="llm_settings" class="settings-content d-none">
@@ -68,66 +80,6 @@
                                     <!-- MCPSV List Items will be injected here -->
                                 </div>
                             </div>
-                            <div id="runner_settings" class="settings-content d-none">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font i18n">Runner Settings</h6>
-                                    <button id="btn_add_runner" class="btn btn-sf ms-3">
-                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        <span class="i18n">Add Setting</span>
-                                    </button>
-                                </div>
-                                <div id="runner_list_container" class="list-group">
-                                    <!-- Runner List Items will be injected here -->
-                                </div>
-                            </div>
-                            <div id="embedding_settings" class="settings-content d-none">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font i18n">Embedding Settings</h6>
-                                    <button id="btn_add_embedding" class="btn btn-sf ms-3">
-                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        <span class="i18n">Add Setting</span>
-                                    </button>
-                                </div>
-                                <div id="embedding_list_container" class="list-group">
-                                    <!-- Embedding List Items will be injected here -->
-                                </div>
-                            </div>
-                            <div id="rag_settings" class="settings-content d-none">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font i18n">RAG Settings</h6>
-                                    <button id="btn_add_rag" class="btn btn-sf ms-3">
-                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        <span class="i18n">Add Setting</span>
-                                    </button>
-                                </div>
-                                <div id="rag_list_container" class="list-group">
-                                    <!-- RAG List Items will be injected here -->
-                                </div>
-                            </div>
-                            <div id="extract_settings" class="settings-content d-none">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font i18n">Extract Settings</h6>
-                                    <button id="btn_add_extract" class="btn btn-sf ms-3">
-                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        <span class="i18n">Add Setting</span>
-                                    </button>
-                                </div>
-                                <div id="extract_list_container" class="list-group">
-                                    <!-- Extract List Items will be injected here -->
-                                </div>
-                            </div>
-                            <div id="memory_settings" class="settings-content d-none">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="m-0 glow-text-cyan system-font i18n">Memory Settings</h6>
-                                    <button id="btn_add_memory" class="btn btn-sf ms-3">
-                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
-                                        <span class="i18n">Add Setting</span>
-                                    </button>
-                                </div>
-                                <div id="memory_list_container" class="list-group">
-                                    <!-- Memory List Items will be injected here -->
-                                </div>
-                            </div>
                             <div id="tts_settings" class="settings-content d-none">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h6 class="m-0 glow-text-cyan system-font i18n">TTS Settings</h6>
@@ -149,6 +101,54 @@
                                             <button id="btn_uninstall_tts" class="btn btn-sf-danger i18n">Uninstall</button>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                            <div id="runner_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font i18n">Runner Settings</h6>
+                                    <button id="btn_add_runner" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        <span class="i18n">Add Setting</span>
+                                    </button>
+                                </div>
+                                <div id="runner_list_container" class="list-group">
+                                    <!-- Runner List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="rag_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font i18n">RAG Settings</h6>
+                                    <button id="btn_add_rag" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        <span class="i18n">Add Setting</span>
+                                    </button>
+                                </div>
+                                <div id="rag_list_container" class="list-group">
+                                    <!-- RAG List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="embedding_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font i18n">Embedding Settings</h6>
+                                    <button id="btn_add_embedding" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        <span class="i18n">Add Setting</span>
+                                    </button>
+                                </div>
+                                <div id="embedding_list_container" class="list-group">
+                                    <!-- Embedding List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="extract_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font i18n">Extract Settings</h6>
+                                    <button id="btn_add_extract" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        <span class="i18n">Add Setting</span>
+                                    </button>
+                                </div>
+                                <div id="extract_list_container" class="list-group">
+                                    <!-- Extract List Items will be injected here -->
                                 </div>
                             </div>
                         </div>

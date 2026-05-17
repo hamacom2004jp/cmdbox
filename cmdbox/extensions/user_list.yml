@@ -68,21 +68,24 @@ groups:                        # A list of groups, each of which is a map that c
 cmdrule:                       # A list of command rules, Specify a rule that determines whether or not a command is executable when executed by a user in web mode.
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
   rules:                       # Specify rules to allow or deny execution of the command, depending on the group the user belongs to.
-  - groups: [admin]
+  - groups: [develop, master]
     coercion:                  # Specify a coercion value for each item to be set when a rule is matched.
                                # e.g. wpath: f"/users/{user_name}"
+      fwpath: "['/']"
+      rjpath: "[]"
+      from_fwpath: "['/']"
+      to_fwpath: "['/']"
+      from_rjpath: '[]'
+      to_rjpath: '[]'
+    rule: allow
+  - groups: [admin]
+    coercion:
       fwpath: "['/.users','/.groups']"
       rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
       from_fwpath: "['/.users','/.groups']"
       to_fwpath: "['/.users','/.groups']"
       from_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
       to_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
-    rule: allow
-  - groups: [develop, master]
-    coercion:
-      fwpath: "['/']"
-      from_fwpath: "['/']"
-      to_fwpath: "['/']"
     rule: allow
   - groups: [guest, user, readonly, editor]
     coercion:
@@ -93,8 +96,12 @@ cmdrule:                       # A list of command rules, Specify a rule that de
       from_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
       to_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
     rule: deny
-  - groups: [admin, master]
+  - groups: [master, admin]
     mode: test
+    rule: deny
+  - groups: [admin]
+    mode: datasource
+    cmds: [save, load, del, tbl_create, tbl_drop, idx_create, idx_drop]
     rule: deny
   - groups: [guest, user, readonly, editor]
     mode: llm

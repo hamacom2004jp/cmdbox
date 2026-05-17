@@ -90,6 +90,13 @@ class RagRegist(rag_base.RAGBase, validator.Validator):
             st, rag_config, cl = self.load_rag_config(args, cl, tm, pf, logger)
             if st != self.RESP_SUCCESS:
                 return st, rag_config, cl
+            
+            # RAGデータソース設定の読込み
+            self.put_resqueue(args, dict(process=dict(message="Loading datasource configuration...")))
+            args.dsname = rag_config.get('rag_datasource', None)
+            st, ds_config, cl = self.load_datasource_config(args, cl, tm, pf, logger)
+            if st != self.RESP_SUCCESS:
+                return st, ds_config, cl
 
             # サインイン情報を取得
             self.put_resqueue(args, dict(process=dict(message="Checking signin information...")))
@@ -116,7 +123,8 @@ class RagRegist(rag_base.RAGBase, validator.Validator):
 
             # RagStoreの作成
             self.put_resqueue(args, dict(process=dict(message="Creating RAG store...")))
-            store = rag_store.RagStore.create(rag_config, logger)
+            store = rag_store.RagStore.create(ds_config, logger,
+                                              appcls=self.appcls, ver=self.ver, language=self.language)
 
             # Extract結果のRAGストアへの登録
             with store.connect() as conn:
