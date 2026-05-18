@@ -228,6 +228,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                     group_dir.mkdir(parents=True, exist_ok=True)
             if web.logger.level == logging.DEBUG:
                 web.logger.debug(f'Set session, uid={user["uid"]}, name={user["name"]}, home={user["home"]}, email={email}, gids={gids}, groups={group_names}, group_homes={group_homes}')
+            self.set_session(req, req.session['signin'])
 
         @app.get('/oauth2/google/callback')
         async def oauth2_google_callback(req:Request, res:Response):
@@ -355,3 +356,14 @@ class DoSignin(cmdbox_web_signin.Signin):
                 msg = f"Error when processing SAML Response: {', '.join(errors)} {auth.get_last_error_reason()}"
                 web.logger.warning(msg)
                 raise HTTPException(status_code=500, detail=msg)
+
+    def set_session(self, req:Request, user_session:Dict[str, Any]):
+        """
+        任意のサインインセッションキーを設定できます。
+        ユーザーのサインインが成功した時に、uidやgroupsなどのサインインセッションを設定しますが、必要に応じてユーザーのサインインセッションに任意のキーを追加できます。
+
+        Args:
+            req (Request): Requestオブジェクト
+            user_session (Dict[str, Any]): サインインセッション
+        """
+        pass

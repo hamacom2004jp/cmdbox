@@ -231,10 +231,12 @@ class RAGBase(feature.ResultEdgeFeature):
             Tuple[int, Dict[str, Any], None]: 終了コード, チェック
         """
         from cmdbox.app.auth import signin
-        sign = signin.Signin._check_cmd(signin_data, args.groups,
-                                        extract_opt.get('mode'), extract_opt.get('cmd'),
-                                        extract_opt, user_name, logger,
-                                        self.appcls, self.ver, self.language)
+        scope = signin.get_request_scope()
+        user_session = scope["req"].session.get('signin', {}) if scope and scope["req"] is not None else {}
+        sign = signin.Signin._check_cmd(signin_file_data=signin_data, user_groups=args.groups,
+                                        mode=extract_opt.get('mode'), cmd=extract_opt.get('cmd'),
+                                        opt=extract_opt, user_name=user_name, user_session=user_session, logger=logger,
+                                        appcls=self.appcls, ver=self.ver, language=self.language)
         if not sign:
             msg = dict(warn=f"You do not have permission to execute the extract command '{extract_opt.get('title')}' required for RAG registration."
                             f" mode={extract_opt.get('mode')}, cmd={extract_opt.get('cmd')}")

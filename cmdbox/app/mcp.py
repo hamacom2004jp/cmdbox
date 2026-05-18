@@ -375,8 +375,9 @@ class ToolList(object):
             cmd_list = [dict(title=r.get('title',''), mode=r['mode'], cmd=r['cmd'],
                         description=r.get('description','') + str(options.get_cmd_attr(r['mode'], r['cmd'], 'description_ja' if is_japan else 'description_en')),
                         tag=r.get('tag','')) for r in cmd_list \
-                       if signin.Signin._check_cmd(data, ['admin'], r['mode'], r['cmd'], r, "unknown", self.logger,
-                                                   self.appcls, self.ver, language=web.language)]
+                       if signin.Signin._check_cmd(signin_file_data=data, user_groups=['admin'], mode=r['mode'], cmd=r['cmd'],
+                                                   opt=r, user_name="unknown", user_session={}, logger=self.logger,
+                                                   appcls=self.appcls, ver=self.ver, language=web.language)]
         except Exception as e:
             # ユーザーコマンドの読み込みに失敗した場合は警告を出して登録済みのリストを返す
             self.logger.warning(f"Error loading user commands: {e}", exc_info=True)
@@ -576,7 +577,8 @@ class ToolList(object):
         func_txt += f'            args.clmsg_id = req.session["signin"]["clmsg_id"]\n'
         func_txt += f'    groups = req.session["signin"]["groups"]\n'
         func_txt += f'    user_name = req.session["signin"]["name"]\n'
-        func_txt += f'    sign = signin.Signin._check_cmd(signin_data, groups, "{mode}", "{cmd}", opt, user_name, logger, appcls, ver, language)\n'
+        func_txt += f'    user_session = req.session["signin"]\n'
+        func_txt += f'    sign = signin.Signin._check_cmd(signin_file_data=signin_data, user_groups=groups, mode="{mode}", cmd="{cmd}", opt=opt, user_name=user_name, user_session=user_session, logger=logger, appcls=appcls, ver=ver, language=language)\n'
         func_txt += f'    if not sign:\n'
         func_txt += f'        logger.warning("You do not have permission to execute this command. check="+common.to_str(sign))\n'
         func_txt += f'        logger.warning("mode={mode}, cmd={cmd}, sign="+common.to_str(sign)+", groups="+common.to_str(groups))\n'

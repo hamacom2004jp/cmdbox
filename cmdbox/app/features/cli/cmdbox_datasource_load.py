@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import cache, convert, redis_client, resdata, validator
 from cmdbox.app.features.cli.datasource import datasource_base
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -11,6 +11,10 @@ import pydantic
 
 
 class DatasourceLoad(datasource_base.DatasourceBase, validator.Validator):
+    def __init__(self, appcls, ver, language = None):
+        super().__init__(appcls, ver, language)
+        self.datasource_cache = cache.MemoryCache()
+
     def get_mode(self) -> Union[str, List[str]]:
         return 'datasource'
 
@@ -47,11 +51,21 @@ class DatasourceLoad(datasource_base.DatasourceBase, validator.Validator):
                 dict(opt="dsname", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="読み込むデータソース接続設定の識別名を指定します。",
                      description_en="Specify the identifier name of the datasource configuration to load."),
+                dict(opt="cache_timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=False, choice=None,
+                     description_ja="設定をキャッシュする時間を秒数で指定します。",
+                     description_en="Specify the duration, in seconds, for which settings should be cached."),
             ]
         )
 
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
+        # データソース接続設定のキャッシュが有効で、かつキャッシュが存在し、キャッシュの有効期限が切れていない場合はキャッシュを返す
+        cached = self.datasource_cache.get(args.dsname)
+        if cached is not None:
+            ret = dict(success=dict(data=cached))
+            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_SUCCESS, ret, None
+
         payload = dict(dsname=args.dsname)
         payload_b64 = convert.str2b64str(common.to_str(payload))
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -60,6 +74,9 @@ class DatasourceLoad(datasource_base.DatasourceBase, validator.Validator):
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
+
+        # 読み込んだデータソース接続設定をキャッシュする
+        self.datasource_cache.set(args.dsname, ret.get('success', {}).get('data', None), args.cache_timeout)
         return self.RESP_SUCCESS, ret, cl
 
     def output_schema(self) -> type:

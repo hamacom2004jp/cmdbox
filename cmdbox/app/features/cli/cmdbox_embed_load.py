@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import cache, convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -11,6 +11,10 @@ import re
 
 
 class EmbedLoad(feature.OneshotResultEdgeFeature, validator.Validator):
+    def __init__(self, appcls, ver, language = None):
+        super().__init__(appcls, ver, language)
+        self._cache = cache.MemoryCache()
+
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -65,11 +69,20 @@ class EmbedLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="embed_name", type=Options.T_STR, default="ruri-v3-30m", required=True, multi=False, hide=False, choice=None,
                      description_ja="エンベッドモデルの登録名を指定します。",
                      description_en="Specify the registration name of the embed model."),
+                dict(opt="cache_timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=False, choice=None,
+                     description_ja="設定をキャッシュする時間を秒数で指定します。",
+                     description_en="Specify the duration, in seconds, for which settings should be cached."),
             ]
         )
 
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
+        # キャッシュが有効で、かつキャッシュが存在し、有効期限が切れていない場合はキャッシュを返す
+        cached = self._cache.get(args.embed_name)
+        if cached is not None:
+            ret = dict(success=cached)
+            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_SUCCESS, ret, None
 
         payload = dict(embed_name=args.embed_name)
         payload_b64 = convert.str2b64str(common.to_str(payload))
@@ -80,6 +93,9 @@ class EmbedLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
+
+        # 読み込んだ設定をキャッシュする
+        self._cache.set(args.embed_name, ret.get('success', None), args.cache_timeout)
         return self.RESP_SUCCESS, ret, cl
 
     def output_schema(self) -> type:

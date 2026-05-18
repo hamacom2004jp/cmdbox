@@ -791,8 +791,9 @@ class Signin(object):
             return True
         if 'signin' not in req.session or 'groups' not in req.session['signin']:
             return False
-        return Signin._check_cmd(data, req.session['signin']['groups'], mode, cmd, opt, req.session['signin']['name'],
-                                 self.logger, self.appcls, self.ver, self.language)
+        return Signin._check_cmd(signin_file_data=data, user_groups=req.session['signin']['groups'], mode=mode, cmd=cmd,
+                                 opt=opt, user_name=req.session['signin']['name'], user_session=req.session['signin'],
+                                 logger=self.logger, appcls=self.appcls, ver=self.ver, language=self.language)
 
     @classmethod
     def load_groups(cls, signin_file_data:Dict[str, Any], apikey:str, logger:logging.Logger):
@@ -823,9 +824,9 @@ class Signin(object):
         return dict(success=group_names)
 
     @classmethod
-    def _check_cmd(cls, signin_file_data:Dict[str, Any], user_groups:List[str], mode:str, cmd:str,
-                   opt:Dict[str, Any], user_name:str, logger:logging.Logger,
-                   appcls, ver, language) -> bool:
+    def _check_cmd(cls, *, signin_file_data:Dict[str, Any], user_groups:List[str], mode:str, cmd:str,
+                   opt:Dict[str, Any], user_name:str, user_session:Dict[str, Any],
+                   logger:logging.Logger, appcls, ver, language) -> bool:
         """
         コマンドの認可をチェックします
 
@@ -836,6 +837,7 @@ class Signin(object):
             cmd (str): コマンド
             opt (Dict[str, Any]): オプション
             user_name (str): ユーザ名
+            user_session (Dict[str, Any]): サインインセッション
             logger (logging.Logger): ロガー
             appcls: アプリクラス
             ver: バージョン
@@ -848,6 +850,7 @@ class Signin(object):
             return True
         if user_groups is None or len(user_groups) <= 0:
             return False
+        user_session = user_session if user_session is not None and isinstance(user_session, dict) else {}
         # コマンドチェック
         jadge = signin_file_data['cmdrule']['policy']
         for rule in signin_file_data['cmdrule']['rules']:
@@ -862,7 +865,7 @@ class Signin(object):
             if 'coercion' in rule:
                 for key, value in rule['coercion'].items():
                     opt[key] = eval(value, {}, dict(user_name=user_name, groups=user_groups,
-                                                    mode=mode, cmd=cmd,
+                                                    mode=mode, cmd=cmd, opt=opt, user_session=user_session,
                                                     appcls=appcls, ver=ver, language=language))
             jadge = rule['rule']
         if logger.level == logging.DEBUG:

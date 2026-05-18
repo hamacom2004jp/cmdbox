@@ -100,8 +100,11 @@ class CmdList(feature.OneshotResultEdgeFeature, validator.Validator, testable.Un
                 continue
             if len([k for k in args.match_opt if k not in r]) > 0:
                 continue
-            if not signin.Signin._check_cmd(self.signin_file_data, args.groups, r['mode'], r['cmd'], args.__dict__, "unknown", logger,
-                                            self.appcls, self.ver, self.language):
+            scope = signin.get_request_scope()
+            user_session = scope["req"].session.get('signin', {}) if scope and scope["req"] is not None else {}
+            if not signin.Signin._check_cmd(signin_file_data=self.signin_file_data, user_groups=args.groups, mode=r['mode'], cmd=r['cmd'],
+                                            opt=args.__dict__, user_name="unknown", user_session=user_session, logger=logger,
+                                            appcls=self.appcls, ver=self.ver, language=self.language):
                 continue
             row = dict(title=r.get('title',''),
                        mode=r['mode'],

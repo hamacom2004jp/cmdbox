@@ -86,8 +86,11 @@ class CmdLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             ret = dict(warn=f"Command not found: '{args.cmd_title}'")
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, ret, None
-        if not signin.Signin._check_cmd(self.signin_file_data, args.groups, opt['mode'], opt['cmd'], args.__dict__, "unknown", logger,
-                                        self.appcls, self.ver, self.language):
+        scope = signin.get_request_scope()
+        user_session = scope["req"].session.get('signin', {}) if scope and scope["req"] is not None else {}
+        if not signin.Signin._check_cmd(signin_file_data=self.signin_file_data, user_groups=args.groups, mode=opt['mode'], cmd=opt['cmd'],
+                                        opt=args.__dict__, user_name="unknown", user_session=user_session, logger=logger,
+                                        appcls=self.appcls, ver=self.ver, language=self.language):
             ret = dict(warn=f"You do not have permission to execute this command.")
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, ret, None
