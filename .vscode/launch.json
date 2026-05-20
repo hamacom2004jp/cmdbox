@@ -137,6 +137,16 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "justMyCode": false
+        },
+        {
+            "name": "Python: cmdbox cmdbox setup",
+            "type": "python",
+            "request": "launch",
+            "args": ["-m","cmdbox","-c","setup"],
+            "module": "cmdbox",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
         }
     ]
 }

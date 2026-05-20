@@ -1,0 +1,14 @@
+{
+    "dsname": "ds_default",
+    "dbtype": "sqlite",
+    "scope": "server",
+    "client_data": null,
+    "db_host": "localhost",
+    "db_port": 5432,
+    "db_user": "postgres",
+    "db_password": null,
+    "db_name": null,
+    "db_timeout": 120,
+    "db_path": "/.datasource/ds_default.db",
+    "db_fullpath": null
+}

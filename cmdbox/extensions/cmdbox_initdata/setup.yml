@@ -1,0 +1,42 @@
+# setup_cmdbox.yml
+# cmdbox セットアップファイルのサンプルです。
+# `cmdbox -m cmdbox -c setup --setup_file setup_cmdbox.yml` で実行します。
+#
+# setups: セットアップ手順の配列です。上から順番に実行されます。
+#   - name       : セットアップ手順の名前
+#     description: セットアップ手順の説明文
+#     exec       : 実行するコマンドのパラメータ
+#       mode     : コマンドのモード (-m に相当)
+#       cmd      : コマンド名 (-c に相当)
+#       その他   : コマンドに渡す追加オプション (--option_name に相当)
+
+setups:
+  - name: "cmd_upload"
+    description: "初期コマンドファイルのアップロードを行います。"
+    exec:
+      mode: client
+      cmd: upload_cmd
+      host: "f'{self.default_host}'"
+      port: "f'{self.default_port}'"
+      password: "f'{self.default_pass}'"
+      svname: "f'{self.default_svname}'"
+      svpath: "'/'"
+      fwpath: "'/'"
+      rjpath:
+      scope: "'server'"
+      upload_file: "f'{cur_path}/.cmdbox_initdata/client/.cmds'"
+
+  - name: "upload_datasource"
+    description: "初期データソースファイルのアップロードを行います。"
+    exec:
+      mode: client
+      cmd: file_upload
+      host: "f'{self.default_host}'"
+      port: "f'{self.default_port}'"
+      password: "f'{self.default_pass}'"
+      svname: "f'{self.default_svname}'"
+      svpath: "'/'"
+      fwpath: "'/'"
+      rjpath:
+      scope: "'server'"
+      upload_file: "f'{cur_path}/.cmdbox_initdata/server/.datasource'"
