@@ -1,6 +1,6 @@
-# setup_cmdbox.yml
+# setup.yml
 # cmdbox セットアップファイルのサンプルです。
-# `cmdbox -m cmdbox -c setup --setup_file setup_cmdbox.yml` で実行します。
+# `cmdbox -m cmdbox -c setup --setup_file setup.yml` で実行します。
 #
 # setups: セットアップ手順の配列です。上から順番に実行されます。
 #   - name       : セットアップ手順の名前
@@ -19,14 +19,14 @@ setups:
       host: "f'{self.default_host}'"
       port: "f'{self.default_port}'"
       password: "f'{self.default_pass}'"
-      svname: "f'{self.ver.__appid__}_setup'"
+      svname: "f'{appid}_setup'"
       svpath: "'/'"
       fwpath: "'/'"
       rjpath:
       scope: "'client'"
       overwrite: false
       client_data: "f'{self.default_data}'"
-      initdata_path: "f'{cur_path / \".cmdbox_initdata\" / \"client\"}'"
+      initdata_path: "f'{cur_path / f\".{appid}_initdata\" / \"client\"}'"
 
   - name: "server_upload"
     description: "サーバー側の設定をアップロードします。"
@@ -36,10 +36,10 @@ setups:
       host: "f'{self.default_host}'"
       port: "f'{self.default_port}'"
       password: "f'{self.default_pass}'"
-      svname: "f'{self.ver.__appid__}_setup'"
+      svname: "f'{appid}_setup'"
       svpath: "'/'"
       fwpath: "'/'"
       rjpath:
       scope: "'server'"
       overwrite: false
-      initdata_path: "f'{cur_path / \".cmdbox_initdata\" / \"server\"}'"
+      initdata_path: "f'{cur_path / f\".{appid}_initdata\" / \"server\"}'"

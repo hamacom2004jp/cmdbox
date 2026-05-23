@@ -179,7 +179,7 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
         cur_path = mod_path.parent
         # それ以外のオプションを追加
         for key, value in exec_conf.items():
-            local_env = dict(Path=Path, self=self, cur_path=cur_path, mod_path=mod_path, key=key)
+            local_env = dict(Path=Path, self=self, cur_path=cur_path, appid=self.ver.__appid__, mod_path=mod_path, key=key)
             if key in ('mode', 'cmd') or value is None:
                 continue
             if isinstance(value, bool):
