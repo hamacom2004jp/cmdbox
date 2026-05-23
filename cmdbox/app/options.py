@@ -232,7 +232,7 @@ class Options:
             if len(schema) == 0 or val == '':
                 continue
             if schema[0]['type'] == Options.T_BOOL:
-                if val:
+                if val is True or str(val).lower() == 'true':
                     opt_list.append(f"--{key}")
                 continue
             if type(val) == list:

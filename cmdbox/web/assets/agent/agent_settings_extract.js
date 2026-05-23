@@ -18,19 +18,24 @@ agentView.build_extract_form = async () => {
 agentView.list_extract = async () => {
     // Extract追加ボタンのクリックイベント
     $('#btn_add_extract').off('click').on('click', async () => {
-        await agentView.build_extract_form();
-        $('#form_extract_edit [name="extract_name"]').prop('readonly', false);
-        $('#form_extract_edit [name="extract_type"]').trigger('change');
-        $('#btn_del_extract').hide();
-        cmdbox.process_i18n($('#extract_edit_modal'));
-        $('#extract_edit_modal').modal('show');
+        cmdbox.show_loading();
+        try {
+            await agentView.build_extract_form();
+            $('#form_extract_edit [name="extract_name"]').prop('readonly', false);
+            $('#form_extract_edit [name="extract_type"]').trigger('change');
+            $('#btn_del_extract').hide();
+            cmdbox.process_i18n($('#extract_edit_modal'));
+            $('#extract_edit_modal').modal('show');
 
-        // extract_cmdをロード
-        await cmdbox.callcmd('cmd','list', {match_opt:['scope','loadpath']},
-            (res)=>{
-                $("[name='extract_cmd']").empty().append('<option></option>');
-                res['data'].forEach(elm=>{$('[name="extract_cmd"]').append('<option value="'+elm["title"]+'">'+elm["title"]+'</option>');});
-        },$('[name="title"]').val(),'extract_cmd');
+            // extract_cmdをロード
+            await cmdbox.callcmd('cmd','list', {match_opt:['scope','loadpath']},
+                (res)=>{
+                    $("[name='extract_cmd']").empty().append('<option></option>');
+                    res['data'].forEach(elm=>{$('[name="extract_cmd"]').append('<option value="'+elm["title"]+'">'+elm["title"]+'</option>');});
+            },$('[name="title"]').val(),'extract_cmd');
+        } finally {
+            cmdbox.hide_loading();
+        }
     });
 
     // Extract保存ボタンのクリックイベント
@@ -82,48 +87,53 @@ agentView.list_extract = async () => {
             
             // リストアイテムクリックで編集
             itemEl.on('click', async () => {
-                await agentView.build_extract_form();
-                const form = $('#form_extract_edit');
-                form.find('[name="extract_name"]').val(config.extract_name).prop('readonly', true);
+                cmdbox.show_loading();
+                try {
+                    await agentView.build_extract_form();
+                    const form = $('#form_extract_edit');
+                    form.find('[name="extract_name"]').val(config.extract_name).prop('readonly', true);
 
-                // 各フィールドに値をセット
-                Object.keys(config).forEach(key => {
-                    if (key === 'extract_name') return;
-                    const input = form.find(`[name="${key}"]`);
-                    if (input.length > 0) {
-                        if (input.attr('type') === 'checkbox') {
-                            input.prop('checked', config[key]);
-                        } else {
-                            input.val(config[key]);
+                    // 各フィールドに値をセット
+                    Object.keys(config).forEach(key => {
+                        if (key === 'extract_name') return;
+                        const input = form.find(`[name="${key}"]`);
+                        if (input.length > 0) {
+                            if (input.attr('type') === 'checkbox') {
+                                input.prop('checked', config[key]);
+                            } else {
+                                input.val(config[key]);
+                            }
                         }
-                    }
-                });
-                // 選択肢による表示非表示の設定
-                form.find(`.choice_show`).each((i, elem) => {
-                    const input_elem = $(elem);
-                    input_elem.change();
-                });
-                // Delete button handler
-                $('#btn_del_extract').show().off('click').on('click', async () => {
-                    if (!await cmdbox.confirm(`Are you sure you want to delete '${config.extract_name}'?`, true, true)) return;
-                    const res = await agentView.exec_cmd('extract', 'del', {extract_name: config.extract_name});
-                    if (res && res.success) {
-                        $('#extract_edit_modal').modal('hide');
-                        agentView.list_extract();
-                    } else {
-                        cmdbox.message(res, true, true);
-                    }
-                });
+                    });
+                    // 選択肢による表示非表示の設定
+                    form.find(`.choice_show`).each((i, elem) => {
+                        const input_elem = $(elem);
+                        input_elem.change();
+                    });
+                    // Delete button handler
+                    $('#btn_del_extract').show().off('click').on('click', async () => {
+                        if (!await cmdbox.confirm(`Are you sure you want to delete '${config.extract_name}'?`, true, true)) return;
+                        const res = await agentView.exec_cmd('extract', 'del', {extract_name: config.extract_name});
+                        if (res && res.success) {
+                            $('#extract_edit_modal').modal('hide');
+                            agentView.list_extract();
+                        } else {
+                            cmdbox.message(res, true, true);
+                        }
+                    });
 
-                // extract_cmdをロード
-                await cmdbox.callcmd('cmd','list', {match_opt:['scope','loadpath']}, (res)=>{
-                    const val = $("[name='extract_cmd']").val();
-                    $("[name='extract_cmd']").empty().append('<option></option>');
-                    res['data'].forEach(elm=>{$('[name="extract_cmd"]').append('<option value="'+elm["title"]+'">'+elm["title"]+'</option>');});
-                    form.find('[name="extract_cmd"]').val(config.extract_cmd);
-                },$('[name="title"]').val(),'extract_cmd');
-                cmdbox.process_i18n($('#extract_edit_modal'));
-                $('#extract_edit_modal').modal('show');
+                    // extract_cmdをロード
+                    await cmdbox.callcmd('cmd','list', {match_opt:['scope','loadpath']}, (res)=>{
+                        const val = $("[name='extract_cmd']").val();
+                        $("[name='extract_cmd']").empty().append('<option></option>');
+                        res['data'].forEach(elm=>{$('[name="extract_cmd"]').append('<option value="'+elm["title"]+'">'+elm["title"]+'</option>');});
+                        form.find('[name="extract_cmd"]').val(config.extract_cmd);
+                    },$('[name="title"]').val(),'extract_cmd');
+                    cmdbox.process_i18n($('#extract_edit_modal'));
+                    $('#extract_edit_modal').modal('show');
+                } finally {
+                    cmdbox.hide_loading();
+                }
             });
 
             container.append(itemEl);

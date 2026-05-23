@@ -200,7 +200,10 @@ class RedisClient(object):
                 yield msg
             return
         else:
-            thread = threading.Thread(target=send, args=(nowait,))
+            def run_send():
+                for _ in send(nowait):
+                    pass
+            thread = threading.Thread(target=run_send)
             thread.start()
             yield dict(success=f"Command sent. cmd={cmd}, nowait={nowait}")
 

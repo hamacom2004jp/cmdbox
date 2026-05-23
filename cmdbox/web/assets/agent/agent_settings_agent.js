@@ -21,27 +21,32 @@ agentView.build_agent_form = async () => {
 agentView.list_agent = async () => {
     // Agent追加ボタンのクリックイベント
     $('#btn_add_agent').off('click').on('click', async () => {
-        await agentView.build_agent_form();
-        $('#form_agent_edit [name="agent_name"]').prop('readonly', false);
-        $('#btn_del_agent').hide();
-        $('[name="agent_type"]').trigger('change');
-        cmdbox.process_i18n($('#agent_edit_modal'));
-        $('#agent_edit_modal').modal('show');
-        // LLMリストをロード
-        await cmdbox.callcmd('llm','list',{},(res)=>{
-            $("[name='llm']").empty().append('<option></option>');
-            res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-        },$('[name="title"]').val(),'llm');
-        // MCPサーバーリストをロード
-        await cmdbox.callcmd('agent','mcpsv_list',{},(res)=>{
-            $("[name='mcpservers']").empty().append('<option></option>');
-            res['data'].map(elm=>{$('[name="mcpservers"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-        },$('[name="title"]').val(),'mcpservers');
-        // SubAgentリストをロード
-        await cmdbox.callcmd('agent','agent_list',{},(res)=>{
-            $("[name='subagents']").empty().append('<option></option>');
-            res['data'].map(elm=>{$('[name="subagents"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-        },$('[name="title"]').val(),'subagents');
+        cmdbox.show_loading();
+        try {
+            await agentView.build_agent_form();
+            $('#form_agent_edit [name="agent_name"]').prop('readonly', false);
+            $('#btn_del_agent').hide();
+            $('[name="agent_type"]').trigger('change');
+            cmdbox.process_i18n($('#agent_edit_modal'));
+            $('#agent_edit_modal').modal('show');
+            // LLMリストをロード
+            await cmdbox.callcmd('llm','list',{},(res)=>{
+                $("[name='llm']").empty().append('<option></option>');
+                res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+            },$('[name="title"]').val(),'llm');
+            // MCPサーバーリストをロード
+            await cmdbox.callcmd('agent','mcpsv_list',{},(res)=>{
+                $("[name='mcpservers']").empty().append('<option></option>');
+                res['data'].map(elm=>{$('[name="mcpservers"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+            },$('[name="title"]').val(),'mcpservers');
+            // SubAgentリストをロード
+            await cmdbox.callcmd('agent','agent_list',{},(res)=>{
+                $("[name='subagents']").empty().append('<option></option>');
+                res['data'].map(elm=>{$('[name="subagents"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+            },$('[name="title"]').val(),'subagents');
+        } finally {
+            cmdbox.hide_loading();
+        }
     });
 
     // Agent保存ボタンのクリックイベント
@@ -93,74 +98,79 @@ agentView.list_agent = async () => {
 
             // リストアイテムクリックで編集
             itemEl.on('click', async () => {
-                await agentView.build_agent_form();
-                const form = $('#form_agent_edit');
-                form.find('[name="agent_name"]').val(config.agent_name).prop('readonly', true);
+                cmdbox.show_loading();
+                try {
+                    await agentView.build_agent_form();
+                    const form = $('#form_agent_edit');
+                    form.find('[name="agent_name"]').val(config.agent_name).prop('readonly', true);
 
-                // 各フィールドに値をセット
-                Object.keys(config).forEach(key => {
-                    if (key === 'agent_name') return;
-                    const input = form.find(`[name="${key}"]`);
-                    if (input.length > 0) {
-                        if (config[key]) {
-                            if (Array.isArray(config[key]) && config[key].length > 1) {
-                                config[key].slice(0,-1).forEach((v, i) => {
-                                    const e = form.find(`[name="${key}"]`).parent().find('.add_buton')[i];
-                                    $(e).click();
-                                });
-                            } else {
-                                input.val(`${config[key]}`);
+                    // 各フィールドに値をセット
+                    Object.keys(config).forEach(key => {
+                        if (key === 'agent_name') return;
+                        const input = form.find(`[name="${key}"]`);
+                        if (input.length > 0) {
+                            if (config[key]) {
+                                if (Array.isArray(config[key]) && config[key].length > 1) {
+                                    config[key].slice(0,-1).forEach((v, i) => {
+                                        const e = form.find(`[name="${key}"]`).parent().find('.add_buton')[i];
+                                        $(e).click();
+                                    });
+                                } else {
+                                    input.val(`${config[key]}`);
+                                }
                             }
                         }
-                    }
-                });
-                // 選択肢による表示非表示の設定
-                form.find(`.choice_show`).each((i, elem) => {
-                    const input_elem = $(elem);
-                    input_elem.change();
-                });
-                // Delete button handler
-                $('#btn_del_agent').show().off('click').on('click', async () => {
-                    if (!await cmdbox.confirm(`Are you sure you want to delete '${config.agent_name}'?`, true, true)) return;
-                    const res = await agentView.exec_cmd('agent', 'agent_del', { agent_name: config.agent_name });
-                    if (res && res.success) {
-                        $('#agent_edit_modal').modal('hide');
-                        agentView.list_agent();
-                    } else {
-                        cmdbox.message(res, true, true);
-                    }
-                });
-                cmdbox.process_i18n($('#agent_edit_modal'));
-                $('#agent_edit_modal').modal('show');
-                // LLMリストをロード
-                await cmdbox.callcmd('llm','list',{},(res)=>{
-                    const val = $("[name='llm']").val();
-                    $("[name='llm']").empty().append('<option></option>');
-                    res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                    form.find('[name="llm"]').val(config.llm);
-                },$('[name="title"]').val(),'llm');
-                // MCPサーバーリストをロード
-                await cmdbox.callcmd('agent','mcpsv_list',{},(res)=>{
-                    const val = $("[name='mcpservers']").val();
-                    $("[name='mcpservers']").empty().append('<option></option>');
-                    res['data'].map(elm=>{$('[name="mcpservers"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                    config.mcpservers && config.mcpservers.forEach((v, i) => {
-                        const e = form.find('[name="mcpservers"]')[i];
-                        $(e).val(v);
                     });
-                },$('[name="title"]').val(),'mcpservers');
-                // SubAgentリストをロード
-                await cmdbox.callcmd('agent','agent_list',{},(res)=>{
-                    $("[name='subagents']").empty().append('<option></option>');
-                    res['data'].map(elm=>{
-                        if (elm["name"] === $('[name="agent_name"]').val()) return;
-                        $('[name="subagents"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');
+                    // 選択肢による表示非表示の設定
+                    form.find(`.choice_show`).each((i, elem) => {
+                        const input_elem = $(elem);
+                        input_elem.change();
                     });
-                    config.subagents && config.subagents.forEach((v, i) => {
-                        const e = form.find('[name="subagents"]')[i];
-                        $(e).val(v);
+                    // Delete button handler
+                    $('#btn_del_agent').show().off('click').on('click', async () => {
+                        if (!await cmdbox.confirm(`Are you sure you want to delete '${config.agent_name}'?`, true, true)) return;
+                        const res = await agentView.exec_cmd('agent', 'agent_del', { agent_name: config.agent_name });
+                        if (res && res.success) {
+                            $('#agent_edit_modal').modal('hide');
+                            agentView.list_agent();
+                        } else {
+                            cmdbox.message(res, true, true);
+                        }
                     });
-                },$('[name="title"]').val(),'subagents');
+                    cmdbox.process_i18n($('#agent_edit_modal'));
+                    $('#agent_edit_modal').modal('show');
+                    // LLMリストをロード
+                    await cmdbox.callcmd('llm','list',{},(res)=>{
+                        const val = $("[name='llm']").val();
+                        $("[name='llm']").empty().append('<option></option>');
+                        res['data'].map(elm=>{$('[name="llm"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                        form.find('[name="llm"]').val(config.llm);
+                    },$('[name="title"]').val(),'llm');
+                    // MCPサーバーリストをロード
+                    await cmdbox.callcmd('agent','mcpsv_list',{},(res)=>{
+                        const val = $("[name='mcpservers']").val();
+                        $("[name='mcpservers']").empty().append('<option></option>');
+                        res['data'].map(elm=>{$('[name="mcpservers"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                        config.mcpservers && config.mcpservers.forEach((v, i) => {
+                            const e = form.find('[name="mcpservers"]')[i];
+                            $(e).val(v);
+                        });
+                    },$('[name="title"]').val(),'mcpservers');
+                    // SubAgentリストをロード
+                    await cmdbox.callcmd('agent','agent_list',{},(res)=>{
+                        $("[name='subagents']").empty().append('<option></option>');
+                        res['data'].map(elm=>{
+                            if (elm["name"] === $('[name="agent_name"]').val()) return;
+                            $('[name="subagents"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');
+                        });
+                        config.subagents && config.subagents.forEach((v, i) => {
+                            const e = form.find('[name="subagents"]')[i];
+                            $(e).val(v);
+                        });
+                    },$('[name="title"]').val(),'subagents');
+                } finally {
+                    cmdbox.hide_loading();
+                }
             });
             container.append(itemEl);
         });

@@ -18,11 +18,16 @@ agentView.build_embedding_form = async () => {
 agentView.list_embedding = async () => {
     // Embedding追加ボタンのクリックイベント
     $('#btn_add_embedding').off('click').on('click', async () => {
-        await agentView.build_embedding_form();
-        $('#form_embedding_edit [name="embedding_name"]').prop('readonly', false);
-        $('#btn_del_embedding').hide();
-        cmdbox.process_i18n($('#embedding_edit_modal'));
-        $('#embedding_edit_modal').modal('show');
+        cmdbox.show_loading();
+        try {
+            await agentView.build_embedding_form();
+            $('#form_embedding_edit [name="embedding_name"]').prop('readonly', false);
+            $('#btn_del_embedding').hide();
+            cmdbox.process_i18n($('#embedding_edit_modal'));
+            $('#embedding_edit_modal').modal('show');
+        } finally {
+            cmdbox.hide_loading();
+        }
     });
 
     // Embedding保存ボタンのクリックイベント
@@ -74,36 +79,41 @@ agentView.list_embedding = async () => {
             
             // リストアイテムクリックで編集
             itemEl.on('click', async () => {
-                await agentView.build_embedding_form();
-                const form = $('#form_embedding_edit');
-                form.find('[name="embed_name"]').val(config.embed_name).prop('readonly', true);
+                cmdbox.show_loading();
+                try {
+                    await agentView.build_embedding_form();
+                    const form = $('#form_embedding_edit');
+                    form.find('[name="embed_name"]').val(config.embed_name).prop('readonly', true);
 
-                // 各フィールドに値をセット
-                Object.keys(config).forEach(key => {
-                    if (key === 'embedding_name' || key === 'embed_name') return;
-                    const input = form.find(`[name="${key}"]`);
-                    if (input.length > 0) {
-                        input.val(config[key]);
-                    }
-                });
-                // 選択肢による表示非表示の設定
-                form.find(`.choice_show`).each((i, elem) => {
-                    const input_elem = $(elem);
-                    input_elem.change();
-                });
-                // Delete button handler
-                $('#btn_del_embedding').show().off('click').on('click', async () => {
-                    if (!await cmdbox.confirm(`Are you sure you want to delete '${config.embed_name}'?`, true, true)) return;
-                    const res = await agentView.exec_cmd('embed', 'del', { embed_name: config.embed_name });
-                    if (res && res.success) {
-                        $('#embedding_edit_modal').modal('hide');
-                        agentView.list_embedding();
-                    } else {
-                        cmdbox.message(res, true, true);
-                    }
-                });
-                cmdbox.process_i18n($('#embedding_edit_modal'));
-                $('#embedding_edit_modal').modal('show');
+                    // 各フィールドに値をセット
+                    Object.keys(config).forEach(key => {
+                        if (key === 'embedding_name' || key === 'embed_name') return;
+                        const input = form.find(`[name="${key}"]`);
+                        if (input.length > 0) {
+                            input.val(config[key]);
+                        }
+                    });
+                    // 選択肢による表示非表示の設定
+                    form.find(`.choice_show`).each((i, elem) => {
+                        const input_elem = $(elem);
+                        input_elem.change();
+                    });
+                    // Delete button handler
+                    $('#btn_del_embedding').show().off('click').on('click', async () => {
+                        if (!await cmdbox.confirm(`Are you sure you want to delete '${config.embed_name}'?`, true, true)) return;
+                        const res = await agentView.exec_cmd('embed', 'del', { embed_name: config.embed_name });
+                        if (res && res.success) {
+                            $('#embedding_edit_modal').modal('hide');
+                            agentView.list_embedding();
+                        } else {
+                            cmdbox.message(res, true, true);
+                        }
+                    });
+                    cmdbox.process_i18n($('#embedding_edit_modal'));
+                    $('#embedding_edit_modal').modal('show');
+                } finally {
+                    cmdbox.hide_loading();
+                }
             });
 
             container.append(itemEl);

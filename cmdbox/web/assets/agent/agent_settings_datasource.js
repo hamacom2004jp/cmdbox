@@ -18,13 +18,18 @@ agentView.build_datasource_form = async () => {
 agentView.list_datasource = async () => {
     // Datasource追加ボタンのクリックイベント
     $('#btn_add_datasource').off('click').on('click', async () => {
-        await agentView.build_datasource_form();
-        $('#form_datasource_edit [name="dsname"]').prop('readonly', false);
-        $('#form_datasource_edit [name="dbtype"]').trigger('change');
-        $('#form_datasource_edit [name="scope"]').trigger('change');
-        $('#btn_del_datasource').hide();
-        cmdbox.process_i18n($('#datasource_edit_modal'));
-        $('#datasource_edit_modal').modal('show');
+        cmdbox.show_loading();
+        try {
+            await agentView.build_datasource_form();
+            $('#form_datasource_edit [name="dsname"]').prop('readonly', false);
+            $('#form_datasource_edit [name="dbtype"]').trigger('change');
+            $('#form_datasource_edit [name="scope"]').trigger('change');
+            $('#btn_del_datasource').hide();
+            cmdbox.process_i18n($('#datasource_edit_modal'));
+            $('#datasource_edit_modal').modal('show');
+        } finally {
+            cmdbox.hide_loading();
+        }
     });
 
     // Datasource保存ボタンのクリックイベント
@@ -76,32 +81,37 @@ agentView.list_datasource = async () => {
 
             // リストアイテムクリックで編集
             itemEl.on('click', async () => {
-                await agentView.build_datasource_form();
-                const form = $('#form_datasource_edit');
-                form.find('[name="dsname"]').val(config.dsname || item.name).prop('readonly', true);
+                cmdbox.show_loading();
+                try {
+                    await agentView.build_datasource_form();
+                    const form = $('#form_datasource_edit');
+                    form.find('[name="dsname"]').val(config.dsname || item.name).prop('readonly', true);
 
-                // 各フィールドに値をセット
-                Object.keys(config).forEach(key => {
-                    if (key === 'dsname') return;
-                    const input = form.find(`[name="${key}"]`);
-                    if (input.length > 0 && config[key] != null) input.val(`${config[key]}`);
-                });
-                // choice_showによる表示切り替えをトリガー
-                form.find('.choice_show').each((i, elem) => { $(elem).change(); });
+                    // 各フィールドに値をセット
+                    Object.keys(config).forEach(key => {
+                        if (key === 'dsname') return;
+                        const input = form.find(`[name="${key}"]`);
+                        if (input.length > 0 && config[key] != null) input.val(`${config[key]}`);
+                    });
+                    // choice_showによる表示切り替えをトリガー
+                    form.find('.choice_show').each((i, elem) => { $(elem).change(); });
 
-                // 削除ボタンのハンドラー
-                $('#btn_del_datasource').show().off('click').on('click', async () => {
-                    if (!await cmdbox.confirm(`Are you sure you want to delete '${item.name}'?`, true, true)) return;
-                    const res = await agentView.exec_cmd('datasource', 'del', { dsname: item.name });
-                    if (res && res.success) {
-                        $('#datasource_edit_modal').modal('hide');
-                        agentView.list_datasource();
-                    } else {
-                        cmdbox.message(res, true, true);
-                    }
-                });
-                cmdbox.process_i18n($('#datasource_edit_modal'));
-                $('#datasource_edit_modal').modal('show');
+                    // 削除ボタンのハンドラー
+                    $('#btn_del_datasource').show().off('click').on('click', async () => {
+                        if (!await cmdbox.confirm(`Are you sure you want to delete '${item.name}'?`, true, true)) return;
+                        const res = await agentView.exec_cmd('datasource', 'del', { dsname: item.name });
+                        if (res && res.success) {
+                            $('#datasource_edit_modal').modal('hide');
+                            agentView.list_datasource();
+                        } else {
+                            cmdbox.message(res, true, true);
+                        }
+                    });
+                    cmdbox.process_i18n($('#datasource_edit_modal'));
+                    $('#datasource_edit_modal').modal('show');
+                } finally {
+                    cmdbox.hide_loading();
+                }
             });
         });
     } catch (e) {

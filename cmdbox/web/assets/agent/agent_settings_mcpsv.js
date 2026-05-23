@@ -19,11 +19,16 @@ agentView.build_mcpsv_form = async () => {
 agentView.list_mcpsv = async () => {
     // MCPSV追加ボタンのクリックイベント
     $('#btn_add_mcpsv').off('click').on('click', () => {
-        agentView.build_mcpsv_form();
-        $('#form_mcpsv_edit [name="mcpserver_name"]').prop('readonly', false);
-        $('#btn_del_mcpsv').hide();
-        cmdbox.process_i18n($('#mcpsv_edit_modal'));
-        $('#mcpsv_edit_modal').modal('show');
+        cmdbox.show_loading();
+        try {
+            agentView.build_mcpsv_form();
+            $('#form_mcpsv_edit [name="mcpserver_name"]').prop('readonly', false);
+            $('#btn_del_mcpsv').hide();
+            cmdbox.process_i18n($('#mcpsv_edit_modal'));
+            $('#mcpsv_edit_modal').modal('show');
+        } finally {
+            cmdbox.hide_loading();
+        }
     });
 
     // MCPSV保存ボタンのクリックイベント
@@ -74,53 +79,58 @@ agentView.list_mcpsv = async () => {
             
             // リストアイテムクリックで編集
             itemEl.on('click', async () => {
-                await agentView.build_mcpsv_form();
-                const form = $('#form_mcpsv_edit');
-                form.find('[name="mcpserver_name"]').val(config.mcpserver_name).prop('readonly', true);
-                
-                // 各フィールドに値をセット
-                Object.keys(config).forEach(key => {
-                    if (key === 'mcpserver_name') return;
-                    const input = form.find(`[name="${key}"]`);
-                    if (input.length > 0) {
-                        if (config[key]) input.val(`${config[key]}`);
+                cmdbox.show_loading();
+                try {
+                    await agentView.build_mcpsv_form();
+                    const form = $('#form_mcpsv_edit');
+                    form.find('[name="mcpserver_name"]').val(config.mcpserver_name).prop('readonly', true);
+                    
+                    // 各フィールドに値をセット
+                    Object.keys(config).forEach(key => {
+                        if (key === 'mcpserver_name') return;
+                        const input = form.find(`[name="${key}"]`);
+                        if (input.length > 0) {
+                            if (config[key]) input.val(`${config[key]}`);
+                        }
+                    });
+                    // 選択肢による表示非表示の設定
+                    form.find(`.choice_show`).each((i, elem) => {
+                        const input_elem = $(elem);
+                        input_elem.change();
+                    });
+                    // Delete button handler
+                    $('#btn_del_mcpsv').show().off('click').on('click', async () => {
+                        if (!await cmdbox.confirm(`Are you sure you want to delete '${config.mcpserver_name}'?`, true, true)) return;
+                        const res = await agentView.exec_cmd('agent', 'mcpsv_del', { mcpserver_name: config.mcpserver_name });
+                        if (res && res.success) {
+                            $('#mcpsv_edit_modal').modal('hide');
+                            agentView.list_mcpsv();
+                        } else {
+                            cmdbox.message(res, true, true);
+                        }
+                    });
+                    cmdbox.process_i18n($('#mcpsv_edit_modal'));
+                    $('#mcpsv_edit_modal').modal('show');
+                    // コマンド実行
+                    const user = await cmdbox.user_info();
+                    let apikey = $('[name="mcpserver_apikey"]').val();
+                    if (!apikey && user && user['apikeys']) {
+                        const keys = Object.keys(user['apikeys']);
+                        if (keys.length > 0) apikey = user['apikeys'][keys[0]][0];
                     }
-                });
-                // 選択肢による表示非表示の設定
-                form.find(`.choice_show`).each((i, elem) => {
-                    const input_elem = $(elem);
-                    input_elem.change();
-                });
-                // Delete button handler
-                $('#btn_del_mcpsv').show().off('click').on('click', async () => {
-                    if (!await cmdbox.confirm(`Are you sure you want to delete '${config.mcpserver_name}'?`, true, true)) return;
-                    const res = await agentView.exec_cmd('agent', 'mcpsv_del', { mcpserver_name: config.mcpserver_name });
-                    if (res && res.success) {
-                        $('#mcpsv_edit_modal').modal('hide');
-                        agentView.list_mcpsv();
-                    } else {
-                        cmdbox.message(res, true, true);
-                    }
-                });
-                cmdbox.process_i18n($('#mcpsv_edit_modal'));
-                $('#mcpsv_edit_modal').modal('show');
-                // コマンド実行
-                const user = await cmdbox.user_info();
-                let apikey = $('[name="mcpserver_apikey"]').val();
-                if (!apikey && user && user['apikeys']) {
-                    const keys = Object.keys(user['apikeys']);
-                    if (keys.length > 0) apikey = user['apikeys'][keys[0]][0];
+                    await cmdbox.callcmd('agent','mcp_client',{
+                        'mcpserver_url':$('[name="mcpserver_url"]').val(),
+                        'mcpserver_apikey':apikey,
+                        'mcpserver_transport':$('[name="mcpserver_transport"]').val(),
+                        'operation':'list_tools',
+                    },(res)=>{
+                        $("[name='mcp_tools']").empty().append('<option></option>');
+                        res['data'].map(elm=>{$('[name="mcp_tools"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                        form.find('[name="mcp_tools"]').val(config.mcpserver_mcp_tools);
+                    },$('[name="title"]').val(),'mcp_tools');
+                } finally {
+                    cmdbox.hide_loading();
                 }
-                await cmdbox.callcmd('agent','mcp_client',{
-                    'mcpserver_url':$('[name="mcpserver_url"]').val(),
-                    'mcpserver_apikey':apikey,
-                    'mcpserver_transport':$('[name="mcpserver_transport"]').val(),
-                    'operation':'list_tools',
-                },(res)=>{
-                    $("[name='mcp_tools']").empty().append('<option></option>');
-                    res['data'].map(elm=>{$('[name="mcp_tools"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                    form.find('[name="mcp_tools"]').val(config.mcpserver_mcp_tools);
-                },$('[name="title"]').val(),'mcp_tools');
             });
 
             container.append(itemEl);

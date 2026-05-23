@@ -2023,6 +2023,18 @@ cmdbox.get_param = (modal_elem) => {
 cmdbox.translation = async (words, nosave, llmname) => {
     if (!words || words.length <= 0) return words;
     const targetLang = await cmdbox.getUserLanguage();
+    const cache_res = {};
+    if (cmdbox.translation_cache[targetLang]) {
+        const to_translate = [];
+        const cache = cmdbox.translation_cache[targetLang];
+        // cacheにある翻訳結果を優先的に使用し、ないものだけ翻訳する
+        words.forEach(word => {
+            if (cache[word]) cache_res[word] = cache[word];
+            else to_translate.push(word);
+        });
+        if (to_translate.length <= 0) return cache_res;
+        words = to_translate;
+    }
     let res = await cmdbox.callcmd('llm', 'translation', {
         llmname: llmname?llmname:'',
         words: words,
@@ -2032,8 +2044,13 @@ cmdbox.translation = async (words, nosave, llmname) => {
     if (!res) return words;
     if (Array.isArray(res) && res.length > 0) res = res[0];
     if (!res['success'] || !res['success']['data']) return words;
-    return res['success']['data'];
+    // 翻訳結果をキャッシュに保存
+    if (!cmdbox.translation_cache[targetLang]) cmdbox.translation_cache[targetLang] = {};
+    Object.assign(cmdbox.translation_cache[targetLang], res['success']['data']);
+    const ret = Object.assign(res['success']['data'], cache_res);
+    return ret;
 }
+cmdbox.translation_cache = {};
 /**
  * 多言語対応のためのテキスト翻訳を処理する
  * @param {$} target - 翻訳対象の要素を含む祖先要素。指定しない場合は全ての.i18nクラスを対象とする

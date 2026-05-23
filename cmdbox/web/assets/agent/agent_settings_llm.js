@@ -19,12 +19,17 @@ agentView.build_llm_form = async () => {
 agentView.list_llm = async () => {
     // LLM追加ボタンのクリックイベント
     $('#btn_add_llm').off('click').on('click', async () => {
-        await agentView.build_llm_form();
-        $('#form_llm_edit [name="llmname"]').prop('readonly', false);
-        $('#form_llm_edit [name="llmprov"]').trigger('change');
-        $('#btn_del_llm').hide();
-        cmdbox.process_i18n($('#llm_edit_modal'));
-        $('#llm_edit_modal').modal('show');
+        cmdbox.show_loading();
+        try {
+            await agentView.build_llm_form();
+            $('#form_llm_edit [name="llmname"]').prop('readonly', false);
+            $('#form_llm_edit [name="llmprov"]').trigger('change');
+            $('#btn_del_llm').hide();
+            cmdbox.process_i18n($('#llm_edit_modal'));
+            $('#llm_edit_modal').modal('show');
+        } finally {
+            cmdbox.hide_loading();
+        }
     });
 
     // LLM保存ボタンのクリックイベント
@@ -75,36 +80,41 @@ agentView.list_llm = async () => {
             
             // リストアイテムクリックで編集
             itemEl.on('click', async () => {
-                await agentView.build_llm_form();
-                const form = $('#form_llm_edit');
-                form.find('[name="llmname"]').val(config.llmname).prop('readonly', true);
+                cmdbox.show_loading();
+                try {
+                    await agentView.build_llm_form();
+                    const form = $('#form_llm_edit');
+                    form.find('[name="llmname"]').val(config.llmname).prop('readonly', true);
 
-                // 各フィールドに値をセット
-                Object.keys(config).forEach(key => {
-                    if (key === 'llmname') return;
-                    const input = form.find(`[name="${key}"]`);
-                    if (input.length > 0) {
-                        input.val(config[key]);
-                    }
-                });
-                // 選択肢による表示非表示の設定
-                form.find(`.choice_show`).each((i, elem) => {
-                    const input_elem = $(elem);
-                    input_elem.change();
-                });
-                // Delete button handler
-                $('#btn_del_llm').show().off('click').on('click', async () => {
-                    if (!await cmdbox.confirm(`Are you sure you want to delete '${config.llmname}'?`, true, true)) return;
-                    const res = await agentView.exec_cmd('llm', 'del', { llmname: config.llmname });
-                    if (res && res.success) {
-                        $('#llm_edit_modal').modal('hide');
-                        agentView.list_llm();
-                    } else {
-                        cmdbox.message(res, true, true);
-                    }
-                });
-                cmdbox.process_i18n($('#llm_edit_modal'));
-                $('#llm_edit_modal').modal('show');
+                    // 各フィールドに値をセット
+                    Object.keys(config).forEach(key => {
+                        if (key === 'llmname') return;
+                        const input = form.find(`[name="${key}"]`);
+                        if (input.length > 0) {
+                            input.val(config[key]);
+                        }
+                    });
+                    // 選択肢による表示非表示の設定
+                    form.find(`.choice_show`).each((i, elem) => {
+                        const input_elem = $(elem);
+                        input_elem.change();
+                    });
+                    // Delete button handler
+                    $('#btn_del_llm').show().off('click').on('click', async () => {
+                        if (!await cmdbox.confirm(`Are you sure you want to delete '${config.llmname}'?`, true, true)) return;
+                        const res = await agentView.exec_cmd('llm', 'del', { llmname: config.llmname });
+                        if (res && res.success) {
+                            $('#llm_edit_modal').modal('hide');
+                            agentView.list_llm();
+                        } else {
+                            cmdbox.message(res, true, true);
+                        }
+                    });
+                    cmdbox.process_i18n($('#llm_edit_modal'));
+                    $('#llm_edit_modal').modal('show');
+                } finally {
+                    cmdbox.hide_loading();
+                }
             });
 
             container.append(itemEl);

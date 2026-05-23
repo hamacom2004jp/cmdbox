@@ -349,9 +349,9 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
                         sel = {}
                         for k,v in select.items():
                             if k in ['clmsg_date', 'svmsg_date']:
-                                sel[f"{k} AT TIME ZONE INTERVAL '{toz}'"] = (k if v is '-' else v)
+                                sel[f"{k} AT TIME ZONE INTERVAL '{toz}'"] = (k if v == '-' else v)
                             else:
-                                sel[k] = (k if v is '-' else v)
+                                sel[k] = (k if v == '-' else v)
                         select = sel
                     sql = []
                     for k,v in select.items():

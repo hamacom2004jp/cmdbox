@@ -47,12 +47,13 @@ def copy_sample(data:Path, ver=version):
     # サンプルデータをコピー
     dst_sample = Path(data) / '.samples' if data is not None else HOME_DIR / '.samples'
     src = Path(ver.__file__).parent / 'extensions'
+    src_sample = src / 'sample_project'
     def copy(src:str, dst:str):
         p = Path(dst)
         if not p.exists():
             shutil.copy2(src, dst)
-    if not dst_sample.exists():
-        shutil.copytree(src / 'sample_project', dst_sample, dirs_exist_ok=True, copy_function=copy)
+    if src_sample.exists() and not dst_sample.exists():
+        shutil.copytree(src_sample, dst_sample, dirs_exist_ok=True, copy_function=copy)
     # 設定ファイルをコピー
     dst_config = Path(data) / f'.{ver.__appid__}' if data is not None else HOME_DIR / f'.{ver.__appid__}'
     dst_config.mkdir(parents=True, exist_ok=True)
@@ -62,8 +63,9 @@ def copy_sample(data:Path, ver=version):
         shutil.copy2(src / 'user_list.yml', dst_config / 'user_list.yml')
     # 初期データをコピー
     dst_initdata = Path(data) / f'.{ver.__appid__}_initdata' if data is not None else HOME_DIR / f'.{ver.__appid__}_initdata'
-    if not dst_initdata.exists():
-        shutil.copytree(src / f'{ver.__appid__}_initdata', dst_initdata, dirs_exist_ok=True, copy_function=copy)
+    src_initdata = src / f'{ver.__appid__}_initdata'
+    if src_initdata.exists() and not dst_initdata.exists():
+        shutil.copytree(src_initdata, dst_initdata, dirs_exist_ok=True, copy_function=copy)
 
 def gen_uuid() -> str:
     """

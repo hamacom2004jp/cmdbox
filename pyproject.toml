@@ -52,6 +52,7 @@ dependencies = [
     "Pillow",
     "plyer",
     "psycopg[binary]",
+    "psycopg[pool]",
     "pyjwt",
     #"pystray",
     "python-multipart",

@@ -18,28 +18,33 @@ agentView.build_rag_form = async () => {
 agentView.list_rag = async () => {
     // RAG追加ボタンのクリックイベント
     $('#btn_add_rag').off('click').on('click', async () => {
-        await agentView.build_rag_form();
-        $('#form_rag_edit [name="rag_name"]').prop('readonly', false);
-        $('#form_rag_edit [name="rag_datasource"]').trigger('change');
-        $('#btn_del_rag').hide();
-        $('#btn_build_rag').hide();
-        cmdbox.process_i18n($('#rag_edit_modal'));
-        $('#rag_edit_modal').modal('show');
-        // Embedリストをロード
-        await cmdbox.callcmd('embed','list',{},(res)=>{
-            $("[name='embed']").empty().append('<option></option>');
-            res['data'].map(elm=>{$('[name="embed"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-        },$('[name="title"]').val(),'embed');
-        // RAG Datasourceリストをロード
-        await cmdbox.callcmd('datasource','list',{},(res)=>{
-            $("[name='rag_datasource']").empty().append('<option></option>');
-            res['data'].map(elm=>{$('[name="rag_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-        },$('[name="title"]').val(),'rag_datasource');
-        // Extractリストをロード
-        await cmdbox.callcmd('extract','list',{match_mode:'extract'},(res)=>{
-            $("[name='extract']").empty().append('<option></option>');
-            res['data'].map(elm=>{$("[name='extract']").append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-        },$('[name="title"]').val(),'extract');
+        cmdbox.show_loading();
+        try {
+            await agentView.build_rag_form();
+            $('#form_rag_edit [name="rag_name"]').prop('readonly', false);
+            $('#form_rag_edit [name="rag_datasource"]').trigger('change');
+            $('#btn_del_rag').hide();
+            $('#btn_build_rag').hide();
+            cmdbox.process_i18n($('#rag_edit_modal'));
+            $('#rag_edit_modal').modal('show');
+            // Embedリストをロード
+            await cmdbox.callcmd('embed','list',{},(res)=>{
+                $("[name='embed']").empty().append('<option></option>');
+                res['data'].map(elm=>{$('[name="embed"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+            },$('[name="title"]').val(),'embed');
+            // RAG Datasourceリストをロード
+            await cmdbox.callcmd('datasource','list',{},(res)=>{
+                $("[name='rag_datasource']").empty().append('<option></option>');
+                res['data'].map(elm=>{$('[name="rag_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+            },$('[name="title"]').val(),'rag_datasource');
+            // Extractリストをロード
+            await cmdbox.callcmd('extract','list',{match_mode:'extract'},(res)=>{
+                $("[name='extract']").empty().append('<option></option>');
+                res['data'].map(elm=>{$("[name='extract']").append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+            },$('[name="title"]').val(),'extract');
+        } finally {
+            cmdbox.hide_loading();
+        }
     });
 
     // RAG保存ボタンのクリックイベント
@@ -91,63 +96,68 @@ agentView.list_rag = async () => {
             
             // リストアイテムクリックで編集
             itemEl.on('click', async () => {
-                await agentView.build_rag_form();
-                const form = $('#form_rag_edit');
-                form.find('[name="rag_name"]').val(config.rag_name).prop('readonly', true);
+                cmdbox.show_loading();
+                try {
+                    await agentView.build_rag_form();
+                    const form = $('#form_rag_edit');
+                    form.find('[name="rag_name"]').val(config.rag_name).prop('readonly', true);
 
-                // 各フィールドに値をセット
-                Object.keys(config).forEach(key => {
-                    if (key === 'rag_name') return;
-                    const input = form.find(`[name="${key}"]`);
-                    if (input.length > 0) {
-                        if (input.attr('type') === 'checkbox') {
-                            input.prop('checked', config[key]);
-                        } else if (key === 'source_dir' && Array.isArray(config[key])) {
-                            // source_dirは複数値の可能性
-                            input.val(config[key].join('\n'));
-                        } else {
-                            input.val(config[key]);
+                    // 各フィールドに値をセット
+                    Object.keys(config).forEach(key => {
+                        if (key === 'rag_name') return;
+                        const input = form.find(`[name="${key}"]`);
+                        if (input.length > 0) {
+                            if (input.attr('type') === 'checkbox') {
+                                input.prop('checked', config[key]);
+                            } else if (key === 'source_dir' && Array.isArray(config[key])) {
+                                // source_dirは複数値の可能性
+                                input.val(config[key].join('\n'));
+                            } else {
+                                input.val(config[key]);
+                            }
                         }
-                    }
-                });
-                // 選択肢による表示非表示の設定
-                form.find(`.choice_show`).each((i, elem) => {
-                    const input_elem = $(elem);
-                    input_elem.change();
-                });
-                // Delete button handler
-                $('#btn_del_rag').show().off('click').on('click', async () => {
-                    if (!await cmdbox.confirm(`Are you sure you want to delete '${config.rag_name}'?`, true, true)) return;
-                    const res = await agentView.exec_cmd('rag', 'del', { rag_name: config.rag_name });
-                    if (res && res.success) {
-                        $('#rag_edit_modal').modal('hide');
-                        agentView.list_rag();
-                    } else {
-                        cmdbox.message(res, true, true);
-                    }
-                });
-                $('#btn_build_rag').show().off('click').on('click', async () => {
-                    if (!await cmdbox.confirm(`Are you sure you want to build '${config.rag_name}'?`, true, true)) return;
-                    await agentView.build_rag();
-                });
-                // コマンド実行
-                await cmdbox.callcmd('embed','list',{},(res)=>{
-                    $("[name='embed']").empty().append('<option></option>');
-                    res['data'].map(elm=>{$('[name="embed"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                    form.find('[name="embed"]').val(config.embed);
-                },$('[name="title"]').val(),'embed');
-                await cmdbox.callcmd('datasource','list',{},(res)=>{
-                    $("[name='rag_datasource']").empty().append('<option></option>');
-                    res['data'].map(elm=>{$('[name="rag_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                    form.find('[name="rag_datasource"]').val(config.rag_datasource);
-                },$('[name="title"]').val(),'rag_datasource');
-                await cmdbox.callcmd('extract','list',{match_mode:'extract'},(res)=>{
-                    $("[name='extract']").empty().append('<option></option>');
-                    res['data'].map(elm=>{$("[name='extract']").append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                    form.find('[name="extract"]').val(config.extract);
-                },$('[name="title"]').val(),'extract');
-                cmdbox.process_i18n($('#rag_edit_modal'));
-                $('#rag_edit_modal').modal('show');
+                    });
+                    // 選択肢による表示非表示の設定
+                    form.find(`.choice_show`).each((i, elem) => {
+                        const input_elem = $(elem);
+                        input_elem.change();
+                    });
+                    // Delete button handler
+                    $('#btn_del_rag').show().off('click').on('click', async () => {
+                        if (!await cmdbox.confirm(`Are you sure you want to delete '${config.rag_name}'?`, true, true)) return;
+                        const res = await agentView.exec_cmd('rag', 'del', { rag_name: config.rag_name });
+                        if (res && res.success) {
+                            $('#rag_edit_modal').modal('hide');
+                            agentView.list_rag();
+                        } else {
+                            cmdbox.message(res, true, true);
+                        }
+                    });
+                    $('#btn_build_rag').show().off('click').on('click', async () => {
+                        if (!await cmdbox.confirm(`Are you sure you want to build '${config.rag_name}'?`, true, true)) return;
+                        await agentView.build_rag();
+                    });
+                    // コマンド実行
+                    await cmdbox.callcmd('embed','list',{},(res)=>{
+                        $("[name='embed']").empty().append('<option></option>');
+                        res['data'].map(elm=>{$('[name="embed"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                        form.find('[name="embed"]').val(config.embed);
+                    },$('[name="title"]').val(),'embed');
+                    await cmdbox.callcmd('datasource','list',{},(res)=>{
+                        $("[name='rag_datasource']").empty().append('<option></option>');
+                        res['data'].map(elm=>{$('[name="rag_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                        form.find('[name="rag_datasource"]').val(config.rag_datasource);
+                    },$('[name="title"]').val(),'rag_datasource');
+                    await cmdbox.callcmd('extract','list',{match_mode:'extract'},(res)=>{
+                        $("[name='extract']").empty().append('<option></option>');
+                        res['data'].map(elm=>{$("[name='extract']").append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                        form.find('[name="extract"]').val(config.extract);
+                    },$('[name="title"]').val(),'extract');
+                    cmdbox.process_i18n($('#rag_edit_modal'));
+                    $('#rag_edit_modal').modal('show');
+                } finally {
+                    cmdbox.hide_loading();
+                }
             });
 
             container.append(itemEl);

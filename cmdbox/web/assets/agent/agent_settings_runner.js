@@ -19,27 +19,32 @@ agentView.build_runner_form = async () => {
 agentView.list_runner = async () => {
     // Runner追加ボタンのクリックイベント
     $('#btn_add_runner').off('click').on('click', async () => {
-        await agentView.build_runner_form();
-        $('#form_runner_edit [name="runner_name"]').prop('readonly', false);
-        $('#form_runner_edit [name="session_datasource"]').trigger('change');
-        $('#btn_del_runner').hide();
-        cmdbox.process_i18n($('#runner_edit_modal'));
-        $('#runner_edit_modal').modal('show');
-        // Agentリストをロード
-        await cmdbox.callcmd('agent','agent_list',{},(res)=>{
-            $("[name='agent']").empty().append('<option></option>');
-            res['data'].map(elm=>{$('[name="agent"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-        },$('[name="title"]').val(),'agent');
-        // Session Datasourceリストをロード
-        await cmdbox.callcmd('datasource','list',{},(res)=>{
-            $("[name='session_datasource']").empty().append('<option></option>');
-            res['data'].map(elm=>{$('[name="session_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-        },$('[name="title"]').val(),'session_datasource');
-        // RAGリストをロード
-        await cmdbox.callcmd('rag','list',{},(res)=>{
-            $("[name='rag']").empty().append('<option></option>');
-            res['data'].map(elm=>{$('[name="rag"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-        },$('[name="title"]').val(),'rag');
+        cmdbox.show_loading();
+        try {
+            await agentView.build_runner_form();
+            $('#form_runner_edit [name="runner_name"]').prop('readonly', false);
+            $('#form_runner_edit [name="session_datasource"]').trigger('change');
+            $('#btn_del_runner').hide();
+            cmdbox.process_i18n($('#runner_edit_modal'));
+            $('#runner_edit_modal').modal('show');
+            // Agentリストをロード
+            await cmdbox.callcmd('agent','agent_list',{},(res)=>{
+                $("[name='agent']").empty().append('<option></option>');
+                res['data'].map(elm=>{$('[name="agent"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+            },$('[name="title"]').val(),'agent');
+            // Session Datasourceリストをロード
+            await cmdbox.callcmd('datasource','list',{},(res)=>{
+                $("[name='session_datasource']").empty().append('<option></option>');
+                res['data'].map(elm=>{$('[name="session_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+            },$('[name="title"]').val(),'session_datasource');
+            // RAGリストをロード
+            await cmdbox.callcmd('rag','list',{},(res)=>{
+                $("[name='rag']").empty().append('<option></option>');
+                res['data'].map(elm=>{$('[name="rag"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+            },$('[name="title"]').val(),'rag');
+        } finally {
+            cmdbox.hide_loading();
+        }
     });
 
     // Runner保存ボタンのクリックイベント
@@ -100,52 +105,57 @@ agentView.list_runner = async () => {
 
             // リストアイテムクリックで編集
             itemEl.on('click', async () => {
-                await agentView.build_runner_form();
-                const form = $('#form_runner_edit');
-                form.find('[name="runner_name"]').val(config.runner_name).prop('readonly', true);
+                cmdbox.show_loading();
+                try {
+                    await agentView.build_runner_form();
+                    const form = $('#form_runner_edit');
+                    form.find('[name="runner_name"]').val(config.runner_name).prop('readonly', true);
 
-                // 各フィールドに値をセット
-                Object.keys(config).forEach(key => {
-                    if (key === 'runner_name') return;
-                    const input = form.find(`[name="${key}"]`);
-                    if (input.length > 0) {
-                        input.val(config[key]);
-                    }
-                });
-                // 選択肢による表示非表示の設定
-                form.find(`.choice_show`).each((i, elem) => {
-                    const input_elem = $(elem);
-                    input_elem.change();
-                });
-                // Delete button handler
-                $('#btn_del_runner').show().off('click').on('click', async () => {
-                    if (!await cmdbox.confirm(`Are you sure you want to delete '${config.runner_name}'?`, true, true)) return;
-                    const res = await agentView.exec_cmd('agent', 'runner_del', { runner_name: config.runner_name });
-                    if (res && res.success) {
-                        $('#runner_edit_modal').modal('hide');
-                        agentView.list_runner();
-                    } else {
-                        cmdbox.message(res, true, true);
-                    }
-                });
-                cmdbox.process_i18n($('#runner_edit_modal'));
-                $('#runner_edit_modal').modal('show');
-                // コマンド実行
-                await cmdbox.callcmd('agent','agent_list',{},(res)=>{
-                    $("[name='agent']").empty().append('<option></option>');
-                    res['data'].map(elm=>{$('[name="agent"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                    form.find('[name="agent"]').val(config.agent);
-                },$('[name="title"]').val(),'agent');
-                await cmdbox.callcmd('datasource','list',{},(res)=>{
-                    $("[name='session_datasource']").empty().append('<option></option>');
-                    res['data'].map(elm=>{$('[name="session_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                    form.find('[name="session_datasource"]').val(config.session_datasource);
-                },$('[name="title"]').val(),'session_datasource');
-                await cmdbox.callcmd('rag','list',{},(res)=>{
-                    $("[name='rag']").empty().append('<option></option>');
-                    res['data'].map(elm=>{$('[name="rag"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                    form.find('[name="rag"]').val(config.rag);
-                },$('[name="title"]').val(),'rag');
+                    // 各フィールドに値をセット
+                    Object.keys(config).forEach(key => {
+                        if (key === 'runner_name') return;
+                        const input = form.find(`[name="${key}"]`);
+                        if (input.length > 0) {
+                            input.val(config[key]);
+                        }
+                    });
+                    // 選択肢による表示非表示の設定
+                    form.find(`.choice_show`).each((i, elem) => {
+                        const input_elem = $(elem);
+                        input_elem.change();
+                    });
+                    // Delete button handler
+                    $('#btn_del_runner').show().off('click').on('click', async () => {
+                        if (!await cmdbox.confirm(`Are you sure you want to delete '${config.runner_name}'?`, true, true)) return;
+                        const res = await agentView.exec_cmd('agent', 'runner_del', { runner_name: config.runner_name });
+                        if (res && res.success) {
+                            $('#runner_edit_modal').modal('hide');
+                            agentView.list_runner();
+                        } else {
+                            cmdbox.message(res, true, true);
+                        }
+                    });
+                    cmdbox.process_i18n($('#runner_edit_modal'));
+                    $('#runner_edit_modal').modal('show');
+                    // コマンド実行
+                    await cmdbox.callcmd('agent','agent_list',{},(res)=>{
+                        $("[name='agent']").empty().append('<option></option>');
+                        res['data'].map(elm=>{$('[name="agent"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                        form.find('[name="agent"]').val(config.agent);
+                    },$('[name="title"]').val(),'agent');
+                    await cmdbox.callcmd('datasource','list',{},(res)=>{
+                        $("[name='session_datasource']").empty().append('<option></option>');
+                        res['data'].map(elm=>{$('[name="session_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                        form.find('[name="session_datasource"]').val(config.session_datasource);
+                    },$('[name="title"]').val(),'session_datasource');
+                    await cmdbox.callcmd('rag','list',{},(res)=>{
+                        $("[name='rag']").empty().append('<option></option>');
+                        res['data'].map(elm=>{$('[name="rag"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                        form.find('[name="rag"]').val(config.rag);
+                    },$('[name="title"]').val(),'rag');
+                } finally {
+                    cmdbox.hide_loading();
+                }
             });
 
             container.append(itemEl);

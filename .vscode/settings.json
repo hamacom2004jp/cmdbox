@@ -4,6 +4,7 @@
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "python.testing.autoTestDiscoverOnSaveEnabled": true,
+    "editor.inlayHints.enabled": "off",
     "esbonio.sphinx.confDir": "",
     "files.eol": "\n",
     "[python]": {
