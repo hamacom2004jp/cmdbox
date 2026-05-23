@@ -1,0 +1,18 @@
+{
+    "mode": "cmd",
+    "cmd": "list",
+    "title": "cmd_list",
+    "kwd": "",
+    "signin_file": ".cmdbox/user_list.yml",
+    "groups": [],
+    "output_json": "",
+    "output_json_append": false,
+    "stdout_log": false,
+    "capture_stdout": false,
+    "capture_maxsize": 10485760,
+    "debug": false,
+    "tag": [
+        "cmd"
+    ],
+    "description": ""
+}

@@ -166,6 +166,11 @@ users.users_list = async () => {
                 cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
                 return;
             }
+            const ret = await res.json();
+            if (!ret['success']) {
+                cmdbox.message(ret, true, true);
+                return;
+            }
             users.users_list();
             users.groups_list();
             modal.modal('hide');
@@ -280,7 +285,7 @@ users.groups_list = async () => {
     // モーダル生成関数
     const groups_modal_func = (cols, group) => {
         const modal = $('#users_modal');
-        modal.find('.modal-title').text(group && group['name'] ? `Edit Group : ${group['name']}` : 'New Group');
+        modal.find('.modal-title').html(group && group['name'] ? `<span class="i18n">Edit Group : </span>${group['name']}` : '<span class="i18n">New Group</span>');
         const row_content = modal.find('.row_content');
         row_content.empty();
         for (const col of cols) {
@@ -307,6 +312,9 @@ users.groups_list = async () => {
             const row = $(modal.find('.row_content_template_str').html()).appendTo(row_content);
             row_content.find('.row_content_template_title').removeClass('row_content_template_title').text(col);
             row_content.find('.row_content_template_input').removeClass('row_content_template_input').attr('name', col).val(group ? group[col] : '');
+            if (col == 'home' || col == 'buildin') {
+                row.find(`:input`).attr('disabled', 'disabled');
+            }
         }
         // 削除実行
         modal.find('#cmd_del').off('click').on('click', async () => {
@@ -320,7 +328,12 @@ users.groups_list = async () => {
                 cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
                 return;
             }
-            cmdbox.message(await res.json(), true, true);
+            const ret = await res.json();
+            if (!ret['success']) {
+                cmdbox.message(ret, true, true);
+                return;
+            }
+            cmdbox.message(ret, true, true);
             users.users_list();
             users.groups_list();
             modal.modal('hide');
@@ -351,6 +364,7 @@ users.groups_list = async () => {
         modal.find('#cmd_add_apikey').hide();
         modal.find('#cmd_del_apikey').hide();
         !group ? modal.find('#cmd_del').hide() : modal.find('#cmd_del').show();
+        cmdbox.process_i18n(modal);
         modal.modal('show');
     };
     // グループ一覧を表示

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( llm mode ) &mdash; cmdbox 2026/05/17 documentation</title>
+  <title>Command Reference ( llm mode ) &mdash; cmdbox 2026/05/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=d23192ec"></script>
+      <script src="../_static/documentation_options.js?v=8310f887"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -340,7 +340,7 @@
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
@@ -381,7 +381,7 @@
 <td><p>処理結果のデータ</p></td>
 </tr>
 <tr class="row-odd"><td><p>warn</p></td>
-<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
@@ -393,7 +393,7 @@
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
 <tr class="row-odd"><td><p>error</p></td>
-<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
@@ -404,7 +404,7 @@
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>schema</p></td>
+<tr class="row-odd"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -525,7 +525,7 @@
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
@@ -566,7 +566,7 @@
 <td><p>処理結果のデータ</p></td>
 </tr>
 <tr class="row-odd"><td><p>warn</p></td>
-<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
@@ -578,7 +578,7 @@
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
 <tr class="row-odd"><td><p>error</p></td>
-<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
@@ -589,7 +589,7 @@
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>schema</p></td>
+<tr class="row-odd"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -716,7 +716,7 @@
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
@@ -775,7 +775,7 @@
 <td><p>優先度</p></td>
 </tr>
 <tr class="row-even"><td><p>warn</p></td>
-<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
@@ -787,7 +787,7 @@
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
 <tr class="row-even"><td><p>error</p></td>
-<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
@@ -798,7 +798,7 @@
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>schema</p></td>
+<tr class="row-even"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -903,6 +903,14 @@
 <td></td>
 <td><p>Specify the name of the LLM configuration to load.</p></td>
 </tr>
+<tr class="row-even"><td><p>--cache_timeout &lt;cache_timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
+<td></td>
+<td><p>Specify the duration, in seconds, for which settings should be cached.</p></td>
+</tr>
 </tbody>
 </table>
 <p><strong>Output Schema</strong></p>
@@ -931,7 +939,7 @@
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
@@ -1044,7 +1052,7 @@
 <td><p>LLM優先度</p></td>
 </tr>
 <tr class="row-odd"><td><p>warn</p></td>
-<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
@@ -1056,7 +1064,7 @@
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
 <tr class="row-odd"><td><p>error</p></td>
-<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
@@ -1067,7 +1075,7 @@
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>schema</p></td>
+<tr class="row-odd"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -1281,7 +1289,7 @@
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
@@ -1322,7 +1330,7 @@
 <td><p>処理結果のデータ</p></td>
 </tr>
 <tr class="row-odd"><td><p>warn</p></td>
-<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
@@ -1334,7 +1342,7 @@
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
 <tr class="row-odd"><td><p>error</p></td>
-<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
@@ -1345,7 +1353,7 @@
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>schema</p></td>
+<tr class="row-odd"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -1499,7 +1507,7 @@
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
@@ -1540,7 +1548,7 @@
 <td><p>翻訳結果。{元の単語: 翻訳後の文字列} の辞書形式。</p></td>
 </tr>
 <tr class="row-odd"><td><p>warn</p></td>
-<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
@@ -1552,7 +1560,7 @@
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
 <tr class="row-odd"><td><p>error</p></td>
-<td><p>dict[str, any] | Data | str | bool | null</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
@@ -1563,7 +1571,7 @@
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>schema</p></td>
+<tr class="row-odd"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>

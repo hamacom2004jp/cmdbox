@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.auth.signin &mdash; cmdbox 2026/04/29 documentation</title>
+  <title>cmdbox.app.auth.signin &mdash; cmdbox 2026/05/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=21c5f9e1"></script>
+      <script src="../../../../_static/documentation_options.js?v=8310f887"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -917,8 +917,9 @@
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="s1">&#39;signin&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span> <span class="ow">or</span> <span class="s1">&#39;groups&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">]:</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="n">Signin</span><span class="o">.</span><span class="n">_check_cmd</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;groups&#39;</span><span class="p">],</span> <span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
-                                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">appcls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Signin</span><span class="o">.</span><span class="n">_check_cmd</span><span class="p">(</span><span class="n">signin_file_data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">user_groups</span><span class="o">=</span><span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;groups&#39;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="n">cmd</span><span class="p">,</span>
+                                 <span class="n">opt</span><span class="o">=</span><span class="n">opt</span><span class="p">,</span> <span class="n">user_name</span><span class="o">=</span><span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">user_session</span><span class="o">=</span><span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">],</span>
+                                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">appcls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Signin.load_groups">
@@ -953,9 +954,9 @@
 
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_check_cmd</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">signin_file_data</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">user_groups</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
-                   <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">user_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span>
-                   <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_cmd</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">signin_file_data</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">user_groups</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+                   <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">user_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">user_session</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+                   <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        コマンドの認可をチェックします</span>
 
@@ -966,6 +967,7 @@
 <span class="sd">            cmd (str): コマンド</span>
 <span class="sd">            opt (Dict[str, Any]): オプション</span>
 <span class="sd">            user_name (str): ユーザ名</span>
+<span class="sd">            user_session (Dict[str, Any]): サインインセッション</span>
 <span class="sd">            logger (logging.Logger): ロガー</span>
 <span class="sd">            appcls: アプリクラス</span>
 <span class="sd">            ver: バージョン</span>
@@ -977,6 +979,11 @@
         <span class="k">if</span> <span class="n">signin_file_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">user_groups</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">user_groups</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">user_session</span> <span class="o">=</span> <span class="n">user_session</span> <span class="k">if</span> <span class="n">user_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">user_session</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="c1"># コマンド存在チェック</span>
+        <span class="n">ref_opt</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">getInstance</span><span class="p">(</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ref_opt</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="s1">&#39;opt&#39;</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="c1"># コマンドチェック</span>
         <span class="n">jadge</span> <span class="o">=</span> <span class="n">signin_file_data</span><span class="p">[</span><span class="s1">&#39;cmdrule&#39;</span><span class="p">][</span><span class="s1">&#39;policy&#39;</span><span class="p">]</span>
@@ -992,7 +999,7 @@
             <span class="k">if</span> <span class="s1">&#39;coercion&#39;</span> <span class="ow">in</span> <span class="n">rule</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;coercion&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="n">opt</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">{},</span> <span class="nb">dict</span><span class="p">(</span><span class="n">user_name</span><span class="o">=</span><span class="n">user_name</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">user_groups</span><span class="p">,</span>
-                                                    <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="n">cmd</span><span class="p">,</span>
+                                                    <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="n">cmd</span><span class="p">,</span> <span class="n">opt</span><span class="o">=</span><span class="n">opt</span><span class="p">,</span> <span class="n">user_session</span><span class="o">=</span><span class="n">user_session</span><span class="p">,</span>
                                                     <span class="n">appcls</span><span class="o">=</span><span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="n">ver</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">))</span>
             <span class="n">jadge</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;rule&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>

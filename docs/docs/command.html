@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference &mdash; cmdbox 2026/05/17 documentation</title>
+  <title>Command Reference &mdash; cmdbox 2026/05/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=d23192ec"></script>
+      <script src="../_static/documentation_options.js?v=8310f887"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -154,6 +154,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_cmd.html">Cmd</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html#cmd-check-cmdbox-m-cmd-c-check-option">cmd ( check ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmd</span> <span class="pre">-c</span> <span class="pre">check</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html#cmd-list-cmdbox-m-cmd-c-list-option">cmd ( list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmd</span> <span class="pre">-c</span> <span class="pre">list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html#cmd-load-cmdbox-m-cmd-c-load-option">cmd ( load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmd</span> <span class="pre">-c</span> <span class="pre">load</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 </ul>
@@ -161,6 +162,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-down-cmdbox-m-cmdbox-c-down-option">cmdbox ( down ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">down</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-exec-cmdbox-m-cmdbox-c-exec-option">cmdbox ( exec ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">exec</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-initdata-install-cmdbox-m-cmdbox-c-initdata-install-option">cmdbox ( initdata_install ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">initdata_install</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-load-cmdbox-m-cmdbox-c-load-option">cmdbox ( load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">load</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-logs-cmdbox-m-cmdbox-c-logs-option">cmdbox ( logs ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">logs</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-pgsql-install-cmdbox-m-cmdbox-c-pgsql-install-option">cmdbox ( pgsql_install ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">pgsql_install</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
@@ -171,6 +173,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-save-cmdbox-m-cmdbox-c-save-option">cmdbox ( save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">save</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-server-install-cmdbox-m-cmdbox-c-server-install-option">cmdbox ( server_install ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">server_install</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-server-load-cmdbox-m-cmdbox-c-server-load-option">cmdbox ( server_load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">server_load</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-setup-cmdbox-m-cmdbox-c-setup-option">cmdbox ( setup ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">setup</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-uninstall-cmdbox-m-cmdbox-c-uninstall-option">cmdbox ( uninstall ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">uninstall</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html#cmdbox-up-cmdbox-m-cmdbox-c-up-option">cmdbox ( up ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">up</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 </ul>

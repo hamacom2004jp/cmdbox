@@ -1024,6 +1024,38 @@ cmdbox.current_time = (error_func=undefined) => {
     });
 };
 /**
+ * 指定したコマンドが実行可能かどうかを確認する
+ * @param {string} mode - モード（client/server/web）
+ * @param {string} cmd - コマンド
+ * @param {function} error_func - エラー時のコールバック関数
+ * @returns {Promise} - レスポンス
+ **/
+cmdbox.check_cmd = (mode, cmd, error_func=undefined) => {
+    const opt = {};
+    opt['mode'] = 'cmd';
+    opt['cmd'] = 'check';
+    opt['chk_mode'] = mode;
+    opt['chk_cmd'] = cmd;
+    cmdbox.show_loading();
+    return cmdbox.sv_exec_cmd(opt).then(res => {
+        const result = Array.isArray(res) ? res : [res];
+        if(!result[0] || !result[0]['success']) {
+            if (error_func) {
+                error_func(result);
+                return false;
+            }
+            cmdbox.hide_loading();
+            cmdbox.message(result, true, true);
+            return false;
+        }
+        if (!result[0]['success']['data']) {
+            cmdbox.hide_loading();
+            return false;
+        }
+        return result[0]['success']['data'];
+    });
+};
+/**
  * 現在のユーザー情報取得
  * @returns {Promise} - レスポンス
  */
@@ -1141,20 +1173,20 @@ cmdbox.file_download = (target, svpath, error_func=undefined, exec_cmd=undefined
  * @param {$} target - 接続先情報のhidden要素を含む祖先要素
  * @param {string} svpath - サーバーパス
  * @param {FormData} formData - ファイルデータ
- * @param {bool} orverwrite - 上書きするかどうか
+ * @param {bool} overwrite - 上書きするかどうか
  * @param {function} progress_func - 進捗状況を表示する関数。呼出時の引数はe(イベントオブジェクト)のみ
  * @param {function} success_func - 成功時のコールバック関数。呼出時の引数はtarget, svpath, data
  * @param {function} error_func - エラー時のコールバック関数。呼出時の引数はtarget, svpath, data
  * @param {bool} async_fg - 非同期で実行するかどうか
  */
-cmdbox.file_upload = (target, svpath, formData, orverwrite=false, progress_func=undefined, success_func=undefined, error_func=undefined, async_fg=true) => {
+cmdbox.file_upload = (target, svpath, formData, overwrite=false, progress_func=undefined, success_func=undefined, error_func=undefined, async_fg=true) => {
     const param = {method: 'POST', body: formData};
     const opt = cmdbox.get_server_opt(false, target);
     let param_str = `host=${encodeURI(opt['host'])}`;
     param_str += `&port=${encodeURI(opt['port'])}`;
     param_str += `&password=${encodeURI(opt['password'])}`;
     param_str += `&svname=${encodeURI(opt['svname'])}`;
-    param_str += `&orverwrite=${!!orverwrite}`;
+    param_str += `&overwrite=${!!overwrite}`;
     param_str += `&svpath=${encodeURI(svpath)}`;
     param_str += `&scope=${encodeURI(opt['scope'])}`;
     param_str += `&client_data=${encodeURI(opt['client_data'])}`;
@@ -1193,19 +1225,19 @@ cmdbox.file_upload = (target, svpath, formData, orverwrite=false, progress_func=
  * @param {$} target - 接続先情報のhidden要素を含む祖先要素
  * @param {string} from_path - コピー元パス
  * @param {string} to_path - コピー先パス
- * @param {bool} orverwrite - 上書きするかどうか
+ * @param {bool} overwrite - 上書きするかどうか
  * @param {function} error_func - エラー時のコールバック関数
  * @param {function} exec_cmd - サーバーAPI実行関数
  * @returns {Promise} - レスポンス
  */
-cmdbox.file_copy = (target, from_path, to_path, orverwrite=false, error_func=undefined, exec_cmd=undefined) => {
+cmdbox.file_copy = (target, from_path, to_path, overwrite=false, error_func=undefined, exec_cmd=undefined) => {
     const opt = cmdbox.get_server_opt(false, target);
     opt['mode'] = 'client';
     opt['cmd'] = 'file_copy';
     opt['capture_stdout'] = true;
     opt['from_path'] = from_path;
     opt['to_path'] = to_path;
-    opt['orverwrite'] = orverwrite;
+    opt['overwrite'] = overwrite;
     cmdbox.show_loading();
     const exec = exec_cmd ? exec_cmd : cmdbox.sv_exec_cmd;
     return exec(opt).then(res => {

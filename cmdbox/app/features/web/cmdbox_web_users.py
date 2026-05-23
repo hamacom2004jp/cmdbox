@@ -68,7 +68,7 @@ class Users(feature.WebFeature):
                 web.options.audit_exec(req, res, web)
                 return dict(success='add user')
             except Exception as e:
-                return dict(error=str(e))
+                return dict(warn=str(e))
 
         @app.post('/users/edit')
         async def users_edit(req:Request, res:Response):
@@ -83,7 +83,7 @@ class Users(feature.WebFeature):
                 web.options.audit_exec(req, res, web)
                 return dict(success='edit user')
             except Exception as e:
-                return dict(error=str(e))
+                return dict(warn=str(e))
 
         @app.post('/users/del')
         async def users_del(req:Request, res:Response):
@@ -100,7 +100,7 @@ class Users(feature.WebFeature):
                 web.options.audit_exec(req, res, web)
                 return dict(success='delete user')
             except Exception as e:
-                return dict(error=str(e))
+                return dict(warn=str(e))
 
         @app.post('/gui/apikey/add')
         @app.post('/users/apikey/add')
@@ -116,7 +116,7 @@ class Users(feature.WebFeature):
                 web.options.audit_exec(req, res, web)
                 return dict(success=apikey)
             except Exception as e:
-                return dict(error=str(e))
+                return dict(warn=str(e))
 
         @app.post('/gui/apikey/del')
         @app.post('/users/apikey/del')
@@ -132,7 +132,7 @@ class Users(feature.WebFeature):
                 web.options.audit_exec(req, res, web)
                 return dict(success=apikey)
             except Exception as e:
-                return dict(error=str(e))
+                return dict(warn=str(e))
 
         @app.get('/groups/list')
         async def groups_list(req:Request, res:Response):
@@ -145,7 +145,7 @@ class Users(feature.WebFeature):
                 web.options.audit_exec(req, res, web)
                 return web.group_list(None)
             except Exception as e:
-                return dict(error=str(e))
+                return dict(warn=str(e))
 
         @app.post('/groups/add')
         async def groups_add(req:Request, res:Response):
@@ -160,7 +160,7 @@ class Users(feature.WebFeature):
                 web.options.audit_exec(req, res, web)
                 return dict(success='add group')
             except Exception as e:
-                return dict(error=str(e))
+                return dict(warn=str(e))
 
         @app.post('/groups/edit')
         async def groups_edit(req:Request, res:Response):
@@ -175,7 +175,7 @@ class Users(feature.WebFeature):
                 web.options.audit_exec(req, res, web)
                 return dict(success='edit group')
             except Exception as e:
-                return dict(error=str(e))
+                return dict(warn=str(e))
 
         @app.post('/groups/del')
         async def groups_del(req:Request, res:Response):
@@ -192,7 +192,7 @@ class Users(feature.WebFeature):
                 web.options.audit_exec(req, res, web)
                 return dict(success='delete group')
             except Exception as e:
-                return dict(error=str(e))
+                return dict(warn=str(e))
 
         @app.get('/cmdrules/list')
         async def cmdrules_list(req:Request, res:Response):
@@ -205,7 +205,7 @@ class Users(feature.WebFeature):
             try:
                 return data['cmdrule']
             except Exception as e:
-                return dict(error=str(e))
+                return dict(warn=str(e))
 
         @app.get('/pathrules/list')
         async def pathrules_list(req:Request, res:Response):
@@ -218,7 +218,7 @@ class Users(feature.WebFeature):
             try:
                 return data['pathrule']
             except Exception as e:
-                return dict(error=str(e))
+                return dict(warn=str(e))
 
         @app.get('/passsetting/list')
         async def passsetting_list(req:Request, res:Response):
@@ -231,7 +231,7 @@ class Users(feature.WebFeature):
             try:
                 return data['password']
             except Exception as e:
-                return dict(error=str(e))
+                return dict(warn=str(e))
 
         @app.post('/password/change')
         async def password_change(req:Request, res:Response):
@@ -247,7 +247,7 @@ class Users(feature.WebFeature):
                 web.options.audit_exec(req, res, web)
                 return ret
             except Exception as e:
-                return dict(error=str(e))
+                return dict(warn=str(e))
 
     def toolmenu(self, web:Web) -> Dict[str, Any]:
         """

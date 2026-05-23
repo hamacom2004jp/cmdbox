@@ -851,6 +851,10 @@ class Signin(object):
         if user_groups is None or len(user_groups) <= 0:
             return False
         user_session = user_session if user_session is not None and isinstance(user_session, dict) else {}
+        # コマンド存在チェック
+        ref_opt = options.Options.getInstance(appcls, ver)
+        if not ref_opt.get_cmd_attr(mode, cmd, 'opt'):
+            return False
         # コマンドチェック
         jadge = signin_file_data['cmdrule']['policy']
         for rule in signin_file_data['cmdrule']['rules']:

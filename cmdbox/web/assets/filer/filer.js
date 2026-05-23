@@ -83,7 +83,7 @@ fsapi.filer = (svpath, is_local) => {
     }
     svpath = fsapi.right.find('.filer_address').val();
     // https://developer.mozilla.org/ja/docs/Web/API/fetch
-    cmdbox.file_upload(fsapi.right, svpath, formData, orverwrite=false, progress_func=(e) => {
+    cmdbox.file_upload(fsapi.right, svpath, formData, overwrite=false, progress_func=(e) => {
       cmdbox.progress(0, e.total, e.loaded, '', true, e.total==e.loaded);
     }, success_func=(target, svpath, data) => {
       if (data != "upload success") {

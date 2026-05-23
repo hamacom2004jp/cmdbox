@@ -172,7 +172,7 @@ agentView.fileuploader.uploadFiles_execute = async (successCallback, errorCallba
             $('#upload_file_input').val('');
             agentView.fileuploader.updateUploadFileList();
         };
-        cmdbox.file_upload(fsapi.right, opt['svpath'], formData, orverwrite=false,
+        cmdbox.file_upload(fsapi.right, opt['svpath'], formData, overwrite=false,
             progress_func=(e) => {
                 cmdbox.progress(0, e.total, e.loaded, '', true, e.total==e.loaded);
             },

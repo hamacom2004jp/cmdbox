@@ -11,32 +11,35 @@
 #       その他   : コマンドに渡す追加オプション (--option_name に相当)
 
 setups:
-  - name: "cmd_upload"
-    description: "初期コマンドファイルのアップロードを行います。"
+  - name: "client_upload"
+    description: "クライアント側の設定をアップロードします。"
     exec:
-      mode: client
-      cmd: upload_cmd
+      mode: cmdbox
+      cmd: initdata_install
       host: "f'{self.default_host}'"
       port: "f'{self.default_port}'"
       password: "f'{self.default_pass}'"
-      svname: "f'{self.default_svname}'"
+      svname: "f'{self.ver.__appid__}_setup'"
       svpath: "'/'"
       fwpath: "'/'"
       rjpath:
-      scope: "'server'"
-      upload_file: "f'{cur_path}/.cmdbox_initdata/client/.cmds'"
+      scope: "'client'"
+      overwrite: false
+      client_data: "f'{self.default_data}'"
+      initdata_path: "f'{cur_path / \".cmdbox_initdata\" / \"client\"}'"
 
-  - name: "upload_datasource"
-    description: "初期データソースファイルのアップロードを行います。"
+  - name: "server_upload"
+    description: "サーバー側の設定をアップロードします。"
     exec:
-      mode: client
-      cmd: file_upload
+      mode: cmdbox
+      cmd: initdata_install
       host: "f'{self.default_host}'"
       port: "f'{self.default_port}'"
       password: "f'{self.default_pass}'"
-      svname: "f'{self.default_svname}'"
+      svname: "f'{self.ver.__appid__}_setup'"
       svpath: "'/'"
       fwpath: "'/'"
       rjpath:
       scope: "'server'"
-      upload_file: "f'{cur_path}/.cmdbox_initdata/server/.datasource'"
+      overwrite: false
+      initdata_path: "f'{cur_path / \".cmdbox_initdata\" / \"server\"}'"

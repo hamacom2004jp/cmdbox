@@ -52,7 +52,7 @@ def apprun_check(func:Callable) -> Callable:
         except Exception as e:
             if issubclass(cls, resdata.Base):
                 info = cls.get_model_info()
-                msg = dict(warn=f"Invalid result format: {e}", output=msg, schema=info)
+                msg = dict(warn=f"Invalid result format: {e}", output=msg, output_schema=info)
             else:
                 msg = dict(warn=f"Invalid result format: {e}", output=msg)
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -101,7 +101,7 @@ def async_apprun_check(func:Callable) -> Callable:
         except Exception as e:
             if issubclass(cls, resdata.Base):
                 info = cls.get_model_info()
-                msg = dict(warn=f"Invalid result format: {e}", output=msg, schema=info)
+                msg = dict(warn=f"Invalid result format: {e}", output=msg, output_schema=info)
             else:
                 msg = dict(warn=f"Invalid result format: {e}", output=msg)
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

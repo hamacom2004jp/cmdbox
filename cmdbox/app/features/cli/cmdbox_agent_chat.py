@@ -139,7 +139,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator):
                 cls.model_validate(res)  # 結果のスキーマ検証
             except Exception as e:
                 info = cls.get_model_info()
-                res = dict(warn=dict(msg=f"Invalid result format: {e}.", output=res, schema=info))
+                res = dict(warn=dict(msg=f"Invalid result format: {e}.", output=res, output_schema=info))
                 logger.warning(f"Invalid result format: {res}", exc_info=True)
             if 'success' in res:
                 yield self.RESP_SUCCESS, res

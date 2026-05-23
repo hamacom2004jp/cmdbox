@@ -73,7 +73,7 @@ class Result(Base):
     """
     model_config = Base.forbid_on()  # 定義されていないフィールドを禁止
     success: Union[Data, str, bool, None] = Field(default=None, description="成功した場合の結果")
-    warn: Union[Dict[str, Any], Data, str, bool, None] = Field(default=None, description="警告がある場合の結果")
-    error: Union[Dict[str, Any], Data, str, bool, None] = Field(default=None, description="エラーがある場合の結果")
-    schema: Union[Dict[str, Any], None] = Field(default=None, description="スキーマ情報")
+    warn: Union[Dict[str, Any], List[Any], Data, str, bool, None] = Field(default=None, description="警告がある場合の結果")
+    error: Union[Dict[str, Any], List[Any], Data, str, bool, None] = Field(default=None, description="エラーがある場合の結果")
+    output_schema: Union[Dict[str, Any], None] = Field(default=None, description="スキーマ情報")
     end: Union[bool, None] = Field(default=None, description="終了フラグ")

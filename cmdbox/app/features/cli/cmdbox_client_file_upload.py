@@ -85,7 +85,7 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator):
                      description_ja="中間フォルダがない場合作成します。",
                      description_en="If there is no in between folder, create one.",
                      test_true={"server":True}),
-                dict(opt="orverwrite", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
+                dict(opt="overwrite", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
                      description_ja="アップロード先に存在していても上書きします。",
                      description_en="Overwrites the file even if it exists at the upload destination."),
                 dict(opt="retry_count", type=Options.T_INT, default=3, required=False, multi=False, hide=True, choice=None,
@@ -130,7 +130,7 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator):
         fwpaths = [p.replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
         rjpaths = [p.replace('"','') for p in args.rjpath] if args.rjpath is not None else []
         ret = cl.file_upload(args.svpath.replace('"',''), upload_file, scope=args.scope, client_data=client_data,
-                             fwpaths=fwpaths, rjpaths=rjpaths, mkdir=args.mkdir, orverwrite=args.orverwrite,
+                             fwpaths=fwpaths, rjpaths=rjpaths, mkdir=args.mkdir, overwrite=args.overwrite,
                              retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
@@ -173,13 +173,13 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator):
         file_name = payload.get("file_name")
         file_data = convert.b64str2bytes(payload.get("file_data"))
         mkdir = payload.get("mkdir") == 'True'
-        orverwrite = payload.get("orverwrite") == 'True'
+        overwrite = payload.get("overwrite", False)=='True' or payload.get("overwrite", False) is True
         fwpaths = payload.get("fwpaths")
         rjpaths = payload.get("rjpaths")
-        st = self.file_upload(msg[1], svpath, file_name, file_data, mkdir, orverwrite, fwpaths, rjpaths, data_dir, logger, redis_cli, sessions)
+        st = self.file_upload(msg[1], svpath, file_name, file_data, mkdir, overwrite, fwpaths, rjpaths, data_dir, logger, redis_cli, sessions)
         return st
 
-    def file_upload(self, reskey:str, current_path:str, file_name:str, file_data:bytes, mkdir:bool, orverwrite:bool, fwpaths:List[str], rjpaths:List[str],
+    def file_upload(self, reskey:str, current_path:str, file_name:str, file_data:bytes, mkdir:bool, overwrite:bool, fwpaths:List[str], rjpaths:List[str],
                     data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ファイルをアップロードする
@@ -190,7 +190,7 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator):
             file_name (str): ファイル名
             file_data (bytes): ファイルデータ
             mkdir (bool): ディレクトリを作成するかどうか
-            orverwrite (bool): 上書きするかどうか
+            overwrite (bool): 上書きするかどうか
             fwpaths (List[str]): 範囲内パスのリスト
             rjpaths (List[str]): 範囲外パスのリスト
             data_dir (Path): データディレクトリ
@@ -203,7 +203,7 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator):
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_upload(current_path, file_name, file_data, mkdir, orverwrite, fwpaths, rjpaths)
+            rescode, msg = f.file_upload(current_path, file_name, file_data, mkdir, overwrite, fwpaths, rjpaths)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

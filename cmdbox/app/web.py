@@ -360,18 +360,18 @@ class Web:
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
         if 'name' not in user:
-            raise ValueError(f"User name is not found. ({user})")
+            raise ValueError(f"User name is not found.")
         if 'apikey_name' not in user:
-            raise ValueError(f"ApiKey name is not found. ({user})")
+            raise ValueError(f"ApiKey name is not found.")
         if len([u for u in signin_data['users'] if u['name'] == user['name']]) <= 0:
-            raise ValueError(f"User name is not exists. ({user})")
+            raise ValueError(f"User name is not exists.")
         apikey:str = None
         for u in signin_data['users']:
             if u['name'] == user['name']:
                 if 'apikeys' not in u:
                     u['apikeys'] = dict()
                 if user['apikey_name'] in u['apikeys']:
-                    raise ValueError(f"ApiKey name is already exists. ({user})")
+                    raise ValueError(f"ApiKey name is already exists.")
                 apikey = common.random_string(64)
                 u['apikeys'][user['apikey_name']] = apikey
                 if signin_data['apikey']['gen_jwt']['enabled']:
@@ -387,7 +387,7 @@ class Web:
                     u['apikeys'][user['apikey_name']] = apikey
 
         if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"apikey_add: {user} -> {self.signin_file}")
+            self.logger.debug(f"apikey_add: {self.signin_file}")
         self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data, nolock=False)
         return apikey
@@ -405,11 +405,11 @@ class Web:
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
         if 'name' not in user:
-            raise ValueError(f"User name is not found. ({user})")
+            raise ValueError(f"User name is not found.")
         if 'apikey_name' not in user:
-            raise ValueError(f"ApiKey name is not found. ({user})")
+            raise ValueError(f"ApiKey name is not found.")
         if len([u for u in signin_data['users'] if u['name'] == user['name']]) <= 0:
-            raise ValueError(f"User name is not exists. ({user})")
+            raise ValueError(f"User name is not exists.")
         apikey:str = None
         for u in signin_data['users']:
             if u['name'] == user['name']:
@@ -422,12 +422,12 @@ class Web:
                 if len(u['apikeys']) <= 0:
                     del u['apikeys']
         if apikey is None:
-            raise ValueError(f"ApiKey name is not exists. ({user})")
+            raise ValueError(f"ApiKey name is not exists.")
 
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"apikey_del: {user} -> {self.signin_file}")
+            self.logger.debug(f"apikey_del: {self.signin_file}")
         self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data, nolock=False)
 
@@ -443,34 +443,41 @@ class Web:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
-        if 'uid' not in user or user['uid'] == '':
-            raise ValueError(f"User uid is not found or empty. ({user})")
+        if 'uid' not in user or not user['uid']:
+            raise ValueError(f"User uid is not found or empty.")
         try:
             user['uid'] = int(user['uid'])
         except:
-            raise ValueError(f"User uid is not number. ({user})")
-        if 'name' not in user or user['name'] == '':
-            raise ValueError(f"User name is not found or empty. ({user})")
-        if 'hash' not in user or user['hash'] == '':
-            raise ValueError(f"User hash is not found or empty. ({user})")
+            raise ValueError(f"User uid is not number.")
+        if 'name' not in user or not user['name']:
+            raise ValueError(f"User name is not found or empty.")
+        if 'hash' not in user or not user['hash']:
+            raise ValueError(f"User hash is not found or empty.")
         hash = user['hash']
-        if hash!='oauth2' and hash!='saml' and ('password' not in user or user['password'] == ''):
-            raise ValueError(f"User password is not found or empty. ({user})")
-        if 'email' not in user:
-            raise ValueError(f"User email is not found. ({user})")
-        if (hash=='oauth2' or hash=='saml') and (user['email'] is None or user['email']==''):
-            raise ValueError(f"Required when `email` is `oauth2` or `saml`. ({user})")
+        if hash!='oauth2' and hash!='saml' and ('password' not in user or not user['password']):
+            raise ValueError(f"User password is not found or empty.")
+        if 'email' not in user or not user['email']:
+            raise ValueError(f"User email is not found or empty.")
         if 'groups' not in user or type(user['groups']) is not list:
-            raise ValueError(f"User groups is not found or empty. ({user})")
+            raise ValueError(f"User groups is not found or empty.")
         for gn in user['groups']:
             if len(self.group_list(gn)) <= 0:
                 raise ValueError(f"Group is not found. ({gn})")
         if len([u for u in signin_data['users'] if u['uid'] == user['uid']]) > 0:
-            raise ValueError(f"User uid is already exists. ({user})")
+            raise ValueError(f"User uid is already exists.")
         if len([u for u in signin_data['users'] if u['name'] == user['name']]) > 0:
-            raise ValueError(f"User name is already exists. ({user})")
+            raise ValueError(f"User name is already exists.")
         if hash not in ['oauth2', 'saml', 'plain', 'md5', 'sha1', 'sha256']:
-            raise ValueError(f"User hash is not supported. ({user})")
+            raise ValueError(f"User hash is not supported.")
+        # buildin設定が有効化されているユーザーは追加できない
+        if 'buildin' in user and user['buildin']:
+            raise ValueError(f"You cannot add a built-in user.")
+        # buildin設定が有効化されているグループは設定できない
+        for gn in user['groups']:
+            group = next((g for g in signin_data['groups'] if g['name'] == gn), None)
+            if group and 'buildin' in group and group['buildin'] is True:
+                raise ValueError(f"You cannot assign a built-in group to a user.")
+
         jadge, msg = self.signin.check_password_policy(user['name'], '', user['password'])
         if not jadge:
             raise ValueError(msg)
@@ -478,9 +485,10 @@ class Web:
             user['password'] = common.hash_password(user['password'], hash if hash != 'oauth2' and hash != 'saml' else 'sha1')
         else:
             user['password'] = user['password']
+        user['home'] = f".users/{user['name']}"
         signin_data['users'].append(user)
         if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"user_add: {user} -> {self.signin_file}")
+            self.logger.debug(f"user_add: {self.signin_file}")
         # パスワード更新日時の保存
         self.user_data(None, user['uid'], user['name'], 'password', 'last_update', datetime.datetime.now())
         # サインインファイルの保存
@@ -499,32 +507,35 @@ class Web:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
-        if 'uid' not in user or user['uid'] == '':
-            raise ValueError(f"User uid is not found or empty. ({user})")
+        if 'uid' not in user or not user['uid']:
+            raise ValueError(f"User uid is not found or empty.")
         try:
             user['uid'] = int(user['uid'])
         except:
-            raise ValueError(f"User uid is not number. ({user})")
-        if 'name' not in user or user['name'] == '':
-            raise ValueError(f"User name is not found or empty. ({user})")
-        if 'hash' not in user or user['hash'] == '':
-            raise ValueError(f"User hash is not found or empty. ({user})")
-        if 'email' not in user:
-            raise ValueError(f"User email is not found. ({user})")
+            raise ValueError(f"User uid is not number.")
+        if 'name' not in user or not user['name']:
+            raise ValueError(f"User name is not found or empty.")
+        if 'hash' not in user or not user['hash']:
+            raise ValueError(f"User hash is not found or empty.")
+        if 'email' not in user or not user['email']:
+            raise ValueError(f"User email is not found or empty.")
         hash = user['hash']
-        if (hash=='oauth2' or hash=='saml') and (user['email'] is None or user['email']==''):
-            raise ValueError(f"Required when `email` is `oauth2` or `saml`. ({user})")
         if 'groups' not in user or type(user['groups']) is not list:
-            raise ValueError(f"User groups is not found or empty. ({user})")
+            raise ValueError(f"User groups is not found or empty.")
         for gn in user['groups']:
             if len(self.group_list(gn)) <= 0:
                 raise ValueError(f"Group is not found. ({gn})")
         if len([u for u in signin_data['users'] if u['uid'] == user['uid']]) <= 0:
-            raise ValueError(f"User uid is not found. ({user})")
+            raise ValueError(f"User uid is not found.")
         if len([u for u in signin_data['users'] if u['name'] == user['name']]) <= 0:
-            raise ValueError(f"User name is not found. ({user})")
+            raise ValueError(f"User name is not found.")
         if hash not in ['oauth2', 'saml', 'plain', 'md5', 'sha1', 'sha256']:
-            raise ValueError(f"User hash is not supported. ({user})")
+            raise ValueError(f"User hash is not supported.")
+        # buildin設定が有効化されているグループは設定できない
+        for gn in user['groups']:
+            group = next((g for g in signin_data['groups'] if g['name'] == gn), None)
+            if group and 'buildin' in group and group['buildin'] is True:
+                raise ValueError(f"You cannot assign a built-in group to a user.")
         for u in signin_data['users']:
             if u['uid'] == user['uid']:
                 u['name'] = user['name']
@@ -542,7 +553,7 @@ class Web:
                 u['groups'] = user['groups']
                 u['email'] = user['email']
         if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"user_edit: {user} -> {self.signin_file}")
+            self.logger.debug(f"user_edit: {self.signin_file}")
         # サインインファイルの保存
         self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data, nolock=False)
@@ -563,12 +574,17 @@ class Web:
             uid = int(uid)
         except:
             raise ValueError(f"User uid is not number. ({uid})")
+        # ユーザーがbuildin設定されていないことをチェック
+        for u in signin_data['users']:
+            if u['uid'] == uid and 'buildin' in u and u['buildin']:
+                raise ValueError(f"This user is a built-in user. ({uid})")
+        # ユーザーの削除
         users = [u for u in signin_data['users'] if u['uid'] != uid]
         if len(users) == len(signin_data['users']):
             raise ValueError(f"User uid is not found. ({uid})")
         signin_data['users'] = users
         if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"user_del: {uid} -> {self.signin_file}")
+            self.logger.debug(f"user_del: {self.signin_file}")
         self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data, nolock=False)
 
@@ -604,25 +620,34 @@ class Web:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
-        if 'gid' not in group:
-            raise ValueError(f"Group gid is not found. ({group})")
-        if 'name' not in group:
-            raise ValueError(f"Group name is not found. ({group})")
+        if 'gid' not in group or not group['gid']:
+            raise ValueError(f"Group gid is not found.")
+        if 'name' not in group or not group['name']:
+            raise ValueError(f"Group name is not found.")
         if 'parent' in group and (group['parent'] is None or group['parent'] == ''):
             del group['parent']
         elif 'parent' in group and group['parent'] not in [g['name'] for g in signin_data['groups']]:
-            raise ValueError(f"Group parent is not found. ({group})")
+            raise ValueError(f"Group parent is not found.")
         if 'parent' in group and group['parent'] == group['name']:
-            raise ValueError(f"Group parent is same as group name. ({group})")
+            raise ValueError(f"Group parent is same as group name.")
         if len([g for g in signin_data['groups'] if g['gid'] == group['gid']]) > 0:
-            raise ValueError(f"Group gid is already exists. ({group})")
+            raise ValueError(f"Group gid is already exists.")
         if len([g for g in signin_data['groups'] if g['name'] == group['name']]) > 0:
-            raise ValueError(f"Group name is already exists. ({group})")
+            raise ValueError(f"Group name is already exists.")
+        # buildin設定が有効化されているグループを親に設定できない
+        if 'parent' in group and group['parent'] is not None:
+            for g in signin_data['groups']:
+                if 'buildin' in g and g['buildin'] is True and g['name'] == group['parent']:
+                    raise ValueError(f"You cannot set a built-in group as a parent group.")
+        # buildin設定が有効化されているグループは追加できない
+        if 'buildin' in group and group['buildin']:
+            raise ValueError(f"You cannot add a built-in group.")
+        group['home'] = f".groups/{group['name']}"
         signin_data['groups'].append(group)
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"group_add: {group} -> {self.signin_file}")
+            self.logger.debug(f"group_add: {self.signin_file}")
         self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data, nolock=False)
 
@@ -639,27 +664,32 @@ class Web:
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
         if 'gid' not in group:
-            raise ValueError(f"Group gid is not found. ({group})")
+            raise ValueError(f"Group gid is not found.")
         if 'name' not in group:
-            raise ValueError(f"Group name is not found. ({group})")
+            raise ValueError(f"Group name is not found.")
         if 'parent' in group and (group['parent'] is None or group['parent'] == ''):
             del group['parent']
         elif 'parent' in group and group['parent'] not in [g['name'] for g in signin_data['groups']]:
-            raise ValueError(f"Group parent is not found. ({group})")
+            raise ValueError(f"Group parent is not found.")
         if 'parent' in group and group['parent'] == group['name']:
-            raise ValueError(f"Group parent is same as group name. ({group})")
-        if len([g for g in signin_data['groups'] if g['gid'] == group['gid']]) <= 0:
-            raise ValueError(f"Group gid is not found. ({group})")
+            raise ValueError(f"Group parent is same as group name.")
+        if len([g for g in signin_data['groups'] if str(g['gid']) == str(group['gid'])]) <= 0:
+            raise ValueError(f"Group gid is not found.")
         if len([g for g in signin_data['groups'] if g['name'] == group['name']]) <= 0:
-            raise ValueError(f"Group name is not found. ({group})")
+            raise ValueError(f"Group name is not found.")
+        # buildin設定が有効化されているグループを親に設定できない
+        if 'parent' in group and group['parent'] is not None:
+            for g in signin_data['groups']:
+                if 'buildin' in g and g['buildin'] is True and g['name'] == group['parent']:
+                    raise ValueError(f"You cannot set a built-in group as a parent group.")
         for g in signin_data['groups']:
-            if g['gid'] == group['gid']:
+            if str(g['gid']) == str(group['gid']):
                 g['name'] = group['name']
                 g['parent'] = group['parent']
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"group_edit: {group} -> {self.signin_file}")
+            self.logger.debug(f"group_edit: {self.signin_file}")
         self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data, nolock=False)
 
@@ -681,36 +711,40 @@ class Web:
             for group in user['groups']:
                 user_group_ids += [g['gid'] for g in signin_data['groups'] if g['name'] == group]
         if gid in user_group_ids:
-            raise ValueError(f"Group gid is used by user. ({gid})")
+            raise ValueError(f"Group gid is used by user.")
         # グループが親グループに使用されているかチェック
         parent_group_ids = []
         for group in signin_data['groups']:
             if 'parent' in group:
                 parent_group_ids += [g['gid'] for g in signin_data['groups'] if g['name'] == group['parent']]
         if gid in parent_group_ids:
-            raise ValueError(f"Group gid is used by parent group. ({gid})")
+            raise ValueError(f"Group gid is used by parent group.")
         # グループがcmdruleグループに使用されているかチェック
         cmdrule_group_ids = []
         for rule in signin_data['cmdrule']['rules']:
             for group in rule['groups']:
                 cmdrule_group_ids += [g['gid'] for g in signin_data['groups'] if g['name'] == group]
         if gid in cmdrule_group_ids:
-            raise ValueError(f"Group gid is used by cmdrule group. ({gid})")
+            raise ValueError(f"Group gid is used by cmdrule group.")
         # グループがpathruleグループに使用されているかチェック
         pathrule_group_ids = []
         for rule in signin_data['pathrule']['rules']:
             for group in rule['groups']:
                 pathrule_group_ids += [g['gid'] for g in signin_data['groups'] if g['name'] == group]
         if gid in pathrule_group_ids:
-            raise ValueError(f"Group gid is used by pathrule group. ({gid})")
+            raise ValueError(f"Group gid is used by pathrule group.")
+        # グループがbuildin設定がされていないことをチェック
+        for g in signin_data['groups']:
+            if 'buildin' in g and g['buildin'] and g['gid'] == gid:
+                raise ValueError(f"This group is a built-in group.")
 
         # グループ削除
         groups = [g for g in signin_data['groups'] if g['gid'] != gid]
         if len(groups) == len(signin_data['groups']):
-            raise ValueError(f"Group gid is not found. ({gid})")
+            raise ValueError(f"Group gid is not found.")
         signin_data['groups'] = groups
         if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"group_del: {gid} -> {self.signin_file}")
+            self.logger.debug(f"group_del: {self.signin_file}")
         self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data, nolock=False)
 

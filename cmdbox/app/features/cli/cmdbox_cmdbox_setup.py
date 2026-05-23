@@ -56,9 +56,6 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
                 dict(opt="password", type=Options.T_PASSWD, default=self.default_pass, required=True, multi=False, hide=True, choice=None, web="mask",
                      description_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
                      description_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
-                dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",
-                     description_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
-                     description_en="Specify the service name of the inference server. If omitted, `server` is used."),
                 dict(opt="data", type=Options.T_DIR, default=self.default_data, required=False, multi=False, hide=False, choice=None, web="mask",
                      description_ja=f"省略した時は `$HOME/.{self.ver.__appid__}` を使用します。",
                      description_en=f"When omitted, `$HOME/.{self.ver.__appid__}` is used."),
@@ -89,9 +86,10 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         # サーバーを起動
+        args.svname = f"{self.ver.__appid__}_setup"
         sv_start = threading.Thread(target=self.server_start.apprun, args=(logger, args, tm, pf))
         sv_start.start()
-
+        has_warn = False
         try:
             # セットアップファイルをチェック
             setup_file = Path(args.setup_file)
@@ -116,7 +114,6 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
 
             # セットアップを順番に実行
             results = []
-            has_warn = False
             app = self.appcls.getInstance()
             for i, setup in enumerate(setups):
                 name = setup.get('name', f'setup_{i}')
@@ -153,7 +150,10 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
             sv_start.join()
             sv_stop.join()
 
-        ret = dict(success=dict(data=results))
+        if not has_warn:
+            ret = dict(success=dict(data=results))
+        else:
+            ret = dict(warn=dict(data=results))
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if has_warn:
             return self.RESP_WARN, ret, None
@@ -187,9 +187,11 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
                     args_list += [f'--{key}']
             elif isinstance(value, list):
                 for v in value:
-                    args_list += [f'--{key}', eval(v, dict(Path=Path), local_env)]
+                    v = eval(v, dict(Path=Path), local_env) if isinstance(v, str) else v
+                    args_list += [f'--{key}', v]
             else:
-                args_list += [f'--{key}', eval(value, dict(Path=Path), local_env)]
+                value = eval(value, dict(Path=Path), local_env) if isinstance(value, str) else value
+                args_list += [f'--{key}', value]
         return args_list
 
     def output_schema(self) -> type:

@@ -13,6 +13,7 @@ users:                         # A list of users, each of which is a map that co
   groups: [develop]
   email: develop@aaa.bbb.jp
   home: /.users/develop
+  buildin: true                # Whether the user is a built-in user. Built-in users cannot be deleted.
 - uid: 3
   name: master
   password: master
@@ -20,6 +21,7 @@ users:                         # A list of users, each of which is a map that co
   groups: [master]
   email: master@aaa.bbb.jp
   home: /.users/master
+  buildin: true
 - uid: 101
   name: user01
   password: b75705d7e35e7014521a46b532236ec3
@@ -48,9 +50,11 @@ groups:                        # A list of groups, each of which is a map that c
 - gid: 2
   name: develop
   home: /.groups/develop
+  buildin: true                # Whether the group is a built-in group. Built-in groups cannot be deleted.
 - gid: 3
   name: master
   home: /.groups/master
+  buildin: true
 - gid: 4
   name: guest
   home: /.groups/guest
@@ -98,6 +102,10 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     rule: deny
   - groups: [master, admin]
     mode: test
+    rule: deny
+  - groups: [admin]
+    mode: tts
+    cmds: [install, uninstall]
     rule: deny
   - groups: [admin]
     mode: datasource

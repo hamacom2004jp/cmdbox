@@ -47,7 +47,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -62,11 +62,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.generated","list[str] | null","no","null","生成されたファイルのリスト"
     "success.skipped","list[str] | null","no","null","スキップされたファイルまたはスキップ件数"
     "success.dry_run","bool | null","no","null","ドライランフラグ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -109,7 +109,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -124,11 +124,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.output_dir","str | null","no","null","出力先ディレクトリ"
     "success.json_file","str | null","no","null","JSONファイルパス"
     "success.count","int | null","no","null","件数"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -168,7 +168,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -183,11 +183,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.output_dir","str | null","no","null","出力先ディレクトリ"
     "success.json_file","str | null","no","null","JSONファイルパス"
     "success.count","int | null","no","null","件数"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -270,7 +270,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -294,10 +294,10 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.data.index_md_file","Path | str | null","no","null","インデックスMarkdownファイルパス"
     "success.data.error_json_file","Path | str | null","no","null","エラーJSONファイルパス"
     "success.data.error_md_file","Path | str | null","no","null","エラーMarkdownファイルパス"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 

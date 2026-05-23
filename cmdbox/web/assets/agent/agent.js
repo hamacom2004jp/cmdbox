@@ -142,7 +142,42 @@ agentView.initView = () => {
             agentView.list_datasource();
         }
     });
-
+    // 権限チェックでコマンドが実行不能ならば設定メニューを非表示にする
+    const promises = [];
+    promises.push(cmdbox.check_cmd('agent', 'agent_load').then((res) => {
+        !res && $('[data-bs-target="#agent_settings"]').hide();
+    }));
+    promises.push(cmdbox.check_cmd('datasource', 'load').then((res) => {
+        !res && $('[data-bs-target="#datasource_settings"]').hide();
+    }));
+    promises.push(cmdbox.check_cmd('llm', 'load').then((res) => {
+        !res && $('[data-bs-target="#llm_settings"]').hide();
+    }));
+    promises.push(cmdbox.check_cmd('agent', 'mcpsv_load').then((res) => {
+        !res && $('[data-bs-target="#mcpsv_settings"]').hide();
+    }));
+    promises.push(cmdbox.check_cmd('tts', 'install').then((res) => {
+        !res && $('[data-bs-target="#tts_settings"]').hide();
+    }));
+    promises.push(cmdbox.check_cmd('agent', 'runner_load').then((res) => {
+        !res && $('[data-bs-target="#runner_settings"]').hide();
+    }));
+    promises.push(cmdbox.check_cmd('rag', 'load').then((res) => {
+        !res && $('[data-bs-target="#rag_settings"]').hide();
+    }));
+    promises.push(cmdbox.check_cmd('embed', 'load').then((res) => {
+        !res && $('[data-bs-target="#embedding_settings"]').hide();
+    }));
+    promises.push(cmdbox.check_cmd('extract', 'load').then((res) => {
+        !res && $('[data-bs-target="#extract_settings"]').hide();
+    }));
+    Promise.all(promises).then(() => {
+        // 表示されている最初の設定メニューをクリックして表示する
+        const firstVisibleSetting = $('[data-bs-target]').filter(':visible').first();
+        if (firstVisibleSetting.length) {
+            firstVisibleSetting.click();
+        }
+    });
     // display_runner_name クリックイベント
     $('#display_runner_name').off('click').on('click', async () => {
         await agentView.show_runner_select_modal();

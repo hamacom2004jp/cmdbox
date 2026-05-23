@@ -65,9 +65,9 @@ class CmdboxInitdataInstall(cmdbox_base.CmdboxBase, validator.Validator):
                      description_ja="参照先スコープを指定します。指定可能なスコープは `client` , `current` , `server` です。",
                      description_en="Specifies the scope to be referenced. Possible values are `client`, `current`, and `server`.",
                      choice_show=dict(client=["client_data"])),
-                dict(opt="initdata_path", type=Options.T_DIR, default=None, required=True, multi=True, hide=False, choice=None, fileio="in",
-                     description_ja="インストールする初期データファイルのパスを指定します。複数指定可能です。",
-                     description_en="Specify the path(s) of the initial data file(s) to install. Multiple paths can be specified."),
+                dict(opt="initdata_path", type=Options.T_DIR, default=None, required=False, multi=True, hide=False, choice=None, fileio="in",
+                     description_ja="インストールする初期データファイルのパスを指定します。",
+                     description_en="Specify the path(s) of the initial data file(s) to install."),
                 dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None, web="mask",
                      description_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
                      description_en="Specify the path of the data folder when local is referenced."),
@@ -113,13 +113,38 @@ class CmdboxInitdataInstall(cmdbox_base.CmdboxBase, validator.Validator):
 
         results = []
         has_warn = False
-        for upload_file in initdata_paths:
-            ret = cl.file_upload(svpath, upload_file, scope=args.scope, client_data=client_data,
-                                 fwpaths=fwpaths, rjpaths=rjpaths, mkdir=args.mkdir, orverwrite=args.orverwrite,
+        upload_paths = dict()
+        for path in initdata_paths:
+            if not path.exists():
+                results.append(dict(file=str(path), result=dict(error="Path not found")))
+                has_warn = True
+                continue
+            _path = str(path.resolve())
+            if path.is_dir():
+                for p in path.rglob("*"):
+                    if p.is_file():
+                        _p = str(p.resolve())
+                        _p = _p[len(_path):].lstrip("/\\")
+                        _p = str(Path(svpath) / _p).replace("\\", "/")
+                        upload_paths[_p] = p
+            else:
+                # ディレクトリ以外が指定された場合はエラーとする
+                msg = dict(warn=f"{str(path)} is not a directory.")
+                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, msg, cl
+        if has_warn:
+            msg = dict(warn=results)
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, cl
+        for svp in upload_paths:
+            ret = cl.file_upload(svp, upload_paths[svp], scope=args.scope, client_data=client_data,
+                                 fwpaths=fwpaths, rjpaths=rjpaths, mkdir=args.mkdir, overwrite=args.overwrite,
                                  retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
-            results.append(dict(file=str(upload_file), result=ret))
+            msg = dict(file=str(upload_paths[svp]))
             if 'success' not in ret:
                 has_warn = True
+                msg['msg'] = ret.get('warn', 'Unknown warning')
+            results.append(msg)
 
         msg = dict(success=results) if not has_warn else dict(warn=results)
         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -133,6 +158,8 @@ class CmdboxInitdataInstall(cmdbox_base.CmdboxBase, validator.Validator):
         class FileResult(resdata.Base):
             file: str = pydantic.Field(default=None, description="アップロードしたファイルパス")
             result: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="アップロード結果")
+        class Data(resdata.Data):
+            data: Union[List[FileResult], None] = pydantic.Field(default=None, description="アップロード結果リスト")
         class Result(resdata.Result):
-            success: Union[List[FileResult], None] = pydantic.Field(default=None, description="成功した場合の結果リスト")
+            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result

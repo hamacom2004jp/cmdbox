@@ -6,6 +6,60 @@ Command Reference ( cmd mode )
 
 List of cmd mode commands.
 
+cmd ( check ) : ``cmdbox -m cmd -c check <Option>``
+===================================================
+
+- Checks whether the specified command can be executed in the specified group.
+
+.. csv-table::
+    :widths: 20, 8, 8, 8, 12, 18, 26
+    :header-rows: 1
+
+    "Option","Type","Multi","Required","Default","Choices","Description"
+    "--chk_mode <chk_mode>","str","","required","","","Specifies the mode to be checked."
+    "--chk_cmd <chk_cmd>","str","","required","","","Specifies the command to be checked."
+    "--data <data>","dir","","required","C:\Users\hama\.cmdbox","","When omitted, `$HONE/.cmdbox` is used."
+    "--signin_file <signin_file>","file","","required",".cmdbox/user_list.yml","","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
+    "--groups <groups>","str","multi","","","","Specifies that `signin_file`, if specified, should return the list of commands allowed for this user group."
+
+**Output Schema**
+
+This command implements ``output_schema()`` returning ``Result`` model.
+
+.. code-block:: json
+
+    {
+      "success": {
+        "performance": [
+          {
+            "key": "string",
+            "value": null
+          }
+        ],
+        "data": false
+      },
+      "warn": {},
+      "error": {},
+      "output_schema": {},
+      "end": false
+    }
+
+.. csv-table::
+    :widths: 25, 10, 10, 15, 40
+    :header-rows: 1
+
+    "Field","Type","Required","Default","Description"
+    "success","Data | null","no","null","成功した場合の結果"
+    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "success.data","bool | null","no","null","処理結果のデータ"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
+    "end","bool | null","no","null","終了フラグ"
+
+
 cmd ( list ) : ``cmdbox -m cmd -c list <Option>``
 =================================================
 
@@ -52,7 +106,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -64,11 +118,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success","Data | list[CmdRecord] | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.data","list[CmdRecord] | null","no","null","処理結果のデータ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -105,7 +159,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -117,10 +171,10 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.data","dict[str, any] | null","no","null","処理結果のデータ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 

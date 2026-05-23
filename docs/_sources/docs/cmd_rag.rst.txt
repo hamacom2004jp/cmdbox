@@ -43,7 +43,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -55,11 +55,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.data","str | null","no","null","処理結果のデータ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -100,7 +100,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -112,11 +112,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.data","str | null","no","null","処理結果のデータ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -162,7 +162,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -176,11 +176,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.data","list[NamePath]","no","(必須)","処理結果のデータ"
     "success.data.name","str","yes","(必須)","名前"
     "success.data.path","Path | str | null","no","null","パス"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -202,6 +202,7 @@ rag ( load ) : ``cmdbox -m rag -c load <Option>``
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","120","","Specify the maximum waiting time until the server responds."
     "--rag_name <rag_name>","str","","required","","","Specify the name of the RAG configuration to load."
+    "--cache_timeout <cache_timeout>","int","","","60","","Specify the duration, in seconds, for which settings should be cached."
 
 **Output Schema**
 
@@ -228,7 +229,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -245,11 +246,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.extract","list[str] | null","no","null","エクストラクト設定リスト"
     "success.embed","str | null","no","null","エンベッディング名"
     "success.embed_vector_dim","int | null","no","null","エンベッディングベクトル次元数"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -293,7 +294,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -305,11 +306,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.data","str | null","no","null","処理結果のデータ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -355,7 +356,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -367,11 +368,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.data","str | null","no","null","処理結果のデータ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -423,7 +424,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -435,10 +436,10 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.data","list[any] | null","no","null","処理結果のデータ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 

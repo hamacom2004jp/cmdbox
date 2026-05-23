@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.common &mdash; cmdbox 2026/05/10 documentation</title>
+  <title>cmdbox.app.common &mdash; cmdbox 2026/05/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=19b80221"></script>
+      <script src="../../../_static/documentation_options.js?v=8310f887"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -126,21 +126,26 @@
 <span class="sd">        data (Path): データディレクトリ</span>
 <span class="sd">        ver (version, optional): バージョン. Defaults to version</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># サンプルデータをコピー</span>
     <span class="n">dst_sample</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">/</span> <span class="s1">&#39;.samples&#39;</span> <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">HOME_DIR</span> <span class="o">/</span> <span class="s1">&#39;.samples&#39;</span>
-    <span class="c1">#if dst.exists():</span>
-    <span class="c1">#    return</span>
     <span class="n">src</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ver</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;extensions&#39;</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="n">src</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">dst</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
-    <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst_sample</span><span class="p">,</span> <span class="n">dirs_exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">copy_function</span><span class="o">=</span><span class="n">copy</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dst_sample</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">src</span> <span class="o">/</span> <span class="s1">&#39;sample_project&#39;</span><span class="p">,</span> <span class="n">dst_sample</span><span class="p">,</span> <span class="n">dirs_exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">copy_function</span><span class="o">=</span><span class="n">copy</span><span class="p">)</span>
+    <span class="c1"># 設定ファイルをコピー</span>
     <span class="n">dst_config</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;.</span><span class="si">{</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">HOME_DIR</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;.</span><span class="si">{</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">&#39;</span>
     <span class="n">dst_config</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">dst_config</span> <span class="o">/</span> <span class="s1">&#39;features.yml&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">src</span> <span class="o">/</span> <span class="s1">&#39;features.yml&#39;</span><span class="p">,</span> <span class="n">dst_config</span> <span class="o">/</span> <span class="s1">&#39;features.yml&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">dst_config</span> <span class="o">/</span> <span class="s1">&#39;user_list.yml&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">src</span> <span class="o">/</span> <span class="s1">&#39;user_list.yml&#39;</span><span class="p">,</span> <span class="n">dst_config</span> <span class="o">/</span> <span class="s1">&#39;user_list.yml&#39;</span><span class="p">)</span></div>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">src</span> <span class="o">/</span> <span class="s1">&#39;user_list.yml&#39;</span><span class="p">,</span> <span class="n">dst_config</span> <span class="o">/</span> <span class="s1">&#39;user_list.yml&#39;</span><span class="p">)</span>
+    <span class="c1"># 初期データをコピー</span>
+    <span class="n">dst_initdata</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;.</span><span class="si">{</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">_initdata&#39;</span> <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">HOME_DIR</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;.</span><span class="si">{</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">_initdata&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dst_initdata</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">src</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s1">_initdata&#39;</span><span class="p">,</span> <span class="n">dst_initdata</span><span class="p">,</span> <span class="n">dirs_exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">copy_function</span><span class="o">=</span><span class="n">copy</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="gen_uuid">

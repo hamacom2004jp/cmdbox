@@ -26,7 +26,7 @@ client ( file_copy ) : ``cmdbox -m client -c file_copy <Option>``
     "--to_fwpath <to_fwpath>","file","multi","required","","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
     "--from_rjpath <from_rjpath>","file","multi","","","","If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."
     "--to_rjpath <to_rjpath>","file","multi","","","","If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."
-    "--orverwrite <orverwrite>","bool","","","False","True | False","Overwrites the copy even if it exists at the destination."
+    "--overwrite <overwrite>","bool","","","False","True | False","Overwrites the copy even if it exists at the destination."
     "--scope <scope>","str","","required","client","client | current | server","Specifies the scope to be referenced. Possible image types are `client` , `current`, and `server`."
     "--client_data <client_data>","str","","","","","Specify the path of the data folder when local is referenced."
     "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
@@ -55,7 +55,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -71,11 +71,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.from_path","str | null","no","null","コピー元・移動元のパス"
     "success.ret_path","str | null","no","null","戻りのパス"
     "success.msg","str | null","no","null","処理結果のメッセージ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -129,7 +129,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -147,11 +147,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.not_modified","bool | null","no","null","未更新フラグ"
     "success.rpath","str | null","no","null","リクエストパス"
     "success.svpath","str | null","no","null","サーバーパス"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -190,7 +190,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       "success": {},
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -200,11 +200,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
 
     "Field","Type","Required","Default","Description"
     "success","dict[str, any] | null","no","null","成功した場合の結果"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -250,7 +250,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -263,11 +263,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.path","str | null","no","null","パス"
     "success.msg","str | null","no","null","処理結果のメッセージ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -319,7 +319,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -335,11 +335,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.from_path","str | null","no","null","移動元・移動元のパス"
     "success.ret_path","str | null","no","null","戻りのパス"
     "success.msg","str | null","no","null","処理結果のメッセージ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -385,7 +385,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -398,11 +398,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.path","str | null","no","null","パス"
     "success.msg","str | null","no","null","処理結果のメッセージ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -448,7 +448,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -461,11 +461,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.path","str | null","no","null","パス"
     "success.msg","str | null","no","null","処理結果のメッセージ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -490,7 +490,7 @@ client ( file_upload ) : ``cmdbox -m client -c file_upload <Option>``
     "--upload_file <upload_file>","file","","","","","Specify the source path of the client."
     "--client_data <client_data>","str","","","","","Specify the path of the data folder when local is referenced."
     "--mkdir <mkdir>","bool","","","False","True | False","If there is no in between folder, create one."
-    "--orverwrite <orverwrite>","bool","","","False","True | False","Overwrites the file even if it exists at the upload destination."
+    "--overwrite <overwrite>","bool","","","False","True | False","Overwrites the file even if it exists at the upload destination."
     "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","15","","Specify the maximum waiting time until the server responds."
@@ -505,7 +505,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       "success": "string",
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -515,11 +515,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
 
     "Field","Type","Required","Default","Description"
     "success","str | null","no","null","成功した場合の結果"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -554,7 +554,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       "success": null,
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -564,11 +564,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
 
     "Field","Type","Required","Default","Description"
     "success","any | null","no","null","成功した場合の結果"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -612,7 +612,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -628,11 +628,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.redis_port","int | null","no","null","Redisサーバーポート"
     "success.redis_password","str | null","no","null","Redisサーバーパスワード"
     "success.data_dir","str | null","no","null","データディレクトリ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 
 
@@ -668,7 +668,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
       },
       "warn": {},
       "error": {},
-      "schema": {},
+      "output_schema": {},
       "end": false
     }
 
@@ -682,10 +682,10 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.data","str | null","no","null","処理結果のデータ"
     "success.timezone","str | null","no","null","タイムゾーン"
     "success.timestamp","float | null","no","null","タイムスタンプ"
-    "warn","dict[str, any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "schema","dict[str, any] | null","no","null","スキーマ情報"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
 

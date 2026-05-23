@@ -41,7 +41,7 @@ class FilerUpload(cmdbox_web_exec_cmd.ExecCmd):
         web.logger.info(f"filer_upload: svpath={svpath}")
         opt = dict(mode='client', cmd='file_upload',
                    host=q['host'], port=q['port'], password=q['password'], svname=q['svname'],
-                   scope=q["scope"], client_data=q['client_data'], orverwrite=('orverwrite' in q))
+                   scope=q["scope"], client_data=q['client_data'], overwrite=('overwrite' in q))
         form = await req.form()
         with tempfile.TemporaryDirectory() as tmpdir:
             for _, fv in form.multi_items():

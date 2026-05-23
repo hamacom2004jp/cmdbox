@@ -289,7 +289,7 @@ class Filer(object):
             self.logger.warning(f"Failed to download {abspath}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to download {abspath}. {e}")
 
-    def file_upload(self, current_path:str, file_name:str, file_data:bytes, mkdir:bool, orverwrite:bool, fwpaths:List[str]=None, rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+    def file_upload(self, current_path:str, file_name:str, file_data:bytes, mkdir:bool, overwrite:bool, fwpaths:List[str]=None, rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルをアップロードする
 
@@ -298,7 +298,7 @@ class Filer(object):
             file_name (str): ファイル名
             file_data (bytes): ファイルデータ
             mkdir (bool): ディレクトリを作成するかどうか
-            orverwrite (bool): 上書きするかどうか
+            overwrite (bool): 上書きするかどうか
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
 
@@ -316,7 +316,7 @@ class Filer(object):
         if abspath.exists():
             if abspath.is_dir():
                 abspath = abspath / file_name
-            if abspath.is_file() and not orverwrite:
+            if abspath.is_file() and not overwrite:
                 self.logger.warning(f"Path {abspath} already exist. param={current_path}")
                 return self.RESP_WARN, dict(warn=f"Path {abspath} already exist. param={current_path}")
             save_path = abspath
@@ -367,7 +367,7 @@ class Filer(object):
             self.logger.warning(f"Failed to remove {abspath}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to remove {abspath}. {e}")
 
-    def file_copy(self, from_path:str, to_path:str, orverwrite:bool, from_fwpaths:List[str]=None, to_fwpaths:List[str]=None,
+    def file_copy(self, from_path:str, to_path:str, overwrite:bool, from_fwpaths:List[str]=None, to_fwpaths:List[str]=None,
                   from_rjpaths:List[str]=None, to_rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルをコピーする
@@ -375,7 +375,7 @@ class Filer(object):
         Args:
             from_path (str): コピー元パス
             to_path (str): コピー先パス
-            orverwrite (bool): 上書きするかどうか
+            overwrite (bool): 上書きするかどうか
             from_fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             to_fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             from_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
@@ -393,12 +393,12 @@ class Filer(object):
             return self.RESP_WARN, msg
 
         chk, to_abspath, msg = self._file_exists(to_path, not_exists=True)
-        if not chk and not orverwrite:
+        if not chk and not overwrite:
             return self.RESP_WARN, msg
         chk, msg = self.check_fwpath(to_path, to_fwpaths, to_rjpaths)
         if not chk:
             return self.RESP_WARN, msg
-        if orverwrite and not to_abspath.parent.exists():
+        if overwrite and not to_abspath.parent.exists():
             to_abspath.parent.mkdir(parents=True, exist_ok=True)
 
         if from_abspath.is_dir():

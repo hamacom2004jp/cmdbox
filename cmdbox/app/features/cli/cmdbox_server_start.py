@@ -80,7 +80,7 @@ class ServerStart(feature.UnsupportEdgeFeature, validator.Validator):
         sv = server.Server(Path(args.data), logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         sv.start_server(args.retry_count, args.retry_interval)
 
-        return self.RESP_SUCCESS, dict(success=f"server stoped. svname={sv.svname}"), sv
+        return self.RESP_SUCCESS, dict(success=dict(data=f"server stoped. svname={sv.svname}")), sv
 
     def output_schema(self) -> type:
         class Data(resdata.Data):
