@@ -38,7 +38,6 @@ Armin Rigo, Maciej Fijalkowski	MIT	cffi	https://cffi.readthedocs.io/en/latest/wh
 speedyk_005 <speedy40115719@gmail.com>	MIT	chunklet-py	https://github.com/speedyk-005/chunklet-py	2.2.0	cmdbox\licenses\LICENSE_chunklet-py_2_2_0_MIT.txt
 UNKNOWN	BSD License	click	https://github.com/pallets/click/	8.1.8	cmdbox\licenses\LICENSE_click_8_1_8_BSD_License.txt
 The cloudpickle developer team	BSD License	cloudpickle	https://github.com/cloudpipe/cloudpickle	3.1.2	cmdbox\licenses\LICENSE_cloudpickle_3_1_2_BSD_License.txt
-hamacom2004jp <hamacom2004jp@gmail.com>	MIT License	cmdbox	https://github.com/hamacom2004jp/cmdbox	0.7.9	cmdbox\licenses\LICENSE_cmdbox_0_7_9_MIT_License.txt
 Michael Williamson	BSD License	cobble	http://github.com/mwilliamson/python-cobble	0.1.4	cmdbox\licenses\LICENSE_cobble_0_1_4_BSD_License.txt
 Jonathan Hartley <tartley@tartley.com>	BSD License	colorama	https://github.com/tartley/colorama	0.4.6	cmdbox\licenses\LICENSE_colorama_0_4_6_BSD_License.txt
 The Python Cryptographic Authority and individual contributors <cryptography-dev@python.org>	Apache-2.0 OR BSD-3-Clause	cryptography	https://github.com/pyca/cryptography	47.0.0	cmdbox\licenses\LICENSE_cryptography_47_0_0_Apache-2_0_OR_BSD-3-Clause.txt
@@ -180,6 +179,7 @@ Google LLC <googleapis-packages@google.com>	Apache Software License	proto-plus	h
 protobuf@googlegroups.com	3-Clause BSD License	protobuf	https://developers.google.com/protocol-buffers/	6.33.6	cmdbox\licenses\LICENSE_protobuf_6_33_6_3-Clause_BSD_License.txt
 Daniele Varrazzo <daniele.varrazzo@gmail.com>	LGPL-3.0-only	psycopg	https://psycopg.org/	3.3.3	cmdbox\licenses\LICENSE_psycopg_3_3_3_LGPL-3_0-only.txt
 Daniele Varrazzo <daniele.varrazzo@gmail.com>	LGPL-3.0-only	psycopg-binary	https://psycopg.org/	3.3.3	cmdbox\licenses\LICENSE_psycopg-binary_3_3_3_LGPL-3_0-only.txt
+Daniele Varrazzo <daniele.varrazzo@gmail.com>	LGPL-3.0-only	psycopg-pool	https://psycopg.org/	3.3.1	cmdbox\licenses\LICENSE_psycopg-pool_3_3_1_LGPL-3_0-only.txt
 UNKNOWN	Apache Software License	py-key-value-aio	UNKNOWN	0.4.4	cmdbox\licenses\LICENSE_py-key-value-aio_0_4_4_Apache_Software_License.txt
 Marco Lui	BSD License	py3langid	https://github.com/adbar/py3langid	0.3.0	cmdbox\licenses\LICENSE_py3langid_0_3_0_BSD_License.txt
 The pyOpenSSL developers	Apache Software License	pyOpenSSL	https://pyopenssl.org/	26.1.0	cmdbox\licenses\LICENSE_pyOpenSSL_26_1_0_Apache_Software_License.txt
@@ -292,6 +292,7 @@ Ian Stapleton Cordasco	BSD 3-Clause OR Apache-2.0	uritemplate	https://uritemplat
 Andrey Petrov <andrey.petrov@shazow.net>	MIT	urllib3	https://github.com/urllib3/urllib3/blob/main/CHANGES.rst	2.6.3	cmdbox\licenses\LICENSE_urllib3_2_6_3_MIT.txt
 Amin Alaee <mohammadamin.alaee@gmail.com>	BSD-3-Clause	uuid_utils	https://github.com/aminalaee/uuid-utils	0.14.1	cmdbox\licenses\LICENSE_uuid_utils_0_14_1_BSD-3-Clause.txt
 Tom Christie <tom@tomchristie.com>	BSD-3-Clause	uvicorn	https://uvicorn.dev/	0.46.0	cmdbox\licenses\LICENSE_uvicorn_0_46_0_BSD-3-Clause.txt
+Hiroshiba <hihokaruta@gmail.com>	MIT	voicevox_core	UNKNOWN	0.16.3	cmdbox\licenses\LICENSE_voicevox_core_0_16_3_MIT.txt
 Mickaël Schoentgen	Apache Software License	watchdog	https://github.com/gorakhargosh/watchdog	6.0.0	cmdbox\licenses\LICENSE_watchdog_6_0_0_Apache_Software_License.txt
 Samuel Colvin <s@muelcolvin.com>	MIT License	watchfiles	https://github.com/samuelcolvin/watchfiles	1.1.1	cmdbox\licenses\LICENSE_watchfiles_1_1_1_MIT_License.txt
 Jeff Quast <contact@jeffquast.com>	MIT	wcwidth	https://github.com/jquast/wcwidth	0.6.0	cmdbox\licenses\LICENSE_wcwidth_0_6_0_MIT.txt
