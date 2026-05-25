@@ -418,6 +418,81 @@ class Client(object):
             self.logger.warning(f"scope is invalid. {scope}")
             return dict(warn=f"scope is invalid. {scope}")
 
+    def file_read(self, svpath:str, encoding:str='utf-8', scope:str="client", client_data:Path=None,
+                 fwpaths:List[str]=None, rjpaths:List[str]=None,
+                 retry_count:int=3, retry_interval:int=5, timeout:int=60):
+        if scope == "client":
+            if client_data is not None:
+                f = filer.Filer(client_data, self.logger)
+                _, res_json = f.file_read(svpath, encoding, fwpaths, rjpaths)
+                return res_json
+            else:
+                return dict(warn="client_data is empty.")
+        elif scope == "current":
+            f = filer.Filer(Path.cwd(), self.logger)
+            _, res_json = f.file_read(svpath, encoding, fwpaths, rjpaths)
+            return res_json
+        elif scope == "server":
+            payload = dict(svpath=svpath, encoding=encoding, fwpaths=fwpaths, rjpaths=rjpaths)
+            payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
+            res_json = self.redis_cli.send_cmd('file_read', [payload_b64],
+                                               retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+            return res_json
+        else:
+            return dict(warn=f"scope is invalid. {scope}")
+
+    def file_write(self, svpath:str, content:str, encoding:str='utf-8',
+                   mkdir:bool=False, overwrite:bool=False,
+                   scope:str="client", client_data:Path=None,
+                   fwpaths:List[str]=None, rjpaths:List[str]=None,
+                   retry_count:int=3, retry_interval:int=5, timeout:int=60):
+        if scope == "client":
+            if client_data is not None:
+                f = filer.Filer(client_data, self.logger)
+                _, res_json = f.file_write(svpath, content, encoding, mkdir, overwrite, fwpaths, rjpaths)
+                return res_json
+            else:
+                return dict(warn="client_data is empty.")
+        elif scope == "current":
+            f = filer.Filer(Path.cwd(), self.logger)
+            _, res_json = f.file_write(svpath, content, encoding, mkdir, overwrite, fwpaths, rjpaths)
+            return res_json
+        elif scope == "server":
+            payload = dict(svpath=svpath, content=content, encoding=encoding, mkdir=mkdir, overwrite=overwrite,
+                           fwpaths=fwpaths, rjpaths=rjpaths)
+            payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
+            res_json = self.redis_cli.send_cmd('file_write', [payload_b64],
+                                               retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+            return res_json
+        else:
+            return dict(warn=f"scope is invalid. {scope}")
+
+    def file_append(self, svpath:str, content:str, encoding:str='utf-8',
+                    mkdir:bool=False,
+                    scope:str="client", client_data:Path=None,
+                    fwpaths:List[str]=None, rjpaths:List[str]=None,
+                    retry_count:int=3, retry_interval:int=5, timeout:int=60):
+        if scope == "client":
+            if client_data is not None:
+                f = filer.Filer(client_data, self.logger)
+                _, res_json = f.file_append(svpath, content, encoding, mkdir, fwpaths, rjpaths)
+                return res_json
+            else:
+                return dict(warn="client_data is empty.")
+        elif scope == "current":
+            f = filer.Filer(Path.cwd(), self.logger)
+            _, res_json = f.file_append(svpath, content, encoding, mkdir, fwpaths, rjpaths)
+            return res_json
+        elif scope == "server":
+            payload = dict(svpath=svpath, content=content, encoding=encoding, mkdir=mkdir,
+                           fwpaths=fwpaths, rjpaths=rjpaths)
+            payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
+            res_json = self.redis_cli.send_cmd('file_append', [payload_b64],
+                                               retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+            return res_json
+        else:
+            return dict(warn=f"scope is invalid. {scope}")
+
     def server_info(self, retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバーの情報を取得する

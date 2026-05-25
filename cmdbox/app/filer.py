@@ -453,3 +453,66 @@ class Filer(object):
                                                     from_path=from_path,
                                                     ret_path=ret_path,
                                                     msg=f"Move from '{from_path}' to '{to_path}'. write '{ret_path}'"))
+
+    def file_read(self, current_path:str, encoding:str='utf-8',
+                  fwpaths:List[str]=None, rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+        chk, abspath, msg = self._file_exists(current_path)
+        if not chk:
+            return self.RESP_WARN, msg
+        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths)
+        if not chk:
+            return self.RESP_WARN, msg
+        if abspath.is_dir():
+            return self.RESP_WARN, dict(warn=f"Path {abspath} is directory.")
+        try:
+            content = common.load_file(abspath, lambda f: f.read(), mode='r', nolock=True)
+            return self.RESP_SUCCESS, dict(success=dict(path=str(abspath), content=content))
+        except UnicodeDecodeError:
+            try:
+                content = common.load_file(abspath, lambda f: f.read(), mode='rb', nolock=True)
+                content = content.decode(encoding, errors='replace')
+                return self.RESP_SUCCESS, dict(success=dict(path=str(abspath), content=content))
+            except Exception as e:
+                return self.RESP_WARN, dict(warn=f"Failed to read {abspath}. {e}")
+        except Exception as e:
+            return self.RESP_WARN, dict(warn=f"Failed to read {abspath}. {e}")
+
+    def file_write(self, current_path:str, content:str, encoding:str='utf-8',
+                   mkdir:bool=False, overwrite:bool=False,
+                   fwpaths:List[str]=None, rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+        chk, abspath, msg = self._file_exists(current_path, exists_chk=False)
+        if not chk:
+            return self.RESP_WARN, msg
+        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths)
+        if not chk:
+            return self.RESP_WARN, msg
+        if abspath.exists() and abspath.is_file() and not overwrite:
+            return self.RESP_WARN, dict(warn=f"Path {abspath} already exists. param={current_path}")
+        try:
+            if mkdir:
+                abspath.parent.mkdir(parents=True, exist_ok=True)
+            def _w(f):
+                f.write(content)
+            common.save_file(abspath, _w, mode='w', nolock=False)
+            return self.RESP_SUCCESS, dict(success=f"Written to {abspath}")
+        except Exception as e:
+            return self.RESP_WARN, dict(warn=f"Failed to write {abspath}. {e}")
+
+    def file_append(self, current_path:str, content:str, encoding:str='utf-8',
+                    mkdir:bool=False,
+                    fwpaths:List[str]=None, rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+        chk, abspath, msg = self._file_exists(current_path, exists_chk=False)
+        if not chk:
+            return self.RESP_WARN, msg
+        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths)
+        if not chk:
+            return self.RESP_WARN, msg
+        try:
+            if mkdir:
+                abspath.parent.mkdir(parents=True, exist_ok=True)
+            def _a(f):
+                f.write(content)
+            common.save_file(abspath, _a, mode='a', nolock=False)
+            return self.RESP_SUCCESS, dict(success=f"Appended to {abspath}")
+        except Exception as e:
+            return self.RESP_WARN, dict(warn=f"Failed to append {abspath}. {e}")

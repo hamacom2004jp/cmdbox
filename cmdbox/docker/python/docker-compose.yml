@@ -1,0 +1,24 @@
+services:
+  cmdbox-python-sandbox:
+    image: cmdbox-python-sandbox:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cmdbox-python-sandbox
+    restart: "no"
+    volumes:
+      - cmdbox-python-sandbox:/sandbox/tmp
+    environment:
+      - TZ=Asia/Tokyo
+    security_opt:
+      - no-new-privileges:true
+    read_only: false
+    tmpfs:
+      - /tmp:size=128m
+    mem_limit: 512m
+    cpus: '1.0'
+    network_mode: none
+
+volumes:
+  cmdbox-python-sandbox:
+    driver: local
