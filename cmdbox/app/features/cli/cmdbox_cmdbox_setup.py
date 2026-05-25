@@ -59,6 +59,9 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
                 dict(opt="data", type=Options.T_DIR, default=self.default_data, required=False, multi=False, hide=False, choice=None, web="mask",
                      description_ja=f"省略した時は `$HOME/.{self.ver.__appid__}` を使用します。",
                      description_en=f"When omitted, `$HOME/.{self.ver.__appid__}` is used."),
+                dict(opt="chopt", type=Options.T_DICT, default=None, required=False, multi=True, hide=True, choice=None,
+                     description_ja="setup.ymlに記載しているコマンドのオプションを変更します。オプション名をキーに、変更後の値をバリューとする辞書を指定します。例: `--chopt host=redis`",
+                     description_en="Change the options for the commands specified in the YML file. Specify a dictionary where the option name is the key and the new value is the value. Example: `--chopt host=redis`"),
                 dict(opt="retry_count", type=Options.T_INT, default=20, required=False, multi=False, hide=True, choice=None,
                      description_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",
                      description_en="Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."),
@@ -115,17 +118,26 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
             # セットアップを順番に実行
             results = []
             app = self.appcls.getInstance()
+            def to_val(val):
+                if isinstance(val, bool):
+                    return val
+                if isinstance(val, str):
+                    ret = val.lower() == 'true'
+                    if ret: return True
+                return f"'{val}'"
             for i, setup in enumerate(setups):
                 name = setup.get('name', f'setup_{i}')
                 description = setup.get('description', '')
                 exec_conf = setup.get('exec', {})
+                chopt = {k:to_val(v) for k,v in args.chopt.items()} or {}
+                exec_conf.update(chopt)  # コマンドラインのオプション変更を反映
 
                 if not exec_conf:
                     logger.warning(f"Setup '{name}': No 'exec' configuration found. Skipping.")
                     results.append(dict(name=name, description=description, status='warn', result=dict(warn='No exec configuration found')))
                     has_warn = True
                     continue
-
+                
                 args_list = self._build_args_list(exec_conf)
                 logger.info(f"Setup '{name}': Executing: {' '.join(str(a) for a in args_list)}")
                 try:

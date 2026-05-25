@@ -97,9 +97,9 @@ class AuditBase(feature.ResultEdgeFeature):
                 try:
                     cursor.execute("SELECT count(*) FROM information_schema.tables WHERE table_name='audit'")
                     row = cursor.fetchone()
-                    if logger.level == logging.DEBUG:
-                        logger.debug(f"SQL query: SELECT count(*) FROM information_schema.tables WHERE table_name='audit'")
-                        logger.debug(f"SQL row  : {row}")
+                    #if logger.level == logging.DEBUG:
+                    #    logger.debug(f"SQL query: SELECT count(*) FROM information_schema.tables WHERE table_name='audit'")
+                    #    logger.debug(f"SQL row  : {row}")
                     if row[0] == 0:
                         # テーブルが存在しない場合は作成
                         cursor.execute('''
@@ -131,9 +131,9 @@ class AuditBase(feature.ResultEdgeFeature):
             try:
                 cursor.execute("SELECT COUNT(*) FROM sqlite_master WHERE TYPE='table' AND NAME='audit'")
                 row = cursor.fetchone()
-                if logger.level == logging.DEBUG:
-                    logger.debug(f"SQL query: SELECT COUNT(*) FROM sqlite_master WHERE TYPE='table' AND NAME='audit'")
-                    logger.debug(f"SQL row  : {row}")
+                #if logger.level == logging.DEBUG:
+                #    logger.debug(f"SQL query: SELECT COUNT(*) FROM sqlite_master WHERE TYPE='table' AND NAME='audit'")
+                #    logger.debug(f"SQL row  : {row}")
                 if row[0] == 0:
                     # テーブルが存在しない場合は作成
                     cursor.execute('''
