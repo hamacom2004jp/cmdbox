@@ -86,8 +86,8 @@ class AuditBase(feature.ResultEdgeFeature):
             Any: データベース接続オブジェクト
         """
         if pg_enabled:
-            if logger.level == logging.DEBUG:
-                logger.debug(f"Initializing database with pg_enabled={pg_enabled}, pg_host={pg_host}, pg_port={pg_port}, pg_user={pg_user}, pg_dbname={pg_dbname}")
+            #if logger.level == logging.DEBUG:
+            #    logger.debug(f"Initializing database with pg_enabled={pg_enabled}, pg_host={pg_host}, pg_port={pg_port}, pg_user={pg_user}, pg_dbname={pg_dbname}")
             constr = f"host={pg_host} port={pg_port} user={pg_user} password={pg_password} dbname={pg_dbname} connect_timeout=60"
             
             if AuditBase._pg_pool is None:
@@ -123,8 +123,8 @@ class AuditBase(feature.ResultEdgeFeature):
             return AuditBase._pg_pool
         else:
             db_path = data_dir / '.audit' / 'audit.db'
-            if logger.level == logging.DEBUG:
-                logger.debug(f"Initializing database with db_path={db_path}")
+            #if logger.level == logging.DEBUG:
+            #    logger.debug(f"Initializing database with db_path={db_path}")
             db_path.parent.mkdir(parents=True, exist_ok=True)
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()

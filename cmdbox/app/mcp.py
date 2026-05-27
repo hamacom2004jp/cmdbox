@@ -402,6 +402,7 @@ class ToolList(object):
             else:
                 params = {}
             func_txt = self._create_func_txt(func_name, mode, cmd, is_japan, options, title=opt['title'], params=params)
+            if func_txt is None: continue
             if self.logger.level == logging.DEBUG:
                 self.logger.debug(f"generating agent tool: {func_name}")
             func_ctx = []
@@ -519,7 +520,11 @@ class ToolList(object):
     def _create_func_txt(self, func_name:str, mode:str, cmd:str, is_japan:bool, options:Options, title:str='', params={}) -> str:
         description = options.get_cmd_attr(mode, cmd, 'description_ja' if is_japan else 'description_en')
         choices = options.get_cmd_choices(mode, cmd, False)
+        if len(choices) <= 1:
+            return None
         for o in choices:
+            if isinstance(o, str):
+                continue
             if o["opt"] in params:
                 o["default"] = params[o["opt"]]
         if "description" in params and params["description"]:

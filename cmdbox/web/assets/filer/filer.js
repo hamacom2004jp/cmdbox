@@ -250,7 +250,7 @@ fsapi.filer = (svpath, is_local) => {
     fsapi.tree(fsapi.left, "/", fsapi.left.find('.tree-menu'), true);
   } else {
     cmdbox.load_server_list(fsapi.right, (opt) => {
-      fsapi.tree(fsapi.right, "/", fsapi.right.find('.tree-menu'), false);
+      fsapi.tree(fsapi.right, svpath, fsapi.right.find('.tree-menu'), false);
     }, false, false);
     //fsapi.load_server_list();
   }
@@ -780,9 +780,9 @@ fsapi.editer = (svpath, data, mime, is_local) => {
     });
   }
 };
-fsapi.onload = () => {
+fsapi.onload = (svpath="/") => {
   cmdbox.get_server_opt(true, fsapi.right).then((opt) => {
-    fsapi.filer("/", false);
+    fsapi.filer(svpath, false);
   });
   hljs.addPlugin({
     'after:highlightElement': ({el, result}) => {
