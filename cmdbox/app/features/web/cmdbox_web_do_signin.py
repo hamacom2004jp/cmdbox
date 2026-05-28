@@ -13,6 +13,7 @@ import importlib
 import inspect
 import json
 import logging
+import re
 import urllib
 
 
@@ -25,6 +26,9 @@ class DoSignin(cmdbox_web_signin.Signin):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
+        @app.post('/dosignin/', response_class=HTMLResponse)
+        async def do_signin(req:Request, res:Response):
+            return await do_signin_token(None, '', req, res)
         @app.post('/dosignin/{next}', response_class=HTMLResponse)
         async def do_signin(next:str, req:Request, res:Response):
             return await do_signin_token(None, next, req, res)
@@ -104,6 +108,11 @@ class DoSignin(cmdbox_web_signin.Signin):
                     return RedirectResponse(url=f'/signin/{next}?error=1')
             group_names = list(set(web.signin.__class__.parent_group(signin_data, user['groups'])))
             group_homes = list(set(web.signin.__class__.group_home(signin_data, group_names)))
+            group_sps = list(set(web.signin.__class__.group_startpage(signin_data, group_names)))
+            if not group_sps or len([sp for sp in group_sps if sp]) <= 0:
+                group_sps = ['gui']
+            if not next or next == '':
+                next = group_sps[0]
             gids = [g['gid'] for g in signin_data['groups'] if g['name'] in group_names]
             email = user.get('email', '')
             # パスワード最終更新日時取得
@@ -124,13 +133,13 @@ class DoSignin(cmdbox_web_signin.Signin):
                     if datetime.datetime.now() > last_update + datetime.timedelta(days=notify):
                         # セッションに保存
                         _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None), home=user.get('home', None)),
-                                     email, passwd, None, group_names, group_homes, gids)
+                                     email, passwd, None, group_names, group_homes, group_sps, gids)
                         next = f"../{next}" if token_ok else next
                         web.options.audit_exec(req, res, web, body=dict(msg='Signin succeeded. However, you should change your password.'), audit_type='auth', user=name)
                         return RedirectResponse(url=f'../{next}?warn=passchange', headers=dict(signin="success"))
             # セッションに保存
             _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None), home=user.get('home', None)),
-                         email, passwd, None, group_names, group_homes, gids)
+                         email, passwd, None, group_names, group_homes, group_sps, gids)
             next = f"../{next}" if token_ok else next
             if notify_passchange:
                 web.options.audit_exec(req, res, web, body=dict(msg='Signin succeeded. However, you should change your password.'), audit_type='auth', user=name)
@@ -185,7 +194,8 @@ class DoSignin(cmdbox_web_signin.Signin):
                 sobj = _load_signin(web, signin_data['saml']['providers']['azure']['signin_module'], self.appcls, self.ver, self.language)
                 self.azure_saml_signin = sobj if sobj is not None else self.azure_saml_signin
 
-        def _set_session(req:Request, user:dict, email:str, hashed_password:str, access_token:str, group_names:list, group_homes:list, gids:list):
+        def _set_session(req:Request, user:dict, email:str, hashed_password:str, access_token:str,
+                         group_names:list, group_homes:list, group_sps:list, gids:list):
             """
             セッションに保存する
 
@@ -197,6 +207,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 access_token (str): アクセストークン
                 group_names (list): グループ名リスト
                 group_homes (list): グループホームリスト
+                group_sps (list): グループスタートページリスト
                 gids (list): グループIDリスト
             """
             # 最終サインイン日時更新
@@ -211,7 +222,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 web.user_data(None, user['uid'], user['name'], 'password', 'pass_miss_count', 0, delkey=True)
             # セッションに保存
             req.session['signin'] = dict(uid=user['uid'], name=user['name'], home=user['home'], password=hashed_password,
-                                         gids=gids, groups=group_names, group_homes=group_homes, email=email)
+                                         gids=gids, groups=group_names, group_homes=group_homes, group_sps=group_sps, email=email)
             #req.session['access_token'] = access_token # アクセストークンはセッションに保存しない。大きすぎてCookieに入らないため。
             req.session['apikeys'] = user.get('apikeys', None)
             # セッション変更を明示的にマーク（SessionMiddleware が認識するために重要）
@@ -227,7 +238,8 @@ class DoSignin(cmdbox_web_signin.Signin):
                 if not group_dir.exists():
                     group_dir.mkdir(parents=True, exist_ok=True)
             if web.logger.level == logging.DEBUG:
-                web.logger.debug(f'Set session, uid={user["uid"]}, name={user["name"]}, home={user["home"]}, email={email}, gids={gids}, groups={group_names}, group_homes={group_homes}')
+                web.logger.debug(f'Set session, uid={user["uid"]}, name={user["name"]}, home={user["home"]}, email={email}, gids={gids}, groups={group_names}, '
+                                 f'group_homes={group_homes}, group_sps={group_sps}')
             self.set_session(req, req.session['signin'])
 
         @app.get('/oauth2/google/callback')
@@ -289,8 +301,9 @@ class DoSignin(cmdbox_web_signin.Signin):
                 # グループ取得
                 group_names, gids = signin.get_groups(access_token, user)
                 group_homes = list(set(web.signin.__class__.group_home(signin_data, group_names)))
+                group_sps = list(set(web.signin.__class__.group_startpage(signin_data, group_names)))
                 # セッションに保存
-                _set_session(req, user, email, None, access_token, group_names, group_homes, gids)
+                _set_session(req, user, email, None, access_token, group_names, group_homes, group_sps, gids)
                 #return RedirectResponse(url=f'../../{next}', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス
                 html = """
                 <html><head><meta http-equiv="refresh" content="0;url=../../{next}"></head>
@@ -343,8 +356,9 @@ class DoSignin(cmdbox_web_signin.Signin):
                     # グループ取得
                     group_names, gids = saml_signin.get_groups(None, user)
                     group_homes = list(set(web.signin.__class__.group_home(signin_data, group_names)))
+                    group_sps = list(set(web.signin.__class__.group_startpage(signin_data, group_names)))
                     # セッションに保存
-                    _set_session(req, user, email, None, None, group_names, group_homes, gids)
+                    _set_session(req, user, email, None, None, group_names, group_homes, group_sps, gids)
                     # SAML場合、ブラウザ制限によりリダイレクトでセッションクッキーが消えるので、HTMLで移動する
                     html = """
                     <html><head><meta http-equiv="refresh" content="0;url=../../{next}"></head>

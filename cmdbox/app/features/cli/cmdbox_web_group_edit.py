@@ -47,6 +47,9 @@ class WebGroupEdit(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="group_parent", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="親グループ名を指定します。",
                      description_en="Specifies the parent group name."),
+                dict(opt="startpage", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja="グループの開始ページを指定します。",
+                     description_en="Specifies the start page for the group."),
                 dict(opt="signin_file", type=Options.T_FILE, default=f'.{self.ver.__appid__}/user_list.yml', required=True, multi=False, hide=False, choice=None, fileio="in", web="mask",
                      description_ja=f"サインイン可能なユーザーとパスワードを記載したファイルを指定します。通常 '.{self.ver.__appid__}/user_list.yml' を指定します。",
                      description_en=f"Specify a file containing users and passwords with which they can signin.Typically, specify '.{self.ver.__appid__}/user_list.yml'."),
@@ -72,7 +75,7 @@ class WebGroupEdit(feature.UnsupportEdgeFeature, validator.Validator):
             w = web.Web(logger, self.default_data, appcls=self.appcls, ver=self.ver,
                         redis_host=self.default_host, redis_port=self.default_port, redis_password=self.default_pass, svname=self.default_svname,
                         signin_file=args.signin_file)
-            group = dict(gid=args.group_id, name=args.group_name, parent=args.group_parent)
+            group = dict(gid=args.group_id, name=args.group_name, parent=args.group_parent, startpage=args.startpage)
             w.group_edit(group)
             msg = dict(success=f"group ID {args.group_id} has been edited.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

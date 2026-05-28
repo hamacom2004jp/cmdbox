@@ -372,12 +372,16 @@ class Signin(object):
             if group['name'] in gnames:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. Duplicate name found. ({signin_file}). name={group["name"]}')
             if 'parent' in group:
-                if group['parent'] not in groups:
+                if not group['parent']:
+                    del group['parent']
+                elif group['parent'] not in groups:
                     raise HTTPException(status_code=500, detail=f'signin_file format error. Parent group not found. ({signin_file}). parent={group["parent"]}')
             if 'home' not in group or group['home'] is None:
                 group['home'] = f'/.groups/{group["name"]}'
             if group['home'] != '/':
                 group['home'] = re.sub(r'^/+', '', group['home'])
+            if 'startpage' not in group or group['startpage'] is None:
+                group['startpage'] = None
             gids.add(group['gid'])
             gnames.add(group['name'])
         # cmdruleのフォーマットチェック
@@ -722,6 +726,20 @@ class Signin(object):
         for gn in group_names.copy():
             ghs += [gr['home'] for gr in signin_file_data['groups'] if 'home' in gr and gr['name']==gn]
         return ghs
+
+    @classmethod
+    def group_startpage(cls, signin_file_data:Dict[str, Any], group_names:List[str]) -> List[str]:
+        """
+        グループ名のスタートページを取得します
+
+        Args:
+            signin_file_data (Dict[str, Any]): サインインファイルデータ
+            group_names (List[str]): グループ名リスト
+        """
+        sps = []
+        for gn in group_names.copy():
+            sps += [re.sub('^/+', '', gr['startpage']) for gr in signin_file_data['groups'] if 'startpage' in gr and gr['name']==gn and gr['startpage']]
+        return sps
 
     def check_path(self, req:Request, path:str) -> Union[None, RedirectResponse]:
         """

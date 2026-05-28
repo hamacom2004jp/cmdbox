@@ -27,6 +27,10 @@ class Signin(feature.WebFeature):
                 with open(web.signin_html, 'r', encoding='utf-8') as f:
                     web.signin_html_data = f.read()
 
+        @app.api_route('/signin/', methods=['GET', 'POST'], response_class=HTMLResponse)
+        @app.api_route('/{full_path:path}/signin/', methods=['GET', 'POST'], response_class=HTMLResponse)
+        async def _signin(req:Request, res:Response, full_path:str=None):
+            return await _signin(None, req, res, full_path)
         @app.api_route('/signin/{next}', methods=['GET', 'POST'], response_class=HTMLResponse)
         @app.api_route('/{full_path:path}/signin/{next}', methods=['GET', 'POST'], response_class=HTMLResponse)
         async def _signin(next:str, req:Request, res:Response, full_path:str=None):
@@ -47,6 +51,9 @@ class Signin(feature.WebFeature):
                 return HTMLResponse(web.signin_html_data, headers=headers)
 
         # https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest
+        @app.get('/oauth2/google/')
+        async def oauth2_google(req:Request, res:Response):
+            return await oauth2_google('/', req, res)
         @app.get('/oauth2/google/{next}')
         async def oauth2_google(next:str, req:Request, res:Response):
             if web.signin is None or web.signin.signin_file_data is None:
@@ -62,6 +69,9 @@ class Signin(feature.WebFeature):
             return RedirectResponse(url=f'https://accounts.google.com/o/oauth2/auth?{query}')
 
         # https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes
+        @app.get('/oauth2/github/')
+        async def oauth2_github(req:Request, res:Response):
+            return await oauth2_github('/', req, res)
         @app.get('/oauth2/github/{next}')
         async def oauth2_github(next:str, req:Request, res:Response):
             if web.signin is None or web.signin.signin_file_data is None:
@@ -77,6 +87,9 @@ class Signin(feature.WebFeature):
             return RedirectResponse(url=f'https://github.com/login/oauth/authorize?{query}')
 
         # https://learn.microsoft.com/ja-jp/entra/identity-platform/v2-oauth2-auth-code-flow
+        @app.get('/oauth2/azure/')
+        async def oauth2_azure(req:Request, res:Response):
+            return await oauth2_azure('/', req, res)
         @app.get('/oauth2/azure/{next}')
         async def oauth2_azure(next:str, req:Request, res:Response):
             if web.signin is None or web.signin.signin_file_data is None:
@@ -101,6 +114,9 @@ class Signin(feature.WebFeature):
                         github=signin_data['oauth2']['providers']['github']['enabled'],
                         azure=signin_data['oauth2']['providers']['azure']['enabled'],)
 
+        @app.get('/saml/{prov}/')
+        async def saml_login(prov:str, req:Request, res:Response):
+            return await saml_login(prov, '/', req, res)
         @app.get('/saml/{prov}/{next}')
         async def saml_login(prov:str, next:str, req:Request, res:Response):
             """

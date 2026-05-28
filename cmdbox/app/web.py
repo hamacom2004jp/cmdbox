@@ -538,6 +538,8 @@ class Web:
                 raise ValueError(f"You cannot assign a built-in group to a user.")
         for u in signin_data['users']:
             if u['uid'] == user['uid']:
+                if 'buildin' in u and u['buildin']:
+                    raise ValueError(f"You cannot edit a built-in user.")
                 u['name'] = user['name']
                 if 'password' in user and user['password'] is not None and user['password'] != '':
                     jadge, msg = self.signin.check_password_policy(user['name'], u['password'], user['password'])
@@ -684,8 +686,13 @@ class Web:
                     raise ValueError(f"You cannot set a built-in group as a parent group.")
         for g in signin_data['groups']:
             if str(g['gid']) == str(group['gid']):
+                if 'buildin' in g and g['buildin']:
+                    raise ValueError(f"You cannot edit a built-in group.")
                 g['name'] = group['name']
-                g['parent'] = group['parent']
+                g['startpage'] = group['startpage'] if 'startpage' in group else None
+                g['parent'] = group['parent'] if 'parent' in group else None
+                if not g['parent']:
+                    del g['parent']
         if self.signin_file is None:
             raise ValueError(f"signin_file is None.")
         if self.logger.level == logging.DEBUG:

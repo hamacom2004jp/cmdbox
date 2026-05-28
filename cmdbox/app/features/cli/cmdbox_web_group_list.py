@@ -81,6 +81,7 @@ class WebGroupList(feature.UnsupportEdgeFeature, validator.Validator):
             name: Union[str, None] = pydantic.Field(default=None, description="名前")
             home: Union[str, None] = pydantic.Field(default=None, description="ホームディレクトリ")
             parent: Union[str, None] = pydantic.Field(default=None, description="親グループ")
+            startpage: Union[str, None] = pydantic.Field(default=None, description="開始ページ")
         class Data(resdata.Data):
             data: Union[List[GroupRecord], None] = pydantic.Field(default=None, description="処理結果のデータ")
         class Result(resdata.Result):

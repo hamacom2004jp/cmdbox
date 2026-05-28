@@ -122,62 +122,78 @@ users.users_list = async () => {
         modal.find('#cmd_add_apikey').off('click').on('click', async () => {
             const apikey_name = window.prompt('Please enter the apikey name.');
             if (!apikey_name) return;
+            cmdbox.show_loading();
             const res = await fetch('users/apikey/add', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({'name': row_content.find('[name="name"]').val(), 'apikey_name': apikey_name})
             });
             if (res.status != 200) {
+                cmdbox.hide_loading();
                 cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
                 return;
             }
+            cmdbox.hide_loading();
             cmdbox.message(await res.json(), true, true);
+            cmdbox.show_loading();
             users.users_list();
             users.groups_list();
+            cmdbox.hide_loading();
             modal.modal('hide');
         });
         // apikey削除実行
         modal.find('#cmd_del_apikey').off('click').on('click', async () => {
             const apikey_name = window.prompt('Please enter the apikey name.');
             if (!apikey_name) return;
+            cmdbox.show_loading();
             const res = await fetch('users/apikey/del', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({'name': row_content.find('[name="name"]').val(), 'apikey_name': apikey_name})
             });
             if (res.status != 200) {
+                cmdbox.hide_loading();
                 cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
                 return;
             }
+            cmdbox.hide_loading();
             cmdbox.message(await res.json(), true, true);
+            cmdbox.show_loading();
             users.users_list();
             users.groups_list();
+            cmdbox.hide_loading();
             modal.modal('hide');
         });
         // 削除実行
         modal.find('#cmd_del').off('click').on('click', async () => {
             if (!await cmdbox.confirm('Do you want to delete?', true)) return;
+            cmdbox.show_loading();
             const res = await fetch('users/del', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({'uid': user['uid']})
             });
             if (res.status != 200) {
+                cmdbox.hide_loading();
                 cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
                 return;
             }
             const ret = await res.json();
             if (!ret['success']) {
+                cmdbox.hide_loading();
                 cmdbox.message(ret, true, true);
                 return;
             }
+            cmdbox.show_loading();
             users.users_list();
             users.groups_list();
+            cmdbox.hide_loading();
             modal.modal('hide');
         });
         // 保存実行
         modal.find('#cmd_save').off('click').on('click', async () => {
             if (!await cmdbox.confirm('Do you want to save?', true)) return;
+            cmdbox.show_loading();
             const data = {};
             row_content.find('[name]').each((i, p) => {
                 const name = $(p).attr('name');
@@ -196,14 +212,19 @@ users.users_list = async () => {
                 body: JSON.stringify(data)
             });
             if (res.status != 200) {
+                cmdbox.hide_loading();
                 cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
                 return;
             }
             const ret = await res.json();
-            cmdbox.message(ret, true, true);
-            if (!ret['success']) return
+            if (!ret['success']) {
+                cmdbox.message(ret, true, true);
+                cmdbox.hide_loading();
+                return;
+            }
             users.users_list();
             users.groups_list();
+            cmdbox.hide_loading();
             modal.modal('hide');
         });
         !user ? modal.find('#cmd_add_apikey').hide() : modal.find('#cmd_add_apikey').show();
@@ -319,28 +340,35 @@ users.groups_list = async () => {
         // 削除実行
         modal.find('#cmd_del').off('click').on('click', async () => {
             if (!await cmdbox.confirm('Do you want to delete?', true)) return;
+            cmdbox.show_loading();
             const res = await fetch('groups/del', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({'gid': group['gid']})
             });
             if (res.status != 200) {
+                cmdbox.hide_loading();
                 cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
                 return;
             }
             const ret = await res.json();
             if (!ret['success']) {
+                cmdbox.hide_loading();
                 cmdbox.message(ret, true, true);
                 return;
             }
+            cmdbox.hide_loading();
             cmdbox.message(ret, true, true);
+            cmdbox.show_loading();
             users.users_list();
             users.groups_list();
+            cmdbox.hide_loading();
             modal.modal('hide');
         });
         // 保存実行
         modal.find('#cmd_save').off('click').on('click', async () => {
             if (!await cmdbox.confirm('Do you want to save?', true)) return;
+            cmdbox.show_loading();
             const data = {};
             row_content.find('[name]').each((i, p) => {
                 const name = $(p).attr('name');
@@ -353,12 +381,16 @@ users.groups_list = async () => {
                 body: JSON.stringify(data)
             });
             if (res.status != 200) {
+                cmdbox.hide_loading();
                 cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
                 return;
             }
+            cmdbox.hide_loading();
             cmdbox.message(await res.json(), true, true);
+            cmdbox.show_loading();
             users.users_list();
             users.groups_list();
+            cmdbox.hide_loading();
             modal.modal('hide');
         });
         modal.find('#cmd_add_apikey').hide();

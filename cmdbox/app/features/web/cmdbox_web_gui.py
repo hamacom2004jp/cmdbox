@@ -32,6 +32,13 @@ class Gui(feature.WebFeature):
 
         @app.get('/', response_class=HTMLResponse)
         async def index(req:Request, res:Response):
+            signin = web.signin.check_signin(req, res)
+            if signin is not None:
+                return signin
+            if 'signin' not in req.session:
+                return RedirectResponse(url='/signin/')
+            if 'group_sps' in req.session['signin'] and req.session['signin']['group_sps']:
+                return RedirectResponse(url=f'/{req.session["signin"]["group_sps"][0]}')
             return RedirectResponse(url='/gui')
 
         @app.get('/gui', response_class=HTMLResponse)
