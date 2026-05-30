@@ -103,7 +103,7 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
                     if not name.startswith('llm-') or not name.endswith('.json'):
                         continue
                     configure = common.load_file(p, lambda f: json.load(f), encoding='utf-8', nolock=False)
-                    priority = configure.get('priority', 0)
+                    priority = configure.get('llmpriority', 9999)
                     results.append(dict(name=name[4:-5], path=str(p), priority=priority if priority is not None else 9999))
 
             msg = dict(success=dict(data=sorted(results, key=lambda x: x.get('priority', 9999))))

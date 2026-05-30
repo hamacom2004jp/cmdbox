@@ -58,6 +58,9 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator):
                                       custom=["llmprojectid", "llmsvaccountfile", "llmlocation",
                                               "llmapikey", "llmapiversion", "llmendpoint", "llmmodel", "llmseed", "llmtemperature"]),
                      ),
+                dict(opt="llmtype", type=Options.T_STR, default="chat", required=False, multi=False, hide=False, choice=['chat', 'embedding'],
+                     description_ja="保存するLLM設定のタイプを指定します。",
+                     description_en="Specify the type of the LLM configuration to save."),
                 dict(opt="llmprojectid", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="llmのプロバイダ接続のためのプロジェクトIDを指定します。",
                      description_en="Specify the project ID for llm's provider connection."),
@@ -97,6 +100,7 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator):
         configure = dict(
             llmname=args.llmname,
             llmprov=args.llmprov,
+            llmtype=args.llmtype if hasattr(args, 'llmtype') and args.llmtype else 'chat',
             llmprojectid=args.llmprojectid if hasattr(args, 'llmprojectid') else None,
             llmsvaccountfile=args.llmsvaccountfile if hasattr(args, 'llmsvaccountfile') else None,
             llmlocation=args.llmlocation if hasattr(args, 'llmlocation') else None,

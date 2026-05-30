@@ -48,7 +48,14 @@ class LLMLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=True, choice=None,
                     description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                     description_en="Specify the maximum waiting time until the server responds."),
-                dict(opt="llmname", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                dict(opt="llmname", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
+                    callcmd="async () => {await cmdbox.callcmd('llm','list',{},(res)=>{"
+                            + "const val = $(\"[name='llmname']\").val();"
+                            + "$(\"[name='llmname']\").empty().append('<option></option>');"
+                            + "res['data'].map(elm=>{$(\"[name='llmname']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
+                            + "$(\"[name='llmname']\").val(val);"
+                            + "},$(\"[name='title']\").val(),'llmname');"
+                            + "}",
                     description_ja="読み込むLLM設定の名前を指定します。",
                     description_en="Specify the name of the LLM configuration to load."),
                 dict(opt="cache_timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=False, choice=None,
@@ -83,6 +90,7 @@ class LLMLoad(feature.OneshotResultEdgeFeature, validator.Validator):
     def output_schema(self) -> type:
         class Data(resdata.Data):
             llmname: Union[str, None] = pydantic.Field(default=None, description="LLM名")
+            llmtype: Union[str, None] = pydantic.Field(default=None, description="LLMタイプ")
             llmprov: Union[str, None] = pydantic.Field(default=None, description="LLMプロバイダ")
             llmprojectid: Union[str, None] = pydantic.Field(default=None, description="LLMプロジェクトID")
             llmsvaccountfile: Union[str, None] = pydantic.Field(default=None, description="LLMサービスアカウントファイル")

@@ -152,7 +152,7 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator):
                        msg_file_url=args.msg_file_url,
                        msg_file=args.msg_file,
                        msg_file_mime=args.msg_file_mime,
-                       msg_file_name=args.msg_file_name,
+                       msg_file_name=args.msg_file_name if hasattr(args, 'msg_file_name') else None,
                        )
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
@@ -246,8 +246,10 @@ class LLMChat(feature.OneshotResultEdgeFeature, validator.Validator):
         if not configure_path.exists():
             msg = dict(warn=f"Specified LLM configuration '{llmname}' not found on server at '{str(configure_path)}'.")
             return self.RESP_WARN, msg
-        with configure_path.open('r', encoding='utf-8') as f:
-            configure = json.load(f)
+        configure = common.load_file(configure_path, lambda x: json.load(x), mode='r', encoding='utf-8', nolock=True)
+        if 'llmtype' in configure and (configure['llmtype'] is None or configure['llmtype'] != 'chat'):
+            msg = dict(warn=f"LLM configuration '{llmname}' is not a chat type.")
+            return self.RESP_WARN, msg
 
         if msg_text_system:
             if msg_text_param:

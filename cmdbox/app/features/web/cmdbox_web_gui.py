@@ -67,6 +67,11 @@ class Gui(feature.WebFeature):
         async def appid(req:Request, res:Response):
             return self.ver.__appid__
 
+        @app.get('/signin/gui/title', response_class=PlainTextResponse)
+        @app.get('/gui/title', response_class=PlainTextResponse)
+        async def title(req:Request, res:Response):
+            return self.ver.__title__
+
         @app.get('/gui/version_info')
         async def version_info(req:Request, res:Response):
             return self.version_info

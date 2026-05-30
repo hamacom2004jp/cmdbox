@@ -203,6 +203,11 @@ fsapi.filer = (svpath, is_local) => {
     });
   };
   // 表示 ==============================================================
+  fsapi.right.find('.filer_address').off('keypress').on('keypress', (event) => {
+    if (event.which === 13) {
+        fsapi.tree(fsapi.right, fsapi.right.find('.filer_address').val(), fsapi.right.find('.tree-menu'), false);
+    }
+  });
   const target = is_local ? fsapi.left : fsapi.right;
   target.find('.filer_address').val(svpath);
   fsapi.right.find('.filer_address_bot').off('click').on('click', ()=>{

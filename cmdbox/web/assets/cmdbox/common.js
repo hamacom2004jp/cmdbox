@@ -10,9 +10,12 @@ cmdbox.change_dark_mode = (dark_mode) => {
     else html.attr('data-bs-theme','dark');
     $('body').css('background-color', '');
 };
-cmdbox.change_color_mode = (color_mode) => {
+cmdbox.change_color_mode = async (color_mode=undefined, nosignin=false) => {
     const html = $('html');
     const select_elem = $('.change_color_mode');
+    select_elem.off('change').on('change', (event) => {
+        cmdbox.change_color_mode($(event.target).val());
+    });
     select_elem.html('');
     select_elem.append('<option value="dark" selected>Dark</option>');
     select_elem.append('<option value="midnight">Midnight</option>');
@@ -24,18 +27,20 @@ cmdbox.change_color_mode = (color_mode) => {
     select_elem.append('<option value="spaceship">Spaceship</option>');
     select_elem.append('<option value="sakura">Sakura</option>');
     select_elem.append('<option value="hydrangea">Hydrangea</option>');
-    color_mode = !color_mode ? localStorage.getItem('color_mode') : color_mode;
-    if(color_mode == 'light') html.attr('data-bs-theme','light');
-    else if(color_mode == 'midnight') html.attr('data-bs-theme','midnight');
-    else if(color_mode == 'deepsea') html.attr('data-bs-theme','deepsea');
-    else if(color_mode == 'verdant') html.attr('data-bs-theme','verdant');
-    else if(color_mode == 'bumblebee') html.attr('data-bs-theme','bumblebee');
-    else if(color_mode == 'crimson') html.attr('data-bs-theme','crimson');
-    else if(color_mode == 'spaceship') html.attr('data-bs-theme','spaceship');
-    else if(color_mode == 'sakura') html.attr('data-bs-theme','sakura');
-    else if(color_mode == 'hydrangea') html.attr('data-bs-theme','hydrangea');
-    else html.attr('data-bs-theme','dark');
-    localStorage.setItem('color_mode', color_mode);
+    // color_mode = !color_mode ? localStorage.getItem('color_mode') : color_mode;
+    if (!color_mode) {
+        if (!nosignin) {
+            const res = await cmdbox.load_user_data('color_mode', 'color_mode');
+            if (res && res.success) color_mode = res.success;
+        }
+        else {
+            color_mode = localStorage.getItem('color_mode');
+        }
+    }
+    color_mode = color_mode || 'dark';
+    html.attr('data-bs-theme', color_mode);
+    if (!nosignin) await cmdbox.save_user_data('color_mode', 'color_mode', color_mode);
+    else localStorage.setItem('color_mode', color_mode);
     if (color_mode) {
         const elem = $('.change_color_mode');
         elem.val(color_mode);
@@ -246,13 +251,19 @@ cmdbox.versions = async () => {
  * @param {string} sel - セレクタ
  */
 cmdbox.appid = async (sel) => {
-    const res = await fetch(`${cmdbox.ctx_path()}gui/appid`, {method: 'GET'});
-    if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
-    const appid = await res.text()
-    $(sel).text(appid);
-    const head = $('head');
-    head.append(`<title>${appid}</title>`);
-    head.append(`<link rel="icon" type="image/x-icon" href="assets/${appid}/favicon.ico">`);
+    {
+        const res = await fetch(`${cmdbox.ctx_path()}gui/title`, {method: 'GET'});
+        if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
+        const title = await res.text()
+        $(sel).text(title);
+    }{
+        const res = await fetch(`${cmdbox.ctx_path()}gui/appid`, {method: 'GET'});
+        if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
+        const appid = await res.text()
+        const head = $('head');
+        head.append(`<title>${appid}</title>`);
+        head.append(`<link rel="icon" type="image/x-icon" href="assets/${appid}/favicon.ico">`);
+    }
 };
 /**
  * 指定のセレクタの前要素にロゴアイコンを設定
@@ -260,7 +271,7 @@ cmdbox.appid = async (sel) => {
  * @param {string} sel - セレクタ
  **/
 cmdbox.set_logoicon = async (sel) => {
-    const res = await fetch('gui/version_info', {method: 'GET'});
+    const res = await fetch(`${cmdbox.ctx_path()}gui/version_info`, {method: 'GET'});
     if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
     const verinfos = await res.json();
     for (const v of verinfos) {
@@ -592,7 +603,7 @@ $(()=>{
             }
             if (!user_info_menu.find('.dropdown-menu .changecolor-menu-item').length) {
                 const changecolor_item = $(`<li><span class="dropdown-item changecolor-menu-item"><span class="i18n">Change Color : </span>`
-                    + `<select class="d-inline-block change_color_mode" onchange="cmdbox.change_color_mode($(this).val());"></select>`
+                    + `<select class="d-inline-block change_color_mode"></select>`
                     + `</span></li>`);
                 user_info_menu.find('.dropdown-menu').append(changecolor_item);
                 // カラーモード対応
@@ -731,7 +742,7 @@ cmdbox.init_modal_button = () => {
     $('.btn_window_stack').css('margin-left', '0px').hide();
     $('.btn_window').css('margin-left', 'auto').show();
     $('.bbforce').off('click').on('click', async () => {
-        await bbforce_cmd();
+        await cmdbox.bbforce_cmd();
         cmdbox.hide_loading();
     });
     // F5 and Ctrl+R 無効化
@@ -742,6 +753,15 @@ cmdbox.init_modal_button = () => {
             return false;
         }
     });
+};
+cmdbox.bbforce_cmd = async () => {
+    try {
+        const res = await fetch('bbforce_cmd', {method: 'GET'});
+        return await res.json();
+    } catch (e) {
+        console.warn(e);
+        return {'warn': e.toString()};
+    }
 };
 /**
  * ファイルサイズ表記を取得する

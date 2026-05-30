@@ -1,6 +1,8 @@
 $(() => {
     // カラーモード対応
-    cmdbox.change_color_mode();
+    cmdbox.change_color_mode(undefined, true);
+    // appidを表示
+    cmdbox.appid('.signin_title');
 
     $('.theme-item').off('click').on('click', (event) => {
         $('.theme-item').removeClass('active');
@@ -92,10 +94,6 @@ $(() => {
 const get_client_data = async () => {
     const res = await fetch('gui/get_client_data', {method: 'GET'});
     return await res.text();
-}
-const bbforce_cmd = async () => {
-    const res = await fetch('bbforce_cmd', {method: 'GET'});
-    return await res.json();
 }
 const oauth2_enabled = async () => {
     const res = await fetch(`${ctx_path()}oauth2/enabled`, {method: 'GET'});

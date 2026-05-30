@@ -72,7 +72,3 @@ const get_client_data = async () => {
     const res = await fetch('gui/get_client_data', {method: 'GET'});
     return await res.text();
 }
-const bbforce_cmd = async () => {
-    const res = await fetch('bbforce_cmd', {method: 'GET'});
-    return await res.json();
-}

@@ -8,7 +8,7 @@ fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_di
     filer_modal.find('.tree-menu').css('height', 'calc(100vh - 180px)');
     filer_modal.find('.file-list').css('height', 'calc(100vh - 180px)');
     //filer_modal.find('.tree-menu').resizable({ghost:true});
-    filer_modal.find('.filer_address_bot').off('click').on('click', async () => {
+    const filer_address_bot_click = async () => {
         const c_path = filer_modal.find('.filer_address').val();
         if (!c_path) return;
         const key = c_path.replace(/[\s\:\\\/\,\.\#\$\%\^\&\!\@\*\(\)\{\}\[\]\'\"\`]/g, `_`);
@@ -18,6 +18,13 @@ fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_di
             return;
         }*/
         await reload_tree(target_id, filer_modal.find('.tree-menu'), c_path, filer_modal.find('.file-list'));
+    };
+    filer_modal.find('.filer_address_bot').off('click').on('click', filer_address_bot_click);
+    filer_modal.find('.filer_address').off('keypress').on('keypress', async (e) => {
+        if (e.which === 13) {
+            e.preventDefault();
+            await filer_address_bot_click();
+        }
     });
 
     const reload_tree = async (target_id, current_node, current_path, file_list_elem, is_current) => {

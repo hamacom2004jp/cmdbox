@@ -1,6 +1,6 @@
 agentView.get_llm_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('llm', 'save');
-    const vform_names = ['llmname', 'llmprov', 'llmapikey', 'llmendpoint', 'llmmodel', 'llmapiversion',
+    const vform_names = ['llmname', 'llmprov', 'llmtype', 'llmapikey', 'llmendpoint', 'llmmodel', 'llmapiversion',
                         'llmprojectid', 'llmsvaccountfile', 'llmlocation', 'llmtemperature', 'llmseed', 'llmpriority'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
