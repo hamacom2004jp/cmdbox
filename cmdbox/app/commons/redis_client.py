@@ -36,7 +36,7 @@ class RedisClient(object):
         """
         Redisに接続します。
         """
-        return redis.Redis(host=self.host, port=self.port, db=0, password=self.password)
+        return redis.Redis(host=self.host, port=self.port, db=0, password=self.password, protocol=2)
     
     def close(self):
         if self.redis_cli is not None:

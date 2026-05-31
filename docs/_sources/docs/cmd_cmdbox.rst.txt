@@ -614,7 +614,7 @@ cmdbox ( server_install ) : ``cmdbox -m cmdbox -c server_install <Option>``
 
     "Option","Type","Multi","Required","Default","Choices","Description"
     "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HONE/.cmdbox` is used."
-    "--install_cmdbox <install_cmdbox>","str","","","cmdbox==0.7.12.1","","When omitted, `cmdbox==0.7.12.1` is used."
+    "--install_cmdbox <install_cmdbox>","str","","","cmdbox==0.7.14","","When omitted, `cmdbox==0.7.14` is used."
     "--install_from <install_from>","str","","","","","Specify the FROM image that will be the source of the docker image to be created."
     "--install_no_python <install_no_python>","bool","","","False","True | False","Do not install python."
     "--install_compile_python <install_compile_python>","bool","","","False","True | False","Compile and install python3; if install_no_python is specified, it is preferred."
@@ -735,6 +735,7 @@ cmdbox ( setup ) : ``cmdbox -m cmdbox -c setup <Option>``
     "--port <port>","int","","required","6379","","Specify the service port of the Redis server."
     "--password <password>","passwd","","required","password","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
     "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HOME/.cmdbox` is used."
+    "--chopt <chopt>","dict","multi","","","","Change the options for the commands specified in the YML file. Specify a dictionary where the option name is the key and the new value is the value. Example: `--chopt host=redis`"
     "--retry_count <retry_count>","int","","","20","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--setup_file <setup_file>","file","","required",".cmdbox_initdata/setup.yml","","Specify the path to the setup file. Default is `.cmdbox_initdata/setup.yml`."

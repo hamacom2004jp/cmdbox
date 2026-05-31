@@ -109,7 +109,7 @@ class McpsvStart(feature.UnsupportEdgeFeature, validator.Validator):
                                        signin_file=args.signin_file)
 
             from fastmcp import FastMCP
-            sign = signin.Signin(logger, signin_file, signin_data, _web.redis_cli, self.appcls, self.ver, self.language)
+            sign = signin.getDefaultInstance(logger, signin_file, signin_data, _web.redis_cli, self.appcls, self.ver, self.language)
             self.mcp = mcp_mod.Mcp(logger, Path(args.data), sign, self.appcls, self.ver, self.language)
             fastmcp:FastMCP = self.mcp.create_mcpserver(logger, args, self.mcp.create_tools(logger, args, False))
 

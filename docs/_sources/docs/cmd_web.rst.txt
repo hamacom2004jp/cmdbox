@@ -242,6 +242,7 @@ web ( group_add ) : ``cmdbox -m web -c group_add <Option>``
     "--group_name <group_name>","str","","required","","","Specify a group name. Do not duplicate other groups."
     "--group_home <group_home>","str","","required","","","Specify the home directory for the group."
     "--group_parent <group_parent>","str","","","","","Specifies the parent group name."
+    "--startpage <startpage>","str","","","","","Specifies the start page for the group."
     "--signin_file <signin_file>","file","","required",".cmdbox/user_list.yml","","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
 
 **Output Schema**
@@ -346,6 +347,7 @@ web ( group_edit ) : ``cmdbox -m web -c group_edit <Option>``
     "--group_id <group_id>","str","","required","","","Specify the group ID. Do not duplicate other groups."
     "--group_name <group_name>","str","","required","","","Specify a group name. Do not duplicate other groups."
     "--group_parent <group_parent>","str","","","","","Specifies the parent group name."
+    "--startpage <startpage>","str","","","","","Specifies the start page for the group."
     "--signin_file <signin_file>","file","","required",".cmdbox/user_list.yml","","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
 
 **Output Schema**
@@ -418,7 +420,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
             "gid": "string",
             "name": "string",
             "home": "string",
-            "parent": "string"
+            "parent": "string",
+            "startpage": "string"
           }
         ]
       },
@@ -481,6 +484,7 @@ web ( start ) : ``cmdbox -m web -c start <Option>``
     "--result_html <result_html>","file","","","","","Specify `result.html`. If omitted, the cmdbox built-in HTML file is used."
     "--users_html <users_html>","file","","","","","Specify `users.html`. If omitted, the cmdbox built-in HTML file is used."
     "--agent_html <agent_html>","file","","","","","Specify `agent.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--audit_html <audit_html>","file","","","","","Specify `audit.html`. If omitted, the cmdbox built-in HTML file is used."
     "--assets <assets>","file","multi","","","","Specify the asset file required when using html files."
     "--signin_html <signin_html>","file","","","","","Specify `signin.html`. If omitted, the cmdbox built-in HTML file is used."
 

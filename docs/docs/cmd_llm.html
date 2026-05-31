@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( llm mode ) &mdash; cmdbox 2026/05/24 documentation</title>
+  <title>Command Reference ( llm mode ) &mdash; cmdbox 2026/05/31 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=4899684a"></script>
+      <script src="../_static/documentation_options.js?v=745f26b0"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -63,6 +63,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">LLM</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#llm-chat-cmdbox-m-llm-c-chat-option">llm ( chat ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">chat</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#llm-del-cmdbox-m-llm-c-del-option">llm ( del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">del</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#llm-embed-cmdbox-m-llm-c-embed-option">llm ( embed ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">embed</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#llm-list-cmdbox-m-llm-c-list-option">llm ( list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#llm-load-cmdbox-m-llm-c-load-option">llm ( load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">load</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#llm-save-cmdbox-m-llm-c-save-option">llm ( save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">save</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
@@ -604,6 +605,199 @@
 </tbody>
 </table>
 </section>
+<section id="llm-embed-cmdbox-m-llm-c-embed-option">
+<h2>llm ( embed ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">embed</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#llm-embed-cmdbox-m-llm-c-embed-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Request text embedding from the LLM.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>600</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--llmname &lt;llmname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td></td>
+<td></td>
+<td><p>Specify the name of the LLM configuration to load.</p></td>
+</tr>
+<tr class="row-even"><td><p>--input_text &lt;input_text&gt;</p></td>
+<td><p>text</p></td>
+<td><p>multi</p></td>
+<td><p>required</p></td>
+<td></td>
+<td></td>
+<td><p>Specify the text to embed. Multiple values can be specified.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>any | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>output_schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="llm-list-cmdbox-m-llm-c-list-option">
 <h2>llm ( list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">list</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#llm-list-cmdbox-m-llm-c-list-option" title="Link to this heading"></a></h2>
 <ul class="simple">
@@ -924,6 +1118,7 @@
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
 <span class="w">    </span><span class="nt">&quot;llmname&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;llmtype&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;llmprov&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;llmprojectid&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;llmsvaccountfile&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -979,109 +1174,115 @@
 <td><p>null</p></td>
 <td><p>LLM名</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.llmprov</p></td>
+<tr class="row-odd"><td><p>success.llmtype</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>LLMタイプ</p></td>
+</tr>
+<tr class="row-even"><td><p>success.llmprov</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>LLMプロバイダ</p></td>
 </tr>
-<tr class="row-even"><td><p>success.llmprojectid</p></td>
+<tr class="row-odd"><td><p>success.llmprojectid</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>LLMプロジェクトID</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.llmsvaccountfile</p></td>
+<tr class="row-even"><td><p>success.llmsvaccountfile</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>LLMサービスアカウントファイル</p></td>
 </tr>
-<tr class="row-even"><td><p>success.llmlocation</p></td>
+<tr class="row-odd"><td><p>success.llmlocation</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>LLMロケーション</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.llmapikey</p></td>
+<tr class="row-even"><td><p>success.llmapikey</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>LLM APIキー</p></td>
 </tr>
-<tr class="row-even"><td><p>success.llmapiversion</p></td>
+<tr class="row-odd"><td><p>success.llmapiversion</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>LLM APIバージョン</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.llmendpoint</p></td>
+<tr class="row-even"><td><p>success.llmendpoint</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>LLMエンドポイント</p></td>
 </tr>
-<tr class="row-even"><td><p>success.llmmodel</p></td>
+<tr class="row-odd"><td><p>success.llmmodel</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>LLMモデル名</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.llmseed</p></td>
+<tr class="row-even"><td><p>success.llmseed</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>LLMシード値</p></td>
 </tr>
-<tr class="row-even"><td><p>success.llmtemperature</p></td>
+<tr class="row-odd"><td><p>success.llmtemperature</p></td>
 <td><p>float | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>LLM温度パラメータ</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.llmsvaccountfile_data</p></td>
+<tr class="row-even"><td><p>success.llmsvaccountfile_data</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>LLMサービスアカウントファイルデータ</p></td>
 </tr>
-<tr class="row-even"><td><p>success.llmpriority</p></td>
+<tr class="row-odd"><td><p>success.llmpriority</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>LLM優先度</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn</p></td>
+<tr class="row-even"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>warn.performance</p></td>
+<tr class="row-odd"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>error</p></td>
+<tr class="row-even"><td><p>error</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>error.performance</p></td>
+<tr class="row-odd"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>output_schema</p></td>
+<tr class="row-even"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-even"><td><p>end</p></td>
+<tr class="row-odd"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -1187,13 +1388,21 @@
 <td></td>
 <td><blockquote>
 <div><div class="line-block">
-<div class="line">azureopenai | openai | vertexai | ollama</div>
+<div class="line">azureopenai | openai | vertexai | ollama | custom</div>
 </div>
 </div></blockquote>
 </td>
 <td><p>Specify llm provider.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--llmprojectid &lt;llmprojectid&gt;</p></td>
+<tr class="row-odd"><td><p>--llmtype &lt;llmtype&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td><p>chat</p></td>
+<td><p>chat | embedding</p></td>
+<td><p>Specify the type of the LLM configuration to save.</p></td>
+</tr>
+<tr class="row-even"><td><p>--llmprojectid &lt;llmprojectid&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -1201,7 +1410,7 @@
 <td></td>
 <td><p>Specify the project ID for llm's provider connection.</p></td>
 </tr>
-<tr class="row-even"><td><p>--llmsvaccountfile &lt;llmsvaccountfile&gt;</p></td>
+<tr class="row-odd"><td><p>--llmsvaccountfile &lt;llmsvaccountfile&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -1209,7 +1418,7 @@
 <td></td>
 <td><p>Specifies the service account file for llm's provider connection.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--llmlocation &lt;llmlocation&gt;</p></td>
+<tr class="row-even"><td><p>--llmlocation &lt;llmlocation&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -1217,7 +1426,7 @@
 <td></td>
 <td><p>Specifies the location for llm provider connections.</p></td>
 </tr>
-<tr class="row-even"><td><p>--llmapikey &lt;llmapikey&gt;</p></td>
+<tr class="row-odd"><td><p>--llmapikey &lt;llmapikey&gt;</p></td>
 <td><p>passwd</p></td>
 <td></td>
 <td></td>
@@ -1225,7 +1434,7 @@
 <td></td>
 <td><p>Specify API key for llm provider connection.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--llmapiversion &lt;llmapiversion&gt;</p></td>
+<tr class="row-even"><td><p>--llmapiversion &lt;llmapiversion&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -1233,7 +1442,7 @@
 <td></td>
 <td><p>Specifies the API version for llm provider connections.</p></td>
 </tr>
-<tr class="row-even"><td><p>--llmendpoint &lt;llmendpoint&gt;</p></td>
+<tr class="row-odd"><td><p>--llmendpoint &lt;llmendpoint&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -1241,7 +1450,7 @@
 <td></td>
 <td><p>Specifies the endpoint for llm provider connections.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--llmmodel &lt;llmmodel&gt;</p></td>
+<tr class="row-even"><td><p>--llmmodel &lt;llmmodel&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -1249,7 +1458,7 @@
 <td></td>
 <td><p>Specifies the llm model.</p></td>
 </tr>
-<tr class="row-even"><td><p>--llmseed &lt;llmseed&gt;</p></td>
+<tr class="row-odd"><td><p>--llmseed &lt;llmseed&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1257,7 +1466,7 @@
 <td></td>
 <td><p>Specifies the seed value when using llm model.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--llmtemperature &lt;llmtemperature&gt;</p></td>
+<tr class="row-even"><td><p>--llmtemperature &lt;llmtemperature&gt;</p></td>
 <td><p>float</p></td>
 <td></td>
 <td></td>
@@ -1265,7 +1474,7 @@
 <td></td>
 <td><p>Specifies the temperature when using llm model.</p></td>
 </tr>
-<tr class="row-even"><td><p>--llmpriority &lt;llmpriority&gt;</p></td>
+<tr class="row-odd"><td><p>--llmpriority &lt;llmpriority&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td><p>required</p></td>

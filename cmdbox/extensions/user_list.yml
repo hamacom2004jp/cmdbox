@@ -253,6 +253,9 @@ apikey:
     issuer: identity_provider       # Specify the issuer of the JWT. This is usually the name of the identity provider. (If not specified, no verification)
     audience: app_organization      # Specify the audience of the JWT. This is usually the name of the organization that will use the application. (If not specified, no verification)
     algorithm: RS256                # Specify the algorithm used to verify the JWT. The value can be RS256, PS256, or ES256.
+signin:                             # Sign-in settings.
+  signin_module:                    # Specify the module name that implements the sign-in for the authentication provider.
+    cmdbox.app.auth.signin
 oauth2:                             # OAuth2 settings.
   providers:                        # This is a per-provider setting for OAuth2.
     google:                         # Google's OAuth2 configuration.

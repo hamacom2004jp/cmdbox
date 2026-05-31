@@ -635,6 +635,8 @@ $(()=>{
             if (params.get('error') == 'apikeyfail') msgelem.text('Authentication failed due to incorrect apikey.');
             if (params.get('error') == 'unauthorizedsite') msgelem.text('Access to an unauthorized site.');
             if (params.get('error') == 'lockout') msgelem.text('The account is locked.');
+            if (params.get('error') == 'notfound') msgelem.text('The account is not found.');
+            if (params.get('error') == 'invalid') msgelem.text('The account is invalid.');
             if (params.get('warn') == 'passchange') msgelem.text('Your password has not been changed or is about to expire. Please change your password.');
             $('<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>').appendTo(elem);
             $('body').prepend(elem);

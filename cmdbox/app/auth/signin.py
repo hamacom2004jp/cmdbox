@@ -10,14 +10,42 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import copy
 import contextvars
+import importlib
+import inspect
 import logging
 import json
 import jwt
 import re
 import string
 
+def getDefaultInstance(logger:logging.Logger, signin_file:Path, signin_file_data:Dict[str, Any],
+                       redis_cli:redis_client.RedisClient, appcls, ver, language:str):
+    if not signin_file_data or 'signin' not in signin_file_data or \
+        'signin_module' not in signin_file_data['signin'] or not signin_file_data['signin']['signin_module']:
+        raise ValueError("Invalid signin_file_data.")
+    signin_module = signin_file_data['signin']['signin_module']
+
+    try:
+        mod = importlib.import_module(signin_module)
+        members = inspect.getmembers(mod, inspect.isclass)
+        for name, cls in members:
+            if cls is Signin or issubclass(cls, Signin):
+                sobj = cls.getInstance(logger, signin_file, signin_file_data, redis_cli, appcls, ver, language)
+                return sobj
+        return None
+    except Exception as e:
+        logger.error(f'Failed to load signin. {e}', exc_info=True)
+        raise e
 
 class Signin(object):
+
+    @classmethod
+    def getInstance(cls, logger:logging.Logger, signin_file:Path, signin_file_data:Dict[str, Any],
+                    redis_cli:redis_client.RedisClient, appcls, ver, language:str):
+        if hasattr(cls, '_instance') and cls._instance is not None:
+            return cls._instance
+        cls._instance = cls(logger, signin_file, signin_file_data, redis_cli, appcls, ver, language)
+        return cls._instance
 
     def __init__(self, logger:logging.Logger, signin_file:Path, signin_file_data:Dict[str, Any],
                  redis_cli:redis_client.RedisClient, appcls, ver, language:str):
@@ -129,10 +157,9 @@ class Signin(object):
             return None
         #if 'signin' in req.session:
         #    signin_file_data = Signin.load_signin_file(self.signin_file, signin_file_data, self=self) # サインインファイルの更新をチェック
-        return Signin._check_signin(req, res, data, self.logger)
-    
-    @classmethod
-    def _check_signin(cls, req:Request, res:Response, signin_file_data:Dict[str, Any], logger:logging.Logger) -> Union[None, RedirectResponse]:
+        return self._check_signin(req, res, data, self.logger)
+
+    def _check_signin(self, req:Request, res:Response, signin_file_data:Dict[str, Any], logger:logging.Logger) -> Union[None, RedirectResponse]:
         """
         サインインをチェックする
 
@@ -163,28 +190,14 @@ class Signin(object):
             return None
         if logger.level == logging.DEBUG:
             logger.debug(f"Not found siginin session. Try check_apikey. path={req.url.path}")
-        ret = Signin._check_apikey(req, res, signin_file_data, logger)
+        ret = self._check_authheader(req, res, signin_file_data, logger)
         if ret is not None and logger.level == logging.DEBUG:
             logger.debug(f"Not signed in.")
         return ret
 
-    def check_apikey(self, req:Request, res:Response) -> Union[None, RedirectResponse]:
+    def _check_authheader(self, req:Request, res:Response, signin_file_data:Dict[str, Any], logger:logging.Logger) -> Union[None, RedirectResponse]:
         """
-        ApiKeyをチェックする
-
-        Args:
-            req (Request): リクエスト
-            res (Response): レスポンス
-
-        Returns:
-             Union[None, RedirectResponse]: サインインエラーの場合はリダイレクトレスポンス
-        """
-        return Signin._check_apikey(req, res, self.signin_file_data, self.logger)
-
-    @classmethod
-    def _check_apikey(cls, req:Request, res:Response, signin_file_data:Dict[str, Any], logger:logging.Logger) -> Union[None, RedirectResponse]:
-        """
-        ApiKeyをチェックする
+        認証ヘッダーをチェックする
 
         Args:
             req (Request): リクエスト
@@ -200,15 +213,11 @@ class Signin(object):
             res.headers['signin'] = 'success'
             return None
         if 'Authorization' not in req.headers:
-            #self.logger.warning(f"Authorization not found. headers={req.headers}")
             return RedirectResponse(url=f'/signin{req.url.path}?error=noauth')
         auth = req.headers['Authorization']
         if not auth.startswith('Bearer '):
-            #self.logger.warning(f"Bearer not found. headers={req.headers}")
             return RedirectResponse(url=f'/signin{req.url.path}?error=apikeyfail')
         apikey = auth.replace('Bearer ', '').strip()
-        #if logger.level == logging.DEBUG:
-        #    logger.debug(f"received apikey: {apikey}")
         find_user = None
         jwt_enabled = signin_file_data['apikey']['verify_jwt']['enabled']
         for user in signin_file_data['users']:
@@ -218,10 +227,10 @@ class Signin(object):
                 if apikey == key:
                     if jwt_enabled:
                         publickey = None
-                        if hasattr(cls, 'verify_jwt_certificate') and cls.verify_jwt_certificate is not None:
-                            publickey = cls.verify_jwt_certificate.public_key()
-                        if hasattr(cls, 'verify_jwt_publickey') and cls.verify_jwt_publickey is not None:
-                            publickey = cls.verify_jwt_publickey
+                        if hasattr(self, 'verify_jwt_certificate') and self.verify_jwt_certificate is not None:
+                            publickey = self.verify_jwt_certificate.public_key()
+                        if hasattr(self, 'verify_jwt_publickey') and self.verify_jwt_publickey is not None:
+                            publickey = self.verify_jwt_publickey
                         algorithm = signin_file_data['apikey']['verify_jwt']['algorithm']
                         issuer = signin_file_data['apikey']['verify_jwt']['issuer']
                         audience = signin_file_data['apikey']['verify_jwt']['audience']
@@ -244,11 +253,28 @@ class Signin(object):
 
         group_names = list(set(Signin.parent_group(signin_file_data, find_user['groups'])))
         gids = [g['gid'] for g in signin_file_data['groups'] if g['name'] in group_names]
+        group_homes = [g["home"] for g in signin_file_data['groups'] if g['name'] in group_names]
         req.session['signin'] = dict(uid=find_user['uid'], name=find_user['name'], password=find_user['password'],
-                                     gids=gids, groups=group_names, apikey=apikey)
+                                     gids=gids, groups=group_names, group_homes=group_homes, apikey=apikey)
         req.session['apikeys'] = find_user.get('apikeys', None)
         if logger.level == logging.DEBUG:
             logger.debug(f"find user: name={find_user['name']}, group_names={group_names}")
+        # パスルールチェック
+        return Signin._check_path(req, res, find_user, signin_file_data, logger)
+
+    def _check_path(self, req:Request, res:Response, find_user:Dict[str, Any], signin_file_data:Dict[str, Any], logger:logging.Logger) -> Union[None, RedirectResponse]:
+        """
+        パスルールをチェックする
+
+        Args:
+            req (Request): リクエスト
+            res (Response): レスポンス
+            find_user (Dict[str, Any]): ユーザーデータ
+            signin_file_data (Dict[str, Any]): サインインファイルデータ（変更不可）
+            logger (logging.Logger): ロガー
+        Returns:
+            Union[None, RedirectResponse]: サインインエラーの場合はリダイレクトレスポンス
+        """
         # パスルールチェック
         user_groups = find_user['groups']
         jadge = signin_file_data['pathrule']['policy']
@@ -592,6 +618,14 @@ class Signin(object):
             if 'algorithm' not in yml['apikey']['verify_jwt']:
                 raise HTTPException(status_code=500, detail=f'signin_file format error. "algorithm" not found in "apikey.verify_jwt". ({signin_file})')
             cls.verify_jwt_algorithm = yml['apikey']['verify_jwt']['algorithm']
+        # signinのフォーマットチェック
+        if 'signin' in yml:
+            if 'signin_module' not in yml['signin']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "signin_module" not found in "signin". ({signin_file})')
+            if not yml['signin']['signin_module']:
+                raise HTTPException(status_code=500, detail=f'signin_file format error. "signin_module" is empty in "signin". ({signin_file})')
+        else:
+            yml['signin'] = dict(signin_module=cls.__module__)
         # oauth2のフォーマットチェック
         if 'oauth2' not in yml:
             raise HTTPException(status_code=500, detail=f'signin_file format error. "oauth2" not found. ({signin_file})')
@@ -1099,7 +1133,7 @@ def get_request_scope() -> Dict[str, Any]:
     scope['res']  # Responseオブジェクト
     scope['session']  # sessionを表す辞書
     scope['websocket']  # WebSocket接続
-    scope['logger']  # loggerオブジェクト
+    scope['web']  # Webオブジェクト
 
     Returns:
         Dict[str, Any]: リクエストとレスポンスとWebSocket接続

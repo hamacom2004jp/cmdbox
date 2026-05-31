@@ -96,7 +96,8 @@ class RAGBase(feature.ResultEdgeFeature):
             msg = dict(warn=f"Request information cannot be retrieved. This command is only available in web mode.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, None
-        sign = signin.Signin._check_signin(req, scope.get("res"), signin_data, logger)
+        web = scope.get("web")
+        sign = web.signin._check_signin(req, scope.get("res"), signin_data, logger)
         if sign is not None or "signin" not in req.session or "groups" not in req.session["signin"]:
             msg = dict(warn=f"Login information cannot be retrieved.This command is only available in web mode.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

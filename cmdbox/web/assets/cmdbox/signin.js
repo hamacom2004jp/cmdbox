@@ -13,6 +13,7 @@ $(() => {
             cmdbox.change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
             return;
         }
+        localStorage.setItem('color_mode', theme);
         $('html').attr('data-bs-theme', theme);
     });
     const storage_name_key = 'cmdbox-signin-name';

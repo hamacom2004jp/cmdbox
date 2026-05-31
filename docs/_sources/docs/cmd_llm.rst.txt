@@ -135,6 +135,64 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "end","bool | null","no","null","終了フラグ"
 
 
+llm ( embed ) : ``cmdbox -m llm -c embed <Option>``
+===================================================
+
+- Request text embedding from the LLM.
+
+.. csv-table::
+    :widths: 20, 8, 8, 8, 12, 18, 26
+    :header-rows: 1
+
+    "Option","Type","Multi","Required","Default","Choices","Description"
+    "--host <host>","str","","required","localhost","","Specify the service host of the Redis server."
+    "--port <port>","int","","required","6379","","Specify the service port of the Redis server."
+    "--password <password>","passwd","","required","password","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","str","","required","cmdbox","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","int","","","600","","Specify the maximum waiting time until the server responds."
+    "--llmname <llmname>","str","","required","","","Specify the name of the LLM configuration to load."
+    "--input_text <input_text>","text","multi","required","","","Specify the text to embed. Multiple values can be specified."
+
+**Output Schema**
+
+This command implements ``output_schema()`` returning ``Result`` model.
+
+.. code-block:: json
+
+    {
+      "success": {
+        "performance": [
+          {
+            "key": "string",
+            "value": null
+          }
+        ],
+        "data": null
+      },
+      "warn": {},
+      "error": {},
+      "output_schema": {},
+      "end": false
+    }
+
+.. csv-table::
+    :widths: 25, 10, 10, 15, 40
+    :header-rows: 1
+
+    "Field","Type","Required","Default","Description"
+    "success","Data | str | null","no","null","成功した場合の結果"
+    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "success.data","any | null","no","null","処理結果のデータ"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
+    "end","bool | null","no","null","終了フラグ"
+
+
 llm ( list ) : ``cmdbox -m llm -c list <Option>``
 =================================================
 
@@ -236,6 +294,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
           }
         ],
         "llmname": "string",
+        "llmtype": "string",
         "llmprov": "string",
         "llmprojectid": "string",
         "llmsvaccountfile": "string",
@@ -263,6 +322,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.llmname","str | null","no","null","LLM名"
+    "success.llmtype","str | null","no","null","LLMタイプ"
     "success.llmprov","str | null","no","null","LLMプロバイダ"
     "success.llmprojectid","str | null","no","null","LLMプロジェクトID"
     "success.llmsvaccountfile","str | null","no","null","LLMサービスアカウントファイル"
@@ -301,7 +361,8 @@ llm ( save ) : ``cmdbox -m llm -c save <Option>``
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
     "--llmname <llmname>","str","","required","","","Specify the name of the LLM configuration to save."
-    "--llmprov <llmprov>","str","","required",""," | azureopenai | openai | vertexai | ollama","Specify llm provider."
+    "--llmprov <llmprov>","str","","required",""," | azureopenai | openai | vertexai | ollama | custom","Specify llm provider."
+    "--llmtype <llmtype>","str","","","chat","chat | embedding","Specify the type of the LLM configuration to save."
     "--llmprojectid <llmprojectid>","str","","","","","Specify the project ID for llm's provider connection."
     "--llmsvaccountfile <llmsvaccountfile>","file","","","","","Specifies the service account file for llm's provider connection."
     "--llmlocation <llmlocation>","str","","","","","Specifies the location for llm provider connections."

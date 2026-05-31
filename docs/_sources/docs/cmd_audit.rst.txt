@@ -251,6 +251,7 @@ audit ( write ) : ``cmdbox -m audit -c write <Option>``
     "--clmsg_body <clmsg_body>","dict","multi","","","","Specifies the body of the client's message in dictionary format."
     "--clmsg_tag <clmsg_tag>","str","multi","","","","Specifies the tag for the client's message. Specify to make it easier to search later."
     "--retention_period_days <retention_period_days>","int","","","365","","Specify the number of days to keep the audit. If the number is less than or equal to 0, the audit will be kept indefinitely."
+    "--buffered_interval <buffered_interval>","int","","","30","","Specify the interval, in seconds, for buffering audit log writes."
 
 **Output Schema**
 

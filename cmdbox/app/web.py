@@ -164,8 +164,8 @@ class Web:
         self.webcap_client = requests.Session()
         from cmdbox.app.auth import signin, signin_saml
         signin_file_data = signin.Signin.load_signin_file(self.signin_file, None, self=self, logger=logger)
-        self.signin = signin.Signin(self.logger, self.signin_file, signin_file_data, self.redis_cli,
-                                    self.appcls, self.ver, self.language)
+        self.signin = signin.getDefaultInstance(self.logger, self.signin_file, signin_file_data, self.redis_cli,
+                                                self.appcls, self.ver, self.language)
         self.signin_saml = signin_saml.SigninSAML(self.logger, self.signin_file, signin_file_data, self.redis_cli,
                                                   self.appcls, self.ver, self.language)
         signin.Signin.set_webcls(self.__class__)
