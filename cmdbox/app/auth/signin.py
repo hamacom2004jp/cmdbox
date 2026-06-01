@@ -179,7 +179,7 @@ class Signin(object):
         if signin_file_data is None:
             return None
         if 'signin' in req.session:
-            path_jadge = Signin._check_path(req, req.url.path, signin_file_data, logger)
+            path_jadge = self._check_path(req, res, req.url.path, req.session['signin'], signin_file_data, logger)
             if path_jadge is not None:
                 return path_jadge
             name = req.session['signin']['name']
@@ -260,15 +260,16 @@ class Signin(object):
         if logger.level == logging.DEBUG:
             logger.debug(f"find user: name={find_user['name']}, group_names={group_names}")
         # パスルールチェック
-        return Signin._check_path(req, res, find_user, signin_file_data, logger)
+        return self._check_path(req, res, req.url.path, find_user, signin_file_data, logger)
 
-    def _check_path(self, req:Request, res:Response, find_user:Dict[str, Any], signin_file_data:Dict[str, Any], logger:logging.Logger) -> Union[None, RedirectResponse]:
+    def _check_path(self, req:Request, res:Response, path:str, find_user:Dict[str, Any], signin_file_data:Dict[str, Any], logger:logging.Logger) -> Union[None, RedirectResponse]:
         """
         パスルールをチェックする
 
         Args:
             req (Request): リクエスト
             res (Response): レスポンス
+            path (str): リクエストパス
             find_user (Dict[str, Any]): ユーザーデータ
             signin_file_data (Dict[str, Any]): サインインファイルデータ（変更不可）
             logger (logging.Logger): ロガー
@@ -277,20 +278,21 @@ class Signin(object):
         """
         # パスルールチェック
         user_groups = find_user['groups']
+        path = path if path.startswith('/') else f'/{path}'
         jadge = signin_file_data['pathrule']['policy']
         for rule in signin_file_data['pathrule']['rules']:
             if len([g for g in rule['groups'] if g in user_groups]) <= 0:
                 continue
-            if len([p for p in rule['paths'] if req.url.path.startswith(p)]) <= 0:
+            if len([p for p in rule['paths'] if path.startswith(p)]) <= 0:
                 continue
             jadge = rule['rule']
         if logger.level == logging.DEBUG:
-            logger.debug(f"path rule: {req.url.path}: {jadge}")
+            logger.debug(f"path rule: {path}: {jadge}")
         if jadge == 'allow':
             res.headers['signin'] = 'success'
             return None
-        logger.warning(f"Unauthorized site. user={find_user['name']}, path={req.url.path}")
-        return RedirectResponse(url=f'/signin{req.url.path}?error=unauthorizedsite')
+        logger.warning(f"Unauthorized site. user={find_user['name']}, path={path}")
+        return RedirectResponse(url=f'/signin{path}?error=unauthorizedsite')
 
     @classmethod
     def _find_user_by_name(cls, name:str, signin_file_data:Dict[str, Any]) -> Dict[str, Any]:
@@ -774,55 +776,6 @@ class Signin(object):
         for gn in group_names.copy():
             sps += [re.sub('^/+', '', gr['startpage']) for gr in signin_file_data['groups'] if 'startpage' in gr and gr['name']==gn and gr['startpage']]
         return sps
-
-    def check_path(self, req:Request, path:str) -> Union[None, RedirectResponse]:
-        """
-        パスの認可をチェックします
-
-        Args:
-            req (Request): リクエスト
-            path (str): パス
-
-        Returns:
-            Union[None, RedirectResponse]: 認可された場合はNone、認可されなかった場合はリダイレクトレスポンス
-        """
-        return Signin._check_path(req, path, self.signin_file_data, self.logger)
-
-    @classmethod
-    def _check_path(cls, req:Request, path:str, signin_file_data:Dict[str, Any], logger:logging.Logger) -> Union[None, RedirectResponse]:
-        """
-        パスの認可をチェックします
-
-        Args:
-            req (Request): リクエスト
-            path (str): パス
-            signin_file_data (Dict[str, Any]): サインインファイルデータ
-            logger (logging.Logger): ロガー
-
-        Returns:
-            Union[None, RedirectResponse]: 認可された場合はNone、認可されなかった場合はリダイレクトレスポンス
-        """
-        if signin_file_data is None:
-            return None
-        if 'signin' not in req.session:
-            return None
-        path = path if path.startswith('/') else f'/{path}'
-        # パスルールチェック
-        user_groups = req.session['signin']['groups']
-        jadge = signin_file_data['pathrule']['policy']
-        for rule in signin_file_data['pathrule']['rules']:
-            if len([g for g in rule['groups'] if g in user_groups]) <= 0:
-                continue
-            if len([p for p in rule['paths'] if path.startswith(p)]) <= 0:
-                continue
-            jadge = rule['rule']
-        if logger.level == logging.DEBUG:
-            logger.debug(f"path rule: {path}: {jadge}")
-        if jadge == 'allow':
-            return None
-        else:
-            logger.warning(f"Unauthorized site. user={req.session['signin']['name']}, path={path}")
-            return RedirectResponse(url=f'/signin{path}?error=unauthorizedsite')
 
     def check_cmd(self, req:Request, res:Response, mode:str, cmd:str, opt:Dict[str, Any]):
         """

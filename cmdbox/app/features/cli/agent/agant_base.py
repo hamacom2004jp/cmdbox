@@ -36,6 +36,12 @@ class AgentBase(feature.ResultEdgeFeature):
             ds_conf = self._load_ds_config(data_dir, runner_conf['session_datasource'])
         else:
             ds_conf = {}
+        if 'db_fullpath' not in ds_conf or not ds_conf['db_fullpath']:
+            if 'db_path' in ds_conf and ds_conf['db_path']:
+                db_path = ds_conf['db_path']
+                db_path = db_path.replace("\\","/").replace("//","/") if db_path else None
+                db_path = db_path[1:] if db_path and db_path.startswith('/') else db_path
+                ds_conf['db_fullpath'] = str((data_dir / db_path).resolve()) if db_path else None
 
         return runner_conf, agent_conf, llm_conf, mcpsv_confs, ds_conf
 

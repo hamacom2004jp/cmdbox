@@ -103,7 +103,8 @@ class Gui(feature.WebFeature):
         async def toolmenu(req:Request, res:Response):
             ret = dict()
             for k, v in web.toolmenu.items():
-                path_jadge = web.signin.check_path(req, v['href'])
+                path_jadge = web.signin._check_path(req, res, v['href'], req.session['signin'],
+                                                    web.signin.signin_file_data, web.logger)
                 if path_jadge is not None:
                     continue
                 ret[k] = v

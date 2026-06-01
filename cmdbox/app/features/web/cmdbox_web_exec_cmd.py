@@ -212,6 +212,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         if req.session is not None and 'signin' in req.session and req.session['signin'] is not None:
             if 'groups' in req.session['signin'] and req.session['signin']['groups'] is not None:
                 opt['groups'] = req.session['signin']['groups']
+        opt = self.coercion_param(req.session, opt.copy())
         ap.sv = None
         ap.cl = None
         ap.web = None
@@ -365,6 +366,19 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         asyncio.create_task(_exec_cmd(ap, title, opt, req, res, True, resqueue=resqueue))
         await asyncio.sleep(0)
         return [dict(warn='start_cmd')]
+    
+    def coercion_param(self, user_session:Dict[str, Any], opt:Dict[str, Any]) -> Dict[str, Any]:
+        """
+        コマンドオプションを強制的に値を設定する拡張ポイントです。
+
+        Args:
+            user_session (Dict[str, Any]): ユーザーセッション
+            opt (Dict[str, Any]): 実行時のコマンドオプション
+
+        Returns:
+            Dict[str, Any]: 強制的に値を設定したコマンドオプション
+        """
+        return opt
 
     def put_queue(self, q:queue.Queue, data):
         """

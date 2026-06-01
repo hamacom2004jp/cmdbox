@@ -78,5 +78,5 @@ class AzureSigninProxy(signin.Signin):
         if logger.level == logging.DEBUG:
             logger.debug(f"find user: name={user['name']}, group_names={group_names}")
         # パスルールチェック
-        return signin.Signin._check_path(req, res, user, signin_file_data, logger)
+        return self._check_path(req, res, req.url.path, user, signin_file_data, logger)
 

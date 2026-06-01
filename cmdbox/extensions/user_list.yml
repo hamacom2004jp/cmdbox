@@ -47,8 +47,6 @@ groups:                        # A list of groups, each of which is a map that c
 - gid: 1                       # An ID that identifies a group. No two groups can have the same ID.
   name: admin                  # A name that identifies the group. No two groups can have the same name.
   home: /.groups/admin         # The home directory of the group, used for file operations.
-  startpage: /gui              # The group's start page.
-                               # This is the page to which users belonging to the group are redirected when they access the “/” path.
 - gid: 2
   name: develop
   home: /.groups/develop
@@ -127,8 +125,7 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     rule: allow                # Specifies whether or not the specified command is allowed for the specified group. The value can be allow or deny.
   - groups: [user]
     mode: agent
-    cmds: [chat, agent_list, mcp_client, mcpsv_list, memory_list, runner_list,
-           memory_status, runner_load,
+    cmds: [chat, agent_list, mcp_client, mcpsv_list, runner_list, runner_load,
            session_list, session_del, start, stop]
     rule: allow
   - groups: [user]
@@ -167,9 +164,9 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     rule: allow
   - groups: [editor]
     mode: agent
-    cmds: [agent_del, mcpsv_del, memory_del, runner_del,
-           agent_load, mcpsv_load, memory_load, runner_load,
-           agent_save, mcpsv_save, memory_save, runner_save,]
+    cmds: [agent_del, mcpsv_del, runner_del,
+           agent_load, mcpsv_load, runner_load,
+           agent_save, mcpsv_save, runner_save,]
     rule: allow
   - groups: [editor]
     mode: extract

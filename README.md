@@ -369,42 +369,44 @@ audit:
 users:                         # A list of users, each of which is a map that contains the following fields.
 - uid: 1                       # An ID that identifies a user. No two users can have the same ID.
   name: admin                  # A name that identifies the user. No two users can have the same name.
-  password: XXXXXXXXXXXXXXXX   # The user's password. The value is hashed with the hash function specified in the next hash field.
+  password: XXXXXXXXXXXXXX     # The user's password. The value is hashed with the hash function specified in the next hash field.
   hash: plain                  # The hash function used to hash the password, which can be plain, md5, sha1, or sha256, or oauth2, or saml.
   groups: [admin]              # A list of groups to which the user belongs, as specified in the groups field.
   email: admin@aaa.bbb.jp      # The email address of the user, used when authenticating using the provider specified in the oauth2 or saml field.
   home: /.users/admin          # The home directory of the user, used for file operations.
 - uid: 2
   name: develop
-  password: XXXXXXXXXXXXXXXX
+  password: XXXXXXXXXXXXXX
   hash: plain
   groups: [develop]
   email: develop@aaa.bbb.jp
   home: /.users/develop
+  buildin: true                # Whether the user is a built-in user. Built-in users cannot be deleted.
 - uid: 3
   name: master
-  password: XXXXXXXXXXXXXXXX
+  password: XXXXXXXXXXXXXX
   hash: plain
   groups: [master]
   email: master@aaa.bbb.jp
   home: /.users/master
+  buildin: true
 - uid: 101
   name: user01
-  password: XXXXXXXXXXXXXXXX
+  password: b75705d7e35e7014521a46b532236ec3
   hash: md5
   groups: [user]
   email: user01@aaa.bbb.jp
   home: /.users/user01
 - uid: 102
   name: user02
-  password: XXXXXXXXXXXXXXXX
+  password: XXXXXXXXXXXXXX
   hash: sha1
   groups: [readonly]
   email: user02@aaa.bbb.jp
   home: /.users/user02
 - uid: 103
   name: user03
-  password: XXXXXXXXXXXXXXXX
+  password: XXXXXXXXXXXXXX
   hash: sha256
   groups: [editor]
   email: user03@aaa.bbb.jp
@@ -413,18 +415,26 @@ groups:                        # A list of groups, each of which is a map that c
 - gid: 1                       # An ID that identifies a group. No two groups can have the same ID.
   name: admin                  # A name that identifies the group. No two groups can have the same name.
   home: /.groups/admin         # The home directory of the group, used for file operations.
+  startpage: /gui              # The group's start page.
+                               # This is the page to which users belonging to the group are redirected when they access the “/” path.
 - gid: 2
   name: develop
   home: /.groups/develop
+  startpage: /gui
+  buildin: true                # Whether the group is a built-in group. Built-in groups cannot be deleted.
 - gid: 3
   name: master
   home: /.groups/master
+  startpage: /gui
+  buildin: true
 - gid: 4
   name: guest
   home: /.groups/guest
+  startpage: /agent
 - gid: 101
   name: user
   home: /.groups/user
+  startpage: /agent
 - gid: 102
   name: readonly
   parent: user                 # The parent group of the group. If the parent group is not specified, the group is a top-level group.
@@ -436,39 +446,61 @@ groups:                        # A list of groups, each of which is a map that c
 cmdrule:                       # A list of command rules, Specify a rule that determines whether or not a command is executable when executed by a user in web mode.
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
   rules:                       # Specify rules to allow or deny execution of the command, depending on the group the user belongs to.
+  - groups: [develop, master]
+    coercion:                  # Specify a coercion value for each item to be set when a rule is matched.
+                               # e.g. wpath: f"/users/{user_name}"
+      fwpath: "['/']"
+      rjpath: "[]"
+      from_fwpath: "['/']"
+      to_fwpath: "['/']"
+      from_rjpath: '[]'
+      to_rjpath: '[]'
+    rule: allow
   - groups: [admin]
     coercion:
       fwpath: "['/.users','/.groups']"
+      rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
       from_fwpath: "['/.users','/.groups']"
       to_fwpath: "['/.users','/.groups']"
+      from_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
+      to_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
     rule: allow
-  - groups: [develop, master]
+  - groups: [guest, user, readonly, editor]
     coercion:
-      fwpath: "['/']"
-      from_fwpath: "['/']"
-      to_fwpath: "['/']"
-    rule: allow
-  - groups: [admin, master]
+      fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
+      rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
+      from_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
+      to_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
+      from_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
+      to_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
+    rule: deny
+  - groups: [master, admin]
     mode: test
     rule: deny
+  - groups: [admin]
+    mode: tts
+    cmds: [install, uninstall]
+    rule: deny
+  - groups: [admin]
+    mode: datasource
+    cmds: [save, load, del, tbl_create, tbl_drop, idx_create, idx_drop]
+    rule: deny
+  - groups: [guest, user, readonly, editor]
+    mode: llm
+    cmds: [list, chat, translation]
+    rule: allow
   - groups: [user]             # Specify the groups to which the rule applies.
     mode: client               # Specify the "mode" as the condition for applying the rule.
     cmds: [file_download, file_list, server_info, time] # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
-    coercion:                  # Specify a coercion value for each item to be set when a rule is matched.
-                               # e.g. wpath: f"/users/{user_name}"
-      fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
-      from_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
-      to_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
     rule: allow                # Specifies whether or not the specified command is allowed for the specified group. The value can be allow or deny.
   - groups: [user]
     mode: agent
-    cmds: [chat, agent_list, mcp_client, mcpsv_list, memory_list, runner_list,
-           memory_status, runner_load,
+    cmds: [chat, agent_list, mcp_client, mcpsv_list, runner_list, runner_load,
            session_list, session_del, start, stop]
     rule: allow
   - groups: [user]
     mode: cmd
-    cmds: [list, load]
+    cmds: [list, load, check]
     rule: allow
   - groups: [user]
     mode: embed
@@ -479,10 +511,6 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     cmds: [list, pdfplumber, chunklet]
     coercion:
       fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
-    rule: allow
-  - groups: [user]
-    mode: llm
-    cmds: [list]
     rule: allow
   - groups: [user]
     mode: rag
@@ -503,16 +531,12 @@ cmdrule:                       # A list of command rules, Specify a rule that de
   - groups: [user]
     mode: client
     cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
-    coercion:
-      fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
-      from_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
-      to_fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
     rule: allow
   - groups: [editor]
     mode: agent
-    cmds: [agent_del, mcpsv_del, memory_del, runner_del,
-           agent_load, mcpsv_load, memory_load, runner_load,
-           agent_save, mcpsv_save, memory_save, runner_save,]
+    cmds: [agent_del, mcpsv_del, runner_del,
+           agent_load, mcpsv_load, runner_load,
+           agent_save, mcpsv_save, runner_save,]
     rule: allow
   - groups: [editor]
     mode: extract
@@ -557,7 +581,7 @@ password:                       # Password settings.
   policy:                       # Password policy settings.
     enabled: true               # Specify whether or not to enable password policy.
     not_same_before: true       # Specify whether or not to allow the same password as the previous one.
-    min_length: 16              # Specify the minimum length of the password.
+    min_length: 8               # Specify the minimum length of the password.
     max_length: 64              # Specify the maximum length of the password.
     min_lowercase: 1            # Specify the minimum number of lowercase letters in the password.
     min_uppercase: 1            # Specify the minimum number of uppercase letters in the password.
@@ -596,6 +620,9 @@ apikey:
     issuer: identity_provider       # Specify the issuer of the JWT. This is usually the name of the identity provider. (If not specified, no verification)
     audience: app_organization      # Specify the audience of the JWT. This is usually the name of the organization that will use the application. (If not specified, no verification)
     algorithm: RS256                # Specify the algorithm used to verify the JWT. The value can be RS256, PS256, or ES256.
+signin:                             # Sign-in settings.
+  signin_module:                    # Specify the module name that implements the sign-in for the authentication provider.
+    cmdbox.app.auth.signin
 oauth2:                             # OAuth2 settings.
   providers:                        # This is a per-provider setting for OAuth2.
     google:                         # Google's OAuth2 configuration.
@@ -656,6 +683,7 @@ saml:                               # SAML settings.
         singleLogoutService: {}
         certFingerprint: ''
         certFingerprintAlgorithm: sha1
+
 ```
 
 - See the documentation for references to each file.
