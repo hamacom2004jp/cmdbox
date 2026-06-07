@@ -65,18 +65,8 @@ class ClientFileRmdir(feature.UnsupportEdgeFeature, validator.Validator):
                      description_ja="指定したパスが要求されたパスにマッチする場合、アクセスが拒否されます。正規表現として解釈します。",
                      description_en="If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."),
                 dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
-                     description_ja="参照先スコープを指定します。指定可能な画像タイプは `client` , `current` , `server` です。",
-                     description_en="Specifies the scope to be referenced. When omitted, 'client' is used.",
-                     choice_show=dict(client=["client_data"]),
-                     test_true={"server":"server",
-                               "client":"client",
-                               "current":"current"}),
-                dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None, web="mask",
-                     description_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
-                     description_en="Specify the path of the data folder when local is referenced.",
-                     test_true={"server":None,
-                                "client":common.HOME_DIR / f".{self.ver.__appid__}",
-                                "current":None}),
+                     description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
+                     description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
                 dict(opt="retry_count", type=Options.T_INT, default=3, required=False, multi=False, hide=True, choice=None,
                      description_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",
                      description_en="Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."),
@@ -128,7 +118,7 @@ class ClientFileRmdir(feature.UnsupportEdgeFeature, validator.Validator):
 
     def output_schema(self) -> type:
         class Data(resdata.Data):
-            path: Union[str, None] = pydantic.Field(default=None, description="パス")
+            path: Union[str, Path, None] = pydantic.Field(default=None, description="パス")
             msg: Union[str, None] = pydantic.Field(default=None, description="処理結果のメッセージ")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")

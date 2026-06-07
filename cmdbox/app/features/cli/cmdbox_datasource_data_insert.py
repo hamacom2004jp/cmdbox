@@ -1,5 +1,5 @@
 from cmdbox.app import common, client
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.features.cli.datasource import datasource_base
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -10,7 +10,7 @@ import logging
 import pydantic
 
 
-class DatasourceDataInsert(datasource_base.DatasourceBase, validator.Validator):
+class DatasourceDataInsert(datasource_base.DatasourceBase, validator.Validator, limiter.LimitedFeature):
     def get_mode(self) -> Union[str, List[str]]:
         return 'datasource'
 
@@ -85,6 +85,7 @@ class DatasourceDataInsert(datasource_base.DatasourceBase, validator.Validator):
                 except Exception:
                     pass
 
+    @limiter.apprun_check_limit
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         payload = dict(dsname=args.dsname, schema=args.schema if hasattr(args, 'schema') else None, tblname=args.tblname, insert_data=args.insert_data)
@@ -105,6 +106,7 @@ class DatasourceDataInsert(datasource_base.DatasourceBase, validator.Validator):
     def is_cluster_redirect(self):
         return False
 
+    @limiter.svrun_check_limit
     def svrun(self, data_dir: Path, logger: logging.Logger, redis_cli: redis_client.RedisClient,
               msg: List[str], sessions: Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
@@ -112,3 +114,26 @@ class DatasourceDataInsert(datasource_base.DatasourceBase, validator.Validator):
         ret = self._do_run(data_dir, payload, logger)
         redis_cli.rpush(reskey, ret)
         return self.RESP_SUCCESS if 'success' in ret else self.RESP_WARN
+
+    def svrun_registrations(self, data_dir, logger, payload, msg):
+        conn = None
+        try:
+            schema = payload.get('schema') or None
+            tblname = self.validate_identifier(payload['tblname'])
+            conn, dbtype = self.get_connection(payload)
+            qualified_tbl = self.qualified_name(schema, tblname, dbtype)
+            sql = f"SELECT COUNT(*) FROM {qualified_tbl}"
+            with conn.cursor() as cur:
+                cur.execute(sql)
+                count = cur.fetchone()[0]
+            conn.commit()
+            return count
+        except Exception as e:
+            logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
+            return 0
+        finally:
+            if conn is not None:
+                try:
+                    conn.close()
+                except Exception:
+                    pass

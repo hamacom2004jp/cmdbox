@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.auth.signin &mdash; cmdbox 2026/05/31 documentation</title>
+  <title>cmdbox.app.auth.signin &mdash; cmdbox 2026/06/06 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=745f26b0"></script>
+      <script src="../../../../_static/documentation_options.js?v=25cc829f"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -282,7 +282,7 @@
         <span class="k">if</span> <span class="n">signin_file_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="s1">&#39;signin&#39;</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">:</span>
-            <span class="n">path_jadge</span> <span class="o">=</span> <span class="n">Signin</span><span class="o">.</span><span class="n">_check_path</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">signin_file_data</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+            <span class="n">path_jadge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_path</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">],</span> <span class="n">signin_file_data</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">path_jadge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">path_jadge</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
@@ -363,15 +363,16 @@
         <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;find user: name=</span><span class="si">{</span><span class="n">find_user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, group_names=</span><span class="si">{</span><span class="n">group_names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># パスルールチェック</span>
-        <span class="k">return</span> <span class="n">Signin</span><span class="o">.</span><span class="n">_check_path</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">find_user</span><span class="p">,</span> <span class="n">signin_file_data</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_path</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">find_user</span><span class="p">,</span> <span class="n">signin_file_data</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_check_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">,</span> <span class="n">find_user</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">signin_file_data</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">RedirectResponse</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span><span class="n">Response</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">find_user</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">signin_file_data</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">RedirectResponse</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        パスルールをチェックする</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            req (Request): リクエスト</span>
 <span class="sd">            res (Response): レスポンス</span>
+<span class="sd">            path (str): リクエストパス</span>
 <span class="sd">            find_user (Dict[str, Any]): ユーザーデータ</span>
 <span class="sd">            signin_file_data (Dict[str, Any]): サインインファイルデータ（変更不可）</span>
 <span class="sd">            logger (logging.Logger): ロガー</span>
@@ -380,20 +381,21 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># パスルールチェック</span>
         <span class="n">user_groups</span> <span class="o">=</span> <span class="n">find_user</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span> <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="sa">f</span><span class="s1">&#39;/</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span>
         <span class="n">jadge</span> <span class="o">=</span> <span class="n">signin_file_data</span><span class="p">[</span><span class="s1">&#39;pathrule&#39;</span><span class="p">][</span><span class="s1">&#39;policy&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">signin_file_data</span><span class="p">[</span><span class="s1">&#39;pathrule&#39;</span><span class="p">][</span><span class="s1">&#39;rules&#39;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">g</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">user_groups</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">p</span><span class="p">)])</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">p</span><span class="p">)])</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="n">jadge</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;rule&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;path rule: </span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">jadge</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;path rule: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">jadge</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">jadge</span> <span class="o">==</span> <span class="s1">&#39;allow&#39;</span><span class="p">:</span>
             <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;success&#39;</span>
             <span class="k">return</span> <span class="kc">None</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unauthorized site. user=</span><span class="si">{</span><span class="n">find_user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, path=</span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/signin</span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">?error=unauthorizedsite&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unauthorized site. user=</span><span class="si">{</span><span class="n">find_user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, path=</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/signin</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">?error=unauthorizedsite&#39;</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_find_user_by_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">signin_file_data</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
@@ -901,58 +903,6 @@
             <span class="n">sps</span> <span class="o">+=</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;^/+&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">gr</span><span class="p">[</span><span class="s1">&#39;startpage&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">gr</span> <span class="ow">in</span> <span class="n">signin_file_data</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;startpage&#39;</span> <span class="ow">in</span> <span class="n">gr</span> <span class="ow">and</span> <span class="n">gr</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">gn</span> <span class="ow">and</span> <span class="n">gr</span><span class="p">[</span><span class="s1">&#39;startpage&#39;</span><span class="p">]]</span>
         <span class="k">return</span> <span class="n">sps</span></div>
 
-
-<div class="viewcode-block" id="Signin.check_path">
-<a class="viewcode-back" href="../../../../resources/cmdbox.app.auth.html#cmdbox.app.auth.signin.Signin.check_path">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">check_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">RedirectResponse</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        パスの認可をチェックします</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            req (Request): リクエスト</span>
-<span class="sd">            path (str): パス</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            Union[None, RedirectResponse]: 認可された場合はNone、認可されなかった場合はリダイレクトレスポンス</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">Signin</span><span class="o">.</span><span class="n">_check_path</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin_file_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span></div>
-
-
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_check_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span><span class="n">Request</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">signin_file_data</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">RedirectResponse</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        パスの認可をチェックします</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            req (Request): リクエスト</span>
-<span class="sd">            path (str): パス</span>
-<span class="sd">            signin_file_data (Dict[str, Any]): サインインファイルデータ</span>
-<span class="sd">            logger (logging.Logger): ロガー</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            Union[None, RedirectResponse]: 認可された場合はNone、認可されなかった場合はリダイレクトレスポンス</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">signin_file_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="s1">&#39;signin&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span> <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="sa">f</span><span class="s1">&#39;/</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span>
-        <span class="c1"># パスルールチェック</span>
-        <span class="n">user_groups</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;groups&#39;</span><span class="p">]</span>
-        <span class="n">jadge</span> <span class="o">=</span> <span class="n">signin_file_data</span><span class="p">[</span><span class="s1">&#39;pathrule&#39;</span><span class="p">][</span><span class="s1">&#39;policy&#39;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">signin_file_data</span><span class="p">[</span><span class="s1">&#39;pathrule&#39;</span><span class="p">][</span><span class="s1">&#39;rules&#39;</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">g</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">user_groups</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">p</span><span class="p">)])</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="n">jadge</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s1">&#39;rule&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;path rule: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">jadge</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">jadge</span> <span class="o">==</span> <span class="s1">&#39;allow&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unauthorized site. user=</span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, path=</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/signin</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">?error=unauthorizedsite&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Signin.check_cmd">
 <a class="viewcode-back" href="../../../../resources/cmdbox.app.auth.html#cmdbox.app.auth.signin.Signin.check_cmd">[docs]</a>

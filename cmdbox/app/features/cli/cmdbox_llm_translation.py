@@ -1,5 +1,5 @@
 from cmdbox.app import common, client
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.features.cli import cmdbox_llm_chat, cmdbox_llm_list
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -77,6 +77,7 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
             ]
         )
 
+    @limiter.apprun_check_limit
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
 
@@ -134,6 +135,7 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
     def is_cluster_redirect(self):
         return False
 
+    @limiter.svrun_check_limit
     def svrun(self, data_dir: Path, logger: logging.Logger, redis_cli: redis_client.RedisClient, msg: List[str],
               sessions: Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]

@@ -22,6 +22,7 @@ See below for available options for the various commands.
    Excel <cmd_excel.rst>
    Extract <cmd_extract.rst>
    GUI <cmd_gui.rst>
+   Limiter <cmd_limiter.rst>
    LLM <cmd_llm.rst>
    MCPServer <cmd_mcpsv.rst>
    RAG <cmd_rag.rst>

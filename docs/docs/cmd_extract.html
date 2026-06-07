@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( extract mode ) &mdash; cmdbox 2026/05/31 documentation</title>
+  <title>Command Reference ( extract mode ) &mdash; cmdbox 2026/06/06 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=745f26b0"></script>
+      <script src="../_static/documentation_options.js?v=25cc829f"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -68,6 +68,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_limiter.html">Limiter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_llm.html">LLM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_rag.html">RAG</a></li>
@@ -176,14 +177,9 @@
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
-<td><p>current</p></td>
-<td><blockquote>
-<div><div class="line-block">
-<div class="line">client | current | server</div>
-</div>
-</div></blockquote>
-</td>
-<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
+<td><p>client</p></td>
+<td><p>client | current | server</p></td>
+<td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--fwpath &lt;fwpath&gt;</p></td>
 <td><p>file</p></td>
@@ -209,15 +205,7 @@
 <td></td>
 <td><p>Specify the source file path.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
-<td><p>str</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td><p>Specify the path of the data folder when local is referenced.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--chunk_lang &lt;chunk_lang&gt;</p></td>
+<tr class="row-even"><td><p>--chunk_lang &lt;chunk_lang&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -225,7 +213,7 @@
 <td><p>auto | ja | en</p></td>
 <td><p>Specify the language of the text to be chunked. If <cite>auto</cite> is specified, the language will be automatically detected.</p></td>
 </tr>
-<tr class="row-even"><td><p>--chunk_max_token_counter &lt;chunk_max_token_counter&gt;</p></td>
+<tr class="row-odd"><td><p>--chunk_max_token_counter &lt;chunk_max_token_counter&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -233,7 +221,7 @@
 <td></td>
 <td><p>Specify the maximum number of tokens for chunking text.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--chunk_max_tokens &lt;chunk_max_tokens&gt;</p></td>
+<tr class="row-even"><td><p>--chunk_max_tokens &lt;chunk_max_tokens&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -241,7 +229,7 @@
 <td></td>
 <td><p>Specify the maximum number of tokens for chunking text.</p></td>
 </tr>
-<tr class="row-even"><td><p>--chunk_max_sentences &lt;chunk_max_sentences&gt;</p></td>
+<tr class="row-odd"><td><p>--chunk_max_sentences &lt;chunk_max_sentences&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -249,7 +237,7 @@
 <td></td>
 <td><p>Specify the maximum number of sentences (not characters) for chunking text.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--chunk_overlap_percent &lt;chunk_overlap_percent&gt;</p></td>
+<tr class="row-even"><td><p>--chunk_overlap_percent &lt;chunk_overlap_percent&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -257,7 +245,7 @@
 <td></td>
 <td><p>Specifies the overlap percentage of the chunk.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -265,7 +253,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -273,7 +261,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1072,14 +1060,9 @@
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
-<td><p>current</p></td>
-<td><blockquote>
-<div><div class="line-block">
-<div class="line">client | current | server</div>
-</div>
-</div></blockquote>
-</td>
-<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
+<td><p>client</p></td>
+<td><p>client | current | server</p></td>
+<td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--loadpath &lt;loadpath&gt;</p></td>
 <td><p>file</p></td>
@@ -1105,15 +1088,7 @@
 <td></td>
 <td><p>If the specified path matches the requested path, access will be denied. Interpreted as a regular expression.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
-<td><p>str</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td><p>Specify the path of the data folder when local is referenced.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--chunk_table &lt;chunk_table&gt;</p></td>
+<tr class="row-even"><td><p>--chunk_table &lt;chunk_table&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -1121,7 +1096,7 @@
 <td><p>none | table | row_with_header</p></td>
 <td><p>Specifies how to chunk tables in the PDF file. <cite>none</cite> :do not chunk by table, <cite>table</cite> :by table, <cite>row_with_header</cite> :by row (with header)</p></td>
 </tr>
-<tr class="row-even"><td><p>--chunk_table_header &lt;chunk_table_header&gt;</p></td>
+<tr class="row-odd"><td><p>--chunk_table_header &lt;chunk_table_header&gt;</p></td>
 <td><p>str</p></td>
 <td><p>multi</p></td>
 <td></td>
@@ -1129,7 +1104,7 @@
 <td></td>
 <td><p>Replaces existing header items by specifying the names of the table header items in the PDF file, from left to right.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--chunk_exclude &lt;chunk_exclude&gt;</p></td>
+<tr class="row-even"><td><p>--chunk_exclude &lt;chunk_exclude&gt;</p></td>
 <td><p>str</p></td>
 <td><p>multi</p></td>
 <td></td>
@@ -1137,7 +1112,7 @@
 <td></td>
 <td><p>A regular expression specifying a string that should not be included in the chunk. If this specification is matched, embedding will not be performed.</p></td>
 </tr>
-<tr class="row-even"><td><p>--chunk_size &lt;chunk_size&gt;</p></td>
+<tr class="row-odd"><td><p>--chunk_size &lt;chunk_size&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1145,7 +1120,7 @@
 <td></td>
 <td><p>Specifies the chunk size.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--chunk_overlap &lt;chunk_overlap&gt;</p></td>
+<tr class="row-even"><td><p>--chunk_overlap &lt;chunk_overlap&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1153,7 +1128,7 @@
 <td></td>
 <td><p>Specifies the overlap size of the chunk.</p></td>
 </tr>
-<tr class="row-even"><td><p>--chunk_separator &lt;chunk_separator&gt;</p></td>
+<tr class="row-odd"><td><p>--chunk_separator &lt;chunk_separator&gt;</p></td>
 <td><p>str</p></td>
 <td><p>multi</p></td>
 <td></td>
@@ -1161,7 +1136,7 @@
 <td></td>
 <td><p>Specifies the delimiter character for chunking.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--chunk_spage &lt;chunk_spage&gt;</p></td>
+<tr class="row-even"><td><p>--chunk_spage &lt;chunk_spage&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1169,7 +1144,7 @@
 <td></td>
 <td><p>Specifies the starting page of the embedding range.</p></td>
 </tr>
-<tr class="row-even"><td><p>--chunk_epage &lt;chunk_epage&gt;</p></td>
+<tr class="row-odd"><td><p>--chunk_epage &lt;chunk_epage&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1177,7 +1152,7 @@
 <td></td>
 <td><p>Specifies the ending page of the embedding range.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1185,7 +1160,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1193,7 +1168,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1422,25 +1397,12 @@
 <tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
-<td></td>
+<td><p>required</p></td>
 <td><p>client</p></td>
-<td><blockquote>
-<div><div class="line-block">
-<div class="line">client | server</div>
-</div>
-</div></blockquote>
-</td>
-<td><p>Specify the reference scope. The available image types are <cite>client</cite> and <cite>server</cite>.</p></td>
+<td><p>client | current | server</p></td>
+<td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_data &lt;client_data&gt;</p></td>
-<td><p>str</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td><p>Specify the path of the data folder when local is referenced.</p></td>
-</tr>
-<tr class="row-even"><td><p>--loadpath &lt;loadpath&gt;</p></td>
+<tr class="row-odd"><td><p>--loadpath &lt;loadpath&gt;</p></td>
 <td><p>dir</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -1448,7 +1410,7 @@
 <td></td>
 <td><p>Specify the source path.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--loadregs &lt;loadregs&gt;</p></td>
+<tr class="row-even"><td><p>--loadregs &lt;loadregs&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>

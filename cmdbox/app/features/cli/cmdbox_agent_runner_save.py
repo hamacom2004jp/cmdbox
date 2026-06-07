@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.features.cli import cmdbox_tts_say
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -11,7 +11,7 @@ import pydantic
 import re
 
 
-class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator):
+class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.LimitedFeature):
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
 
@@ -121,6 +121,7 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator):
             ret.append(svname)
         return ret
 
+    @limiter.apprun_check_limit
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
 
@@ -153,6 +154,7 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator):
     def is_cluster_redirect(self):
         return False
 
+    @limiter.svrun_check_limit
     def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
               sessions:Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
@@ -178,3 +180,18 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator):
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
+
+    def apprun_registrations(self, data_dir, logger, args, msg):
+        raise NotImplementedError("In the Limiter settings, please use `scope=server`.")
+
+    def svrun_registrations(self, data_dir, logger, opt, msg):
+        agent_dir = data_dir / '.agent'
+        count = 0
+        if agent_dir.exists() and agent_dir.is_dir():
+            paths = agent_dir.glob(f"runner-*.json")
+            for p in sorted(paths):
+                name = p.name
+                if not name.startswith('runner-') or not name.endswith('.json'):
+                    continue
+                count += 1
+        return count

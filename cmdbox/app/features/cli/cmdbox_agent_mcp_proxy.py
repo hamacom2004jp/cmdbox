@@ -1,5 +1,5 @@
 from cmdbox.app import common, feature
-from cmdbox.app.commons import resdata, validator
+from cmdbox.app.commons import limiter, resdata, validator
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -7,7 +7,7 @@ import logging
 import pydantic
 
 
-class AgentMcpProxy(feature.UnsupportEdgeFeature, validator.Validator):
+class AgentMcpProxy(feature.UnsupportEdgeFeature, validator.Validator, limiter.LimitedFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -52,6 +52,7 @@ class AgentMcpProxy(feature.UnsupportEdgeFeature, validator.Validator):
                      description_en="Specifies the transport of the remote MCP server. If omitted, it is `streamable-http`.",),
             ])
 
+    @limiter.apprun_check_limit
     @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """

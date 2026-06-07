@@ -53,7 +53,6 @@ class FilerUpload(cmdbox_web_exec_cmd.ExecCmd):
                     upload_file.parent.mkdir(parents=True)
                 opt['svpath'] = str(svpath / Path(raw_filename).parent)
                 opt['upload_file'] = str(upload_file).replace('"','')
-                opt['capture_stdout'] = True
                 shutil.copyfileobj(fv.file, Path(opt['upload_file']).open('wb'))
                 web.options.audit_exec(req, res, web)
                 ret = await self.exec_cmd(req, res, web, "file_upload", opt, nothread=True)

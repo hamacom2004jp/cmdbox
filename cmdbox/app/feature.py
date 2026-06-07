@@ -1,6 +1,6 @@
 from cmdbox import version
 from cmdbox.app import common, edge_tool
-from cmdbox.app.commons import convert, redis_client
+from cmdbox.app.commons import redis_client
 from cmdbox.app.web import Web
 from fastapi import FastAPI
 from pathlib import Path

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( llm mode ) &mdash; cmdbox 2026/05/31 documentation</title>
+  <title>Command Reference ( llm mode ) &mdash; cmdbox 2026/06/06 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,14 +14,14 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=745f26b0"></script>
+      <script src="../_static/documentation_options.js?v=25cc829f"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Command Reference ( mcpsv mode )" href="cmd_mcpsv.html" />
-    <link rel="prev" title="Command Reference ( gui mode )" href="cmd_gui.html" /> 
+    <link rel="prev" title="Command Reference ( limiter mode )" href="cmd_limiter.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -60,6 +60,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_extract.html">Extract</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_limiter.html">Limiter</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">LLM</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#llm-chat-cmdbox-m-llm-c-chat-option">llm ( chat ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">chat</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#llm-del-cmdbox-m-llm-c-del-option">llm ( del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">llm</span> <span class="pre">-c</span> <span class="pre">del</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
@@ -259,17 +260,9 @@
 <td></td>
 <td><p>client</p></td>
 <td><p>client | current | server</p></td>
-<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
+<td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_data &lt;client_data&gt;</p></td>
-<td><p>str</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td><p>Specify the path of the data folder when local is referenced.</p></td>
-</tr>
-<tr class="row-even"><td><p>--fwpath &lt;fwpath&gt;</p></td>
+<tr class="row-odd"><td><p>--fwpath &lt;fwpath&gt;</p></td>
 <td><p>file</p></td>
 <td><p>multi</p></td>
 <td><p>required</p></td>
@@ -277,7 +270,7 @@
 <td></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--msg_audio &lt;msg_audio&gt;</p></td>
+<tr class="row-even"><td><p>--msg_audio &lt;msg_audio&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -285,7 +278,7 @@
 <td></td>
 <td><p>Specify the content of the audio to be sent.</p></td>
 </tr>
-<tr class="row-even"><td><p>--msg_audio_format &lt;msg_audio_format&gt;</p></td>
+<tr class="row-odd"><td><p>--msg_audio_format &lt;msg_audio_format&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -293,7 +286,7 @@
 <td><p>wav | mp3 | ogg | flac</p></td>
 <td><p>Specify the format of the audio to be sent.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--msg_video_url &lt;msg_video_url&gt;</p></td>
+<tr class="row-even"><td><p>--msg_video_url &lt;msg_video_url&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -301,7 +294,7 @@
 <td></td>
 <td><p>Specify the URL of the video to be sent.</p></td>
 </tr>
-<tr class="row-even"><td><p>--msg_file_url &lt;msg_file_url&gt;</p></td>
+<tr class="row-odd"><td><p>--msg_file_url &lt;msg_file_url&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -309,7 +302,7 @@
 <td></td>
 <td><p>Specify the URL of the file to be sent.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--msg_file &lt;msg_file&gt;</p></td>
+<tr class="row-even"><td><p>--msg_file &lt;msg_file&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -317,7 +310,7 @@
 <td></td>
 <td><p>Specify the content of the file to be sent.</p></td>
 </tr>
-<tr class="row-even"><td><p>--msg_file_mime &lt;msg_file_mime&gt;</p></td>
+<tr class="row-odd"><td><p>--msg_file_mime &lt;msg_file_mime&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -1801,7 +1794,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cmd_gui.html" class="btn btn-neutral float-left" title="Command Reference ( gui mode )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmd_limiter.html" class="btn btn-neutral float-left" title="Command Reference ( limiter mode )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="cmd_mcpsv.html" class="btn btn-neutral float-right" title="Command Reference ( mcpsv mode )" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

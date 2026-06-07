@@ -139,7 +139,6 @@ fsapi.filer = (svpath, is_local) => {
       list_downloads.forEach(async path => {
         opt['mode'] = 'client';
         opt['cmd'] = 'file_download';
-        opt['capture_stdout'] = true;
         opt['svpath'] = path['svpath'];
         opt['rpath'] = path['rpath'];
         opt['capture_maxsize'] = 1024**3*10;
@@ -269,7 +268,6 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
   opt = cmdbox.get_server_opt(false, fsapi.right);
   opt['mode'] = 'client';
   opt['cmd'] = 'file_list';
-  opt['capture_stdout'] = true;
   opt['svpath'] = svpath;
   let exec_cmd = is_local ? fsapi.local_exec_cmd : cmdbox.sv_exec_cmd;
   exec_cmd(opt).then(res => {

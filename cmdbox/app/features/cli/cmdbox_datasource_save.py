@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.features.cli.datasource import datasource_base
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -10,7 +10,7 @@ import logging
 import pydantic
 
 
-class DatasourceSave(datasource_base.DatasourceBase, validator.Validator):
+class DatasourceSave(datasource_base.DatasourceBase, validator.Validator, limiter.LimitedFeature):
     def get_mode(self) -> Union[str, List[str]]:
         return 'datasource'
 
@@ -56,12 +56,8 @@ class DatasourceSave(datasource_base.DatasourceBase, validator.Validator):
                      description_ja="データベースの種類を指定します。",
                      description_en="Specify the database type."),
                 dict(opt="scope", type=Options.T_STR, default="server", required=True, multi=False, hide=False, choice=["client", "current", "server"],
-                     description_ja="参照先スコープを指定します。指定可能なスコープは `client` , `current` , `server` です。",
-                     description_en="Specifies the reference scope. Available scopes are `client`, `current`, and `server`.",
-                     choice_show=dict(client=["client_data"]),),
-                dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None, web="mask",
-                     description_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
-                     description_en="Specify the path of the data folder when local is referenced.",),
+                     description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
+                     description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
                 dict(opt="db_host", type=Options.T_STR, default="localhost", required=False, multi=False, hide=False, choice=None,
                      description_ja="データベースサーバーのホストを指定します（PostgreSQL用）。",
                      description_en="Specify the database server host (for PostgreSQL)."),
@@ -86,6 +82,7 @@ class DatasourceSave(datasource_base.DatasourceBase, validator.Validator):
             ]
         )
 
+    @limiter.apprun_check_limit
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         if args.scope == 'client' and not args.client_data:
@@ -124,6 +121,7 @@ class DatasourceSave(datasource_base.DatasourceBase, validator.Validator):
     def is_cluster_redirect(self):
         return False
 
+    @limiter.svrun_check_limit
     def svrun(self, data_dir: Path, logger: logging.Logger, redis_cli: redis_client.RedisClient, msg: List[str],
               sessions: Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
@@ -151,3 +149,18 @@ class DatasourceSave(datasource_base.DatasourceBase, validator.Validator):
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, result)
             return self.RESP_WARN
+
+    def apprun_registrations(self, data_dir, logger, args, msg):
+        raise NotImplementedError("In the Limiter settings, please use `scope=server`.")
+
+    def svrun_registrations(self, data_dir, logger, opt, msg):
+        datasource_dir = data_dir / '.datasource'
+        count = 0
+        if datasource_dir.exists() and datasource_dir.is_dir():
+            paths = datasource_dir.glob(f"datasource-*.json")
+            for p in sorted(paths):
+                name = p.name
+                if not name.startswith('datasource-') or not name.endswith('.json'):
+                    continue
+                count += 1
+        return count

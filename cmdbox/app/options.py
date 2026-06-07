@@ -300,6 +300,10 @@ class Options:
             short="c", type=Options.T_STR, default=None, required=True, multi=False, hide=True, choice=[],
             description_ja="コマンドを指定します。",
             description_en="Specify the command.",)
+        self._options["client_data"] = dict(
+            type=Options.T_STR, default=None, required=False, multi=False, hide=True, choice=None, web="mask",
+            description_ja="クライアント側のデータフォルダのパスを指定します。",
+            description_en="Specify the path to the client-side data folder.")
         self._options["tag"] = dict(
             short="t", type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=None,
             description_ja="このコマンドのタグを指定します。",
@@ -348,6 +352,7 @@ class Options:
     def init_debugoption(self):
         # デバックオプションを追加
         self._options["debug"]["opt"] = "debug"
+        self._options["client_data"]["opt"] = "client_data"
         self._options["tag"]["opt"] = "tag"
         self._options["clmsg_id"]["opt"] = "clmsg_id"
         self._options["language"]["opt"] = "language"
@@ -372,6 +377,8 @@ class Options:
                     c["choice"].append(self._options["debug"])
                 if "tag" not in [_o['opt'] for _o in c["choice"]]:
                     c["choice"].append(self._options["tag"])
+                if "client_data" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["client_data"])
                 if "clmsg_id" not in [_o['opt'] for _o in c["choice"]]:
                     c["choice"].append(self._options["clmsg_id"])
                 if "language" not in [_o['opt'] for _o in c["choice"]]:

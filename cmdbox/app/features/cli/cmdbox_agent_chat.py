@@ -1,6 +1,6 @@
 from cmdbox.app import common, client, options
 from cmdbox.app.auth import signin
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.features.cli import cmdbox_tts_say
 from cmdbox.app.features.cli.agent import agant_base
 from cmdbox.app.options import Options
@@ -14,7 +14,7 @@ import pydantic
 import re
 
 
-class AgentChat(agant_base.AgentBase, validator.Validator):
+class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeature):
 
     def __init__(self, appcls, ver, language:str=None):
         super().__init__(appcls, ver, language=language)
@@ -77,6 +77,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator):
             ]
         )
 
+    @limiter.apprun_check_limit
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
 
@@ -451,6 +452,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator):
             tools.append(toolset)
         return tools
 
+    @limiter.async_svrun_check_limit
     async def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
                     sessions:Dict[str, Dict[str, Any]]):
         reskey = msg[1]

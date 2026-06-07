@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import logging
 import json
-import platform
+import sys
 import re
 
 
@@ -97,8 +97,12 @@ class AgentBase(feature.ResultEdgeFeature):
             BaseSessionService: セッションサービス
         """
         if ds_conf.get('dbtype') == 'sqlite':
-            uri = Path(ds_conf['db_fullpath']).as_uri()
-            agent_session_dburl = f"sqlite+aiosqlite:{uri.replace('file:///', '///')}"
+            if sys.platform == 'win32':
+                uri = Path(ds_conf['db_fullpath']).as_uri()
+                agent_session_dburl = f"sqlite+aiosqlite:{uri.replace('file:///', '///')}"
+            else:
+                db_path = Path(ds_conf['db_fullpath']).resolve().as_posix()
+                agent_session_dburl = f"sqlite+aiosqlite:////{db_path.lstrip('/')}"
         elif ds_conf.get('dbtype') == 'postgresql':
             agent_session_dburl = f"postgresql+psycopg://{ds_conf['pguser']}:{ds_conf['pgpass']}@{ds_conf['pghost']}:{ds_conf['pgport']}/{ds_conf['pgdbname']}"
         else:

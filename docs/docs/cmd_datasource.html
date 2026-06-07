@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( datasource mode ) &mdash; cmdbox 2026/05/31 documentation</title>
+  <title>Command Reference ( datasource mode ) &mdash; cmdbox 2026/06/06 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=745f26b0"></script>
+      <script src="../_static/documentation_options.js?v=25cc829f"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -74,6 +74,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_extract.html">Extract</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_limiter.html">Limiter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_llm.html">LLM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_rag.html">RAG</a></li>
@@ -2209,17 +2210,9 @@
 <td><p>required</p></td>
 <td><p>server</p></td>
 <td><p>client | current | server</p></td>
-<td><p>Specifies the reference scope. Available scopes are <cite>client</cite>, <cite>current</cite>, and <cite>server</cite>.</p></td>
+<td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
-<td><p>str</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td><p>Specify the path of the data folder when local is referenced.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--db_host &lt;db_host&gt;</p></td>
+<tr class="row-even"><td><p>--db_host &lt;db_host&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -2227,7 +2220,7 @@
 <td></td>
 <td><p>Specify the database server host (for PostgreSQL).</p></td>
 </tr>
-<tr class="row-even"><td><p>--db_port &lt;db_port&gt;</p></td>
+<tr class="row-odd"><td><p>--db_port &lt;db_port&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -2235,7 +2228,7 @@
 <td></td>
 <td><p>Specify the database server port (for PostgreSQL).</p></td>
 </tr>
-<tr class="row-odd"><td><p>--db_user &lt;db_user&gt;</p></td>
+<tr class="row-even"><td><p>--db_user &lt;db_user&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -2243,7 +2236,7 @@
 <td></td>
 <td><p>Specify the username for database connection (for PostgreSQL).</p></td>
 </tr>
-<tr class="row-even"><td><p>--db_password &lt;db_password&gt;</p></td>
+<tr class="row-odd"><td><p>--db_password &lt;db_password&gt;</p></td>
 <td><p>passwd</p></td>
 <td></td>
 <td></td>
@@ -2251,7 +2244,7 @@
 <td></td>
 <td><p>Specify the password for database connection (for PostgreSQL).</p></td>
 </tr>
-<tr class="row-odd"><td><p>--db_name &lt;db_name&gt;</p></td>
+<tr class="row-even"><td><p>--db_name &lt;db_name&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -2259,7 +2252,7 @@
 <td></td>
 <td><p>Specify the database name to connect to (for PostgreSQL).</p></td>
 </tr>
-<tr class="row-even"><td><p>--db_timeout &lt;db_timeout&gt;</p></td>
+<tr class="row-odd"><td><p>--db_timeout &lt;db_timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -2267,7 +2260,7 @@
 <td></td>
 <td><p>Specify the database connection timeout (for PostgreSQL).</p></td>
 </tr>
-<tr class="row-odd"><td><p>--db_path &lt;db_path&gt;</p></td>
+<tr class="row-even"><td><p>--db_path &lt;db_path&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>

@@ -1,5 +1,5 @@
 from cmdbox.app import common, client
-from cmdbox.app.commons import convert, resdata, validator
+from cmdbox.app.commons import convert, limiter, resdata, validator
 from cmdbox.app.features.cli.rag import rag_base, rag_store
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -10,7 +10,7 @@ import pydantic
 import re
 
 
-class RagRegist(rag_base.RAGBase, validator.Validator):
+class RagRegist(rag_base.RAGBase, validator.Validator, limiter.LimitedFeature):
 
     def get_mode(self) -> Union[str, List[str]]:
         """
@@ -78,6 +78,7 @@ class RagRegist(rag_base.RAGBase, validator.Validator):
             ]
         )
 
+    @limiter.apprun_check_limit
     @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
 

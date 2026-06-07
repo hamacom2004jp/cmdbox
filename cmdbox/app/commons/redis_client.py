@@ -30,6 +30,7 @@ class RedisClient(object):
         self.hbname = f"hb-{svname}"
         self.siname = f"showimg-{svname}"
         self.memname = f"mem-{svname}"
+        self.lmtname = f"lmt-{svname}"
         self.redis_cli = self.connect()
 
     def connect(self):
@@ -47,12 +48,23 @@ class RedisClient(object):
         if type(value) is dict or type(value) is list:
             if pfkey and tm > 0:
                 common.update_performance(pfkey, tm, value)
-            self.redis_cli.rpush(name, json.dumps(value, default=common.default_json_enc))
+            res_str = json.dumps(value, default=common.default_json_enc)
+            self.redis_cli.rpush(name, res_str)
+            self.last_ressize = len(res_str)
+            self.last_resval = value
         elif type(value) is str:
             self.redis_cli.rpush(name, value)
+            self.last_ressize = len(value)
+            self.last_resval = value
         else:
             self.logger.warning(f"Unsupported type. {type(value)}")
             raise Exception(f"Unsupported type. {type(value)}")
+
+    def exists(self, name:str):
+        return self.redis_cli.exists(name)
+
+    def pipeline(self, transaction:bool=True, shard_hint=None):
+        return self.redis_cli.pipeline(transaction=transaction, shard_hint=shard_hint)
 
     def blpop(self, name:str, timeout:int=1):
         return self.redis_cli.blpop(name, timeout=timeout)
@@ -71,6 +83,9 @@ class RedisClient(object):
     
     def hget(self, name:str, key:str):
         return self.redis_cli.hget(name, key)
+
+    def hgetall(self, name:str):
+        return self.redis_cli.hgetall(name)
 
     def keys(self, pattern:str):
         return self.redis_cli.keys(pattern)

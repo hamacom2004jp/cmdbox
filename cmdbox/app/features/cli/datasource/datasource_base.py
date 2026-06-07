@@ -43,7 +43,7 @@ class _Sqlite3ConnectionWrapper:
         return getattr(self._conn, name)
 
 
-class DatasourceBase(feature.OneshotResultEdgeFeature):
+class DatasourceBase(feature.ResultEdgeFeature):
     DBTYPE_PG = 'postgresql'
     DBTYPE_SQLITE = 'sqlite'
     DBTYPES = [DBTYPE_PG, DBTYPE_SQLITE]

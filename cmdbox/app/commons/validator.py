@@ -34,7 +34,7 @@ def apprun_check(func:Callable) -> Callable:
         if not isinstance(self, Validator):
             logger.warning(f"apprun_check decorator is applied to a function whose self is not an instance of Validator. Skipping validation. args: {args}")
             return func(self, logger, args, tm, pf)
-        
+
         # 引数の妥当性検証
         st, msg, obj = self.valid(logger, args, tm, pf)
         if st != self.RESP_SUCCESS:

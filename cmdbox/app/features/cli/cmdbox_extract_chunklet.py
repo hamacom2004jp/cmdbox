@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature, filer
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -10,7 +10,7 @@ import platform
 import pydantic
 
 
-class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator):
+class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator, limiter.LimitedFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -53,10 +53,9 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",
                      description_ja="サーバーのサービス名を指定します。",
                      description_en="Specify the service name of the inference server."),
-                dict(opt="scope", type=Options.T_STR, default="current", required=True, multi=False, hide=False, choice=["", "client", "current", "server"],
-                     description_ja="参照先スコープを指定します。指定可能な画像タイプは `client` , `current` , `server` です。",
-                     description_en="Specifies the scope to be referenced. When omitted, 'client' is used.",
-                     choice_show=dict(client=["client_data"]),),
+                dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
+                     description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
+                     description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
                 dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None, web="mask",
                      description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合エラーにします。",
                      description_en="Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.",),
@@ -66,9 +65,6 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="loadpath", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="読み込みファイルパスを指定します。",
                      description_en="Specify the source file path."),
-                dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None, web="mask",
-                     description_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
-                     description_en="Specify the path of the data folder when local is referenced."),
                 dict(opt="chunk_lang", type=Options.T_STR, default='auto', required=False, multi=False, hide=False,
                      choice=['auto', 'ja', 'en'],
                      choice_edit=True,
@@ -113,6 +109,7 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator):
         from tiktoken import model
         return [""] + sorted([k for k in model.MODEL_TO_ENCODING.keys()])
 
+    @limiter.apprun_check_limit
     @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
@@ -204,6 +201,7 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator):
     def is_cluster_redirect(self):
         return False
 
+    @limiter.svrun_check_limit
     def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
               sessions:Dict[str, Dict[str, Any]]) -> int:
         """

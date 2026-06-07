@@ -1,5 +1,5 @@
 from cmdbox.app import common, feature
-from cmdbox.app.commons import resdata, validator
+from cmdbox.app.commons import limiter, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -10,7 +10,7 @@ import requests
 import urllib.parse
 
 
-class ClientHttp(feature.ResultEdgeFeature, validator.Validator):
+class ClientHttp(feature.ResultEdgeFeature, validator.Validator, limiter.LimitedFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -82,6 +82,7 @@ class ClientHttp(feature.ResultEdgeFeature, validator.Validator):
             ]
         )
 
+    @limiter.apprun_check_limit
     @validator.async_apprun_check
     async def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """

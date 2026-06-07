@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -10,7 +10,7 @@ import pydantic
 import re
 
 
-class RagSave(feature.OneshotResultEdgeFeature, validator.Validator):
+class RagSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.LimitedFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -104,6 +104,7 @@ class RagSave(feature.OneshotResultEdgeFeature, validator.Validator):
             ]
         )
 
+    @limiter.apprun_check_limit
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
 
@@ -136,6 +137,7 @@ class RagSave(feature.OneshotResultEdgeFeature, validator.Validator):
     def is_cluster_redirect(self):
         return False
 
+    @limiter.svrun_check_limit
     def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
               sessions:Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
@@ -155,3 +157,18 @@ class RagSave(feature.OneshotResultEdgeFeature, validator.Validator):
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
+
+    def apprun_registrations(self, data_dir, logger, args, msg):
+        raise NotImplementedError("In the Limiter settings, please use `scope=server`.")
+
+    def svrun_registrations(self, data_dir, logger, opt, msg):
+        rag_dir = data_dir / '.agent'
+        count = 0
+        if rag_dir.exists() and rag_dir.is_dir():
+            paths = rag_dir.glob(f"rag-*.json")
+            for p in sorted(paths):
+                name = p.name
+                if not name.startswith('rag-') or not name.endswith('.json'):
+                    continue
+                count += 1
+        return count

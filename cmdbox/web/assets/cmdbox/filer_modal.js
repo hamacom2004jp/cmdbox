@@ -145,7 +145,6 @@ fmodal.list_tree_server = async (current_path) => {
         const opt = cmdbox.get_server_opt(false, fmodal.left);
         opt['mode'] = 'client';
         opt['cmd'] = 'file_list';
-        opt['capture_stdout'] = true;
         opt['svpath'] = current_path;
         const res = await cmdbox.sv_exec_cmd(opt);
         let success = res && res['success'];

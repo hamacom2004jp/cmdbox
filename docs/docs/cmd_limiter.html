@@ -1,0 +1,1585 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Command Reference ( limiter mode ) &mdash; cmdbox 2026/06/06 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=25cc829f"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Command Reference ( llm mode )" href="cmd_llm.html" />
+    <link rel="prev" title="Command Reference ( gui mode )" href="cmd_gui.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cmd_a2asv.html">A2AServer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html">Agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_audit.html">Audit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_datasource.html">Datasource</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_embed.html">Embed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_extract.html">Extract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Limiter</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#limiter-counter-cmdbox-m-limiter-c-counter-option">limiter ( counter ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">limiter</span> <span class="pre">-c</span> <span class="pre">counter</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#limiter-del-cmdbox-m-limiter-c-del-option">limiter ( del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">limiter</span> <span class="pre">-c</span> <span class="pre">del</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#limiter-list-cmdbox-m-limiter-c-list-option">limiter ( list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">limiter</span> <span class="pre">-c</span> <span class="pre">list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#limiter-load-cmdbox-m-limiter-c-load-option">limiter ( load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">limiter</span> <span class="pre">-c</span> <span class="pre">load</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#limiter-save-cmdbox-m-limiter-c-save-option">limiter ( save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">limiter</span> <span class="pre">-c</span> <span class="pre">save</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#limiter-targets-cmdbox-m-limiter-c-targets-option">limiter ( targets ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">limiter</span> <span class="pre">-c</span> <span class="pre">targets</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_llm.html">LLM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_rag.html">RAG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_test.html">Test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="command.html">Command Reference</a></li>
+      <li class="breadcrumb-item active">Command Reference ( limiter mode )</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/cmd_limiter.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="command-reference-limiter-mode">
+<h1>Command Reference ( limiter mode )<a class="headerlink" href="#command-reference-limiter-mode" title="Link to this heading"></a></h1>
+<p>List of limiter mode commands.</p>
+<section id="limiter-counter-cmdbox-m-limiter-c-counter-option">
+<h2>limiter ( counter ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">limiter</span> <span class="pre">-c</span> <span class="pre">counter</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#limiter-counter-cmdbox-m-limiter-c-counter-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Gets the counter for a limiter configuration.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--limiter_name &lt;limiter_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td></td>
+<td></td>
+<td><p>Specify the identifier name of the limiter configuration to get the counter for.</p></td>
+</tr>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>server</p></td>
+<td><p>client | server</p></td>
+<td><p>Specify the reference scope. <cite>client</cite> loads from the client local, <cite>server</cite> loads from the server side.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;limiter_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;total_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;total_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;total_input&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;total_process&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;total_output&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;total_registrations&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;last_refresh&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>Counter | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.limiter_name</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>制限設定の識別名</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.total_count</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>実行回数</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.total_time</p></td>
+<td><p>float | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>実行総時間（秒）</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.total_input</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>入力総バイト数</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.total_process</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理総バイト数</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.total_output</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>出力総バイト数</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.total_registrations</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>登録総数</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.last_refresh</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>最終リセット日時</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>output_schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="limiter-del-cmdbox-m-limiter-c-del-option">
+<h2>limiter ( del ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">limiter</span> <span class="pre">-c</span> <span class="pre">del</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#limiter-del-cmdbox-m-limiter-c-del-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Deletes a limiter configuration.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--limiter_name &lt;limiter_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td></td>
+<td></td>
+<td><p>Specify the identifier name of the limiter configuration to delete.</p></td>
+</tr>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>server</p></td>
+<td><p>client | current | server</p></td>
+<td><p>Specify the delete scope. <cite>client</cite> deletes from the client local, <cite>server</cite> deletes from the server side. <cite>current</cite> is not supported.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>output_schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="limiter-list-cmdbox-m-limiter-c-list-option">
+<h2>limiter ( list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">limiter</span> <span class="pre">-c</span> <span class="pre">list</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#limiter-list-cmdbox-m-limiter-c-list-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Lists registered limiter configurations.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--kwd &lt;kwd&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the identifier name to search for. Searches for partial matches.</p></td>
+</tr>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>server</p></td>
+<td><p>client | current | server</p></td>
+<td><p>Specify the reference scope. <cite>client</cite> lists from the client local, <cite>server</cite> lists from the server side. <cite>current</cite> is not supported.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;target_option&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="p">{}</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>list[LimiterRecord]</p></td>
+<td><p>no</p></td>
+<td><p>(必須)</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.name</p></td>
+<td><p>str</p></td>
+<td><p>yes</p></td>
+<td><p>(必須)</p></td>
+<td><p>制限設定の識別名</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.target_option</p></td>
+<td><p>list[dict[str, any]] | dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>対象コマンドの条件</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>output_schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="limiter-load-cmdbox-m-limiter-c-load-option">
+<h2>limiter ( load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">limiter</span> <span class="pre">-c</span> <span class="pre">load</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#limiter-load-cmdbox-m-limiter-c-load-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Loads a limiter configuration.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--limiter_name &lt;limiter_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td></td>
+<td></td>
+<td><p>Specify the identifier name of the limiter configuration to load.</p></td>
+</tr>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>server</p></td>
+<td><p>client | current | server</p></td>
+<td><p>Specify the reference scope. <cite>client</cite> loads from the client local, <cite>server</cite> loads from the server side. <cite>current</cite> is not supported.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;limiter_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;target_option&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{}</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;max_registrations&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;max_total_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;max_total_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;max_total_input&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;max_total_process&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;max_total_output&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;exec_period_start&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;exec_period_end&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;refresh_datetime&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;refresh_interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>Configure | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.scope</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スコープ</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.limiter_name</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>制限設定の識別名</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.target_option</p></td>
+<td><p>list[dict[str, any]] | dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>対象コマンドの条件</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.max_registrations</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>登録最大数（又は登録最大サイズ）</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.max_total_count</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>実行最大回数</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.max_total_time</p></td>
+<td><p>float | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>実行可能総時間（秒）</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.max_total_input</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>入力総バイト数の上限</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.max_total_process</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理総バイト数の上限</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.max_total_output</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>出力総バイト数の上限</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.exec_period_start</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>実行可能期間の開始日時</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.exec_period_end</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>実行可能期間の終了日時</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.refresh_datetime</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>カウンタリセット日時</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.refresh_interval</p></td>
+<td><p>float | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>カウンタリセット間隔（秒）</p></td>
+</tr>
+<tr class="row-even"><td><p>warn</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>error</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>output_schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-odd"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="limiter-save-cmdbox-m-limiter-c-save-option">
+<h2>limiter ( save ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">limiter</span> <span class="pre">-c</span> <span class="pre">save</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#limiter-save-cmdbox-m-limiter-c-save-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Adds or saves quantitative restriction settings for command execution.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--limiter_name &lt;limiter_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td></td>
+<td></td>
+<td><p>Specify the identifier name of the limiter configuration.</p></td>
+</tr>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>server</p></td>
+<td><p>client | current | server</p></td>
+<td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--target_option &lt;target_option&gt;</p></td>
+<td><p>dict</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the target command conditions to apply the restriction in dict format. Set the command option name (e.g. mode, cmd) as the key and the option value as the value.</p></td>
+</tr>
+<tr class="row-even"><td><p>--max_registrations &lt;max_registrations&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the maximum number of registrations (or maximum registration size). If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--max_total_count &lt;max_total_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the maximum number of command executions. If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-even"><td><p>--max_total_time &lt;max_total_time&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the total executable time in seconds for the command. If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--max_total_input &lt;max_total_input&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the maximum total number of input bytes. If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-even"><td><p>--max_total_process &lt;max_total_process&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the maximum total number of process bytes. If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--max_total_output &lt;max_total_output&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the maximum total number of output bytes. If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-even"><td><p>--exec_period_start &lt;exec_period_start&gt;</p></td>
+<td><p>datetime</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the start datetime of the executable period for the command (e.g. 2024-01-01T00:00:00). If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--exec_period_end &lt;exec_period_end&gt;</p></td>
+<td><p>datetime</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the end datetime of the executable period for the command (e.g. 2024-12-31T23:59:59). If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-even"><td><p>--refresh_datetime &lt;refresh_datetime&gt;</p></td>
+<td><p>datetime</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the datetime to reset this restriction (e.g. 2024-06-01T00:00:00). The restriction counters are reset at the specified datetime. If omitted, no reset is performed.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--refresh_interval &lt;refresh_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the interval in seconds after which this restriction is reset. The restriction counters are reset when the specified number of seconds has elapsed. If omitted, no reset is performed.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>output_schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-even"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="limiter-targets-cmdbox-m-limiter-c-targets-option">
+<h2>limiter ( targets ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">limiter</span> <span class="pre">-c</span> <span class="pre">targets</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#limiter-targets-cmdbox-m-limiter-c-targets-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Gets the list of Features that inherit from LimitedFeature.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--scope &lt;scope&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>server</p></td>
+<td><p>client | current | server</p></td>
+<td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;cmd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;limiters&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="p">{}</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data</p></td>
+<td><p>list[TargetRecord]</p></td>
+<td><p>no</p></td>
+<td><p>(必須)</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.mode</p></td>
+<td><p>str | list[str]</p></td>
+<td><p>yes</p></td>
+<td><p>(必須)</p></td>
+<td><p>フィーチャーのモード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.cmd</p></td>
+<td><p>str</p></td>
+<td><p>yes</p></td>
+<td><p>(必須)</p></td>
+<td><p>フィーチャーのコマンド</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.limiters</p></td>
+<td><p>list[dict[str, any]]</p></td>
+<td><p>no</p></td>
+<td><p>(必須)</p></td>
+<td><p>適合する制限設定の詳細内容リスト</p></td>
+</tr>
+<tr class="row-even"><td><p>warn</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>error</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>output_schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-odd"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cmd_gui.html" class="btn btn-neutral float-left" title="Command Reference ( gui mode )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmd_llm.html" class="btn btn-neutral float-right" title="Command Reference ( llm mode )" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

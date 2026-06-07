@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( excel mode ) &mdash; cmdbox 2026/05/31 documentation</title>
+  <title>Command Reference ( excel mode ) &mdash; cmdbox 2026/06/06 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=745f26b0"></script>
+      <script src="../_static/documentation_options.js?v=25cc829f"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -66,6 +66,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_extract.html">Extract</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_limiter.html">Limiter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_llm.html">LLM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_rag.html">RAG</a></li>
@@ -176,7 +177,7 @@
 <td><p>required</p></td>
 <td><p>client</p></td>
 <td><p>client | current | server</p></td>
-<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
+<td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svpath &lt;svpath&gt;</p></td>
 <td><p>file</p></td>
@@ -186,15 +187,7 @@
 <td></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
-<td><p>str</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td><p>Specify the path of the data folder when local is referenced.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -202,7 +195,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -210,7 +203,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -218,7 +211,7 @@
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-<tr class="row-even"><td><p>--formula_data_only &lt;formula_data_only&gt;</p></td>
+<tr class="row-odd"><td><p>--formula_data_only &lt;formula_data_only&gt;</p></td>
 <td><p>bool</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -226,7 +219,7 @@
 <td><p>True | False</p></td>
 <td><p>Specify whether to get only formula data. This option is valid if cached data exists.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--sheet_name &lt;sheet_name&gt;</p></td>
+<tr class="row-even"><td><p>--sheet_name &lt;sheet_name&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -234,7 +227,7 @@
 <td></td>
 <td><p>Specify the sheet name to get the cell value.If omitted, the first sheet will be used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cell_name &lt;cell_name&gt;</p></td>
+<tr class="row-odd"><td><p>--cell_name &lt;cell_name&gt;</p></td>
 <td><p>str</p></td>
 <td><p>multi</p></td>
 <td></td>
@@ -242,7 +235,7 @@
 <td></td>
 <td><p>Specify the cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--cell_top_left &lt;cell_top_left&gt;</p></td>
+<tr class="row-even"><td><p>--cell_top_left &lt;cell_top_left&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -250,7 +243,7 @@
 <td></td>
 <td><p>Specify the top-left cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cell_bottom_right &lt;cell_bottom_right&gt;</p></td>
+<tr class="row-odd"><td><p>--cell_bottom_right &lt;cell_bottom_right&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -258,7 +251,7 @@
 <td></td>
 <td><p>Specify the bottom-right cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--output_detail_format &lt;output_detail_format&gt;</p></td>
+<tr class="row-even"><td><p>--output_detail_format &lt;output_detail_format&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -430,7 +423,7 @@
 <td><p>required</p></td>
 <td><p>client</p></td>
 <td><p>client | current | server</p></td>
-<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
+<td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svpath &lt;svpath&gt;</p></td>
 <td><p>file</p></td>
@@ -440,15 +433,7 @@
 <td></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
-<td><p>str</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td><p>Specify the path of the data folder when local is referenced.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -456,7 +441,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -464,7 +449,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -472,7 +457,7 @@
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-<tr class="row-even"><td><p>--formula_data_only &lt;formula_data_only&gt;</p></td>
+<tr class="row-odd"><td><p>--formula_data_only &lt;formula_data_only&gt;</p></td>
 <td><p>bool</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -480,7 +465,7 @@
 <td><p>True | False</p></td>
 <td><p>Specify whether to get only formula data. This option is valid if cached data exists.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--sheet_name &lt;sheet_name&gt;</p></td>
+<tr class="row-even"><td><p>--sheet_name &lt;sheet_name&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -488,7 +473,7 @@
 <td></td>
 <td><p>Specify the sheet name to get the cell value.If omitted, all sheets will be used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cell_name &lt;cell_name&gt;</p></td>
+<tr class="row-odd"><td><p>--cell_name &lt;cell_name&gt;</p></td>
 <td><p>str</p></td>
 <td><p>multi</p></td>
 <td></td>
@@ -496,7 +481,7 @@
 <td></td>
 <td><p>Specify the cell name to search for the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--cell_top_left &lt;cell_top_left&gt;</p></td>
+<tr class="row-even"><td><p>--cell_top_left &lt;cell_top_left&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -504,7 +489,7 @@
 <td></td>
 <td><p>Specify the top-left cell name to search for the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cell_bottom_right &lt;cell_bottom_right&gt;</p></td>
+<tr class="row-odd"><td><p>--cell_bottom_right &lt;cell_bottom_right&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -512,7 +497,7 @@
 <td></td>
 <td><p>Specify the bottom-right cell name to search for the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--match_type &lt;match_type&gt;</p></td>
+<tr class="row-even"><td><p>--match_type &lt;match_type&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -520,7 +505,7 @@
 <td><p>full | partial | regex</p></td>
 <td><p>Specifies the matching method for the value in the search cell. <cite>full</cite>: Exact match, <cite>partial</cite>: Partial match, <cite>regex</cite>: Regular expression.</p></td>
 </tr>
-<tr class="row-even"><td><p>--search_value &lt;search_value&gt;</p></td>
+<tr class="row-odd"><td><p>--search_value &lt;search_value&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -528,7 +513,7 @@
 <td></td>
 <td><p>Specify the value to search for in the cell. The method of specification depends on <cite>match_type</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--output_cell_format &lt;output_cell_format&gt;</p></td>
+<tr class="row-even"><td><p>--output_cell_format &lt;output_cell_format&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -700,7 +685,7 @@
 <td><p>required</p></td>
 <td><p>client</p></td>
 <td><p>client | current | server</p></td>
-<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
+<td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svpath &lt;svpath&gt;</p></td>
 <td><p>file</p></td>
@@ -710,15 +695,7 @@
 <td></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
-<td><p>str</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td><p>Specify the path of the data folder when local is referenced.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -726,7 +703,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -734,7 +711,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -742,7 +719,7 @@
 <td></td>
 <td><p>Specify the maximum waiting time until the server responds.</p></td>
 </tr>
-<tr class="row-even"><td><p>--formula_data_only &lt;formula_data_only&gt;</p></td>
+<tr class="row-odd"><td><p>--formula_data_only &lt;formula_data_only&gt;</p></td>
 <td><p>bool</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -750,7 +727,7 @@
 <td><p>True | False</p></td>
 <td><p>Specify whether to get only formula data. This option is valid if cached data exists.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--sheet_name &lt;sheet_name&gt;</p></td>
+<tr class="row-even"><td><p>--sheet_name &lt;sheet_name&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -758,7 +735,7 @@
 <td></td>
 <td><p>Specify the sheet name to get the cell value.If omitted, the first sheet will be used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cell_name &lt;cell_name&gt;</p></td>
+<tr class="row-odd"><td><p>--cell_name &lt;cell_name&gt;</p></td>
 <td><p>str</p></td>
 <td><p>multi</p></td>
 <td></td>
@@ -766,7 +743,7 @@
 <td></td>
 <td><p>Specify the cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--cell_top_left &lt;cell_top_left&gt;</p></td>
+<tr class="row-even"><td><p>--cell_top_left &lt;cell_top_left&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -774,7 +751,7 @@
 <td></td>
 <td><p>Specify the top-left cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--cell_bottom_right &lt;cell_bottom_right&gt;</p></td>
+<tr class="row-odd"><td><p>--cell_bottom_right &lt;cell_bottom_right&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -782,7 +759,7 @@
 <td></td>
 <td><p>Specify the bottom-right cell name to get the cell value. For example, <cite>A1</cite>, <cite>B2</cite>, <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--cell_value &lt;cell_value&gt;</p></td>
+<tr class="row-even"><td><p>--cell_value &lt;cell_value&gt;</p></td>
 <td><p>dict</p></td>
 <td><p>multi</p></td>
 <td></td>
@@ -790,7 +767,7 @@
 <td></td>
 <td><p>Set a value in a cell. Specify the cell's name and value. Cell names can be, for example, <cite>A1</cite>, <cite>B2</cite>, or <cite>R5987</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p>--output_cell_format &lt;output_cell_format&gt;</p></td>
+<tr class="row-odd"><td><p>--output_cell_format &lt;output_cell_format&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -962,7 +939,7 @@
 <td><p>required</p></td>
 <td><p>client</p></td>
 <td><p>client | current | server</p></td>
-<td><p>Specifies the scope to be referenced. When omitted, 'client' is used.</p></td>
+<td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svpath &lt;svpath&gt;</p></td>
 <td><p>file</p></td>
@@ -972,15 +949,7 @@
 <td></td>
 <td><p>Specify the directory path to get the list of files.</p></td>
 </tr>
-<tr class="row-even"><td><p>--client_data &lt;client_data&gt;</p></td>
-<td><p>str</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td><p>Specify the path of the data folder when local is referenced.</p></td>
-</tr>
-<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -988,7 +957,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -996,7 +965,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>

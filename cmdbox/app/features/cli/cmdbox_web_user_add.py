@@ -1,5 +1,5 @@
 from cmdbox.app import common, feature, web
-from cmdbox.app.commons import resdata, validator
+from cmdbox.app.commons import limiter, resdata, validator
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -7,7 +7,7 @@ import logging
 import pydantic
 
 
-class WebUserAdd(feature.UnsupportEdgeFeature, validator.Validator):
+class WebUserAdd(feature.UnsupportEdgeFeature, validator.Validator, limiter.LimitedFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -65,6 +65,7 @@ class WebUserAdd(feature.UnsupportEdgeFeature, validator.Validator):
             ]
         )
 
+    @limiter.apprun_check_limit
     @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
@@ -101,3 +102,13 @@ class WebUserAdd(feature.UnsupportEdgeFeature, validator.Validator):
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
+
+    def apprun_registrations(self, data_dir, logger, args, msg):
+        w = web.Web(logger, self.default_data, appcls=self.appcls, ver=self.ver,
+                    redis_host=self.default_host, redis_port=self.default_port, redis_password=self.default_pass, svname=self.default_svname,
+                    signin_file=args.signin_file)
+        users = w.user_list(None)
+        return len(users)
+
+    def svrun_registrations(self, data_dir, logger, opt, msg):
+        raise NotImplementedError("In the Limiter settings, please use `scope=client`.")

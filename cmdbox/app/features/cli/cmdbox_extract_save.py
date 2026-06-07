@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -9,7 +9,7 @@ import json
 import pydantic
 
 
-class ExtractSave(feature.OneshotResultEdgeFeature, validator.Validator):
+class ExtractSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.LimitedFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -81,12 +81,9 @@ class ExtractSave(feature.OneshotResultEdgeFeature, validator.Validator):
                      ),
                      description_ja="抽出の種類を指定します。",
                      description_en="Specify the type of extraction."),
-                dict(opt="scope", type=Options.T_STR, default="client", required=False, multi=False, hide=False, choice=["", "client", "server"],
-                     description_ja="参照先スコープを指定します。指定可能な画像タイプは `client` , `server` です。",
-                     description_en="Specify the reference scope. The available image types are `client` and `server`.",),
-                dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None, web="mask",
-                     description_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
-                     description_en="Specify the path of the data folder when local is referenced."),
+                dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
+                     description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
+                     description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
                 dict(opt="loadpath", type=Options.T_DIR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="読み込み元パスを指定します。",
                      description_en="Specify the source path."),
@@ -96,6 +93,7 @@ class ExtractSave(feature.OneshotResultEdgeFeature, validator.Validator):
             ]
         )
 
+    @limiter.apprun_check_limit
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         payload = dict(
@@ -128,6 +126,7 @@ class ExtractSave(feature.OneshotResultEdgeFeature, validator.Validator):
     def is_cluster_redirect(self):
         return False
 
+    @limiter.svrun_check_limit
     def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
               sessions:Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
@@ -146,3 +145,18 @@ class ExtractSave(feature.OneshotResultEdgeFeature, validator.Validator):
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
+
+    def apprun_registrations(self, data_dir, logger, args, msg):
+        raise NotImplementedError("In the Limiter settings, please use `scope=server`.")
+
+    def svrun_registrations(self, data_dir, logger, opt, msg):
+        extract_dir = data_dir / '.agent'
+        count = 0
+        if extract_dir.exists() and extract_dir.is_dir():
+            paths = extract_dir.glob(f"extract-*.json")
+            for p in sorted(paths):
+                name = p.name
+                if not name.startswith('extract-') or not name.endswith('.json'):
+                    continue
+                count += 1
+        return count

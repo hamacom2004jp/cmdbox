@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature, filer
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -10,7 +10,7 @@ import pydantic
 import re
 
 
-class ExtractPdfplumber(feature.OneshotResultEdgeFeature, validator.Validator):
+class ExtractPdfplumber(feature.OneshotResultEdgeFeature, validator.Validator, limiter.LimitedFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -53,10 +53,9 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",
                      description_ja="サーバーのサービス名を指定します。",
                      description_en="Specify the service name of the inference server."),
-                dict(opt="scope", type=Options.T_STR, default="current", required=True, multi=False, hide=False, choice=["", "client", "current", "server"],
-                     description_ja="参照先スコープを指定します。指定可能な画像タイプは `client` , `current` , `server` です。",
-                     description_en="Specifies the scope to be referenced. When omitted, 'client' is used.",
-                     choice_show=dict(client=["client_data"]),),
+                dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
+                     description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
+                     description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
                 dict(opt="loadpath", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="読み込みファイルパスを指定します。",
                      description_en="Specify the source file path."),
@@ -66,9 +65,6 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="rjpath", type=Options.T_FILE, default=None, required=False, multi=True, hide=False, choice=None, web="mask",
                      description_ja="指定したパスが要求されたパスにマッチする場合、アクセスが拒否されます。正規表現として解釈します。",
                      description_en="If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."),
-                dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None, web="mask",
-                     description_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
-                     description_en="Specify the path of the data folder when local is referenced."),
                 dict(opt="chunk_table", type=Options.T_STR, default="table", required=False, multi=False, hide=False, choice=["none", "table", "row_with_header"],
                     description_ja="PDFファイル内の表のチャンク方法を指定します。 `none` :表単位でチャンクしない、 `table` :表単位、 `row_with_header` :行単位(ヘッダ付き)",
                     description_en="Specifies how to chunk tables in the PDF file. `none` :do not chunk by table, `table` :by table, `row_with_header` :by row (with header)",
@@ -107,6 +103,7 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_en="Specify the maximum waiting time until the server responds."),
             ])
 
+    @limiter.apprun_check_limit
     @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
@@ -198,6 +195,7 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature, validator.Validator):
     def is_cluster_redirect(self):
         return False
 
+    @limiter.svrun_check_limit
     def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
               sessions:Dict[str, Dict[str, Any]]) -> int:
         """

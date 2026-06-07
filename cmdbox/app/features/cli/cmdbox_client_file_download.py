@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature, filer
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -9,7 +9,7 @@ import json
 import pydantic
 
 
-class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator):
+class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limiter.LimitedFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -65,12 +65,8 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator):
                      description_ja="ETagを指定します。サーバー側でファイルのETagと一致する場合、ファイルコンテンツはダウンロードされずに空が返されます。",
                      description_en="Specify the ETag. If the ETag matches the file's ETag on the server, the file content will not be downloaded and an empty response will be returned."),
                 dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
-                     description_ja="参照先スコープを指定します。指定可能な画像タイプは `client` , `current` , `server` です。",
-                     description_en="Specifies the scope to be referenced. When omitted, 'client' is used.",
-                     choice_show=dict(client=["client_data"]),
-                     test_true={"server":"server",
-                                "client":"client",
-                                "current":"current"}),
+                     description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
+                     description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
                 dict(opt="rpath", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="リクエストパスを指定します。この値は何もせずそのままレスポンスに含めて返されます。",
                      description_en="Specifies the request path. This value is returned in the response without any modification."),
@@ -78,12 +74,6 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator):
                      description_ja="クライアントの保存先パスを指定します。",
                      description_en="Specify the destination path of the client.",
                      test_true={"server":"upload/dog.jpg"}),
-                dict(opt="client_data", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None, web="mask",
-                     description_ja="ローカルを参照させる場合のデータフォルダのパスを指定します。",
-                     description_en="Specify the path of the data folder when local is referenced.",
-                     test_true={"server":None,
-                                "client":common.HOME_DIR / f".{self.ver.__appid__}",
-                                "current":None}),
                 dict(opt="img_thumbnail", type=Options.T_FLOAT, default=0.0, required=False, multi=False, hide=True, choice=None,
                      description_ja="対象が画像だった場合のサムネイルのピクセル単位のサイズを指定します。",
                      description_en="Specifies the size in pixels of the thumbnail if the subject is an image."),
@@ -108,6 +98,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator):
         """
         return 'file_download'
 
+    @limiter.apprun_check_limit
     @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
@@ -148,8 +139,8 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator):
             mime_type: Union[str, None] = pydantic.Field(default=None, description="MIMEタイプ")
             etag: Union[str, None] = pydantic.Field(default=None, description="ETag")
             not_modified: Union[bool, None] = pydantic.Field(default=None, description="未更新フラグ")
-            rpath: Union[str, None] = pydantic.Field(default=None, description="リクエストパス")
-            svpath: Union[str, None] = pydantic.Field(default=None, description="サーバーパス")
+            rpath: Union[str, Path, None] = pydantic.Field(default=None, description="リクエストパス")
+            svpath: Union[str, Path, None] = pydantic.Field(default=None, description="サーバーパス")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
@@ -163,6 +154,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator):
         """
         return False
 
+    @limiter.svrun_check_limit
     def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
               sessions:Dict[str, Dict[str, Any]]) -> int:
         """

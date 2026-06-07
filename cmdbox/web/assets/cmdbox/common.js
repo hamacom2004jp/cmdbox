@@ -932,7 +932,6 @@ cmdbox.load_server_list = (parent_elem, call_back_func, server_only, current_onl
         const opt = cmdbox.get_server_opt(false, parent_elem);
         opt['mode'] = 'server';
         opt['cmd'] = 'list';
-        opt["capture_stdout"] = true;
         delete opt['svname'];
         cmdbox.sv_exec_cmd(opt).then(res => {
             if(res && res['success']) res = [res];
@@ -998,7 +997,6 @@ cmdbox.deploy_list = (target, error_func=undefined) => {
     const opt = cmdbox.get_server_opt(false, target);
     opt['mode'] = 'client';
     opt['cmd'] = 'deploy_list';
-    opt['capture_stdout'] = true;
     cmdbox.show_loading();
     return cmdbox.sv_exec_cmd(opt).then(res => {
         if(!res[0] || !res[0]['success']) {
@@ -1108,19 +1106,18 @@ cmdbox.genpass = (pass_length=16, pass_count=1, use_alphabet="both", use_number=
     opt['use_number'] = use_number;
     opt['use_symbol'] = use_symbol;
     opt['similar'] = similar;
-    opt['capture_stdout'] = true;
     cmdbox.show_loading();
     return cmdbox.sv_exec_cmd(opt).then(res => {
-        if(!res[0] || !res[0]['success']) {
+        if(!res || !res['success']) {
             cmdbox.hide_loading();
             if (error_func) {
                 error_func(res);
                 return;
             }
             cmdbox.message(res, true, true);
-            return res[0];
+            return res;
         }
-        const ret = res[0]['success'];
+        const ret = res['success'];
         cmdbox.hide_loading();
         return ret['passwords'];
     });
@@ -1138,7 +1135,6 @@ cmdbox.file_list = (target, svpath, recursive=false, error_func=undefined, exec_
     const opt = cmdbox.get_server_opt(false, target);
     opt['mode'] = 'client';
     opt['cmd'] = 'file_list';
-    opt['capture_stdout'] = true;
     opt['svpath'] = svpath;
     opt['recursive'] = recursive ? true : false;
     cmdbox.show_loading();
@@ -1169,7 +1165,6 @@ cmdbox.file_download = (target, svpath, error_func=undefined, exec_cmd=undefined
     const opt = cmdbox.get_server_opt(false, target);
     opt['mode'] = 'client';
     opt['cmd'] = 'file_download';
-    opt['capture_stdout'] = true;
     opt['svpath'] = svpath;
     opt['capture_maxsize'] = 1024**3*10;
     cmdbox.show_loading();
@@ -1256,7 +1251,6 @@ cmdbox.file_copy = (target, from_path, to_path, overwrite=false, error_func=unde
     const opt = cmdbox.get_server_opt(false, target);
     opt['mode'] = 'client';
     opt['cmd'] = 'file_copy';
-    opt['capture_stdout'] = true;
     opt['from_path'] = from_path;
     opt['to_path'] = to_path;
     opt['overwrite'] = overwrite;
@@ -1289,7 +1283,6 @@ cmdbox.file_move = (target, from_path, to_path, error_func=undefined, exec_cmd=u
     const opt = cmdbox.get_server_opt(false, target);
     opt['mode'] = 'client';
     opt['cmd'] = 'file_move';
-    opt['capture_stdout'] = true;
     opt['from_path'] = from_path;
     opt['to_path'] = to_path;
     cmdbox.show_loading();
@@ -1320,7 +1313,6 @@ cmdbox.file_remove = (target, svpath, error_func=undefined, exec_cmd=undefined) 
     const opt = cmdbox.get_server_opt(false, target);
     opt['mode'] = 'client';
     opt['cmd'] = 'file_remove';
-    opt['capture_stdout'] = true;
     opt['svpath'] = svpath;
     cmdbox.show_loading();
     const exec = exec_cmd ? exec_cmd : cmdbox.sv_exec_cmd;
@@ -1350,7 +1342,6 @@ cmdbox.file_rmdir = (target, svpath, error_func=undefined, exec_cmd=undefined) =
     const opt = cmdbox.get_server_opt(false, target);
     opt['mode'] = 'client';
     opt['cmd'] = 'file_rmdir';
-    opt['capture_stdout'] = true;
     opt['svpath'] = svpath;
     cmdbox.show_loading();
     const exec = exec_cmd ? exec_cmd : cmdbox.sv_exec_cmd;
@@ -1380,7 +1371,6 @@ cmdbox.file_mkdir = (target, svpath, error_func=undefined, exec_cmd=undefined) =
     const opt = cmdbox.get_server_opt(false, target);
     opt['mode'] = 'client';
     opt['cmd'] = 'file_mkdir';
-    opt['capture_stdout'] = true;
     opt['svpath'] = svpath;
     cmdbox.show_loading();
     const exec = exec_cmd ? exec_cmd : cmdbox.sv_exec_cmd;
