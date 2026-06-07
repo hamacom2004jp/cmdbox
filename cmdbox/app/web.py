@@ -65,7 +65,8 @@ class Web:
                  redis_host:str="localhost", redis_port:int=6379, redis_password:str=None, svname:str='server',
                  client_only:bool=False, doc_root:Path=None, gui_html:str=None,
                  filer_html:str=None, result_html:str=None, users_html:str=None, agent_html:str=None,
-                 audit_html:str=None, assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
+                 audit_html:str=None, assets:List[str]=None, limiter_html:str=None,
+                 signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
                  web_features_packages:List[str]=None, web_features_prefix:List[str]=[]):
         """
         cmdboxクライアント側のwebapiサービス
@@ -89,6 +90,7 @@ class Web:
             agent_html (str, optional): エージェントのHTMLファイル. Defaults to None.
             audit_html (str, optional): 監査のHTMLファイル. Defaults to None.
             assets (List[str], optional): 静的ファイルのリスト. Defaults to None.
+            limiter_html (str, optional): リミッターのHTMLファイル. Defaults to None.
             signin_html (str, optional): ログイン画面のHTMLファイル. Defaults to None.
             signin_file (str, optional): ログイン情報のファイル. Defaults to args.signin_file.
             gui_mode (bool, optional): GUIモードかどうか. Defaults to False.
@@ -133,6 +135,7 @@ class Web:
                     self.assets.append(asset)
                 else:
                     logger.warning(f'assets not found. ({asset})')
+        self.limiter_html = Path(limiter_html) if limiter_html is not None else Path(__file__).parent.parent / 'web' / 'limiter.html'
         self.signin_html = Path(signin_html) if signin_html is not None else Path(__file__).parent.parent / 'web' / 'signin.html'
         self.signin_file = Path(signin_file) if signin_file is not None else None
         self.gui_html_data = None
@@ -141,6 +144,7 @@ class Web:
         self.users_html_data = None
         self.audit_html_data = None
         self.assets_data = None
+        self.limiter_html_data = None
         self.agent_html_data = None
         self.signin_html_data = None
         self.gui_mode = gui_mode
@@ -184,6 +188,7 @@ class Web:
             self.logger.debug(f"web init parameter: audit_html={self.audit_html} -> {self.audit_html.absolute() if self.audit_html is not None else None}")
             self.logger.debug(f"web init parameter: agent_html={self.agent_html} -> {self.agent_html.absolute() if self.agent_html is not None else None}")
             self.logger.debug(f"web init parameter: assets={self.assets} -> {[a.absolute() for a in self.assets] if self.assets is not None else None}")
+            self.logger.debug(f"web init parameter: limiter_html={self.limiter_html} -> {self.limiter_html.absolute() if self.limiter_html is not None else None}")
             self.logger.debug(f"web init parameter: signin_html={self.signin_html} -> {self.signin_html.absolute() if self.signin_html is not None else None}")
             self.logger.debug(f"web init parameter: signin_file={self.signin_file} -> {self.signin_file.absolute() if self.signin_file is not None else None}")
             self.logger.debug(f"web init parameter: gui_mode={self.gui_mode}")

@@ -47,8 +47,8 @@ class LimiterList(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_ja="検索したい識別名を指定します。中間マッチで検索します。",
                      description_en="Specify the identifier name to search for. Searches for partial matches."),
                 dict(opt="scope", type=Options.T_STR, default="server", required=True, multi=False, hide=False, choice=["client", "current", "server"],
-                     description_ja="参照先スコープを指定します。`client` はクライアントローカル、`server` はサーバー側から一覧取得します。`current` は未サポートです。",
-                     description_en="Specify the reference scope. `client` lists from the client local, `server` lists from the server side. `current` is not supported.",),
+                     description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
+                     description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
             ]
         )
 
@@ -79,6 +79,8 @@ class LimiterList(feature.OneshotResultEdgeFeature, validator.Validator):
                         cfg = json.load(f)
                     results.append(dict(
                         name=name[len('limiter-'):],
+                        target_mode=cfg.get('target_mode', None),
+                        target_cmd=cfg.get('target_cmd', None),
                         target_option=cfg.get('target_option', None),
                     ))
             out = dict(success=dict(data=results))
@@ -100,6 +102,8 @@ class LimiterList(feature.OneshotResultEdgeFeature, validator.Validator):
     def output_schema(self) -> type:
         class LimiterRecord(resdata.Base):
             name: str = pydantic.Field(..., description="制限設定の識別名")
+            target_mode: Union[str, None] = pydantic.Field(default=None, description="対象コマンドのモード名")
+            target_cmd: Union[str, None] = pydantic.Field(default=None, description="対象コマンドのコマンド名")
             target_option: Union[List[Dict[str, Any]], Dict[str, Any], None] = pydantic.Field(default=None, description="対象コマンドの条件")
         class Data(resdata.Data):
             data: List[LimiterRecord] = pydantic.Field(default_factory=list, description="処理結果のデータ")
@@ -127,6 +131,8 @@ class LimiterList(feature.OneshotResultEdgeFeature, validator.Validator):
                         cfg = json.load(f)
                     results.append(dict(
                         name=name[len('limiter-'):],
+                        target_mode=cfg.get('target_mode', None),
+                        target_cmd=cfg.get('target_cmd', None),
                         target_option=cfg.get('target_option', None),
                     ))
             result = dict(success=dict(data=results))

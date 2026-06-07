@@ -17,6 +17,7 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
         return 'save'
 
     def get_option(self) -> Dict[str, Any]:
+        op = Options.getInstance(self.appcls, self.ver)
         return dict(
             use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="コマンド実行に対する量的な制限設定を追加/保存します。",
@@ -49,9 +50,24 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="scope", type=Options.T_STR, default="server", required=True, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
                      description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
+                dict(opt="target_mode", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                     choice_fn=lambda o, webmode, opt: ['']+op.get_mode_keys(),
+                     description_ja="制限を適用する対象コマンドのモード名を指定します。",
+                     description_en="Specify the mode name of the target command to apply the restriction. If omitted, all modes are targeted."),
+                dict(opt="target_cmd", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
+                     callcmd="async () => {"
+                             + "const res = await get_cmds($(\"[name='target_mode']\").val());"
+                             + "const py_load_cmd = await cmdbox.load_cmd($(\"[name='title']\").val());"
+                             + "const val = py_load_cmd['target_cmd'];"
+                             + "$(\"[name='target_cmd']\").empty();"
+                             + "res.map(elm=>{$(\"[name='target_cmd']\").append('<option value=\"'+elm+'\">'+elm+'</option>');});"
+                             + "$(\"[name='target_cmd']\").val(val);"
+                             + "}",
+                     description_ja="制限を適用する対象コマンドのコマンド名を指定します。",
+                     description_en="Specify the command name of the target command to apply the restriction. If omitted, all commands are targeted."),
                 dict(opt="target_option", type=Options.T_DICT, default=None, required=False, multi=True, hide=False, choice=None,
-                     description_ja="制限を適用する対象コマンドの条件をdict形式で指定します。keyにコマンドオプション名（例: mode, cmd）、valにオプションの値を指定します。",
-                     description_en="Specify the target command conditions to apply the restriction in dict format. Set the command option name (e.g. mode, cmd) as the key and the option value as the value."),
+                     description_ja="制限を適用する対象コマンドの条件をdict形式で指定します。keyにコマンドオプション名、valにオプションの値を指定します。",
+                     description_en="Specify the conditions for the commands to which the restrictions apply in dictionary format. Specify the command option name as the key and the option value as the value."),
                 dict(opt="max_registrations", type=Options.T_INT, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="登録最大数（又は登録最大サイズ）を指定します。省略時は制限しません。",
                      description_en="Specify the maximum number of registrations (or maximum registration size). If omitted, no limit is applied."),
@@ -96,6 +112,8 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
         configure = dict(
             scope=args.scope,
             limiter_name=args.limiter_name,
+            target_mode=args.target_mode if hasattr(args, 'target_mode') else None,
+            target_cmd=args.target_cmd if hasattr(args, 'target_cmd') else None,
             target_option=args.target_option if hasattr(args, 'target_option') else None,
             max_total_count=args.max_total_count if hasattr(args, 'max_total_count') else None,
             max_registrations=args.max_registrations if hasattr(args, 'max_registrations') else None,

@@ -613,7 +613,7 @@ cmdbox ( server_install ) : ``cmdbox -m cmdbox -c server_install <Option>``
 
     "Option","Type","Multi","Required","Default","Choices","Description"
     "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HONE/.cmdbox` is used."
-    "--install_cmdbox <install_cmdbox>","str","","","cmdbox==0.7.14.1","","When omitted, `cmdbox==0.7.14.1` is used."
+    "--install_cmdbox <install_cmdbox>","str","","","cmdbox==0.7.15","","When omitted, `cmdbox==0.7.15` is used."
     "--install_from <install_from>","str","","","","","Specify the FROM image that will be the source of the docker image to be created."
     "--install_no_python <install_no_python>","bool","","","False","True | False","Do not install python."
     "--install_compile_python <install_compile_python>","bool","","","False","True | False","Compile and install python3; if install_no_python is specified, it is preferred."

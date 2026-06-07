@@ -88,7 +88,7 @@ class LLMDel(feature.OneshotResultEdgeFeature, validator.Validator):
                 return self.RESP_WARN
 
             configure_path.unlink()
-            msg = dict(success=f"LLM configuration '{llmname}' deleted from '{str(configure_path)}'.")
+            msg = dict(success=dict(data=f"LLM configuration '{llmname}' deleted from '{str(configure_path)}'."))
             redis_cli.rpush(reskey, msg)
             return self.RESP_SUCCESS
 

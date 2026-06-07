@@ -128,6 +128,9 @@ class WebStart(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="assets", type=Options.T_FILE, default=None, required=False, multi=True, hide=False, choice=None, fileio="in",
                      description_ja="htmlファイルを使用する場合に必要なアセットファイルを指定します。",
                      description_en="Specify the asset file required when using html files."),
+                dict(opt="limiter_html", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
+                     description_ja="`limiter.html` を指定します。省略時はcmdbox内蔵のHTMLファイルを使用します。",
+                     description_en="Specify `limiter.html`. If omitted, the cmdbox built-in HTML file is used."),
                 dict(opt="signin_html", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
                      description_ja="`signin.html` を指定します。省略時はcmdbox内蔵のHTMLファイルを使用します。",
                      description_en="Specify `signin.html`. If omitted, the cmdbox built-in HTML file is used."),
@@ -185,7 +188,7 @@ class WebStart(feature.UnsupportEdgeFeature, validator.Validator):
                     redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                     client_only=args.client_only, doc_root=args.doc_root, gui_html=args.gui_html, filer_html=args.filer_html,
                     result_html=args.result_html, users_html=args.users_html, agent_html=args.agent_html, audit_html=args.audit_html,
-                    assets=args.assets, signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=args.gui_mode)
+                    assets=args.assets, limiter_html=args.limiter_html, signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=args.gui_mode)
         return w
 
     def start(self, w:web.Web, logger:logging.Logger, args:argparse.Namespace) -> None:

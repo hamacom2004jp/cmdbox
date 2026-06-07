@@ -47,8 +47,8 @@ class LimiterLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_ja="読み込む制限設定の識別名を指定します。",
                      description_en="Specify the identifier name of the limiter configuration to load."),
                 dict(opt="scope", type=Options.T_STR, default="server", required=True, multi=False, hide=False, choice=["client", "current", "server"],
-                     description_ja="参照先スコープを指定します。`client` はクライアントローカル、`server` はサーバー側から読み込みます。`current` は未サポートです。",
-                     description_en="Specify the reference scope. `client` loads from the client local, `server` loads from the server side. `current` is not supported.",),
+                     description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
+                     description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
             ]
         )
 
@@ -96,6 +96,8 @@ class LimiterLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         class Configure(resdata.Base):
             scope: Union[str, None] = pydantic.Field(default=None, description="スコープ")
             limiter_name: Union[str, None] = pydantic.Field(default=None, description="制限設定の識別名")
+            target_mode: Union[str, None] = pydantic.Field(default=None, description="対象コマンドのモード名")
+            target_cmd: Union[str, None] = pydantic.Field(default=None, description="対象コマンドのコマンド名")
             target_option: Union[List[Dict[str, Any]], Dict[str, Any], None] = pydantic.Field(default=None, description="対象コマンドの条件")
             max_registrations: Union[int, None] = pydantic.Field(default=None, description="登録最大数（又は登録最大サイズ）")
             max_total_count: Union[int, None] = pydantic.Field(default=None, description="実行最大回数")

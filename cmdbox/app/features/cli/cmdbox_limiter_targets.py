@@ -24,6 +24,7 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
         return 'targets'
 
     def get_option(self) -> Dict[str, Any]:
+        op = Options.getInstance(appcls=self.appcls, ver=self.ver)
         return dict(
             use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=False,
             description_ja="LimitedFeature を継承しているFeature一覧を取得します。",
@@ -53,19 +54,48 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="scope", type=Options.T_STR, default="server", required=True, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
                      description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
+                dict(opt="filter_target_mode", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                     choice_fn=lambda o, webmode, opt: ['']+op.get_mode_keys(),
+                     description_ja="対象モードで絞り込みます。指定した場合、そのモードのみの結果を返します。",
+                     description_en="Filter by target mode. If specified, returns results for that mode only."),
+                dict(opt="filter_target_cmd", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=[],
+                     callcmd="async () => {"
+                             + "const res = await get_cmds($(\"[name='filter_target_mode']\").val());"
+                             + "const py_load_cmd = await cmdbox.load_cmd($(\"[name='title']\").val());"
+                             + "const val = py_load_cmd['filter_target_cmd'];"
+                             + "$(\"[name='filter_target_cmd']\").empty();"
+                             + "res.map(elm=>{$(\"[name='filter_target_cmd']\").append('<option value=\"'+elm+'\">'+elm+'</option>');});"
+                             + "$(\"[name='filter_target_cmd']\").val(val);"
+                             + "}",
+                     description_ja="対象コマンドで絞り込みます。指定した場合、そのコマンドのみの結果を返します。",
+                     description_en="Filter by target command. If specified, returns results for that command only."),
             ]
         )
 
     @staticmethod
-    def _limiter_matches(target_option: Dict[str, Any], feat_mode: Union[str, List[str]], feat_cmd: str) -> bool:
-        if not target_option:
-            return True
-        if isinstance(feat_mode, list) and target_option.get('mode') not in feat_mode:
-            return False
-        if target_option.get('mode') != feat_mode:
-            return False
-        if target_option.get('cmd') != feat_cmd:
-            return False
+    def _limiter_matches(entry: Dict[str, Any], feat_mode: Union[str, List[str]], feat_cmd: str) -> bool:
+        target_mode = entry.get('target_mode')
+        if target_mode:
+            if isinstance(feat_mode, list):
+                if str(target_mode) not in [str(m) for m in feat_mode]:
+                    return False
+            elif str(feat_mode) != str(target_mode):
+                return False
+
+        target_cmd = entry.get('target_cmd')
+        if target_cmd:
+            if str(feat_cmd) != str(target_cmd):
+                return False
+
+        target_option = entry.get('target_option')
+        if target_option:
+            if isinstance(feat_mode, list) and target_option.get('mode') not in feat_mode:
+                return False
+            if not isinstance(feat_mode, list) and target_option.get('mode') and target_option.get('mode') != feat_mode:
+                return False
+            if target_option.get('cmd') and target_option.get('cmd') != feat_cmd:
+                return False
+
         return True
 
     @validator.apprun_check
@@ -84,8 +114,20 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
                 return {}
             return res.get('success', {}).get('data', {})
 
+        # 絞り込み条件を取得
+        filter_target_mode = getattr(args, 'filter_target_mode', None)
+        filter_target_cmd = getattr(args, 'filter_target_cmd', None)
+
         for mode in options.get_mode_keys():
+            # target_mode で絞り込み
+            if filter_target_mode and str(mode) != str(filter_target_mode):
+                continue
+
             for cmd in options.get_cmd_keys(mode):
+                # target_cmd で絞り込み
+                if filter_target_cmd and str(cmd) != str(filter_target_cmd):
+                    continue
+
                 feat = options.get_cmd_attr(mode, cmd, 'feature')
                 if not isinstance(feat, limiter.LimitedFeature):
                     continue
@@ -93,7 +135,7 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
                 feat_cmd = feat.get_cmd()
                 matched_limiters: List[Dict[str, Any]] = []
                 for entry in lt:
-                    if not self._limiter_matches(entry.get('target_option'), feat_mode, feat_cmd):
+                    if not self._limiter_matches(entry, feat_mode, feat_cmd):
                         continue
                     load_args = copy.copy(args)
                     load_args.limiter_name = entry['name']

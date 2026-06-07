@@ -47,8 +47,8 @@ class LimiterDel(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_ja="削除する制限設定の識別名を指定します。",
                      description_en="Specify the identifier name of the limiter configuration to delete."),
                 dict(opt="scope", type=Options.T_STR, default="server", required=True, multi=False, hide=False, choice=["client", "current", "server"],
-                     description_ja="削除先スコープを指定します。`client` はクライアントローカル、`server` はサーバー側から削除します。`current` は未サポートです。",
-                     description_en="Specify the delete scope. `client` deletes from the client local, `server` deletes from the server side. `current` is not supported.",),
+                     description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
+                     description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
             ]
         )
 
@@ -118,7 +118,7 @@ class LimiterDel(feature.OneshotResultEdgeFeature, validator.Validator):
                 return self.RESP_WARN
 
             configure_path.unlink()
-            result = dict(success=f"Limiter configuration '{limiter_name}' deleted from '{configure_path}'.")
+            result = dict(success=dict(data=f"Limiter configuration '{limiter_name}' deleted from '{configure_path}'.")) 
             redis_cli.rpush(reskey, result)
             return self.RESP_SUCCESS
 

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body lang="ja" class="overflow-hidden p-2" style="background-color:var(--bs-body-bg)">
+    <script type="text/javascript" src="assets/cmdbox/svgicon.js"></script>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar navbar-expand-sm console-header fixed-top p-2">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="./">cmdbox</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle i18n" href="#" id="aboutMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            About
+                        </a>
+                        <ul class="dropdown-menu aboutmenu" aria-labelledby="aboutMenuLink">
+                            <li><a class="dropdown-item i18n" href="#" onclick="$(`#versions_modal`).modal(`show`);">Versions</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="d-none dropdown user_info">
+                    <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle show" data-bs-toggle="dropdown" aria-expanded="true" style="fill:gray;">
+                        <svg class="m-1" width="24" height="24" viewBox="0 0 16 16">
+                            <use href="#svg_signin_ico"></use>
+                        </svg>
+                        <span class="username">UserName</span>
+                    </a>
+                    <ul class="dropdown-menu text-small shadow" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);" data-popper-placement="bottom-end">
+                        <div class="user_info_note ps-3 pe-3"></div>
+                        <li><hr class="dropdown-divider"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div id="main_container" class="container-fluid overflow-auto" style="margin-top:66px;height:calc(100vh - 120px);">
+        <form class="d-none filer_form">
+            <input name="filer_host" type="hidden" class="filer_host">
+            <input name="filer_port" type="hidden" class="filer_port">
+            <input name="filer_password" type="hidden" class="filer_password">
+            <input name="filer_svname" type="hidden" class="filer_svname">
+            <input name="filer_scope" type="hidden" class="filer_scope">
+            <input name="filer_client_data" type="hidden" class="filer_client_data">
+        </form>
+        <!-- ツールバー -->
+        <div class="d-flex align-items-center gap-2 my-2">
+            <div class="input-group" style="width:auto;">
+                <label class="input-group-text i18n">Target Mode</label>
+                <select id="filter_target_mode" class="form-select" style="width:130px;">
+                    <option value="">all</option>
+                </select>
+            </div>
+            <div class="input-group" style="width:auto;">
+                <label class="input-group-text i18n">Target Cmd</label>
+                <select id="filter_target_cmd" class="form-select" style="width:130px;">
+                </select>
+            </div>
+            <div class="input-group" style="width:auto;">
+                <label class="input-group-text i18n">Scope</label>
+                <select id="scope_select" class="form-select" style="width:130px;">
+                    <option value="server" selected>server</option>
+                    <option value="client">client</option>
+                </select>
+            </div>
+            <button id="btn_refresh" type="button" class="btn btn-outline-secondary">
+                <i class="fas fa-sync-alt"></i>
+                <span class="i18n ms-1">Refresh</span>
+            </button>
+        </div>
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link i18n active" id="targets-tab" data-bs-toggle="tab" href="#targets" role="tab" aria-controls="targets" aria-selected="true">Targets</a>
+            </li>
+            <!--li class="nav-item" role="presentation">
+                <a class="nav-link i18n" id="limiters-tab" data-bs-toggle="tab" href="#limiters" role="tab" aria-controls="limiters" aria-selected="false">Limiters</a>
+            </li-->
+        </ul>
+        <div class="tab-content overflow-auto" style="height:calc(100vh - 220px);">
+            <div class="tab-pane fade show active p-2" id="targets" role="tabpanel" aria-labelledby="targets-tab">
+                <div id="targets_area" class="row g-3"></div>
+            </div>
+            <div class="tab-pane fade p-2" id="limiters" role="tabpanel" aria-labelledby="limiters-tab">
+            </div>
+        </div>
+    </div>
+
+    <!-- Limiter 追加/編集モーダル -->
+    <div id="limiter_modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content novalidate">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font i18n">Limiter Settings</h5>
+                    <button type="button" class="btn btn-sf-icon btn_window_stack">
+                        <i class="fa-regular fa-window-restore"></i>
+                    </button>
+                    <button type="button" class="btn btn-sf-icon btn_window">
+                        <i class="fa-regular fa-window-maximize"></i>
+                    </button>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+                    <form id="limiter_form_content" class="row"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>
+                    <button id="cmd_limiter_save" type="button" class="btn btn-outline-success i18n">Save</button>
+                    <button id="cmd_limiter_del" type="button" class="btn btn-outline-danger d-none i18n">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- versionsモーダル -->
+    <div id="versions_modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="version_form" class="modal-content novalidate">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font i18n">Versions</h5>
+                    <button type="button" class="btn btn-sf-icon btn_window_stack">
+                        <i class="fa-regular fa-window-restore"></i>
+                    </button>
+                    <button type="button" class="btn btn-sf-icon btn_window">
+                        <i class="fa-regular fa-window-maximize"></i>
+                    </button>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs version-tabs" role="tablist"></ul>
+                    <div class="tab-content version-content"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ローディングマスク -->
+    <div id="loading" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(0, 0, 0, 0.3);z-index:10000;">
+        <div class="text-center position-absolute top-50 start-50 w-100 translate-middle">
+            <div class="spinner-border text-light" role="status">
+                <span class="sr-only"></span>
+            </div>
+            <div>
+                <button type="button" class="btn btn-outline-danger mt-3 bbforce">Back by force</button>
+            </div>
+        </div>
+    </div>
+    <!-- フッター -->
+    <footer class="fixed-bottom text-center p-2 copyright"></footer>
+</body>
+<script type="text/javascript">
+    document.querySelector(`body`).style.setProperty(`--bs-body-bg`, `#212529`);
+    document.querySelector(`body`).style.setProperty(`--bs-tertiary-bg`, `#2b3035`);
+    document.querySelector(`body`).style.setProperty(`--bs-tertiary-bg-rgb`, `43,48,53`);
+    document.querySelector(`body`).style.setProperty(`--bs-secondary-bg`, `#343a40`);
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelector(`body`).style.setProperty(`--bs-body-bg`, null);
+        document.querySelector(`body`).style.setProperty(`--bs-tertiary-bg`, null);
+        document.querySelector(`body`).style.setProperty(`--bs-tertiary-bg-rgb`, null);
+        document.querySelector(`body`).style.setProperty(`--bs-secondary-bg`, null);
+    });
+</script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/bootstrap/bootstrap.min.5.3.0.css">
+<link rel="stylesheet" href="assets/cmdbox/color_mode.css">
+<link rel="stylesheet" href="assets/lightbox2/css/lightbox.min.css">
+<link rel="stylesheet" href="assets/tree-menu/css/tree-menu.css">
+<script type="text/javascript" src="assets/bootstrap/bootstrap.bundle.min.5.3.0.js"></script>
+<script type="text/javascript" src="assets/jquery/jquery.min.3.2.0.js"></script>
+<script type="text/javascript" src="assets/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="assets/jquery-resizable/jquery-resizable.min.js"></script>
+<script type="text/javascript" src="assets/tree-menu/js/tree-menu.js"></script>
+<script type="text/javascript" src="assets/lightbox2/js/lightbox.min.js"></script>
+<script type="text/javascript" src="assets/cmdbox/common.js"></script>
+<script type="text/javascript" src="assets/cmdbox/list_cmd.js"></script>
+<script type="text/javascript" src="assets/limiter/limiter.js"></script>
+<script type="text/javascript" src="assets/limiter/main.js"></script>
+</html>

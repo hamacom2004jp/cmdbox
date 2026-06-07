@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( limiter mode ) &mdash; cmdbox 2026/06/06 documentation</title>
+  <title>Command Reference ( limiter mode ) &mdash; cmdbox 2026/06/07 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=25cc829f"></script>
+      <script src="../_static/documentation_options.js?v=81b40686"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -210,8 +210,8 @@
 <td></td>
 <td><p>required</p></td>
 <td><p>server</p></td>
-<td><p>client | server</p></td>
-<td><p>Specify the reference scope. <cite>client</cite> loads from the client local, <cite>server</cite> loads from the server side.</p></td>
+<td><p>client | current | server</p></td>
+<td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
 </tbody>
 </table>
@@ -461,7 +461,7 @@
 <td><p>required</p></td>
 <td><p>server</p></td>
 <td><p>client | current | server</p></td>
-<td><p>Specify the delete scope. <cite>client</cite> deletes from the client local, <cite>server</cite> deletes from the server side. <cite>current</cite> is not supported.</p></td>
+<td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
 </tbody>
 </table>
@@ -654,7 +654,7 @@
 <td><p>required</p></td>
 <td><p>server</p></td>
 <td><p>client | current | server</p></td>
-<td><p>Specify the reference scope. <cite>client</cite> lists from the client local, <cite>server</cite> lists from the server side. <cite>current</cite> is not supported.</p></td>
+<td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
 </tbody>
 </table>
@@ -671,6 +671,8 @@
 <span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;target_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;target_cmd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">        </span><span class="nt">&quot;target_option&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">          </span><span class="p">{}</span>
 <span class="w">        </span><span class="p">]</span>
@@ -724,6 +726,18 @@
 <td><p>yes</p></td>
 <td><p>(必須)</p></td>
 <td><p>制限設定の識別名</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.target_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>対象コマンドのモード名</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.target_cmd</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>対象コマンドのコマンド名</p></td>
 </tr>
 <tr class="row-even"><td><p>success.data.target_option</p></td>
 <td><p>list[dict[str, any]] | dict[str, any] | null</p></td>
@@ -866,7 +880,7 @@
 <td><p>required</p></td>
 <td><p>server</p></td>
 <td><p>client | current | server</p></td>
-<td><p>Specify the reference scope. <cite>client</cite> loads from the client local, <cite>server</cite> loads from the server side. <cite>current</cite> is not supported.</p></td>
+<td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
 </tbody>
 </table>
@@ -883,6 +897,8 @@
 <span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;limiter_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;target_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;target_cmd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;target_option&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">        </span><span class="p">{}</span>
 <span class="w">      </span><span class="p">],</span>
@@ -951,6 +967,18 @@
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>制限設定の識別名</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.target_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>対象コマンドのモード名</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.target_cmd</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>対象コマンドのコマンド名</p></td>
 </tr>
 <tr class="row-odd"><td><p>success.data.target_option</p></td>
 <td><p>list[dict[str, any]] | dict[str, any] | null</p></td>
@@ -1155,13 +1183,29 @@
 <td><p>client | current | server</p></td>
 <td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
+<tr class="row-odd"><td><p>--target_mode &lt;target_mode&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td></td>
+<td></td>
+<td><p>Specify the mode name of the target command to apply the restriction. If omitted, all modes are targeted.</p></td>
+</tr>
+<tr class="row-even"><td><p>--target_cmd &lt;target_cmd&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td></td>
+<td></td>
+<td><p>Specify the command name of the target command to apply the restriction. If omitted, all commands are targeted.</p></td>
+</tr>
 <tr class="row-odd"><td><p>--target_option &lt;target_option&gt;</p></td>
 <td><p>dict</p></td>
 <td><p>multi</p></td>
 <td></td>
 <td></td>
 <td></td>
-<td><p>Specify the target command conditions to apply the restriction in dict format. Set the command option name (e.g. mode, cmd) as the key and the option value as the value.</p></td>
+<td><p>Specify the conditions for the commands to which the restrictions apply in dictionary format. Specify the command option name as the key and the option value as the value.</p></td>
 </tr>
 <tr class="row-even"><td><p>--max_registrations &lt;max_registrations&gt;</p></td>
 <td><p>int</p></td>
@@ -1427,6 +1471,22 @@
 <td><p>server</p></td>
 <td><p>client | current | server</p></td>
 <td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
+</tr>
+<tr class="row-even"><td><p>--filter_target_mode &lt;filter_target_mode&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Filter by target mode. If specified, returns results for that mode only.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--filter_target_cmd &lt;filter_target_cmd&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Filter by target command. If specified, returns results for that command only.</p></td>
 </tr>
 </tbody>
 </table>

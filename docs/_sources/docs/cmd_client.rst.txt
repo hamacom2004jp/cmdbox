@@ -65,10 +65,10 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "Field","Type","Required","Default","Description"
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.path","str | null","no","null","パス"
-    "success.to_path","str | null","no","null","コピー先・移動先のパス"
-    "success.from_path","str | null","no","null","コピー元・移動元のパス"
-    "success.ret_path","str | null","no","null","戻りのパス"
+    "success.path","str | Path | null","no","null","パス"
+    "success.to_path","str | Path | null","no","null","コピー先・移動先のパス"
+    "success.from_path","str | Path | null","no","null","コピー元・移動元のパス"
+    "success.ret_path","str | Path | null","no","null","戻りのパス"
     "success.msg","str | null","no","null","処理結果のメッセージ"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
@@ -143,8 +143,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.mime_type","str | null","no","null","MIMEタイプ"
     "success.etag","str | null","no","null","ETag"
     "success.not_modified","bool | null","no","null","未更新フラグ"
-    "success.rpath","str | null","no","null","リクエストパス"
-    "success.svpath","str | null","no","null","サーバーパス"
+    "success.rpath","str | Path | null","no","null","リクエストパス"
+    "success.svpath","str | Path | null","no","null","サーバーパス"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
@@ -257,7 +257,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "Field","Type","Required","Default","Description"
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.path","str | null","no","null","パス"
+    "success.path","str | Path | null","no","null","パス"
     "success.msg","str | null","no","null","処理結果のメッセージ"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
@@ -325,10 +325,10 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "Field","Type","Required","Default","Description"
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.path","str | null","no","null","パス"
-    "success.to_path","str | null","no","null","移動先・移動先のパス"
-    "success.from_path","str | null","no","null","移動元・移動元のパス"
-    "success.ret_path","str | null","no","null","戻りのパス"
+    "success.path","str | Path | null","no","null","パス"
+    "success.to_path","str | Path | null","no","null","移動先・移動先のパス"
+    "success.from_path","str | Path | null","no","null","移動元・移動元のパス"
+    "success.ret_path","str | Path | null","no","null","戻りのパス"
     "success.msg","str | null","no","null","処理結果のメッセージ"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
@@ -390,7 +390,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "Field","Type","Required","Default","Description"
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.path","str | null","no","null","パス"
+    "success.path","str | Path | null","no","null","パス"
     "success.msg","str | null","no","null","処理結果のメッセージ"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
@@ -452,7 +452,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "Field","Type","Required","Default","Description"
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.path","str | null","no","null","パス"
+    "success.path","str | Path | null","no","null","パス"
     "success.msg","str | null","no","null","処理結果のメッセージ"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
@@ -494,11 +494,22 @@ This command implements ``output_schema()`` returning ``Result`` model.
 .. code-block:: json
 
     {
-      "success": "string",
-      "warn": {},
-      "error": {},
-      "output_schema": {},
-      "end": false
+      "performance": [
+        {
+          "key": "string",
+          "value": null
+        }
+      ],
+      "data": "string",
+      "success": {
+        "performance": [
+          {
+            "key": "string",
+            "value": null
+          }
+        ],
+        "data": "string"
+      }
     }
 
 .. csv-table::
@@ -506,13 +517,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
     :header-rows: 1
 
     "Field","Type","Required","Default","Description"
-    "success","str | null","no","null","成功した場合の結果"
-    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
-    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
-    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
-    "end","bool | null","no","null","終了フラグ"
+    "performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "data","str | Path | null","no","null","アップロードしたファイルのパスを含むメッセージ"
+    "success","Data | null","no","null","成功した場合の結果"
+    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "success.data","str | Path | null","no","null","アップロードしたファイルのパスを含むメッセージ"
 
 
 client ( http ) : ``cmdbox -m client -c http <Option>``

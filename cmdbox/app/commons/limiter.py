@@ -642,9 +642,11 @@ class Limiter:
         """
         制限設定が現在のコマンドコンテキストに適合するかどうかを判定します。
 
+        ``target_mode`` が指定されている場合、``command_options`` の ``mode`` と一致する場合にマッチします。
+        ``target_cmd`` が指定されている場合、``command_options`` の ``cmd`` と一致する場合にマッチします。
         ``target_option`` に設定された各 key/val がすべて
         ``command_options`` と一致する場合にマッチします。
-        ``target_option`` が未設定の場合はすべてのコマンドに適合します。
+        いずれも未設定の場合はすべてのコマンドに適合します。
 
         Args:
             config (Dict[str, Any]): 制限設定
@@ -652,6 +654,21 @@ class Limiter:
         Returns:
             bool: 制限設定が適合する場合は True
         """
+        target_mode = config.get('target_mode')
+        if target_mode:
+            mode_val = command_options.get('mode')
+            if isinstance(mode_val, list):
+                if str(target_mode) not in [str(m) for m in mode_val]:
+                    return False
+            else:
+                if str(mode_val) != str(target_mode):
+                    return False
+
+        target_cmd = config.get('target_cmd')
+        if target_cmd:
+            if str(command_options.get('cmd', '')) != str(target_cmd):
+                return False
+
         target_option = config.get('target_option')
         if target_option:
             # list[dict] 形式（multi=True で複数指定された場合）

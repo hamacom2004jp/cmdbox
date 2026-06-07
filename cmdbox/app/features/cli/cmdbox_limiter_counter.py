@@ -46,9 +46,9 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="limiter_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="カウンターを取得する制限設定の識別名を指定します。",
                      description_en="Specify the identifier name of the limiter configuration to get the counter for."),
-                dict(opt="scope", type=Options.T_STR, default="server", required=True, multi=False, hide=False, choice=["client", "server"],
-                     description_ja="参照先スコープを指定します。`client` はクライアントローカル、`server` はサーバー側から取得します。",
-                     description_en="Specify the reference scope. `client` loads from the client local, `server` loads from the server side.",),
+                dict(opt="scope", type=Options.T_STR, default="server", required=True, multi=False, hide=False, choice=["client", "current", "server"],
+                     description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
+                     description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
             ]
         )
 
