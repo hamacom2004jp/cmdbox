@@ -133,7 +133,7 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
     def output_schema(self) -> type:
         class Data(resdata.Data):
             data: Union[str, Path, None] = pydantic.Field(default=None, description="アップロードしたファイルのパスを含むメッセージ")
-        class Result(Data):
+        class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
 

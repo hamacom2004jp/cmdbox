@@ -246,7 +246,7 @@ limiter_page._render_limiter_item = (parent, lm, show_counter) => {
     limiter_page.make_progress('Input', counter.total_input, lm.max_total_input, limiter_page.fmt_bytes).appendTo(progress_area);
     limiter_page.make_progress('Process', counter.total_process, lm.max_total_process, limiter_page.fmt_bytes).appendTo(progress_area);
     limiter_page.make_progress('Output', counter.total_output, lm.max_total_output, limiter_page.fmt_bytes).appendTo(progress_area);
-    limiter_page.make_progress('Registrations', counter.total_registrations, lm.max_registrations, null).appendTo(progress_area);
+    limiter_page.make_progress('Registrations', counter.total_registrations, lm.max_registrations, limiter_page.fmt_bytes).appendTo(progress_area);
 
     if (last_refresh) {
         progress_area.append(`<div><small class="i18n">Last reset: </small><small>${last_refresh}</small></div>`);
