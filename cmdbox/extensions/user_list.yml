@@ -95,7 +95,7 @@ cmdrule:                       # A list of command rules, Specify a rule that de
       from_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
       to_rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
     rule: allow
-  - groups: [guest, user, readonly, editor]
+  - groups: [guest, user]
     coercion:
       fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
       rjpath: '[f''^/.(users|groups)/develop'', f''^/.(users|groups)/master'']'
@@ -115,7 +115,11 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     mode: datasource
     cmds: [save, load, del, tbl_create, tbl_drop, idx_create, idx_drop]
     rule: deny
-  - groups: [guest, user, readonly, editor]
+  - groups: [guest, user]
+    mode: datasource
+    cmds: [list]
+    rule: allow
+  - groups: [guest, user]
     mode: llm
     cmds: [list, chat, translation]
     rule: allow

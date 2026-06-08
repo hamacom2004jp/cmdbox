@@ -61,7 +61,7 @@ agentView.initSettingsView = () => {
     }));
     Promise.all(promises).then(() => {
         // 表示されている最初の設定メニューをクリックして表示する
-        const firstVisibleSetting = $('[data-bs-target]').filter(':visible').first();
+        const firstVisibleSetting = agentView.settingsModal.find('[data-bs-target]').filter(':visible').first();
         if (firstVisibleSetting.length) {
             firstVisibleSetting.click();
         }
@@ -69,7 +69,10 @@ agentView.initSettingsView = () => {
 
     // 設定モーダルの shown.bs.modal イベントハンドラ
     agentView.settingsModal.off('shown.bs.modal').on('shown.bs.modal', async () => {
-        await agentView.list_agent();
+        const firstVisibleSetting = agentView.settingsModal.find('[data-bs-target]').filter(':visible').first();
+        if (firstVisibleSetting.length) {
+            firstVisibleSetting.click();
+        }
         cmdbox.process_i18n(agentView.settingsModal);
     });
 };
