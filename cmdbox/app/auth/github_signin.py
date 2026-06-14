@@ -26,7 +26,8 @@ class GithubSignin(Signin):
     def request_access_token(self, conf:Dict, req:Request, res:Response) -> str:
         headers = {'Content-Type': 'application/x-www-form-urlencoded',
                     'Accept': 'application/json'}
-        data = {'code': req.query_params['code'],
+        query_params = dict(**req.query_params)
+        data = {'code': query_params.get('code'),
                 'client_id': conf['client_id'],
                 'client_secret': conf['client_secret'],
                 'redirect_uri': conf['redirect_uri']}

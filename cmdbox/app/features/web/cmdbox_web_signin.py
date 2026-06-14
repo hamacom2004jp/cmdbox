@@ -27,12 +27,12 @@ class Signin(feature.WebFeature):
                 with open(web.signin_html, 'r', encoding='utf-8') as f:
                     web.signin_html_data = f.read()
 
-        @app.api_route('/signin/', methods=['GET', 'POST'], response_class=HTMLResponse)
-        @app.api_route('/{full_path:path}/signin/', methods=['GET', 'POST'], response_class=HTMLResponse)
+        @app.api_route('/signin/', methods=['GET', 'POST'], response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.api_route('/{full_path:path}/signin/', methods=['GET', 'POST'], response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def _signin(req:Request, res:Response, full_path:str=None):
             return await _signin(None, req, res, full_path)
-        @app.api_route('/signin/{next}', methods=['GET', 'POST'], response_class=HTMLResponse)
-        @app.api_route('/{full_path:path}/signin/{next}', methods=['GET', 'POST'], response_class=HTMLResponse)
+        @app.api_route('/signin/{next}', methods=['GET', 'POST'], response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.api_route('/{full_path:path}/signin/{next}', methods=['GET', 'POST'], response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def _signin(next:str, req:Request, res:Response, full_path:str=None):
             signin.Signin._enable_cors(req, res)
             im = req.headers.get('If-None-Match')
@@ -51,10 +51,10 @@ class Signin(feature.WebFeature):
                 return HTMLResponse(web.signin_html_data, headers=headers)
 
         # https://developers.google.com/identity/protocols/oauth2/web-server?hl=ja#httprest
-        @app.get('/oauth2/google/')
+        @app.get('/oauth2/google/', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_google(req:Request, res:Response):
             return await oauth2_google('/', req, res)
-        @app.get('/oauth2/google/{next}')
+        @app.get('/oauth2/google/{next}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_google(next:str, req:Request, res:Response):
             if web.signin is None or web.signin.signin_file_data is None:
                 return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
@@ -69,10 +69,10 @@ class Signin(feature.WebFeature):
             return RedirectResponse(url=f'https://accounts.google.com/o/oauth2/auth?{query}')
 
         # https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#scopes
-        @app.get('/oauth2/github/')
+        @app.get('/oauth2/github/', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_github(req:Request, res:Response):
             return await oauth2_github('/', req, res)
-        @app.get('/oauth2/github/{next}')
+        @app.get('/oauth2/github/{next}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_github(next:str, req:Request, res:Response):
             if web.signin is None or web.signin.signin_file_data is None:
                 return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
@@ -87,10 +87,10 @@ class Signin(feature.WebFeature):
             return RedirectResponse(url=f'https://github.com/login/oauth/authorize?{query}')
 
         # https://learn.microsoft.com/ja-jp/entra/identity-platform/v2-oauth2-auth-code-flow
-        @app.get('/oauth2/azure/')
+        @app.get('/oauth2/azure/', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_azure(req:Request, res:Response):
             return await oauth2_azure('/', req, res)
-        @app.get('/oauth2/azure/{next}')
+        @app.get('/oauth2/azure/{next}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_azure(next:str, req:Request, res:Response):
             if web.signin is None or web.signin.signin_file_data is None:
                 return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
@@ -105,7 +105,7 @@ class Signin(feature.WebFeature):
             query = '&'.join([f'{k}={urllib.parse.quote(v)}' for k, v in data.items()])
             return RedirectResponse(url=f'https://login.microsoftonline.com/{conf["tenant_id"]}/oauth2/v2.0/authorize?{query}')
 
-        @app.get('/oauth2/enabled')
+        @app.get('/oauth2/enabled', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_enabled(req:Request, res:Response):
             if web.signin is None or web.signin.signin_file_data is None:
                 return dict(google=False, github=False, azure=False)
@@ -114,10 +114,10 @@ class Signin(feature.WebFeature):
                         github=signin_data['oauth2']['providers']['github']['enabled'],
                         azure=signin_data['oauth2']['providers']['azure']['enabled'],)
 
-        @app.get('/saml/{prov}/')
+        @app.get('/saml/{prov}/', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def saml_login(prov:str, req:Request, res:Response):
             return await saml_login(prov, '/', req, res)
-        @app.get('/saml/{prov}/{next}')
+        @app.get('/saml/{prov}/{next}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def saml_login(prov:str, next:str, req:Request, res:Response):
             """
             SAML認証のログイン処理を行います
@@ -132,7 +132,7 @@ class Signin(feature.WebFeature):
             auth = await web.signin_saml.make_saml(prov, next, form, req, res)
             return RedirectResponse(url=auth.login())
 
-        @app.get('/saml/enabled')
+        @app.get('/saml/enabled', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def saml_enabled(req:Request, res:Response):
             if web.signin_saml is None or web.signin_saml.signin_file_data is None:
                 return dict(azure=False)

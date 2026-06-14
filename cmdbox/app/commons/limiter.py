@@ -218,7 +218,7 @@ def async_svrun_check_limit(func: Callable) -> Callable:
     Returns:
         Callable: デコレーターでラップされた関数
     """
-    @functools.wraps(func)
+    #@functools.wraps(func)
     async def wrapper(self:'LimitedFeature', data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str], sessions:Dict[str, Dict[str, Any]]) -> int:
         if isinstance(self, LimitedFeature):
             limit_st, ret, limit, command_options = _svrun_pre(self, data_dir, logger, redis_cli, msg, sessions)
@@ -228,7 +228,8 @@ def async_svrun_check_limit(func: Callable) -> Callable:
                 st = self.RESP_WARN
             else:
                 stime = common.perf_counter()
-                st = common.exec_svrun_sync(functools.partial(func, self), data_dir, logger, redis_cli, msg, sessions)
+                _func = functools.partial(func, self)
+                st = await _func(data_dir, logger, redis_cli, msg, sessions)
                 if st == self.RESP_SUCCESS and limit_st == Limiter.CHECK_ALLOW:
                     try:
                         _svrun_post(self, data_dir, logger, redis_cli, msg, command_options, limit, stime)
@@ -238,7 +239,8 @@ def async_svrun_check_limit(func: Callable) -> Callable:
                         redis_cli.rpush(msg[1], ret)
                         logger.error(ret)
         else:
-            st = common.exec_svrun_sync(functools.partial(func, self), data_dir, logger, redis_cli, msg, sessions)
+            _func = functools.partial(func, self)
+            st = await _func(data_dir, logger, redis_cli, msg, sessions)
         return st
     return wrapper
 

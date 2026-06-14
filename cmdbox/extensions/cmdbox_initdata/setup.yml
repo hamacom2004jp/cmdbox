@@ -24,7 +24,7 @@ setups:
       fwpath: "'/'"
       rjpath:
       scope: "'client'"
-      overwrite: false
+      overwrite: true
       client_data: "f'{self.default_data}'"
       initdata_path: "f'{cur_path / f\".{appid}_initdata\" / \"client\"}'"
 
@@ -41,5 +41,21 @@ setups:
       fwpath: "'/'"
       rjpath:
       scope: "'server'"
-      overwrite: false
+      overwrite: true
       initdata_path: "f'{cur_path / f\".{appid}_initdata\" / \"server\"}'"
+
+  - name: "current_upload"
+    description: "実行時ディレクトリの設定をアップロードします。"
+    exec:
+      mode: cmdbox
+      cmd: initdata_install
+      host: "f'{self.default_host}'"
+      port: "f'{self.default_port}'"
+      password: "f'{self.default_pass}'"
+      svname: "f'{appid}_setup'"
+      svpath: "'/'"
+      fwpath: "'/'"
+      rjpath:
+      scope: "'current'"
+      overwrite: true
+      initdata_path: "f'{cur_path / f\".{appid}_initdata\" / \"current\"}'"

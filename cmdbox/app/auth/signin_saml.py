@@ -49,8 +49,9 @@ class SigninSAML(Signin):
             post_data=dict(),
             get_data=dict(),
         )
-        if (req.query_params):
-            request_data["get_data"] = req.query_params,
+        if req.query_params:
+            query_params = dict(**req.query_params)
+            request_data["get_data"] = query_params
         if "SAMLResponse" in form_data:
             SAMLResponse = form_data["SAMLResponse"]
             request_data["post_data"]["SAMLResponse"] = SAMLResponse

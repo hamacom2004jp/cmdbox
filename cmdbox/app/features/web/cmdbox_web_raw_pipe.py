@@ -1,4 +1,4 @@
-from cmdbox.app import common
+from cmdbox.app import common, feature
 from cmdbox.app.features.web import cmdbox_web_raw_cmd, cmdbox_web_load_cmd
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
@@ -16,7 +16,7 @@ class RawPipe(cmdbox_web_raw_cmd.RawCmd, cmdbox_web_load_cmd.LoadCmd):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/gui/raw_pipe')
+        @app.post('/gui/raw_pipe', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def raw_pipe(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
@@ -24,6 +24,8 @@ class RawPipe(cmdbox_web_raw_cmd.RawCmd, cmdbox_web_load_cmd.LoadCmd):
             form = await req.form()
             title = form.get('title')
             opt = form.get('opt')
+            if not title or not opt:
+                return dict(warn='Title and opt are required.')
             ret = self.raw_pipe(web, title, json.loads(opt))
             return ret
 

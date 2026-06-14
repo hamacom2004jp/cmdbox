@@ -30,7 +30,7 @@ class Gui(feature.WebFeature):
                 with open(web.gui_html, 'r', encoding='utf-8') as f:
                     web.gui_html_data = f.read()
 
-        @app.get('/', response_class=HTMLResponse)
+        @app.get('/', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def index(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
@@ -41,8 +41,8 @@ class Gui(feature.WebFeature):
                 return RedirectResponse(url=f'/{req.session["signin"]["group_sps"][0]}')
             return RedirectResponse(url='/gui')
 
-        @app.get('/gui', response_class=HTMLResponse)
-        @app.post('/gui', response_class=HTMLResponse)
+        @app.get('/gui', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.post('/gui', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def gui(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
@@ -62,21 +62,21 @@ class Gui(feature.WebFeature):
                 web.options.audit_exec(req, res, web)
                 return HTMLResponse(web.gui_html_data, headers=headers)
 
-        @app.get('/signin/gui/appid', response_class=PlainTextResponse)
-        @app.get('/gui/appid', response_class=PlainTextResponse)
+        @app.get('/signin/gui/appid', response_class=PlainTextResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.get('/gui/appid', response_class=PlainTextResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def appid(req:Request, res:Response):
             return self.ver.__appid__
 
-        @app.get('/signin/gui/title', response_class=PlainTextResponse)
-        @app.get('/gui/title', response_class=PlainTextResponse)
+        @app.get('/signin/gui/title', response_class=PlainTextResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.get('/gui/title', response_class=PlainTextResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def title(req:Request, res:Response):
             return self.ver.__title__
 
-        @app.get('/gui/version_info')
+        @app.get('/gui/version_info', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def version_info(req:Request, res:Response):
             return self.version_info
 
-        @app.get('/gui/user_info')
+        @app.get('/gui/user_info', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def user_info(req:Request, res:Response):
             if 'signin' not in req.session:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
@@ -95,12 +95,14 @@ class Gui(feature.WebFeature):
             except Exception as e:
                 return dict(error=f'{e}')
 
-        @app.get('/gui/filemenu')
+        @app.get('/gui/filemenu', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def filemenu(req:Request, res:Response):
             return web.filemenu
 
-        @app.get('/gui/toolmenu')
+        @app.get('/gui/toolmenu', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def toolmenu(req:Request, res:Response):
+            if 'signin' not in req.session:
+                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             ret = dict()
             for k, v in web.toolmenu.items():
                 path_jadge = web.signin._check_path(req, res, v['href'], req.session['signin'],
@@ -110,11 +112,11 @@ class Gui(feature.WebFeature):
                 ret[k] = v
             return ret
 
-        @app.get('/gui/viewmenu')
+        @app.get('/gui/viewmenu', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def viewmenu(req:Request, res:Response):
             return web.viewmenu
 
-        @app.get('/gui/aboutmenu')
+        @app.get('/gui/aboutmenu', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def aboutmenu(req:Request, res:Response):
             return web.aboutmenu
 

@@ -1,4 +1,4 @@
-from cmdbox.app import common, options, web as _web
+from cmdbox.app import common, feature, options, web as _web
 from cmdbox.app.commons import convert
 from cmdbox.app.features.web import cmdbox_web_load_pipe, cmdbox_web_raw_pipe
 from cmdbox.app.web import Web
@@ -24,8 +24,8 @@ class ExecPipe(cmdbox_web_load_pipe.LoadPipe, cmdbox_web_raw_pipe.RawPipe):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.get('/exec_pipe/{title}')
-        @app.post('/exec_pipe/{title}')
+        @app.get('/exec_pipe/{title}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.post('/exec_pipe/{title}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def exec_pipe(req:Request, res:Response, title:str=None):
             upfiles = dict()
             try:

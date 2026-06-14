@@ -13,7 +13,7 @@ class Copyright(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.get('/copyright', response_class=PlainTextResponse)
+        @app.get('/copyright', response_class=PlainTextResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def copyright(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:

@@ -1,8 +1,6 @@
-from cmdbox.app import common, feature
+from cmdbox.app import feature
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
-from starlette.responses import PlainTextResponse
-import json
 
 
 class GetCmds(feature.WebFeature):
@@ -14,13 +12,15 @@ class GetCmds(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/gui/get_cmds', response_class=PlainTextResponse)
+        @app.post('/gui/get_cmds', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def get_cmds(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             form = await req.form()
             mode = form.get('mode')
+            if not mode:
+                return dict(warn='Mode is required.')
             #ret = web.options.get_cmds(mode)
             ret = web.signin.get_enable_cmds(mode, req, res)
-            return json.dumps(ret, default=common.default_json_enc)
+            return ret

@@ -1,6 +1,7 @@
+from cmdbox.app import feature
 from cmdbox.app.features.web import cmdbox_web_exec_cmd
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response, HTTPException
+from fastapi import FastAPI, Query, Request, Response, HTTPException
 from fastapi.responses import PlainTextResponse
 from pathlib import Path
 from starlette.datastructures import UploadFile
@@ -17,8 +18,9 @@ class FilerUpload(cmdbox_web_exec_cmd.ExecCmd):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/filer/upload', response_class=PlainTextResponse)
-        async def filer_upload(req:Request, res:Response):
+        @app.post('/filer/upload', response_class=PlainTextResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        async def filer_upload(req:Request, res:Response,
+                               svpath:str=Query(..., description="サーバー上のパス"),):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
@@ -36,12 +38,14 @@ class FilerUpload(cmdbox_web_exec_cmd.ExecCmd):
         Returns:
             str: 結果
         """
-        q = req.query_params
-        svpath = q['svpath']
+        q = dict(**req.query_params)
+        svpath = q.get('svpath')
+        if svpath is None:
+            raise HTTPException(status_code=400, detail="Missing 'svpath' query parameter.")
         web.logger.info(f"filer_upload: svpath={svpath}")
         opt = dict(mode='client', cmd='file_upload',
-                   host=q['host'], port=q['port'], password=q['password'], svname=q['svname'],
-                   scope=q["scope"], client_data=q['client_data'], overwrite=('overwrite' in q))
+                   host=q.get('host'), port=q.get('port'), password=q.get('password'), svname=q.get('svname'),
+                   scope=q.get("scope"), client_data=q.get('client_data'), overwrite=('overwrite' in q))
         form = await req.form()
         with tempfile.TemporaryDirectory() as tmpdir:
             for _, fv in form.multi_items():

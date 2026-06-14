@@ -1,6 +1,6 @@
 from cmdbox.app import common, feature
 from cmdbox.app.web import Web
-from fastapi import FastAPI, Request, Response, HTTPException
+from fastapi import FastAPI, Request, Response, HTTPException, Body
 from fastapi.responses import HTMLResponse
 from typing import Dict, Any
 import argparse
@@ -25,8 +25,8 @@ class Audit(feature.WebFeature):
                 with open(web.audit_html, 'r', encoding='utf-8') as f:
                     web.audit_html_data = f.read()
 
-        @app.get('/audit', response_class=HTMLResponse)
-        @app.post('/audit', response_class=HTMLResponse)
+        @app.get('/audit', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.post('/audit', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def audit(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
@@ -46,8 +46,8 @@ class Audit(feature.WebFeature):
                 web.options.audit_exec(req, res, web)
                 return HTMLResponse(web.audit_html_data, headers=headers)
 
-        @app.post('/audit/rawlog')
-        async def audit_rawlog(req:Request, res:Response):
+        @app.post('/audit/rawlog', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        async def audit_rawlog(req:Request, res:Response, body:feature.RequestBody):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
@@ -55,7 +55,8 @@ class Audit(feature.WebFeature):
                 return dict(error='signin_file_data is None.')
             if not hasattr(web.options, 'audit_search') or web.options.audit_search is None:
                 return dict(warn='audit feature is disabled.')
-            opt = await req.json()
+            # Convert Pydantic model to dict
+            opt = body.model_dump()
             opt = {**opt, **web.options.audit_search_args.copy()}
             opt['host'] = web.redis_host
             opt['port'] = web.redis_port
@@ -67,7 +68,7 @@ class Audit(feature.WebFeature):
                 return dict(error=ret_main)
             return ret_main
 
-        @app.get('/audit/mode_cmd')
+        @app.get('/audit/mode_cmd', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def audit_mode_cmd(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:

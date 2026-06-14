@@ -13,8 +13,8 @@ class DoSignout(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.api_route('/dosignout/{next}', methods=['GET', 'POST'], response_class=HTMLResponse)
-        @app.api_route('/{full_path:path}/dosignout/{next}/', methods=['GET', 'POST'], response_class=HTMLResponse)
+        @app.api_route('/dosignout/{next}', methods=['GET', 'POST'], response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.api_route('/{full_path:path}/dosignout/{next}/', methods=['GET', 'POST'], response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def do_signout(next, req:Request, res:Response, full_path:str=None):
             if 'signin' in req.session:
                 web.options.audit_exec(req, res, web, body=dict(msg='Signout.'), audit_type='auth')

@@ -12,8 +12,8 @@ class Usesignout(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.get('/usesignout')
-        @app.get('/signin/usesignout')
+        @app.get('/usesignout', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.get('/signin/usesignout', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def usesignout(req:Request, res:Response):
             if web.signin_file is not None:
                 return dict(success={'usesignout': True})

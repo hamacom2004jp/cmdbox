@@ -130,7 +130,7 @@
             "name": "Python: cmdbox cmdbox setup",
             "type": "python",
             "request": "launch",
-            "args": ["-m","cmdbox","-c","setup","--chopt","host=redis"],
+            "args": ["-m","cmdbox","-c","setup"],
             "module": "cmdbox",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",

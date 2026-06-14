@@ -1,4 +1,4 @@
-from cmdbox.app import common
+from cmdbox.app import common, feature
 from cmdbox.app.commons import convert
 from cmdbox.app.features.web import cmdbox_web_exec_cmd
 from cmdbox.app.web import Web
@@ -18,7 +18,7 @@ class FilerDownload(cmdbox_web_exec_cmd.ExecCmd):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.get('/filer/download/{constr:str}', response_class=StreamingResponse)
+        @app.get('/filer/download/{constr:str}', response_class=StreamingResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def filer_download(constr:str, req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:

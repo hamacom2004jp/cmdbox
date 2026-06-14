@@ -13,7 +13,7 @@ class GetServerOpt(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.get('/get_server_opt')
+        @app.get('/get_server_opt', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def get_server_opt(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:

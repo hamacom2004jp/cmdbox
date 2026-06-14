@@ -23,8 +23,8 @@ class Filer(feature.WebFeature):
                 with open(web.filer_html, 'r', encoding='utf-8') as f:
                     web.filer_html_data = f.read()
 
-        @app.get('/filer', response_class=HTMLResponse)
-        @app.post('/filer', response_class=HTMLResponse)
+        @app.get('/filer', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.post('/filer', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def filer(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:

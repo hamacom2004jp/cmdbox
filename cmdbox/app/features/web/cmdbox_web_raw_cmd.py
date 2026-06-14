@@ -1,4 +1,4 @@
-from cmdbox.app import common
+from cmdbox.app import common, feature
 from cmdbox.app.features.web import cmdbox_web_gui
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
@@ -16,7 +16,7 @@ class RawCmd(cmdbox_web_gui.Gui):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/gui/raw_cmd')
+        @app.post('/gui/raw_cmd', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def raw_cmd(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
@@ -24,6 +24,8 @@ class RawCmd(cmdbox_web_gui.Gui):
             form = await req.form()
             title = form.get('title')
             opt = form.get('opt')
+            if not title or not opt:
+                return dict(warn='Title and opt are required.')
             ret = self.raw_cmd(web, title, json.loads(opt))
             return ret
 

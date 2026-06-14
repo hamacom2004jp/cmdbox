@@ -13,7 +13,7 @@ class UserData(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/gui/user_data/load')
+        @app.post('/gui/user_data/load', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def load(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
@@ -23,6 +23,8 @@ class UserData(feature.WebFeature):
             form = await req.form()
             categoly = form.get('categoly')
             key = form.get('key')
+            if not categoly or not key:
+                return dict(warn='Category and key are required.')
             sess = req.session['signin']
 
             im = req.headers.get('If-None-Match')
@@ -34,7 +36,7 @@ class UserData(feature.WebFeature):
             res.headers.update(headers)
             return dict(success=ret)
 
-        @app.post('/gui/user_data/save')
+        @app.post('/gui/user_data/save', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def save(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
@@ -45,11 +47,13 @@ class UserData(feature.WebFeature):
             categoly = form.get('categoly')
             key = form.get('key')
             val = form.get('val')
+            if not categoly or not key:
+                return dict(warn='Category and key are required.')
             sess = req.session['signin']
             web.user_data(req, sess['uid'], sess['name'], categoly, key, val)
             return dict(success=f'user_data "{categoly}:{key}:val" saved.')
 
-        @app.post('/gui/user_data/delete')
+        @app.post('/gui/user_data/delete', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def delete(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
@@ -60,6 +64,8 @@ class UserData(feature.WebFeature):
             categoly = form.get('categoly')
             key = form.get('key')
             val = form.get('val')
+            if not categoly or not key:
+                return dict(warn='Category and key are required.')
             sess = req.session['signin']
             web.user_data(req, sess['uid'], sess['name'], categoly, key, delkey=True)
             return dict(success=f'user_data "{categoly}:{key}:val" deleted.')

@@ -12,7 +12,7 @@ class DelCmd(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/gui/del_cmd')
+        @app.post('/gui/del_cmd', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def del_cmd(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
@@ -20,6 +20,8 @@ class DelCmd(feature.WebFeature):
         
             form = await req.form()
             title = form.get('title')
+            if not title:
+                return dict(warn='Title is required.')
 
             opt_path = web.cmds_path / f"cmd-{title}.json"
             web.logger.info(f"del_cmd: opt_path={opt_path}")

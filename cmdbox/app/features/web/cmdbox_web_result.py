@@ -23,13 +23,15 @@ class Result(feature.WebFeature):
             with open(web.result_html, 'r', encoding='utf-8') as f:
                 web.result_html_data = f.read()
 
-        @app.post('/result/pub')
+        @app.post('/result/pub', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def result(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
             form = await req.form()
             title = form.get('title')
+            if not title:
+                return dict(warn='Title is required.')
             output = form.get('output')
             try:
                 output = json.loads(output)
@@ -38,8 +40,8 @@ class Result(feature.WebFeature):
             web.cb_queue.put(('js_return_cmd_exec_func', title, output))
             return dict(success="result put to queue.")
 
-        @app.post('/result', response_class=HTMLResponse)
-        @app.get('/result', response_class=HTMLResponse)
+        @app.post('/result', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.get('/result', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def result_html(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:

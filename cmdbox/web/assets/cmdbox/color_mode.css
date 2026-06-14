@@ -799,6 +799,78 @@ body::after {
     box-shadow: 0 0 20px var(--accent-green);
     font-weight: bold;
 }
+
+/* コーヒーショップモード - 昭和の日本の喫茶店をイメージ */
+[data-bs-theme="coffeeshop"] {
+    --bs-body-bg: #3d2817; /* 濃いコーヒーブラウン */
+    --bs-body-color: #f5e6d3; /* クリーム色 */
+    --bs-emphasis-color: #d4a574; /* キャメル色 */
+    --bs-secondary-color: #5a4a3a; /* 焦茶色 */
+    --bs-secondary-bg: #2a1f15;
+    --bs-tertiary-color: #8b6f47; /* 濃い焦茶色 */
+    --bs-tertiary-bg: #5a4a3a;
+    --bs-link-color: #c99a6e; /* コッパー色 */
+    --bs-link-hover-color: #a68563; /* ダークコッパー色 */
+    --bs-code-color: #fde9d0; /* 薄い桜色 */
+    --bs-highlight-bg: #4a3a2a;
+    --bs-highlight-border-color: #2a1f15;
+  
+    --bs-primary: #d4a574; /* キャメル色 */
+    --bs-primary-rgb: 212, 165, 116;
+    --bs-primary-text: #fff;
+    --bs-primary-bg-subtle: #5a4a3a;
+    --bs-primary-border-subtle: #3d2817;
+    --bs-secondary: #5a4a3a; /* 焦茶色 */
+    --bs-secondary-rgb: 90, 74, 58;
+    --bs-secondary-text: #fff;
+    --bs-secondary-bg-subtle: #2a1f15;
+    --bs-secondary-border-subtle: #1a120a;
+    --bs-success: #6b8e23; /* オリーブダラブ */
+    --bs-success-rgb: 107, 142, 35;
+    --bs-success-text: #fff;
+    --bs-success-bg-subtle: #2a3209;
+    --bs-success-border-subtle: #1a2005;
+    --bs-info: #8fa3a0; /* グレイッシュブルー */
+    --bs-info-rgb: 143, 163, 160;
+    --bs-info-text: #fff;
+    --bs-info-bg-subtle: #2a3432;
+    --bs-info-border-subtle: #1a201e;
+    --bs-warning: #d4a574; /* キャメル色 */
+    --bs-warning-rgb: 212, 165, 116;
+    --bs-warning-text: #000;
+    --bs-warning-bg-subtle: #5a4a3a;
+    --bs-warning-border-subtle: #3d2817;
+    --bs-danger: #a0522d; /* シエナ */
+    --bs-danger-rgb: 160, 82, 45;
+    --bs-danger-text: #fff;
+    --bs-danger-bg-subtle: #3d1a0f;
+    --bs-danger-border-subtle: #260f08;
+    --bs-light: #8b6f47; /* 濃い焦茶色 */
+    --bs-light-rgb: 139, 111, 71;
+    --bs-light-text: #fff;
+    --bs-light-bg-subtle: #3d2817;
+    --bs-light-border-subtle: #2a1f15;
+    --bs-dark: #2a1f15; /* 濃いダークブラウン */
+    --bs-dark-rgb: 42, 31, 21;
+    --bs-dark-text: #f5e6d3;
+    --bs-dark-bg-subtle: #1a120a;
+    --bs-dark-border-subtle: #0f0906;
+  
+    --bs-gradient: linear-gradient(180deg, rgba(212, 165, 116, 0.1), rgba(212, 165, 116, 0));
+    --bs-border-width: 1px;
+    --bs-border-style: solid;
+    --bs-border-color: #8b6f47;
+    --bs-border-color-translucent: rgba(139, 111, 71, 0.5);
+
+    --bs-emphasis-color-rgb: var(--bs-card-title-color);
+    --bs-warning-text-emphasis: var(--bs-code-color);
+    --bs-body-color-rgb: var(--bs-body-color);
+    --bs-secondary-rgb: var(--bs-btn-color);
+    --bs-table-bg: var(--bs-tertiary-bg);
+    --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
+
+    --area-bg-color-10: rgba(0, 247, 255, 0.3);
+}
 [data-bs-theme="spaceship"] .btn-info,
 [data-bs-theme="spaceship"] .btn-outline-info {
     --bs-btn-color: var(--accent-blue);
@@ -843,10 +915,10 @@ body::after {
     box-shadow: 0 0 20px var(--accent-magenta);
     font-weight: bold;
 }
-[data-bs-theme="spaceship"] .console-header {
+.console-header {
     padding: 20px;
     border-bottom: 1px solid var(--area-border-color);
-    background: linear-gradient(90deg, var(--item-border-color), transparent);
+    background: linear-gradient(90deg, var(--area-bg-color-10), transparent);
 }
 [data-bs-theme="spaceship"] h1,
 [data-bs-theme="spaceship"] h2,

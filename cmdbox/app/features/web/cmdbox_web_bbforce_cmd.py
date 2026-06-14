@@ -13,7 +13,7 @@ class BbforceCmd(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.get('/bbforce_cmd')
+        @app.get('/bbforce_cmd', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def del_cmd(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:

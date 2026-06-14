@@ -14,7 +14,7 @@ class GetModes(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.get('/gui/get_modes', response_class=PlainTextResponse)
+        @app.get('/gui/get_modes', response_class=PlainTextResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def get_modes(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:

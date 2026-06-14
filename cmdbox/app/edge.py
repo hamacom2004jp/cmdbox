@@ -486,11 +486,12 @@ class Edge(object):
                 fastapi = FastAPI()
                 @fastapi.get('/oauth2/google/callback')
                 async def oauth2_google_callback(req:Request):
-                    if req.query_params['state'] != 'edge':
+                    query_params = dict(**req.query_params)
+                    if query_params.get('state') != 'edge':
                         return dict(warn="Invalid state.")
                     # アクセストークン取得
                     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-                    data = {'code': req.query_params['code'],
+                    data = {'code': query_params.get('code'),
                             'client_id': oauth2_client_id,
                             'client_secret': oauth2_client_secret,
                             'redirect_uri': redirect_uri,
@@ -552,12 +553,13 @@ class Edge(object):
                 fastapi = FastAPI()
                 @fastapi.get('/oauth2/github/callback')
                 async def oauth2_github_callback(req:Request):
-                    if req.query_params['state'] != 'edge':
+                    query_params = dict(**req.query_params)
+                    if query_params.get('state') != 'edge':
                         return dict(warn="Invalid state.")
                     # アクセストークン取得
                     headers = {'Content-Type': 'application/x-www-form-urlencoded',
                                'Accept': 'application/json'}
-                    data = {'code': req.query_params['code'],
+                    data = {'code': query_params.get('code'),
                             'client_id': oauth2_client_id,
                             'client_secret': oauth2_client_secret,
                             'redirect_uri': redirect_uri}
@@ -620,13 +622,14 @@ class Edge(object):
                 fastapi = FastAPI()
                 @fastapi.get('/oauth2/azure/callback')
                 async def oauth2_azure_callback(req:Request):
-                    if req.query_params['state'] != 'edge':
+                    query_params = dict(**req.query_params)
+                    if query_params.get('state') != 'edge':
                         return dict(warn="Invalid state.")
                     # アクセストークン取得
                     headers = {'Content-Type': 'application/x-www-form-urlencoded',
                                'Accept': 'application/json'}
                     data = {'tenant': oauth2_tenant_id,
-                            'code': req.query_params['code'],
+                            'code': query_params.get('code'),
                             'scope': " ".join(['openid', 'profile', 'email']),
                             'client_id': oauth2_client_id,
                             #'client_secret': oauth2_client_secret,

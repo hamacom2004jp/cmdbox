@@ -27,6 +27,7 @@ cmdbox.change_color_mode = async (color_mode=undefined, nosignin=false) => {
     select_elem.append('<option value="spaceship">Spaceship</option>');
     select_elem.append('<option value="sakura">Sakura</option>');
     select_elem.append('<option value="hydrangea">Hydrangea</option>');
+    select_elem.append('<option value="coffeeshop">Coffeeshop</option>');
     // color_mode = !color_mode ? localStorage.getItem('color_mode') : color_mode;
     if (!color_mode) {
         if (!nosignin) {
@@ -1199,14 +1200,15 @@ cmdbox.file_download = (target, svpath, error_func=undefined, exec_cmd=undefined
 cmdbox.file_upload = (target, svpath, formData, overwrite=false, progress_func=undefined, success_func=undefined, error_func=undefined, async_fg=true) => {
     const param = {method: 'POST', body: formData};
     const opt = cmdbox.get_server_opt(false, target);
-    let param_str = `host=${encodeURI(opt['host'])}`;
+    let param_str = '';
+    /*param_str += `host=${encodeURI(opt['host'])}`;
     param_str += `&port=${encodeURI(opt['port'])}`;
     param_str += `&password=${encodeURI(opt['password'])}`;
-    param_str += `&svname=${encodeURI(opt['svname'])}`;
+    param_str += `&svname=${encodeURI(opt['svname'])}`;*/
     param_str += `&overwrite=${!!overwrite}`;
     param_str += `&svpath=${encodeURI(svpath)}`;
     param_str += `&scope=${encodeURI(opt['scope'])}`;
-    param_str += `&client_data=${encodeURI(opt['client_data'])}`;
+    //param_str += `&client_data=${encodeURI(opt['client_data'])}`;
     $.ajax({ // fetchだとxhr.upload.onprogressが使えないため、$.ajaxを使用
         url: `filer/upload?${param_str}`,
         type: 'POST',

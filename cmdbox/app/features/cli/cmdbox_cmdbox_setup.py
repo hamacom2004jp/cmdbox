@@ -129,7 +129,7 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
                 name = setup.get('name', f'setup_{i}')
                 description = setup.get('description', '')
                 exec_conf = setup.get('exec', {})
-                chopt = {k:to_val(v) for k,v in args.chopt.items()} or {}
+                chopt = args.chopt and {k:to_val(v) for k,v in args.chopt.items()} or {}
                 exec_conf.update(chopt)  # コマンドラインのオプション変更を反映
 
                 if not exec_conf:

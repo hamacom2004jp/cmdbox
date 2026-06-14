@@ -14,14 +14,17 @@ class AuditMetrics(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/audit/metrics/save')
+        @app.post('/audit/metrics/save', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def save_metrics(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             form = await req.form()
             title = form.get('title')
-            opt = json.loads(form.get('opt'))
+            opt = form.get('opt')
+            if not title or not opt:
+                return dict(warn='Title and opt are required.')
+            opt = json.loads(opt)
             if common.check_fname(title):
                 return dict(warn=f'The title contains invalid characters."{title}"')
             opt_path = web.audit_path / f"metrics-{title}.json"
@@ -31,13 +34,15 @@ class AuditMetrics(feature.WebFeature):
             web.options.audit_exec(req, res, web, title=title)
             return ret
 
-        @app.post('/audit/metrics/load')
+        @app.post('/audit/metrics/load', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def load_metrics(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             form = await req.form()
             title = form.get('title')
+            if not title:
+                return dict(warn='Title is required.')
             opt_path = web.audit_path / f"metrics-{title}.json"
             if not opt_path.is_file():
                 return dict(warn=f'The metrics file is not found."{opt_path}"')
@@ -45,20 +50,22 @@ class AuditMetrics(feature.WebFeature):
                 opt = json.load(f)
             return dict(success=opt)
 
-        @app.post('/audit/metrics/delete')
+        @app.post('/audit/metrics/delete', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def delete_metrics(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             form = await req.form()
             title = form.get('title')
+            if not title:
+                return dict(warn='Title is required.')
             opt_path = web.audit_path / f"metrics-{title}.json"
             if not opt_path.is_file():
                 return dict(warn=f'The metrics file is not found."{opt_path}"')
             opt_path.unlink()
             return dict(success=f'Metrics "{title}" deleted.')
 
-        @app.post('/audit/metrics/list')
+        @app.post('/audit/metrics/list', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def list_metrics(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:

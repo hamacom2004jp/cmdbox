@@ -15,7 +15,7 @@ class ListCmd(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/gui/list_cmd')
+        @app.post('/gui/list_cmd', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def list_cmd(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:

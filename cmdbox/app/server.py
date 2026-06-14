@@ -171,7 +171,12 @@ class Server(filer.Filer):
                         self.is_running = False
                     if self.logger.level == logging.DEBUG:
                         self.logger.debug(f"svname:{self.svname}, msg: {msg}"[:300])
-                    st = common.exec_svrun_sync(svcmd_feature.svrun, self.data_dir, self.logger, self.redis_cli, msg, self.sessions)
+                    try:
+                        st = common.exec_svrun_sync(svcmd_feature.svrun, self.data_dir, self.logger, self.redis_cli, msg, self.sessions)
+                    except Exception as e:
+                        self.redis_cli.rpush(msg[1], dict(warn=f"Unknown error occurred. {e}: {msg}."))
+                        self.logger.error(f"Unknown error occurred. {e}: {msg}.", exc_info=True)
+                        st = self.RESP_ERROR
                 else:
                     self.logger.warning(f"Unknown command {msg}")
                     st = self.RESP_WARN

@@ -1,4 +1,4 @@
-from cmdbox.app import common
+from cmdbox.app import common, feature
 from cmdbox.app.features.web import cmdbox_web_gui
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
@@ -15,13 +15,15 @@ class LoadCmd(cmdbox_web_gui.Gui):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/gui/load_cmd')
+        @app.post('/gui/load_cmd', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def load_cmd(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             form = await req.form()
             title = form.get('title')
+            if not title:
+                return dict(warn='Title is required.')
             ret = self.load_cmd(web, title)
             return ret
 

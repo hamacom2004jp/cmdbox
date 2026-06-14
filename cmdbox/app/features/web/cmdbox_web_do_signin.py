@@ -1,5 +1,5 @@
 import urllib.parse
-from cmdbox.app import common
+from cmdbox.app import common, feature
 from cmdbox.app.auth import signin, signin_saml, azure_signin, azure_signin_saml, github_signin, google_signin
 from cmdbox.app.commons import convert
 from cmdbox.app.features.web import cmdbox_web_signin
@@ -26,14 +26,14 @@ class DoSignin(cmdbox_web_signin.Signin):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/dosignin/', response_class=HTMLResponse)
+        @app.post('/dosignin/', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def do_signin(req:Request, res:Response):
             return await do_signin_token(None, '', req, res)
-        @app.post('/dosignin/{next}', response_class=HTMLResponse)
+        @app.post('/dosignin/{next}', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def do_signin(next:str, req:Request, res:Response):
             return await do_signin_token(None, next, req, res)
 
-        @app.get('/dosignin_token/{token}/{next}', response_class=HTMLResponse)
+        @app.get('/dosignin_token/{token}/{next}', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def do_signin_token(token:str, next:str, req:Request, res:Response):
             form = await req.form()
             name = form.get('name')
@@ -44,8 +44,11 @@ class DoSignin(cmdbox_web_signin.Signin):
             if token is not None:
                 if web.logger.level == logging.DEBUG:
                     web.logger.debug(f'token={token}')
-                token = convert.b64str2str(token)
-                token = json.loads(token)
+                try:
+                    token = convert.b64str2str(token)
+                    token = json.loads(token)
+                except Exception as e:
+                    raise HTTPException(status_code=400, detail='Invalid token format.')
                 name = token['user']
                 user = [u for u in signin_data['users'] if u['name'] == name]
                 if len(user) <= 0:
@@ -242,51 +245,54 @@ class DoSignin(cmdbox_web_signin.Signin):
                                  f'group_homes={group_homes}, group_sps={group_sps}')
             self.set_session(req, req.session['signin'])
 
-        @app.get('/oauth2/google/callback')
+        @app.get('/oauth2/google/callback', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_google_callback(req:Request, res:Response):
             conf = web.signin.signin_file_data['oauth2']['providers']['google']
-            next = req.query_params['state']
+            query_params = dict(**req.query_params)
+            next = query_params.get('state')
             try:
                 # アクセストークン取得
                 access_token = self.google_signin.request_access_token(conf, req, res)
                 return await oauth2_google_session(access_token, next, req, res)
             except Exception as e:
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
-                raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
+                raise HTTPException(status_code=400, detail=f'Failed to get token. {e}')
 
-        @app.get('/oauth2/google/session/{access_token}/{next}')
+        @app.get('/oauth2/google/session/{access_token}/{next}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_google_session(access_token:str, next:str, req:Request, res:Response):
             return await oauth2_login_session(self.google_signin, access_token, next, req, res)
 
-        @app.get('/oauth2/github/callback')
+        @app.get('/oauth2/github/callback', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_github_callback(req:Request, res:Response):
             conf = web.signin.signin_file_data['oauth2']['providers']['github']
-            next = req.query_params['state']
+            query_params = dict(**req.query_params)
+            next = query_params.get('state')
             try:
                 # アクセストークン取得
                 access_token = self.github_signin.request_access_token(conf, req, res)
                 return await oauth2_github_session(access_token, next, req, res)
             except Exception as e:
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
-                raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
+                raise HTTPException(status_code=400, detail=f'Failed to get token. {e}')
 
-        @app.get('/oauth2/github/session/{access_token}/{next}')
+        @app.get('/oauth2/github/session/{access_token}/{next}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_github_session(access_token:str, next:str, req:Request, res:Response):
             return await oauth2_login_session(self.github_signin, access_token, next, req, res)
 
-        @app.get('/oauth2/azure/callback')
+        @app.get('/oauth2/azure/callback', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_azure_callback(req:Request, res:Response):
             conf = web.signin.signin_file_data['oauth2']['providers']['azure']
-            next = req.query_params['state']
+            query_params = dict(**req.query_params)
+            next = query_params.get('state')
             try:
                 # アクセストークン取得
                 access_token = self.azure_signin.request_access_token(conf, req, res)
                 return await oauth2_azure_session(access_token, next, req, res)
             except Exception as e:
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
-                raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
+                raise HTTPException(status_code=400, detail=f'Failed to get token. {e}')
 
-        @app.get('/oauth2/azure/session/{access_token}/{next}')
+        @app.get('/oauth2/azure/session/{access_token}/{next}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_azure_session(access_token:str, next:str, req:Request, res:Response):
             return await oauth2_login_session(self.azure_signin, access_token, next, req, res)
 
@@ -313,14 +319,14 @@ class DoSignin(cmdbox_web_signin.Signin):
                 return HTMLResponse(content=html, headers=dict(signin="success"))
             except Exception as e:
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
-                raise HTTPException(status_code=500, detail=f'Failed to get token. {e}')
+                raise HTTPException(status_code=400, detail=f'Failed to get token. {e}')
 
-        @app.post('/saml/azure/callback')
+        @app.post('/saml/azure/callback', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def saml_azure_callback(req:Request, res:Response):
             form = await req.form()
             return await saml_login_callback('azure', self.azure_saml_signin, form, None, req, res)
 
-        @app.get('/saml/azure/session/{saml_token}/{next}')
+        @app.get('/saml/azure/session/{saml_token}/{next}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def saml_azure_session(saml_token:str, next:str, req:Request, res:Response):
             form = json.loads(convert.b64str2str(saml_token))
             return await saml_login_callback('azure', self.azure_saml_signin, form, next, req, res)
@@ -369,7 +375,7 @@ class DoSignin(cmdbox_web_signin.Signin):
             else:
                 msg = f"Error when processing SAML Response: {', '.join(errors)} {auth.get_last_error_reason()}"
                 web.logger.warning(msg)
-                raise HTTPException(status_code=500, detail=msg)
+                raise HTTPException(status_code=401, detail=msg)
 
     def set_session(self, req:Request, user_session:Dict[str, Any]):
         """

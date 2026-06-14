@@ -88,8 +88,6 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
 .console-header {
     padding: 20px;
     border-bottom: 1px solid var(--area-border-color);
-}
-[data-bs-theme="spaceship"] .console-header {
     background: linear-gradient(90deg, var(--area-bg-color-10), transparent);
 }
 
@@ -696,6 +694,7 @@ a.list-group-item.active {
     justify-content: center;
     padding-bottom: 10px;
     border-bottom: 1px solid var(--area-border-color);
+    background: var(--area-bg-color-10);
 }
 
 .btn-nav-toggle {

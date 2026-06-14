@@ -4,6 +4,7 @@ from cmdbox.app.commons import redis_client
 from cmdbox.app.web import Web
 from fastapi import FastAPI
 from pathlib import Path
+from pydantic import BaseModel, ConfigDict
 from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
@@ -213,12 +214,32 @@ class UnsupportEdgeFeature(Feature):
         tool.notify(res)
         yield 1, res
 
+class RequestBody(BaseModel):
+    """OpenAI-compatible embeddings request schema"""
+    model_config = ConfigDict(extra="allow")
+
 class WebFeature(object):
     USE_REDIS_FALSE:int = Feature.USE_REDIS_FALSE
     USE_REDIS_MEIGHT:int = Feature.USE_REDIS_MEIGHT
     USE_REDIS_TRUE:int = Feature.USE_REDIS_TRUE
     DEFAULT_CAPTURE_MAXSIZE:int = Feature.DEFAULT_CAPTURE_MAXSIZE
+    DEFAULT_302_MESSAGE:str = "Redirecting. Please follow the redirect URL to continue."
+    DEFAULT_400_MESSAGE:str = "Bad Request. Please check your request and try again."
     DEFAULT_401_MESSAGE:str = "Unauthorized operation. Please sign in again as an authorized user."
+    DEFAULT_403_MESSAGE:str = "Forbidden operation. You don't have permission to perform this action."
+    DEFAULT_404_MESSAGE:str = "Not Found. The requested resource was not found."
+    DEFAULT_405_MESSAGE:str = "Method Not Allowed. The requested method is not allowed for the resource."
+    DEFAULT_422_MESSAGE:str = "Unprocessable Meessage. The request was well-formed but was unable to be followed due to semantic errors."
+    DEFAULT_RESPONCE_STATES:Dict[int, str] = {
+        200:{"description": "Successful"},
+        302:{"description": DEFAULT_302_MESSAGE},
+        400:{"description": DEFAULT_400_MESSAGE},
+        401:{"description": DEFAULT_401_MESSAGE},
+        403:{"description": DEFAULT_403_MESSAGE},
+        404:{"description": DEFAULT_404_MESSAGE},
+        405:{"description": DEFAULT_405_MESSAGE},
+        422:{"description": DEFAULT_422_MESSAGE},
+    }
 
     def __init__(self, appcls=None, ver=version, language:str=None):
         self.ver = ver

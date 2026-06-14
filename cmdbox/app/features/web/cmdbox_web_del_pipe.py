@@ -12,13 +12,15 @@ class DelPipe(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/gui/del_pipe')
+        @app.post('/gui/del_pipe', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def del_pipe(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             form = await req.form()
             title = form.get('title')
+            if not title:
+                return dict(warn='Title is required.')
 
             opt_path = web.pipes_path / f"pipe-{title}.json"
             web.logger.info(f"del_pipe: opt_path={opt_path}")

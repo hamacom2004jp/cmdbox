@@ -1,4 +1,4 @@
-from cmdbox.app import app, client, common, options, server
+from cmdbox.app import app, client, common, feature, options, server
 from cmdbox.app.auth import signin
 from cmdbox.app.commons import convert
 from cmdbox.app.features.cli import cmdbox_audit_search, cmdbox_audit_write
@@ -28,9 +28,9 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/exec_cmd')
-        @app.get('/exec_cmd/{title}')
-        @app.post('/exec_cmd/{title}')
+        @app.post('/exec_cmd', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.get('/exec_cmd/{title}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.post('/exec_cmd/{title}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def exec_cmd(req:Request, res:Response, title:str=None, scope=Depends(signin.create_request_scope)):
             try:
                 opt = await self._preprocess(web, app, req, res, title)
@@ -49,8 +49,8 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                     return dict(warn=f'Command execution failed. {traceback.format_exc()}')
                 return dict(warn=f'Command "{title}" failed. {traceback.format_exc()}')
 
-        @app.get('/exec_sse_cmd')
-        @app.get('/exec_sse_cmd/{title}')
+        @app.get('/exec_sse_cmd', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.get('/exec_sse_cmd/{title}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def exec_sse_cmd(req:Request, res:Response, title:str=None, scope=Depends(signin.create_request_scope)):
             try:
                 opt = await self._preprocess(web, app, req, res, title)
@@ -111,7 +111,12 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
                 opt[key] = fv.file
                 if key == 'input_file': opt['stdin'] = False
         elif content_type.startswith('application/json'):
-            opt = await req.json()
+            if not await req.body():
+                raise HTTPException(status_code=400, detail='Request body is empty.')
+            try:
+                opt = await req.json()
+            except Exception as e:
+                raise HTTPException(status_code=400, detail=f'Invalid JSON: {e}')
             opt = _marge_opt(opt_def, opt)
         elif content_type.startswith('application/octet-stream'):
             opt = _marge_opt(opt_def, req.query_params)

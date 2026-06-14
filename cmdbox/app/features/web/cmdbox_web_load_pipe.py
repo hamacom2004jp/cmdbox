@@ -15,13 +15,15 @@ class LoadPipe(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/gui/load_pipe')
+        @app.post('/gui/load_pipe', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def load_pipe(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             form = await req.form()
             title = form.get('title')
+            if not title:
+                return dict(warn='Title is required.')
 
             ret = self.load_pipe(web, title)
             return ret

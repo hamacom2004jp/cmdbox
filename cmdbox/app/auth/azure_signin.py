@@ -1,5 +1,5 @@
 from cmdbox.app.auth.signin import Signin
-from fastapi import Request, Response
+from fastapi import Request, Response, HTTPException
 from typing import Any, Dict, Tuple
 import requests
 import urllib
@@ -66,8 +66,11 @@ class AzureSignin(Signin):
     def request_access_token(self, conf:Dict, req:Request, res:Response) -> str:
         headers = {'Content-Type': 'application/x-www-form-urlencoded',
                     'Accept': 'application/json'}
+        query_params = dict(**req.query_params)
+        if not query_params.get('code'):
+            raise HTTPException(status_code=400, detail="Missing 'code' query parameter.")
         data = {'tenant': conf['tenant_id'],
-                'code': req.query_params['code'],
+                'code': query_params.get('code'),
                 'scope': " ".join(conf['scope']),
                 'client_id': conf['client_id'],
                 'client_secret': conf['client_secret'],

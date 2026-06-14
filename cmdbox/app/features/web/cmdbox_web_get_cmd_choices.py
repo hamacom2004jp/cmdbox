@@ -12,7 +12,7 @@ class GetCmdChoices(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/gui/get_cmd_choices')
+        @app.post('/gui/get_cmd_choices', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def get_cmd_choices(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
@@ -21,6 +21,8 @@ class GetCmdChoices(feature.WebFeature):
             mode = form.get('mode')
             cmd = form.get('cmd')
             language = form.get('language')
+            if not mode or not cmd:
+                return dict(warn='Mode and cmd are required.')
             ret = web.options.get_cmd_choices(mode, cmd, True).copy()
             fobj = web.options.get_cmd_attr(mode, cmd, 'feature')
             desc = web.options.get_cmd_attr(mode, cmd, 'description_en' if not common.is_japan(language=language) else 'description_ja')

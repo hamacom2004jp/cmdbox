@@ -18,8 +18,9 @@ class GoogleSignin(Signin):
 
     def request_access_token(self, conf:Dict, req:Request, res:Response) -> str:
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        next = req.query_params['state']
-        data = {'code': req.query_params['code'],
+        query_params = dict(**req.query_params)
+        next = query_params.get('state')
+        data = {'code': query_params.get('code'),
                 'client_id': conf['client_id'],
                 'client_secret': conf['client_secret'],
                 'redirect_uri': conf['redirect_uri'],

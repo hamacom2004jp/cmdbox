@@ -15,7 +15,7 @@ class VersionsCmdbox(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.get('/versions')
+        @app.get('/versions', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def versions(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
@@ -32,7 +32,7 @@ class VersionsCmdbox(feature.WebFeature):
             if hasattr(self.ver, '__docurl__'): ret['docurl'] = self.ver.__docurl__
             return ret
 
-        @app.get('/versions_cmdbox')
+        @app.get('/versions_cmdbox', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def versions_cmdbox(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
@@ -40,7 +40,7 @@ class VersionsCmdbox(feature.WebFeature):
             logo = [version.__logo__]
             return logo + version.__description__.split('\n')
 
-        @app.get('/versions_used')
+        @app.get('/versions_used', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def versions_used(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:

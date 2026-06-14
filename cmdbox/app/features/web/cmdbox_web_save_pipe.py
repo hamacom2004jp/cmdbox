@@ -14,7 +14,7 @@ class SavePipe(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/gui/save_pipe')
+        @app.post('/gui/save_pipe', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def save_pipe(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
@@ -22,6 +22,8 @@ class SavePipe(feature.WebFeature):
             form = await req.form()
             title = form.get('title')
             opt = form.get('opt')
+            if not title or not opt:
+                return dict(warn='Title and opt are required.')
             ret = self.save_pipe(web, title, json.loads(opt))
             web.options.audit_exec(req, res, web)
             return ret
@@ -31,6 +33,7 @@ class SavePipe(feature.WebFeature):
         パイプラインを保存する
 
         Args:
+            web (Web): Webオブジェクト
             title (str): タイトル
             opt (dict): オプション
 

@@ -14,7 +14,7 @@ class SaveCmd(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        @app.post('/gui/save_cmd')
+        @app.post('/gui/save_cmd', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def save_cmd(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
@@ -22,6 +22,8 @@ class SaveCmd(feature.WebFeature):
             form = await req.form()
             title = form.get('title')
             opt = form.get('opt')
+            if not title or not opt:
+                return dict(warn='Title and opt are required.')
             ret = self.save_cmd(web, title, json.loads(opt))
             web.options.audit_exec(req, res, web)
             return ret

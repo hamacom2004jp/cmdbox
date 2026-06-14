@@ -23,8 +23,8 @@ class Limiter(feature.WebFeature):
                 with open(web.limiter_html, 'r', encoding='utf-8') as f:
                     web.limiter_html_data = f.read()
 
-        @app.get('/limiter', response_class=HTMLResponse)
-        @app.post('/limiter', response_class=HTMLResponse)
+        @app.get('/limiter', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.post('/limiter', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def limiter(req:Request, res:Response):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
