@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.feature &mdash; cmdbox 2026/06/06 documentation</title>
+  <title>cmdbox.app.feature &mdash; cmdbox 2026/06/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=25cc829f"></script>
+      <script src="../../../_static/documentation_options.js?v=76fbd8b1"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -84,6 +84,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.web</span><span class="w"> </span><span class="kn">import</span> <span class="n">Web</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
@@ -359,6 +360,12 @@
 </div>
 
 
+<div class="viewcode-block" id="RequestBody">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.RequestBody">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RequestBody</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">extra</span><span class="o">=</span><span class="s2">&quot;allow&quot;</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="WebFeature">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.feature.WebFeature">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">WebFeature</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -366,7 +373,23 @@
     <span class="n">USE_REDIS_MEIGHT</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">Feature</span><span class="o">.</span><span class="n">USE_REDIS_MEIGHT</span>
     <span class="n">USE_REDIS_TRUE</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">Feature</span><span class="o">.</span><span class="n">USE_REDIS_TRUE</span>
     <span class="n">DEFAULT_CAPTURE_MAXSIZE</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">Feature</span><span class="o">.</span><span class="n">DEFAULT_CAPTURE_MAXSIZE</span>
+    <span class="n">DEFAULT_302_MESSAGE</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Redirecting. Please follow the redirect URL to continue.&quot;</span>
+    <span class="n">DEFAULT_400_MESSAGE</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Bad Request. Please check your request and try again.&quot;</span>
     <span class="n">DEFAULT_401_MESSAGE</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Unauthorized operation. Please sign in again as an authorized user.&quot;</span>
+    <span class="n">DEFAULT_403_MESSAGE</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Forbidden operation. You don&#39;t have permission to perform this action.&quot;</span>
+    <span class="n">DEFAULT_404_MESSAGE</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Not Found. The requested resource was not found.&quot;</span>
+    <span class="n">DEFAULT_405_MESSAGE</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Method Not Allowed. The requested method is not allowed for the resource.&quot;</span>
+    <span class="n">DEFAULT_422_MESSAGE</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Unprocessable Meessage. The request was well-formed but was unable to be followed due to semantic errors.&quot;</span>
+    <span class="n">DEFAULT_RESPONCE_STATES</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">200</span><span class="p">:{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Successful&quot;</span><span class="p">},</span>
+        <span class="mi">302</span><span class="p">:{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">DEFAULT_302_MESSAGE</span><span class="p">},</span>
+        <span class="mi">400</span><span class="p">:{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">DEFAULT_400_MESSAGE</span><span class="p">},</span>
+        <span class="mi">401</span><span class="p">:{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">DEFAULT_401_MESSAGE</span><span class="p">},</span>
+        <span class="mi">403</span><span class="p">:{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">DEFAULT_403_MESSAGE</span><span class="p">},</span>
+        <span class="mi">404</span><span class="p">:{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">DEFAULT_404_MESSAGE</span><span class="p">},</span>
+        <span class="mi">405</span><span class="p">:{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">DEFAULT_405_MESSAGE</span><span class="p">},</span>
+        <span class="mi">422</span><span class="p">:{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">DEFAULT_422_MESSAGE</span><span class="p">},</span>
+    <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appcls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="n">version</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ver</span> <span class="o">=</span> <span class="n">ver</span>

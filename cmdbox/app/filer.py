@@ -13,7 +13,9 @@ class Filer(object):
     RESP_WARN:int = 1
     RESP_ERROR:int = 2
     def __init__(self, data_dir: Path, logger: logging.Logger,):
-        self.data_dir = data_dir
+        if not data_dir:
+            raise ValueError("data_dir is required.")
+        self.data_dir = data_dir.resolve() if isinstance(data_dir, Path) else Path(data_dir).resolve()
         self.logger = logger
         common.mkdirs(self.data_dir)
 
@@ -50,18 +52,19 @@ class Filer(object):
             return False, abspath, dict(warn=f"Path {abspath} exist. param={current_path}")
         return True, abspath, dict(success=f"Path {abspath} exists.")
 
-    def check_fwpath(self, path:str, fwpaths:List[str], rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+    def check_fwpath(self, path:str, fwpaths:List[str], rjpaths:List[str]=None, exists_chk:bool=True) -> Tuple[int, Dict[str, Any]]:
         """
         パスが範囲内かどうかを確認する
         Args:
             path (str): パス
             fwpaths (List[str]): 範囲内かどうかを示すパスのリスト
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト, by default None
+            exists_chk (bool, optional): パス存在チェックを行うかどうか, by default True
         Returns:
             int: レスポンスコード
             dict: メッセージ
         """
-        _, from_abspath, _ = self._file_exists(path)
+        _, from_abspath, _ = self._file_exists(path, exists_chk=exists_chk)
         if fwpaths is None:
             return False, dict(warn=f"fwpaths is None.")
         if not any(from_abspath.is_relative_to(self._file_exists(fwpath)[1]) for fwpath in fwpaths):
@@ -309,7 +312,7 @@ class Filer(object):
         chk, abspath, msg = self._file_exists(current_path, exists_chk=False)
         if not chk:
             return self.RESP_WARN, msg
-        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths)
+        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths, exists_chk=False)
         if not chk:
             return self.RESP_WARN, msg
 

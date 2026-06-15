@@ -1,5 +1,5 @@
 from cmdbox.app import common, client
-from cmdbox.app.commons import convert, resdata, validator
+from cmdbox.app.commons import resdata, validator
 from cmdbox.app.features.cli.rag import rag_base, rag_store
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -127,11 +127,6 @@ class RagSearch(rag_base.RAGBase, validator.Validator):
             scope = signin_res['success']['scope']
             signin_data = signin_res['success']['signin_data']
 
-            # Embeddingの起動
-            st, embedstart_res, cl = self.embedstart(rag_config, args, cl, tm, pf, logger)
-            if st != self.RESP_SUCCESS:
-                return st, embedstart_res, cl
-
             # RagStoreの作成
             store = rag_store.RagStore.create(ds_config, logger,
                                               appcls=self.appcls, ver=self.ver, language=self.language)
@@ -154,8 +149,7 @@ class RagSearch(rag_base.RAGBase, validator.Validator):
                         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                         return st, embed_res, cl
                     embed_data = embed_res['data'][0]
-                    embed_npy = convert.b64str2npy(embed_data['embed'], shape=embed_data['shape'], dtype=embed_data['type'])
-                    vec_data = common.to_str(embed_npy.tolist())
+                    vec_data = common.to_str(embed_data['embedding'])
 
                 # 検索
                 recodes = store.select_doc(connection=conn, select=args.select,

@@ -1,6 +1,6 @@
 agentView.get_rag_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('rag', 'save');
-    const vform_names = ['rag_name', 'rag_datasource', 'source_dir', 'extract', 'embed', 'embed_vector_dim', 'savetype',];
+    const vform_names = ['rag_name', 'rag_datasource', 'source_dir', 'extract', 'llm_name', 'embed_vector_dim', 'savetype',];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };
@@ -27,11 +27,11 @@ agentView.list_rag = async () => {
             $('#btn_build_rag').hide();
             cmdbox.process_i18n($('#rag_edit_modal'));
             $('#rag_edit_modal').modal('show');
-            // Embedリストをロード
-            await cmdbox.callcmd('embed','list',{},(res)=>{
-                $("[name='embed']").empty().append('<option></option>');
-                res['data'].map(elm=>{$('[name="embed"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-            },$('[name="title"]').val(),'embed');
+            // LLM（embedding）リストをロード
+            await cmdbox.callcmd('llm','list',{},(res)=>{
+                $('[name=\'llm_name\']').empty().append('<option></option>');
+                res['data'].map(elm=>{$('[name="llm_name"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+            },$('[name="title"]').val(),'llm_name');
             // RAG Datasourceリストをロード
             await cmdbox.callcmd('datasource','list',{},(res)=>{
                 $("[name='rag_datasource']").empty().append('<option></option>');
@@ -89,7 +89,7 @@ agentView.list_rag = async () => {
                 <li class="sf-list-item" style="cursor: pointer;">
                     <div>
                         <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.rag_name}</span>
-                        <span>${config.rag_datasource} / ${config.extract} / ${config.embed}</span>
+                        <span>${config.rag_datasource} / ${config.extract} / ${config.llm_name}</span>
                     </div>
                 </li>
             `).appendTo(container_ul);
@@ -138,11 +138,11 @@ agentView.list_rag = async () => {
                         await agentView.build_rag();
                     });
                     // コマンド実行
-                    await cmdbox.callcmd('embed','list',{},(res)=>{
-                        $("[name='embed']").empty().append('<option></option>');
-                        res['data'].map(elm=>{$('[name="embed"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
-                        form.find('[name="embed"]').val(config.embed);
-                    },$('[name="title"]').val(),'embed');
+                    await cmdbox.callcmd('llm','list',{},(res)=>{
+                        $('[name=\'llm_name\']').empty().append('<option></option>');
+                        res['data'].map(elm=>{$('[name="llm_name"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                        form.find('[name="llm_name"]').val(config.llm_name);
+                    },$('[name="title"]').val(),'llm_name');
                     await cmdbox.callcmd('datasource','list',{},(res)=>{
                         $("[name='rag_datasource']").empty().append('<option></option>');
                         res['data'].map(elm=>{$('[name="rag_datasource"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});

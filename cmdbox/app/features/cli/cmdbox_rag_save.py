@@ -85,16 +85,16 @@ class RagSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
                              + "}",
                      description_ja="RAGで使用するExtract処理の登録名を指定します。候補がない場合はextractモードのコマンドの登録が必要です。",
                      description_en="Specify the registered name for the Extract process used in RAG. If no candidates exist, you must register a command in extract mode."),
-                dict(opt="embed", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=[],
-                     callcmd="async () => {await cmdbox.callcmd('embed','list',{},(res)=>{"
-                             + "const val = $(\"[name='embed']\").val();"
-                             + "$(\"[name='embed']\").empty().append('<option></option>');"
-                             + "res['data'].map(elm=>{$(\"[name='embed']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
-                             + "$(\"[name='embed']\").val(val);"
-                             + "},$(\"[name='title']\").val(),'embed');"
+                dict(opt="llm_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
+                     callcmd="async () => {await cmdbox.callcmd('llm','list',{},(res)=>{"
+                             + "const val = $(\"[name='llm_name']\").val();"
+                             + "$(\"[name='llm_name']\").empty().append('<option></option>');"
+                             + "res['data'].map(elm=>{$(\"[name='llm_name']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
+                             + "$(\"[name='llm_name']\").val(val);"
+                             + "},$(\"[name='title']\").val(),'llm_name');"
                              + "}",
-                     description_ja="エンベッドモデルの登録名を指定します。",
-                     description_en="Specify the registration name of the embed model."),
+                     description_ja="エンベディングに使用するLLM設定の名前を指定します。llmモードのsaveコマンドでllmtypeにembeddingを指定したものを使用します。",
+                     description_en="Specify the name of the LLM configuration to use for embedding. Use one that has llmtype set to embedding in the llm mode save command."),
                 dict(opt="embed_vector_dim", type=Options.T_INT, default=256, required=False, multi=False, hide=False, choice=None,
                      description_ja="Embed時のベクトル次元数を指定します。",
                      description_en="Specify the vector dimension for embedding."),
@@ -113,7 +113,7 @@ class RagSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
             rag_datasource=args.rag_datasource if hasattr(args, 'rag_datasource') else None,
             savetype=args.savetype,
             extract=list(set(args.extract)) if hasattr(args, 'extract') and args.extract is not None else None,
-            embed=args.embed if hasattr(args, 'embed') else None,
+            llm_name=args.llm_name if hasattr(args, 'llm_name') else None,
             embed_vector_dim=args.embed_vector_dim if hasattr(args, 'embed_vector_dim') else None,
         )
 

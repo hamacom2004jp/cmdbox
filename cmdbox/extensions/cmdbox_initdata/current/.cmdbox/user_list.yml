@@ -137,10 +137,6 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     cmds: [list, load, check]
     rule: allow
   - groups: [user]
-    mode: embed
-    cmds: [list]
-    rule: allow
-  - groups: [user]
     mode: extract
     cmds: [list, pdfplumber, chunklet]
     coercion:
@@ -179,10 +175,6 @@ cmdrule:                       # A list of command rules, Specify a rule that de
   - groups: [editor]
     mode: llm
     cmds: [del, load, save]
-    rule: allow
-  - groups: [editor]
-    mode: embed
-    cmds: [del, load, save, start, stop]
     rule: allow
 pathrule:                      # List of RESTAPI rules, rules that determine whether or not a RESTAPI can be executed when a user in web mode accesses it.
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.

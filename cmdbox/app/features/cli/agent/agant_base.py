@@ -73,14 +73,6 @@ class AgentBase(feature.ResultEdgeFeature):
                     mcpsv_confs.append(mcpsv_conf)
         return mcpsv_confs
 
-    def _load_embed_config(self, data_dir:Path, embed_name:str) -> Dict[str, Any]:
-        embed_conf_path = data_dir / ".agent" / f"embed-{embed_name}.json"
-        if not embed_conf_path.exists():
-            raise FileNotFoundError(f"Specified embed configuration '{embed_name}' not found on server at '{str(embed_conf_path)}'.")
-        with embed_conf_path.open('r', encoding='utf-8') as f:
-            embed_conf = json.load(f)
-        return embed_conf
-
     def _load_ds_config(self, data_dir:Path, dsname:str) -> Dict[str, Any]:
         ds_conf = self.ds_load.load_datasource(data_dir, dsname)
         return ds_conf

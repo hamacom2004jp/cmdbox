@@ -494,13 +494,6 @@ This command implements ``output_schema()`` returning ``Result`` model.
 .. code-block:: json
 
     {
-      "performance": [
-        {
-          "key": "string",
-          "value": null
-        }
-      ],
-      "data": "string",
       "success": {
         "performance": [
           {
@@ -509,7 +502,11 @@ This command implements ``output_schema()`` returning ``Result`` model.
           }
         ],
         "data": "string"
-      }
+      },
+      "warn": {},
+      "error": {},
+      "output_schema": {},
+      "end": false
     }
 
 .. csv-table::
@@ -517,11 +514,15 @@ This command implements ``output_schema()`` returning ``Result`` model.
     :header-rows: 1
 
     "Field","Type","Required","Default","Description"
-    "performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "data","str | Path | null","no","null","アップロードしたファイルのパスを含むメッセージ"
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.data","str | Path | null","no","null","アップロードしたファイルのパスを含むメッセージ"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
+    "end","bool | null","no","null","終了フラグ"
 
 
 client ( http ) : ``cmdbox -m client -c http <Option>``

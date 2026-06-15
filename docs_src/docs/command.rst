@@ -18,7 +18,6 @@ See below for available options for the various commands.
    Common Options <cmd_common.rst>
    Datasource <cmd_datasource.rst>
    Edge <cmd_edge.rst>
-   Embed <cmd_embed.rst>
    Excel <cmd_excel.rst>
    Extract <cmd_extract.rst>
    GUI <cmd_gui.rst>

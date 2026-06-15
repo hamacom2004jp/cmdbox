@@ -101,7 +101,7 @@ class CmdboxInitdataInstall(cmdbox_base.CmdboxBase, validator.Validator):
         """
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
-        client_data = Path(args.client_data.replace('"', '')) if args.client_data is not None else None
+        client_data = Path(args.client_data.replace('"', '')).resolve() if args.client_data is not None else None
         initdata_paths = [Path(p.replace('"', '')) for p in args.initdata_path] if args.initdata_path is not None else []
         fwpaths = [p.replace('"', '') for p in args.fwpath] if args.fwpath is not None else ["/"]
         rjpaths = [p.replace('"', '') for p in args.rjpath] if args.rjpath is not None else []

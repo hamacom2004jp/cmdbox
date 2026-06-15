@@ -47,6 +47,7 @@ groups:                        # A list of groups, each of which is a map that c
 - gid: 1                       # An ID that identifies a group. No two groups can have the same ID.
   name: admin                  # A name that identifies the group. No two groups can have the same name.
   home: /.groups/admin         # The home directory of the group, used for file operations.
+  startpage: /gui
 - gid: 2
   name: develop
   home: /.groups/develop
@@ -98,11 +99,11 @@ cmdrule:                       # A list of command rules, Specify a rule that de
   - groups: [guest, user]
     coercion:
       fwpath: "[f'/.users/{user_name}/']+[f'/.groups/{g}/' for g in groups]"
-      rjpath: '[f''^/.(users|groups)/develop/'', f''^/.(users|groups)/master/'']'
+      rjpath: "[f'^/.(users|groups)/develop/', f'^/.(users|groups)/master/']"
       from_fwpath: "[f'/.users/{user_name}/']+[f'/.groups/{g}/' for g in groups]"
       to_fwpath: "[f'/.users/{user_name}/']+[f'/.groups/{g}/' for g in groups]"
-      from_rjpath: '[f''^/.(users|groups)/develop/'', f''^/.(users|groups)/master/'']'
-      to_rjpath: '[f''^/.(users|groups)/develop/'', f''^/.(users|groups)/master/'']'
+      from_rjpath: "[f'^/.(users|groups)/develop/', f'^/.(users|groups)/master/']"
+      to_rjpath: "[f'^/.(users|groups)/develop/', f'^/.(users|groups)/master/']"
     rule: deny
   - groups: [master, admin]
     mode: test
@@ -135,10 +136,6 @@ cmdrule:                       # A list of command rules, Specify a rule that de
   - groups: [user]
     mode: cmd
     cmds: [list, load, check]
-    rule: allow
-  - groups: [user]
-    mode: embed
-    cmds: [list]
     rule: allow
   - groups: [user]
     mode: extract
@@ -179,10 +176,6 @@ cmdrule:                       # A list of command rules, Specify a rule that de
   - groups: [editor]
     mode: llm
     cmds: [del, load, save]
-    rule: allow
-  - groups: [editor]
-    mode: embed
-    cmds: [del, load, save, start, stop]
     rule: allow
 pathrule:                      # List of RESTAPI rules, rules that determine whether or not a RESTAPI can be executed when a user in web mode accesses it.
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.

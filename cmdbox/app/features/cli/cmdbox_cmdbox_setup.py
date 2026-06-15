@@ -90,6 +90,7 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
         """
         # サーバーを起動
         args.svname = f"{self.ver.__appid__}_setup"
+        args.data = Path(args.data).resolve() if args.data is not None else None
         sv_start = threading.Thread(target=self.server_start.apprun, args=(logger, args, tm, pf))
         sv_start.start()
         has_warn = False

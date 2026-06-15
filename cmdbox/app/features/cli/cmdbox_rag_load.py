@@ -104,7 +104,7 @@ class RagLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             rag_datasource: Union[str, None] = pydantic.Field(default=None, description="RAGのデータソース識別名")
             savetype: Union[str, None] = pydantic.Field(default=None, description="保存タイプ")
             extract: Union[List[str], None] = pydantic.Field(default=None, description="エクストラクト設定リスト")
-            embed: Union[str, None] = pydantic.Field(default=None, description="エンベッディング名")
+            llm_name: Union[str, None] = pydantic.Field(default=None, description="LLM名")
             embed_vector_dim: Union[int, None] = pydantic.Field(default=None, description="エンベッディングベクトル次元数")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")

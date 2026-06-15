@@ -1,5 +1,5 @@
 from cmdbox.app import common, client
-from cmdbox.app.commons import convert, limiter, resdata, validator
+from cmdbox.app.commons import limiter, resdata, validator
 from cmdbox.app.features.cli.rag import rag_base, rag_store
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -107,12 +107,6 @@ class RagRegist(rag_base.RAGBase, validator.Validator, limiter.LimitedFeature):
             user_name = signin_res['success']['user_name']
             scope = signin_res['success']['scope']
             signin_data = signin_res['success']['signin_data']
-
-            # Embeddingの起動
-            self.put_resqueue(args, dict(process=dict(message="Starting embedding...")))
-            st, embedstart_res, cl = self.embedstart(rag_config, args, cl, tm, pf, logger)
-            if st != self.RESP_SUCCESS:
-                return st, embedstart_res, cl
 
             # Extract設定の読込み
             self.put_resqueue(args, dict(process=dict(message="Loading extract configuration...")))
@@ -233,14 +227,13 @@ class RagRegist(rag_base.RAGBase, validator.Validator, limiter.LimitedFeature):
                                 self.put_resqueue(args, dict(process=dict(message=f"({doc_index}/{doc_count}) Registering extracted document to RAG store...file={marge_opt['loadpath']}",
                                                                           count=doc_count, index=doc_index, filename=Path(marge_opt['loadpath']).name)))
                                 for embed_i, embed_data in enumerate(embed_res.get('data', [])):
-                                    vec_npy = convert.b64str2npy(embed_data['embed'], shape=embed_data['shape'], dtype=embed_data['type'])
-                                    vev_list = vec_npy.tolist()
+                                    vev_list = embed_data['embedding']
                                     store.insert_doc(connection=conn,
                                                     servicename=args.rag_name,
-                                                    content_text=embed_data['data'],
+                                                    content_text=docs[embed_i]['content'],
                                                     origin_name=marge_opt['loadpath'],
                                                     metadata=docs[embed_i]['metadata'],
-                                                    vec_model=rag_config.get('embed'),
+                                                    vec_model=rag_config.get('llm_name'),
                                                     vec_data=vev_list)
                                 conn.commit()
 

@@ -81,10 +81,9 @@ agent_adk = [
     "litellm>=1.82.6",
 ]
 agent_mem = [
-    "sentence-transformers",
-    "sqlite_vec",
-    "transformers>=4.48.0",
-    "torch",
+#    "sentence-transformers",
+#    "transformers>=4.48.0",
+#    "torch",
 ]
 rag = [
     "chunklet-py",
@@ -101,6 +100,7 @@ rag = [
     "langchain_community",
     "markdown",
     "pdfplumber",
+    "sqlite_vec",
 ]
 omni = [
     "accelerate>=1.12.0",
@@ -125,7 +125,7 @@ dev = [
     "wheel",
 ]
 app = [
-    "cmdbox[dev, agent_mcp, agent_adk, agent_mem, rag]"
+    "cmdbox[dev, agent_mcp, agent_adk, rag]"
 ]
 
 [project.urls]
@@ -165,6 +165,7 @@ version = { attr = "cmdbox.version.__version__" }
 cmdbox = [
     "*.yml",
     "extensions/**",
+    "extensions/cmdbox_initdata/**",
     "extensions/sample_project/.vscode/**",
     "docker/**",
     "licenses/*",

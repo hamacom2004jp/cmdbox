@@ -5,8 +5,7 @@ from cmdbox.app.features.cli import (
     cmdbox_client_file_list,
     cmdbox_cmd_load,
     cmdbox_datasource_load,
-    cmdbox_embed_start,
-    cmdbox_embed_embedding,
+    cmdbox_llm_embed,
     cmdbox_extract_load,
     cmdbox_rag_load,
 )
@@ -23,8 +22,7 @@ class RAGBase(feature.ResultEdgeFeature):
         super().__init__(appcls, ver, language=language)
         self.cmdload = cmdbox_cmd_load.CmdLoad(appcls, ver, language)
         self.ragload = cmdbox_rag_load.RagLoad(appcls, ver, language)
-        self.embedstarter = cmdbox_embed_start.EmbedStart(appcls, ver, language)
-        self.embedembedding = cmdbox_embed_embedding.EmbedEmbedding(appcls, ver, language)
+        self.llmembed = cmdbox_llm_embed.LLMEmbed(appcls, ver, language)
         self.extractload = cmdbox_extract_load.ExtractLoad(appcls, ver, language)
         self.client_file_list = cmdbox_client_file_list.ClientFileList(appcls, ver, language)
         self.ds_load = cmdbox_datasource_load.DatasourceLoad(appcls, ver, language)
@@ -106,32 +104,9 @@ class RAGBase(feature.ResultEdgeFeature):
         msg = dict(success=dict(user_name=user_name, scope=scope, signin_data=signin_data))
         return self.RESP_SUCCESS, msg, None
 
-    def embedstart(self, rag_config:Dict, args:argparse.Namespace, cl:client.Client, tm:float, pf, logger:logging.Logger) -> Tuple[int, Dict[str, Any], client.Client]:
-        """
-        Embed start処理を行います
-
-        Args:
-            rag_config (Dict): RAG設定
-            args (argparse.Namespace): 引数
-            cl (client.Client): クライアント
-            tm (float): 実行開始時間
-            pf: パフォーマンス情報
-            logger (logging.Logger): ロガー
-        Returns:
-            Tuple[int, Dict[str, Any], client.Client]: 終了コード, 結果, クライアント
-        """
-        embedstart_payload = dict(embed_name=rag_config.get('embed', 'None'))
-        embedstart_payload_b64 = convert.str2b64str(common.to_str(embedstart_payload))
-        embedstart_res = cl.redis_cli.send_cmd(self.embedstarter.get_svcmd(), [embedstart_payload_b64],
-                                    retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
-        if 'success' not in embedstart_res:
-            common.print_format(embedstart_res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, embedstart_res, cl
-        return self.RESP_SUCCESS, embedstart_res['success'], cl
-    
     def embedding(self, rag_config:Dict, original_data:List[Any], args:argparse.Namespace, cl:client.Client, tm:float, pf, logger:logging.Logger) -> Tuple[int, Dict[str, Any], client.Client]:
         """
-        Embed embedding処理を行います
+        LLM embedを利用したEmbedding処理を行います
 
         Args:
             rag_config (Dict): RAG設定
@@ -144,17 +119,17 @@ class RAGBase(feature.ResultEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], client.Client]: 終了コード, 結果, クライアント
         """
-        if 'embed' not in rag_config or rag_config['embed'] is None:
-            msg = dict(warn=f"RAG configuration does not specify embed model name.")
+        if 'llm_name' not in rag_config or rag_config['llm_name'] is None:
+            msg = dict(warn=f"RAG configuration does not specify llm_name for embedding.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, cl
         if original_data is None:
             msg = dict(warn=f"Original data for embedding is None.")
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, cl
-        embedding_payload = dict(embed_name=rag_config.get('embed'), original_data=original_data)
+        embedding_payload = dict(llmname=rag_config.get('llm_name'), input_text=original_data)
         embedding_payload_b64 = convert.str2b64str(common.to_str(embedding_payload))
-        embedding_res = cl.redis_cli.send_cmd(self.embedembedding.get_svcmd(), [embedding_payload_b64],
+        embedding_res = cl.redis_cli.send_cmd(self.llmembed.get_svcmd(), [embedding_payload_b64],
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
         if 'success' not in embedding_res:
             common.print_format(embedding_res, args.format, tm, args.output_json, args.output_json_append, pf=pf)

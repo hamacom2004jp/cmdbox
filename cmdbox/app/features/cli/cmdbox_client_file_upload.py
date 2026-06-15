@@ -166,7 +166,7 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
         svpath = payload.get("svpath")
         file_name = payload.get("file_name")
         file_data = convert.b64str2bytes(payload.get("file_data"))
-        mkdir = payload.get("mkdir") == 'True'
+        mkdir = payload.get("mkdir")==True or payload.get("mkdir") == 'True'
         overwrite = payload.get("overwrite", False)=='True' or payload.get("overwrite", False) is True
         fwpaths = payload.get("fwpaths")
         rjpaths = payload.get("rjpaths")
@@ -212,5 +212,3 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
             logger.warning(f"Failed to upload file: {e}", exc_info=True)
             redis_cli.rpush(reskey, dict(warn=f"Failed to upload file: {e}"))
             return self.RESP_WARN
-
-

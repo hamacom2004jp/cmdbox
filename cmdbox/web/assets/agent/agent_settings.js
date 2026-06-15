@@ -16,8 +16,6 @@ agentView.initSettingsView = () => {
             agentView.list_llm();
         } else if (target === '#mcpsv_settings') {
             agentView.list_mcpsv();
-        } else if (target === '#embedding_settings') {
-            agentView.list_embedding();
         } else if (target === '#runner_settings') {
             agentView.list_runner();
         } else if (target === '#rag_settings') {
@@ -52,9 +50,6 @@ agentView.initSettingsView = () => {
     }));
     promises.push(cmdbox.check_cmd('rag', 'load').then((res) => {
         !res && $('[data-bs-target="#rag_settings"]').hide();
-    }));
-    promises.push(cmdbox.check_cmd('embed', 'load').then((res) => {
-        !res && $('[data-bs-target="#embedding_settings"]').hide();
     }));
     promises.push(cmdbox.check_cmd('extract', 'load').then((res) => {
         !res && $('[data-bs-target="#extract_settings"]').hide();

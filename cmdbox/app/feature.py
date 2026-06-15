@@ -215,7 +215,6 @@ class UnsupportEdgeFeature(Feature):
         yield 1, res
 
 class RequestBody(BaseModel):
-    """OpenAI-compatible embeddings request schema"""
     model_config = ConfigDict(extra="allow")
 
 class WebFeature(object):

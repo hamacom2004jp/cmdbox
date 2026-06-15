@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( rag mode ) &mdash; cmdbox 2026/06/07 documentation</title>
+  <title>Command Reference ( rag mode ) &mdash; cmdbox 2026/06/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=81b40686"></script>
+      <script src="../_static/documentation_options.js?v=76fbd8b1"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -56,7 +56,6 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_datasource.html">Datasource</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_embed.html">Embed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_extract.html">Extract</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
@@ -804,7 +803,7 @@
 <span class="w">    </span><span class="nt">&quot;extract&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="s2">&quot;string&quot;</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;embed&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;llm_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;embed_vector_dim&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
@@ -867,11 +866,11 @@
 <td><p>null</p></td>
 <td><p>エクストラクト設定リスト</p></td>
 </tr>
-<tr class="row-even"><td><p>success.embed</p></td>
+<tr class="row-even"><td><p>success.llm_name</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
-<td><p>エンベッディング名</p></td>
+<td><p>LLM名</p></td>
 </tr>
 <tr class="row-odd"><td><p>success.embed_vector_dim</p></td>
 <td><p>int | null</p></td>
@@ -1233,13 +1232,13 @@
 <td></td>
 <td><p>Specify the registered name for the Extract process used in RAG. If no candidates exist, you must register a command in extract mode.</p></td>
 </tr>
-<tr class="row-even"><td><p>--embed &lt;embed&gt;</p></td>
+<tr class="row-even"><td><p>--llm_name &lt;llm_name&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
+<td><p>required</p></td>
 <td></td>
 <td></td>
-<td></td>
-<td><p>Specify the registration name of the embed model.</p></td>
+<td><p>Specify the name of the LLM configuration to use for embedding. Use one that has llmtype set to embedding in the llm mode save command.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--embed_vector_dim &lt;embed_vector_dim&gt;</p></td>
 <td><p>int</p></td>

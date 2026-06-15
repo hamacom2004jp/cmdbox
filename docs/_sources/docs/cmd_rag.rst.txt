@@ -224,7 +224,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
         "extract": [
           "string"
         ],
-        "embed": "string",
+        "llm_name": "string",
         "embed_vector_dim": 0
       },
       "warn": {},
@@ -244,7 +244,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.rag_datasource","str | null","no","null","RAGのデータソース識別名"
     "success.savetype","str | null","no","null","保存タイプ"
     "success.extract","list[str] | null","no","null","エクストラクト設定リスト"
-    "success.embed","str | null","no","null","エンベッディング名"
+    "success.llm_name","str | null","no","null","LLM名"
     "success.embed_vector_dim","int | null","no","null","エンベッディングベクトル次元数"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
@@ -334,7 +334,7 @@ rag ( save ) : ``cmdbox -m rag -c save <Option>``
     "--rag_name <rag_name>","str","","required","","","Specify the name of the RAG configuration."
     "--rag_datasource <rag_datasource>","str","","required","","","Specify the data source where RAG will be stored."
     "--extract <extract>","str","multi","required","","","Specify the registered name for the Extract process used in RAG. If no candidates exist, you must register a command in extract mode."
-    "--embed <embed>","str","","","","","Specify the registration name of the embed model."
+    "--llm_name <llm_name>","str","","required","","","Specify the name of the LLM configuration to use for embedding. Use one that has llmtype set to embedding in the llm mode save command."
     "--embed_vector_dim <embed_vector_dim>","int","","","256","","Specify the vector dimension for embedding."
     "--savetype <savetype>","str","","","per_doc","per_doc | per_service | add_only","Specify the storage pattern. `per_doc` :per document, `per_service` :per service, `add_only` :add only"
 

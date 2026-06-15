@@ -17,10 +17,6 @@ $(() => {
             const agent_edit_html = await fetch('assets/agent/agent_settings_agent.html').then(res => res.text());
             $('.layout-grid').append(agent_edit_html);
 
-            // embed追加/編集モーダルの読込み
-            const embed_edit_html = await fetch('assets/agent/agent_settings_embed.html').then(res => res.text());
-            $('.layout-grid').append(embed_edit_html);
-
             // rag追加/編集モーダルの読込み
             const rag_edit_html = await fetch('assets/agent/agent_settings_rag.html').then(res => res.text());
             $('.layout-grid').append(rag_edit_html);
