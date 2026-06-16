@@ -20,7 +20,7 @@ class GetCmds(feature.WebFeature):
             form = await req.form()
             mode = form.get('mode')
             if not mode:
-                return dict(warn='Mode is required.')
+                return ['Please select mode.']
             #ret = web.options.get_cmds(mode)
             ret = web.signin.get_enable_cmds(mode, req, res)
             return ret

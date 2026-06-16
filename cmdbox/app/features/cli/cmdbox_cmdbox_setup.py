@@ -189,7 +189,7 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
         if 'cmd' in exec_conf and exec_conf['cmd'] is not None:
             args_list += ['-c', str(exec_conf['cmd'])]
         mod_path = Path(self.ver.__file__).parent
-        cur_path = mod_path.parent
+        cur_path = Path.cwd()
         # それ以外のオプションを追加
         for key, value in exec_conf.items():
             local_env = dict(Path=Path, self=self, cur_path=cur_path, appid=self.ver.__appid__, mod_path=mod_path, key=key)

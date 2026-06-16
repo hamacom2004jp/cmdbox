@@ -18,12 +18,7 @@ RUN apt-get update && \
     apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl build-essential libopencv-dev && \
     apt-get install -y iputils-ping net-tools && \
     apt-get install -y ffmpeg
-#{INSTALL_TORCH}
-RUN pip install --upgrade pip && \
-    pip install "pydantic>=2.0.0,<3.0.0" "fastmcp>=2.14.4" "mcp>=1.23.0,<2.0.0" && \
-    pip install "google-adk>=1.23.0" "a2a-sdk>=0.3.4,<0.4.0" "litellm>=1.75.5,<1.80.17" && \
-    pip install "sentence-transformers" "sqlite_vec" "transformers>=4.48.0" && \
-    pip install "chunklet-py[document]" "langchain_community" "markdown" "pdfplumber"
+RUN pip install --upgrade pip
 #{RUN_EXTRA_PRE}
 #{COPY_CMDBOX}
 RUN pip install #{INSTALL_CMDBOX} && cmdbox --version

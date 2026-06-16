@@ -209,13 +209,11 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase, validator.Validator):
                 text = text.replace('#{COPY_CMDBOX_START}', f'RUN mkdir -p {start_sh_tgt}\nCOPY {start_sh_hst} {start_sh_tgt}')
 
                 base_image = 'python:3.12.12-slim' #'python:3.11.9-slim' #'python:3.8.18-slim'
-                install_torch = 'RUN pip install --upgrade pip && pip install torch "torchvision>=0.25.0"'
                 if install_use_gpu:
                     #base_image = 'nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04'
                     #base_image = 'pytorch/pytorch:2.7.0-cuda12.8-cudnn9-runtime'
                     #base_image = 'pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime'
                     base_image = 'pytorch/pytorch:2.4.0-cuda12.1-cudnn9-devel'
-                    install_torch = ''
                 if install_from is not None and install_from != '':
                     base_image = install_from
                 text = text.replace('#{FROM}', f'FROM {base_image}')
@@ -265,7 +263,6 @@ class CmdboxServerInstall(cmdbox_base.CmdboxBase, validator.Validator):
                 text = text.replace('#{INSTALL_TAG}', install_tag)
                 text = text.replace('#{INSTALL_CMDBOX}', install_cmdbox_tgt)
                 text = text.replace('#{INSTALL_VOICEVOX}', install_voicevox)
-                text = text.replace('#{INSTALL_TORCH}', install_torch)
                 text = text.replace('#{INSTALL_EXTRA}', install_extra)
                 text = text.replace('#{RUN_EXTRA_PRE}', run_extra_pre)
                 text = text.replace('#{RUN_EXTRA_POST}', run_extra_post)
