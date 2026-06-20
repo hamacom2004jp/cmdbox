@@ -99,7 +99,7 @@ class DatasourceBase(feature.ResultEdgeFeature):
         ds_path = data_dir / ".datasource" / f"datasource-{dsname}.json"
         ds_path.parent.mkdir(parents=True, exist_ok=True)
 
-        current_path = db_path.replace("\\","/").replace("//","/") if db_path else None
+        current_path = str(db_path).replace("\\","/").replace("//","/") if db_path else None
         current_path = current_path[1:] if current_path and current_path.startswith('/') else current_path
         db_fullpath = str((data_dir / current_path).resolve()) if current_path else None
         dsconfig = dict(

@@ -52,12 +52,13 @@ def _apprun_post(self:'LimitedFeature', stime:float, msg:Dict[str, Any], data_di
     """
     # コマンド実行後のカウンタ更新
     exec_time = common.perf_counter() - stime
-    input_bytes = len(common.to_str(args.__dict__).encode('utf-8'))
-    output_bytes = len(common.to_str(msg).encode('utf-8'))
+    input_bytes = self.apprun_input_bytes(data_dir, logger, args, msg)
+    output_bytes = self.apprun_output_bytes(data_dir, logger, args, msg)
+    count = self.apprun_count(data_dir, logger, args, msg)
     process_bytes = self.apprun_process_bytes(data_dir, logger, args, msg)
     registrations = self.apprun_registrations(data_dir, logger, args, msg)
     limit.update(feat=self, data_dir=data_dir, logger=logger, command_options=args.__dict__,
-                    exec_time=exec_time, input_bytes=input_bytes, process_bytes=process_bytes,
+                    count=count, exec_time=exec_time, input_bytes=input_bytes, process_bytes=process_bytes,
                     output_bytes=output_bytes, registrations=registrations)
 
 def apprun_check_limit(func: Callable) -> Callable:
@@ -161,13 +162,15 @@ def _svrun_post(self:'LimitedFeature', data_dir:Path, logger:logging.Logger, red
         stime (float): コマンド実行開始時間
     """
     exec_time = common.perf_counter() - stime
-    input_bytes = len(' '.join(msg))
-    output_bytes = redis_cli.last_ressize if hasattr(redis_cli, 'last_ressize') and redis_cli.last_ressize is not None else 0
     resval = redis_cli.last_resval if hasattr(redis_cli, 'last_resval') and redis_cli.last_resval is not None else None
+    input_bytes = self.svrun_input_bytes(data_dir, logger, command_options, msg)
+    output_bytes = redis_cli.last_ressize if hasattr(redis_cli, 'last_ressize') and redis_cli.last_ressize is not None else 0
+    output_bytes = self.svrun_output_bytes(data_dir, logger, command_options, resval, output_bytes)
+    count = self.svrun_count(data_dir, logger, command_options, resval)
     process_bytes = self.svrun_process_bytes(data_dir, logger, command_options, resval)
     registrations = self.svrun_registrations(data_dir, logger, command_options, resval)
     limit.update(feat=self, data_dir=data_dir, logger=logger, command_options=command_options,
-                    exec_time=exec_time, input_bytes=input_bytes, process_bytes=process_bytes,
+                    count=count, exec_time=exec_time, input_bytes=input_bytes, process_bytes=process_bytes,
                     output_bytes=output_bytes, registrations=registrations)
     redis_cli.last_ressize = None
     redis_cli.last_resval = None
@@ -273,6 +276,56 @@ class LimitedFeature(feature.Feature):
             cmd=self.get_cmd(),
         )
         return ret
+    
+    def apprun_input_bytes(self, data_dir:Path, logger:logging.Logger, args:argparse.Namespace, msg:Dict[str, Any]) -> int:
+        """
+        apprunの実行結果として入力バイト数を取得します。
+        デフォルトの実装では、argsを文字列に変換してUTF-8でエンコードしたバイト数を返します。
+        このメソッドを拡張して、コマンドの引数やセッション情報などから入力バイト数を算出する処理を実装できます。
+
+        Args:
+            data_dir (Path): データディレクトリのパス
+            logger (logging.Logger): ロガー
+            args (argparse.Namespace): コマンドの引数
+            msg (Dict[str, Any]): apprunの処理結果
+        Returns:
+            int: 入力バイト数
+        """
+        input_bytes = len(common.to_str(args.__dict__).encode('utf-8')) if args else 0
+        return input_bytes
+
+    def apprun_output_bytes(self, data_dir:Path, logger:logging.Logger, args:argparse.Namespace, msg:Dict[str, Any]) -> int:
+        """
+        apprunの実行結果として出力バイト数を取得します。
+        デフォルトの実装では、msgを文字列に変換してUTF-8でエンコードしたバイト数を返します。
+        このメソッドを拡張して、コマンドの引数やセッション情報などから出力バイト数を算出する処理を実装できます。
+
+        Args:
+            data_dir (Path): データディレクトリのパス
+            logger (logging.Logger): ロガー
+            args (argparse.Namespace): コマンドの引数
+            msg (Dict[str, Any]): apprunの処理結果
+        Returns:
+            int: 出力バイト数
+        """
+        output_bytes = len(common.to_str(msg).encode('utf-8')) if msg else 0
+        return output_bytes
+
+    def apprun_count(self, data_dir:Path, logger:logging.Logger, args:argparse.Namespace, msg:Dict[str, Any]) -> int:
+        """
+        apprunの実行結果として実行回数を取得します。
+        デフォルトの実装では、1 を返します。
+        このメソッドを拡張して、コマンドの引数やセッション情報などから実行回数を算出する処理を実装できます。
+
+        Args:
+            data_dir (Path): データディレクトリのパス
+            logger (logging.Logger): ロガー
+            args (argparse.Namespace): コマンドの引数
+            msg (Dict[str, Any]): apprunの処理結果
+        Returns:
+            int: 実行回数
+        """
+        return 1
 
     def apprun_process_bytes(self, data_dir:Path, logger:logging.Logger, args:argparse.Namespace, msg:Dict[str, Any]) -> int:
         """
@@ -305,6 +358,56 @@ class LimitedFeature(feature.Feature):
             int: 登録数
         """
         return 0
+
+    def svrun_input_bytes(self, data_dir:Path, logger:logging.Logger, opt:Dict[str, Any], msg:List[str]) -> int:
+        """
+        svrunの実行結果として入力バイト数を取得します。
+        デフォルトの実装では、msgをスペースで結合した文字列のバイト数を返します。
+        このメソッドを拡張して、コマンドの引数やセッション情報などから入力バイト数を算出する処理を実装できます。
+
+        Args:
+            data_dir (Path): データディレクトリのパス
+            logger (logging.Logger): ロガー
+            opt (Dict[str, Any]): コマンドのオプション
+            msg (List[str]): svrunに渡されるmsg
+        Returns:
+            int: 入力バイト数
+        """
+        input_bytes = len(' '.join(msg)) if msg else 0
+        return input_bytes
+    
+    def svrun_output_bytes(self, data_dir:Path, logger:logging.Logger, opt:Dict[str, Any], msg:List[str], msg_size:int) -> int:
+        """
+        svrunの実行結果として出力バイト数を取得します。
+        デフォルトの実装では、msg_sizeを返します。
+        このメソッドを拡張して、コマンドの引数やセッション情報などから出力バイト数を算出する処理を実装できます。
+
+        Args:
+            data_dir (Path): データディレクトリのパス
+            logger (logging.Logger): ロガー
+            opt (Dict[str, Any]): コマンドのオプション
+            msg (List[str]): svrunに渡されるmsg
+            msg_size (int): svrunに渡されるmsgのサイズ
+        Returns:
+            int: 出力バイト数
+        """
+        return msg_size if msg_size is not None else 0
+
+    def svrun_count(self, data_dir:Path, logger:logging.Logger, opt:Dict[str, Any], msg:Union[Dict, str]) -> int:
+        """
+        svrunの実行結果として実行回数を取得します。
+        デフォルトの実装では、1 を返します。
+        このメソッドを拡張して、コマンドの引数やセッション情報などから実行回数を算出する処理を実装できます。
+
+        Args:
+            data_dir (Path): データディレクトリのパス
+            logger (logging.Logger): ロガー
+            opt (Dict[str, Any]): コマンドのオプション
+            msg (Union[Dict, str]): svrunの処理結果
+        Returns:
+            int: 実行回数
+        """
+        return 1
 
     def svrun_process_bytes(self, data_dir:Path, logger:logging.Logger, opt:Dict[str, Any], msg:Union[Dict, str]) -> int:
         """
@@ -817,6 +920,7 @@ class Limiter:
 
     def update(self, *, feat:LimitedFeature, data_dir: Path, logger: logging.Logger,
                command_options: Dict[str, Any],
+               count: int = 1,
                exec_time: float = 0.0,
                input_bytes: int = 0,
                process_bytes: int = 0,
@@ -833,6 +937,7 @@ class Limiter:
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             command_options (Dict[str, Any]): 実行コマンドのオプション
+            count (int): 実行回数（デフォルトは 1）
             exec_time (float): 実行時間（秒）
             input_bytes (int): 入力バイト数
             process_bytes (int): 処理バイト数
@@ -853,7 +958,7 @@ class Limiter:
                 if self.needs_refresh(config, counter):
                     counter = self.reset_counter(limiter_name)
 
-                counter['total_count'] = counter.get('total_count', 0) + 1
+                counter['total_count'] = counter.get('total_count', 0) + count
                 counter['total_time'] = counter.get('total_time', 0) + round(exec_time)
                 counter['total_input'] = counter.get('total_input', 0) + input_bytes
                 counter['total_process'] = counter.get('total_process', 0) + process_bytes

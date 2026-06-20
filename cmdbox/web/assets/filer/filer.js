@@ -3,7 +3,7 @@ fsapi.left = $('#left_container');
 fsapi.right = $('#right_container');
 fsapi.filer = (svpath, is_local) => {
   // ファイルアップロード ========================================================
-  const upload = async (event) => {
+  fsapi._upload = async (event) => {
     cmdbox.show_loading();
     // https://qiita.com/KokiSakano/items/a122bc0a1a368c697643
     const files = [];
@@ -225,7 +225,7 @@ fsapi.filer = (svpath, is_local) => {
       fsapi.right.find('.drop-area').removeClass('dragover');
       const from = event.originalEvent.dataTransfer.getData('from');
       if (from=="local") {
-          upload(event);
+          fsapi._upload(event);
       }
     }
     event.preventDefault();
@@ -319,6 +319,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
     list_tree.forEach(([key, node]) => {
       if(!node['path']) return;
       target.find('.filer_address').val(node['path']);
+      // ファイル選択エリアのクリックイベント
       const table = $('<table class="table table-bordered table-hover table-sm">'
                     + '<thead><tr><th class="th" scope="col">-</th><th class="th" scope="col">name</th><th class="th" scope="col">mime</th><th class="th" scope="col">size</th><th class="th" scope="col">last</th></tr></thead>'
                     + '</table>');
@@ -527,6 +528,30 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
           table_body.append(tr);
         });
       }
+      // ドロップエリア
+      const drop_area = $('<div class="border border-2 rounded pt-4 pb-3 d-flex flex-column align-items-center justify-content-center">'
+                        + '<h5 class="system-font glow-text-cyan i18n">Drop files here to upload.</h5>'
+                        + '<input type="file" class="d-none" multiple>'
+                        + '</div>').css('transition', '0.3s').css('transform', 'scale(0.95)').css('background-color', 'var(--area-bg-color-10)');
+      ['dragenter', 'dragover', 'mouseenter', 'mouseover','dragleave', 'drop', 'mouseleave', 'mouseout'].forEach(eventName => {
+        drop_area.off(eventName);
+       });
+      ['dragenter', 'dragover', 'mouseenter', 'mouseover'].forEach(eventName => {
+        drop_area.on(eventName, () => {drop_area.css('transform', 'scale(1)');});
+      });
+      ['dragleave', 'drop', 'mouseleave', 'mouseout'].forEach(eventName => {
+        drop_area.on(eventName, () => {drop_area.css('transform', 'scale(0.95)');});
+      });
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        drop_area.on(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        });
+      });
+      cmdbox.process_i18n(drop_area);
+      // ファイルがドロップされたときの処理
+      drop_area.on('drop', (e) => {fsapi._upload(e);});
+      target.find('.file-list').append(drop_area);
     });
     const fl_elem = target.find('.file-list').off('contextmenu').on('contextmenu', (e) => {
       target.find('.file-list').find('.dropdown-menu').hide();

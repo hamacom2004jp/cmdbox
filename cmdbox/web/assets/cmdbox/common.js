@@ -1845,8 +1845,10 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
  * @param {string} title - コマンドタイトル
  * @param {string} opt_name - オプション名
  * @param {object} err_i18n - エラー発生時のメッセージを国際化するかどうか
+ * @param {object} no_error - エラー発生時にメッセージを表示しないようにするかどうか
+ * @returns {Promise} - レスポンス
  */
-cmdbox.callcmd = async (mode, cmd, params, callback, title, opt_name, err_i18n=true) => {
+cmdbox.callcmd = async (mode, cmd, params, callback, title, opt_name, err_i18n=true, no_error=false) => {
     const opt = {
         mode: mode,
         cmd: cmd,
@@ -1860,20 +1862,20 @@ cmdbox.callcmd = async (mode, cmd, params, callback, title, opt_name, err_i18n=t
         body: JSON.stringify(opt)
     });
     if (res.status != 200) {
-        cmdbox.message({'error':`${res.status}: ${res.statusText}`}, err_i18n, true);
+        if (!no_error) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, err_i18n, true);
         console.log({'error':`${res.status}: ${res.statusText}`});
         return res;
     }
     try {
         res = await res.json();
     } catch (e) {
-        cmdbox.message({'error':`JSON parse error: ${e}`}, err_i18n, true);
+        if (!no_error) cmdbox.message({'error':`JSON parse error: ${e}`}, err_i18n, true);
         console.log({'error':`JSON parse error: ${e}`});
         return res;
     }
     if (res && res['success']) res = [res];
     if (!res[0] || !res[0]['success']) {
-        cmdbox.message(res, err_i18n, true);
+        if (!no_error) cmdbox.message(res, err_i18n, true);
         console.log({'error':res});
         return res;
     }
@@ -1883,7 +1885,7 @@ cmdbox.callcmd = async (mode, cmd, params, callback, title, opt_name, err_i18n=t
     }
     return cmdbox.load_cmd(title).then(cmd_opt => {
         if (!cmd_opt || cmd_opt['error']) {
-            cmdbox.message(cmd_opt, err_i18n, true);
+            if (!no_error) cmdbox.message(cmd_opt, err_i18n, true);
             console.log({'error':cmd_opt});
             return res;
         }
@@ -2054,7 +2056,7 @@ cmdbox.translation = async (words, nosave, llmname) => {
         words: words,
         target_lang: targetLang,
         nosave: nosave ? true : false
-    }, undefined, undefined, undefined, false);
+    }, undefined, undefined, undefined, false, true);
     if (!res) return words;
     if (Array.isArray(res) && res.length > 0) res = res[0];
     if (!res['success'] || !res['success']['data']) return words;

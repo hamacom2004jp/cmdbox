@@ -165,12 +165,14 @@ version = { attr = "cmdbox.version.__version__" }
 cmdbox = [
     "*.yml",
     "extensions/**",
-    "extensions/cmdbox_initdata/**",
+    "extensions/**/*",
     "extensions/sample_project/.vscode/**",
     "docker/**",
+    "docker/**/*",
     "licenses/*",
     "tools/datas/**",
     "web/**",
+    "web/**/*",
 ]
 
 [tool.setuptools.exclude-package-data]

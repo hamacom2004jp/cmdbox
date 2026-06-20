@@ -144,6 +144,19 @@ class Validator(feature.Feature):
         options.Options.T_STR: [str],
         options.Options.T_TEXT: [str],
     }
+    validator_type_castfunc = {
+        options.Options.T_BOOL: lambda v: v in [True, 'true', 'True'],
+        options.Options.T_DATE: lambda v: v,
+        options.Options.T_DATETIME: lambda v: v,
+        options.Options.T_DICT: lambda v: v,
+        options.Options.T_DIR: lambda v: Path(v) if isinstance(v, str) else v,
+        options.Options.T_FILE: lambda v: Path(v) if isinstance(v, str) else v,
+        options.Options.T_FLOAT: lambda v: float(v) if isinstance(v, str) and re.match(r'^-?\d+(\.\d+)?$', v) else v,
+        options.Options.T_INT: lambda v: int(v) if isinstance(v, str) and re.match(r'^-?\d+$', v) else v,
+        options.Options.T_PASSWD: lambda v: v,
+        options.Options.T_STR: lambda v: str(v),
+        options.Options.T_TEXT: lambda v: str(v),
+    }
 
     def valid(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
@@ -252,6 +265,7 @@ class Validator(feature.Feature):
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         if type in self.validator_types and val is not None:
+            val = self.validator_type_castfunc.get(type, lambda v: v)(val)
             if not any([isinstance(val, t) for t in self.validator_types[type]]):
                 msg = dict(warn=f"Invalid value for --{opt}: {val} (must be a {type})")
                 return self.RESP_WARN, msg, None

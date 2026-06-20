@@ -120,7 +120,7 @@ class AgentMcpClient(feature.UnsupportEdgeFeature, validator.Validator, limiter.
                     if not hasattr(args, 'mcp_timeout'):
                         args.mcp_timeout = 60
                     result = await client.call_tool(args.tool_name, arguments=args.tool_args, timeout=args.mcp_timeout)
-                    ret = dict(success=result.__dict__)
+                    ret = result.structured_content
                 elif args.operation == 'list_resources':
                     result = await client.list_resources()
                     ret = dict(success=[r.__dict__ for r in result])
@@ -128,7 +128,7 @@ class AgentMcpClient(feature.UnsupportEdgeFeature, validator.Validator, limiter.
                     if not args.resource_url:
                         raise ValueError("Resource URL must be specified for 'read_resource' operation.")
                     result = await client.read_resource(args.resource_url)
-                    ret = dict(success=result.__dict__)
+                    ret = result.structured_content
                 elif args.operation == 'list_prompts':
                     result = await client.list_prompts()
                     ret = dict(success=[r.__dict__ for r in result])
@@ -138,7 +138,7 @@ class AgentMcpClient(feature.UnsupportEdgeFeature, validator.Validator, limiter.
                     if not args.prompt_args:
                         args.prompt_args = dict()
                     result = await client.get_prompt(args.prompt_name, arguments=args.prompt_args)
-                    ret = dict(success=result.__dict__)
+                    ret = result.structured_content
                 else:
                     raise ValueError(f"Unknown operation: {args.operation}")
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -153,8 +153,6 @@ class AgentMcpClient(feature.UnsupportEdgeFeature, validator.Validator, limiter.
             return self.RESP_ERROR, msg, None
 
     def output_schema(self) -> type:
-        class Data(resdata.Data):
-            data: Union[List[Any], Any] = pydantic.Field(default=None, description="処理結果のデータ")
         class Result(resdata.Result):
-            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+            success: Union[Any, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result

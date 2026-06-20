@@ -301,7 +301,7 @@ class Options:
             description_ja="コマンドを指定します。",
             description_en="Specify the command.",)
         self._options["client_data"] = dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=True, choice=None, web="mask",
+            type=Options.T_DIR, default=None, required=False, multi=False, hide=True, choice=None, web="mask",
             description_ja="クライアント側のデータフォルダのパスを指定します。",
             description_en="Specify the path to the client-side data folder.")
         self._options["tag"] = dict(

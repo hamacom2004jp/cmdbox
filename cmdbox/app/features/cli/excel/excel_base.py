@@ -85,7 +85,7 @@ class ExcelBase(feature.ResultEdgeFeature, validator.Validator):
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         try:
-            client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
+            client_data = Path(str(args.client_data).replace('"','')) if args.client_data is not None else None
             if args.scope == "client":
                 if client_data is not None:
                     f = filer.Filer(client_data, logger)
