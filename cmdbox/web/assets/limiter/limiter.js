@@ -167,18 +167,19 @@ limiter_page.load_targets = async () => {
         cmdbox.message(res, true, true);
         return;
     }
-    limiter_page.render_targets(first['success']['data'] || []);
+    await limiter_page.render_targets(first['success']['data'] || []);
 };
 
 /**
  * Targets タブの描画
  */
-limiter_page.render_targets = (targets) => {
+limiter_page.render_targets = async (targets) => {
     const area = $('#targets_area').empty();
     if (!targets || targets.length === 0) {
         area.append('<div class="col-12 text-muted p-3 i18n">No LimitedFeature targets found.</div>');
         return;
     }
+    const is_limiter_save = await cmdbox.check_cmd('limiter', 'save');
     for (const target of targets) {
         const mode = Array.isArray(target.mode) ? target.mode.join('/') : (target.mode || '');
         const cmd = target.cmd || '';
@@ -189,11 +190,13 @@ limiter_page.render_targets = (targets) => {
         card_header.append(`<span class="badge rounded-pill text-bg-primary">mode</span><strong>${mode}</strong>`);
         card_header.append(`<span class="badge rounded-pill text-bg-success ms-2">cmd</span><strong>${cmd}</strong>`);
         card_header.append(`<span class="ms-auto badge ${limiters.length > 0 ? 'rounded-pill text-bg-info' : 'text-body text-opacity-75'}">${limiters.length} limiter${limiters.length !== 1 ? 's' : ''}</span>`);
-        
-        // 「＋」ボタンを追加（mode/cmd をデフォルト値として渡す）
-        const btn_add = $(`<button type="button" class="btn btn-sm btn-outline-secondary ms-2" title="Add limiter"><i class="fas fa-plus"></i></button>`);
-        btn_add.on('click', () => limiter_page.open_edit_modal(null, { target_mode: mode, target_cmd: cmd }));
-        card_header.append(btn_add);
+
+        if (is_limiter_save) {
+            // 「＋」ボタンを追加（mode/cmd をデフォルト値として渡す）
+            const btn_add = $(`<button type="button" class="btn btn-sm btn-outline-secondary ms-2" title="Add limiter"><i class="fas fa-plus"></i></button>`);
+            btn_add.on('click', () => limiter_page.open_edit_modal(null, { target_mode: mode, target_cmd: cmd }));
+            card_header.append(btn_add);
+        }
 
         const card_body = $(`<div class="card-body p-2"></div>`).appendTo(card);
         if (limiters.length === 0) {
@@ -204,6 +207,7 @@ limiter_page.render_targets = (targets) => {
             limiter_page._render_limiter_item(card_body, lm, true);
         }
     }
+    cmdbox.hide_loading();
 };
 
 

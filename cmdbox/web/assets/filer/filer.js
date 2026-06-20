@@ -530,25 +530,32 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
       }
       // ドロップエリア
       const drop_area = $('<div class="border border-2 rounded pt-4 pb-3 d-flex flex-column align-items-center justify-content-center">'
-                        + '<h5 class="system-font glow-text-cyan i18n">Drop files here to upload.</h5>'
+                        + '<h5 class="system-font i18n"></h5>'
                         + '<input type="file" class="d-none" multiple>'
-                        + '</div>').css('transition', '0.3s').css('transform', 'scale(0.95)').css('background-color', 'var(--area-bg-color-10)');
+                        + '</div>').css('transition', '0.3s').css('transform', 'scale(0.95)');
       ['dragenter', 'dragover', 'mouseenter', 'mouseover','dragleave', 'drop', 'mouseleave', 'mouseout'].forEach(eventName => {
         drop_area.off(eventName);
-       });
-      ['dragenter', 'dragover', 'mouseenter', 'mouseover'].forEach(eventName => {
-        drop_area.on(eventName, () => {drop_area.css('transform', 'scale(1)');});
       });
-      ['dragleave', 'drop', 'mouseleave', 'mouseout'].forEach(eventName => {
-        drop_area.on(eventName, () => {drop_area.css('transform', 'scale(0.95)');});
+      cmdbox.file_is(target, node['path'], 'upload', res => {}).then(res => {
+        if (res && res['executable']) {
+          ['dragenter', 'dragover', 'mouseenter', 'mouseover'].forEach(eventName => {
+              drop_area.on(eventName, () => {drop_area.css('transform', 'scale(1)');});
+          });
+          ['dragleave', 'drop', 'mouseleave', 'mouseout'].forEach(eventName => {
+              drop_area.on(eventName, () => {drop_area.css('transform', 'scale(0.95)');});
+          });
+          ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+              drop_area.on(eventName, (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              });
+          });
+          drop_area.find('h5').text(`DRAG AND DROP FILES`);
+        } else {
+          drop_area.find('h5').text(`Don't have permission to upload files.`);
+        }
+        cmdbox.process_i18n(drop_area);
       });
-      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        drop_area.on(eventName, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        });
-      });
-      cmdbox.process_i18n(drop_area);
       // ファイルがドロップされたときの処理
       drop_area.on('drop', (e) => {fsapi._upload(e);});
       target.find('.file-list').append(drop_area);

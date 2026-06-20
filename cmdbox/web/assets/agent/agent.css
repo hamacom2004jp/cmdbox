@@ -382,6 +382,9 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     background: var(--accent-cyan);
     box-shadow: 0 0 20px var(--accent-cyan);
 }
+[data-bs-theme="darkheroine"] .btn-footer-action:hover {
+    color: var(--bs-body-bg);
+}
 .btn-sf {
     flex: 1;
     background: transparent;
@@ -413,6 +416,12 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     background: var(--accent-cyan);
     color: var(--bg-slate-950);
     box-shadow: 0 0 20px var(--accent-cyan);
+    font-weight: bold;
+}
+[data-bs-theme="darkheroine"] .btn-sf:hover {
+    background: var(--bs-body-color);
+    color: var(--bs-body-bg);
+    box-shadow: 0 0 20px var(--bs-body-color);
     font-weight: bold;
 }
 .btn-sf-danger {
@@ -546,6 +555,9 @@ a.list-group-item {
 [data-bs-theme="spaceship"] a.list-group-item {
     background-color: var(--bg-slate-950);
 }
+[data-bs-theme="darkheroine"] a.list-group-item {
+    color: var(--bs-body-color);
+}
 a.list-group-item:hover {
     border-color: var(--bs-emphasis-color);
     color: var(--text-primary);
@@ -564,6 +576,9 @@ a.list-group-item:hover {
     background-color: var(--area-bg-color-10);
     border-color: var(--accent-cyan);
 }
+[data-bs-theme="darkheroine"] a.list-group-item:hover {
+    color: var(--bs-body-color);
+}
 a.list-group-item.active {
     background-color: var(--bs-emphasis-color);
     color: var(--bg-slate-950);
@@ -572,6 +587,9 @@ a.list-group-item.active {
 [data-bs-theme="spaceship"] a.list-group-item.active {
     background-color: var(--accent-cyan);
     box-shadow: 0 0 20px var(--accent-cyan);
+}
+[data-bs-theme="darkheroine"] a.list-group-item.active {
+    color: var(--bs-body-bg);
 }
 
 /* SF List Group for Modal */
@@ -718,6 +736,9 @@ a.list-group-item.active {
 [data-bs-theme="spaceship"] .btn-nav-toggle:hover {
     background: var(--accent-cyan);
     box-shadow: 0 0 15px var(--accent-cyan);
+}
+[data-bs-theme="darkheroine"] .btn-nav-toggle:hover {
+    color: var(--bs-body-bg);
 }
 
 .nav-sidebar-content {
@@ -887,6 +908,9 @@ a.list-group-item.active {
 [data-bs-theme="spaceship"] .btn-nav-action:hover {
     background: var(--accent-cyan);
     box-shadow: 0 0 20px var(--accent-cyan);
+}
+[data-bs-theme="darkheroine"] .btn-nav-action:hover {
+    color: var(--bs-body-bg);
 }
 
 .nav-sidebar.expanded .btn-nav-action {

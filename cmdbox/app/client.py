@@ -418,6 +418,66 @@ class Client(object):
             self.logger.warning(f"scope is invalid. {scope}")
             return dict(warn=f"scope is invalid. {scope}")
 
+    def file_is(self, file_func:str, svpath:str=None, from_path:str=None, to_path:str=None,
+                fwpaths:List[str]=None, rjpaths:List[str]=None,
+                from_fwpaths:List[str]=None, to_fwpaths:List[str]=None,
+                from_rjpaths:List[str]=None, to_rjpaths:List[str]=None,
+                scope:str="client", client_data:Path=None,
+                retry_count:int=3, retry_interval:int=5, timeout:int=60):
+        """
+        指定した操作が実行可能かどうかを確認する
+
+        Args:
+            file_func (str): 操作種別 ("copy", "download", "list", "mkdir", "move", "remove", "rmdir", "upload")
+            svpath (str, optional): 操作対象パス (copy/move 以外). Defaults to None.
+            from_path (str, optional): コピー・移動元パス (copy/move のみ). Defaults to None.
+            to_path (str, optional): コピー・移動先パス (copy/move のみ). Defaults to None.
+            fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
+            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            from_fwpaths (List[str], optional): コピー・移動元の範囲内パスのリスト. Defaults to None.
+            to_fwpaths (List[str], optional): コピー・移動先の範囲内パスのリスト. Defaults to None.
+            from_rjpaths (List[str], optional): コピー・移動元の範囲外パスのリスト. Defaults to None.
+            to_rjpaths (List[str], optional): コピー・移動先の範囲外パスのリスト. Defaults to None.
+            scope (str, optional): 参照先のスコープ. Defaults to "client".
+            client_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
+            retry_count (int, optional): リトライ回数. Defaults to 3.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
+            timeout (int, optional): タイムアウト時間. Defaults to 60.
+
+        Returns:
+            dict: 確認結果
+        """
+        if scope == "client":
+            if client_data is not None:
+                f = filer.Filer(client_data, self.logger)
+                _, res_json = f.file_is(file_func, svpath=svpath, from_path=from_path, to_path=to_path,
+                                        fwpaths=fwpaths, rjpaths=rjpaths,
+                                        from_fwpaths=from_fwpaths, to_fwpaths=to_fwpaths,
+                                        from_rjpaths=from_rjpaths, to_rjpaths=to_rjpaths)
+                return res_json
+            else:
+                self.logger.warning(f"client_data is empty.")
+                return dict(warn=f"client_data is empty.")
+        elif scope == "current":
+            f = filer.Filer(Path.cwd(), self.logger)
+            _, res_json = f.file_is(file_func, svpath=svpath, from_path=from_path, to_path=to_path,
+                                    fwpaths=fwpaths, rjpaths=rjpaths,
+                                    from_fwpaths=from_fwpaths, to_fwpaths=to_fwpaths,
+                                    from_rjpaths=from_rjpaths, to_rjpaths=to_rjpaths)
+            return res_json
+        elif scope == "server":
+            payload = dict(file_func=file_func, svpath=svpath, from_path=from_path, to_path=to_path,
+                           fwpaths=fwpaths, rjpaths=rjpaths,
+                           from_fwpaths=from_fwpaths, to_fwpaths=to_fwpaths,
+                           from_rjpaths=from_rjpaths, to_rjpaths=to_rjpaths)
+            payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
+            res_json = self.redis_cli.send_cmd('file_is', [payload_b64],
+                                               retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+            return res_json
+        else:
+            self.logger.warning(f"scope is invalid. {scope}")
+            return dict(warn=f"scope is invalid. {scope}")
+
     def server_info(self, retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバーの情報を取得する

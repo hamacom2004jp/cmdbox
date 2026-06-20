@@ -456,3 +456,55 @@ class Filer(object):
                                                     from_path=from_path,
                                                     ret_path=ret_path,
                                                     msg=f"Move from '{from_path}' to '{to_path}'. write '{ret_path}'"))
+
+    def file_is(self, file_func:str, svpath:str=None, from_path:str=None, to_path:str=None,
+                fwpaths:List[str]=None, rjpaths:List[str]=None,
+                from_fwpaths:List[str]=None, to_fwpaths:List[str]=None,
+                from_rjpaths:List[str]=None, to_rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+        """
+        指定した操作が実行可能かどうかを確認する
+
+        Args:
+            file_func (str): 操作種別 ("copy", "download", "list", "mkdir", "move", "remove", "rmdir", "upload")
+            svpath (str, optional): 操作対象パス (copy/move 以外). Defaults to None.
+            from_path (str, optional): コピー・移動元パス (copy/move のみ). Defaults to None.
+            to_path (str, optional): コピー・移動先パス (copy/move のみ). Defaults to None.
+            fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
+            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            from_fwpaths (List[str], optional): コピー・移動元の範囲内パスのリスト. Defaults to None.
+            to_fwpaths (List[str], optional): コピー・移動先の範囲内パスのリスト. Defaults to None.
+            from_rjpaths (List[str], optional): コピー・移動元の範囲外パスのリスト. Defaults to None.
+            to_rjpaths (List[str], optional): コピー・移動先の範囲外パスのリスト. Defaults to None.
+
+        Returns:
+            int: レスポンスコード
+            dict: メッセージ
+        """
+        if file_func in ('list', 'download', 'remove', 'rmdir'):
+            if svpath is None:
+                return self.RESP_WARN, dict(warn=f"svpath is required for file_func='{file_func}'.")
+            ok, msg = self.check_fwpath(svpath, fwpaths, rjpaths, exists_chk=True)
+            if not ok:
+                return self.RESP_WARN, msg
+            return self.RESP_SUCCESS, dict(success=dict(file_func=file_func, path=svpath, executable=True))
+        elif file_func in ('mkdir', 'upload'):
+            if svpath is None:
+                return self.RESP_WARN, dict(warn=f"svpath is required for file_func='{file_func}'.")
+            ok, msg = self.check_fwpath(svpath, fwpaths, rjpaths, exists_chk=False)
+            if not ok:
+                return self.RESP_WARN, msg
+            return self.RESP_SUCCESS, dict(success=dict(file_func=file_func, path=svpath, executable=True))
+        elif file_func in ('copy', 'move'):
+            if from_path is None:
+                return self.RESP_WARN, dict(warn=f"from_path is required for file_func='{file_func}'.")
+            if to_path is None:
+                return self.RESP_WARN, dict(warn=f"to_path is required for file_func='{file_func}'.")
+            ok, msg = self.check_fwpath(from_path, from_fwpaths, from_rjpaths, exists_chk=True)
+            if not ok:
+                return self.RESP_WARN, msg
+            ok, msg = self.check_fwpath(to_path, to_fwpaths, to_rjpaths, exists_chk=False)
+            if not ok:
+                return self.RESP_WARN, msg
+            return self.RESP_SUCCESS, dict(success=dict(file_func=file_func, from_path=from_path, to_path=to_path, executable=True))
+        else:
+            return self.RESP_WARN, dict(warn=f"Unknown file_func: '{file_func}'. Choose from: copy, download, list, mkdir, move, remove, rmdir, upload.")

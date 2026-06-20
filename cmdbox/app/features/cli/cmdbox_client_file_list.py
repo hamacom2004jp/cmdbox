@@ -109,13 +109,13 @@ class ClientFileList(feature.OneshotResultEdgeFeature, validator.Validator):
         """
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
-        client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
+        client_data = Path(str(args.client_data).replace('"','')) if args.client_data is not None else None
         args.fwpath = args.fwpath if isinstance(args.fwpath, list) else [args.fwpath] if args.fwpath is not None and args.fwpath != "********" else []
         args.rjpath = args.rjpath if isinstance(args.rjpath, list) else [args.rjpath] if args.rjpath is not None and args.rjpath != "********" else []
-        fwpaths = [p.replace('"','') for p in args.fwpath]
-        rjpaths = [p.replace('"','') for p in args.rjpath]
+        fwpaths = [str(p).replace('"','') for p in args.fwpath]
+        rjpaths = [str(p).replace('"','') for p in args.rjpath]
         listregs = args.listregs if args.listregs is not None else ".*"
-        ret = cl.file_list(svpath=args.svpath.replace('"',''), recursive=args.recursive, scope=args.scope,
+        ret = cl.file_list(svpath=str(args.svpath).replace('"',''), recursive=args.recursive, scope=args.scope,
                            client_data=client_data, fwpaths=fwpaths, rjpaths=rjpaths, listregs=listregs,
                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)

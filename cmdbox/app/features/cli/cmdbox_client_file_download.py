@@ -119,10 +119,10 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limite
             return self.RESP_WARN, msg, None
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
-        client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
-        download_file = Path(args.download_file.replace('"','')) if args.download_file is not None else None
-        fwpaths = [p.replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
-        ret = cl.file_download(args.svpath.replace('"',''), download_file, scope=args.scope, client_data=client_data,
+        client_data = Path(str(args.client_data).replace('"','')) if args.client_data is not None else None
+        download_file = Path(str(args.download_file).replace('"','')) if args.download_file is not None else None
+        fwpaths = [str(p).replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
+        ret = cl.file_download(str(args.svpath).replace('"',''), download_file, scope=args.scope, client_data=client_data,
                                fwpaths=fwpaths, etag=args.etag, rpath=args.rpath, img_thumbnail=args.img_thumbnail,
                                retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)

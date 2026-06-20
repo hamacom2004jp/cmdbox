@@ -116,11 +116,11 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
         """
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
-        client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
-        upload_file = Path(args.upload_file.replace('"','')) if args.upload_file is not None else None
-        fwpaths = [p.replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
-        rjpaths = [p.replace('"','') for p in args.rjpath] if args.rjpath is not None else []
-        ret = cl.file_upload(args.svpath.replace('"',''), upload_file, scope=args.scope, client_data=client_data,
+        client_data = Path(str(args.client_data).replace('"','')) if args.client_data is not None else None
+        upload_file = Path(str(args.upload_file).replace('"','')) if args.upload_file is not None else None
+        fwpaths = [str(p).replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
+        rjpaths = [str(p).replace('"','') for p in args.rjpath] if args.rjpath is not None else []
+        ret = cl.file_upload(str(args.svpath).replace('"',''), upload_file, scope=args.scope, client_data=client_data,
                              fwpaths=fwpaths, rjpaths=rjpaths, mkdir=args.mkdir, overwrite=args.overwrite,
                              retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)

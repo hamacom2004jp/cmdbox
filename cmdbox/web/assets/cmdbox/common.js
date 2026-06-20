@@ -28,6 +28,7 @@ cmdbox.change_color_mode = async (color_mode=undefined, nosignin=false) => {
     select_elem.append('<option value="sakura">Sakura</option>');
     select_elem.append('<option value="hydrangea">Hydrangea</option>');
     select_elem.append('<option value="coffeeshop">Coffeeshop</option>');
+    select_elem.append('<option value="darkheroine">DarkHeroine</option>');
     // color_mode = !color_mode ? localStorage.getItem('color_mode') : color_mode;
     if (!color_mode) {
         if (!nosignin) {
@@ -1374,6 +1375,37 @@ cmdbox.file_mkdir = (target, svpath, error_func=undefined, exec_cmd=undefined) =
     opt['mode'] = 'client';
     opt['cmd'] = 'file_mkdir';
     opt['svpath'] = svpath;
+    cmdbox.show_loading();
+    const exec = exec_cmd ? exec_cmd : cmdbox.sv_exec_cmd;
+    return exec(opt).then(res => {
+        if (res && res['success']) res = [res];
+        if (!res[0] || !res[0]['success']) {
+            if (error_func) {
+                error_func(res);
+                return;
+            }
+            cmdbox.hide_loading();
+            cmdbox.message(res, true, true);
+            return;
+        }
+        return res[0]['success'];
+    });
+};
+/**
+ * ファイル操作判定
+ * @param {$} target - 接続先情報のhidden要素を含む祖先要素
+ * @param {string} svpath - サーバーパス
+ * @param {function} file_func - ファイル操作の種類。"copy", "download", "list", "mkdir", "move", "remove", "rmdir", "upload"
+ * @param {function} error_func - エラー時のコールバック関数
+ * @param {function} exec_cmd - サーバーAPI実行関数
+ * @returns {Promise} - レスポンス
+ */
+cmdbox.file_is = (target, svpath, file_func, error_func=undefined, exec_cmd=undefined) => {
+    const opt = cmdbox.get_server_opt(false, target);
+    opt['mode'] = 'client';
+    opt['cmd'] = 'file_is';
+    opt['svpath'] = svpath;
+    opt['file_func'] = file_func;
     cmdbox.show_loading();
     const exec = exec_cmd ? exec_cmd : cmdbox.sv_exec_cmd;
     return exec(opt).then(res => {

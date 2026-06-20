@@ -3,8 +3,6 @@ $(() => {
     cmdbox.copyright();
     // バージョン情報
     cmdbox.init_version_modal();
-    // スコープ変更
-    $('#scope_select').on('change', () => limiter_page.refresh_all());
     // フィルタ条件の変更
     $('#filter_target_mode').on('change', async () => {
         const mode = $('#filter_target_mode').val();

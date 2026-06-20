@@ -117,12 +117,12 @@ class ClientFileMove(feature.UnsupportEdgeFeature, validator.Validator, limiter.
         """
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
-        client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
-        from_fwpaths = [p.replace('"','') for p in args.from_fwpath] if args.from_fwpath is not None else ["/"]
-        to_fwpaths = [p.replace('"','') for p in args.to_fwpath] if args.to_fwpath is not None else ["/"]
-        from_rjpaths = [p.replace('"','') for p in args.from_rjpath] if args.from_rjpath is not None else []
-        to_rjpaths = [p.replace('"','') for p in args.to_rjpath] if args.to_rjpath is not None else []
-        ret = cl.file_move(args.from_path.replace('"',''), args.to_path.replace('"',''),
+        client_data = Path(str(args.client_data).replace('"','')) if args.client_data is not None else None
+        from_fwpaths = [str(p).replace('"','') for p in args.from_fwpath] if args.from_fwpath is not None else ["/"]
+        to_fwpaths = [str(p).replace('"','') for p in args.to_fwpath] if args.to_fwpath is not None else ["/"]
+        from_rjpaths = [str(p).replace('"','') for p in args.from_rjpath] if args.from_rjpath is not None else []
+        to_rjpaths = [str(p).replace('"','') for p in args.to_rjpath] if args.to_rjpath is not None else []
+        ret = cl.file_move(str(args.from_path).replace('"',''), str(args.to_path).replace('"',''),
                            from_fwpaths=from_fwpaths, to_fwpaths=to_fwpaths,
                            from_rjpaths=from_rjpaths, to_rjpaths=to_rjpaths,
                            scope=args.scope, client_data=client_data,

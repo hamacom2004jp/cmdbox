@@ -77,7 +77,7 @@ groups:                        # A list of groups, each of which is a map that c
 cmdrule:                       # A list of command rules, Specify a rule that determines whether or not a command is executable when executed by a user in web mode.
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
   rules:                       # Specify rules to allow or deny execution of the command, depending on the group the user belongs to.
-  - groups: [develop, master]
+  - groups: [develop, master]  # Specify the groups to which the rule applies.
     coercion:                  # Specify a coercion value for each item to be set when a rule is matched.
                                # e.g. wpath: f"/users/{user_name}"
       fwpath: "['/']"
@@ -86,7 +86,7 @@ cmdrule:                       # A list of command rules, Specify a rule that de
       to_fwpath: "['/']"
       from_rjpath: '[]'
       to_rjpath: '[]'
-    rule: allow
+    rule: allow                # Specifies whether or not the specified command is allowed for the specified group. The value can be allow or deny.
   - groups: [admin]
     coercion:
       fwpath: "['/.users/','/.groups/']"
@@ -105,12 +105,16 @@ cmdrule:                       # A list of command rules, Specify a rule that de
       from_rjpath: "[f'^/.(users|groups)/develop/', f'^/.(users|groups)/master/']"
       to_rjpath: "[f'^/.(users|groups)/develop/', f'^/.(users|groups)/master/']"
     rule: deny
+  - groups: [admin]
+    mode: limiter              # Specify the "mode" as the condition for applying the rule.
+    cmds: [del, save]
+    rule: deny
   - groups: [master, admin]
     mode: test
     rule: deny
   - groups: [admin]
     mode: tts
-    cmds: [install, uninstall]
+    cmds: [install, uninstall] # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
     rule: deny
   - groups: [admin]
     mode: datasource
@@ -124,10 +128,10 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     mode: llm
     cmds: [list, chat, translation]
     rule: allow
-  - groups: [user]             # Specify the groups to which the rule applies.
-    mode: client               # Specify the "mode" as the condition for applying the rule.
-    cmds: [file_download, file_list, server_info, time] # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
-    rule: allow                # Specifies whether or not the specified command is allowed for the specified group. The value can be allow or deny.
+  - groups: [user]
+    mode: client
+    cmds: [file_download, file_is, file_list, server_info, time]
+    rule: allow
   - groups: [user]
     mode: agent
     cmds: [chat, agent_list, mcp_client, mcpsv_list, runner_list, runner_load,

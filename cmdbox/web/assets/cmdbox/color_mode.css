@@ -1107,3 +1107,453 @@ body::after {
     --area-bg-color-danger-50: rgba(198, 40, 40, 0.5);
     --area-bg-color-danger-10: rgba(198, 40, 40, 0.9);
 }
+
+/* ダークヒロインモード - ゴシック・アンド・ロリータをイメージ（モノクロ） */
+[data-bs-theme="darkheroine"] {
+    --mono-black:    #000000;
+    --mono-ink:      #111111;  /* 漆黒 */
+    --mono-ebony:    #222222;  /* 墨黒 */
+    --mono-charcoal: #3a3a3a;  /* チャコール */
+    --mono-graphite: #555555;  /* グラファイト */
+    --mono-slate:    #777777;  /* スレート */
+    --mono-ash:      #999999;  /* アッシュ */
+    --mono-silver:   #c8c8c8;  /* シルバー */
+    --mono-mist:     #e0e0e0;  /* ミスト */
+    --mono-lace:     #f2f2f2;  /* レース */
+    --mono-white:    #ffffff;  /* 純白 */
+
+    /* --- 基本色 --- */
+    --bs-body-bg: var(--mono-white);
+    --bs-body-color: var(--mono-ebony);
+    --bs-emphasis-color: var(--mono-black);
+    --bs-secondary-color: var(--mono-graphite);
+    --bs-secondary-bg: var(--mono-lace);
+    --bs-tertiary-color: var(--mono-slate);
+    --bs-tertiary-bg: var(--mono-mist);
+    --bs-link-color: var(--mono-ink);
+    --bs-link-hover-color: var(--mono-graphite);
+    --bs-code-color: var(--mono-charcoal);
+    --bs-highlight-bg: var(--mono-lace);
+    --bs-highlight-border-color: var(--mono-silver);
+    --bs-link-color-rgb: var(--mono-ink);
+
+    /* --- Primary: 漆黒 (最強調) --- */
+    --bs-primary: var(--mono-ebony);
+    --bs-primary-rgb: 34, 34, 34;
+    --bs-primary-text-emphasis: var(--mono-ink);
+    --bs-primary-bg-subtle: var(--mono-lace);
+    --bs-primary-border-subtle: var(--mono-silver);
+
+    /* --- Secondary: グラファイト --- */
+    --bs-secondary: var(--mono-graphite);
+    --bs-secondary-rgb: 85, 85, 85;
+    --bs-secondary-text-emphasis: var(--mono-charcoal);
+    --bs-secondary-bg-subtle: var(--mono-mist);
+    --bs-secondary-border-subtle: var(--mono-silver);
+
+    /* --- Success: チャコール --- */
+    --bs-success: var(--mono-charcoal);
+    --bs-success-rgb: 58, 58, 58;
+    --bs-success-text: #fff;
+    --bs-success-text-emphasis: var(--mono-ebony);
+    --bs-success-bg-subtle: #ececec;
+    --bs-success-border-subtle: #d4d4d4;
+
+    /* --- Info: アッシュグレー --- */
+    --bs-info: var(--mono-ash);
+    --bs-info-rgb: 153, 153, 153;
+    --bs-info-text: #fff;
+    --bs-info-text-emphasis: var(--mono-slate);
+    --bs-info-bg-subtle: #f5f5f5;
+    --bs-info-border-subtle: #dedede;
+
+    /* --- Warning: スレートグレー --- */
+    --bs-warning: var(--mono-slate);
+    --bs-warning-rgb: 119, 119, 119;
+    --bs-warning-text: #fff;
+    --bs-warning-text-emphasis: var(--mono-graphite);
+    --bs-warning-bg-subtle: #f0f0f0;
+    --bs-warning-border-subtle: #d8d8d8;
+
+    /* --- Danger: 漆黒 (最高緊張) --- */
+    --bs-danger: var(--mono-ink);
+    --bs-danger-rgb: 17, 17, 17;
+    --bs-danger-text: #fff;
+    --bs-danger-text-emphasis: var(--mono-black);
+    --bs-danger-bg-subtle: #e4e4e4;
+    --bs-danger-border-subtle: #c4c4c4;
+
+    /* --- Light / Dark --- */
+    --bs-light: var(--mono-lace);
+    --bs-light-rgb: 242, 242, 242;
+    --bs-light-text: var(--mono-ebony);
+    --bs-light-bg-subtle: #fafafa;
+    --bs-light-border-subtle: var(--mono-mist);
+    --bs-dark: var(--mono-ebony);
+    --bs-dark-rgb: 34, 34, 34;
+    --bs-dark-text: #fff;
+    --bs-dark-bg-subtle: var(--mono-silver);
+    --bs-dark-border-subtle: #aaaaaa;
+
+    /* --- カラーパレット上書き (Bootstrap内部変数) --- */
+    --bs-blue:   var(--mono-graphite);
+    --bs-indigo: var(--mono-charcoal);
+    --bs-purple: var(--mono-slate);
+    --bs-pink:   var(--mono-ash);
+    --bs-red:    var(--mono-ink);
+    --bs-orange: var(--mono-slate);
+    --bs-yellow: var(--mono-slate);
+    --bs-green:  var(--mono-charcoal);
+    --bs-teal:   var(--mono-graphite);
+    --bs-cyan:   var(--mono-ash);
+    --bs-gray:   var(--mono-slate);
+    --bs-gray-dark: var(--mono-charcoal);
+    --bs-white:  var(--mono-white);
+    --bs-black:  var(--mono-black);
+
+    /* --- グラデーション・ボーダー --- */
+    --bs-gradient: linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0));
+    --bs-border-width: 1px;
+    --bs-border-style: solid;
+    --bs-border-color: var(--mono-ebony);
+    --bs-border-color-translucent: rgba(0, 0, 0, 0.15);
+
+    /* --- ボックスシャドウ --- */
+    --bs-box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .10);
+    --bs-box-shadow-sm: 0 .125rem .25rem rgba(0, 0, 0, .06);
+    --bs-box-shadow-lg: 0 1rem 3rem rgba(0, 0, 0, .12);
+
+    /* --- 共通変数 --- */
+    --bs-emphasis-color-rgb: var(--bs-card-title-color);
+    --bs-warning-text-emphasis: var(--bs-code-color);
+    --bs-body-color-rgb: var(--bs-body-color);
+    --bs-secondary-rgb: var(--bs-btn-color);
+    --bs-table-bg: var(--bs-tertiary-bg);
+    --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
+
+    /* --- エリア色 --- */
+    --area-border-color: rgba(0, 0, 0, 0.25);
+    --area-bg-color-50: rgba(0, 0, 0, 0.50);
+    --area-bg-color-10: rgba(0, 0, 0, 0.85);
+    --area-bg-color-danger-50: rgba(0, 0, 0, 0.50);
+    --area-bg-color-danger-10: rgba(0, 0, 0, 0.85);
+}
+[data-bs-theme="darkheroine"] .navbar-brand {
+    color: var(--bs-body-bg);
+}
+[data-bs-theme="darkheroine"] .nav-link {
+    color: var(--bs-body-bg);
+}
+[data-bs-theme="darkheroine"] #btn_toggle_sidebar {
+    color: var(--bs-body-bg);
+}
+[data-bs-theme="darkheroine"] .doc-link {
+    color: var(--mono-ink);
+}
+[data-bs-theme="darkheroine"] .doc-link:hover {
+    color: var(--mono-graphite);
+    text-shadow: none;
+    text-decoration: underline double;
+}
+[data-bs-theme="darkheroine"] .btn-sf-icon {
+    color: var(--mono-graphite);
+}
+[data-bs-theme="darkheroine"] .btn-sf-icon:hover {
+    color: var(--mono-ink);
+    text-shadow: none;
+}
+[data-bs-theme="darkheroine"] .glow-text-cyan {
+    color: var(--bs-body-bg);
+}
+[data-bs-theme="darkheroine"] .sf-list-item .glow-text-cyan {
+    color: var(--bs-body-color);
+}
+/* --- btn-primary --- */
+[data-bs-theme="darkheroine"] .btn-primary,
+[data-bs-theme="darkheroine"] .btn-outline-primary:hover,
+[data-bs-theme="darkheroine"] .btn-outline-primary:active {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #222222;
+    --bs-btn-border-color: #222222;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #3a3a3a;
+    --bs-btn-hover-border-color: #3a3a3a;
+    --bs-btn-focus-shadow-rgb: 34, 34, 34;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #111111;
+    --bs-btn-active-border-color: #111111;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #aaaaaa;
+    --bs-btn-disabled-border-color: #aaaaaa;
+}
+[data-bs-theme="darkheroine"] .btn-outline-primary {
+    --bs-btn-color: #222222;
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: #222222;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #222222;
+    --bs-btn-hover-border-color: #222222;
+    --bs-btn-focus-shadow-rgb: 34, 34, 34;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #111111;
+    --bs-btn-active-border-color: #111111;
+    --bs-btn-disabled-color: #aaaaaa;
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #aaaaaa;
+}
+
+/* --- btn-secondary --- */
+[data-bs-theme="darkheroine"] .btn-secondary {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #555555;
+    --bs-btn-border-color: #555555;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #666666;
+    --bs-btn-hover-border-color: #666666;
+    --bs-btn-focus-shadow-rgb: 85, 85, 85;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #444444;
+    --bs-btn-active-border-color: #444444;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #bbbbbb;
+    --bs-btn-disabled-border-color: #bbbbbb;
+}
+[data-bs-theme="darkheroine"] .btn-outline-secondary {
+    --bs-btn-color: #555555;
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: #555555;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #555555;
+    --bs-btn-hover-border-color: #555555;
+    --bs-btn-focus-shadow-rgb: 85, 85, 85;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #444444;
+    --bs-btn-active-border-color: #444444;
+    --bs-btn-disabled-color: #bbbbbb;
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #bbbbbb;
+}
+
+/* --- btn-success --- */
+[data-bs-theme="darkheroine"] .btn-success {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #3a3a3a;
+    --bs-btn-border-color: #3a3a3a;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #4a4a4a;
+    --bs-btn-hover-border-color: #4a4a4a;
+    --bs-btn-focus-shadow-rgb: 58, 58, 58;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #2a2a2a;
+    --bs-btn-active-border-color: #2a2a2a;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #aaaaaa;
+    --bs-btn-disabled-border-color: #aaaaaa;
+}
+[data-bs-theme="darkheroine"] .btn-outline-success {
+    --bs-btn-color: #3a3a3a;
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: #3a3a3a;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #3a3a3a;
+    --bs-btn-hover-border-color: #3a3a3a;
+    --bs-btn-focus-shadow-rgb: 58, 58, 58;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #2a2a2a;
+    --bs-btn-active-border-color: #2a2a2a;
+    --bs-btn-disabled-color: #aaaaaa;
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #aaaaaa;
+}
+
+/* --- btn-info --- */
+[data-bs-theme="darkheroine"] .btn-info {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #999999;
+    --bs-btn-border-color: #999999;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #aaaaaa;
+    --bs-btn-hover-border-color: #aaaaaa;
+    --bs-btn-focus-shadow-rgb: 153, 153, 153;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #888888;
+    --bs-btn-active-border-color: #888888;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #cccccc;
+    --bs-btn-disabled-border-color: #cccccc;
+}
+[data-bs-theme="darkheroine"] .btn-outline-info {
+    --bs-btn-color: #777777;
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: #999999;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #999999;
+    --bs-btn-hover-border-color: #999999;
+    --bs-btn-focus-shadow-rgb: 153, 153, 153;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #888888;
+    --bs-btn-active-border-color: #888888;
+    --bs-btn-disabled-color: #cccccc;
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #cccccc;
+}
+
+/* --- btn-warning --- */
+[data-bs-theme="darkheroine"] .btn-warning {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #777777;
+    --bs-btn-border-color: #777777;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #888888;
+    --bs-btn-hover-border-color: #888888;
+    --bs-btn-focus-shadow-rgb: 119, 119, 119;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #666666;
+    --bs-btn-active-border-color: #666666;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #cccccc;
+    --bs-btn-disabled-border-color: #cccccc;
+}
+[data-bs-theme="darkheroine"] .btn-outline-warning {
+    --bs-btn-color: #555555;
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: #777777;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #777777;
+    --bs-btn-hover-border-color: #777777;
+    --bs-btn-focus-shadow-rgb: 119, 119, 119;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #666666;
+    --bs-btn-active-border-color: #666666;
+    --bs-btn-disabled-color: #cccccc;
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #cccccc;
+}
+
+/* --- btn-danger --- */
+[data-bs-theme="darkheroine"] .btn-danger {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #111111;
+    --bs-btn-border-color: #111111;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #222222;
+    --bs-btn-hover-border-color: #222222;
+    --bs-btn-focus-shadow-rgb: 17, 17, 17;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #000000;
+    --bs-btn-active-border-color: #000000;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #aaaaaa;
+    --bs-btn-disabled-border-color: #aaaaaa;
+}
+[data-bs-theme="darkheroine"] .btn-outline-danger {
+    --bs-btn-color: #111111;
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: #111111;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #111111;
+    --bs-btn-hover-border-color: #111111;
+    --bs-btn-focus-shadow-rgb: 17, 17, 17;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #000000;
+    --bs-btn-active-border-color: #000000;
+    --bs-btn-disabled-color: #aaaaaa;
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #aaaaaa;
+}
+
+/* --- btn-light --- */
+[data-bs-theme="darkheroine"] .btn-light {
+    --bs-btn-color: #111111;
+    --bs-btn-bg: #f2f2f2;
+    --bs-btn-border-color: #cccccc;
+    --bs-btn-hover-color: #111111;
+    --bs-btn-hover-bg: #e0e0e0;
+    --bs-btn-hover-border-color: #aaaaaa;
+    --bs-btn-focus-shadow-rgb: 200, 200, 200;
+    --bs-btn-active-color: #111111;
+    --bs-btn-active-bg: #cccccc;
+    --bs-btn-active-border-color: #999999;
+    --bs-btn-disabled-color: #aaaaaa;
+    --bs-btn-disabled-bg: #f2f2f2;
+    --bs-btn-disabled-border-color: #dddddd;
+}
+[data-bs-theme="darkheroine"] .btn-outline-light {
+    --bs-btn-color: #555555;
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: #cccccc;
+    --bs-btn-hover-color: #111111;
+    --bs-btn-hover-bg: #f2f2f2;
+    --bs-btn-hover-border-color: #cccccc;
+    --bs-btn-focus-shadow-rgb: 200, 200, 200;
+    --bs-btn-active-color: #111111;
+    --bs-btn-active-bg: #e0e0e0;
+    --bs-btn-active-border-color: #aaaaaa;
+    --bs-btn-disabled-color: #cccccc;
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #dddddd;
+}
+
+/* --- btn-dark --- */
+[data-bs-theme="darkheroine"] .btn-dark {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #222222;
+    --bs-btn-border-color: #222222;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #3a3a3a;
+    --bs-btn-hover-border-color: #3a3a3a;
+    --bs-btn-focus-shadow-rgb: 34, 34, 34;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #111111;
+    --bs-btn-active-border-color: #111111;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #aaaaaa;
+    --bs-btn-disabled-border-color: #aaaaaa;
+}
+[data-bs-theme="darkheroine"] .btn-outline-dark {
+    --bs-btn-color: #222222;
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: #222222;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #222222;
+    --bs-btn-hover-border-color: #222222;
+    --bs-btn-focus-shadow-rgb: 34, 34, 34;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #111111;
+    --bs-btn-active-border-color: #111111;
+    --bs-btn-disabled-color: #aaaaaa;
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #aaaaaa;
+}
+
+/* --- text-bg-* (背景+テキストユーティリティ) --- */
+[data-bs-theme="darkheroine"] .text-bg-primary   { color: #fff !important; background-color: #222222 !important; }
+[data-bs-theme="darkheroine"] .text-bg-secondary  { color: #fff !important; background-color: #555555 !important; }
+[data-bs-theme="darkheroine"] .text-bg-success    { color: #fff !important; background-color: #3a3a3a !important; }
+[data-bs-theme="darkheroine"] .text-bg-info       { color: #fff !important; background-color: #999999 !important; }
+[data-bs-theme="darkheroine"] .text-bg-warning    { color: #fff !important; background-color: #777777 !important; }
+[data-bs-theme="darkheroine"] .text-bg-danger     { color: #fff !important; background-color: #111111 !important; }
+[data-bs-theme="darkheroine"] .text-bg-light      { color: #111 !important; background-color: #f2f2f2 !important; }
+[data-bs-theme="darkheroine"] .text-bg-dark       { color: #fff !important; background-color: #222222 !important; }
+
+/* --- badge (bg-*) --- */
+[data-bs-theme="darkheroine"] .badge.bg-primary,
+[data-bs-theme="darkheroine"] .badge.text-bg-primary   { background-color: #222222 !important; color: #fff !important; }
+[data-bs-theme="darkheroine"] .badge.bg-secondary,
+[data-bs-theme="darkheroine"] .badge.text-bg-secondary  { background-color: #555555 !important; color: #fff !important; }
+[data-bs-theme="darkheroine"] .badge.bg-success,
+[data-bs-theme="darkheroine"] .badge.text-bg-success    { background-color: #3a3a3a !important; color: #fff !important; }
+[data-bs-theme="darkheroine"] .badge.bg-info,
+[data-bs-theme="darkheroine"] .badge.text-bg-info       { background-color: #999999 !important; color: #fff !important; }
+[data-bs-theme="darkheroine"] .badge.bg-warning,
+[data-bs-theme="darkheroine"] .badge.text-bg-warning    { background-color: #777777 !important; color: #fff !important; }
+[data-bs-theme="darkheroine"] .badge.bg-danger,
+[data-bs-theme="darkheroine"] .badge.text-bg-danger     { background-color: #111111 !important; color: #fff !important; }
+
+/* --- alert-* --- */
+[data-bs-theme="darkheroine"] .alert-primary   { --bs-alert-color: #222222; --bs-alert-bg: #f2f2f2; --bs-alert-border-color: #cccccc; --bs-alert-link-color: #111111; }
+[data-bs-theme="darkheroine"] .alert-secondary { --bs-alert-color: #333333; --bs-alert-bg: #eeeeee; --bs-alert-border-color: #cccccc; --bs-alert-link-color: #222222; }
+[data-bs-theme="darkheroine"] .alert-success   { --bs-alert-color: #2a2a2a; --bs-alert-bg: #ececec; --bs-alert-border-color: #c8c8c8; --bs-alert-link-color: #111111; }
+[data-bs-theme="darkheroine"] .alert-info      { --bs-alert-color: #555555; --bs-alert-bg: #f5f5f5; --bs-alert-border-color: #dddddd; --bs-alert-link-color: #444444; }
+[data-bs-theme="darkheroine"] .alert-warning   { --bs-alert-color: #444444; --bs-alert-bg: #f0f0f0; --bs-alert-border-color: #d4d4d4; --bs-alert-link-color: #333333; }
+[data-bs-theme="darkheroine"] .alert-danger    { --bs-alert-color: #111111; --bs-alert-bg: #e8e8e8; --bs-alert-border-color: #c0c0c0; --bs-alert-link-color: #000000; }
