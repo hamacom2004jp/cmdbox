@@ -153,6 +153,81 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "end","bool | null","no","null","終了フラグ"
 
 
+client ( file_is ) : ``cmdbox -m client -c file_is <Option>``
+=============================================================
+
+- Determine whether the specified file operation is executable.
+
+.. csv-table::
+    :widths: 20, 8, 8, 8, 12, 18, 26
+    :header-rows: 1
+
+    "Option","Type","Multi","Required","Default","Choices","Description"
+    "--host <host>","str","","required","localhost","","Specify the service host of the Redis server."
+    "--port <port>","int","","required","6379","","Specify the service port of the Redis server."
+    "--password <password>","passwd","","required","password","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","str","","required","cmdbox","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--file_func <file_func>","str","","required","","copy | download | list | mkdir | move | remove | rmdir | upload","Specify the operation to determine whether it is executable."
+    "--svpath <svpath>","file","","","","","Specify the target path. Used for operations other than copy and move."
+    "--from_path <from_path>","file","","","","","Specify the source path. Used for copy and move operations."
+    "--to_path <to_path>","file","","","","","Specify the destination path. Used for copy and move operations."
+    "--fwpath <fwpath>","file","multi","","","","Specify a path to determine whether the target path is within bounds for single-path operations."
+    "--rjpath <rjpath>","file","multi","","","","For single-path operations, access will be denied if the path matches. Interpreted as a regular expression."
+    "--from_fwpath <from_fwpath>","file","multi","","","","Specify a path to determine whether the source path is within bounds for copy/move operations."
+    "--to_fwpath <to_fwpath>","file","multi","","","","Specify a path to determine whether the destination path is within bounds for copy/move operations."
+    "--from_rjpath <from_rjpath>","file","multi","","","","For copy/move operations, access will be denied if the source path matches. Interpreted as a regular expression."
+    "--to_rjpath <to_rjpath>","file","multi","","","","For copy/move operations, access will be denied if the destination path matches. Interpreted as a regular expression."
+    "--scope <scope>","str","","required","client","client | current | server","Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory."
+    "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","int","","","15","","Specify the maximum waiting time until the server responds."
+
+**Output Schema**
+
+This command implements ``output_schema()`` returning ``Result`` model.
+
+.. code-block:: json
+
+    {
+      "success": {
+        "performance": [
+          {
+            "key": "string",
+            "value": null
+          }
+        ],
+        "file_func": "string",
+        "path": "string",
+        "from_path": "string",
+        "to_path": "string",
+        "executable": false
+      },
+      "warn": {},
+      "error": {},
+      "output_schema": {},
+      "end": false
+    }
+
+.. csv-table::
+    :widths: 25, 10, 10, 15, 40
+    :header-rows: 1
+
+    "Field","Type","Required","Default","Description"
+    "success","Data | null","no","null","成功した場合の結果"
+    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "success.file_func","str | null","no","null","操作種別"
+    "success.path","str | null","no","null","操作対象パス"
+    "success.from_path","str | null","no","null","コピー・移動元パス"
+    "success.to_path","str | null","no","null","コピー・移動先パス"
+    "success.executable","bool | null","no","null","実行可能かどうか"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
+    "end","bool | null","no","null","終了フラグ"
+
+
 client ( file_list ) : ``cmdbox -m client -c file_list <Option>``
 =================================================================
 

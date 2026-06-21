@@ -20,6 +20,7 @@ cmdbox
    Command Reference <docs/command.rst>
    Features <docs/features.rst>
    Audit <docs/audit.rst>
+   Limiter <docs/limiter.rst>
    Authentication <docs/authentication.rst>
    Text-to-Speech (TTS) <docs/tts.rst>
    Developer Information <docs/developer.rst>

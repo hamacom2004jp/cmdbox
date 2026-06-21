@@ -326,7 +326,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
           "function_response": false
         },
         "message": "string",
-        "wav_b64": "string"
+        "wav_b64": "string",
+        "ressize": 0
       },
       "warn": {},
       "error": {},
@@ -351,6 +352,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.flags.function_response","bool","no","False","関数レスポンスフラグ"
     "success.message","str | null","no","null","メッセージ"
     "success.wav_b64","str | null","no","null","Base64エンコードされたWAVデータ"
+    "success.ressize","int | null","no","null","Agentが返したレスポンスのサイズ"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
@@ -388,17 +390,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
 .. code-block:: json
 
     {
-      "success": {
-        "performance": [
-          {
-            "key": "string",
-            "value": null
-          }
-        ],
-        "data": [
-          null
-        ]
-      },
+      "success": null,
       "warn": {},
       "error": {},
       "output_schema": {},
@@ -410,9 +402,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     :header-rows: 1
 
     "Field","Type","Required","Default","Description"
-    "success","Data | null","no","null","成功した場合の結果"
-    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.data","list[any] | any","no","null","処理結果のデータ"
+    "success","any | null","no","null","成功した場合の結果"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"

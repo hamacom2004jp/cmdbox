@@ -1,0 +1,465 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Limiter &mdash; cmdbox 2026/06/21 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=27dab2da"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Authentication" href="authentication.html" />
+    <link rel="prev" title="Audit Log" href="audit.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audit.html">Audit</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Limiter</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scope">Scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#saving-a-restriction-configuration">Saving a Restriction Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#loading-a-restriction-configuration">Loading a Restriction Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#listing-restriction-configurations">Listing Restriction Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deleting-a-restriction-configuration">Deleting a Restriction Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#retrieving-counters">Retrieving Counters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#listing-restriction-targets">Listing Restriction Targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#developer-guide-implementing-a-limiter-enabled-command">Developer Guide: Implementing a Limiter-Enabled Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#command-reference">Command Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Limiter</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/limiter.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="limiter">
+<h1>Limiter<a class="headerlink" href="#limiter" title="Link to this heading"></a></h1>
+<p><cite>Limiter</cite> provides quantitative restrictions on command execution.
+By saving restriction configurations and verifying them before each command runs, you can prevent excessive usage.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The Limiter functionality is implemented using the following modules:</p>
+<ul class="simple">
+<li><p><cite>cmdbox.app.commons.limiter</cite>: Core logic for restriction checks and counter updates.</p></li>
+<li><p><cite>cmdbox.app.features.cli.cmdbox_limiter_save</cite>: Add or save a restriction configuration.</p></li>
+<li><p><cite>cmdbox.app.features.cli.cmdbox_limiter_load</cite>: Load a restriction configuration.</p></li>
+<li><p><cite>cmdbox.app.features.cli.cmdbox_limiter_list</cite>: List registered restriction configurations.</p></li>
+<li><p><cite>cmdbox.app.features.cli.cmdbox_limiter_del</cite>: Delete a restriction configuration.</p></li>
+<li><p><cite>cmdbox.app.features.cli.cmdbox_limiter_counter</cite>: Retrieve restriction counters.</p></li>
+<li><p><cite>cmdbox.app.features.cli.cmdbox_limiter_targets</cite>: List Features that inherit from <cite>LimitedFeature</cite>.</p></li>
+</ul>
+<p>Restriction configurations are stored at <cite>data_dir/.limiter/limiter-{name}.json</cite> and
+counters are stored at <cite>data_dir/.limiter/counter-{name}.json</cite>.</p>
+</section>
+<section id="scope">
+<h2>Scope<a class="headerlink" href="#scope" title="Link to this heading"></a></h2>
+<p>Limiter supports two scopes:</p>
+<ul class="simple">
+<li><p><cite>server</cite>: Stores restriction configurations in the server-side data directory (recommended).</p></li>
+<li><p><cite>client</cite>: Stores restriction configurations in the client-side data directory specified by <cite>--client_data</cite>.</p></li>
+</ul>
+</section>
+<section id="saving-a-restriction-configuration">
+<h2>Saving a Restriction Configuration<a class="headerlink" href="#saving-a-restriction-configuration" title="Link to this heading"></a></h2>
+<p>Use the <cite>save</cite> command to register a restriction configuration.</p>
+<p>Example (limit command executions to 100 times on the server side):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmdbox<span class="w"> </span>-m<span class="w"> </span>limiter<span class="w"> </span>-c<span class="w"> </span>save<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--host<span class="w"> </span>localhost<span class="w"> </span>--port<span class="w"> </span><span class="m">6379</span><span class="w"> </span>--password<span class="w"> </span>password<span class="w"> </span>--svname<span class="w"> </span>cmdbox<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--limiter_name<span class="w"> </span>my_limit<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--scope<span class="w"> </span>server<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--target_mode<span class="w"> </span>mymode<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--target_cmd<span class="w"> </span>mycommand<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--max_total_count<span class="w"> </span><span class="m">100</span>
+</pre></div>
+</div>
+<p>Example (set an execution period and periodic reset on the client side):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmdbox<span class="w"> </span>-m<span class="w"> </span>limiter<span class="w"> </span>-c<span class="w"> </span>save<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--host<span class="w"> </span>localhost<span class="w"> </span>--port<span class="w"> </span><span class="m">6379</span><span class="w"> </span>--password<span class="w"> </span>password<span class="w"> </span>--svname<span class="w"> </span>cmdbox<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--limiter_name<span class="w"> </span>my_limit2<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--scope<span class="w"> </span>client<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--target_mode<span class="w"> </span>mymode<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec_period_start<span class="w"> </span><span class="m">2024</span>-01-01T00:00:00<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec_period_end<span class="w"> </span><span class="m">2024</span>-12-31T23:59:59<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--refresh_interval<span class="w"> </span><span class="m">86400</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--max_history_interval<span class="w"> </span><span class="m">2678400</span>
+</pre></div>
+</div>
+<p>Main options:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--limiter_name</span></code></p></td>
+<td><p>Identifier name for the restriction configuration (required).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--scope</span></code></p></td>
+<td><p>Scope: <cite>client</cite> or <cite>server</cite> (required).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--target_mode</span></code></p></td>
+<td><p>Mode name of the target command to restrict. If omitted, all modes are targeted.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--target_cmd</span></code></p></td>
+<td><p>Command name of the target command to restrict. If omitted, all commands are targeted.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--target_option</span></code></p></td>
+<td><p>Conditions for the target command in dictionary format (can be specified multiple times).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--max_registrations</span></code></p></td>
+<td><p>Maximum number of registrations (or maximum registration size). If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--max_total_count</span></code></p></td>
+<td><p>Maximum number of command executions. If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--max_total_time</span></code></p></td>
+<td><p>Total executable time in seconds for the command. If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--max_total_input</span></code></p></td>
+<td><p>Maximum total number of input bytes. If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--max_total_process</span></code></p></td>
+<td><p>Maximum total number of process bytes. If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--max_total_output</span></code></p></td>
+<td><p>Maximum total number of output bytes. If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--max_total_credits</span></code></p></td>
+<td><p>Maximum number of credits for the command. If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--service_credits</span></code></p></td>
+<td><p>Number of service credits.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--exec_period_start</span></code></p></td>
+<td><p>Start datetime of the executable period (e.g. <cite>2024-01-01T00:00:00</cite>). If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--exec_period_end</span></code></p></td>
+<td><p>End datetime of the executable period (e.g. <cite>2024-12-31T23:59:59</cite>). If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--refresh_datetime</span></code></p></td>
+<td><p>Datetime at which the restriction counters are reset. If omitted, no reset is performed.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--refresh_interval</span></code></p></td>
+<td><p>Interval in seconds after which the restriction counters are reset. If omitted, no reset is performed.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--max_history_interval</span></code></p></td>
+<td><p>Maximum duration in seconds for which counter history is retained. Default is 31 days (2678400 seconds).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="loading-a-restriction-configuration">
+<h2>Loading a Restriction Configuration<a class="headerlink" href="#loading-a-restriction-configuration" title="Link to this heading"></a></h2>
+<p>Use the <cite>load</cite> command to inspect a registered restriction configuration.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmdbox<span class="w"> </span>-m<span class="w"> </span>limiter<span class="w"> </span>-c<span class="w"> </span>load<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--host<span class="w"> </span>localhost<span class="w"> </span>--port<span class="w"> </span><span class="m">6379</span><span class="w"> </span>--password<span class="w"> </span>password<span class="w"> </span>--svname<span class="w"> </span>cmdbox<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--limiter_name<span class="w"> </span>my_limit<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--scope<span class="w"> </span>server
+</pre></div>
+</div>
+</section>
+<section id="listing-restriction-configurations">
+<h2>Listing Restriction Configurations<a class="headerlink" href="#listing-restriction-configurations" title="Link to this heading"></a></h2>
+<p>Use the <cite>list</cite> command to display all registered restriction configurations.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmdbox<span class="w"> </span>-m<span class="w"> </span>limiter<span class="w"> </span>-c<span class="w"> </span>list<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--host<span class="w"> </span>localhost<span class="w"> </span>--port<span class="w"> </span><span class="m">6379</span><span class="w"> </span>--password<span class="w"> </span>password<span class="w"> </span>--svname<span class="w"> </span>cmdbox<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--scope<span class="w"> </span>server
+</pre></div>
+</div>
+<p>Example with keyword search (partial match):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmdbox<span class="w"> </span>-m<span class="w"> </span>limiter<span class="w"> </span>-c<span class="w"> </span>list<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--host<span class="w"> </span>localhost<span class="w"> </span>--port<span class="w"> </span><span class="m">6379</span><span class="w"> </span>--password<span class="w"> </span>password<span class="w"> </span>--svname<span class="w"> </span>cmdbox<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--scope<span class="w"> </span>server<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--kwd<span class="w"> </span>my_
+</pre></div>
+</div>
+</section>
+<section id="deleting-a-restriction-configuration">
+<h2>Deleting a Restriction Configuration<a class="headerlink" href="#deleting-a-restriction-configuration" title="Link to this heading"></a></h2>
+<p>Use the <cite>del</cite> command to delete a registered restriction configuration.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmdbox<span class="w"> </span>-m<span class="w"> </span>limiter<span class="w"> </span>-c<span class="w"> </span>del<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--host<span class="w"> </span>localhost<span class="w"> </span>--port<span class="w"> </span><span class="m">6379</span><span class="w"> </span>--password<span class="w"> </span>password<span class="w"> </span>--svname<span class="w"> </span>cmdbox<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--limiter_name<span class="w"> </span>my_limit<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--scope<span class="w"> </span>server
+</pre></div>
+</div>
+</section>
+<section id="retrieving-counters">
+<h2>Retrieving Counters<a class="headerlink" href="#retrieving-counters" title="Link to this heading"></a></h2>
+<p>Use the <cite>counter</cite> command to retrieve the counter for a restriction configuration.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmdbox<span class="w"> </span>-m<span class="w"> </span>limiter<span class="w"> </span>-c<span class="w"> </span>counter<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--host<span class="w"> </span>localhost<span class="w"> </span>--port<span class="w"> </span><span class="m">6379</span><span class="w"> </span>--password<span class="w"> </span>password<span class="w"> </span>--svname<span class="w"> </span>cmdbox<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--limiter_name<span class="w"> </span>my_limit<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--scope<span class="w"> </span>server
+</pre></div>
+</div>
+<p>To also retrieve counter history:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmdbox<span class="w"> </span>-m<span class="w"> </span>limiter<span class="w"> </span>-c<span class="w"> </span>counter<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--host<span class="w"> </span>localhost<span class="w"> </span>--port<span class="w"> </span><span class="m">6379</span><span class="w"> </span>--password<span class="w"> </span>password<span class="w"> </span>--svname<span class="w"> </span>cmdbox<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--limiter_name<span class="w"> </span>my_limit<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--scope<span class="w"> </span>server<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--load_history
+</pre></div>
+</div>
+<p>Available counter fields:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">limiter_name</span></code></p></td>
+<td><p>Identifier name of the restriction configuration.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">total_count</span></code></p></td>
+<td><p>Number of executions.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">total_time</span></code></p></td>
+<td><p>Total execution time in seconds.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">total_input</span></code></p></td>
+<td><p>Total input bytes.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">total_process</span></code></p></td>
+<td><p>Total process bytes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">total_output</span></code></p></td>
+<td><p>Total output bytes.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">total_credits</span></code></p></td>
+<td><p>Total credits consumed.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">total_registrations</span></code></p></td>
+<td><p>Total number of registrations.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">last_refresh</span></code></p></td>
+<td><p>Datetime of the last counter reset.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">last_update</span></code></p></td>
+<td><p>Datetime of the last counter update.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="listing-restriction-targets">
+<h2>Listing Restriction Targets<a class="headerlink" href="#listing-restriction-targets" title="Link to this heading"></a></h2>
+<p>Use the <cite>targets</cite> command to list all Features that inherit from <cite>LimitedFeature</cite> (i.e. commands that support restriction).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmdbox<span class="w"> </span>-m<span class="w"> </span>limiter<span class="w"> </span>-c<span class="w"> </span>targets<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--host<span class="w"> </span>localhost<span class="w"> </span>--port<span class="w"> </span><span class="m">6379</span><span class="w"> </span>--password<span class="w"> </span>password<span class="w"> </span>--svname<span class="w"> </span>cmdbox<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--scope<span class="w"> </span>server
+</pre></div>
+</div>
+<p>To filter by mode or command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmdbox<span class="w"> </span>-m<span class="w"> </span>limiter<span class="w"> </span>-c<span class="w"> </span>targets<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--host<span class="w"> </span>localhost<span class="w"> </span>--port<span class="w"> </span><span class="m">6379</span><span class="w"> </span>--password<span class="w"> </span>password<span class="w"> </span>--svname<span class="w"> </span>cmdbox<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--scope<span class="w"> </span>server<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--filter_target_mode<span class="w"> </span>mymode<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--filter_target_cmd<span class="w"> </span>mycommand
+</pre></div>
+</div>
+</section>
+<section id="developer-guide-implementing-a-limiter-enabled-command">
+<h2>Developer Guide: Implementing a Limiter-Enabled Command<a class="headerlink" href="#developer-guide-implementing-a-limiter-enabled-command" title="Link to this heading"></a></h2>
+<p>To apply the Limiter to a custom command, inherit from <cite>LimitedFeature</cite> and apply the appropriate decorator to <cite>apprun</cite> or <cite>svrun</cite>.</p>
+<p><strong>Applying to a client-side command</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons.limiter</span><span class="w"> </span><span class="kn">import</span> <span class="n">LimitedFeature</span><span class="p">,</span> <span class="n">apprun_check_limit</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyFeature</span><span class="p">(</span><span class="n">LimitedFeature</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;mymode&#39;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;mycommand&#39;</span>
+
+    <span class="nd">@apprun_check_limit</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="c1"># The restriction check runs automatically before execution.</span>
+        <span class="c1"># The counter is updated automatically after execution.</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="s2">&quot;done&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="kc">None</span>
+</pre></div>
+</div>
+<p><strong>Applying to a server-side command</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons.limiter</span><span class="w"> </span><span class="kn">import</span> <span class="n">LimitedFeature</span><span class="p">,</span> <span class="n">svrun_check_limit</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyFeature</span><span class="p">(</span><span class="n">LimitedFeature</span><span class="p">):</span>
+    <span class="nd">@svrun_check_limit</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">svrun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sessions</span><span class="p">):</span>
+        <span class="c1"># The restriction check runs automatically before execution.</span>
+        <span class="c1"># The counter is updated automatically after execution.</span>
+        <span class="o">...</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span>
+</pre></div>
+</div>
+<p><strong>Applying to async commands</strong></p>
+<p>Use <cite>async_apprun_check_limit</cite> / <cite>async_svrun_check_limit</cite> for async <cite>apprun</cite> / <cite>svrun</cite>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons.limiter</span><span class="w"> </span><span class="kn">import</span> <span class="n">LimitedFeature</span><span class="p">,</span> <span class="n">async_apprun_check_limit</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyAsyncFeature</span><span class="p">(</span><span class="n">LimitedFeature</span><span class="p">):</span>
+    <span class="nd">@async_apprun_check_limit</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="s2">&quot;done&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="kc">None</span>
+</pre></div>
+</div>
+<p><strong>Customizing counter calculation methods</strong></p>
+<p><cite>LimitedFeature</cite> provides the following methods that can be overridden to customize how counter values are calculated:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 35.0%" />
+<col style="width: 65.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">apprun_input_bytes()</span></code></p></td>
+<td><p>Returns the input byte count for a client-side command. Default is the byte length of the argument string.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">apprun_output_bytes()</span></code></p></td>
+<td><p>Returns the output byte count for a client-side command. Default is the byte length of the result string.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">apprun_credit()</span></code></p></td>
+<td><p>Returns the credits consumed by a client-side command. Default is 0.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">apprun_count()</span></code></p></td>
+<td><p>Returns the execution count for a client-side command. Default is 1.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">apprun_process_bytes()</span></code></p></td>
+<td><p>Returns the process byte count for a client-side command. Default is 0.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">apprun_registrations()</span></code></p></td>
+<td><p>Returns the registration count for a client-side command. Default is 0.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">svrun_input_bytes()</span></code></p></td>
+<td><p>Returns the input byte count for a server-side command.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">svrun_output_bytes()</span></code></p></td>
+<td><p>Returns the output byte count for a server-side command.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">svrun_credit()</span></code></p></td>
+<td><p>Returns the credits consumed by a server-side command. Default is 0.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">svrun_count()</span></code></p></td>
+<td><p>Returns the execution count for a server-side command. Default is 1.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">svrun_process_bytes()</span></code></p></td>
+<td><p>Returns the process byte count for a server-side command. Default is 0.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">svrun_registrations()</span></code></p></td>
+<td><p>Returns the registration count for a server-side command. Default is 0.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="command-reference">
+<h2>Command Reference<a class="headerlink" href="#command-reference" title="Link to this heading"></a></h2>
+<p>For the full list of options for each command, see <a class="reference internal" href="cmd_limiter.html"><span class="doc">Command Reference ( limiter mode )</span></a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="audit.html" class="btn btn-neutral float-left" title="Audit Log" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="authentication.html" class="btn btn-neutral float-right" title="Authentication" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

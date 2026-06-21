@@ -25,6 +25,7 @@ limiter ( counter ) : ``cmdbox -m limiter -c counter <Option>``
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
     "--limiter_name <limiter_name>","str","","required","","","Specify the identifier name of the limiter configuration to get the counter for."
     "--scope <scope>","str","","required","server","client | current | server","Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory."
+    "--load_history <load_history>","bool","","","False","True | False","Specify whether to retrieve the counter history as well. If you set this to True, the counter history will also be retrieved."
 
 **Output Schema**
 
@@ -47,8 +48,10 @@ This command implements ``output_schema()`` returning ``Result`` model.
           "total_input": 0,
           "total_process": 0,
           "total_output": 0,
+          "total_credits": 0,
           "total_registrations": 0,
-          "last_refresh": "string"
+          "last_refresh": "string",
+          "last_update": "string"
         }
       },
       "warn": {},
@@ -64,15 +67,17 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "Field","Type","Required","Default","Description"
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.data","Counter | null","no","null","処理結果のデータ"
+    "success.data","Counter | list[Counter] | null","no","null","処理結果のデータ"
     "success.data.limiter_name","str | null","no","null","制限設定の識別名"
     "success.data.total_count","int | null","no","null","実行回数"
     "success.data.total_time","float | null","no","null","実行総時間（秒）"
     "success.data.total_input","int | null","no","null","入力総バイト数"
     "success.data.total_process","int | null","no","null","処理総バイト数"
     "success.data.total_output","int | null","no","null","出力総バイト数"
+    "success.data.total_credits","int | null","no","null","コマンドの最大クレジット数"
     "success.data.total_registrations","int | null","no","null","登録総数"
     "success.data.last_refresh","str | null","no","null","最終リセット日時"
+    "success.data.last_update","str | null","no","null","最終更新日時"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
@@ -258,10 +263,13 @@ This command implements ``output_schema()`` returning ``Result`` model.
           "max_total_input": 0,
           "max_total_process": 0,
           "max_total_output": 0,
+          "max_total_credits": 0,
+          "service_credits": 0,
           "exec_period_start": "string",
           "exec_period_end": "string",
           "refresh_datetime": "string",
-          "refresh_interval": 0.0
+          "refresh_interval": 0.0,
+          "max_history_interval": 0.0
         }
       },
       "warn": {},
@@ -289,10 +297,13 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.data.max_total_input","int | null","no","null","入力総バイト数の上限"
     "success.data.max_total_process","int | null","no","null","処理総バイト数の上限"
     "success.data.max_total_output","int | null","no","null","出力総バイト数の上限"
+    "success.data.max_total_credits","int | null","no","null","コマンドの最大クレジット数"
+    "success.data.service_credits","int | null","no","null","サービスクレジット数"
     "success.data.exec_period_start","str | null","no","null","実行可能期間の開始日時"
     "success.data.exec_period_end","str | null","no","null","実行可能期間の終了日時"
     "success.data.refresh_datetime","str | null","no","null","カウンタリセット日時"
     "success.data.refresh_interval","float | null","no","null","カウンタリセット間隔（秒）"
+    "success.data.max_history_interval","float | null","no","null","履歴保存期間の最大間隔（秒）"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
@@ -329,10 +340,13 @@ limiter ( save ) : ``cmdbox -m limiter -c save <Option>``
     "--max_total_input <max_total_input>","int","","","","","Specify the maximum total number of input bytes. If omitted, no limit is applied."
     "--max_total_process <max_total_process>","int","","","","","Specify the maximum total number of process bytes. If omitted, no limit is applied."
     "--max_total_output <max_total_output>","int","","","","","Specify the maximum total number of output bytes. If omitted, no limit is applied."
+    "--max_total_credits <max_total_credits>","int","","","","","Specify the maximum number of credits. If omitted, no limit is applied."
+    "--service_credits <service_credits>","int","","","","","Specify the number of service credits."
     "--exec_period_start <exec_period_start>","datetime","","","","","Specify the start datetime of the executable period for the command (e.g. 2024-01-01T00:00:00). If omitted, no limit is applied."
     "--exec_period_end <exec_period_end>","datetime","","","","","Specify the end datetime of the executable period for the command (e.g. 2024-12-31T23:59:59). If omitted, no limit is applied."
     "--refresh_datetime <refresh_datetime>","datetime","","","","","Specify the datetime to reset this restriction (e.g. 2024-06-01T00:00:00). The restriction counters are reset at the specified datetime. If omitted, no reset is performed."
     "--refresh_interval <refresh_interval>","int","","","","","Specify the interval in seconds after which this restriction is reset. The restriction counters are reset when the specified number of seconds has elapsed. If omitted, no reset is performed."
+    "--max_history_interval <max_history_interval>","int","","required","2678400","","Specify the maximum duration (in seconds) for which counter history will be retained. History older than the specified number of seconds will be deleted."
 
 **Output Schema**
 

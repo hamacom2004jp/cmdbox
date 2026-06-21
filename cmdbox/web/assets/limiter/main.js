@@ -19,6 +19,8 @@ $(() => {
         const name = $('#lm_limiter_name').val().trim();
         limiter_page.delete_limiter(name);
     });
+    // モーダルボタン初期化
+    cmdbox.init_modal_button();
     // モーダルのドラッグ対応
     cmdbox.modal_draggable($('#limiter_modal'));
     // 初期化とデータ読み込み

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( limiter mode ) &mdash; cmdbox 2026/06/15 documentation</title>
+  <title>Command Reference ( limiter mode ) &mdash; cmdbox 2026/06/21 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=76fbd8b1"></script>
+      <script src="../_static/documentation_options.js?v=27dab2da"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -79,6 +79,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="limiter.html">Limiter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tts.html">Text-to-Speech (TTS)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Information</a></li>
@@ -212,6 +213,14 @@
 <td><p>client | current | server</p></td>
 <td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
+<tr class="row-odd"><td><p>--load_history &lt;load_history&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Specify whether to retrieve the counter history as well. If you set this to True, the counter history will also be retrieved.</p></td>
+</tr>
 </tbody>
 </table>
 <p><strong>Output Schema</strong></p>
@@ -231,8 +240,10 @@
 <span class="w">      </span><span class="nt">&quot;total_input&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;total_process&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;total_output&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;total_credits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;total_registrations&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;last_refresh&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">      </span><span class="nt">&quot;last_refresh&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;last_update&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
@@ -272,7 +283,7 @@
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
 <tr class="row-even"><td><p>success.data</p></td>
-<td><p>Counter | null</p></td>
+<td><p>Counter | list[Counter] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>処理結果のデータ</p></td>
@@ -313,17 +324,29 @@
 <td><p>null</p></td>
 <td><p>出力総バイト数</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.total_registrations</p></td>
+<tr class="row-odd"><td><p>success.data.total_credits</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>コマンドの最大クレジット数</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.total_registrations</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>登録総数</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.last_refresh</p></td>
+<tr class="row-odd"><td><p>success.data.last_refresh</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>最終リセット日時</p></td>
+</tr>
+<tr class="row-even"><td><p>success.data.last_update</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>最終更新日時</p></td>
 </tr>
 <tr class="row-odd"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
@@ -907,10 +930,13 @@
 <span class="w">      </span><span class="nt">&quot;max_total_input&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;max_total_process&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;max_total_output&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;max_total_credits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;service_credits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;exec_period_start&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;exec_period_end&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;refresh_datetime&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;refresh_interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span>
+<span class="w">      </span><span class="nt">&quot;refresh_interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;max_history_interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
@@ -1021,6 +1047,18 @@
 <td><p>null</p></td>
 <td><p>出力総バイト数の上限</p></td>
 </tr>
+<tr class="row-even"><td><p>success.data.max_total_credits</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>コマンドの最大クレジット数</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.service_credits</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>サービスクレジット数</p></td>
+</tr>
 <tr class="row-even"><td><p>success.data.exec_period_start</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
@@ -1045,37 +1083,43 @@
 <td><p>null</p></td>
 <td><p>カウンタリセット間隔（秒）</p></td>
 </tr>
-<tr class="row-even"><td><p>warn</p></td>
+<tr class="row-even"><td><p>success.data.max_history_interval</p></td>
+<td><p>float | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>履歴保存期間の最大間隔（秒）</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn.performance</p></td>
+<tr class="row-even"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>error</p></td>
+<tr class="row-odd"><td><p>error</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>error.performance</p></td>
+<tr class="row-even"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>output_schema</p></td>
+<tr class="row-odd"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-odd"><td><p>end</p></td>
+<tr class="row-even"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -1254,6 +1298,22 @@
 <td></td>
 <td><p>Specify the maximum total number of output bytes. If omitted, no limit is applied.</p></td>
 </tr>
+<tr class="row-even"><td><p>--max_total_credits &lt;max_total_credits&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the maximum number of credits. If omitted, no limit is applied.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--service_credits &lt;service_credits&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the number of service credits.</p></td>
+</tr>
 <tr class="row-even"><td><p>--exec_period_start &lt;exec_period_start&gt;</p></td>
 <td><p>datetime</p></td>
 <td></td>
@@ -1285,6 +1345,14 @@
 <td></td>
 <td></td>
 <td><p>Specify the interval in seconds after which this restriction is reset. The restriction counters are reset when the specified number of seconds has elapsed. If omitted, no reset is performed.</p></td>
+</tr>
+<tr class="row-even"><td><p>--max_history_interval &lt;max_history_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>2678400</p></td>
+<td></td>
+<td><p>Specify the maximum duration (in seconds) for which counter history will be retained. History older than the specified number of seconds will be deleted.</p></td>
 </tr>
 </tbody>
 </table>

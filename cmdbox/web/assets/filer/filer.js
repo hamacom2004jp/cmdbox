@@ -552,8 +552,10 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
                         });
                     });
                     drop_area.find('h5').text(`DRAG AND DROP FILES`);
+                    drop_area.css('background-color', 'var(--bs-tertiary-bg)');
                 } else {
                     drop_area.find('h5').text(`Don't have permission to upload files.`);
+                    drop_area.css('background-color', '');
                 }
                 cmdbox.process_i18n(drop_area);
             });

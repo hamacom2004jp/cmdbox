@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.client &mdash; cmdbox 2026/05/31 documentation</title>
+  <title>cmdbox.app.client &mdash; cmdbox 2026/06/21 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=745f26b0"></script>
+      <script src="../../../_static/documentation_options.js?v=27dab2da"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -46,6 +46,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">Command Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/limiter.html">Limiter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/authentication.html">Authentication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">Developer Information</a></li>
@@ -521,6 +522,69 @@
             <span class="n">payload_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">default_json_enc</span><span class="p">))</span>
             <span class="n">res_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">send_cmd</span><span class="p">(</span><span class="s1">&#39;file_move&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">payload_b64</span><span class="p">],</span>
                                             <span class="n">retry_count</span><span class="o">=</span><span class="n">retry_count</span><span class="p">,</span> <span class="n">retry_interval</span><span class="o">=</span><span class="n">retry_interval</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">res_json</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;scope is invalid. </span><span class="si">{</span><span class="n">scope</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;scope is invalid. </span><span class="si">{</span><span class="n">scope</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Client.file_is">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.client.Client.file_is">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">file_is</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_func</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">svpath</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">from_path</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_path</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rjpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">from_fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_fwpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">from_rjpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_rjpaths</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">scope</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;client&quot;</span><span class="p">,</span> <span class="n">client_data</span><span class="p">:</span><span class="n">Path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">retry_count</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">retry_interval</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">60</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        指定した操作が実行可能かどうかを確認する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            file_func (str): 操作種別 (&quot;copy&quot;, &quot;download&quot;, &quot;list&quot;, &quot;mkdir&quot;, &quot;move&quot;, &quot;remove&quot;, &quot;rmdir&quot;, &quot;upload&quot;)</span>
+<span class="sd">            svpath (str, optional): 操作対象パス (copy/move 以外). Defaults to None.</span>
+<span class="sd">            from_path (str, optional): コピー・移動元パス (copy/move のみ). Defaults to None.</span>
+<span class="sd">            to_path (str, optional): コピー・移動先パス (copy/move のみ). Defaults to None.</span>
+<span class="sd">            fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.</span>
+<span class="sd">            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.</span>
+<span class="sd">            from_fwpaths (List[str], optional): コピー・移動元の範囲内パスのリスト. Defaults to None.</span>
+<span class="sd">            to_fwpaths (List[str], optional): コピー・移動先の範囲内パスのリスト. Defaults to None.</span>
+<span class="sd">            from_rjpaths (List[str], optional): コピー・移動元の範囲外パスのリスト. Defaults to None.</span>
+<span class="sd">            to_rjpaths (List[str], optional): コピー・移動先の範囲外パスのリスト. Defaults to None.</span>
+<span class="sd">            scope (str, optional): 参照先のスコープ. Defaults to &quot;client&quot;.</span>
+<span class="sd">            client_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.</span>
+<span class="sd">            retry_count (int, optional): リトライ回数. Defaults to 3.</span>
+<span class="sd">            retry_interval (int, optional): リトライ間隔. Defaults to 5.</span>
+<span class="sd">            timeout (int, optional): タイムアウト時間. Defaults to 60.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: 確認結果</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">scope</span> <span class="o">==</span> <span class="s2">&quot;client&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">client_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">filer</span><span class="o">.</span><span class="n">Filer</span><span class="p">(</span><span class="n">client_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">res_json</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">file_is</span><span class="p">(</span><span class="n">file_func</span><span class="p">,</span> <span class="n">svpath</span><span class="o">=</span><span class="n">svpath</span><span class="p">,</span> <span class="n">from_path</span><span class="o">=</span><span class="n">from_path</span><span class="p">,</span> <span class="n">to_path</span><span class="o">=</span><span class="n">to_path</span><span class="p">,</span>
+                                        <span class="n">fwpaths</span><span class="o">=</span><span class="n">fwpaths</span><span class="p">,</span> <span class="n">rjpaths</span><span class="o">=</span><span class="n">rjpaths</span><span class="p">,</span>
+                                        <span class="n">from_fwpaths</span><span class="o">=</span><span class="n">from_fwpaths</span><span class="p">,</span> <span class="n">to_fwpaths</span><span class="o">=</span><span class="n">to_fwpaths</span><span class="p">,</span>
+                                        <span class="n">from_rjpaths</span><span class="o">=</span><span class="n">from_rjpaths</span><span class="p">,</span> <span class="n">to_rjpaths</span><span class="o">=</span><span class="n">to_rjpaths</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">res_json</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;client_data is empty.&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;client_data is empty.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">scope</span> <span class="o">==</span> <span class="s2">&quot;current&quot;</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">filer</span><span class="o">.</span><span class="n">Filer</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">res_json</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">file_is</span><span class="p">(</span><span class="n">file_func</span><span class="p">,</span> <span class="n">svpath</span><span class="o">=</span><span class="n">svpath</span><span class="p">,</span> <span class="n">from_path</span><span class="o">=</span><span class="n">from_path</span><span class="p">,</span> <span class="n">to_path</span><span class="o">=</span><span class="n">to_path</span><span class="p">,</span>
+                                    <span class="n">fwpaths</span><span class="o">=</span><span class="n">fwpaths</span><span class="p">,</span> <span class="n">rjpaths</span><span class="o">=</span><span class="n">rjpaths</span><span class="p">,</span>
+                                    <span class="n">from_fwpaths</span><span class="o">=</span><span class="n">from_fwpaths</span><span class="p">,</span> <span class="n">to_fwpaths</span><span class="o">=</span><span class="n">to_fwpaths</span><span class="p">,</span>
+                                    <span class="n">from_rjpaths</span><span class="o">=</span><span class="n">from_rjpaths</span><span class="p">,</span> <span class="n">to_rjpaths</span><span class="o">=</span><span class="n">to_rjpaths</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">res_json</span>
+        <span class="k">elif</span> <span class="n">scope</span> <span class="o">==</span> <span class="s2">&quot;server&quot;</span><span class="p">:</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">file_func</span><span class="o">=</span><span class="n">file_func</span><span class="p">,</span> <span class="n">svpath</span><span class="o">=</span><span class="n">svpath</span><span class="p">,</span> <span class="n">from_path</span><span class="o">=</span><span class="n">from_path</span><span class="p">,</span> <span class="n">to_path</span><span class="o">=</span><span class="n">to_path</span><span class="p">,</span>
+                           <span class="n">fwpaths</span><span class="o">=</span><span class="n">fwpaths</span><span class="p">,</span> <span class="n">rjpaths</span><span class="o">=</span><span class="n">rjpaths</span><span class="p">,</span>
+                           <span class="n">from_fwpaths</span><span class="o">=</span><span class="n">from_fwpaths</span><span class="p">,</span> <span class="n">to_fwpaths</span><span class="o">=</span><span class="n">to_fwpaths</span><span class="p">,</span>
+                           <span class="n">from_rjpaths</span><span class="o">=</span><span class="n">from_rjpaths</span><span class="p">,</span> <span class="n">to_rjpaths</span><span class="o">=</span><span class="n">to_rjpaths</span><span class="p">)</span>
+            <span class="n">payload_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">default_json_enc</span><span class="p">))</span>
+            <span class="n">res_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">send_cmd</span><span class="p">(</span><span class="s1">&#39;file_is&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">payload_b64</span><span class="p">],</span>
+                                               <span class="n">retry_count</span><span class="o">=</span><span class="n">retry_count</span><span class="p">,</span> <span class="n">retry_interval</span><span class="o">=</span><span class="n">retry_interval</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">res_json</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;scope is invalid. </span><span class="si">{</span><span class="n">scope</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

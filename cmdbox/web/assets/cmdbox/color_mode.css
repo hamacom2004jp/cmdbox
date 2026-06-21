@@ -958,65 +958,66 @@ body::after {
 
 /* 桜モード */
 [data-bs-theme="sakura"] {
-    --bs-body-bg: #fdf0f5; /* 淡い桜色の白 */
-    --bs-body-color: #4a2030; /* 深みのある紅褐色 */
-    --bs-emphasis-color: #8b1a4a; /* 濃い桜色 */
-    --bs-secondary-color: #c47a90; /* くすんだ桜色 */
-    --bs-secondary-bg: #f9e0ea;
-    --bs-tertiary-color: #d4a0b0; /* 薄桜色 */
-    --bs-tertiary-bg: #fce8f0;
-    --bs-link-color: #c0315a; /* 紅 */
-    --bs-link-hover-color: #8b1a4a; /* 濃い紅 */
-    --bs-code-color: #7b4f00; /* 黄金茶 */
-    --bs-highlight-bg: #fce8f0;
-    --bs-highlight-border-color: #f5c8da;
+    --bs-body-bg: #fff0f8; /* ふんわりホワイトピンク */
+    --bs-body-color: #4d0a35; /* 深みのあるベリーマゼンタ */
+    --bs-emphasis-color: #cc005a; /* ビビッドディープピンク */
+    --bs-secondary-color: #ff6eb4; /* 鮮やかピンク */
+    --bs-secondary-bg: #ffd6eb;
+    --bs-tertiary-color: #ffb3d9; /* 淡いピンク */
+    --bs-tertiary-bg: #ffe8f4;
+    --bs-link-color: #e6004d; /* ホットピンクリンク */
+    --bs-link-hover-color: #b3003c; /* ディープホットピンク */
+    --bs-code-color: #8b0057; /* ダークマゼンタ */
+    --bs-highlight-bg: #ffd6eb;
+    --bs-highlight-border-color: #ffb3d9;
+    --bs-link-color-rgb: var(--bs-link-color);
 
-    --bs-primary: #e8698a; /* 桜色 */
-    --bs-primary-rgb: 232, 105, 138;
+    --bs-primary: #ff2080; /* ビビッドホットピンク（可愛い自信） */
+    --bs-primary-rgb: 255, 32, 128;
     --bs-primary-text: #fff;
-    --bs-primary-bg-subtle: #fce8f0;
-    --bs-primary-border-subtle: #f5c8da;
-    --bs-secondary: #c47a90; /* くすんだ桜 */
-    --bs-secondary-rgb: 196, 122, 144;
+    --bs-primary-bg-subtle: #ffe0f0;
+    --bs-primary-border-subtle: #ffb3d9;
+    --bs-secondary: #ff80bb; /* ライトホットピンク */
+    --bs-secondary-rgb: 255, 128, 187;
     --bs-secondary-text: #fff;
-    --bs-secondary-bg-subtle: #f9e0ea;
-    --bs-secondary-border-subtle: #f0c8d8;
-    --bs-success: #5a8a5a; /* 若葉色 */
-    --bs-success-rgb: 90, 138, 90;
+    --bs-secondary-bg-subtle: #ffd6eb;
+    --bs-secondary-border-subtle: #ffb3d9;
+    --bs-success: #3daa70; /* フレッシュグリーン */
+    --bs-success-rgb: 61, 170, 112;
     --bs-success-text: #fff;
-    --bs-success-bg-subtle: #d8ead8;
-    --bs-success-border-subtle: #c0d8c0;
-    --bs-info: #7090c0; /* 春の空色 */
-    --bs-info-rgb: 112, 144, 192;
+    --bs-success-bg-subtle: #c8eedd;
+    --bs-success-border-subtle: #a0ddc4;
+    --bs-info: #aa55dd; /* ラベンダー（キラキラ星） */
+    --bs-info-rgb: 170, 85, 221;
     --bs-info-text: #fff;
-    --bs-info-bg-subtle: #dce8f5;
-    --bs-info-border-subtle: #c0d4ee;
-    --bs-warning: #d4860a; /* 枯れ葉色 */
-    --bs-warning-rgb: 212, 134, 10;
+    --bs-info-bg-subtle: #edd9f9;
+    --bs-info-border-subtle: #d8aaf0;
+    --bs-warning: #ffb800; /* ゴールドスパークル */
+    --bs-warning-rgb: 255, 184, 0;
     --bs-warning-text: #fff;
-    --bs-warning-bg-subtle: #fdefd4;
-    --bs-warning-border-subtle: #f8dcb0;
-    --bs-danger: #c0314a; /* 紅梅 */
-    --bs-danger-rgb: 192, 49, 74;
+    --bs-warning-bg-subtle: #fff0b3;
+    --bs-warning-border-subtle: #ffe066;
+    --bs-danger: #dd1155; /* 情熱クリムゾン */
+    --bs-danger-rgb: 221, 17, 85;
     --bs-danger-text: #fff;
-    --bs-danger-bg-subtle: #f8d8de;
-    --bs-danger-border-subtle: #f0b8c4;
-    --bs-light: #fdf0f5; /* 淡い桜色 */
-    --bs-light-rgb: 253, 240, 245;
-    --bs-light-text: #4a2030;
-    --bs-light-bg-subtle: #fff7fa;
-    --bs-light-border-subtle: #fce8f0;
-    --bs-dark: #4a2030; /* 深紅褐色 */
-    --bs-dark-rgb: 74, 32, 48;
+    --bs-danger-bg-subtle: #f9c8d8;
+    --bs-danger-border-subtle: #f0a0bc;
+    --bs-light: #fff0f8; /* 淡いピンクホワイト */
+    --bs-light-rgb: 255, 240, 248;
+    --bs-light-text: #4d0a35;
+    --bs-light-bg-subtle: #fff8fc;
+    --bs-light-border-subtle: #ffe0f0;
+    --bs-dark: #4d0a35; /* ディープベリー */
+    --bs-dark-rgb: 77, 10, 53;
     --bs-dark-text: #fff;
-    --bs-dark-bg-subtle: #f5d8e4;
-    --bs-dark-border-subtle: #e8c0d0;
+    --bs-dark-bg-subtle: #f5c8e0;
+    --bs-dark-border-subtle: #e8a8cc;
 
-    --bs-gradient: linear-gradient(180deg, rgba(232, 105, 138, 0.08), rgba(232, 105, 138, 0));
+    --bs-gradient: linear-gradient(180deg, rgba(255, 32, 128, 0.10), rgba(255, 32, 128, 0));
     --bs-border-width: 1px;
     --bs-border-style: solid;
-    --bs-border-color: #e8b0c8;
-    --bs-border-color-translucent: rgba(196, 122, 144, 0.4);
+    --bs-border-color: #ffb0d6;
+    --bs-border-color-translucent: rgba(255, 32, 128, 0.35);
 
     --bs-emphasis-color-rgb: var(--bs-card-title-color);
     --bs-warning-text-emphasis: var(--bs-code-color);
@@ -1025,11 +1026,11 @@ body::after {
     --bs-table-bg: var(--bs-tertiary-bg);
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
 
-    --area-border-color: rgba(232, 105, 138, 0.4);
-    --area-bg-color-50: rgba(232, 105, 138, 0.5);
-    --area-bg-color-10: rgba(232, 105, 138, 0.9);
-    --area-bg-color-danger-50: rgba(192, 49, 74, 0.5);
-    --area-bg-color-danger-10: rgba(192, 49, 74, 0.9);
+    --area-border-color: rgba(255, 32, 128, 0.45);
+    --area-bg-color-50: rgba(255, 32, 128, 0.5);
+    --area-bg-color-10: rgba(255, 32, 128, 0.9);
+    --area-bg-color-danger-50: rgba(221, 17, 85, 0.5);
+    --area-bg-color-danger-10: rgba(221, 17, 85, 0.9);
 }
 
 /* ハイドランジア(紫陽花)モード */
