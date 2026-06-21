@@ -49,6 +49,9 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="scope", type=Options.T_STR, default="server", required=True, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
                      description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
+                dict(opt="load_history", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
+                     description_ja="カウンターの履歴も取得するかどうかを指定します。Trueを指定すると、カウンターの履歴も取得します。",
+                     description_en="Specify whether to retrieve the counter history as well. If you set this to True, the counter history will also be retrieved."),
             ]
         )
 
@@ -77,7 +80,7 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
             return self.RESP_SUCCESS, out, None
 
         # scope == 'server'
-        payload = dict(limiter_name=args.limiter_name)
+        payload = dict(limiter_name=args.limiter_name, load_history=args.load_history)
         payload_b64 = convert.str2b64str(common.to_str(payload))
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.redis_cli.send_cmd(self.get_svcmd(), [payload_b64],
@@ -95,10 +98,12 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
             total_input: Union[int, None] = pydantic.Field(default=None, description="入力総バイト数")
             total_process: Union[int, None] = pydantic.Field(default=None, description="処理総バイト数")
             total_output: Union[int, None] = pydantic.Field(default=None, description="出力総バイト数")
+            total_credits: Union[int, None] = pydantic.Field(default=None, description="コマンドの最大クレジット数")
             total_registrations: Union[int, None] = pydantic.Field(default=None, description="登録総数")
             last_refresh: Union[str, None] = pydantic.Field(default=None, description="最終リセット日時")
+            last_update: Union[str, None] = pydantic.Field(default=None, description="最終更新日時")
         class Data(resdata.Data):
-            data: Union[Counter, None] = pydantic.Field(default=None, description="処理結果のデータ")
+            data: Union[Counter, List[Counter], None] = pydantic.Field(default=None, description="処理結果のデータ")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
@@ -112,26 +117,14 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
         try:
             payload = json.loads(convert.b64str2str(msg[2]))
             limiter_name = payload.get('limiter_name')
+            load_history = payload.get('load_history', False)
             if not limiter_name:
                 result = dict(warn="limiter_name is required.")
                 redis_cli.rpush(reskey, result)
                 return self.RESP_WARN
 
-            # Redis からカウンターを取得
-            counter = None
-            try:
-                raw = redis_cli.redis_cli.hget(
-                    f"{redis_cli.lmtname}_{limiter.Limiter.REDIS_COUNTER_HASH}", limiter_name)
-                if raw is not None:
-                    text = raw.decode('utf-8') if isinstance(raw, bytes) else raw
-                    counter = json.loads(text)
-            except Exception:
-                pass
-
-            # Redis になければファイルから取得
-            if counter is None:
-                lmt = limiter.Limiter(redis_client=redis_cli)
-                counter = lmt._load_counter_from_file(data_dir, limiter_name)
+            lmt = limiter.Limiter.getInstance(redis_client=redis_cli, flush_interval=10, reload_interval=60)
+            counter = lmt.load_counter(data_dir, limiter_name, load_history)
 
             result = dict(success=dict(data=counter))
             redis_cli.rpush(reskey, result)

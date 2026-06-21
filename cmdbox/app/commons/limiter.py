@@ -54,12 +54,13 @@ def _apprun_post(self:'LimitedFeature', stime:float, msg:Dict[str, Any], data_di
     exec_time = common.perf_counter() - stime
     input_bytes = self.apprun_input_bytes(data_dir, logger, args, msg)
     output_bytes = self.apprun_output_bytes(data_dir, logger, args, msg)
+    credits = self.apprun_credit(data_dir, logger, args, msg)
     count = self.apprun_count(data_dir, logger, args, msg)
     process_bytes = self.apprun_process_bytes(data_dir, logger, args, msg)
     registrations = self.apprun_registrations(data_dir, logger, args, msg)
     limit.update(feat=self, data_dir=data_dir, logger=logger, command_options=args.__dict__,
                     count=count, exec_time=exec_time, input_bytes=input_bytes, process_bytes=process_bytes,
-                    output_bytes=output_bytes, registrations=registrations)
+                    output_bytes=output_bytes, credits=credits, registrations=registrations)
 
 def apprun_check_limit(func: Callable) -> Callable:
     """
@@ -166,12 +167,13 @@ def _svrun_post(self:'LimitedFeature', data_dir:Path, logger:logging.Logger, red
     input_bytes = self.svrun_input_bytes(data_dir, logger, command_options, msg)
     output_bytes = redis_cli.last_ressize if hasattr(redis_cli, 'last_ressize') and redis_cli.last_ressize is not None else 0
     output_bytes = self.svrun_output_bytes(data_dir, logger, command_options, resval, output_bytes)
+    credits = self.svrun_credit(data_dir, logger, command_options, resval)
     count = self.svrun_count(data_dir, logger, command_options, resval)
     process_bytes = self.svrun_process_bytes(data_dir, logger, command_options, resval)
     registrations = self.svrun_registrations(data_dir, logger, command_options, resval)
     limit.update(feat=self, data_dir=data_dir, logger=logger, command_options=command_options,
                     count=count, exec_time=exec_time, input_bytes=input_bytes, process_bytes=process_bytes,
-                    output_bytes=output_bytes, registrations=registrations)
+                    output_bytes=output_bytes, credits=credits, registrations=registrations)
     redis_cli.last_ressize = None
     redis_cli.last_resval = None
 
@@ -310,6 +312,22 @@ class LimitedFeature(feature.Feature):
         """
         output_bytes = len(common.to_str(msg).encode('utf-8')) if msg else 0
         return output_bytes
+    
+    def apprun_credit(self, data_dir:Path, logger:logging.Logger, args:argparse.Namespace, msg:Dict[str, Any]) -> int:
+        """
+        apprunの実行結果として使用クレジット数を取得します。
+        デフォルトの実装では、0 を返します。
+        このメソッドを拡張して、コマンドの引数やセッション情報などから使用クレジット数を算出する処理を実装できます。
+
+        Args:
+            data_dir (Path): データディレクトリのパス
+            logger (logging.Logger): ロガー
+            args (argparse.Namespace): コマンドの引数
+            msg (Dict[str, Any]): apprunの処理結果
+        Returns:
+            int: 使用クレジット数
+        """
+        return 0
 
     def apprun_count(self, data_dir:Path, logger:logging.Logger, args:argparse.Namespace, msg:Dict[str, Any]) -> int:
         """
@@ -393,6 +411,22 @@ class LimitedFeature(feature.Feature):
         """
         return msg_size if msg_size is not None else 0
 
+    def svrun_credit(self, data_dir:Path, logger:logging.Logger, opt:Dict[str, Any], msg:Union[Dict, str]) -> int:
+        """
+        svrunの実行結果として使用クレジット数を取得します。
+        デフォルトの実装では、0 を返します。
+        このメソッドを拡張して、コマンドの引数やセッション情報などから使用クレジット数を算出する処理を実装できます。
+
+        Args:
+            data_dir (Path): データディレクトリのパス
+            logger (logging.Logger): ロガー
+            opt (Dict[str, Any]): コマンドのオプション
+            msg (Union[Dict, str]): svrunの処理結果
+        Returns:
+            int: 使用クレジット数
+        """
+        return 0
+
     def svrun_count(self, data_dir:Path, logger:logging.Logger, opt:Dict[str, Any], msg:Union[Dict, str]) -> int:
         """
         svrunの実行結果として実行回数を取得します。
@@ -459,11 +493,11 @@ class Limiter:
     # Redis キーの定数
     REDIS_CONFIG_HASH = "limiter:config"
     REDIS_COUNTER_HASH = "limiter:counter"
-    REDIS_CONFIG_LOADED_KEY = "limiter:config:loaded"
 
     CHECK_ALLOW = 0 # 制限なしでコマンド実行を許可
     CHECK_DENY = 1  # 制限によりコマンド実行を拒否
     CHECK_NOT_APPLICABLE = 2  # 制限が適用されない場合
+    COUNTER_VALKEYS = ['total_count', 'total_time', 'total_input', 'total_process', 'total_output', 'total_credits', 'total_registrations']
 
     @classmethod
     def getInstance(cls, redis_client: Optional[redis_client.RedisClient] = None, flush_interval: float = 60.0, reload_interval: float = 60.0) -> 'Limiter':
@@ -545,7 +579,7 @@ class Limiter:
                             pipe.hset(f"{self.redis_client.lmtname}_{self.REDIS_CONFIG_HASH}", name, json.dumps(cfg))
                     pipe.execute()
                     return configs
-                if self.redis_client.exists(f"{self.redis_client.lmtname}_{self.REDIS_CONFIG_LOADED_KEY}"):
+                if self.redis_client.exists(f"{self.redis_client.lmtname}_{self.REDIS_CONFIG_HASH}"):
                     raw = self.redis_client.hgetall(f"{self.redis_client.lmtname}_{self.REDIS_CONFIG_HASH}")
                     if raw:
                         configs: List[Dict[str, Any]] = []
@@ -578,7 +612,7 @@ class Limiter:
                 pass
         return configs
 
-    def load_counter(self, data_dir: Path, limiter_name: str) -> Dict[str, Any]:
+    def load_counter(self, data_dir: Path, limiter_name: str, load_history: bool = False) -> Dict[str, Any]:
         """
         指定した制限設定のカウンタをロードします。
 
@@ -589,43 +623,63 @@ class Limiter:
         Args:
             data_dir (Path): データディレクトリ
             limiter_name (str): 制限設定の識別名
+            load_history (bool): カウンタの履歴も読み込むかどうか
         Returns:
             Dict[str, Any]: カウンタ
         """
-        if self.redis_client is not None:
+        enable = False
+        if self.redis_client is not None and not load_history:
             try:
                 raw = self.redis_client.hget(f"{self.redis_client.lmtname}_{self.REDIS_COUNTER_HASH}", limiter_name)
                 if raw is not None:
                     text = raw.decode('utf-8') if isinstance(raw, bytes) else raw
-                    return json.loads(text)
+                    last_json = json.loads(text)
+                enable = any(last_json.get(k) for k in self.COUNTER_VALKEYS)
+                if enable: return last_json
             except Exception:
                 pass
-        counter = self._load_counter_from_file(data_dir, limiter_name)
-        self.save_counter(data_dir, limiter_name, counter)  # Redis にも保存しておく
+        counter = self._load_counter_from_file(data_dir, limiter_name, load_history=load_history)
+        if not load_history and enable:
+            self.save_counter(data_dir, limiter_name, counter)  # Redis にも保存しておく
         return counter
 
-    def _load_counter_from_file(self, data_dir: Path, limiter_name: str) -> Dict[str, Any]:
+    def _load_counter_from_file(self, data_dir: Path, limiter_name: str, load_history: bool = False) -> Dict[str, Any]:
         """
         ファイルからカウンタをロードします（内部用）。
         JSONL 形式のファイルから最終行のみを読み込みます。
+
+        Args:
+            data_dir (Path): データディレクトリ
+            limiter_name (str): 制限設定の識別名
+            load_history (bool): カウンタの履歴も読み込むかどうか
+        Returns:
+            Dict[str, Any]: カウンタ
         """
         counter_path = Path(data_dir) / self.LIMITER_DIR / f"{self.COUNTER_PREFIX}{limiter_name}.jsonl"
         if not counter_path.exists():
             return self._init_counter(limiter_name)
         try:
-            last_line = None
+            last = None
+            counters = []
             with counter_path.open('r', encoding='utf-8') as f:
                 for line in f:
                     stripped = line.strip()
                     if stripped:
-                        last_line = stripped
-            if last_line is None:
-                return self._init_counter(limiter_name)
-            return json.loads(last_line)
+                        last = stripped
+                        try:
+                            last_json = json.loads(stripped)
+                            enable = any(last_json.get(k) for k in self.COUNTER_VALKEYS)
+                            if not enable: continue
+                            last = last_json
+                            counters.append(last_json)
+                        except Exception:
+                            pass
+            return counters if load_history else (last if last else self._init_counter(limiter_name))
         except Exception:
             return self._init_counter(limiter_name)
 
-    def save_counter(self, data_dir: Path, limiter_name: str, counter: Dict[str, Any]) -> None:
+    def save_counter(self, data_dir: Path, limiter_name: str, counter: Dict[str, Any],
+                     max_history_interval: Optional[int] = None) -> None:
         """
         指定した制限設定のカウンタを保存します。
 
@@ -637,9 +691,20 @@ class Limiter:
             data_dir (Path): データディレクトリ
             limiter_name (str): 制限設定の識別名
             counter (Dict[str, Any]): 保存するカウンタ
+            max_history_interval (Optional[int]): 履歴保持最大期間（秒）。指定した場合、ファイル保存後に古い履歴を削除します。
         """
         if self.redis_client is not None:
             try:
+                raw = self.redis_client.hget(f"{self.redis_client.lmtname}_{self.REDIS_COUNTER_HASH}", limiter_name)
+                if raw is not None:
+                    text = raw.decode('utf-8') if isinstance(raw, bytes) else raw
+                    share_counter = json.loads(text)
+                    is_same = all(counter.get(k, 0) == share_counter.get(k, 0) for k in self.COUNTER_VALKEYS)
+                    if is_same:
+                        return  # 変更なし
+                    # Redis 上のカウンタとマージする
+                    for k in self.COUNTER_VALKEYS:
+                        counter[k] = max(counter.get(k, 0), share_counter.get(k, 0))
                 self.redis_client.hset(
                     f"{self.redis_client.lmtname}_{self.REDIS_COUNTER_HASH}", limiter_name, json.dumps(counter))
             except Exception:
@@ -648,8 +713,12 @@ class Limiter:
             if now - self._last_counter_flush.get(limiter_name, 0.0) >= self._flush_interval:
                 self._save_counter_to_file(data_dir, limiter_name, counter)
                 self._last_counter_flush[limiter_name] = now
+                if max_history_interval is not None:
+                    self._prune_counter_history(data_dir, limiter_name, max_history_interval)
         else:
             self._save_counter_to_file(data_dir, limiter_name, counter)
+            if max_history_interval is not None:
+                self._prune_counter_history(data_dir, limiter_name, max_history_interval)
 
     def _save_counter_to_file(self, data_dir: Path, limiter_name: str, counter: Dict[str, Any]) -> None:
         """
@@ -673,13 +742,9 @@ class Limiter:
         """
         return dict(
             limiter_name=limiter_name,
-            total_count=0,
-            total_time=0,
-            total_input=0,
-            total_process=0,
-            total_output=0,
-            total_registrations=0,
+            **{k: 0 for k in self.COUNTER_VALKEYS},
             last_refresh=datetime.now().isoformat(),
+            last_update=datetime.now().isoformat()
         )
 
     # ------------------------------------------------------------------
@@ -913,7 +978,18 @@ class Limiter:
                         f"Limiter '{limiter_name}': maximum total output bytes "
                         f"({max_total_output}) has been reached."
                     )
-                
+
+            # クレジット最大数チェック
+            max_total_credits = config.get('max_total_credits')
+            service_credits = config.get('service_credits')
+            if max_total_credits is not None:
+                service_credits = service_credits if service_credits else 0
+                if counter.get('total_credits', 0) >= int(max_total_credits) + int(service_credits):
+                    return self.CHECK_DENY, dict(warn=
+                        f"Limiter '{limiter_name}': maximum total credits "
+                        f"({max_total_credits} + {service_credits}) has been reached."
+                    )
+
             checkfg = self.CHECK_ALLOW
 
         return checkfg, None
@@ -925,6 +1001,7 @@ class Limiter:
                input_bytes: int = 0,
                process_bytes: int = 0,
                output_bytes: int = 0,
+               credits: int = 0,
                registrations: int = 0) -> None:
         """
         コマンド実行後にカウンタを更新します。
@@ -942,6 +1019,7 @@ class Limiter:
             input_bytes (int): 入力バイト数
             process_bytes (int): 処理バイト数
             output_bytes (int): 出力バイト数
+            credits (int): 使用クレジット数
             registrations (int): 登録数（又は登録サイズ）
         """
         configs = self.load_configs(data_dir)
@@ -959,11 +1037,52 @@ class Limiter:
                     counter = self.reset_counter(limiter_name)
 
                 counter['total_count'] = counter.get('total_count', 0) + count
-                counter['total_time'] = counter.get('total_time', 0) + round(exec_time)
+                counter['total_time'] = counter.get('total_time', 0.0) + exec_time
                 counter['total_input'] = counter.get('total_input', 0) + input_bytes
                 counter['total_process'] = counter.get('total_process', 0) + process_bytes
                 counter['total_output'] = counter.get('total_output', 0) + output_bytes
                 counter['total_registrations'] = registrations
-                self.save_counter(data_dir, limiter_name, counter)
+                counter['total_credits'] = counter.get('total_credits', 0) + credits
+                counter['last_update'] = datetime.now().isoformat()
+                max_history_interval = config.get('max_history_interval')
+                self.save_counter(data_dir, limiter_name, counter,
+                                  max_history_interval=int(max_history_interval) if max_history_interval is not None else None)
             except Exception as e:
                 logger.warning(f"Limiter.update failed for '{limiter_name}': {e}", exc_info=True)
+
+    def _prune_counter_history(self, data_dir: Path, limiter_name: str, max_history_interval: int) -> None:
+        """
+        max_history_interval 秒を超えた古い履歴エントリを JSONL ファイルから削除します。
+
+        Args:
+            data_dir (Path): データディレクトリ
+            limiter_name (str): 制限設定の識別名
+            max_history_interval (int): 保持する最大期間（秒）
+        """
+        counter_path = Path(data_dir) / self.LIMITER_DIR / f"{self.COUNTER_PREFIX}{limiter_name}.jsonl"
+        if not counter_path.exists():
+            return
+        now = datetime.now()
+        cutoff = now.timestamp() - max_history_interval
+        lines_to_keep = []
+        try:
+            with counter_path.open('r', encoding='utf-8') as f:
+                for line in f:
+                    stripped = line.strip()
+                    if not stripped:
+                        continue
+                    try:
+                        entry = json.loads(stripped)
+                        last_update_str = entry.get('last_update')
+                        if last_update_str:
+                            last_update = datetime.fromisoformat(last_update_str)
+                            if last_update.timestamp() >= cutoff:
+                                lines_to_keep.append(stripped)
+                        else:
+                            lines_to_keep.append(stripped)
+                    except Exception:
+                        lines_to_keep.append(stripped)
+            common.save_file(counter_path, lambda f: f.write('\n'.join(lines_to_keep) + ('\n' if lines_to_keep else '')),
+                             mode='w', encoding='utf-8', nolock=False)
+        except Exception:
+            pass

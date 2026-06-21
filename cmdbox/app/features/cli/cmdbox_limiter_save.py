@@ -86,6 +86,12 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="max_total_output", type=Options.T_INT, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="出力の総バイト数の上限を指定します。省略時は制限しません。",
                      description_en="Specify the maximum total number of output bytes. If omitted, no limit is applied."),
+                dict(opt="max_total_credits", type=Options.T_INT, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja="コマンドの最大クレジット数を指定します。省略時は制限しません。",
+                     description_en="Specify the maximum number of credits. If omitted, no limit is applied."),
+                dict(opt="service_credits", type=Options.T_INT, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja="サービスクレジット数を指定します。",
+                     description_en="Specify the number of service credits."),
                 dict(opt="exec_period_start", type=Options.T_DATETIME, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="コマンドの実行可能期間の開始日時を指定します（例: 2024-01-01T00:00:00）。省略時は制限しません。",
                      description_en="Specify the start datetime of the executable period for the command (e.g. 2024-01-01T00:00:00). If omitted, no limit is applied."),
@@ -98,6 +104,9 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="refresh_interval", type=Options.T_INT, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="この制限をリセットするまでの時間（秒）を指定します。指定した秒数が経過すると制限カウンタをリセットします。省略時はリセットしません。",
                      description_en="Specify the interval in seconds after which this restriction is reset. The restriction counters are reset when the specified number of seconds has elapsed. If omitted, no reset is performed."),
+                dict(opt="max_history_interval", type=Options.T_INT, default=3600*24*31, required=True, multi=False, hide=False, choice=None,
+                     description_ja="カウンター履歴を保持する最大期間（秒）を指定します。指定した秒数を超えた履歴は削除されます。",
+                     description_en="Specify the maximum duration (in seconds) for which counter history will be retained. History older than the specified number of seconds will be deleted."),
             ]
         )
 
@@ -106,6 +115,11 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
         if args.scope not in ['client', 'server']:
             result = dict(warn="Limiters are supported only in the “client” and “server” scopes.")
             logger.warning("Limiters are supported only in the “client” and “server” scopes.")
+            common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, result, None
+        if args.max_history_interval and args.max_history_interval <= 120:
+            result = dict(warn="max_history_interval should be greater than 120 seconds.")
+            logger.warning("max_history_interval should be greater than 120 seconds.")
             common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, result, None
 
@@ -121,10 +135,13 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
             max_total_input=args.max_total_input if hasattr(args, 'max_total_input') else None,
             max_total_process=args.max_total_process if hasattr(args, 'max_total_process') else None,
             max_total_output=args.max_total_output if hasattr(args, 'max_total_output') else None,
+            max_total_credits=args.max_total_credits if hasattr(args, 'max_total_credits') else None,
+            service_credits=args.service_credits if hasattr(args, 'service_credits') else None,
             exec_period_start=str(args.exec_period_start) if hasattr(args, 'exec_period_start') and args.exec_period_start is not None else None,
             exec_period_end=str(args.exec_period_end) if hasattr(args, 'exec_period_end') and args.exec_period_end is not None else None,
             refresh_datetime=str(args.refresh_datetime) if hasattr(args, 'refresh_datetime') and args.refresh_datetime is not None else None,
             refresh_interval=args.refresh_interval if hasattr(args, 'refresh_interval') else None,
+            max_history_interval=args.max_history_interval if hasattr(args, 'max_history_interval') else None,
         )
 
         if args.scope == 'client':

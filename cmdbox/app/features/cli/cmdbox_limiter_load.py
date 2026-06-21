@@ -105,10 +105,13 @@ class LimiterLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             max_total_input: Union[int, None] = pydantic.Field(default=None, description="入力総バイト数の上限")
             max_total_process: Union[int, None] = pydantic.Field(default=None, description="処理総バイト数の上限")
             max_total_output: Union[int, None] = pydantic.Field(default=None, description="出力総バイト数の上限")
+            max_total_credits: Union[int, None] = pydantic.Field(default=None, description="コマンドの最大クレジット数")
+            service_credits: Union[int, None] = pydantic.Field(default=None, description="サービスクレジット数")
             exec_period_start: Union[str, None] = pydantic.Field(default=None, description="実行可能期間の開始日時")
             exec_period_end: Union[str, None] = pydantic.Field(default=None, description="実行可能期間の終了日時")
             refresh_datetime: Union[str, None] = pydantic.Field(default=None, description="カウンタリセット日時")
             refresh_interval: Union[float, None] = pydantic.Field(default=None, description="カウンタリセット間隔（秒）")
+            max_history_interval: Union[float, None] = pydantic.Field(default=None, description="履歴保存期間の最大間隔（秒）")
         class Data(resdata.Data):
             data: Union[Configure, None] = pydantic.Field(default=None, description="処理結果のデータ")
         class Result(resdata.Result):

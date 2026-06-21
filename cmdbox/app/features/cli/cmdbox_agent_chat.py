@@ -161,6 +161,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             flags: Union[Flags, None] = pydantic.Field(default=None, description="フラグ情報")
             message: Union[str, None] = pydantic.Field(default=None, description="メッセージ")
             wav_b64: Union[str, None] = pydantic.Field(default=None, description="Base64エンコードされたWAVデータ")
+            ressize: Union[int, None] = pydantic.Field(default=None, description="Agentが返したレスポンスのサイズ")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
@@ -265,7 +266,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             custom_httpx_client = httpx.AsyncClient(
                 follow_redirects=True,
                 timeout=httpx.Timeout(600.0),
-                event_hooks={'request': [_create_dynamic_header_provider()]}
+                event_hooks={'request': [_create_dynamic_header_provider()]},
             )
             config = ClientConfig(httpx_client=custom_httpx_client)
             factory = ClientFactory(config=config)
@@ -347,7 +348,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                     vertex_credentials=llmsvaccountfile_data,
                     vertex_location=llmlocation,
                     seed=llmseed,
-                    temperature=llmtemperature,
+                    temperature=llmtemperature
                 ),
                 description=description,
                 instruction=instruction,
@@ -371,7 +372,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                     model=f"ollama/{llmmodel}",
                     api_base=llmendpoint,
                     temperature=llmtemperature,
-                    stream=True
+                    stream=True,
                 ),
                 description=description,
                 instruction=instruction,
@@ -473,7 +474,6 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             from google.adk.runners import Runner
             from google.genai import types
 
-            json_pattern = re.compile(r'\{.*?\}')
             runner_conf, agent_conf, llm_conf, mcpsv_confs, ds_conf = self.load_conf(name, data_dir, logger)
             agent = self.create_agent(logger, data_dir, False, agent_conf, llm_conf, mcpsv_confs)
             runner = Runner(
@@ -499,6 +499,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             # チャットを実行する
             signin.set_request_scope(dict(mcpserver_apikey=mcpserver_apikey, a2asv_apikey=a2asv_apikey))
             run_config = RunConfig(streaming_mode=StreamingMode.NONE)
+            resval = []
             async with aclosing(runner.run_async(user_id=user_name,
                                                  session_id=agent_session.id,
                                                  new_message=content,
@@ -521,6 +522,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                         flags['final_response'] = is_final_response
                         flags['function_call'] = is_func_call
                         flags['function_response'] = is_func_response
+                        resval.append(outputs)
                         if msg:
                             success['message'] = msg
                             options.Options.getInstance().audit_exec(body=dict(agent_session=agent_session.id, result=msg),
@@ -543,7 +545,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                                                 ids=dict(agent_session_id=agent_session.id)),)
                     redis_cli.rpush(reskey, outputs)
                     raise e
-            msg = dict(success=dict(message=f"Chat '{name}' successfully."), end=True)
+            msg = dict(success=dict(message=f"Chat '{name}' successfully.", ressize=len(convert.str2b64str(common.to_str(resval)))), end=True)
             redis_cli.rpush(reskey, msg)
             await run_iter.aclose()
             return self.RESP_SUCCESS
@@ -561,3 +563,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 if hasattr(runner.session_service, 'db_engine'):
                     await runner.session_service.db_engine.dispose()
                 await runner.close()
+
+    def svrun_output_bytes(self, data_dir, logger, opt, msg, msg_size):
+        msg_size = msg.get('success', {}).get('ressize', msg_size)
+        return msg_size

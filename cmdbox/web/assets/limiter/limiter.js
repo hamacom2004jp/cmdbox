@@ -8,7 +8,9 @@ limiter_page.get_limiter_form_def = async () => {
     const vform_names = ['limiter_name', 'scope', 'target_mode', 'target_cmd', 'target_option',
         'max_registrations', 'max_total_count', 'max_total_time',
         'max_total_input', 'max_total_process', 'max_total_output',
-        'exec_period_start', 'exec_period_end', 'refresh_datetime', 'refresh_interval'];
+        'max_total_credits', 'service_credits',
+        'exec_period_start', 'exec_period_end',
+        'refresh_datetime', 'refresh_interval', 'max_history_interval'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };
@@ -24,6 +26,15 @@ limiter_page.build_limiter_form = async () => {
     defs.forEach((row, i) => {
         cmdbox.add_form_func(i, modal, form, row, null);
     });
+};
+
+/**
+ * 数値を人が読みやすい形式に変換
+ */
+limiter_page.fmt_num = (n) => {
+    if (n == null) return '-';
+    if (typeof n === 'number') return n.toLocaleString();
+    return n;
 };
 
 /**
@@ -54,7 +65,7 @@ limiter_page.to_dt_local = (s) => {
 /**
  * 進捗バーを生成して返す
  */
-limiter_page.make_progress = (label, current, max, fmt_func) => {
+limiter_page.make_progress = (label, current, max, fmt_func, service=null) => {
     if (max == null) {
         // 上限なし: 現在値だけ表示
         return $(`<div class="mb-1">
@@ -64,13 +75,15 @@ limiter_page.make_progress = (label, current, max, fmt_func) => {
             </div>
         </div>`);
     }
-    const pct = max > 0 ? Math.min(100, Math.round((current || 0) / max * 100)) : 0;
+    service = service || 0;
+    const pct = max > 0 ? Math.min(100, Math.round((current || 0) / (max + service) * 100)) : 0;
     const color = pct >= 90 ? 'bg-danger' : pct >= 70 ? 'bg-warning' : 'bg-info';
     const cur_str = fmt_func ? fmt_func(current || 0) : (current || 0);
-    const max_str = fmt_func ? fmt_func(max) : max;
+    const max_str = fmt_func ? fmt_func(max + service) : max + service;
+    const service_str = fmt_func ? fmt_func(service) : service;
     return $(`<div class="mb-1">
         <div class="d-flex justify-content-between">
-            <small class="text-secondary i18n">${label}</small>
+            <small class="text-secondary i18n">${label} ${service ? `(Service: ${service_str})` : ''}</small>
             <small class="text-info">${cur_str} / ${max_str} (${pct}%)</small>
         </div>
         <div class="progress" style="height:6px;">
@@ -245,11 +258,12 @@ limiter_page._render_limiter_item = (parent, lm, show_counter) => {
     const last_refresh = counter.last_refresh;
     const progress_area = $(`<div class="mt-1"></div>`).appendTo(item);
 
-    limiter_page.make_progress('Count', counter.total_count, lm.max_total_count, null).appendTo(progress_area);
+    limiter_page.make_progress('Count', counter.total_count, lm.max_total_count, limiter_page.fmt_num).appendTo(progress_area);
     limiter_page.make_progress('Time (s)', counter.total_time, lm.max_total_time, (v) => v != null ? `${typeof v === 'number' ? v.toFixed(1) : v}s` : '-').appendTo(progress_area);
     limiter_page.make_progress('Input', counter.total_input, lm.max_total_input, limiter_page.fmt_bytes).appendTo(progress_area);
     limiter_page.make_progress('Process', counter.total_process, lm.max_total_process, limiter_page.fmt_bytes).appendTo(progress_area);
     limiter_page.make_progress('Output', counter.total_output, lm.max_total_output, limiter_page.fmt_bytes).appendTo(progress_area);
+    limiter_page.make_progress('Credits', counter.total_credits, lm.max_total_credits, limiter_page.fmt_num, lm.service_credits).appendTo(progress_area);
     limiter_page.make_progress('Registrations', counter.total_registrations, lm.max_registrations, limiter_page.fmt_bytes).appendTo(progress_area);
 
     if (last_refresh) {

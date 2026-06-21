@@ -73,7 +73,7 @@ agentView.list_llm = async () => {
                 <li class="sf-list-item" style="cursor: pointer;">
                     <div>
                         <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.llmname}</span>
-                        <span>${config.llmprov} / ${config.llmmodel}</span>
+                        <span>( ${config.llmpriority} ) ${config.llmprov} / ${config.llmmodel}</span>
                     </div>
                 </li>
             `).appendTo(container_ul);
