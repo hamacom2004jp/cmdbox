@@ -89,15 +89,6 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
                      description_en="Specify the maximum waiting time until the server responds."),
             ]
         )
-    
-    def get_svcmd(self):
-        """
-        この機能のサーバー側のコマンドを返します
-
-        Returns:
-            str: サーバー側のコマンド
-        """
-        return 'file_upload'
 
     @limiter.apprun_check_limit
     @validator.apprun_check

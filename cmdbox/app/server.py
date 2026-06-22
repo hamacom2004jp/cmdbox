@@ -167,7 +167,7 @@ class Server(filer.Filer):
                     if to_cluster and svcmd_feature.is_cluster_redirect():
                         _publish(msg_str)
                         continue
-                    if msg[0] == 'stop_server':
+                    if msg[0] == 'client_stop_server':
                         self.is_running = False
                     if self.logger.level == logging.DEBUG:
                         self.logger.debug(f"svname:{self.svname}, msg: {msg}"[:300])

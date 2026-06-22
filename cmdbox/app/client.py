@@ -42,7 +42,7 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
-        res_json = self.redis_cli.send_cmd('stop_server', [], retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+        res_json = self.redis_cli.send_cmd('client_stop_server', [], retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         return res_json
     
     def file_list(self, svpath:str, recursive:bool, scope:str="client", client_data:Path=None,
@@ -80,7 +80,7 @@ class Client(object):
         elif scope == "server":
             payload = dict(svpath=svpath, recursive=recursive, fwpaths=fwpaths, rjpaths=rjpaths, listregs=listregs)
             payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
-            res_json = self.redis_cli.send_cmd('file_list', [payload_b64],
+            res_json = self.redis_cli.send_cmd('client_file_list', [payload_b64],
                                                retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
             return res_json
         else:
@@ -121,7 +121,7 @@ class Client(object):
         elif scope == "server":
             payload = dict(svpath=svpath, fwpaths=fwpaths, rjpaths=rjpaths)
             payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
-            res_json = self.redis_cli.send_cmd('file_mkdir', [payload_b64],
+            res_json = self.redis_cli.send_cmd('client_file_mkdir', [payload_b64],
                                             retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
             return res_json
         else:
@@ -162,7 +162,7 @@ class Client(object):
         elif scope == "server":
             payload = dict(svpath=svpath, fwpaths=fwpaths, rjpaths=rjpaths)
             payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
-            res_json = self.redis_cli.send_cmd('file_rmdir', [payload_b64],
+            res_json = self.redis_cli.send_cmd('client_file_rmdir', [payload_b64],
                                             retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
             return res_json
         else:
@@ -206,7 +206,7 @@ class Client(object):
         elif scope == "server":
             payload = dict(svpath=svpath, img_thumbnail=img_thumbnail, fwpaths=fwpaths, rjpaths=rjpaths, etag=etag)
             payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
-            res_json = self.redis_cli.send_cmd('file_download', [payload_b64],
+            res_json = self.redis_cli.send_cmd('client_file_download', [payload_b64],
                                                retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         else:
             self.logger.warning(f"scope is invalid. {scope}")
@@ -276,7 +276,7 @@ class Client(object):
                 payload = dict(svpath=svpath, file_name=upload_file.name, file_data=convert.bytes2b64str(f.read()),
                                mkdir=mkdir, overwrite=overwrite, fwpaths=fwpaths, rjpaths=rjpaths)
                 payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
-                res_json = self.redis_cli.send_cmd('file_upload', [payload_b64,],
+                res_json = self.redis_cli.send_cmd('client_file_upload', [payload_b64,],
                                     retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
                 return res_json
             else:
@@ -317,7 +317,7 @@ class Client(object):
         elif scope == "server":
             payload = dict(svpath=svpath, fwpaths=fwpaths, rjpaths=rjpaths)
             payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
-            res_json = self.redis_cli.send_cmd('file_remove', [payload_b64],
+            res_json = self.redis_cli.send_cmd('client_file_remove', [payload_b64],
                                             retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
             return res_json
         else:
@@ -365,7 +365,7 @@ class Client(object):
             payload = dict(from_path=from_path, to_path=to_path, overwrite=overwrite,
                            from_fwpaths=from_fwpaths, to_fwpaths=to_fwpaths, from_rjpaths=from_rjpaths, to_rjpaths=to_rjpaths)
             payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
-            res_json = self.redis_cli.send_cmd('file_copy', [payload_b64],
+            res_json = self.redis_cli.send_cmd('client_file_copy', [payload_b64],
                                             retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
             return res_json
         else:
@@ -411,7 +411,7 @@ class Client(object):
             payload = dict(from_path=from_path, to_path=to_path, from_fwpaths=from_fwpaths, to_fwpaths=to_fwpaths,
                            from_rjpaths=from_rjpaths, to_rjpaths=to_rjpaths)
             payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
-            res_json = self.redis_cli.send_cmd('file_move', [payload_b64],
+            res_json = self.redis_cli.send_cmd('client_file_move', [payload_b64],
                                             retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
             return res_json
         else:
@@ -471,7 +471,7 @@ class Client(object):
                            from_fwpaths=from_fwpaths, to_fwpaths=to_fwpaths,
                            from_rjpaths=from_rjpaths, to_rjpaths=to_rjpaths)
             payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
-            res_json = self.redis_cli.send_cmd('file_is', [payload_b64],
+            res_json = self.redis_cli.send_cmd('client_file_is', [payload_b64],
                                                retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
             return res_json
         else:
@@ -490,5 +490,5 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
-        res_json = self.redis_cli.send_cmd('server_info', [], retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+        res_json = self.redis_cli.send_cmd('client_server_info', [], retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         return res_json
