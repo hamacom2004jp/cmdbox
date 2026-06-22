@@ -132,6 +132,11 @@ agentView.chat = (session_id) => {
             return;
         }
         if (packet && packet['end']) {
+            if (packet['warn']) {  // 握り潰さず表示（不具合B）
+                const txt = agentView.create_agent_message(agentView.message_id || cmdbox.random_string(16));
+                await agentView.format_agent_message(txt, `${packet['warn']}`);
+            }
+            agentView.clear_loading();
             agentView.message_id = null;
             console.log(packet);
             return;
@@ -144,6 +149,7 @@ agentView.chat = (session_id) => {
         // チャットリスナーにメッセージを渡す
         agentView.chat_listeners && agentView.chat_listeners.forEach(listener => listener(packet));
         if (packet && packet['warn']) {
+            agentView.clear_loading();
             console.log(packet);
             const txt = agentView.create_agent_message(agentView.message_id);
             await agentView.format_agent_message(txt, `${packet['warn']}`);
@@ -152,10 +158,12 @@ agentView.chat = (session_id) => {
         }
         const success = packet && packet['success'] || {};
         if (success.turn_complete) {
+            agentView.clear_loading();
             agentView.message_id = null;
             return;
         }
         if (!success.message || success.message.length <= 0) {
+            agentView.clear_loading();
             agentView.message_id = null;
             return;
         }
@@ -180,6 +188,7 @@ agentView.chat = (session_id) => {
             }
             await agentView.format_agent_message(msg_content, success.message);
             agentView.scrollToBottom();
+            agentView.clear_loading();
             return;
         }
         $('.ai-core').removeClass('ai-core2');
@@ -194,7 +203,7 @@ agentView.chat = (session_id) => {
         if (msg_container.find('.message-thinking').length <= 0) {
             msg_container.find('.btn-toggle-message').remove();
         }
-        msg_container.find('.spinner-grow').remove();
+        agentView.clear_loading();
         await agentView.say.play(success.wav_b64);
         agentView.message_id = null;
     };
@@ -209,10 +218,12 @@ agentView.chat = (session_id) => {
         agentView.chat_callback_ping_handler = setInterval(() => {ping();}, ping_interval);
     };
     agentView.ws.onerror = (event) => {
+        agentView.clear_loading();
         console.error(event);
         clearInterval(agentView.chat_callback_ping_handler);
     };
     agentView.ws.onclose = () => {
+        agentView.clear_loading();
         clearInterval(agentView.chat_callback_ping_handler);
         if (agentView.chat_reconnect_count >= max_reconnect_count) {
             clearInterval(agentView.chat_reconnectInterval_handler);
@@ -226,6 +237,9 @@ agentView.chat = (session_id) => {
         }, ping_interval);
     };
     cmdbox.hide_loading();
+};
+agentView.clear_loading = () => {
+    agentView.chatMessages.find('.spinner-grow').remove();
 };
 agentView.create_user_message = (msg) => {
     const msgDiv = $('<div/>').appendTo(agentView.chatMessages);
