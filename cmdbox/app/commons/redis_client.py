@@ -172,8 +172,10 @@ class RedisClient(object):
         Returns:
             dict: Redisサーバーからの応答
         """
-        def send(nowait:bool=False):
+        def send(nowait:bool=False, timeout:int=60):
             try:
+                if isinstance(timeout, str):
+                    timeout = int(timeout)
                 if timeout <= 0:
                     raise ValueError(f"timeout must be greater than 0. timeout={timeout}")
                 if not self.check_server(find_svname=True, retry_count=retry_count, retry_interval=retry_interval, outstatus=outstatus):
@@ -211,14 +213,14 @@ class RedisClient(object):
                 yield dict(error=f"fail to execute command. cmd={cmd}, msg={e}")
                 return
         if not nowait:
-            for msg in send(nowait):
+            for msg in send(nowait, timeout):
                 yield msg
             return
         else:
-            def run_send():
-                for _ in send(nowait):
+            def run_send(nowait:bool=False, timeout:int=60):
+                for _ in send(nowait, timeout):
                     pass
-            thread = threading.Thread(target=run_send)
+            thread = threading.Thread(target=run_send, args=(nowait, timeout))
             thread.start()
             yield dict(success=f"Command sent. cmd={cmd}, nowait={nowait}")
 

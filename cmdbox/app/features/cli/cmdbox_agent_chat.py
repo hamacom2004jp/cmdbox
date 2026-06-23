@@ -194,6 +194,16 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                       f"2. コマンド実行に必要なパラメータのなかで、ユーザーのクエリから取得できないものは、コマンド定義にあるデフォルト値を指定して実行してください。\n" + \
                       f"3. もしエラーが発生した場合は、ユーザーにコマンド名とパラメータとエラー内容を提示してください。\n" \
                       f"4. コマンドの実行結果は、json文字列で出力するようにしてください。この時json文字列は「```json」と「```」で囲んだ文字列にしてください。\n")
+        agent_system_instruction = agent_conf.get("agent_system_instruction", None)
+        prompt_param = agent_conf.get("prompt_param", None)
+
+        # prompt_param によるプレースホルダー置換
+        instruction = self.apply_prompt_param(instruction, prompt_param)
+        agent_system_instruction = self.apply_prompt_param(agent_system_instruction, prompt_param)
+
+        # agent_system_instruction を instruction の先頭に結合
+        if agent_system_instruction:
+            instruction = agent_system_instruction + ("\n" + instruction if instruction else "")
 
         if logger.level == logging.DEBUG:
             logger.debug(f"google-adk loading..")

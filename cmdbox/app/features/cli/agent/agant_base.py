@@ -135,6 +135,25 @@ class AgentBase(feature.ResultEdgeFeature):
             return session
 
     @classmethod
+    def apply_prompt_param(cls, text: str, prompt_param: Dict[str, Any]) -> str:
+        """
+        テキスト中のプレースホルダーを prompt_param の値で置換します
+
+        Args:
+            text (str): 置換対象のテキスト
+            prompt_param (Dict[str, Any]): プレースホルダーに対応するパラメータ
+
+        Returns:
+            str: 置換後のテキスト
+        """
+        if text is None or not prompt_param:
+            return text
+        try:
+            return text.format_map(prompt_param)
+        except (KeyError, ValueError):
+            return text
+
+    @classmethod
     def gen_msg(cls, event:Any) -> Tuple[str, bool, bool, bool]:
         json_pattern = re.compile(r'\{.*?\}')
         msg = None

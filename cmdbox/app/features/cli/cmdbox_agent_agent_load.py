@@ -99,6 +99,8 @@ class AgentAgentLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             subagents: Union[List[str], None] = pydantic.Field(default=None, description="サブエージェントリスト")
             agent_description: Union[str, None] = pydantic.Field(default=None, description="エージェントの説明")
             agent_instruction: Union[str, None] = pydantic.Field(default=None, description="エージェントへの指示")
+            agent_system_instruction: Union[str, None] = pydantic.Field(default=None, description="サービス提供側が内部的に設定するシステムプロンプト")
+            prompt_param: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="プレースホルダーに対応するパラメータ")
         class Result(resdata.Result):
             success: Data = pydantic.Field(description="成功した場合の結果")
         return Result

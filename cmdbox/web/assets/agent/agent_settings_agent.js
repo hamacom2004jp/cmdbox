@@ -3,7 +3,7 @@ agentView.get_agent_form_def = async () => {
     const vform_names = ['agent_name', 'agent_type', 'use_planner',
                          'a2asv_baseurl', 'a2asv_delegated_auth', 'a2asv_apikey',
                          'llm', 'mcpservers', 'subagents',
-                         'agent_description', 'agent_instruction'];
+                         'agent_description', 'agent_system_instruction','agent_instruction','prompt_param'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };
