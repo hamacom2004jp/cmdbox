@@ -133,7 +133,7 @@ class CmdBoxApp:
                         d[kv[0]] = kv[1] if len(kv) > 1 else None
                     args_dict[key] = d
         # featuresの初期値を適用する
-        self.options.load_features_args(args_dict)
+        self.options.load_features_args(args_dict, language=self.default_language, multi_check=True)
         args = argparse.Namespace(**{k:common.chopdq(v) for k,v in args_dict.items()})
         eargsparsetime = common.perf_counter()
 

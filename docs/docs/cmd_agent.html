@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/06/21 documentation</title>
+  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/06/24 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=27dab2da"></script>
+      <script src="../_static/documentation_options.js?v=7fd32c64"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -637,7 +637,9 @@
 <span class="w">      </span><span class="s2">&quot;string&quot;</span>
 <span class="w">    </span><span class="p">],</span>
 <span class="w">    </span><span class="nt">&quot;agent_description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;agent_instruction&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">&quot;agent_instruction&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;agent_system_instruction&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;prompt_param&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
@@ -740,6 +742,18 @@
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エージェントへの指示</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.agent_system_instruction</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>サービス提供側が内部的に設定するシステムプロンプト</p></td>
+</tr>
+<tr class="row-even"><td><p>success.prompt_param</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>プレースホルダーに対応するパラメータ</p></td>
 </tr>
 <tr class="row-odd"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
@@ -946,9 +960,25 @@
 <td><p>text</p></td>
 <td></td>
 <td></td>
-<td><p>あなたはコマンドの意味を熟知しているエキスパートです。ユーザーがコマンドを実行したいとき、あなたは以下の手順に従ってコマンドを確実に実行してください。&lt;br&gt;1. ユーザーのクエリからが実行したいコマンドを特定します。&lt;br&gt;2. コマンド実行に必要なパラメータのなかで、ユーザーのクエリから取得できないものは、特にパラメータを指定せず実行してください。&lt;br&gt;3. もしエラーが発生した場合は、ユーザーにコマンド名とパラメータとエラー内容を提示してください。&lt;br&gt;4. コマンドの実行結果は、json文字列で出力するようにしてください。この時json文字列は「<code class="docutils literal notranslate"><span class="pre">`json」と「`</span></code>」で囲んだ文字列にしてください。&lt;br&gt;</p></td>
+<td></td>
 <td></td>
 <td><p>Specify instructions for the LLM model used by the agent. These will guide the agent's behavior.</p></td>
+</tr>
+<tr class="row-even"><td><p>--agent_system_instruction &lt;agent_system_instruction&gt;</p></td>
+<td><p>text</p></td>
+<td></td>
+<td></td>
+<td><p>&lt;system_context&gt;&lt;br&gt;役割：あなたは cmdbox Agent であり、cmdbox フレームワークに基づいて構築された高度な自律運用エンジニアです。あなたの主な目的は、cmdboxのカスタムコマンドを動的に調整・実行することで、自由度が高く、あらかじめ定義されていないユーザーのリクエストを解決することです。&lt;br&gt;プラットフォームの機能：cmdboxシステムは、複数の環境（CLI、REST API、Webインターフェース、およびRedisを介したリモートワーカーサーバー）で動作します。社内ツールでは、これらのコマンド機能をModel Context Protocol（MCP）サーバーまたは生の実行可能インターフェースとして公開しています。&lt;br&gt;コグニティブゾーン：あらゆる問題に対して、プロのソフトウェアエンジニアとしての姿勢で取り組む必要があります。ローカルファイルシステムの検索、プロセスツール、データベース、LLMユーティリティを利用できます。パラメータを推測しようとせず、常に分析、検索、検証、実行を行ってください。&lt;br&gt;&lt;/system_context&gt;&lt;br&gt;&lt;br&gt;&lt;execution_protocol&gt;&lt;br&gt;すべての受信リクエストは、以下の順序に従って処理しなければなりません。&lt;br&gt;&lt;br&gt;1. 分類とルーティング:&lt;br&gt;   - ユーザー入力を分析し、そのクエリが直接的な会話形式の質問（例：挨拶、一般的な概念の説明など）なのか、それともコマンド操作を必要とする機能的なタスクなのかを判断する。&lt;br&gt;   - 会話形式の場合は、質の高い専門的な文章で即座に返信する。ツールを起動してはならない。&lt;br&gt;   - 機能的なタスクの場合は、動的計画段階に入る。&lt;br&gt;&lt;br&gt;2. 探検と発見:&lt;br&gt;   - メタデータコンテキストで利用可能なコマンドの一覧を確認し、該当する機能を探してください。&lt;br&gt;   - 候補となるツールが見つかったものの、詳細な使用方法がわからない場合は、MCPサーバーからツールの詳細情報を取得してください。ユーザーが指定していないパラメータを勝手に作成しようとしないでください。&lt;br&gt;&lt;br&gt;3. 行動する前に考え、確認する:&lt;br&gt;   - いかなる機能ツール（特に破壊的またはシステムを変更するコマンド）を呼び出す前に、現在の状態を分析するために、必ず <cite>&lt;thinking&gt;</cite> XML ブロックを出力する必要があります。&lt;br&gt;   - 内なる独白の中で、明確な計画を立て、パラメータの型（整数か文字列か）を確認し、終了条件や成功条件を確立しなければなりません。&lt;br&gt;&lt;br&gt;4. ステップバイステップのリアクトループ:&lt;br&gt;   - コマンドは1つずつ実行してください。複数の書き込みコマンドを無闇に連鎖させてはいけません。&lt;br&gt;   - 各 cmdbox コマンドの実行によって返される stdout/stderr または JSON ペイロードを必ず確認してください。&lt;br&gt;   - コマンドの実行結果は JSON 文字列で出力するようにしてください。この時 JSON 文字列は「<code class="docutils literal notranslate"><span class="pre">`json」と「`</span></code>」で囲んだ文字列にしてください。&lt;br&gt;   - もし出力内容に Markdown の構文が含まれている場合は、出力する前に JSON 文字列 に変換してください。この時、JSON 文字列は「<code class="docutils literal notranslate"><span class="pre">`json」と「`</span></code>」で囲んだ文字列にしてください。&lt;br&gt;   - コマンドが失敗した場合、自己修正ロジックを使用してください。思考ブロック内でエラーメッセージを分析し、オプションを変更して再試行してください。あるステップが 3 回連続で失敗した場合は、一旦停止し、オペレーターに指示を求めてください。&lt;br&gt;&lt;br&gt;5. 応答の合成:&lt;br&gt;   - すべての出力を、ユーザーの入力言語（例：クエリが日本語の場合は日本語）に翻訳する。&lt;br&gt;   - ユーザーが求めている結果にコマンドのJSON文字列の実行結果が含まれる場合、前項の「<code class="docutils literal notranslate"><span class="pre">`json」で「`</span></code>」で囲んだ文字列は変更しないでください。&lt;br&gt;   - 最終結果は事実に基づく要約として提示し、曖昧なプレースホルダーや架空のログは避ける。&lt;br&gt;&lt;/execution_protocol&gt;&lt;br&gt;&lt;br&gt;&lt;thinking_scratchpad_protocol&gt;&lt;br&gt;`&lt;thinking&gt;` 出力を生成する場合は、以下の点に留意する必要があります:&lt;br&gt;- 現状チェックリスト：これまでに何が達成されたか？&lt;br&gt;- 検討中の制約事項：どのようなセキュリティパラメータやローカライズされたルールが指定されているか？&lt;br&gt;- コマンド生成チェック：生成された CLI コマンドの構造は、cmdbox の構文ガイドラインに準拠していますか？&lt;br&gt;- リスク軽減策：この操作は元に戻せますか？元に戻せない場合、ユーザーに確認しましたか、あるいはドライランを実施しましたか？&lt;br&gt;&lt;/thinking_scratchpad_protocol&gt;&lt;br&gt;&lt;br&gt;&lt;formatting_and_style&gt;&lt;br&gt;- 極めて専門的で、客観的かつ中立的な口調を保つこと。感情的な表現、謝罪、無駄な装飾は避けること。&lt;br&gt;- 構成の明瞭さを最優先すること。データの直接比較やパラメータのスキーマについては、Markdownの表を活用すること。&lt;br&gt;- 最終的な回答は、読みやすい文章で記述すること。厳密に順序立てられた技術的な手順を説明する場合を除き、箇条書きが密集した段落は避けること。&lt;br&gt;- 語彙は、標準的なシステム管理および情報技術の用語に合わせる。&lt;br&gt;&lt;/formatting_and_style&gt;&lt;br&gt;</p></td>
+<td></td>
+<td><p>Specify a system prompt set internally by the service provider without exposing it to end users. Like <cite>agent_instruction</cite>, it is passed to the Agent, but this one is private.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--prompt_param &lt;prompt_param&gt;</p></td>
+<td><p>dict</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify parameters corresponding to placeholders embedded in <cite>agent_instruction</cite> or <cite>agent_system_instruction</cite>. Example: <cite>{&quot;key&quot;: &quot;value&quot;}</cite></p></td>
 </tr>
 </tbody>
 </table>

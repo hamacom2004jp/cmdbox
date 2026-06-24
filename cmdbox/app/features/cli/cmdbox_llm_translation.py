@@ -92,16 +92,6 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
             result = {word: lang_cache[word] for word in words}
             msg = dict(success=dict(data=result))
             return self.RESP_SUCCESS, msg, None
-        
-        if args.llmname is None:
-            # LLM名が指定されていない場合は利用可能なLLM設定のリストの一番最初のllmnameを自動的に選択する
-            st, msg, cl = self.llm_list.apprun(logger, args, tm, pf)
-            if st != self.RESP_SUCCESS:
-                return st, msg, cl
-            data = msg.get('success', {}).get('data', [])
-            if data:
-                data = sorted(data, key=lambda x: x.get('llmpriority', 9999))
-                args.llmname = data[0].get('name')
 
         payload = dict(
             llmname=args.llmname,
@@ -146,8 +136,25 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
             target_lang = payload.get('target_lang', 'en_US')
             nosave = payload.get('nosave', False)
 
-            st, result = self.translate(data_dir, logger, llmname, words, target_lang, nosave=nosave)
-            redis_cli.rpush(reskey, result)
+            data = [] if not llmname else [dict(llmname=llmname, priority=0, type='chat')]
+            data = data + self.llm_list.get_llmlist("", data_dir)
+            # 優先度の高いものから順に試す
+            for llm in data:
+                if llm.get('type', 'chat') != 'chat': continue
+                name = llm.get('name')
+                try:
+                    st, result = self.translate(data_dir, logger, name, words, target_lang, nosave=nosave)
+                    if st == self.RESP_SUCCESS:
+                        redis_cli.rpush(reskey, result)
+                        return st
+                except Exception as e:
+                    logger.warning(f"Failed to translate using LLM '{name}': {e}. Trying next LLM if available.")
+                    continue
+            # すべてのLLMで翻訳できなかった場合は、元の単語を返す
+            redis_cli.rpush(reskey, dict(success=dict(data={w: w for w in words})))
+            return self.RESP_SUCCESS
+
+            redis_cli.rpush(reskey, dict(warn=f"{self.get_mode()}_{self.get_cmd()}: No available LLM could translate the words."))
             return st
 
         except Exception as e:

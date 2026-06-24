@@ -294,14 +294,16 @@ agentView.format_agent_message =  async (txt, message) => {
             let start = message.match(regs_start);
             if (!start || start.length < 0) {
                 // JSON開始部分が無い場合はそのまま表示
-                const msg = message.replace(/\n/g, '<br/>');
-                txt.append(msg);
+                // const msg = message.replace(/\n/g, '<br/>');
+                const msg_html = marked.parse(message);
+                txt.append(msg_html);
                 break;
             }
             start = message.substring(0, start.index);
             if (start) {
-                const msg = start.replace(/\n/g, '<br/>');
-                txt.append(msg);
+                // const msg = start.replace(/\n/g, '<br/>');
+                const msg_html = marked.parse(start);
+                txt.append(msg_html);
             }
             message = message.replace(start+regs_start.source, '');
 
@@ -309,8 +311,9 @@ agentView.format_agent_message =  async (txt, message) => {
             let jbody = message.match(regs_end);
             if (!jbody || jbody.length < 0) {
                 // JSON内容部分が無い場合はそのまま表示
-                const msg = message.replace(/\n/g, '<br/>');
-                txt.append(msg);
+                // const msg = message.replace(/\n/g, '<br/>');
+                const msg_html = marked.parse(message);
+                txt.append(msg_html);
                 break;
             }
             jbody = message.substring(0, jbody.index);
@@ -333,8 +336,9 @@ agentView.format_agent_message =  async (txt, message) => {
             }
         } catch (e) {
             try {
-                const msg = message.replace(/\n/g, '<br/>');
-                txt.append(msg);
+                // const msg = message.replace(/\n/g, '<br/>');
+                const msg_html = marked.parse(message);
+                txt.append(msg_html);
             } catch (e) {
                 txt.append(`${e}`);
             }

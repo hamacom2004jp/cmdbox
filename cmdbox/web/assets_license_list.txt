@@ -11,3 +11,4 @@ Alan Williamson MIT jquery-linedtextarea    https://github.com/cotenoni/jquery-l
 ApexCharts  MIT ApexCharts https://apexcharts.com/   v4.3.0 -
 svgdotjs    MIT svg.resize.js    https://github.com/svgdotjs/svg.resize.js  2.0.4   -
 svgdotjs    MIT svg.select.js    https://github.com/svgdotjs/svg.select.js  4.0.1   -
+MarkedJS,Christopher Jeffrey    MIT   Marked    https://github.com/markedjs/marked  18.05   -

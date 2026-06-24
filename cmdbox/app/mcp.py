@@ -583,6 +583,7 @@ class ToolList(object):
         func_txt += f'    groups = req.session["signin"]["groups"]\n'
         func_txt += f'    user_name = req.session["signin"]["name"]\n'
         func_txt += f'    user_session = req.session["signin"]\n'
+        func_txt += f'    options.load_features_args(opt, language="{self.language}", multi_check=False)\n'
         func_txt += f'    sign = signin.Signin._check_cmd(signin_file_data=signin_data, user_groups=groups, mode="{mode}", cmd="{cmd}", opt=opt, user_name=user_name, user_session=user_session, logger=logger, appcls=appcls, ver=ver, language=language)\n'
         func_txt += f'    if not sign:\n'
         func_txt += f'        logger.warning("You do not have permission to execute this command. check="+common.to_str(sign))\n'

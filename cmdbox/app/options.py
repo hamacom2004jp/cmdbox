@@ -159,8 +159,8 @@ class Options:
                 return o
         return None
 
-    def list_options(self, language:str=None) -> Dict[str, Any]:
-        def _list(ret, key, val):
+    def list_options(self, language:str=None, multi_check:bool=True) -> Dict[str, Any]:
+        def _list(ret, key, val, multi_check):
             if type(val) != dict or 'type' not in val:
                 return
             opt = dict()
@@ -190,7 +190,7 @@ class Options:
             o += [f'--{key}']
             opt['help'] = val['description_en'] if not common.is_japan(language=language) else val['description_ja']
             opt['default'] = val['default']
-            if val['multi'] and val['default'] is not None:
+            if val['multi'] and val['default'] is not None and multi_check:
                 raise ValueError(f'list_options: The default value must be None if multi is True. key={key}, val={val}')
             opt['opts'] = o
             if val['choice'] is not None:
@@ -207,7 +207,7 @@ class Options:
             ret[key] = opt
         ret = dict()
         for k, v in self._options.items():
-            _list(ret, k, v)
+            _list(ret, k, v, multi_check)
         #for mode in self._options["mode"]['choice']:
         for _, cmd in self._options["cmd"].items():
             if type(cmd) is not dict:
@@ -218,7 +218,7 @@ class Options:
                 for o in opt["choice"]:
                     if type(o) is not dict:
                         continue
-                    _list(ret, o['opt'], o)
+                    _list(ret, o['opt'], o, multi_check)
         return ret
 
     def mk_opt_list(self, opt:dict, webmode:bool=False) -> List[str]:
@@ -518,14 +518,14 @@ class Options:
             self.features_loaded[ftype] = True
 
 
-    def load_features_args(self, args_dict:Dict[str, Any]):
+    def load_features_args(self, args_dict:Dict[str, Any], language:str=None, multi_check:bool=True):
         yml = self.features_yml_data
         if yml is None:
             return
         if 'args' not in yml or 'cli' not in yml['args']:
             return
 
-        opts = self.list_options()
+        opts = self.list_options(language=language, multi_check=multi_check)
         def _cast(self, key, val):
             for opt in opts.values():
                 if f"--{key}" in opt['opts']:

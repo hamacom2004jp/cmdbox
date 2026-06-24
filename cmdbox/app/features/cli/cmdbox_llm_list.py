@@ -67,6 +67,7 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
             name: str = pydantic.Field(..., description="名前")
             path: str = pydantic.Field(..., description="パス")
             priority: int = pydantic.Field(..., description="優先度")
+            type: str = pydantic.Field(..., description="タイプ")
         class Data(resdata.Data):
             data: List[NamedRecoard] = pydantic.Field(default_factory=list, description="処理結果のデータ")
         class Result(resdata.Result):
@@ -90,23 +91,9 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
         reskey = msg[1]
         try:
             payload = json.loads(convert.b64str2str(msg[2]))
-
             kwd = payload.get('kwd')
-            if kwd is None or kwd == '':
-                kwd = '*'
-            agent_dir = data_dir / '.agent'
-            results: List[Dict[str, Any]] = []
-            if agent_dir.exists() and agent_dir.is_dir():
-                paths = agent_dir.glob(f"llm-{kwd}.json")
-                for p in sorted(paths):
-                    name = p.name
-                    if not name.startswith('llm-') or not name.endswith('.json'):
-                        continue
-                    configure = common.load_file(p, lambda f: json.load(f), encoding='utf-8', nolock=False)
-                    priority = configure.get('llmpriority', 9999)
-                    results.append(dict(name=name[4:-5], path=str(p), priority=priority if priority is not None else 9999))
-
-            msg = dict(success=dict(data=sorted(results, key=lambda x: x.get('priority', 9999))))
+            data = self.get_llmlist(kwd, data_dir)
+            msg = dict(success=dict(data=data))
             redis_cli.rpush(reskey, msg)
             return self.RESP_SUCCESS
 
@@ -115,3 +102,33 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
+
+    def get_llmlist(self, kwd:str, data_dir:Path) -> List[Dict[str, Any]]:
+        """
+        保存されているLLM設定のリストを取得します。
+
+        Args:
+            kwd (str): 検索キーワード
+            data_dir (Path): データディレクトリのパス
+
+        Returns:
+            List[Dict[str, Any]]: LLM設定のリスト
+        """
+        if kwd is None or kwd == '':
+            kwd = '*'
+        agent_dir = data_dir / '.agent'
+        results: List[Dict[str, Any]] = []
+        if agent_dir.exists() and agent_dir.is_dir():
+            paths = agent_dir.glob(f"llm-{kwd}.json")
+            for p in sorted(paths):
+                name = p.name
+                if not name.startswith('llm-') or not name.endswith('.json'):
+                    continue
+                configure = common.load_file(p, lambda f: json.load(f), encoding='utf-8', nolock=False)
+                priority = configure.get('llmpriority', 9999)
+                llmtype = configure.get('llmtype', 'chat')
+                results.append(dict(name=name[4:-5], path=str(p),
+                                    priority=priority if priority is not None else 9999,
+                                    type=llmtype if llmtype is not None else 'chat'))
+        data=sorted(results, key=lambda x: x.get('priority', 9999))
+        return data

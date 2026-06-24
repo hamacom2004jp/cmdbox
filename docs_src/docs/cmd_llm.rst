@@ -229,7 +229,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
           {
             "name": "string",
             "path": "string",
-            "priority": 0
+            "priority": 0,
+            "type": "string"
           }
         ]
       },
@@ -250,6 +251,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.data.name","str","yes","(必須)","名前"
     "success.data.path","str","yes","(必須)","パス"
     "success.data.priority","int","yes","(必須)","優先度"
+    "success.data.type","str","yes","(必須)","タイプ"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
