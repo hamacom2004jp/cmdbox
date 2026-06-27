@@ -115,11 +115,11 @@ class Server(filer.Filer):
         self.logger.info(f"start server. svname={self.svname}")
         ltime = time.time()
         receive_cnt = 0
-        sccess_cnt = 0
+        success_cnt = 0
         warn_cnt = 0
         error_cnt = 0
         self.redis_cli.hset(self.redis_cli.hbname, 'receive_cnt', receive_cnt)
-        self.redis_cli.hset(self.redis_cli.hbname, 'sccess_cnt', sccess_cnt)
+        self.redis_cli.hset(self.redis_cli.hbname, 'success_cnt', success_cnt)
         self.redis_cli.hset(self.redis_cli.hbname, 'warn_cnt', warn_cnt)
         self.redis_cli.hset(self.redis_cli.hbname, 'error_cnt', error_cnt)
 
@@ -167,7 +167,7 @@ class Server(filer.Filer):
                     if to_cluster and svcmd_feature.is_cluster_redirect():
                         _publish(msg_str)
                         continue
-                    if msg[0] == 'client_stop_server':
+                    if msg[0] == 'server_stop':
                         self.is_running = False
                     if self.logger.level == logging.DEBUG:
                         self.logger.debug(f"svname:{self.svname}, msg: {msg}"[:300])
@@ -182,8 +182,8 @@ class Server(filer.Filer):
                     st = self.RESP_WARN
 
                 if st==self.RESP_SUCCESS:
-                    sccess_cnt += 1
-                    self.redis_cli.hset(self.redis_cli.hbname, 'sccess_cnt', sccess_cnt)
+                    success_cnt += 1
+                    self.redis_cli.hset(self.redis_cli.hbname, 'success_cnt', success_cnt)
                 elif st==self.RESP_WARN:
                     warn_cnt += 1
                     self.redis_cli.hset(self.redis_cli.hbname, 'warn_cnt', warn_cnt)

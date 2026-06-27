@@ -5,7 +5,7 @@ const limiter_page = {};
  */
 limiter_page.get_limiter_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('limiter', 'save');
-    const vform_names = ['limiter_name', 'scope', 'target_mode', 'target_cmd', 'target_option',
+    const vform_names = ['limiter_name', 'limiter_title', 'scope', 'target_mode', 'target_cmd', 'target_option',
         'max_registrations', 'max_total_count', 'max_total_time',
         'max_total_input', 'max_total_process', 'max_total_output',
         'max_total_credits', 'service_credits',
@@ -52,6 +52,32 @@ limiter_page.fmt_bytes = (n) => {
  * null値を '-' に変換
  */
 limiter_page.fmt_val = (v) => (v == null || v === '') ? '-' : v;
+
+/**
+ * 時間差を人間が読みやすい形式に変換（例：2 hours ago）
+ */
+limiter_page.fmt_time_ago = (datestr) => {
+    if (!datestr) return '';
+    try {
+        // "2024-01-01 10:30:45" または "2024-01-01T10:30:45" をパース
+        const dt = new Date(datestr.replace(' ', 'T'));
+        if (isNaN(dt.getTime())) return '';
+        
+        const now = new Date();
+        const diff_ms = now.getTime() - dt.getTime();
+        const diff_s = Math.floor(diff_ms / 1000);
+        
+        if (diff_s < 60) return `${diff_s} seconds ago`;
+        const diff_m = Math.floor(diff_s / 60);
+        if (diff_m < 60) return `${diff_m} minute${diff_m !== 1 ? 's' : ''} ago`;
+        const diff_h = Math.floor(diff_m / 60);
+        if (diff_h < 24) return `${diff_h} hour${diff_h !== 1 ? 's' : ''} ago`;
+        const diff_d = Math.floor(diff_h / 24);
+        return `${diff_d} day${diff_d !== 1 ? 's' : ''} ago`;
+    } catch (e) {
+        return '';
+    }
+};
 
 /**
  * datetime文字列から datetime-local input 用の文字列に変換
@@ -231,7 +257,7 @@ limiter_page.render_targets = async (targets) => {
 limiter_page._render_limiter_item = (parent, lm, show_counter) => {
     const item = $(`<div class="border rounded p-2 mb-2 bg-body-tertiary"></div>`).appendTo(parent);
     const name_row = $(`<div class="d-flex align-items-center mb-1 gap-1"></div>`).appendTo(item);
-    name_row.append(`<i class="fas fa-lock fa-sm text-info me-1"></i><strong class="me-auto">${lm.limiter_name || ''}</strong>`);
+    name_row.append(`<i class="fas fa-lock fa-sm text-info me-1"></i><strong>${lm.limiter_title || ''}</strong><span class="me-auto">${' ( '+lm.limiter_name+' )' || ''}</span>`);
     name_row.append(`<span class="badge bg-secondary">${lm.scope || ''}</span>`);
     // target_mode/target_cmd
     //item.append(`<div class="mb-1"><small class="i18n me-1">Target Mode:</small><span class="badge bg-info text-dark">${limiter_page.fmt_val(lm.target_mode)}</span></div>`);
@@ -267,7 +293,8 @@ limiter_page._render_limiter_item = (parent, lm, show_counter) => {
     limiter_page.make_progress('Registrations', counter.total_registrations, lm.max_registrations, limiter_page.fmt_bytes).appendTo(progress_area);
 
     if (last_refresh) {
-        progress_area.append(`<div><small class="i18n">Last reset: </small><small>${last_refresh}</small></div>`);
+        const time_ago = limiter_page.fmt_time_ago(last_refresh);
+        limiter_page.make_progress('Last reset', `${last_refresh} (${time_ago})`, null).appendTo(progress_area);
     }
 
     // 操作ボタン

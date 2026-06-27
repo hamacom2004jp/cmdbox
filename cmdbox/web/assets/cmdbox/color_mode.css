@@ -1245,6 +1245,9 @@ body::after {
 [data-bs-theme="darkheroine"] .nav-link {
     color: var(--bs-body-bg);
 }
+[data-bs-theme="darkheroine"] .nav-tabs .nav-link {
+    color: var(--bs-body-color);
+}
 [data-bs-theme="darkheroine"] #btn_toggle_sidebar {
     color: var(--bs-body-bg);
 }

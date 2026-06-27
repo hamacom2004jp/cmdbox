@@ -499,6 +499,35 @@ class Limiter:
     CHECK_NOT_APPLICABLE = 2  # 制限が適用されない場合
     COUNTER_VALKEYS = ['total_count', 'total_time', 'total_input', 'total_process', 'total_output', 'total_credits', 'total_registrations']
 
+    # Redis Lua スクリプト: カウンタのアトミックインクリメント
+    # KEYS[1]: hash key, ARGV[1]: limiter_name, ARGV[2]: JSON deltas,
+    # ARGV[3]: last_update timestamp, ARGV[4]: '1'=reset / '0'=increment
+    _COUNTER_INCREMENT_LUA = """
+local raw = redis.call('HGET', KEYS[1], ARGV[1])
+local c
+if raw == false or ARGV[4] == '1' then
+    c = {}
+    c['last_refresh'] = ARGV[3]
+else
+    c = cjson.decode(raw)
+end
+local d = cjson.decode(ARGV[2])
+c['limiter_name']        = ARGV[1]
+c['total_count']         = (tonumber(c['total_count'])        or 0) + (tonumber(d['count'])        or 0)
+c['total_time']          = (tonumber(c['total_time'])         or 0) + (tonumber(d['exec_time'])     or 0)
+c['total_input']         = (tonumber(c['total_input'])        or 0) + (tonumber(d['input_bytes'])   or 0)
+c['total_process']       = (tonumber(c['total_process'])      or 0) + (tonumber(d['process_bytes']) or 0)
+c['total_output']        = (tonumber(c['total_output'])       or 0) + (tonumber(d['output_bytes'])  or 0)
+c['total_credits']       = (tonumber(c['total_credits'])      or 0) + (tonumber(d['credits'])       or 0)
+c['total_registrations'] = tonumber(d['registrations'])       or 0
+c['last_update']         = ARGV[3]
+if not c['last_refresh'] then
+    c['last_refresh'] = ARGV[3]
+end
+redis.call('HSET', KEYS[1], ARGV[1], cjson.encode(c))
+return cjson.encode(c)
+"""
+
     @classmethod
     def getInstance(cls, redis_client: Optional[redis_client.RedisClient] = None, flush_interval: float = 60.0, reload_interval: float = 60.0) -> 'Limiter':
         """
@@ -627,20 +656,27 @@ class Limiter:
         Returns:
             Dict[str, Any]: カウンタ
         """
-        enable = False
         if self.redis_client is not None and not load_history:
             try:
                 raw = self.redis_client.hget(f"{self.redis_client.lmtname}_{self.REDIS_COUNTER_HASH}", limiter_name)
                 if raw is not None:
                     text = raw.decode('utf-8') if isinstance(raw, bytes) else raw
                     last_json = json.loads(text)
-                enable = any(last_json.get(k) for k in self.COUNTER_VALKEYS)
-                if enable: return last_json
+                    if any(last_json.get(k) for k in self.COUNTER_VALKEYS):
+                        return last_json
             except Exception:
                 pass
         counter = self._load_counter_from_file(data_dir, limiter_name, load_history=load_history)
-        if not load_history and enable:
-            self.save_counter(data_dir, limiter_name, counter)  # Redis にも保存しておく
+        # ファイルから読んだ場合、Redis にも同期しておく（Redis 再起動後の復元）
+        if not load_history and self.redis_client is not None:
+            try:
+                self.redis_client.hset(
+                    f"{self.redis_client.lmtname}_{self.REDIS_COUNTER_HASH}",
+                    limiter_name,
+                    json.dumps(counter)
+                )
+            except Exception:
+                pass
         return counter
 
     def _load_counter_from_file(self, data_dir: Path, limiter_name: str, load_history: bool = False) -> Dict[str, Any]:
@@ -730,6 +766,46 @@ class Limiter:
         line = json.dumps(counter, ensure_ascii=False)
         common.save_file(counter_path, lambda f: f.write(line + '\n'),
                          mode='a', encoding='utf-8', nolock=False)
+
+    def _atomic_increment_redis(self, data_dir: Path, limiter_name: str,
+                                deltas: Dict[str, Any], last_update: str,
+                                reset: bool = False,
+                                max_history_interval: Optional[int] = None) -> Dict[str, Any]:
+        """
+        Redis Lua スクリプトを使用してカウンタをアトミックにインクリメントします。
+        Lua スクリプトは Redis 上でアトミックに実行されるため、
+        複数サーバープロセスが同時にカウンタを更新してもロストアップデートが発生しません。
+
+        Args:
+            data_dir (Path): データディレクトリ
+            limiter_name (str): 制限設定の識別名
+            deltas (Dict[str, Any]): 加算するデルタ値の辞書
+            last_update (str): 最終更新日時 (ISO 形式)
+            reset (bool): True の場合、カウンタを 0 にリセットしてからデルタを適用します
+            max_history_interval (Optional[int]): 履歴保持最大期間（秒）
+        Returns:
+            Dict[str, Any]: 更新後のカウンタ
+        """
+        redis_key = f"{self.redis_client.lmtname}_{self.REDIS_COUNTER_HASH}"
+        result_raw = self.redis_client.redis_cli.eval(
+            self._COUNTER_INCREMENT_LUA,
+            1,
+            redis_key,
+            limiter_name,
+            json.dumps(deltas),
+            last_update,
+            '1' if reset else '0'
+        )
+        text = result_raw.decode('utf-8') if isinstance(result_raw, bytes) else result_raw
+        counter = json.loads(text)
+        # flush_interval 秒ごとにファイルへ永続化
+        now = time.time()
+        if now - self._last_counter_flush.get(limiter_name, 0.0) >= self._flush_interval:
+            self._save_counter_to_file(data_dir, limiter_name, counter)
+            self._last_counter_flush[limiter_name] = now
+            if max_history_interval is not None:
+                self._prune_counter_history(data_dir, limiter_name, max_history_interval)
+        return counter
 
     def _init_counter(self, limiter_name: str) -> Dict[str, Any]:
         """
@@ -1033,20 +1109,33 @@ class Limiter:
 
             try:
                 counter = self.load_counter(data_dir, limiter_name)
-                if self.needs_refresh(config, counter):
-                    counter = self.reset_counter(limiter_name)
-
-                counter['total_count'] = counter.get('total_count', 0) + count
-                counter['total_time'] = counter.get('total_time', 0.0) + exec_time
-                counter['total_input'] = counter.get('total_input', 0) + input_bytes
-                counter['total_process'] = counter.get('total_process', 0) + process_bytes
-                counter['total_output'] = counter.get('total_output', 0) + output_bytes
-                counter['total_registrations'] = registrations
-                counter['total_credits'] = counter.get('total_credits', 0) + credits
-                counter['last_update'] = datetime.now().isoformat()
+                needs_reset = self.needs_refresh(config, counter)
                 max_history_interval = config.get('max_history_interval')
-                self.save_counter(data_dir, limiter_name, counter,
-                                  max_history_interval=int(max_history_interval) if max_history_interval is not None else None)
+                last_update = datetime.now().isoformat()
+                if self.redis_client is not None:
+                    # Redis が有効な場合は Lua スクリプトでアトミックにインクリメント
+                    deltas = dict(count=count, exec_time=exec_time, input_bytes=input_bytes,
+                                  process_bytes=process_bytes, output_bytes=output_bytes,
+                                  credits=credits, registrations=registrations)
+                    self._atomic_increment_redis(
+                        data_dir, limiter_name, deltas, last_update, needs_reset,
+                        max_history_interval=int(max_history_interval) if max_history_interval is not None else None
+                    )
+                else:
+                    # Redis なし: ファイルのみ（従来動作）
+                    if needs_reset:
+                        counter = self.reset_counter(limiter_name)
+                    counter['total_count'] = counter.get('total_count', 0) + count
+                    counter['total_time'] = counter.get('total_time', 0.0) + exec_time
+                    counter['total_input'] = counter.get('total_input', 0) + input_bytes
+                    counter['total_process'] = counter.get('total_process', 0) + process_bytes
+                    counter['total_output'] = counter.get('total_output', 0) + output_bytes
+                    counter['total_registrations'] = registrations
+                    counter['total_credits'] = counter.get('total_credits', 0) + credits
+                    counter['last_update'] = last_update
+                    self._save_counter_to_file(data_dir, limiter_name, counter)
+                    if max_history_interval is not None:
+                        self._prune_counter_history(data_dir, limiter_name, int(max_history_interval))
             except Exception as e:
                 logger.warning(f"Limiter.update failed for '{limiter_name}': {e}", exc_info=True)
 

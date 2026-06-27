@@ -216,6 +216,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             logger.debug(f"litellm loading..")
         from google.adk.models import lite_llm
         import litellm
+        litellm.drop_params = True
         #from litellm import _logging
         #_logging._turn_on_debug()
 

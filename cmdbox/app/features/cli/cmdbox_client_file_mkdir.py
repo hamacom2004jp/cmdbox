@@ -67,6 +67,9 @@ class ClientFileMkdir(feature.UnsupportEdgeFeature, validator.Validator, limiter
                 dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
                      description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
+                dict(opt="exist_ok", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
+                     description_ja="既に存在する場合にエラーを出さないかどうかを指定します。",
+                     description_en="Specify whether to ignore the error if the directory already exists."),
                 dict(opt="retry_count", type=Options.T_INT, default=3, required=False, multi=False, hide=True, choice=None,
                      description_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",
                      description_en="Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."),
@@ -100,7 +103,7 @@ class ClientFileMkdir(feature.UnsupportEdgeFeature, validator.Validator, limiter
         fwpaths = [str(p).replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
         rjpaths = [str(p).replace('"','') for p in args.rjpath] if args.rjpath is not None else []
         ret = cl.file_mkdir(str(args.svpath).replace('"',''), scope=args.scope, client_data=client_data, fwpaths=fwpaths, rjpaths=rjpaths,
-                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
+                            exist_ok=args.exist_ok, retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:
@@ -145,10 +148,11 @@ class ClientFileMkdir(feature.UnsupportEdgeFeature, validator.Validator, limiter
         svpath = payload.get('svpath', '/')
         fwpaths = payload.get('fwpaths', None)
         rjpaths = payload.get('rjpaths', None)
-        st = self.file_mkdir(msg[1], svpath, fwpaths, rjpaths, data_dir, logger, redis_cli, sessions)
+        exist_ok = payload.get('exist_ok', False)
+        st = self.file_mkdir(msg[1], svpath, fwpaths, rjpaths, exist_ok, data_dir, logger, redis_cli, sessions)
         return st
 
-    def file_mkdir(self, reskey:str, current_path:str, fwpaths:List[str], rjpaths:List[str],
+    def file_mkdir(self, reskey:str, current_path:str, fwpaths:List[str], rjpaths:List[str], exist_ok:bool,
                    data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ディレクトリを作成する
@@ -158,6 +162,7 @@ class ClientFileMkdir(feature.UnsupportEdgeFeature, validator.Validator, limiter
             current_path (str): ディレクトリパス
             fwpaths (List[str]): 範囲内かどうかを示すパスのリスト
             rjpaths (List[str]): 範囲外かどうかを示すパスのリスト
+            exist_ok (bool): 既に存在する場合にエラーを出さないかどうか
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
@@ -168,7 +173,7 @@ class ClientFileMkdir(feature.UnsupportEdgeFeature, validator.Validator, limiter
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_mkdir(current_path, fwpaths, rjpaths)
+            rescode, msg = f.file_mkdir(current_path, fwpaths, rjpaths, exist_ok)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

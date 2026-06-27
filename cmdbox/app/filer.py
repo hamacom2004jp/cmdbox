@@ -42,11 +42,14 @@ class Filer(object):
         if not str(abspath).startswith(str(self.data_dir)):
             self.logger.warning(f"Path {abspath} is out of data directory. current_path={current_path}")
             return False, abspath, dict(warn=f"Path {abspath} is out of data directory. current_path={current_path}")
+        # パス存在チェックを行わない場合は、パスが存在するかどうかに関わらず成功とする
         if not exists_chk:
             return True, abspath, dict(success=f"Path {abspath} not exists.")
+        # not_existsがTrueの場合は、パスが存在しないことを確認する
         if not not_exists and not abspath.exists():
             self.logger.warning(f"Path {abspath} does not exist. param={current_path}")
             return False, abspath, dict(warn=f"Path {abspath} does not exist. param={current_path}")
+        # not_existsがFalseの場合は、パスが存在することを確認する
         if not_exists and abspath.exists():
             self.logger.warning(f"Path {abspath} exist. param={current_path}")
             return False, abspath, dict(warn=f"Path {abspath} exist. param={current_path}")
@@ -185,7 +188,7 @@ class Filer(object):
             path_tree[tpath_key] = pt
         return self.RESP_SUCCESS, dict(success=path_tree)
     
-    def file_mkdir(self, current_path:str, fwpaths:List[str]=None, rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+    def file_mkdir(self, current_path:str, fwpaths:List[str]=None, rjpaths:List[str]=None, exist_ok:bool=False) -> Tuple[int, Dict[str, Any]]:
         """
         ディレクトリを作成する
 
@@ -193,27 +196,28 @@ class Filer(object):
             current_path (str): ディレクトリパス
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            exist_ok (bool, optional): 既に存在する場合にエラーを出さないかどうか. Defaults to False.
 
         Returns:
             int: レスポンスコード
             dict: メッセージ
         """
-        chk, abspath, msg = self._file_exists(current_path, not_exists=True)
+        chk, abspath, msg = self._file_exists(current_path, not_exists=True, exists_chk=not exist_ok)
         if not chk:
             return self.RESP_WARN, msg
-        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths)
+        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths, exists_chk=not exist_ok)
         if not chk:
             return self.RESP_WARN, msg
 
         try:
-            abspath.mkdir(parents=True)
+            abspath.mkdir(parents=True, exist_ok=exist_ok)
             ret_path = str(Path(current_path).parent).replace("\\","/")
             return self.RESP_SUCCESS, dict(success=dict(path=f"{ret_path}",msg=f"Created {abspath}"))
         except Exception as e:
             self.logger.warning(f"Failed to create {abspath}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to create {abspath}. {e}")
     
-    def file_rmdir(self, current_path:str, fwpaths:List[str]=None, rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+    def file_rmdir(self, current_path:str, fwpaths:List[str]=None, rjpaths:List[str]=None, notexist_ok:bool=False) -> Tuple[int, Dict[str, Any]]:
         """
         ディレクトリを削除する
 
@@ -221,15 +225,16 @@ class Filer(object):
             current_path (str): ディレクトリパス
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            notexist_ok (bool, optional): ディレクトリが存在しない場合にエラーを出さないかどうか. Defaults to False.
 
         Returns:
             int: レスポンスコード
             dict: メッセージ
         """
-        chk, abspath, msg = self._file_exists(current_path)
+        chk, abspath, msg = self._file_exists(current_path, exists_chk=not notexist_ok)
         if not chk:
             return self.RESP_WARN, msg
-        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths)
+        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths, exists_chk=not notexist_ok)
         if not chk:
             return self.RESP_WARN, msg
         if abspath == self.data_dir:
@@ -237,7 +242,7 @@ class Filer(object):
             return self.RESP_WARN, dict(warn=f"Path {abspath} is root directory.")
 
         try:
-            common.rmdirs(abspath, ignore_errors=False)
+            common.rmdirs(abspath, ignore_errors=notexist_ok)
             ret_path = str(Path(current_path).parent).replace("\\","/")
             return self.RESP_SUCCESS, dict(success=dict(path=f"{ret_path}",msg=f"Removed {abspath}"))
         except Exception as e:
@@ -339,7 +344,7 @@ class Filer(object):
             self.logger.warning(f"Failed to upload {save_path}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to upload {save_path}. {e}")
 
-    def file_remove(self, current_path:str, fwpaths:List[str]=None, rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+    def file_remove(self, current_path:str, fwpaths:List[str]=None, rjpaths:List[str]=None, notexist_ok:bool=False) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルを削除する
 
@@ -347,15 +352,16 @@ class Filer(object):
             current_path (str): ファイルパス
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            notexist_ok (bool, optional): ファイルが存在しない場合にエラーを出さないかどうか. Defaults to False.
 
         Returns:
             int: レスポンスコード
             dict: メッセージ
         """
-        chk, abspath, msg = self._file_exists(current_path)
+        chk, abspath, msg = self._file_exists(current_path, exists_chk=not notexist_ok)
         if not chk:
             return self.RESP_WARN, msg
-        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths)
+        chk, msg = self.check_fwpath(current_path, fwpaths, rjpaths, exists_chk=not notexist_ok)
         if not chk:
             return self.RESP_WARN, msg
         if abspath.is_dir():
@@ -363,7 +369,7 @@ class Filer(object):
             return self.RESP_WARN, dict(warn=f"Path {abspath} is directory.")
 
         try:
-            abspath.unlink()
+            abspath.unlink(missing_ok=notexist_ok)
             ret_path = str(Path(current_path).parent).replace("\\","/")
             return self.RESP_SUCCESS, dict(success=dict(path=ret_path, msg=f"Removed {abspath}"))
         except Exception as e:

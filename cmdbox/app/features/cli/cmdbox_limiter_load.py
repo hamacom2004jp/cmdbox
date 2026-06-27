@@ -96,6 +96,7 @@ class LimiterLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         class Configure(resdata.Base):
             scope: Union[str, None] = pydantic.Field(default=None, description="スコープ")
             limiter_name: Union[str, None] = pydantic.Field(default=None, description="制限設定の識別名")
+            limiter_title: Union[str, None] = pydantic.Field(default=None, description="制限設定の表示名")
             target_mode: Union[str, None] = pydantic.Field(default=None, description="対象コマンドのモード名")
             target_cmd: Union[str, None] = pydantic.Field(default=None, description="対象コマンドのコマンド名")
             target_option: Union[List[Dict[str, Any]], Dict[str, Any], None] = pydantic.Field(default=None, description="対象コマンドの条件")

@@ -67,6 +67,9 @@ class ClientFileRemove(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
                      description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
+                dict(opt="notexist_ok", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
+                     description_ja="既に存在しない場合にエラーを出さないかどうかを指定します。",
+                     description_en="Specify whether to ignore the error if the directory does not exist."),
                 dict(opt="retry_count", type=Options.T_INT, default=3, required=False, multi=False, hide=True, choice=None,
                      description_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",
                      description_en="Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."),
@@ -98,7 +101,8 @@ class ClientFileRemove(feature.UnsupportEdgeFeature, validator.Validator):
         client_data = Path(str(args.client_data).replace('"','')) if args.client_data is not None else None
         fwpaths = [str(p).replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
         rjpaths = [str(p).replace('"','') for p in args.rjpath] if args.rjpath is not None else []
-        ret = cl.file_remove(str(args.svpath).replace('"',''), scope=args.scope, client_data=client_data, fwpaths=fwpaths, rjpaths=rjpaths,
+        ret = cl.file_remove(str(args.svpath).replace('"',''), scope=args.scope, client_data=client_data,
+                             fwpaths=fwpaths, rjpaths=rjpaths, notexist_ok=args.notexist_ok,
                              retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
@@ -143,10 +147,11 @@ class ClientFileRemove(feature.UnsupportEdgeFeature, validator.Validator):
         svpath = payload.get("svpath")
         fwpaths = payload.get("fwpaths")
         rjpaths = payload.get("rjpaths")
-        st = self.file_remove(msg[1], svpath, fwpaths, rjpaths, data_dir, logger, redis_cli, sessions)
+        notexist_ok = payload.get("notexist_ok", False)
+        st = self.file_remove(msg[1], svpath, fwpaths, rjpaths, notexist_ok, data_dir, logger, redis_cli, sessions)
         return st
 
-    def file_remove(self, reskey:str, current_path:str, fwpaths:List[str], rjpaths:List[str],
+    def file_remove(self, reskey:str, current_path:str, fwpaths:List[str], rjpaths:List[str], notexist_ok:bool,
                    data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ファイルを削除する
@@ -156,6 +161,7 @@ class ClientFileRemove(feature.UnsupportEdgeFeature, validator.Validator):
             current_path (str): ファイルパス
             fwpaths (List[str]): 範囲内パスのリスト
             rjpaths (List[str]): 範囲外パスのリスト
+            notexist_ok (bool): ファイルが存在しない場合にエラーを出さないかどうか
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
@@ -166,7 +172,7 @@ class ClientFileRemove(feature.UnsupportEdgeFeature, validator.Validator):
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_remove(current_path, fwpaths, rjpaths)
+            rescode, msg = f.file_remove(current_path, fwpaths, rjpaths, notexist_ok)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

@@ -9,18 +9,18 @@ import json
 import pydantic
 
 
-class LimiterList(feature.OneshotResultEdgeFeature, validator.Validator):
+class LimiterPlanList(feature.OneshotResultEdgeFeature, validator.Validator):
     def get_mode(self) -> Union[str, List[str]]:
         return 'limiter'
 
     def get_cmd(self) -> str:
-        return 'list'
+        return 'plan_list'
 
     def get_option(self) -> Dict[str, Any]:
         return dict(
             use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
-            description_ja="登録済みの制限設定を一覧表示します。",
-            description_en="Lists registered limiter configurations.",
+            description_ja="登録済みのプラン設定を一覧表示します。",
+            description_en="Lists registered plan configurations.",
             choice=[
                 dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
                      description_ja="Redisサーバーのサービスホストを指定します。",
@@ -44,51 +44,13 @@ class LimiterList(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定します。",
                      description_en="Specify the maximum waiting time until the server responds."),
                 dict(opt="kwd", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
-                     description_ja="検索したい識別名を指定します。中間マッチで検索します。",
-                     description_en="Specify the identifier name to search for. Searches for partial matches."),
-                dict(opt="scope", type=Options.T_STR, default="server", required=True, multi=False, hide=False, choice=["client", "current", "server"],
-                     description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
-                     description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
+                     description_ja="検索したいプラン識別名を指定します。中間マッチで検索します。",
+                     description_en="Specify the plan identifier name to search for. Searches for partial matches."),
             ]
         )
 
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        if args.scope not in ['client', 'server']:
-            result = dict(warn="Limiters are supported only in the “client” and “server” scopes.")
-            logger.warning("Limiters are supported only in the “client” and “server” scopes.")
-            common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, result, None
-
-        if args.scope == 'client':
-            client_data = args.client_data if hasattr(args, 'client_data') else None
-            if not client_data:
-                result = dict(warn="client_data is required when scope is 'client'.")
-                logger.warning("client_data is required when scope is 'client'.")
-                common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-                return self.RESP_WARN, result, None
-            kwd = args.kwd if hasattr(args, 'kwd') and args.kwd else '*'
-            limiter_dir = Path(client_data) / ".limiter"
-            results: List[Dict[str, Any]] = []
-            if limiter_dir.exists() and limiter_dir.is_dir():
-                for p in sorted(limiter_dir.glob(f"limiter-{kwd}.json")):
-                    name = p.stem
-                    if not name.startswith('limiter-'):
-                        continue
-                    with p.open('r', encoding='utf-8') as f:
-                        cfg = json.load(f)
-                    results.append(dict(
-                        name=name[len('limiter-'):],
-                        limiter_title=cfg.get('limiter_title', None),
-                        target_mode=cfg.get('target_mode', None),
-                        target_cmd=cfg.get('target_cmd', None),
-                        target_option=cfg.get('target_option', None),
-                    ))
-            out = dict(success=dict(data=results))
-            common.print_format(out, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_SUCCESS, out, None
-
-        # scope == 'server'
         kwd = args.kwd if hasattr(args, 'kwd') else None
         payload = dict(kwd=kwd)
         payload_b64 = convert.str2b64str(common.to_str(payload))
@@ -101,16 +63,21 @@ class LimiterList(feature.OneshotResultEdgeFeature, validator.Validator):
         return self.RESP_SUCCESS, ret, cl
 
     def output_schema(self) -> type:
-        class LimiterRecord(resdata.Base):
-            name: str = pydantic.Field(..., description="制限設定の識別名")
-            limiter_title: Union[str, None] = pydantic.Field(default=None, description="制限設定の表示名")
-            target_mode: Union[str, None] = pydantic.Field(default=None, description="対象コマンドのモード名")
-            target_cmd: Union[str, None] = pydantic.Field(default=None, description="対象コマンドのコマンド名")
-            target_option: Union[List[Dict[str, Any]], Dict[str, Any], None] = pydantic.Field(default=None, description="対象コマンドの条件")
+        class PlanInfo(resdata.Base):
+            name: Union[str, None] = pydantic.Field(default=None, description="プラン識別名")
+            plan_title: Union[str, None] = pydantic.Field(default=None, description="プランのタイトル")
+            plan_desc: Union[str, None] = pydantic.Field(default=None, description="プランの説明")
+            billing_type: Union[str, None] = pydantic.Field(default=None, description="請求タイプ")
+            limiters: Union[List[str], None] = pydantic.Field(default=None, description="このプランに含まれるリミッター設定名一覧")
+            plan_start: Union[str, None] = pydantic.Field(default=None, description="プラン適用開始日時")
+            plan_end: Union[str, None] = pydantic.Field(default=None, description="プラン適用終了日時")
+
         class Data(resdata.Data):
-            data: List[LimiterRecord] = pydantic.Field(default_factory=list, description="処理結果のデータ")
+            data: Union[List[PlanInfo], None] = pydantic.Field(default=None, description="プラン設定一覧")
+
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+
         return Result
 
     def is_cluster_redirect(self):
@@ -121,29 +88,35 @@ class LimiterList(feature.OneshotResultEdgeFeature, validator.Validator):
         reskey = msg[1]
         try:
             payload = json.loads(convert.b64str2str(msg[2]))
-            kwd = payload.get('kwd') or '*'
-            limiter_dir = data_dir / '.limiter'
+            kwd = payload.get('kwd')
+            if not kwd:
+                kwd = '*'
+
+            plan_dir = data_dir / ".limiter"
             results: List[Dict[str, Any]] = []
-            if limiter_dir.exists() and limiter_dir.is_dir():
-                for p in sorted(limiter_dir.glob(f"limiter-{kwd}.json")):
+            if plan_dir.exists() and plan_dir.is_dir():
+                for p in sorted(plan_dir.glob(f"plan-{kwd}.json")):
                     name = p.stem
-                    if not name.startswith('limiter-'):
+                    if not name.startswith('plan-'):
                         continue
                     with p.open('r', encoding='utf-8') as f:
                         cfg = json.load(f)
                     results.append(dict(
-                        name=name[len('limiter-'):],
-                        limiter_title=cfg.get('limiter_title', None),
-                        target_mode=cfg.get('target_mode', None),
-                        target_cmd=cfg.get('target_cmd', None),
-                        target_option=cfg.get('target_option', None),
+                        name=name[len('plan-'):],
+                        plan_title=cfg.get('plan_title', None),
+                        plan_desc=cfg.get('plan_desc', None),
+                        billing_type=cfg.get('billing_type', None),
+                        limiters=cfg.get('limiters', []),
+                        plan_start=cfg.get('plan_start', None),
+                        plan_end=cfg.get('plan_end', None),
                     ))
-            result = dict(success=dict(data=results))
-            redis_cli.rpush(reskey, result)
+
+            out = dict(success=dict(data=results))
+            redis_cli.rpush(reskey, out)
             return self.RESP_SUCCESS
 
         except Exception as e:
-            result = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
+            out = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
-            redis_cli.rpush(reskey, result)
+            redis_cli.rpush(reskey, out)
             return self.RESP_WARN

@@ -48,42 +48,55 @@
             <input name="filer_scope" type="hidden" class="filer_scope">
             <input name="filer_client_data" type="hidden" class="filer_client_data">
         </form>
-        <!-- ツールバー -->
-        <div class="d-flex align-items-center gap-2 my-2">
-            <div class="input-group" style="width:auto;">
-                <label class="input-group-text i18n">Target Mode</label>
-                <select id="filter_target_mode" class="form-select" style="width:130px;">
-                    <option value="">all</option>
-                </select>
-            </div>
-            <div class="input-group" style="width:auto;">
-                <label class="input-group-text i18n">Target Cmd</label>
-                <select id="filter_target_cmd" class="form-select" style="width:130px;">
-                </select>
-            </div>
-            <div class="input-group" style="width:auto;">
-                <label class="input-group-text i18n">Scope</label>
-                <select id="scope_select" class="form-select" style="width:130px;">
-                    <option value="server" selected>server</option>
-                    <option value="client">client</option>
-                </select>
-            </div>
-            <button id="btn_refresh" type="button" class="btn btn-outline-secondary">
-                <i class="fas fa-sync-alt"></i>
-                <span class="i18n ms-1">Refresh</span>
-            </button>
-        </div>
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <a class="nav-link i18n active" id="targets-tab" data-bs-toggle="tab" href="#targets" role="tab" aria-controls="targets" aria-selected="true">Targets</a>
             </li>
-            <!--li class="nav-item" role="presentation">
-                <a class="nav-link i18n" id="limiters-tab" data-bs-toggle="tab" href="#limiters" role="tab" aria-controls="limiters" aria-selected="false">Limiters</a>
-            </li-->
+            <li class="nav-item" role="presentation">
+                <a class="nav-link i18n" id="plans-tab" data-bs-toggle="tab" href="#plans" role="tab" aria-controls="plans" aria-selected="false">Plans</a>
+            </li>
         </ul>
         <div class="tab-content overflow-auto" style="height:calc(100vh - 220px);">
             <div class="tab-pane fade show active p-2" id="targets" role="tabpanel" aria-labelledby="targets-tab">
+                <!-- ターゲットタブのツールバー -->
+                <div class="d-flex align-items-center gap-2 my-2">
+                    <div class="input-group" style="width:auto;">
+                        <label class="input-group-text i18n">Target Mode</label>
+                        <select id="filter_target_mode" class="form-select" style="width:130px;">
+                            <option value="">all</option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="width:auto;">
+                        <label class="input-group-text i18n">Target Cmd</label>
+                        <select id="filter_target_cmd" class="form-select" style="width:130px;">
+                        </select>
+                    </div>
+                    <div class="input-group" style="width:auto;">
+                        <label class="input-group-text i18n">Scope</label>
+                        <select id="scope_select" class="form-select" style="width:130px;">
+                            <option value="server" selected>server</option>
+                            <option value="client">client</option>
+                        </select>
+                    </div>
+                    <button id="btn_refresh" type="button" class="btn btn-outline-secondary">
+                        <i class="fas fa-sync-alt"></i>
+                        <span class="i18n ms-1">Refresh</span>
+                    </button>
+                </div>
                 <div id="targets_area" class="row g-3"></div>
+            </div>
+            <div class="tab-pane fade p-2" id="plans" role="tabpanel" aria-labelledby="plans-tab">
+                <div class="d-flex align-items-center gap-2 my-2">
+                    <button id="btn_plan_add" type="button" class="btn btn-outline-primary">
+                        <i class="fas fa-plus"></i>
+                        <span class="i18n ms-1">New Plan</span>
+                    </button>
+                    <button id="btn_plan_refresh" type="button" class="btn btn-outline-secondary">
+                        <i class="fas fa-sync-alt"></i>
+                        <span class="i18n ms-1">Refresh</span>
+                    </button>
+                </div>
+                <div id="plans_area" class="row g-3"></div>
             </div>
             <div class="tab-pane fade p-2" id="limiters" role="tabpanel" aria-labelledby="limiters-tab">
             </div>
@@ -113,6 +126,34 @@
                     <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>
                     <button id="cmd_limiter_save" type="button" class="btn btn-outline-success i18n">Save</button>
                     <button id="cmd_limiter_del" type="button" class="btn btn-outline-danger d-none i18n">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plan 追加/編集モーダル -->
+    <div id="plan_modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content novalidate">
+                <div class="modal-header doc-header">
+                    <h5 class="modal-title glow-text-cyan system-font i18n">Plan Settings</h5>
+                    <button type="button" class="btn btn-sf-icon btn_window_stack">
+                        <i class="fa-regular fa-window-restore"></i>
+                    </button>
+                    <button type="button" class="btn btn-sf-icon btn_window">
+                        <i class="fa-regular fa-window-maximize"></i>
+                    </button>
+                    <button type="button" class="btn btn-sf-icon" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+                    <form id="plan_form_content" class="row"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>
+                    <button id="cmd_plan_save" type="button" class="btn btn-outline-success i18n">Save</button>
+                    <button id="cmd_plan_del" type="button" class="btn btn-outline-danger d-none i18n">Delete</button>
                 </div>
             </div>
         </div>
@@ -186,5 +227,6 @@
 <script type="text/javascript" src="assets/cmdbox/common.js"></script>
 <script type="text/javascript" src="assets/cmdbox/list_cmd.js"></script>
 <script type="text/javascript" src="assets/limiter/limiter.js"></script>
+<script type="text/javascript" src="assets/limiter/limiter_plan.js"></script>
 <script type="text/javascript" src="assets/limiter/main.js"></script>
 </html>

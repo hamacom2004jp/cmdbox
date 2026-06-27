@@ -69,6 +69,9 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
                              + "}",
                      description_ja="対象コマンドで絞り込みます。指定した場合、そのコマンドのみの結果を返します。",
                      description_en="Filter by target command. If specified, returns results for that command only."),
+                dict(opt="filter_limiter_name", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja="リミッター名で絞り込みます。指定した場合、そのリミッター名のみの結果を返します。",
+                     description_en="Filter by limiter name. If specified, returns results for that limiter only."),
             ]
         )
 
@@ -108,15 +111,10 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
             return st, res, None
         lt = res.get('success', {}).get('data', [])
 
-        def _load_counter(limiter_name: str) -> Dict[str, Any]:
-            st, res, _ = self.limiter_counter.apprun(logger, args, tm, pf)
-            if st != self.RESP_SUCCESS:
-                return {}
-            return res.get('success', {}).get('data', {})
-
         # 絞り込み条件を取得
         filter_target_mode = getattr(args, 'filter_target_mode', None)
         filter_target_cmd = getattr(args, 'filter_target_cmd', None)
+        filter_limiter_name = getattr(args, 'filter_limiter_name', None)
 
         for mode in options.get_mode_keys():
             # target_mode で絞り込み
@@ -135,6 +133,10 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
                 feat_cmd = feat.get_cmd()
                 matched_limiters: List[Dict[str, Any]] = []
                 for entry in lt:
+                    # limiter_name で絞り込み
+                    if filter_limiter_name and str(entry['name']) != str(filter_limiter_name):
+                        continue
+
                     if not self._limiter_matches(entry, feat_mode, feat_cmd):
                         continue
                     load_args = copy.copy(args)
@@ -147,13 +149,14 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
                         cfg = {'limiter_name': entry['name']}
                     cfg = {k:v for k,v in cfg.items() if v}
                     # Counter を取得
-                    args.limiter_name = entry['name']
-                    st, res, _ = self.limiter_counter.apprun(logger, args, tm, pf)
+                    st, res, _ = self.limiter_counter.apprun(logger, load_args, tm, pf)
                     if st != self.RESP_SUCCESS:
                         cfg['counter'] = {}
                     else:
                         cfg['counter'] = res.get('success', {}).get('data', {})
                     matched_limiters.append(cfg)
+                if filter_limiter_name and not matched_limiters:
+                    continue
                 results.append(dict(
                     mode=feat_mode,
                     cmd=feat_cmd,

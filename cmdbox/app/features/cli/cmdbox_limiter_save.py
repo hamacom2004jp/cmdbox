@@ -47,6 +47,9 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="limiter_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="制限設定の識別名を指定します。",
                      description_en="Specify the identifier name of the limiter configuration."),
+                dict(opt="limiter_title", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja="制限設定の表示名を指定します。",
+                     description_en="Specify the display name of the limiter configuration."),
                 dict(opt="scope", type=Options.T_STR, default="server", required=True, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
                      description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
@@ -126,6 +129,7 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
         configure = dict(
             scope=args.scope,
             limiter_name=args.limiter_name,
+            limiter_title=args.limiter_title if hasattr(args, 'limiter_title') else None,
             target_mode=args.target_mode if hasattr(args, 'target_mode') else None,
             target_cmd=args.target_cmd if hasattr(args, 'target_cmd') else None,
             target_option=args.target_option if hasattr(args, 'target_option') else None,

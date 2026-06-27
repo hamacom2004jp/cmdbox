@@ -42,7 +42,7 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
-        res_json = self.redis_cli.send_cmd('client_stop_server', [], retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+        res_json = self.redis_cli.send_cmd('server_stop', [], retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         return res_json
     
     def file_list(self, svpath:str, recursive:bool, scope:str="client", client_data:Path=None,
@@ -88,7 +88,7 @@ class Client(object):
             return dict(warn=f"scope is invalid. {scope}")
 
     def file_mkdir(self, svpath:str, scope:str="client", client_data:Path=None,
-                   fwpaths:List[str]=None, rjpaths:List[str]=None,
+                   fwpaths:List[str]=None, rjpaths:List[str]=None, exist_ok:bool=False,
                    retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバー上にディレクトリを作成する
@@ -99,6 +99,7 @@ class Client(object):
             client_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            exist_ok (bool, optional): 既に存在する場合にエラーを出さないかどうか. Defaults to False.
             retry_count (int, optional): リトライ回数. Defaults to 3.
             retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
@@ -109,17 +110,17 @@ class Client(object):
         if scope == "client":
             if client_data is not None:
                 f = filer.Filer(client_data, self.logger)
-                _, res_json = f.file_mkdir(svpath, fwpaths, rjpaths)
+                _, res_json = f.file_mkdir(svpath, fwpaths, rjpaths, exist_ok)
                 return res_json
             else:
                 self.logger.warning(f"client_data is empty.")
                 return dict(warn=f"client_data is empty.")
         elif scope == "current":
             f = filer.Filer(Path.cwd(), self.logger)
-            _, res_json = f.file_mkdir(svpath, fwpaths, rjpaths)
+            _, res_json = f.file_mkdir(svpath, fwpaths, rjpaths, exist_ok)
             return res_json
         elif scope == "server":
-            payload = dict(svpath=svpath, fwpaths=fwpaths, rjpaths=rjpaths)
+            payload = dict(svpath=svpath, fwpaths=fwpaths, rjpaths=rjpaths, exist_ok=exist_ok)
             payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
             res_json = self.redis_cli.send_cmd('client_file_mkdir', [payload_b64],
                                             retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
@@ -129,7 +130,7 @@ class Client(object):
             return dict(warn=f"scope is invalid. {scope}")
     
     def file_rmdir(self, svpath:str, scope:str="client", client_data:Path=None,
-                   fwpaths:List[str]=None, rjpaths:List[str]=None,
+                   fwpaths:List[str]=None, rjpaths:List[str]=None, notexist_ok:bool=False,
                    retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバー上のディレクトリを削除する
@@ -140,6 +141,7 @@ class Client(object):
             client_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            notexist_ok (bool, optional): ディレクトリが存在しない場合にエラーを出さないかどうか. Defaults to False.
             retry_count (int, optional): リトライ回数. Defaults to 3.
             retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
@@ -150,17 +152,17 @@ class Client(object):
         if scope == "client":
             if client_data is not None:
                 f = filer.Filer(client_data, self.logger)
-                _, res_json = f.file_rmdir(svpath, fwpaths, rjpaths)
+                _, res_json = f.file_rmdir(svpath, fwpaths, rjpaths, notexist_ok)
                 return res_json
             else:
                 self.logger.warning(f"client_data is empty.")
                 return dict(warn=f"client_data is empty.")
         elif scope == "current":
             f = filer.Filer(Path.cwd(), self.logger)
-            _, res_json = f.file_rmdir(svpath, fwpaths, rjpaths)
+            _, res_json = f.file_rmdir(svpath, fwpaths, rjpaths, notexist_ok)
             return res_json
         elif scope == "server":
-            payload = dict(svpath=svpath, fwpaths=fwpaths, rjpaths=rjpaths)
+            payload = dict(svpath=svpath, fwpaths=fwpaths, rjpaths=rjpaths, notexist_ok=notexist_ok)
             payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
             res_json = self.redis_cli.send_cmd('client_file_rmdir', [payload_b64],
                                             retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
@@ -284,7 +286,7 @@ class Client(object):
                 return dict(warn=f"scope is invalid. {scope}")
 
     def file_remove(self, svpath:str, scope:str="client", client_data:Path = None,
-                    fwpaths:List[str]=None, rjpaths:List[str]=None,
+                    fwpaths:List[str]=None, rjpaths:List[str]=None, notexist_ok:bool=False,
                     retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバー上のファイルを削除する
@@ -295,6 +297,7 @@ class Client(object):
             client_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            notexist_ok (bool, optional): ファイルが存在しない場合にエラーを出さないかどうか. Defaults to False.
             retry_count (int, optional): リトライ回数. Defaults to 3.
             retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
@@ -305,17 +308,17 @@ class Client(object):
         if scope == "client":
             if client_data is not None:
                 f = filer.Filer(client_data, self.logger)
-                _, res_json = f.file_remove(svpath, fwpaths, rjpaths)
+                _, res_json = f.file_remove(svpath, fwpaths, rjpaths, notexist_ok)
                 return res_json
             else:
                 self.logger.warning(f"client_data is empty.")
                 return dict(warn=f"client_data is empty.")
         elif scope == "current":
             f = filer.Filer(Path.cwd(), self.logger)
-            _, res_json = f.file_remove(svpath, fwpaths, rjpaths)
+            _, res_json = f.file_remove(svpath, fwpaths, rjpaths, notexist_ok)
             return res_json
         elif scope == "server":
-            payload = dict(svpath=svpath, fwpaths=fwpaths, rjpaths=rjpaths)
+            payload = dict(svpath=svpath, fwpaths=fwpaths, rjpaths=rjpaths, notexist_ok=notexist_ok)
             payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
             res_json = self.redis_cli.send_cmd('client_file_remove', [payload_b64],
                                             retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
