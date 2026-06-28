@@ -119,6 +119,9 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                      choice=[3600, 3600*24, 3600*24*31, 3600*24*366], choice_edit=True,
                      description_ja="カウンター履歴を保持する最大期間（秒）を指定します。指定した秒数を超えた履歴は削除されます。",
                      description_en="Specify the maximum duration (in seconds) for which counter history will be retained. History older than the specified number of seconds will be deleted."),
+                dict(opt="history_end", type=Options.T_DATETIME, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja="カウンターの記録を行う最終日時を指定します（例: 2024-12-31T23:59:59）。指定した日時以降はカウンターの更新を行いません。省略時は制限しません。",
+                     description_en="Specify the final datetime to record the counter (e.g. 2024-12-31T23:59:59). After this datetime, the counter will not be updated. If omitted, no limit is applied."),
             ]
         )
 
@@ -145,6 +148,26 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, result, None
 
+        # Validate reset_datetime and exec_period_start
+        reset_datetime = args.reset_datetime if hasattr(args, 'reset_datetime') and args.reset_datetime is not None else None
+        exec_period_start = args.exec_period_start if hasattr(args, 'exec_period_start') and args.exec_period_start is not None else None
+        if reset_datetime and exec_period_start:
+            if str(reset_datetime) > str(exec_period_start):
+                result = dict(warn=f"reset_datetime ({reset_datetime}) must be equal to or earlier than exec_period_start ({exec_period_start}).")
+                logger.warning(result['warn'])
+                common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, result, None
+
+        # Validate history_end and exec_period_end
+        history_end = args.history_end if hasattr(args, 'history_end') and args.history_end is not None else None
+        exec_period_end = args.exec_period_end if hasattr(args, 'exec_period_end') and args.exec_period_end is not None else None
+        if history_end and exec_period_end:
+            if str(history_end) < str(exec_period_end):
+                result = dict(warn=f"history_end ({history_end}) must be equal to or later than exec_period_end ({exec_period_end}).")
+                logger.warning(result['warn'])
+                common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, result, None
+
         configure = dict(
             scope=args.scope,
             limiter_name=args.limiter_name,
@@ -166,6 +189,7 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
             reset_period_unit=args.reset_period_unit if hasattr(args, 'reset_period_unit') else None,
             reset_period_qty=args.reset_period_qty if hasattr(args, 'reset_period_qty') else None,
             max_history_interval=args.max_history_interval if hasattr(args, 'max_history_interval') else None,
+            history_end=str(args.history_end) if hasattr(args, 'history_end') and args.history_end is not None else None,
         )
 
         if args.scope == 'client':
@@ -215,6 +239,24 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 out = dict(warn="limiter_name is required.")
                 redis_cli.rpush(reskey, out)
                 return self.RESP_WARN
+
+            # Validate reset_datetime and exec_period_start
+            reset_datetime = configure.get('reset_datetime')
+            exec_period_start = configure.get('exec_period_start')
+            if reset_datetime and exec_period_start:
+                if reset_datetime > exec_period_start:
+                    out = dict(warn=f"reset_datetime ({reset_datetime}) must be equal to or earlier than exec_period_start ({exec_period_start}).")
+                    redis_cli.rpush(reskey, out)
+                    return self.RESP_WARN
+
+            # Validate history_end and exec_period_end
+            history_end = configure.get('history_end')
+            exec_period_end = configure.get('exec_period_end')
+            if history_end and exec_period_end:
+                if history_end < exec_period_end:
+                    out = dict(warn=f"history_end ({history_end}) must be equal to or later than exec_period_end ({exec_period_end}).")
+                    redis_cli.rpush(reskey, out)
+                    return self.RESP_WARN
 
             # プラン設定でこのリミッターが使用されていないか確認
             limiter_dir = data_dir / ".limiter"

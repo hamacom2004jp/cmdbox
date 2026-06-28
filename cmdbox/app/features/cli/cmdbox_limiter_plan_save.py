@@ -206,8 +206,32 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 redis_cli.rpush(reskey, out)
                 return self.RESP_WARN
 
-            # plan_start とリミッターの reset_datetime を比較
+            # plan_start は open_date 以降、plan_end は suspend_date 以前であることを確認
             plan_start = configure.get('plan_start')
+            plan_end = configure.get('plan_end')
+            open_date = configure.get('open_date')
+            suspend_date = configure.get('suspend_date')
+            try:
+                from datetime import datetime as _dt
+                if plan_start and open_date:
+                    if _dt.fromisoformat(plan_start) < _dt.fromisoformat(open_date):
+                        out = dict(warn=f"plan_start '{plan_start}' must be on or after open_date '{open_date}'.")
+                        logger.warning(out)
+                        redis_cli.rpush(reskey, out)
+                        return self.RESP_WARN
+                if plan_end and suspend_date:
+                    if _dt.fromisoformat(plan_end) > _dt.fromisoformat(suspend_date):
+                        out = dict(warn=f"plan_end '{plan_end}' must be on or before suspend_date '{suspend_date}'.")
+                        logger.warning(out)
+                        redis_cli.rpush(reskey, out)
+                        return self.RESP_WARN
+            except (ValueError, TypeError) as e:
+                out = dict(warn=f"Invalid datetime format in plan dates: {e}")
+                logger.warning(out)
+                redis_cli.rpush(reskey, out)
+                return self.RESP_WARN
+
+            # plan_start とリミッターの reset_datetime を比較
             limiters = configure.get('limiters', [])
             if plan_start and limiters:
                 mismatched_limiters = []
@@ -265,6 +289,49 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                         logger.warning(out)
                         redis_cli.rpush(reskey, out)
                         return self.RESP_WARN
+
+            # open_date/suspend_date とリミッターの exec_period_start/exec_period_end を比較
+            if (open_date or suspend_date) and limiters:
+                mismatched_dates = []
+                for limiter_name in limiters:
+                    try:
+                        limiter_config = self.limiter_load._load_limiter_config(data_dir, limiter_name)
+                        exec_period_start = limiter_config.get('exec_period_start')
+                        exec_period_end = limiter_config.get('exec_period_end')
+                        if open_date and exec_period_start != open_date:
+                            mismatched_dates.append(
+                                f"{limiter_name}: exec_period_start={exec_period_start} (expected open_date={open_date})")
+                        if suspend_date and exec_period_end != suspend_date:
+                            mismatched_dates.append(
+                                f"{limiter_name}: exec_period_end={exec_period_end} (expected suspend_date={suspend_date})")
+                    except FileNotFoundError:
+                        mismatched_dates.append(f"Limiter configuration '{limiter_name}' not found")
+                    except Exception as e:
+                        mismatched_dates.append(f"Failed to load limiter config for '{limiter_name}': {e}")
+                if mismatched_dates:
+                    out = dict(warn=f"The open_date/suspend_date does not match the exec_period_start/exec_period_end of the following limiters: {', '.join(mismatched_dates)}")
+                    logger.warning(out)
+                    redis_cli.rpush(reskey, out)
+                    return self.RESP_WARN
+
+            # plan_end とリミッターの history_end を比較
+            if plan_end and limiters:
+                mismatched_history_end = []
+                for limiter_name in limiters:
+                    try:
+                        limiter_config = self.limiter_load._load_limiter_config(data_dir, limiter_name)
+                        history_end = limiter_config.get('history_end')
+                        if history_end and history_end != plan_end:
+                            mismatched_history_end.append(f"{limiter_name}: history_end={history_end} (expected plan_end={plan_end})")
+                    except FileNotFoundError:
+                        mismatched_history_end.append(f"Limiter configuration '{limiter_name}' not found")
+                    except Exception as e:
+                        mismatched_history_end.append(f"Failed to load limiter config for '{limiter_name}': {e}")
+                if mismatched_history_end:
+                    out = dict(warn=f"The plan_end '{plan_end}' does not match the history_end of the following limiters: {', '.join(mismatched_history_end)}")
+                    logger.warning(out)
+                    redis_cli.rpush(reskey, out)
+                    return self.RESP_WARN
 
             configure_path = data_dir / ".limiter" / f"plan-{plan_name}.json"
             configure_path.parent.mkdir(parents=True, exist_ok=True)

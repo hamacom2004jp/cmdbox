@@ -10,7 +10,7 @@ limiter_page.get_limiter_form_def = async () => {
         'max_total_input', 'max_total_process', 'max_total_output',
         'max_total_credits', 'service_credits',
         'exec_period_start', 'exec_period_end',
-        'reset_datetime', 'reset_period_unit', 'reset_period_qty', 'max_history_interval'];
+        'reset_datetime', 'reset_period_unit', 'reset_period_qty', 'max_history_interval', 'history_end'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };

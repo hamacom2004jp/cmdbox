@@ -83,6 +83,7 @@ class LimiterList(feature.OneshotResultEdgeFeature, validator.Validator):
                         target_mode=cfg.get('target_mode', None),
                         target_cmd=cfg.get('target_cmd', None),
                         target_option=cfg.get('target_option', None),
+                        history_end=cfg.get('history_end', None),
                     ))
             out = dict(success=dict(data=results))
             common.print_format(out, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -107,6 +108,7 @@ class LimiterList(feature.OneshotResultEdgeFeature, validator.Validator):
             target_mode: Union[str, None] = pydantic.Field(default=None, description="対象コマンドのモード名")
             target_cmd: Union[str, None] = pydantic.Field(default=None, description="対象コマンドのコマンド名")
             target_option: Union[List[Dict[str, Any]], Dict[str, Any], None] = pydantic.Field(default=None, description="対象コマンドの条件")
+            history_end: Union[str, None] = pydantic.Field(default=None, description="カウンター記録の最終日時")
         class Data(resdata.Data):
             data: List[LimiterRecord] = pydantic.Field(default_factory=list, description="処理結果のデータ")
         class Result(resdata.Result):
@@ -137,6 +139,7 @@ class LimiterList(feature.OneshotResultEdgeFeature, validator.Validator):
                         target_mode=cfg.get('target_mode', None),
                         target_cmd=cfg.get('target_cmd', None),
                         target_option=cfg.get('target_option', None),
+                        history_end=cfg.get('history_end', None),
                     ))
             result = dict(success=dict(data=results))
             redis_cli.rpush(reskey, result)

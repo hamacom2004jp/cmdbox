@@ -1199,6 +1199,15 @@ return cjson.encode(c)
                 continue
 
             try:
+                # history_end が設定されていて現在時刻が超過している場合はカウンター更新をスキップ
+                history_end_str = config.get('history_end')
+                if history_end_str:
+                    try:
+                        if datetime.now() > datetime.fromisoformat(history_end_str):
+                            continue
+                    except (ValueError, TypeError):
+                        pass
+
                 counter = self.load_counter(data_dir, limiter_name)
                 needs_reset = self.needs_reset(config, counter)
                 max_history_interval = config.get('max_history_interval')

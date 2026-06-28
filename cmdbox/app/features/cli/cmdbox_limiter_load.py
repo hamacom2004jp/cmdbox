@@ -114,6 +114,7 @@ class LimiterLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             reset_period_unit: Union[str, None] = pydantic.Field(default=None, description="リセット単位（hour/day/month/year）")
             reset_period_qty: Union[int, None] = pydantic.Field(default=None, description="リセット間隔の数量")
             max_history_interval: Union[float, None] = pydantic.Field(default=None, description="履歴保存期間の最大間隔（秒）")
+            history_end: Union[str, None] = pydantic.Field(default=None, description="カウンター記録の最終日時")
         class Data(resdata.Data):
             data: Union[Configure, None] = pydantic.Field(default=None, description="処理結果のデータ")
         class Result(resdata.Result):
