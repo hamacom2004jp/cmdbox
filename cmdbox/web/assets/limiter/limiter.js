@@ -10,7 +10,7 @@ limiter_page.get_limiter_form_def = async () => {
         'max_total_input', 'max_total_process', 'max_total_output',
         'max_total_credits', 'service_credits',
         'exec_period_start', 'exec_period_end',
-        'refresh_datetime', 'refresh_interval', 'max_history_interval'];
+        'reset_datetime', 'reset_period_unit', 'reset_period_qty', 'max_history_interval'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };
@@ -76,6 +76,22 @@ limiter_page.fmt_time_ago = (datestr) => {
         return `${diff_d} day${diff_d !== 1 ? 's' : ''} ago`;
     } catch (e) {
         return '';
+    }
+};
+
+/**
+ * datetime文字列を人間が読みやすい形式に変換（例：2024-01-01 10:30:45）
+ */
+limiter_page.fmt_datetime = (datestr) => {
+    if (!datestr) return '-';
+    try {
+        const parts = datestr.split('T');
+        if (parts.length !== 2) return datestr;
+        const date_part = parts[0];
+        const time_part = parts[1].split('.')[0];
+        return `${date_part} ${time_part}`;
+    } catch (e) {
+        return datestr || '-';
     }
 };
 
@@ -146,10 +162,28 @@ limiter_page.init_filter_options = async () => {
         if (target_mode_opt && target_mode_opt.choice) {
             const mode_select = $('#filter_target_mode');
             mode_select.empty();
+            mode_select.append('<option value="">all</option>');
             target_mode_opt.choice.forEach(mode => {
                 const val = typeof mode === 'object' ? Object.keys(mode)[0] : mode;
                 mode_select.append(`<option value="${val}">${val}</option>`);
             });
+        }
+        
+        // リミッター一覧を取得して filter_limiter_name を初期化
+        const scope = limiter_page.get_scope();
+        const list_res = await cmdbox.sv_exec_cmd({ mode: 'limiter', cmd: 'list', scope: scope });
+        if (list_res) {
+            const data_list = Array.isArray(list_res) ? list_res : [list_res];
+            const first = data_list[0];
+            if (first && first['success'] && Array.isArray(first['success']['data'])) {
+                const limiters = first['success']['data'];
+                const limiter_select = $('#filter_limiter_name');
+                limiter_select.empty();
+                limiter_select.append('<option value="">all</option>');
+                limiters.forEach(lm => {
+                    limiter_select.append(`<option value="${lm.name}">${lm.name}</option>`);
+                });
+            }
         }
     } catch (e) {
         console.log('Failed to init filter options:', e);
@@ -173,13 +207,14 @@ limiter_page.init_filter_cmds = async (mode) => {
 };
 
 /**
- * Targets タブのデータを読み込んで描画
+ * limiters タブのデータを読み込んで描画
  */
 limiter_page.load_targets = async () => {
     cmdbox.show_loading();
     const scope = limiter_page.get_scope();
     const filter_target_mode = $('#filter_target_mode').val();
     const filter_target_cmd = $('#filter_target_cmd').val();
+    const filter_limiter_name = $('#filter_limiter_name').val();
     
     const payload = {
         mode: 'limiter',
@@ -189,6 +224,7 @@ limiter_page.load_targets = async () => {
     // フィルタ条件がある場合のみ追加
     if (filter_target_mode) payload.filter_target_mode = filter_target_mode.trim();
     if (filter_target_cmd) payload.filter_target_cmd = filter_target_cmd.trim();
+    if (filter_limiter_name) payload.filter_limiter_name = filter_limiter_name.trim();
     
     let res;
     try {
@@ -210,10 +246,10 @@ limiter_page.load_targets = async () => {
 };
 
 /**
- * Targets タブの描画
+ * limiters タブの描画
  */
 limiter_page.render_targets = async (targets) => {
-    const area = $('#targets_area').empty();
+    const area = $('#limiters_area').empty();
     if (!targets || targets.length === 0) {
         area.append('<div class="col-12 text-muted p-3 i18n">No LimitedFeature targets found.</div>');
         return;
@@ -252,7 +288,7 @@ limiter_page.render_targets = async (targets) => {
 
 
 /**
- * 制限設定カードアイテムを親要素に追加 (Targets ビュー内)
+ * 制限設定カードアイテムを親要素に追加 (limiters ビュー内)
  */
 limiter_page._render_limiter_item = (parent, lm, show_counter) => {
     const item = $(`<div class="border rounded p-2 mb-2 bg-body-tertiary"></div>`).appendTo(parent);
@@ -271,17 +307,17 @@ limiter_page._render_limiter_item = (parent, lm, show_counter) => {
     if (lm.exec_period_start || lm.exec_period_end) {
         item.append(`<div class="mb-1"><small class="i18n me-1">Period: </small><small>${limiter_page.fmt_val(lm.exec_period_start)} ~ ${limiter_page.fmt_val(lm.exec_period_end)}</small></div>`);
     }
-    // リフレッシュ
-    if (lm.refresh_interval || lm.refresh_datetime) {
+    // リセット
+    if (lm.reset_datetime || lm.reset_period_unit && lm.reset_period_qty) {
         let rf = '';
-        if (lm.refresh_interval) rf += `<small class="i18n">every </small><small>${lm.refresh_interval}s</small> `;
-        if (lm.refresh_datetime) rf += `<small class="i18n">reset at </small><small>${lm.refresh_datetime}</small>`;
-        item.append(`<div class="mb-1"><small class="i18n">Refresh: </small>${rf}</div>`);
+        if (lm.reset_datetime) rf += limiter_page.fmt_datetime(lm.reset_datetime);
+        if (lm.reset_period_unit && lm.reset_period_qty) rf += ` (every ${lm.reset_period_qty} ${lm.reset_period_unit})`;
+        limiter_page.make_progress('Reset', rf, null, null).appendTo(item);
     }
 
     // 制限値とカウンター
     const counter = lm.counter || {};
-    const last_refresh = counter.last_refresh;
+    const last_reset = counter.last_reset;
     const progress_area = $(`<div class="mt-1"></div>`).appendTo(item);
 
     limiter_page.make_progress('Count', counter.total_count, lm.max_total_count, limiter_page.fmt_num).appendTo(progress_area);
@@ -290,11 +326,12 @@ limiter_page._render_limiter_item = (parent, lm, show_counter) => {
     limiter_page.make_progress('Process', counter.total_process, lm.max_total_process, limiter_page.fmt_bytes).appendTo(progress_area);
     limiter_page.make_progress('Output', counter.total_output, lm.max_total_output, limiter_page.fmt_bytes).appendTo(progress_area);
     limiter_page.make_progress('Credits', counter.total_credits, lm.max_total_credits, limiter_page.fmt_num, lm.service_credits).appendTo(progress_area);
-    limiter_page.make_progress('Registrations', counter.total_registrations, lm.max_registrations, limiter_page.fmt_bytes).appendTo(progress_area);
+    limiter_page.make_progress('Registrations', counter.total_registrations, lm.max_registrations, limiter_page.fmt_num).appendTo(progress_area);
 
-    if (last_refresh) {
-        const time_ago = limiter_page.fmt_time_ago(last_refresh);
-        limiter_page.make_progress('Last reset', `${last_refresh} (${time_ago})`, null).appendTo(progress_area);
+    if (last_reset) {
+        const time_ago = limiter_page.fmt_time_ago(last_reset);
+        const formatted_datetime = limiter_page.fmt_datetime(last_reset);
+        limiter_page.make_progress('Last reset', `${formatted_datetime} (${time_ago})`, null).appendTo(progress_area);
     }
 
     // 操作ボタン
@@ -369,7 +406,7 @@ limiter_page.open_edit_modal = async (name, defaults) => {
     Object.keys(cfg).forEach(key => {
         const input = form.find(`[name="${key}"]`);
         if (input.length > 0) {
-            if (key === 'exec_period_start' || key === 'exec_period_end' || key === 'refresh_datetime') {
+            if (key === 'exec_period_start' || key === 'exec_period_end' || key === 'reset_datetime') {
                 // datetime 型は変換が必要
                 input.val(limiter_page.to_dt_local(cfg[key]));
             } else {
@@ -464,7 +501,7 @@ limiter_page.delete_limiter = async (name) => {
 };
 
 /**
- * Targets タブのデータを再読み込み
+ * limiters タブのデータを再読み込み
  */
 limiter_page.refresh_all = async () => {
     await limiter_page.load_targets();

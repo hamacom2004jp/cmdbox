@@ -50,14 +50,14 @@
         </form>
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <a class="nav-link i18n active" id="targets-tab" data-bs-toggle="tab" href="#targets" role="tab" aria-controls="targets" aria-selected="true">Targets</a>
+                <a class="nav-link i18n active" id="plans-tab" data-bs-toggle="tab" href="#plans" role="tab" aria-controls="plans" aria-selected="true">Plans</a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link i18n" id="plans-tab" data-bs-toggle="tab" href="#plans" role="tab" aria-controls="plans" aria-selected="false">Plans</a>
+                <a class="nav-link i18n" id="limiters-tab" data-bs-toggle="tab" href="#limiters" role="tab" aria-controls="limiters" aria-selected="false">Limiters</a>
             </li>
         </ul>
-        <div class="tab-content overflow-auto" style="height:calc(100vh - 220px);">
-            <div class="tab-pane fade show active p-2" id="targets" role="tabpanel" aria-labelledby="targets-tab">
+        <div class="tab-content overflow-auto" style="height:calc(100vh - 165px);">
+            <div class="tab-pane fade p-2" id="limiters" role="tabpanel" aria-labelledby="limiters-tab">
                 <!-- ターゲットタブのツールバー -->
                 <div class="d-flex align-items-center gap-2 my-2">
                     <div class="input-group" style="width:auto;">
@@ -72,6 +72,12 @@
                         </select>
                     </div>
                     <div class="input-group" style="width:auto;">
+                        <label class="input-group-text i18n">Limiter Name</label>
+                        <select id="filter_limiter_name" class="form-select" style="width:130px;">
+                            <option value="">all</option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="width:auto;">
                         <label class="input-group-text i18n">Scope</label>
                         <select id="scope_select" class="form-select" style="width:130px;">
                             <option value="server" selected>server</option>
@@ -83,9 +89,9 @@
                         <span class="i18n ms-1">Refresh</span>
                     </button>
                 </div>
-                <div id="targets_area" class="row g-3"></div>
+                <div id="limiters_area" class="row g-3"></div>
             </div>
-            <div class="tab-pane fade p-2" id="plans" role="tabpanel" aria-labelledby="plans-tab">
+            <div class="tab-pane fade show active p-2" id="plans" role="tabpanel" aria-labelledby="plans-tab">
                 <div class="d-flex align-items-center gap-2 my-2">
                     <button id="btn_plan_add" type="button" class="btn btn-outline-primary">
                         <i class="fas fa-plus"></i>

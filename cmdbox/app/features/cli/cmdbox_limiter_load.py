@@ -110,8 +110,9 @@ class LimiterLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             service_credits: Union[int, None] = pydantic.Field(default=None, description="サービスクレジット数")
             exec_period_start: Union[str, None] = pydantic.Field(default=None, description="実行可能期間の開始日時")
             exec_period_end: Union[str, None] = pydantic.Field(default=None, description="実行可能期間の終了日時")
-            refresh_datetime: Union[str, None] = pydantic.Field(default=None, description="カウンタリセット日時")
-            refresh_interval: Union[float, None] = pydantic.Field(default=None, description="カウンタリセット間隔（秒）")
+            reset_datetime: Union[str, None] = pydantic.Field(default=None, description="カウンタリセット日時")
+            reset_period_unit: Union[str, None] = pydantic.Field(default=None, description="リセット単位（hour/day/month/year）")
+            reset_period_qty: Union[int, None] = pydantic.Field(default=None, description="リセット間隔の数量")
             max_history_interval: Union[float, None] = pydantic.Field(default=None, description="履歴保存期間の最大間隔（秒）")
         class Data(resdata.Data):
             data: Union[Configure, None] = pydantic.Field(default=None, description="処理結果のデータ")
@@ -121,6 +122,15 @@ class LimiterLoad(feature.OneshotResultEdgeFeature, validator.Validator):
 
     def is_cluster_redirect(self):
         return False
+
+    def _load_limiter_config(self, data_dir: Path, limiter_name: str) -> Dict[str, Any]:
+        """Load limiter configuration from file (internal helper method)"""
+        configure_path = data_dir / ".limiter" / f"limiter-{limiter_name}.json"
+        if not configure_path.exists():
+            raise FileNotFoundError(f"Limiter configuration '{limiter_name}' not found at '{configure_path}'.")
+        
+        with configure_path.open('r', encoding='utf-8') as f:
+            return json.load(f)
 
     def svrun(self, data_dir: Path, logger: logging.Logger, redis_cli: redis_client.RedisClient, msg: List[str],
               sessions: Dict[str, Dict[str, Any]]) -> int:
@@ -133,14 +143,13 @@ class LimiterLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                 redis_cli.rpush(reskey, result)
                 return self.RESP_WARN
 
-            configure_path = data_dir / ".limiter" / f"limiter-{limiter_name}.json"
-            if not configure_path.exists():
-                result = dict(warn=f"Limiter configuration '{limiter_name}' not found at '{configure_path}'.")
+            try:
+                configure = self._load_limiter_config(data_dir, limiter_name)
+            except FileNotFoundError as e:
+                result = dict(warn=str(e))
                 redis_cli.rpush(reskey, result)
                 return self.RESP_WARN
-
-            with configure_path.open('r', encoding='utf-8') as f:
-                configure = json.load(f)
+            
             result = dict(success=dict(data=configure))
             redis_cli.rpush(reskey, result)
             return self.RESP_SUCCESS

@@ -1,6 +1,7 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
+from cmdbox.app.features.cli import cmdbox_limiter_counter, cmdbox_limiter_load
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -10,6 +11,11 @@ import pydantic
 
 
 class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
+    def __init__(self, appcls, ver, language='en'):
+        super().__init__(appcls, ver, language)
+        self.limiter_load = cmdbox_limiter_load.LimiterLoad(appcls, ver, language)
+        self.limiter_counter = cmdbox_limiter_counter.LimiterCounter(appcls, ver, language)
+
     def get_mode(self) -> Union[str, List[str]]:
         return 'limiter'
 
@@ -62,11 +68,33 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         return self.RESP_SUCCESS, ret, cl
 
     def output_schema(self) -> type:
+        class LimiterDetail(resdata.Base):
+            limiter_name: Union[str, None] = pydantic.Field(default=None, description="制限設定の識別名")
+            limiter_title: Union[str, None] = pydantic.Field(default=None, description="制限設定の表示名")
+            target_mode: Union[str, None] = pydantic.Field(default=None, description="対象コマンドのモード名")
+            target_cmd: Union[str, None] = pydantic.Field(default=None, description="対象コマンドのコマンド名")
+            target_option: Union[List[Dict[str, Any]], Dict[str, Any], None] = pydantic.Field(default=None, description="対象コマンドの条件")
+            max_registrations: Union[int, None] = pydantic.Field(default=None, description="登録最大数（又は登録最大サイズ）")
+            max_total_count: Union[int, None] = pydantic.Field(default=None, description="実行最大回数")
+            max_total_time: Union[float, None] = pydantic.Field(default=None, description="実行可能総時間（秒）")
+            max_total_input: Union[int, None] = pydantic.Field(default=None, description="入力総バイト数の上限")
+            max_total_process: Union[int, None] = pydantic.Field(default=None, description="処理総バイト数の上限")
+            max_total_output: Union[int, None] = pydantic.Field(default=None, description="出力総バイト数の上限")
+            max_total_credits: Union[int, None] = pydantic.Field(default=None, description="コマンドの最大クレジット数")
+            service_credits: Union[int, None] = pydantic.Field(default=None, description="サービスクレジット数")
+            exec_period_start: Union[str, None] = pydantic.Field(default=None, description="実行可能期間の開始日時")
+            exec_period_end: Union[str, None] = pydantic.Field(default=None, description="実行可能期間の終了日時")
+            reset_datetime: Union[str, None] = pydantic.Field(default=None, description="カウンタリセット日時")
+            reset_period_unit: Union[str, None] = pydantic.Field(default=None, description="リセット単位（hour/day/month/year）")
+            reset_period_qty: Union[int, None] = pydantic.Field(default=None, description="リセット間隔の数量")
+            max_history_interval: Union[float, None] = pydantic.Field(default=None, description="履歴保存期間の最大間隔（秒）")
+            counter: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="現在のカウンター状態")
+
         class Configure(resdata.Base):
             plan_name: Union[str, None] = pydantic.Field(default=None, description="プランの識別名")
             plan_title: Union[str, None] = pydantic.Field(default=None, description="プランのタイトル")
             plan_desc: Union[str, None] = pydantic.Field(default=None, description="プランの説明")
-            limiters: Union[List[str], None] = pydantic.Field(default=None, description="このプランに含まれるリミッター設定名一覧")
+            limiters: Union[List[LimiterDetail], None] = pydantic.Field(default=None, description="このプランに含まれるリミッター設定の詳細情報")
 
             plan_start: Union[str, None] = pydantic.Field(default=None, description="プラン適用開始日時")
             plan_end: Union[str, None] = pydantic.Field(default=None, description="プラン適用終了日時")
@@ -80,6 +108,8 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             billing_min_amount: Union[float, None] = pydantic.Field(default=None, description="請求の最小金額")
             billing_max_amount: Union[float, None] = pydantic.Field(default=None, description="請求の最大金額")
             billing_unit_price: Union[float, None] = pydantic.Field(default=None, description="請求単価")
+            billing_currency: Union[str, None] = pydantic.Field(default="JPY", description="請求に使用する通貨（JPY, USD, EUR等）")
+            current_billing_amount: Union[float, None] = pydantic.Field(default=None, description="現在の請求金額")
 
         class Data(resdata.Data):
             data: Union[Configure, None] = pydantic.Field(default=None, description="プラン設定データ")
@@ -92,6 +122,27 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
     def is_cluster_redirect(self):
         return False
 
+    def _load_plan_config(self, data_dir: Path, plan_name: str) -> Dict[str, Any]:
+        """
+        プラン設定ファイルを読み込んで辞書として返す
+        
+        Args:
+            data_dir: データディレクトリのパス
+            plan_name: プラン識別名
+        Returns:
+            プラン設定の辞書
+        Raises:
+            FileNotFoundError: プラン設定ファイルが存在しない場合
+        """
+        configure_path = data_dir / ".limiter" / f"plan-{plan_name}.json"
+        if not configure_path.exists():
+            raise FileNotFoundError(f"Plan configuration '{plan_name}' not found at '{configure_path}'.")
+        
+        with configure_path.open('r', encoding='utf-8') as f:
+            configure = json.load(f)
+        
+        return configure
+
     def svrun(self, data_dir: Path, logger: logging.Logger, redis_cli: redis_client.RedisClient, msg: List[str],
               sessions: Dict[str, Dict[str, Any]]) -> int:
         reskey = msg[1]
@@ -103,14 +154,61 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                 redis_cli.rpush(reskey, out)
                 return self.RESP_WARN
 
-            configure_path = data_dir / ".limiter" / f"plan-{plan_name}.json"
-            if not configure_path.exists():
-                out = dict(warn=f"Plan configuration '{plan_name}' not found at '{configure_path}'.")
+            try:
+                configure = self._load_plan_config(data_dir, plan_name)
+            except FileNotFoundError as e:
+                out = dict(warn=str(e))
                 redis_cli.rpush(reskey, out)
                 return self.RESP_WARN
+            
+            # limiters フィールドが存在する場合、各limiterの詳細情報を取得
+            if 'limiters' in configure and isinstance(configure['limiters'], list):
+                limiter_details = []
+                for limiter_name in configure['limiters']:
+                    try:
+                        # self.limiter_load を使用して limiter 設定を取得
+                        limiter_cfg = self.limiter_load._load_limiter_config(data_dir, limiter_name)
+                        # self.limiter_counter を使用してカウンター情報を取得
+                        counter_data = self.limiter_counter._load_limiter_counter(data_dir, limiter_name, redis_cli, logger, False)
+                        limiter_cfg['counter'] = counter_data
+                        limiter_details.append(limiter_cfg)
+                    except FileNotFoundError as e:
+                        logger.warning(f"Failed to load limiter '{limiter_name}': {e}")
+                        limiter_details.append({'limiter_name': limiter_name, 'error': str(e)})
+                    except Exception as e:
+                        logger.warning(f"Failed to load limiter '{limiter_name}': {e}")
+                        limiter_details.append({'limiter_name': limiter_name, 'error': str(e)})
+                
+                configure['limiters'] = limiter_details
+            
+            # 現在の請求金額を計算
+            billing_type = configure.get('billing_type')
+            billing_unit_price = configure.get('billing_unit_price')
+            current_billing_amount = None
+            if billing_type == 'period':
+                current_billing_amount = float(billing_unit_price) if billing_unit_price is not None else None
+            elif billing_type == 'metered':
+                billing_limiter = configure.get('billing_limiter')
+                if billing_unit_price is not None and billing_limiter:
+                    # billing_limiter のカウンターからクレジット数を取得
+                    credits = None
+                    limiter_details_list = configure.get('limiters', [])
+                    for lm in limiter_details_list:
+                        if isinstance(lm, dict) and lm.get('limiter_name') == billing_limiter:
+                            counter = lm.get('counter') or {}
+                            credits = counter.get('total_credits')
+                            break
+                    if credits is not None:
+                        amount = float(credits) * float(billing_unit_price)
+                        billing_min = configure.get('billing_min_amount')
+                        billing_max = configure.get('billing_max_amount')
+                        if billing_min is not None:
+                            amount = max(amount, float(billing_min))
+                        if billing_max is not None:
+                            amount = min(amount, float(billing_max))
+                        current_billing_amount = amount
+            configure['current_billing_amount'] = current_billing_amount
 
-            with configure_path.open('r', encoding='utf-8') as f:
-                configure = json.load(f)
             out = dict(success=dict(data=configure))
             redis_cli.rpush(reskey, out)
             return self.RESP_SUCCESS

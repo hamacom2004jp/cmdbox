@@ -1,6 +1,7 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
+from cmdbox.app.features.cli import cmdbox_limiter_load
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -10,6 +11,10 @@ import pydantic
 
 
 class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
+    def __init__(self, appcls, ver, language='en'):
+        super().__init__(appcls, ver, language)
+        self.limiter_load = cmdbox_limiter_load.LimiterLoad(appcls, ver, language)
+
     def get_mode(self) -> Union[str, List[str]]:
         return 'limiter'
 
@@ -64,9 +69,9 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_ja="このプランに含まれるリミッター設定名を指定します。",
                      description_en="Specify the limiter configuration names included in this plan."),
                 # プラン期間設定
-                dict(opt="plan_start", type=Options.T_DATETIME, default=None, required=False, multi=False, hide=False, choice=None,
-                     description_ja="プランの適用開始日時を指定します（例: 2024-01-01T00:00:00）。省略時は制限しません。",
-                     description_en="Specify the start datetime of the plan application (e.g. 2024-01-01T00:00:00). If omitted, no limit is applied."),
+                dict(opt="plan_start", type=Options.T_DATETIME, default=None, required=True, multi=False, hide=False, choice=None,
+                     description_ja="プランの適用開始日時を指定します（例: 2024-01-01T00:00:00）。",
+                     description_en="Specify the start datetime of the plan application (e.g. 2024-01-01T00:00:00)."),
                 dict(opt="plan_end", type=Options.T_DATETIME, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="プランの適用終了日時を指定します（例: 2024-12-31T23:59:59）。省略時は制限しません。",
                      description_en="Specify the end datetime of the plan application (e.g. 2024-12-31T23:59:59). If omitted, no limit is applied."),
@@ -92,9 +97,6 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="billing_period_qty", type=Options.T_INT, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="請求期間数量を指定します（期間課金の場合）。",
                      description_en="Specify the billing period quantity (for period-based billing)."),
-                dict(opt="billing_unit_price", type=Options.T_FLOAT, default=None, required=False, multi=False, hide=False, choice=None,
-                     description_ja="請求単価を指定します。期間課金の場合は期間単位の単価、従量課金の場合はクレジット当たりの単価です。",
-                     description_en="Specify the billing unit price. For period-based billing, the price per period. For metered billing, the price per credit."),
                 # 従量課金用オプション
                 dict(opt="billing_limiter", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=[],
                      callcmd="async () => {await cmdbox.callcmd('limiter','list',{},(res)=>{"
@@ -112,6 +114,13 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="billing_max_amount", type=Options.T_FLOAT, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="請求の最大金額を指定します（従量課金の場合）。",
                      description_en="Specify the maximum billing amount (for metered billing)."),
+                # 金額設定
+                dict(opt="billing_currency", type=Options.T_STR, default="JPY", required=False, multi=False, hide=False, choice=None,
+                     description_ja="請求に使用する通貨を指定します。デフォルトはJPY（日本円）です。",
+                     description_en="Specify the currency used for billing. Default is JPY (Japanese Yen)."),
+                dict(opt="billing_unit_price", type=Options.T_FLOAT, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja="請求単価を指定します。期間課金の場合は期間単位の単価、従量課金の場合はクレジット当たりの単価です。",
+                     description_en="Specify the billing unit price. For period-based billing, the price per period. For metered billing, the price per credit."),
             ]
         )
 
@@ -125,11 +134,17 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, result, None
         elif args.billing_type == 'metered':
-            if not args.billing_limiter or args.billing_unit_price is None:
-                result = dict(warn="For metered billing, billing_limiter and billing_unit_price are required.")
-                logger.warning("For metered billing, billing_limiter and billing_unit_price are required.")
+            if not args.billing_limiter or args.billing_unit_price is None or not args.billing_currency:
+                result = dict(warn="For metered billing, billing_limiter, billing_unit_price, and billing_currency are required.")
+                logger.warning("For metered billing, billing_limiter, billing_unit_price, and billing_currency are required.")
                 common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, result, None
+        # リミッターリストの中に請求リミッターが無い場合は警告
+        if args.billing_type == 'metered' and args.billing_limiter not in args.limiters:
+            result = dict(warn=f"The billing_limiter '{args.billing_limiter}' is not included in the limiters list. Please include it in the limiters list.")
+            logger.warning(f"The billing_limiter '{args.billing_limiter}' is not included in the limiters list. Please include it in the limiters list.")
+            common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, result, None
 
         # リミッターリストの処理
         limiters = []
@@ -156,6 +171,7 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
             billing_min_amount=args.billing_min_amount if hasattr(args, 'billing_min_amount') else None,
             billing_max_amount=args.billing_max_amount if hasattr(args, 'billing_max_amount') else None,
             billing_unit_price=args.billing_unit_price if hasattr(args, 'billing_unit_price') else None,
+            billing_currency=args.billing_currency if hasattr(args, 'billing_currency') and args.billing_currency is not None else "JPY",
         )
 
         configure_b64 = convert.str2b64str(common.to_str(configure))
@@ -189,6 +205,66 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 out = dict(warn="plan_name is required.")
                 redis_cli.rpush(reskey, out)
                 return self.RESP_WARN
+
+            # plan_start とリミッターの reset_datetime を比較
+            plan_start = configure.get('plan_start')
+            limiters = configure.get('limiters', [])
+            if plan_start and limiters:
+                mismatched_limiters = []
+                for limiter_name in limiters:
+                    try:
+                        limiter_config = self.limiter_load._load_limiter_config(data_dir, limiter_name)
+                        reset_datetime = limiter_config.get('reset_datetime')
+                        if not reset_datetime:
+                            mismatched_limiters.append(f"Limiter configuration '{limiter_name}' does not have a reset_datetime")
+                        elif reset_datetime != plan_start:
+                            mismatched_limiters.append(f"{limiter_name}: reset_datetime={reset_datetime}")
+                    except FileNotFoundError:
+                        mismatched_limiters.append(f"Limiter configuration '{limiter_name}' not found")
+                    except Exception as e:
+                        mismatched_limiters.append(f"Failed to load limiter config for '{limiter_name}': {e}")
+                if mismatched_limiters:
+                    out = dict(warn=f"The plan_start '{plan_start}' does not match the reset_datetime of the following limiters: {', '.join(mismatched_limiters)}")
+                    logger.warning(out)
+                    redis_cli.rpush(reskey, out)
+                    return self.RESP_WARN
+
+            if configure.get('billing_type') == 'metered':
+                billing_limiter = configure.get('billing_limiter')
+                if billing_limiter and billing_limiter not in limiters:
+                    out = dict(warn=f"The billing_limiter '{billing_limiter}' is not included in the limiters list. Please include it in the limiters list.")
+                    logger.warning(out)
+                    redis_cli.rpush(reskey, out)
+                    return self.RESP_WARN
+
+            # billing_type が period の場合、billing_period_unit/qty と reset_period_unit/qty が一致することを確認
+            if configure.get('billing_type') == 'period':
+                billing_period_unit = configure.get('billing_period_unit')
+                billing_period_qty = configure.get('billing_period_qty')
+                if plan_start and limiters:
+                    mismatched_limiters = []
+                    for limiter_name in limiters:
+                        try:
+                            limiter_config = self.limiter_load._load_limiter_config(data_dir, limiter_name)
+                            # reset_period_unit の一致確認
+                            reset_period_unit = limiter_config.get('reset_period_unit')
+                            if billing_period_unit and reset_period_unit != billing_period_unit:
+                                mismatched_limiters.append(f"{limiter_name}: reset_period_unit={reset_period_unit} (expected {billing_period_unit})")
+                            # reset_period_qty の一致確認
+                            reset_period_qty = limiter_config.get('reset_period_qty')
+                            billing_qty_val = int(billing_period_qty) if billing_period_qty is not None else None
+                            reset_qty_val = int(reset_period_qty) if reset_period_qty is not None else None
+                            if billing_qty_val is not None and reset_qty_val != billing_qty_val:
+                                mismatched_limiters.append(f"{limiter_name}: reset_period_qty={reset_period_qty} (expected {billing_period_qty})")
+                        except FileNotFoundError:
+                            mismatched_limiters.append(f"Limiter configuration '{limiter_name}' not found")
+                        except Exception as e:
+                            mismatched_limiters.append(f"Failed to load limiter config for '{limiter_name}': {e}")
+                    if mismatched_limiters:
+                        out = dict(warn=f"The billing_period_unit/qty does not match the reset_period_unit/qty of the following limiters: {', '.join(mismatched_limiters)}")
+                        logger.warning(out)
+                        redis_cli.rpush(reskey, out)
+                        return self.RESP_WARN
 
             configure_path = data_dir / ".limiter" / f"plan-{plan_name}.json"
             configure_path.parent.mkdir(parents=True, exist_ok=True)

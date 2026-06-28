@@ -4,13 +4,13 @@ $(() => {
     // バージョン情報
     cmdbox.init_version_modal();
     
-    // ===== Limiter (Targets) タブのイベント =====
+    // ===== Limiter (limiters) タブのイベント =====
     // フィルタ条件の変更
     $('#filter_target_mode').on('change', async () => {
         const mode = $('#filter_target_mode').val();
         await limiter_page.init_filter_cmds(mode);
     });
-    // リフレッシュボタン (Targets)
+    // リフレッシュボタン (limiters)
     $('#btn_refresh').on('click', () => limiter_page.refresh_all());
     // target_option 追加ボタン
     $('#btn_add_target_opt').on('click', () => limiter_page._add_target_opt_row());
@@ -30,10 +30,11 @@ $(() => {
         $('#filter_target_cmd').closest('.input-group').closest('div').addClass('d-none');
         await limiter_plan_page.load_plans();
     });
-    // Targets タブクリック時
-    $('#targets-tab').on('show.bs.tab', () => {
+    // limiters タブクリック時
+    $('#limiters-tab').on('show.bs.tab', async () => {
         $('#filter_target_mode').closest('.input-group').closest('div').removeClass('d-none');
         $('#filter_target_cmd').closest('.input-group').closest('div').removeClass('d-none');
+        limiter_page.refresh_all();
     });
     
     // Plans リフレッシュボタン
@@ -48,11 +49,6 @@ $(() => {
         limiter_plan_page.delete_plan(name);
     });
     const plan_modal = $('#plan_modal');
-    plan_modal.off('shown.bs.modal').on('shown.bs.modal', async () => {
-        plan_modal.find('.callcmd_buton').click();
-    });
-
-    
     // モーダルボタン初期化
     cmdbox.init_modal_button();
     // モーダルのドラッグ対応
@@ -62,8 +58,8 @@ $(() => {
     // 初期化とデータ読み込み
     (async () => {
         await limiter_page.init_filter_options();
-        limiter_page.refresh_all();
+        await limiter_plan_page.load_plans();
+        // 多言語対応のためのテキスト翻訳を処理
+        setTimeout(() => {cmdbox.process_i18n();}, 100);
     })();
-    // 多言語対応のためのテキスト翻訳を処理
-    setTimeout(() => {cmdbox.process_i18n();}, 100);
 });

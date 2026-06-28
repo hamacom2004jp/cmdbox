@@ -1,6 +1,7 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
+from cmdbox.app.features.cli import cmdbox_limiter_plan_load
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -10,6 +11,10 @@ import pydantic
 
 
 class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
+    def __init__(self, appcls, ver, language='en'):
+        super().__init__(appcls, ver, language)
+        self.limiter_plan_load = cmdbox_limiter_plan_load.LimiterPlanLoad(appcls, ver, language)
+
     def get_mode(self) -> Union[str, List[str]]:
         return 'limiter'
 
@@ -101,13 +106,17 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="exec_period_end", type=Options.T_DATETIME, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="コマンドの実行可能期間の終了日時を指定します（例: 2024-12-31T23:59:59）。省略時は制限しません。",
                      description_en="Specify the end datetime of the executable period for the command (e.g. 2024-12-31T23:59:59). If omitted, no limit is applied."),
-                dict(opt="refresh_datetime", type=Options.T_DATETIME, default=None, required=False, multi=False, hide=False, choice=None,
-                     description_ja="この制限をリセットする日時を指定します（例: 2024-06-01T00:00:00）。指定した日時になると制限カウンタをリセットします。省略時はリセットしません。",
-                     description_en="Specify the datetime to reset this restriction (e.g. 2024-06-01T00:00:00). The restriction counters are reset at the specified datetime. If omitted, no reset is performed."),
-                dict(opt="refresh_interval", type=Options.T_INT, default=None, required=False, multi=False, hide=False, choice=None,
-                     description_ja="この制限をリセットするまでの時間（秒）を指定します。指定した秒数が経過すると制限カウンタをリセットします。省略時はリセットしません。",
-                     description_en="Specify the interval in seconds after which this restriction is reset. The restriction counters are reset when the specified number of seconds has elapsed. If omitted, no reset is performed."),
-                dict(opt="max_history_interval", type=Options.T_INT, default=3600*24*31, required=True, multi=False, hide=False, choice=None,
+                dict(opt="reset_datetime", type=Options.T_DATETIME, default=None, required=True, multi=False, hide=False, choice=None,
+                     description_ja="この制限の起点となる日時を指定します（例: 2024-06-01T00:00:00）。指定した日時を基準に制限カウンタをリセットします。",
+                     description_en="Specify the date and time from which this restriction takes effect (e.g., 2024-06-01T00:00:00). The restriction counter will be reset based on the specified date and time."),
+                dict(opt="reset_period_unit", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=["hour", "day", "month", "year"],
+                     description_ja="リセット単位を指定します。reset_datetimeを起点として、hour, day, month, year から選択します。",
+                     description_en="Specify the reset unit based on reset_datetime. Select from hour, day, month, or year."),
+                dict(opt="reset_period_qty", type=Options.T_INT, default=None, required=False, multi=False, hide=False, choice=None,
+                     description_ja="リセット間隔の数量を指定します。reset_datetimeを起点としてreset_period_unit単位でこの数量分の間隔ごとにカウンタをリセットします。",
+                     description_en="Specify the reset interval quantity. The counter is reset at intervals of this quantity in reset_period_unit units, starting from reset_datetime."),
+                dict(opt="max_history_interval", type=Options.T_INT, default=3600*24*31, required=True, multi=False, hide=False,
+                     choice=[3600, 3600*24, 3600*24*31, 3600*24*366], choice_edit=True,
                      description_ja="カウンター履歴を保持する最大期間（秒）を指定します。指定した秒数を超えた履歴は削除されます。",
                      description_en="Specify the maximum duration (in seconds) for which counter history will be retained. History older than the specified number of seconds will be deleted."),
             ]
@@ -125,6 +134,16 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
             logger.warning("max_history_interval should be greater than 120 seconds.")
             common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, result, None
+        reset_period_unit = args.reset_period_unit if hasattr(args, 'reset_period_unit') else None
+        reset_period_qty = args.reset_period_qty if hasattr(args, 'reset_period_qty') else None
+        if args.max_history_interval and reset_period_unit and reset_period_qty:
+            unit_seconds = {'hour': 3600, 'day': 3600 * 24, 'month': 3600 * 24 * 31, 'year': 3600 * 24 * 366}
+            period_seconds = unit_seconds.get(reset_period_unit, 0) * int(reset_period_qty)
+            if period_seconds > 0 and args.max_history_interval < period_seconds:
+                result = dict(warn=f"max_history_interval ({args.max_history_interval}s) must be greater than the reset period ({reset_period_qty} {reset_period_unit} = {period_seconds}s).")
+                logger.warning(result['warn'])
+                common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                return self.RESP_WARN, result, None
 
         configure = dict(
             scope=args.scope,
@@ -143,8 +162,9 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
             service_credits=args.service_credits if hasattr(args, 'service_credits') else None,
             exec_period_start=str(args.exec_period_start) if hasattr(args, 'exec_period_start') and args.exec_period_start is not None else None,
             exec_period_end=str(args.exec_period_end) if hasattr(args, 'exec_period_end') and args.exec_period_end is not None else None,
-            refresh_datetime=str(args.refresh_datetime) if hasattr(args, 'refresh_datetime') and args.refresh_datetime is not None else None,
-            refresh_interval=args.refresh_interval if hasattr(args, 'refresh_interval') else None,
+            reset_datetime=str(args.reset_datetime) if hasattr(args, 'reset_datetime') and args.reset_datetime is not None else None,
+            reset_period_unit=args.reset_period_unit if hasattr(args, 'reset_period_unit') else None,
+            reset_period_qty=args.reset_period_qty if hasattr(args, 'reset_period_qty') else None,
             max_history_interval=args.max_history_interval if hasattr(args, 'max_history_interval') else None,
         )
 
@@ -195,6 +215,32 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 out = dict(warn="limiter_name is required.")
                 redis_cli.rpush(reskey, out)
                 return self.RESP_WARN
+
+            # プラン設定でこのリミッターが使用されていないか確認
+            limiter_dir = data_dir / ".limiter"
+            if limiter_dir.exists():
+                for plan_file in limiter_dir.glob("plan-*.json"):
+                    try:
+                        plan_name_from_file = plan_file.stem.replace('plan-', '')
+                        plan_config = self.limiter_plan_load._load_plan_config(data_dir, plan_name_from_file)
+                        # limiters リストをチェック
+                        plan_limiters = plan_config.get('limiters', [])
+                        if limiter_name in plan_limiters:
+                            plan_name = plan_config.get('plan_name', plan_name_from_file)
+                            out = dict(warn=f"Cannot save limiter '{limiter_name}' because it is used in plan '{plan_name}'.")
+                            redis_cli.rpush(reskey, out)
+                            return self.RESP_WARN
+                        # billing_limiter をチェック
+                        billing_limiter = plan_config.get('billing_limiter')
+                        if billing_limiter == limiter_name:
+                            plan_name = plan_config.get('plan_name', plan_name_from_file)
+                            out = dict(warn=f"Cannot save limiter '{limiter_name}' because it is used as billing_limiter in plan '{plan_name}'.")
+                            redis_cli.rpush(reskey, out)
+                            return self.RESP_WARN
+                    except Exception as parse_err:
+                        out = dict(warn=f"Failed to parse plan file {plan_file}: {parse_err}")
+                        redis_cli.rpush(reskey, out)
+                        return self.RESP_WARN
 
             configure_path = data_dir / ".limiter" / f"limiter-{limiter_name}.json"
             configure_path.parent.mkdir(parents=True, exist_ok=True)

@@ -100,7 +100,7 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
             total_output: Union[int, None] = pydantic.Field(default=None, description="出力総バイト数")
             total_credits: Union[int, None] = pydantic.Field(default=None, description="コマンドの最大クレジット数")
             total_registrations: Union[int, None] = pydantic.Field(default=None, description="登録総数")
-            last_refresh: Union[str, None] = pydantic.Field(default=None, description="最終リセット日時")
+            last_reset: Union[str, None] = pydantic.Field(default=None, description="最終リセット日時")
             last_update: Union[str, None] = pydantic.Field(default=None, description="最終更新日時")
         class Data(resdata.Data):
             data: Union[Counter, List[Counter], None] = pydantic.Field(default=None, description="処理結果のデータ")
@@ -110,6 +110,15 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
 
     def is_cluster_redirect(self):
         return False
+
+    def _load_limiter_counter(self, data_dir: Path, limiter_name: str, redis_cli: redis_client.RedisClient, logger: logging.Logger, load_history: bool = False) -> Dict[str, Any]:
+        """Load limiter counter (internal helper method)"""
+        try:
+            lmt = limiter.Limiter.getInstance(redis_client=redis_cli, flush_interval=60, reload_interval=60)
+            return lmt.load_counter(data_dir, limiter_name, load_history)
+        except Exception as e:
+            logger.warning(f"Failed to load counter for limiter '{limiter_name}': {e}")
+            return {}
 
     def svrun(self, data_dir: Path, logger: logging.Logger, redis_cli: redis_client.RedisClient, msg: List[str],
               sessions: Dict[str, Dict[str, Any]]) -> int:
@@ -123,9 +132,7 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
                 redis_cli.rpush(reskey, result)
                 return self.RESP_WARN
 
-            lmt = limiter.Limiter.getInstance(redis_client=redis_cli, flush_interval=10, reload_interval=60)
-            counter = lmt.load_counter(data_dir, limiter_name, load_history)
-
+            counter = self._load_limiter_counter(data_dir, limiter_name, redis_cli, logger, load_history)
             result = dict(success=dict(data=counter))
             redis_cli.rpush(reskey, result)
             return self.RESP_SUCCESS

@@ -68,6 +68,7 @@ class LimiterPlanList(feature.OneshotResultEdgeFeature, validator.Validator):
             plan_title: Union[str, None] = pydantic.Field(default=None, description="プランのタイトル")
             plan_desc: Union[str, None] = pydantic.Field(default=None, description="プランの説明")
             billing_type: Union[str, None] = pydantic.Field(default=None, description="請求タイプ")
+            billing_currency: Union[str, None] = pydantic.Field(default="JPY", description="請求に使用する通貨")
             limiters: Union[List[str], None] = pydantic.Field(default=None, description="このプランに含まれるリミッター設定名一覧")
             plan_start: Union[str, None] = pydantic.Field(default=None, description="プラン適用開始日時")
             plan_end: Union[str, None] = pydantic.Field(default=None, description="プラン適用終了日時")

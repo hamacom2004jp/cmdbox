@@ -1,9 +1,10 @@
 from cmdbox.app import common, feature
 from cmdbox.app.commons import redis_client
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 import argparse
+import calendar
 import functools
 import json
 import logging
@@ -34,7 +35,7 @@ def _apprun_pre(self:'LimitedFeature', logger:logging.Logger, args:argparse.Name
         msg = dict(warn=f"The limiter check is enabled, but the client_data option is not enabled. mode={mode}, cmd={cmd}")
         return -1, msg, None
     redis_cli = redis_client.RedisClient(logger, host=host, port=port, password=password, svname=svname) if host and port and password and svname else None
-    limit = Limiter.getInstance(redis_cli, flush_interval=10, reload_interval=60)
+    limit = Limiter.getInstance(redis_cli, flush_interval=60, reload_interval=60)
     st, msg = limit.check(feat=self, data_dir=Path(client_data_path), logger=logger, command_options=args.__dict__, scope='client')
     return st, msg, limit
 
@@ -145,7 +146,7 @@ def _svrun_pre(self:'LimitedFeature', data_dir:Path, logger:logging.Logger, redi
         Tuple[int, Dict[str, Any], Any, Dict[str, Any]]: ステータス、メッセージ、制限オブジェクト、コマンドオプション
     """
     command_options = self.svrun_parse_options(data_dir, logger, redis_cli, msg, sessions=sessions)
-    limit = Limiter.getInstance(redis_cli, flush_interval=10, reload_interval=60)
+    limit = Limiter.getInstance(redis_cli, flush_interval=60, reload_interval=60)
     st, ret = limit.check(feat=self, data_dir=data_dir, logger=logger, command_options=command_options, scope='server')
     return st, ret, limit, command_options
 
@@ -507,7 +508,7 @@ local raw = redis.call('HGET', KEYS[1], ARGV[1])
 local c
 if raw == false or ARGV[4] == '1' then
     c = {}
-    c['last_refresh'] = ARGV[3]
+    c['last_reset'] = ARGV[3]
 else
     c = cjson.decode(raw)
 end
@@ -521,15 +522,15 @@ c['total_output']        = (tonumber(c['total_output'])       or 0) + (tonumber(
 c['total_credits']       = (tonumber(c['total_credits'])      or 0) + (tonumber(d['credits'])       or 0)
 c['total_registrations'] = tonumber(d['registrations'])       or 0
 c['last_update']         = ARGV[3]
-if not c['last_refresh'] then
-    c['last_refresh'] = ARGV[3]
+if not c['last_reset'] then
+    c['last_reset'] = ARGV[3]
 end
 redis.call('HSET', KEYS[1], ARGV[1], cjson.encode(c))
 return cjson.encode(c)
 """
 
     @classmethod
-    def getInstance(cls, redis_client: Optional[redis_client.RedisClient] = None, flush_interval: float = 60.0, reload_interval: float = 60.0) -> 'Limiter':
+    def getInstance(cls, redis_client:Optional[redis_client.RedisClient] = None, flush_interval:float = 60.0, reload_interval:float = 60.0) -> 'Limiter':
         """
         Limiter のインスタンスを取得します。
 
@@ -575,6 +576,8 @@ return cjson.encode(c)
         self._last_counter_flush: Dict[str, float] = {}
         # 設定の最終読込みタイムスタンプ
         self._last_config_loaded: float = 0.0
+        # カウンターの最終読込みタイムスタンプ
+        self._last_counter_loaded: float = 0.0
 
     # ------------------------------------------------------------------
     # 設定 / カウンタの入出力
@@ -656,17 +659,20 @@ return cjson.encode(c)
         Returns:
             Dict[str, Any]: カウンタ
         """
-        if self.redis_client is not None and not load_history:
-            try:
-                raw = self.redis_client.hget(f"{self.redis_client.lmtname}_{self.REDIS_COUNTER_HASH}", limiter_name)
-                if raw is not None:
-                    text = raw.decode('utf-8') if isinstance(raw, bytes) else raw
-                    last_json = json.loads(text)
-                    if any(last_json.get(k) for k in self.COUNTER_VALKEYS):
-                        return last_json
-            except Exception:
-                pass
+        now = time.time()
+        if now - self._last_counter_loaded < self._reload_interval:
+            if self.redis_client is not None and not load_history:
+                try:
+                    raw = self.redis_client.hget(f"{self.redis_client.lmtname}_{self.REDIS_COUNTER_HASH}", limiter_name)
+                    if raw is not None:
+                        text = raw.decode('utf-8') if isinstance(raw, bytes) else raw
+                        last_json = json.loads(text)
+                        if any(last_json.get(k) for k in self.COUNTER_VALKEYS):
+                            return last_json
+                except Exception:
+                    pass
         counter = self._load_counter_from_file(data_dir, limiter_name, load_history=load_history)
+        self._last_counter_loaded = now
         # ファイルから読んだ場合、Redis にも同期しておく（Redis 再起動後の復元）
         if not load_history and self.redis_client is not None:
             try:
@@ -703,7 +709,7 @@ return cjson.encode(c)
                     if stripped:
                         last = stripped
                         try:
-                            last_json = json.loads(stripped)
+                            last_json:Dict[str, Any] = json.loads(stripped)
                             enable = any(last_json.get(k) for k in self.COUNTER_VALKEYS)
                             if not enable: continue
                             last = last_json
@@ -746,12 +752,14 @@ return cjson.encode(c)
             except Exception:
                 pass
             now = time.time()
+            counter['last_update'] = datetime.now().isoformat()
             if now - self._last_counter_flush.get(limiter_name, 0.0) >= self._flush_interval:
                 self._save_counter_to_file(data_dir, limiter_name, counter)
                 self._last_counter_flush[limiter_name] = now
                 if max_history_interval is not None:
                     self._prune_counter_history(data_dir, limiter_name, max_history_interval)
         else:
+            counter['last_update'] = datetime.now().isoformat()
             self._save_counter_to_file(data_dir, limiter_name, counter)
             if max_history_interval is not None:
                 self._prune_counter_history(data_dir, limiter_name, max_history_interval)
@@ -819,54 +827,143 @@ return cjson.encode(c)
         return dict(
             limiter_name=limiter_name,
             **{k: 0 for k in self.COUNTER_VALKEYS},
-            last_refresh=datetime.now().isoformat(),
+            last_reset=datetime.now().isoformat(),
             last_update=datetime.now().isoformat()
         )
 
     # ------------------------------------------------------------------
-    # リフレッシュ判定
+    # リセット判定
     # ------------------------------------------------------------------
-    def needs_refresh(self, config: Dict[str, Any], counter: Dict[str, Any]) -> bool:
+    def _add_months(self, dt: datetime, months: int) -> datetime:
         """
-        カウンタのリフレッシュが必要かどうかを判定します。
+        datetime に指定した月数を加算して返します。
+        月末日のずれ（例: 1/31 + 1ヶ月 = 2/28）はカレンダーの月末日に丸めます。
+        """
+        if months == 0:
+            return dt
+        m = dt.month - 1 + months
+        year = dt.year + m // 12
+        month = m % 12 + 1
+        day = min(dt.day, calendar.monthrange(year, month)[1])
+        return dt.replace(year=year, month=month, day=day)
 
-        ``refresh_datetime`` が指定されており、現在時刻がその日時以降で
-        かつ前回リフレッシュ時刻よりも後の場合にリフレッシュが必要と判定します。
+    def _add_years(self, dt: datetime, years: int) -> datetime:
+        """
+        datetime に指定した年数を加算して返します。
+        2/29 → 2/28 等のフォールバックを行います。
+        """
+        if years == 0:
+            return dt
+        try:
+            return dt.replace(year=dt.year + years)
+        except ValueError:
+            return dt.replace(year=dt.year + years, day=28)
 
-        ``refresh_interval`` が指定されており、前回リフレッシュからの経過秒数が
-        指定値以上の場合にリフレッシュが必要と判定します。
+    def needs_reset(self, config: Dict[str, Any], counter: Dict[str, Any]) -> bool:
+        """
+        カウンタのリセットが必要かどうかを判定します。
+
+        ``reset_datetime`` を起点として ``reset_period_unit`` と ``reset_period_qty``
+        で定義された周期ごとにリセットが必要かどうかを判定します。
+
+        ``reset_period_unit``/``reset_period_qty`` が未設定の場合は、
+        ``reset_datetime`` を1回限りのリセット日時として扱います。
 
         Args:
             config (Dict[str, Any]): 制限設定
             counter (Dict[str, Any]): 現在のカウンタ
         Returns:
-            bool: リフレッシュが必要な場合は True
+            bool: リセットが必要な場合は True
         """
         now = datetime.now()
-
-        refresh_dt_str = config.get('refresh_datetime')
-        if refresh_dt_str:
-            try:
-                refresh_dt = datetime.fromisoformat(refresh_dt_str)
-                last_refresh = datetime.fromisoformat(
-                    counter.get('last_refresh', '1970-01-01T00:00:00'))
-                if now >= refresh_dt > last_refresh:
-                    return True
-            except (ValueError, TypeError):
-                pass
-
-        refresh_interval = config.get('refresh_interval')
-        if refresh_interval is not None:
-            try:
-                last_refresh = datetime.fromisoformat(
-                    counter.get('last_refresh', '1970-01-01T00:00:00'))
-                elapsed = (now - last_refresh).total_seconds()
-                if elapsed >= int(refresh_interval):
-                    return True
-            except (ValueError, TypeError):
-                pass
-
+        reset_dt_str = config.get('reset_datetime')
+        if not reset_dt_str:
+            return False
+        try:
+            reset_dt = datetime.fromisoformat(reset_dt_str)
+            last_reset = datetime.fromisoformat(counter.get('last_reset', '1970-01-01T00:00:00'))
+            reset_period_unit = config.get('reset_period_unit')
+            reset_period_qty = config.get('reset_period_qty')
+            if reset_period_unit and reset_period_qty:
+                qty = int(reset_period_qty)
+                if qty <= 0:
+                    return False
+                if reset_dt > now:
+                    return False  # まだ開始前
+                # 経過した期間数 n を直接計算（O(1)）
+                if reset_period_unit == 'hour':
+                    elapsed = (now - reset_dt).total_seconds() / 3600
+                    n = int(elapsed // qty)
+                    latest_reset = reset_dt + timedelta(hours=n * qty)
+                elif reset_period_unit == 'day':
+                    elapsed = (now - reset_dt).total_seconds() / 86400
+                    n = int(elapsed // qty)
+                    latest_reset = reset_dt + timedelta(days=n * qty)
+                elif reset_period_unit == 'month':
+                    # 近似 n を月数差から計算し、境界付近の誤差を ±1 補正する
+                    approx_months = (now.year - reset_dt.year) * 12 + (now.month - reset_dt.month)
+                    n = max(0, approx_months // qty)
+                    latest_reset = self._add_months(reset_dt, n * qty)
+                    if latest_reset > now and n > 0:
+                        n -= 1
+                        latest_reset = self._add_months(reset_dt, n * qty)
+                    else:
+                        next_reset = self._add_months(reset_dt, (n + 1) * qty)
+                        if next_reset <= now:
+                            latest_reset = next_reset
+                elif reset_period_unit == 'year':
+                    # 近似 n を年数差から計算し、境界付近の誤差を ±1 補正する
+                    n = max(0, (now.year - reset_dt.year) // qty)
+                    latest_reset = self._add_years(reset_dt, n * qty)
+                    if latest_reset > now and n > 0:
+                        n -= 1
+                        latest_reset = self._add_years(reset_dt, n * qty)
+                    else:
+                        next_reset = self._add_years(reset_dt, (n + 1) * qty)
+                        if next_reset <= now:
+                            latest_reset = next_reset
+                else:
+                    return False
+                return latest_reset > last_reset
+            else:
+                # 周期未設定: 1回限りのリセット
+                return now >= reset_dt > last_reset
+        except (ValueError, TypeError):
+            pass
         return False
+
+    def _save_evidence_file(self, data_dir: Path, limiter_name: str,
+                              config: Dict[str, Any], counter: Dict[str, Any]) -> None:
+        """
+        リセット前のカウンター履歴とリミッター設定をエビデンスファイルに保存します。
+        ファイル名: evidence-{limiter_name}-{last_reset_yyyymmdd_hhmmss}.json
+
+        Args:
+            data_dir (Path): データディレクトリ
+            limiter_name (str): 制限設定の識別名
+            config (Dict[str, Any]): リミッター設定
+            counter (Dict[str, Any]): リセット前のカウンタ（last_reset を含む）
+        """
+        try:
+            last_reset_str = counter.get('last_reset', '')
+            try:
+                last_reset_dt = datetime.fromisoformat(last_reset_str) if last_reset_str else datetime.now()
+                last_reset_formatted = last_reset_dt.strftime('%Y%m%d_%H%M%S')
+            except (ValueError, TypeError):
+                last_reset_formatted = datetime.now().strftime('%Y%m%d_%H%M%S')
+            history = self.load_counter(data_dir, limiter_name, load_history=True)
+            history.append(counter)
+
+            evidence_path = Path(data_dir) / self.LIMITER_DIR / f"evidence-{limiter_name}-{last_reset_formatted}.json"
+            evidence = dict(
+                limiter_name=limiter_name,
+                config=config,
+                history=history if isinstance(history, list) else ([history] if history else []),
+            )
+            common.save_file(evidence_path, lambda f: json.dump(evidence, f, indent=4, ensure_ascii=False),
+                             encoding='utf-8', nolock=False)
+        except Exception:
+            pass
 
     def reset_counter(self, limiter_name: str) -> Dict[str, Any]:
         """
@@ -927,7 +1024,6 @@ return cjson.encode(c)
                 for key, val in opt_dict.items():
                     if str(command_options.get(key, '')) != str(val):
                         return False
-
         return True
 
     # ------------------------------------------------------------------
@@ -972,12 +1068,7 @@ return cjson.encode(c)
                 continue
             if not self.matches(config, command_options):
                 continue
-
             counter = self.load_counter(data_dir, limiter_name)
-            if self.needs_refresh(config, counter):
-                self.save_counter(data_dir, limiter_name, counter)
-                counter = self.reset_counter(limiter_name)
-
             # 実行可能期間チェック
             period_start = config.get('exec_period_start')
             if period_start:
@@ -1109,11 +1200,13 @@ return cjson.encode(c)
 
             try:
                 counter = self.load_counter(data_dir, limiter_name)
-                needs_reset = self.needs_refresh(config, counter)
+                needs_reset = self.needs_reset(config, counter)
                 max_history_interval = config.get('max_history_interval')
                 last_update = datetime.now().isoformat()
                 if self.redis_client is not None:
                     # Redis が有効な場合は Lua スクリプトでアトミックにインクリメント
+                    if needs_reset:
+                        self._save_evidence_file(data_dir, limiter_name, config, counter)
                     deltas = dict(count=count, exec_time=exec_time, input_bytes=input_bytes,
                                   process_bytes=process_bytes, output_bytes=output_bytes,
                                   credits=credits, registrations=registrations)
@@ -1124,6 +1217,7 @@ return cjson.encode(c)
                 else:
                     # Redis なし: ファイルのみ（従来動作）
                     if needs_reset:
+                        self._save_evidence_file(data_dir, limiter_name, config, counter)
                         counter = self.reset_counter(limiter_name)
                     counter['total_count'] = counter.get('total_count', 0) + count
                     counter['total_time'] = counter.get('total_time', 0.0) + exec_time
