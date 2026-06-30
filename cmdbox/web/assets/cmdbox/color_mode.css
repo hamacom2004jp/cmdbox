@@ -956,8 +956,8 @@ body::after {
     border-color: var(--area-border-color);
 }
 
-/* 桜モード */
-[data-bs-theme="sakura"] {
+/* 桃モード */
+[data-bs-theme="peach"] {
     --bs-body-bg: #fff0f8; /* ふんわりホワイトピンク */
     --bs-body-color: #4d0a35; /* 深みのあるベリーマゼンタ */
     --bs-emphasis-color: #cc005a; /* ビビッドディープピンク */

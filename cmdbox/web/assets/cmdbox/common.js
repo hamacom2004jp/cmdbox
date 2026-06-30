@@ -25,7 +25,7 @@ cmdbox.change_color_mode = async (color_mode=undefined, nosignin=false) => {
     select_elem.append('<option value="crimson">Crimson</option>');
     select_elem.append('<option value="light">Light</option>');
     select_elem.append('<option value="spaceship">Spaceship</option>');
-    select_elem.append('<option value="sakura">Sakura</option>');
+    select_elem.append('<option value="peach">Peach</option>');
     select_elem.append('<option value="hydrangea">Hydrangea</option>');
     select_elem.append('<option value="coffeeshop">Coffeeshop</option>');
     select_elem.append('<option value="darkheroine">DarkHeroine</option>');
@@ -876,6 +876,134 @@ cmdbox.sv_exec_cmd = async (opt) => {
         console.warn(e);
         return {'warn': e.toString()};
     }
+};
+/**
+ * 指定間隔でサーバーAPI実行
+ * @param {object} opt - オプション
+ * @param {number} interval - 実行間隔（秒）
+ * @param {function} success_func - 実行するコールバック関数
+ * @param {number} start - 開始までの時間（秒）
+ * @param {number} end - 実行を続ける時間（秒）
+ * @param {function} error_func - エラー時のコールバック関数
+ * @param {boolean} loading - ローディング表示の有無
+ * @returns {Promise} - 完了時のPromise
+ */
+cmdbox.interval_exec_cmd = async (opt, interval, success_func, start=0, end=-1, error_func=null, loading=true) => {
+    if (loading) cmdbox.show_loading();
+    try {
+        // start秒待機
+        if (start > 0) {
+            await new Promise(resolve => setTimeout(resolve, start * 1000));
+        }
+        const endTime = end > 0 ? Date.now() + (end * 1000) : Infinity;
+        return new Promise((resolve, reject) => {
+            const timer = setInterval(async () => {
+                try {
+                    // end秒経過したら停止
+                    if (Date.now() >= endTime) {
+                        clearInterval(timer);
+                        if (loading) cmdbox.hide_loading();
+                        resolve({'success': true});
+                        return;
+                    }
+                    // サーバーAPI実行
+                    let res = await cmdbox.sv_exec_cmd(opt);
+                    if(res && !Array.isArray(res)) res = [res];
+                    if (!res[0] || !res[0]['success']) {
+                        if (error_func) {
+                            const result = error_func(res);
+                            // 結果がfalseの場合は停止
+                            if (result === false) {
+                                clearInterval(timer);
+                                if (loading) cmdbox.hide_loading();
+                                reject({'warn': true});
+                                return;
+                            }
+                        }
+                        console.warn(res);
+                        //cmdbox.message(res, true, true);
+                        return;
+                    }
+                    const result = await success_func(opt, res);
+                    // 結果がfalseの場合は停止
+                    if (result === false) {
+                        clearInterval(timer);
+                        // コールバック関数を実行
+                        if (loading) cmdbox.hide_loading();
+                        resolve({'success': true});
+                        return;
+                    }
+                    return;
+                } catch (e) {
+                    clearInterval(timer);
+                    console.error(e);
+                    if (loading) cmdbox.hide_loading();
+                    if (error_func) {
+                        error_func({'error': e.toString()});
+                    }
+                    reject(e);
+                }
+            }, interval*1000);
+        });
+    } catch (e) {
+        console.error(e);
+        if (loading) cmdbox.hide_loading();
+        if (error_func) {
+            error_func({'error': e.toString()});
+        }
+    }
+};
+/**
+ * サーバーAPI実行（SSE対応）
+ * @param {object} opt - オプション
+ * @param {function} error_func - エラー時のコールバック関数
+ * @param {boolean} loading - ローディング表示の有無
+ * @param {function} sse_cb - SSEメッセージ受信時のコールバック関数
+ * @returns {Promise} - レスポンス
+ */
+cmdbox.sse_exec_cmd = async (opt, error_func=null, loading=true, sse_cb=null) => {
+    if (loading) cmdbox.show_loading();
+    if (sse_cb) {
+        const queryString = new URLSearchParams(opt).toString();
+        const evtSource = new EventSource(`exec_sse_cmd?${queryString}`, {withCredentials: true,});
+        evtSource.onmessage = function(event) {
+            try {
+                console.log('SSE message received:', event.data);
+                const data = JSON.parse(event.data);
+                sse_cb(data);
+                if (data['success'] || data['error'] || data['warn']) {
+                    evtSource.close();
+                    if (loading) cmdbox.hide_loading();
+                }
+            } catch(e) {
+                console.error('Error parsing SSE data:', e);
+            }
+        };
+        evtSource.onerror = function(e) {
+            evtSource.close();
+            if (loading) cmdbox.hide_loading();
+            if (error_func) error_func({'error': `An error occurred during command execution.(${e})`});
+        };
+        return;
+    }
+    return cmdbox.sv_exec_cmd(opt).then(res => {
+        if(res && Array.isArray(res) && res.length <=0) {
+            if (loading) cmdbox.hide_loading();
+            return res;
+        }
+        if (loading) cmdbox.hide_loading();
+        if (res['success']) return res;
+        if (!res[0] || !res[0]['success']) {
+            if (error_func) {
+                error_func(res);
+                return;
+            }
+            console.warn(res);
+            //cmdbox.message(res, true, true);
+            return res;
+        }
+        return res[0];
+    });
 };
 /**
  * 接続情報取得

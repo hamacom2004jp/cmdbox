@@ -129,8 +129,8 @@ limiter_plan_page.fmt_val = (v) => (v == null || v === '') ? '-' : v;
  */
 limiter_plan_page.to_dt_local = (s) => {
     if (!s) return '-';
-    // "2024-01-01 00:00:00" または "2024-01-01T00:00:00" を "2024-01-01T00:00:00" に
-    return s.replace(' ', 'T').substring(0, 19);
+    // "2024-01-01 00:00:00" または "2024-01-01T00:00:00" または "2024-01-01T00:00" を "2024-01-01T00:00:00" に
+    return s.replace(' ', 'T').padEnd(19, ':00').substring(0, 19);
 };
 
 /**
@@ -321,7 +321,8 @@ limiter_plan_page.open_edit_modal = async (name) => {
             if (key === 'plan_start' || key === 'plan_end' || key === 'open_date' || 
                 key === 'suspend_date' || key === 'notice_date') {
                 // datetime 型は変換が必要
-                input.val(limiter_plan_page.to_dt_local(cfg[key]));
+                const dt_local = limiter_plan_page.to_dt_local(cfg[key]);
+                dt_local!='-' && input.val(dt_local);
             } else if (key === 'limiters') {
                 // limiters は callcmd ブロックで別途処理するのでここではスキップ
             } else {
