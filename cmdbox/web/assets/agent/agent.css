@@ -877,7 +877,7 @@ a.list-group-item.active {
 
 /* --- Upload Panel Styles --- */
 #upload_drop_area {
-    background-color: var(--area-bg-color-10);
+    background-color: var(--area-bg-color-50);
 }
 
 #upload_file_list .list-group-item {

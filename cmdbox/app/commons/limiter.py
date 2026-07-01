@@ -771,6 +771,7 @@ return cjson.encode(c)
         """
         counter_path = Path(data_dir) / self.LIMITER_DIR / f"{self.COUNTER_PREFIX}{limiter_name}.jsonl"
         counter_path.parent.mkdir(parents=True, exist_ok=True)
+        counter = {k: counter[k] for k in sorted(counter.keys())}
         line = json.dumps(counter, ensure_ascii=False)
         common.save_file(counter_path, lambda f: f.write(line + '\n'),
                          mode='a', encoding='utf-8', nolock=False)
@@ -824,12 +825,13 @@ return cjson.encode(c)
         Returns:
             Dict[str, Any]: 初期カウンタ
         """
-        return dict(
+        counter = dict(
             limiter_name=limiter_name,
             **{k: 0 for k in self.COUNTER_VALKEYS},
             last_reset=datetime.now().isoformat(),
             last_update=datetime.now().isoformat()
         )
+        return counter
 
     # ------------------------------------------------------------------
     # リセット判定
@@ -945,6 +947,7 @@ return cjson.encode(c)
             counter (Dict[str, Any]): リセット前のカウンタ（last_reset を含む）
         """
         try:
+            counter = {k: counter[k] for k in sorted(counter.keys())}
             last_reset_str = counter.get('last_reset', '')
             try:
                 last_reset_dt = datetime.fromisoformat(last_reset_str) if last_reset_str else datetime.now()
@@ -957,6 +960,8 @@ return cjson.encode(c)
             evidence_path = Path(data_dir) / self.LIMITER_DIR / f"evidence-{limiter_name}-{last_reset_formatted}.json"
             evidence = dict(
                 limiter_name=limiter_name,
+                last_counter=counter,
+                last_reset=last_reset_dt.isoformat(),
                 config=config,
                 history=history if isinstance(history, list) else ([history] if history else []),
             )
