@@ -87,7 +87,7 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                 # 請求タイプ
                 dict(opt="billing_type", type=Options.T_STR, default="period", required=True, multi=False, hide=False, choice=["period", "metered"],
                      choice_show=dict(period=["billing_period_unit", "billing_period_qty", "billing_unit_price"],
-                                      metered=["billing_limiter", "billing_min_amount", "billing_max_amount", "billing_unit_price"]),
+                                      metered=["billing_limiter", "billing_limiter_item", "billing_min_amount", "billing_max_amount", "billing_unit_price"]),
                      description_ja="請求タイプを指定します。`period` は期間課金、`metered` は従量課金です。",
                      description_en="Specify the billing type. `period` for period-based billing, `metered` for metered billing."),
                 # 期間課金用オプション
@@ -106,8 +106,11 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                              + "$(\"[name='billing_limiter']\").val(val);"
                              + "},$(\"[name='title']\").val(),'billing_limiter');"
                              + "}",
-                     description_ja="請求対象のリミッター名を指定します（従量課金の場合）。このリミッターのクレジットカウンターを基に請求されます。",
-                     description_en="Specify the limiter name to be billed (for metered billing). Billing is based on the credit counter of this limiter."),
+                     description_ja="請求対象のリミッター名を指定します（従量課金の場合）。このリミッターの指定した項目を基に請求されます。",
+                     description_en="Specify the limiter name to be billed (for metered billing). Billing is based on the specified item of this limiter."),
+                dict(opt="billing_limiter_item", type=Options.T_STR, default="credits", required=False, multi=False, hide=False, choice=["registrations", "count", "time", "input", "process", "output", "credits"],
+                     description_ja="請求の計算に使用するリミッター項目を指定します（従量課金の場合）。registrations(登録数), count(実行回数), time(実行時間), input(入力バイト数), process(処理バイト数), output(出力バイト数), credits(クレジット) から選択します。デフォルトは credits です。",
+                     description_en="Specify the limiter item to be used for billing calculation (for metered billing). Choose from registrations, count, time, input, process, output, credits. Default is credits."),
                 dict(opt="billing_min_amount", type=Options.T_FLOAT, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="請求の最小金額を指定します（従量課金の場合）。",
                      description_en="Specify the minimum billing amount (for metered billing)."),
@@ -168,6 +171,7 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
             billing_period_unit=args.billing_period_unit if hasattr(args, 'billing_period_unit') else None,
             billing_period_qty=args.billing_period_qty if hasattr(args, 'billing_period_qty') else None,
             billing_limiter=args.billing_limiter if hasattr(args, 'billing_limiter') else None,
+            billing_limiter_item=args.billing_limiter_item if hasattr(args, 'billing_limiter_item') else 'credits',
             billing_min_amount=args.billing_min_amount if hasattr(args, 'billing_min_amount') else None,
             billing_max_amount=args.billing_max_amount if hasattr(args, 'billing_max_amount') else None,
             billing_unit_price=args.billing_unit_price if hasattr(args, 'billing_unit_price') else None,

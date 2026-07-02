@@ -1,7 +1,7 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
-from cmdbox.app.features.cli import cmdbox_limiter_counter, cmdbox_limiter_load
+from cmdbox.app.features.cli import cmdbox_limiter_counter, cmdbox_limiter_evidences, cmdbox_limiter_load
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -15,6 +15,7 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         super().__init__(appcls, ver, language)
         self.limiter_load = cmdbox_limiter_load.LimiterLoad(appcls, ver, language)
         self.limiter_counter = cmdbox_limiter_counter.LimiterCounter(appcls, ver, language)
+        self.limiter_evidences = cmdbox_limiter_evidences.LimiterEvidences(appcls, ver, language)
 
     def get_mode(self) -> Union[str, List[str]]:
         return 'limiter'
@@ -52,12 +53,15 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="plan_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="読み込むプランの識別名を指定します。",
                      description_en="Specify the identifier name of the plan to load."),
+                dict(opt="include_history", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
+                     description_ja="エビデンスファイルの履歴情報を含めるかどうかを指定します。`True` の場合、履歴情報は出力されます。",
+                     description_en="Specifies whether to include history information in the evidence file. If set to `True`, the history information is included in the output."),
             ]
         )
 
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        payload = dict(plan_name=args.plan_name)
+        payload = dict(plan_name=args.plan_name, include_history=getattr(args, 'include_history', False))
         payload_b64 = convert.str2b64str(common.to_str(payload))
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.redis_cli.send_cmd(self.get_svcmd(), [payload_b64],
@@ -105,11 +109,13 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             billing_period_unit: Union[str, None] = pydantic.Field(default=None, description="請求期間単位")
             billing_period_qty: Union[int, None] = pydantic.Field(default=None, description="請求期間数量")
             billing_limiter: Union[str, None] = pydantic.Field(default=None, description="請求対象のリミッター名")
+            billing_limiter_item: Union[str, None] = pydantic.Field(default="credits", description="請求計算に使用するリミッター項目（registrations/count/time/input/process/output/credits）")
             billing_min_amount: Union[float, None] = pydantic.Field(default=None, description="請求の最小金額")
             billing_max_amount: Union[float, None] = pydantic.Field(default=None, description="請求の最大金額")
             billing_unit_price: Union[float, None] = pydantic.Field(default=None, description="請求単価")
             billing_currency: Union[str, None] = pydantic.Field(default="JPY", description="請求に使用する通貨（JPY, USD, EUR等）")
             current_billing_amount: Union[float, None] = pydantic.Field(default=None, description="現在の請求金額")
+            evidences: Union[List[Dict[str, Any]], None] = pydantic.Field(default=None, description="請求対象リミッター(billing_limiter)のエビデンスファイルデータ")
 
         class Data(resdata.Data):
             data: Union[Configure, None] = pydantic.Field(default=None, description="プラン設定データ")
@@ -149,6 +155,7 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         try:
             payload = json.loads(convert.b64str2str(msg[2]))
             plan_name = payload.get('plan_name')
+            include_history = payload.get('include_history', False)
             if not plan_name:
                 out = dict(warn="plan_name is required.")
                 redis_cli.rpush(reskey, out)
@@ -181,6 +188,15 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                 
                 configure['limiters'] = limiter_details
             
+            # billing_limiter に対応するエビデンスを取得
+            billing_limiter = configure.get('billing_limiter')
+            if billing_limiter:
+                try:
+                    evidences = self.limiter_evidences._get_evidences(data_dir, billing_limiter, include_history=include_history)
+                    configure['evidences'] = evidences
+                except Exception as e:
+                    logger.warning(f"Failed to load evidences for billing_limiter '{billing_limiter}': {e}")
+            
             # 現在の請求金額を計算
             billing_type = configure.get('billing_type')
             billing_unit_price = configure.get('billing_unit_price')
@@ -188,18 +204,36 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             if billing_type == 'period':
                 current_billing_amount = float(billing_unit_price) if billing_unit_price is not None else None
             elif billing_type == 'metered':
-                billing_limiter = configure.get('billing_limiter')
+                billing_limiter_item = configure.get('billing_limiter_item', 'credits')
                 if billing_unit_price is not None and billing_limiter:
-                    # billing_limiter のカウンターからクレジット数を取得
-                    credits = None
+                    # billing_limiter のカウンターから指定された項目の値を取得
+                    billing_value = None
                     limiter_details_list = configure.get('limiters', [])
                     for lm in limiter_details_list:
                         if isinstance(lm, dict) and lm.get('limiter_name') == billing_limiter:
                             counter = lm.get('counter') or {}
-                            credits = counter.get('total_credits')
+                            # billing_limiter_item に対応するカウンター値を取得
+                            if billing_limiter_item == 'registrations':
+                                billing_value = counter.get('total_registrations', 0)
+                            elif billing_limiter_item == 'count':
+                                billing_value = counter.get('total_count', 0)
+                            elif billing_limiter_item == 'time':
+                                billing_value = counter.get('total_time', 0.0)
+                            elif billing_limiter_item == 'input':
+                                billing_value = counter.get('total_input', 0)
+                            elif billing_limiter_item == 'process':
+                                billing_value = counter.get('total_process', 0)
+                            elif billing_limiter_item == 'output':
+                                billing_value = counter.get('total_output', 0)
+                            else:  # 'credits' がデフォルト
+                                billing_value = counter.get('total_credits', 0)
+                                max_total_credits = lm.get('max_total_credits', 0)
+                                if max_total_credits:
+                                    billing_value = max_total_credits if max_total_credits < billing_value else billing_value
+                            billing_value = billing_value if billing_value else 0
                             break
-                    if credits is not None:
-                        amount = float(credits) * float(billing_unit_price)
+                    if billing_value is not None:
+                        amount = float(billing_value) * float(billing_unit_price)
                         billing_min = configure.get('billing_min_amount')
                         billing_max = configure.get('billing_max_amount')
                         if billing_min is not None:

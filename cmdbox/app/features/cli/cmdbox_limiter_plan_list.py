@@ -68,6 +68,8 @@ class LimiterPlanList(feature.OneshotResultEdgeFeature, validator.Validator):
             plan_title: Union[str, None] = pydantic.Field(default=None, description="プランのタイトル")
             plan_desc: Union[str, None] = pydantic.Field(default=None, description="プランの説明")
             billing_type: Union[str, None] = pydantic.Field(default=None, description="請求タイプ")
+            billing_limiter: Union[str, None] = pydantic.Field(default=None, description="請求対象のリミッター名")
+            billing_limiter_item: Union[str, None] = pydantic.Field(default="credits", description="請求計算に使用するリミッター項目")
             billing_currency: Union[str, None] = pydantic.Field(default="JPY", description="請求に使用する通貨")
             limiters: Union[List[str], None] = pydantic.Field(default=None, description="このプランに含まれるリミッター設定名一覧")
             plan_start: Union[str, None] = pydantic.Field(default=None, description="プラン適用開始日時")
@@ -107,6 +109,9 @@ class LimiterPlanList(feature.OneshotResultEdgeFeature, validator.Validator):
                         plan_title=cfg.get('plan_title', None),
                         plan_desc=cfg.get('plan_desc', None),
                         billing_type=cfg.get('billing_type', None),
+                        billing_limiter=cfg.get('billing_limiter', None),
+                        billing_limiter_item=cfg.get('billing_limiter_item', 'credits'),
+                        billing_currency=cfg.get('billing_currency', 'JPY'),
                         limiters=cfg.get('limiters', []),
                         plan_start=cfg.get('plan_start', None),
                         plan_end=cfg.get('plan_end', None),

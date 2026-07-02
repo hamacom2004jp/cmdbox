@@ -8,7 +8,7 @@ limiter_plan_page.get_plan_form_def = async () => {
     const vform_names = ['plan_name', 'plan_title', 'plan_desc', 'limiters',
         'plan_start', 'plan_end', 'open_date', 'suspend_date', 'notice_date',
         'billing_type', 'billing_period_unit', 'billing_period_qty',
-        'billing_limiter', 'billing_min_amount', 'billing_max_amount', 'billing_unit_price', 'billing_currency'];
+        'billing_limiter', 'billing_limiter_item', 'billing_min_amount', 'billing_max_amount', 'billing_unit_price', 'billing_currency'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };
@@ -179,18 +179,17 @@ limiter_plan_page.render_plans = async (plans) => {
         const card = $(`<div class="card h-100 border-start border-4" style="border-left-color:var(--bs-success)!important;"></div>`).appendTo(col);
         const card_header = $(`<div class="doc-header d-flex align-items-center gap-2"></div>`).appendTo(card);
         
-        card_header.append(`<i class="fas fa-lg fa-layer-group"></i><strong>${plan.plan_title || ''}</strong><span> ${' ( '+plan.name+' )' || ''}</span>`);
-        if (plan.billing_type) {
-            const billing_badge = plan.billing_type === 'period' ? 'bg-info' : 'bg-warning';
-            card_header.append(`<span class="badge rounded-pill ${billing_badge} ms-auto">${plan.billing_type}</span>`);
-        }
-
+        card_header.append(`<i class="fas fa-lg fa-layer-group"></i><strong>${plan.plan_title || ''}</strong><span class="me-auto"> ${' ( '+plan.name+' )' || ''}</span>`);
         const card_body = $(`<div class="card-body p-2"></div>`).appendTo(card);
         // 説明
         if (plan.plan_desc) {
             card_body.append(`<div class="mb-2">${plan.plan_desc}</div>`);
         }
         const plan_div = $(`<div class="mb-1 pt-2 border-top"></div>`).appendTo(card_body);
+        // 請求タイプ
+        if (plan.billing_type) {
+            plan_div.append(`<div class="d-flex justify-content-between"><small class="text-secondary i18n">Billing Type</small><small class="text-info i18n">${plan.billing_type}</small></div>`);
+        }
         // プラン期間
         if (plan.plan_start || plan.plan_end) {
             plan_div.append(`<div class="d-flex justify-content-between"><small class="text-secondary i18n">Plan Period</small><small class="text-info">${limiter_plan_page.to_dt_local(plan.plan_start)} ~ ${limiter_plan_page.to_dt_local(plan.plan_end)}</small></div>`);
@@ -198,7 +197,7 @@ limiter_plan_page.render_plans = async (plans) => {
         
         // リミッター詳細を読み込んで表示
         try {
-            const res = await cmdbox.sv_exec_cmd({ mode: 'limiter', cmd: 'plan_load', plan_name: plan.name });
+            const res = await cmdbox.sv_exec_cmd({ mode: 'limiter', cmd: 'plan_load', plan_name: plan.name, include_history: false });
             const data_list = Array.isArray(res) ? res : [res];
             const first = data_list[0];
             if (first && first['success']) {
@@ -214,13 +213,13 @@ limiter_plan_page.render_plans = async (plans) => {
                 if (plan_detail.notice_date) {
                     plan_div.append(`<div class="d-flex justify-content-between"><small class="text-secondary i18n">Notice Date</small><small class="text-info">${limiter_plan_page.to_dt_local(plan_detail.notice_date)}</small></div>`);
                 }
-                
+
                 // 請求情報を表示
                 if (plan_detail.billing_period_unit && plan_detail.billing_period_qty) {
                     plan_div.append(`<div class="d-flex justify-content-between"><small class="text-secondary i18n">Billing Unit</small><small class="text-info">${plan_detail.billing_period_qty} ${plan_detail.billing_period_unit}</small></div>`);
                 }
                 if (plan_detail.billing_limiter) {
-                    plan_div.append(`<div class="d-flex justify-content-between"><small class="text-secondary i18n">Billing Credits</small><small class="text-info">${plan_detail.billing_limiter}</small></div>`);
+                    plan_div.append(`<div class="d-flex justify-content-between"><small class="text-secondary i18n">Billing Limiter</small><small class="text-info">${plan_detail.billing_limiter} ( ${plan_detail.billing_limiter_item} )</small></div>`);
                 }
                 if (plan_detail.billing_min_amount || plan_detail.billing_max_amount) {
                     const min_str = plan_detail.billing_min_amount ? `${limiter_plan_page.fmt_num(plan_detail.billing_min_amount)}` : '-';
@@ -235,6 +234,31 @@ limiter_plan_page.render_plans = async (plans) => {
                 if (plan_detail.current_billing_amount !== undefined && plan_detail.current_billing_amount !== null) {
                     const current_amount_str = limiter_plan_page.fmt_num(plan_detail.current_billing_amount);
                     plan_div.append(`<div class="d-flex justify-content-between"><small class="text-secondary i18n">Current Billing Amount</small><small class="badge text-bg-warning">${current_amount_str} ${plan_detail.billing_currency || ''}</small></div>`);
+                }
+                // billing_limiter のエビデンスを表示
+                const evidences = plan_detail.evidences || [];
+                if (evidences.length > 0) {
+                    const evidences_section = $(`<div class="mt-2 border-top pt-2"></div>`).appendTo(plan_div);
+                    const evidences_header = $(`<div class="d-flex align-items-center gap-2 mb-1 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#evidences_billing_${plan.name.replace(/[^a-zA-Z0-9]/g, '_')}"></div>`).appendTo(evidences_section);
+                    evidences_header.append(`<i class="fas fa-history fa-sm text-secondary"></i><small class="text-secondary fw-bold i18n">Evidences</small><span class="badge bg-secondary ms-auto">${evidences.length}</span>`);
+
+                    const evidences_list = $(`<div class="collapse mt-1" id="evidences_billing_${plan.name.replace(/[^a-zA-Z0-9]/g, '_')}"></div>`).appendTo(evidences_section);
+                    evidences.forEach((ev, idx) => {
+                        const ev_item = $(`<div class="small border rounded p-1 mb-2"></div>`).appendTo(evidences_list);
+                        if (ev.last_reset) {
+                            const dt_str = limiter_page.fmt_datetime(ev.last_reset);
+                            ev_item.append(`<div class="text-truncate" title="${dt_str}"><i class="fas fa-file-alt fa-xs me-1"></i><strong>${dt_str}</strong></div>`);
+                        }
+                        const lc = ev.last_counter || {};
+                        const ec = ev.config || {};
+                        limiter_page.make_progress('&nbsp;Count', lc.total_count, ec.max_total_count, limiter_page.fmt_num).appendTo(ev_item);
+                        limiter_page.make_progress('&nbsp;Time (s)', lc.total_time, ec.max_total_time, (v) => v != null ? `${typeof v === 'number' ? v.toFixed(1) : v}s` : '-').appendTo(ev_item);
+                        limiter_page.make_progress('&nbsp;Input', lc.total_input, ec.max_total_input, limiter_page.fmt_bytes).appendTo(ev_item);
+                        limiter_page.make_progress('&nbsp;Process', lc.total_process, ec.max_total_process, limiter_page.fmt_bytes).appendTo(ev_item);
+                        limiter_page.make_progress('&nbsp;Output', lc.total_output, ec.max_total_output, limiter_page.fmt_bytes).appendTo(ev_item);
+                        limiter_page.make_progress('&nbsp;Credits', lc.total_credits, ec.max_total_credits, limiter_page.fmt_num, ec.service_credits).appendTo(ev_item);
+                        limiter_page.make_progress('&nbsp;Registrations', lc.total_registrations, ec.max_registrations, limiter_page.fmt_num).appendTo(ev_item);
+                    });
                 }
                 // リミッター詳細を表示
                 if (plan_detail.limiters && Array.isArray(plan_detail.limiters) && plan_detail.limiters.length > 0) {

@@ -334,6 +334,31 @@ limiter_page._render_limiter_item = (parent, lm, show_counter) => {
         limiter_page.make_progress('Last reset', `${formatted_datetime} (${time_ago})`, null).appendTo(progress_area);
     }
 
+    // エビデンスデータ
+    const evidences = lm.evidences || [];
+    if (evidences.length > 0) {
+        const evidences_section = $(`<div class="mt-2 border-top pt-2"></div>`).appendTo(item);
+        const evidences_header = $(`<div class="d-flex align-items-center gap-2 mb-1 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#evidences_${lm.limiter_name.replace(/[^a-zA-Z0-9]/g, '_')}"></div>`).appendTo(evidences_section);
+        evidences_header.append(`<i class="fas fa-history fa-sm text-secondary"></i><small class="text-secondary fw-bold i18n">Evidences</small><span class="badge bg-secondary ms-auto">${evidences.length}</span>`);
+
+        const evidences_list = $(`<div class="collapse mt-1" id="evidences_${lm.limiter_name.replace(/[^a-zA-Z0-9]/g, '_')}"></div>`).appendTo(evidences_section);
+        evidences.forEach((ev, idx) => {
+            const ev_item = $(`<div class="small border rounded p-1 mb-2"></div>`).appendTo(evidences_list);
+            if (ev.last_reset) {
+                const dt_str = limiter_page.fmt_datetime(ev.last_reset);
+                ev_item.append(`<div class="text-truncate" title="${dt_str}"><i class="fas fa-file-alt fa-xs me-1"></i><strong>${dt_str}</strong></div>`);
+            }
+            const lc = ev.last_counter || {};
+            limiter_page.make_progress('&nbsp;Count', lc.total_count, lm.max_total_count, limiter_page.fmt_num).appendTo(ev_item);
+            limiter_page.make_progress('&nbsp;Time (s)', lc.total_time, lm.max_total_time, (v) => v != null ? `${typeof v === 'number' ? v.toFixed(1) : v}s` : '-').appendTo(ev_item);
+            limiter_page.make_progress('&nbsp;Input', lc.total_input, lm.max_total_input, limiter_page.fmt_bytes).appendTo(ev_item);
+            limiter_page.make_progress('&nbsp;Process', lc.total_process, lm.max_total_process, limiter_page.fmt_bytes).appendTo(ev_item);
+            limiter_page.make_progress('&nbsp;Output', lc.total_output, lm.max_total_output, limiter_page.fmt_bytes).appendTo(ev_item);
+            limiter_page.make_progress('&nbsp;Credits', lc.total_credits, lm.max_total_credits, limiter_page.fmt_num, lm.service_credits).appendTo(ev_item);
+            limiter_page.make_progress('&nbsp;Registrations', lc.total_registrations, lm.max_registrations, limiter_page.fmt_num).appendTo(ev_item);
+        });
+    }
+
     // 操作ボタン
     const btn_row = $(`<div class="d-flex gap-2 mt-2"></div>`).appendTo(item);
     const btn_edit = $(`<button type="button" class="btn btn-sm btn-outline-info i18n">Edit</button>`).appendTo(btn_row);

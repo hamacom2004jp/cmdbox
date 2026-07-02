@@ -1,6 +1,6 @@
 from cmdbox.app import common, feature
 from cmdbox.app.commons import limiter, redis_client, resdata, validator
-from cmdbox.app.features.cli import cmdbox_limiter_counter, cmdbox_limiter_list, cmdbox_limiter_load
+from cmdbox.app.features.cli import cmdbox_limiter_counter, cmdbox_limiter_evidences, cmdbox_limiter_list, cmdbox_limiter_load
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -16,6 +16,7 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
         self.limiter_list = cmdbox_limiter_list.LimiterList(appcls, ver, language)
         self.limiter_load = cmdbox_limiter_load.LimiterLoad(appcls, ver, language)
         self.limiter_counter = cmdbox_limiter_counter.LimiterCounter(appcls, ver, language)
+        self.limiter_evidences = cmdbox_limiter_evidences.LimiterEvidences(appcls, ver, language)
 
     def get_mode(self) -> Union[str, List[str]]:
         return 'limiter'
@@ -72,6 +73,9 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="filter_limiter_name", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="リミッター名で絞り込みます。指定した場合、そのリミッター名のみの結果を返します。",
                      description_en="Filter by limiter name. If specified, returns results for that limiter only."),
+                dict(opt="include_history", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
+                     description_ja="エビデンスファイルの履歴情報を含めるかどうかを指定します。`True` の場合、履歴情報は出力されます。",
+                     description_en="Specifies whether to include history information in the evidence file. If set to `True`, the history information is included in the output."),
             ]
         )
 
@@ -154,6 +158,15 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
                         cfg['counter'] = {}
                     else:
                         cfg['counter'] = res.get('success', {}).get('data', {})
+                    # Evidences を取得
+                    ev_args = copy.copy(args)
+                    ev_args.limiter_name = entry['name']
+                    ev_args.include_history = getattr(args, 'include_history', False)
+                    st_e, res_e, _ = self.limiter_evidences.apprun(logger, ev_args, tm, pf)
+                    if st_e == self.RESP_SUCCESS:
+                        cfg['evidences'] = res_e.get('success', {}).get('data', [])
+                    else:
+                        cfg['evidences'] = []
                     matched_limiters.append(cfg)
                 if filter_limiter_name and not matched_limiters:
                     continue
