@@ -1,9 +1,10 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.options import Options
-from cmdbox.app.features.cli import cmdbox_limiter_counter, cmdbox_limiter_evidences, cmdbox_limiter_load
+from cmdbox.app.features.cli import cmdbox_limiter_counter, cmdbox_limiter_load, cmdbox_limiter_billing_load
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
+from datetime import datetime as _dt
 import argparse
 import logging
 import json
@@ -11,11 +12,11 @@ import pydantic
 
 
 class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
-    def __init__(self, appcls, ver, language='en'):
+    def __init__(self, appcls, ver, language=None):
         super().__init__(appcls, ver, language)
         self.limiter_load = cmdbox_limiter_load.LimiterLoad(appcls, ver, language)
         self.limiter_counter = cmdbox_limiter_counter.LimiterCounter(appcls, ver, language)
-        self.limiter_evidences = cmdbox_limiter_evidences.LimiterEvidences(appcls, ver, language)
+        self.billing_load = cmdbox_limiter_billing_load.LimiterBillingLoad(appcls, ver, language)
 
     def get_mode(self) -> Union[str, List[str]]:
         return 'limiter'
@@ -94,6 +95,22 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             max_history_interval: Union[float, None] = pydantic.Field(default=None, description="履歴保存期間の最大間隔（秒）")
             counter: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="現在のカウンター状態")
 
+        class BillingData(resdata.Base):
+            plan_name: Union[str, None] = pydantic.Field(default=None, description="プランの識別名")
+            plan_title: Union[str, None] = pydantic.Field(default=None, description="プランのタイトル")
+            billing_limiter: Union[str, None] = pydantic.Field(default=None, description="請求対象のリミッター名")
+            billing_limiter_item: Union[str, None] = pydantic.Field(default="credits", description="請求計算に使用するリミッター項目")
+            billing_type: Union[str, None] = pydantic.Field(default=None, description="請求タイプ（period or metered）")
+            billing_currency: Union[str, None] = pydantic.Field(default="JPY", description="請求通貨")
+            billing_unit_price: Union[float, None] = pydantic.Field(default=None, description="請求単価")
+            billing_min_amount: Union[float, None] = pydantic.Field(default=None, description="請求の最小金額")
+            billing_max_amount: Union[float, None] = pydantic.Field(default=None, description="請求の最大金額")
+            billing_amount: Union[float, None] = pydantic.Field(default=None, description="計算された請求金額")
+            last_reset: Union[str, None] = pydantic.Field(default=None, description="リセット日時")
+            last_counter: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="リセット時点のカウンター")
+            calc_datetime: Union[str, None] = pydantic.Field(default=None, description="請求金額計算日時")
+            evidence_filename: Union[str, None] = pydantic.Field(default=None, description="エビデンスファイル名")
+
         class Configure(resdata.Base):
             plan_name: Union[str, None] = pydantic.Field(default=None, description="プランの識別名")
             plan_title: Union[str, None] = pydantic.Field(default=None, description="プランのタイトル")
@@ -114,8 +131,9 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             billing_max_amount: Union[float, None] = pydantic.Field(default=None, description="請求の最大金額")
             billing_unit_price: Union[float, None] = pydantic.Field(default=None, description="請求単価")
             billing_currency: Union[str, None] = pydantic.Field(default="JPY", description="請求に使用する通貨（JPY, USD, EUR等）")
+            current_billing_qty: Union[float, None] = pydantic.Field(default=None, description="現在の請求対象量")
             current_billing_amount: Union[float, None] = pydantic.Field(default=None, description="現在の請求金額")
-            evidences: Union[List[Dict[str, Any]], None] = pydantic.Field(default=None, description="請求対象リミッター(billing_limiter)のエビデンスファイルデータ")
+            billing_data: Union[List[BillingData], None] = pydantic.Field(default=None, description="請求データリスト")
 
         class Data(resdata.Data):
             data: Union[Configure, None] = pydantic.Field(default=None, description="プラン設定データ")
@@ -128,7 +146,8 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
     def is_cluster_redirect(self):
         return False
 
-    def _load_plan_config(self, data_dir: Path, plan_name: str) -> Dict[str, Any]:
+    @classmethod
+    def _load_plan_config(cls, data_dir: Path, plan_name: str) -> Dict[str, Any]:
         """
         プラン設定ファイルを読み込んで辞書として返す
         
@@ -188,18 +207,30 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                 
                 configure['limiters'] = limiter_details
             
-            # billing_limiter に対応するエビデンスを取得
+            # billing_limiter に対応する請求データを取得（cmdbox_limiter_billing_load を使用）
             billing_limiter = configure.get('billing_limiter')
             if billing_limiter:
                 try:
-                    evidences = self.limiter_evidences._get_evidences(data_dir, billing_limiter, include_history=include_history)
-                    configure['evidences'] = evidences
+                    # billing_load から請求ファイルを検索
+                    billing_files = self.billing_load._find_billing_files(data_dir, billing_limiter)
+                    # 各請求データファイルを読み込んで返す
+                    billing_data_list = []
+                    for billing_file in billing_files:
+                        try:
+                            with billing_file.open('r', encoding='utf-8') as f:
+                                billing_data = json.load(f)
+                                billing_data_list.append(billing_data)
+                        except Exception as e:
+                            logger.warning(f"Failed to load billing data file '{billing_file}': {e}")
+                            continue
+                    configure['billing_data'] = billing_data_list
                 except Exception as e:
-                    logger.warning(f"Failed to load evidences for billing_limiter '{billing_limiter}': {e}")
+                    logger.warning(f"Failed to load billing data for billing_limiter '{billing_limiter}': {e}")
             
             # 現在の請求金額を計算
             billing_type = configure.get('billing_type')
             billing_unit_price = configure.get('billing_unit_price')
+            billing_value = None
             current_billing_amount = None
             if billing_type == 'period':
                 current_billing_amount = float(billing_unit_price) if billing_unit_price is not None else None
@@ -225,7 +256,7 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                                 billing_value = counter.get('total_process', 0)
                             elif billing_limiter_item == 'output':
                                 billing_value = counter.get('total_output', 0)
-                            else:  # 'credits' がデフォルト
+                            else:
                                 billing_value = counter.get('total_credits', 0)
                                 max_total_credits = lm.get('max_total_credits', 0)
                                 if max_total_credits:
@@ -241,7 +272,13 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                         if billing_max is not None:
                             amount = min(amount, float(billing_max))
                         current_billing_amount = amount
+            configure['current_billing_qty'] = billing_value
             configure['current_billing_amount'] = current_billing_amount
+            if configure.get('billing_type') == 'period':
+                configure['billing_limiter'] = None
+                configure['billing_limiter_item'] = None
+                configure['billing_min_amount'] = None
+                configure['billing_max_amount'] = None
 
             out = dict(success=dict(data=configure))
             redis_cli.rpush(reskey, out)

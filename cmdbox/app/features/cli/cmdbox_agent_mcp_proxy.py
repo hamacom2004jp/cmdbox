@@ -95,3 +95,6 @@ class AgentMcpProxy(feature.UnsupportEdgeFeature, validator.Validator, limiter.L
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
+
+    def apprun_credit(self, data_dir, logger, args, msg):
+        return 1

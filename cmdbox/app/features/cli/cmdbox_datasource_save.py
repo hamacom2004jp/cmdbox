@@ -155,12 +155,6 @@ class DatasourceSave(datasource_base.DatasourceBase, validator.Validator, limite
 
     def svrun_registrations(self, data_dir, logger, opt, msg):
         datasource_dir = data_dir / '.datasource'
-        count = 0
-        if datasource_dir.exists() and datasource_dir.is_dir():
-            paths = datasource_dir.glob(f"datasource-*.json")
-            for p in sorted(paths):
-                name = p.name
-                if not name.startswith('datasource-') or not name.endswith('.json'):
-                    continue
-                count += 1
+        paths = datasource_dir.glob(f"datasource-*.json")
+        count = len(list(paths))
         return count

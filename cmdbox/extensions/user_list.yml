@@ -95,7 +95,7 @@ cmdrule:                       # A list of command rules, Specify a rule that de
       to_fwpath: "['/.users/','/.groups/']"
       from_rjpath: '[f''^/.(users|groups)/develop/'', f''^/.(users|groups)/master/'']'
       to_rjpath: '[f''^/.(users|groups)/develop/'', f''^/.(users|groups)/master/'']'
-    rule: allow
+    rule: deny
   - groups: [guest, user]
     coercion:
       fwpath: "[f'/.users/{user_name}/']+[f'/.groups/{g}/' for g in groups]"
@@ -107,77 +107,74 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     rule: deny
   - groups: [admin]
     mode: limiter              # Specify the "mode" as the condition for applying the rule.
-    cmds: [del, save]
-    rule: deny
-  - groups: [master, admin]
+    cmds: [counter, evidences, # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
+           list, load, targets, plan_list, plan_load]
+    rule: allow
+  - groups: [master]
     mode: test
     rule: deny
-  - groups: [admin]
+  - groups: [admin, guest, user]
     mode: tts
-    cmds: [install, uninstall] # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
-    rule: deny
-  - groups: [admin]
-    mode: datasource
-    cmds: [save, load, del, tbl_create, tbl_drop, idx_create, idx_drop]
-    rule: deny
-  - groups: [guest, user]
+    cmds: [list, say] 
+    rule: allow
+  - groups: [admin, guest, user]
     mode: datasource
     cmds: [list]
     rule: allow
-  - groups: [guest, user]
+  - groups: [admin, guest, user]
     mode: llm
     cmds: [list, chat, translation]
     rule: allow
-  - groups: [user]
+  - groups: [admin, user]
     mode: client
     cmds: [file_download, file_is, file_list, server_info, time]
     rule: allow
-  - groups: [user]
+  - groups: [admin, user]
     mode: agent
     cmds: [chat, agent_list, mcp_client, mcpsv_list, runner_list, runner_load,
            session_list, session_del, start, stop]
     rule: allow
-  - groups: [user]
+  - groups: [admin, user]
     mode: cmd
     cmds: [list, load, check]
     rule: allow
-  - groups: [user]
+  - groups: [admin, user]
     mode: extract
     cmds: [list, pdfplumber, chunklet]
     coercion:
       fwpath: "[f'/.users/{user_name}/']+[f'/.groups/{g}/' for g in groups]"
     rule: allow
-  - groups: [user]
+  - groups: [admin, user]
     mode: rag
     cmds: [list]
     rule: allow
-  - groups: [user]
+  - groups: [admin, user]
     mode: server
     cmds: [list]
     rule: allow
-  - groups: [user, guest]
+  - groups: [admin, user, guest]
     mode: audit
     cmds: [write]
     rule: allow
-  - groups: [user, guest]
+  - groups: [admin, user, guest]
     mode: web
     cmds: [genpass]
     rule: allow
-  - groups: [user]
+  - groups: [admin, user]
     mode: client
     cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
     rule: allow
-  - groups: [editor]
+  - groups: [admin, editor]
     mode: agent
     cmds: [agent_del, mcpsv_del, runner_del,
            agent_load, mcpsv_load, runner_load,
            agent_save, mcpsv_save, runner_save,]
     rule: allow
-  - groups: [editor]
+  - groups: [admin, editor]
     mode: extract
     cmds: [del, load, save]
     rule: allow
-  - groups: [editor]
+  - groups: [admin, editor]
     mode: llm
     cmds: [del, load, save]
     rule: allow

@@ -162,7 +162,6 @@ limiter_page.init_filter_options = async () => {
         if (target_mode_opt && target_mode_opt.choice) {
             const mode_select = $('#filter_target_mode');
             mode_select.empty();
-            mode_select.append('<option value="">all</option>');
             target_mode_opt.choice.forEach(mode => {
                 const val = typeof mode === 'object' ? Object.keys(mode)[0] : mode;
                 mode_select.append(`<option value="${val}">${val}</option>`);
@@ -179,7 +178,7 @@ limiter_page.init_filter_options = async () => {
                 const limiters = first['success']['data'];
                 const limiter_select = $('#filter_limiter_name');
                 limiter_select.empty();
-                limiter_select.append('<option value="">all</option>');
+                limiter_select.append('<option value=""></option>');
                 limiters.forEach(lm => {
                     limiter_select.append(`<option value="${lm.name}">${lm.name}</option>`);
                 });
@@ -279,7 +278,7 @@ limiter_page.render_targets = async (targets) => {
             continue;
         }
         for (const lm of limiters) {
-            limiter_page._render_limiter_item(card_body, lm, true);
+            limiter_page._render_limiter_item(card_body, lm, true, is_limiter_save);
         }
     }
     cmdbox.hide_loading();
@@ -290,7 +289,7 @@ limiter_page.render_targets = async (targets) => {
 /**
  * 制限設定カードアイテムを親要素に追加 (limiters ビュー内)
  */
-limiter_page._render_limiter_item = (parent, lm, show_counter) => {
+limiter_page._render_limiter_item = (parent, lm, show_counter, is_limiter_save) => {
     const item = $(`<div class="border rounded p-2 mb-2 bg-body-tertiary"></div>`).appendTo(parent);
     const name_row = $(`<div class="d-flex align-items-center mb-1 gap-1"></div>`).appendTo(item);
     name_row.append(`<i class="fas fa-lock fa-sm text-info me-1"></i><strong>${lm.limiter_title || ''}</strong><span class="me-auto">${' ( '+lm.limiter_name+' )' || ''}</span>`);
@@ -359,12 +358,14 @@ limiter_page._render_limiter_item = (parent, lm, show_counter) => {
         });
     }
 
-    // 操作ボタン
-    const btn_row = $(`<div class="d-flex gap-2 mt-2"></div>`).appendTo(item);
-    const btn_edit = $(`<button type="button" class="btn btn-sm btn-outline-info i18n">Edit</button>`).appendTo(btn_row);
-    const btn_del = $(`<button type="button" class="btn btn-sm btn-outline-danger i18n">Delete</button>`).appendTo(btn_row);
-    btn_edit.on('click', () => limiter_page.open_edit_modal(lm.limiter_name));
-    btn_del.on('click', () => limiter_page.delete_limiter(lm.limiter_name));
+    if (is_limiter_save) {
+        // 操作ボタン
+        const btn_row = $(`<div class="d-flex gap-2 mt-2"></div>`).appendTo(item);
+        const btn_edit = $(`<button type="button" class="btn btn-sm btn-outline-info i18n">Edit</button>`).appendTo(btn_row);
+        const btn_del = $(`<button type="button" class="btn btn-sm btn-outline-danger i18n">Delete</button>`).appendTo(btn_row);
+        btn_edit.on('click', () => limiter_page.open_edit_modal(lm.limiter_name));
+        btn_del.on('click', () => limiter_page.delete_limiter(lm.limiter_name));
+    }
 };
 
 /**

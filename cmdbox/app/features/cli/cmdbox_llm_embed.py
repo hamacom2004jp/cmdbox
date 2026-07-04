@@ -208,3 +208,9 @@ class LLMEmbed(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Li
         else:
             raise ValueError(f"Unsupported LLM provider: {llmprov}")
         return self.RESP_SUCCESS, dict(success=dict(data=res))
+
+    def svrun_credit(self, data_dir, logger, opt, msg):
+        data = msg.get('success', {}).get('data', [])
+        if not data:
+            return 0
+        return len(data)

@@ -18,7 +18,7 @@ $(() => {
     $('#cmd_limiter_save').on('click', () => limiter_page.save_limiter());
     // Limiter 削除ボタン
     $('#cmd_limiter_del').on('click', () => {
-        const name = $('#lm_limiter_name').val().trim();
+        const name = $('[name="limiter_name"]').val().trim();
         limiter_page.delete_limiter(name);
     });
     

@@ -1,7 +1,7 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
-from cmdbox.app.features.cli import cmdbox_limiter_load
+from cmdbox.app.features.cli import cmdbox_limiter_load, cmdbox_limiter_list
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -11,8 +11,9 @@ import pydantic
 
 
 class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
-    def __init__(self, appcls, ver, language='en'):
+    def __init__(self, appcls, ver, language=None):
         super().__init__(appcls, ver, language)
+        self.limiter_list = cmdbox_limiter_list.LimiterList(appcls, ver, language)
         self.limiter_load = cmdbox_limiter_load.LimiterLoad(appcls, ver, language)
 
     def get_mode(self) -> Union[str, List[str]]:
@@ -59,13 +60,7 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_ja="プランの説明を指定します。",
                      description_en="Specify the description of the plan."),
                 dict(opt="limiters", type=Options.T_STR, default=None, required=True, multi=True, hide=False, choice=[],
-                     callcmd="async () => {await cmdbox.callcmd('limiter','list',{},(res)=>{"
-                             + "const val = $(\"[name='limiters']\").val();"
-                             + "$(\"[name='limiters']\").empty().append('<option></option>');"
-                             + "res['data'].map(elm=>{$(\"[name='limiters']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
-                             + "$(\"[name='limiters']\").val(val);"
-                             + "},$(\"[name='title']\").val(),'limiters');"
-                             + "}",
+                     choice_fn = self.choice_limiters,
                      description_ja="このプランに含まれるリミッター設定名を指定します。",
                      description_en="Specify the limiter configuration names included in this plan."),
                 # プラン期間設定
@@ -86,7 +81,7 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_en="Specify the datetime to notify about the suspension date before the suspend_date (e.g. 2024-12-20T00:00:00). If omitted, no notification is sent."),
                 # 請求タイプ
                 dict(opt="billing_type", type=Options.T_STR, default="period", required=True, multi=False, hide=False, choice=["period", "metered"],
-                     choice_show=dict(period=["billing_period_unit", "billing_period_qty", "billing_unit_price"],
+                     choice_show=dict(period=["billing_unit_price"],
                                       metered=["billing_limiter", "billing_limiter_item", "billing_min_amount", "billing_max_amount", "billing_unit_price"]),
                      description_ja="請求タイプを指定します。`period` は期間課金、`metered` は従量課金です。",
                      description_en="Specify the billing type. `period` for period-based billing, `metered` for metered billing."),
@@ -127,13 +122,33 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
             ]
         )
 
+    def choice_limiters(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
+        """
+        オプションのchoiceを動的に生成する関数
+
+        Args:
+            o (Dict[str, Any]): choice_fn関数が呼ばれたコマンドオプションのchoice定義
+            webmode (bool): Webモードかどうか
+            opt (Dict[str, Any]): このコマンドのすべてのコマンドオプションのchoice定義
+
+        Returns:
+            Any: choice情報
+        """
+        logger = common.default_logger(False, ver=self.ver, webcall=webmode)
+        args = argparse.Namespace(**opt)
+        st, res, _ = self.limiter_list.apprun(logger, args, 0.0, [])
+        if st != self.RESP_SUCCESS:
+            return []
+        ret = [k.get('name') for k in res.get('success', {}).get('data', [])]
+        return [''] + ret
+
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         # 請求タイプ別の検証
         if args.billing_type == 'period':
-            if not args.billing_period_unit or not args.billing_period_qty or args.billing_unit_price is None:
-                result = dict(warn="For period-based billing, billing_period_unit, billing_period_qty, and billing_unit_price are required.")
-                logger.warning("For period-based billing, billing_period_unit, billing_period_qty, and billing_unit_price are required.")
+            if args.billing_unit_price is None:
+                result = dict(warn="For period-based billing, billing_unit_price is required.")
+                logger.warning("For period-based billing, billing_unit_price is required.")
                 common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, result, None
         elif args.billing_type == 'metered':
@@ -257,6 +272,7 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                     redis_cli.rpush(reskey, out)
                     return self.RESP_WARN
 
+            # billing_type が metered の場合、billing_limiter が limiters に含まれていることを確認
             if configure.get('billing_type') == 'metered':
                 billing_limiter = configure.get('billing_limiter')
                 if billing_limiter and billing_limiter not in limiters:
@@ -265,34 +281,33 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                     redis_cli.rpush(reskey, out)
                     return self.RESP_WARN
 
-            # billing_type が period の場合、billing_period_unit/qty と reset_period_unit/qty が一致することを確認
-            if configure.get('billing_type') == 'period':
-                billing_period_unit = configure.get('billing_period_unit')
-                billing_period_qty = configure.get('billing_period_qty')
-                if plan_start and limiters:
-                    mismatched_limiters = []
-                    for limiter_name in limiters:
-                        try:
-                            limiter_config = self.limiter_load._load_limiter_config(data_dir, limiter_name)
-                            # reset_period_unit の一致確認
-                            reset_period_unit = limiter_config.get('reset_period_unit')
-                            if billing_period_unit and reset_period_unit != billing_period_unit:
-                                mismatched_limiters.append(f"{limiter_name}: reset_period_unit={reset_period_unit} (expected {billing_period_unit})")
-                            # reset_period_qty の一致確認
-                            reset_period_qty = limiter_config.get('reset_period_qty')
-                            billing_qty_val = int(billing_period_qty) if billing_period_qty is not None else None
-                            reset_qty_val = int(reset_period_qty) if reset_period_qty is not None else None
-                            if billing_qty_val is not None and reset_qty_val != billing_qty_val:
-                                mismatched_limiters.append(f"{limiter_name}: reset_period_qty={reset_period_qty} (expected {billing_period_qty})")
-                        except FileNotFoundError:
-                            mismatched_limiters.append(f"Limiter configuration '{limiter_name}' not found")
-                        except Exception as e:
-                            mismatched_limiters.append(f"Failed to load limiter config for '{limiter_name}': {e}")
-                    if mismatched_limiters:
-                        out = dict(warn=f"The billing_period_unit/qty does not match the reset_period_unit/qty of the following limiters: {', '.join(mismatched_limiters)}")
-                        logger.warning(out)
-                        redis_cli.rpush(reskey, out)
-                        return self.RESP_WARN
+            # billing_period_unit/qty と reset_period_unit/qty が一致することを確認
+            billing_period_unit = configure.get('billing_period_unit')
+            billing_period_qty = configure.get('billing_period_qty')
+            if plan_start and limiters:
+                mismatched_limiters = []
+                for limiter_name in limiters:
+                    try:
+                        limiter_config = self.limiter_load._load_limiter_config(data_dir, limiter_name)
+                        # reset_period_unit の一致確認
+                        reset_period_unit = limiter_config.get('reset_period_unit')
+                        if billing_period_unit and reset_period_unit != billing_period_unit:
+                            mismatched_limiters.append(f"{limiter_name}: reset_period_unit={reset_period_unit} (expected {billing_period_unit})")
+                        # reset_period_qty の一致確認
+                        reset_period_qty = limiter_config.get('reset_period_qty')
+                        billing_qty_val = int(billing_period_qty) if billing_period_qty is not None else None
+                        reset_qty_val = int(reset_period_qty) if reset_period_qty is not None else None
+                        if billing_qty_val is not None and reset_qty_val != billing_qty_val:
+                            mismatched_limiters.append(f"{limiter_name}: reset_period_qty={reset_period_qty} (expected {billing_period_qty})")
+                    except FileNotFoundError:
+                        mismatched_limiters.append(f"Limiter configuration '{limiter_name}' not found")
+                    except Exception as e:
+                        mismatched_limiters.append(f"Failed to load limiter config for '{limiter_name}': {e}")
+                if mismatched_limiters:
+                    out = dict(warn=f"The billing_period_unit/qty does not match the reset_period_unit/qty of the following limiters: {', '.join(mismatched_limiters)}")
+                    logger.warning(out)
+                    redis_cli.rpush(reskey, out)
+                    return self.RESP_WARN
 
             # open_date/suspend_date とリミッターの exec_period_start/exec_period_end を比較
             if (open_date or suspend_date) and limiters:

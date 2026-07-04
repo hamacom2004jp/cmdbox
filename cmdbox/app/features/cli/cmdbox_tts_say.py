@@ -394,3 +394,6 @@ class TtsSay(feature.ResultEdgeFeature, validator.Validator, limiter.LimitedFeat
             synthesizer.unload_voice_model(tts_engine_obj['model_id'])
         except Exception:
             pass
+
+    def svrun_credit(self, data_dir, logger, opt, msg):
+        return 1

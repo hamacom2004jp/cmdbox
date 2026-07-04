@@ -124,7 +124,8 @@ class LimiterLoad(feature.OneshotResultEdgeFeature, validator.Validator):
     def is_cluster_redirect(self):
         return False
 
-    def _load_limiter_config(self, data_dir: Path, limiter_name: str) -> Dict[str, Any]:
+    @classmethod
+    def _load_limiter_config(cls, data_dir: Path, limiter_name: str) -> Dict[str, Any]:
         """Load limiter configuration from file (internal helper method)"""
         configure_path = data_dir / ".limiter" / f"limiter-{limiter_name}.json"
         if not configure_path.exists():
@@ -145,7 +146,7 @@ class LimiterLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                 return self.RESP_WARN
 
             try:
-                configure = self._load_limiter_config(data_dir, limiter_name)
+                configure = LimiterLoad._load_limiter_config(data_dir, limiter_name)
             except FileNotFoundError as e:
                 result = dict(warn=str(e))
                 redis_cli.rpush(reskey, result)

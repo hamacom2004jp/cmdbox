@@ -11,7 +11,7 @@ import pydantic
 
 
 class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
-    def __init__(self, appcls, ver, language='en'):
+    def __init__(self, appcls, ver, language=None):
         super().__init__(appcls, ver, language)
         self.limiter_plan_load = cmdbox_limiter_plan_load.LimiterPlanLoad(appcls, ver, language)
 

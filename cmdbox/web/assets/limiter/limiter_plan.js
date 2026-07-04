@@ -230,42 +230,56 @@ limiter_plan_page.render_plans = async (plans) => {
                     const price_str = limiter_plan_page.fmt_num(plan_detail.billing_unit_price);
                     plan_div.append(`<div class="d-flex justify-content-between"><small class="text-secondary i18n">Unit Price</small><small class="text-info">${price_str} ${plan_detail.billing_currency || ''}</small></div>`);
                 }
+                if (plan_detail.current_billing_qty) {
+                    const qty_str = limiter_plan_page.fmt_num(plan_detail.current_billing_qty);
+                    plan_div.append(`<div class="d-flex justify-content-between"><small class="text-secondary i18n">Current Billing Quantity</small><small class="text-info">${qty_str}</small></div>`);
+                }
                 // 現在の請求金額を表示
                 if (plan_detail.current_billing_amount !== undefined && plan_detail.current_billing_amount !== null) {
                     const current_amount_str = limiter_plan_page.fmt_num(plan_detail.current_billing_amount);
                     plan_div.append(`<div class="d-flex justify-content-between"><small class="text-secondary i18n">Current Billing Amount</small><small class="badge text-bg-warning">${current_amount_str} ${plan_detail.billing_currency || ''}</small></div>`);
                 }
                 // billing_limiter のエビデンスを表示
-                const evidences = plan_detail.evidences || [];
-                if (evidences.length > 0) {
-                    const evidences_section = $(`<div class="mt-2 border-top pt-2"></div>`).appendTo(plan_div);
-                    const evidences_header = $(`<div class="d-flex align-items-center gap-2 mb-1 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#evidences_billing_${plan.name.replace(/[^a-zA-Z0-9]/g, '_')}"></div>`).appendTo(evidences_section);
-                    evidences_header.append(`<i class="fas fa-history fa-sm text-secondary"></i><small class="text-secondary fw-bold i18n">Evidences</small><span class="badge bg-secondary ms-auto">${evidences.length}</span>`);
+                const billing_datas = plan_detail.billing_data || [];
+                if (billing_datas.length > 0) {
+                    const billing_section = $(`<div class="mt-2 border-top pt-2"></div>`).appendTo(plan_div);
+                    const billing_header = $(`<div class="d-flex align-items-center gap-2 mb-1 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#billings_${plan.name.replace(/[^a-zA-Z0-9]/g, '_')}"></div>`).appendTo(billing_section);
+                    billing_header.append(`<i class="fas fa-history fa-sm text-secondary"></i><small class="text-secondary fw-bold i18n">Billings</small><small>${plan_detail.billing_limiter ? ' ( '+plan_detail.billing_limiter+' )' : ''}</small><span class="badge bg-secondary ms-auto">${billing_datas.length}</span>`);
 
-                    const evidences_list = $(`<div class="collapse mt-1" id="evidences_billing_${plan.name.replace(/[^a-zA-Z0-9]/g, '_')}"></div>`).appendTo(evidences_section);
-                    evidences.forEach((ev, idx) => {
-                        const ev_item = $(`<div class="small border rounded p-1 mb-2"></div>`).appendTo(evidences_list);
-                        if (ev.last_reset) {
-                            const dt_str = limiter_page.fmt_datetime(ev.last_reset);
-                            ev_item.append(`<div class="text-truncate" title="${dt_str}"><i class="fas fa-file-alt fa-xs me-1"></i><strong>${dt_str}</strong></div>`);
+                    const billing_list = $(`<div class="collapse mt-1" id="billings_${plan.name.replace(/[^a-zA-Z0-9]/g, '_')}"></div>`).appendTo(billing_section);
+                    billing_datas.forEach((bl, idx) => {
+                        const ev_item = $(`<div class="small border rounded p-1 mb-2"></div>`).appendTo(billing_list);
+                        const dt_elem = $(`<div class="d-flex justify-content-between"><strong class="i18n">Last Reset</strong><strong class="text-info">${limiter_plan_page.fmt_datetime(bl.last_reset)}</strong></div>`).appendTo(ev_item);
+                        const calc_elem = $(`<div class="d-flex justify-content-between"><small class="text-secondary i18n">Calculation Datetime</small><small class="text-info">${limiter_plan_page.fmt_datetime(bl.calc_datetime)}</small></div>`).appendTo(ev_item);
+                        if (bl.billing_min_amount || bl.billing_max_amount) {
+                            const min_str = bl.billing_min_amount ? `${limiter_plan_page.fmt_num(bl.billing_min_amount)}` : '-';
+                            const max_str = bl.billing_max_amount ? `${limiter_plan_page.fmt_num(bl.billing_max_amount)}` : '-';
+                            ev_item.append(`<div class="d-flex justify-content-between"><small class="text-secondary i18n">Price Range</small><small class="text-info">${min_str} ~ ${max_str} ${bl.billing_currency || ''}</small></div>`);
                         }
-                        const lc = ev.last_counter || {};
-                        const ec = ev.config || {};
-                        limiter_page.make_progress('&nbsp;Count', lc.total_count, ec.max_total_count, limiter_page.fmt_num).appendTo(ev_item);
-                        limiter_page.make_progress('&nbsp;Time (s)', lc.total_time, ec.max_total_time, (v) => v != null ? `${typeof v === 'number' ? v.toFixed(1) : v}s` : '-').appendTo(ev_item);
-                        limiter_page.make_progress('&nbsp;Input', lc.total_input, ec.max_total_input, limiter_page.fmt_bytes).appendTo(ev_item);
-                        limiter_page.make_progress('&nbsp;Process', lc.total_process, ec.max_total_process, limiter_page.fmt_bytes).appendTo(ev_item);
-                        limiter_page.make_progress('&nbsp;Output', lc.total_output, ec.max_total_output, limiter_page.fmt_bytes).appendTo(ev_item);
-                        limiter_page.make_progress('&nbsp;Credits', lc.total_credits, ec.max_total_credits, limiter_page.fmt_num, ec.service_credits).appendTo(ev_item);
-                        limiter_page.make_progress('&nbsp;Registrations', lc.total_registrations, ec.max_registrations, limiter_page.fmt_num).appendTo(ev_item);
+                        if (bl.billing_unit_price) {
+                            const price_str = limiter_plan_page.fmt_num(bl.billing_unit_price);
+                            ev_item.append(`<div class="d-flex justify-content-between"><small class="text-secondary i18n">Unit Price</small><small class="text-info">${price_str} ${bl.billing_currency || ''}</small></div>`);
+                        }
+                        if (bl.billing_qty !== undefined && bl.billing_qty !== null) {
+                            const qty_str = limiter_plan_page.fmt_num(bl.billing_qty);
+                            ev_item.append(`<div class="d-flex justify-content-between"><small class="text-secondary i18n">Billing Quantity</small><small class="text-info">${qty_str}</small></div>`);
+                        }
+                        if (bl.billing_amount !== undefined && bl.billing_amount !== null) {
+                            const amount_str = limiter_plan_page.fmt_num(bl.billing_amount);
+                            ev_item.append(`<div class="d-flex justify-content-between"><small class="text-secondary i18n">Billing Amount</small><small class="badge text-bg-info">${amount_str} ${bl.billing_currency || ''}</small></div>`);
+                        }
                     });
                 }
                 // リミッター詳細を表示
                 if (plan_detail.limiters && Array.isArray(plan_detail.limiters) && plan_detail.limiters.length > 0) {
-                    const limiters_area = $(`<div class="mt-2 pt-2 border-top"></div>`).appendTo(card_body);
+                    const limiters_section = $(`<div class="mt-2 border-top pt-2"></div>`).appendTo(card_body);
+                    const limiters_header = $(`<div class="d-flex align-items-center gap-2 mb-1 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#limiters_${plan.name.replace(/[^a-zA-Z0-9]/g, '_')}"></div>`).appendTo(limiters_section);
+                    limiters_header.append(`<i class="fas fa-lock fa-sm text-secondary"></i><small class="text-secondary fw-bold i18n">Limiters</small><span class="badge bg-secondary ms-auto">${plan_detail.limiters.length}</span>`);
+
+                    const limiters_list = $(`<div class="collapse mt-1" id="limiters_${plan.name.replace(/[^a-zA-Z0-9]/g, '_')}"></div>`).appendTo(limiters_section);
                     for (const limiter_obj of plan_detail.limiters) {
                         if (typeof limiter_obj === 'object' && !limiter_obj.error) {
-                            limiter_plan_page._render_limiter_item_in_plan(limiters_area, limiter_obj);
+                            limiter_plan_page._render_limiter_item_in_plan(limiters_list, limiter_obj);
                         }
                     }
                 }
@@ -390,41 +404,23 @@ limiter_plan_page.open_edit_modal = async (name) => {
  */
 limiter_plan_page._render_limiter_item_in_plan = (parent, lm) => {
     const item = $(`<div class="border rounded p-2 mb-2 bg-body-tertiary small"></div>`).appendTo(parent);
-    
     // Limiter name
     const name_row = $(`<div class="d-flex align-items-center gap-1 mb-1"></div>`).appendTo(item);
-    name_row.append(`<i class="fas fa-lock fa-sm text-info"></i><strong>${lm.limiter_title || ''}</strong><span class="me-auto"> (${lm.limiter_name})</span>`);
-    
+    name_row.append(`<strong>${lm.limiter_title || ''}</strong><span class="me-auto"> (${lm.limiter_name})</span>`);
     // Target info
     name_row.append(`<span class="badge rounded-pill text-bg-primary">mode</span><strong>${lm.target_mode || '-'}</strong>`);
     name_row.append(`<span class="badge rounded-pill text-bg-success ms-2">cmd</span><strong>${lm.target_cmd || '-'}</strong>`);
-
     // 制限設定（プログレスバー付き）
     const counter = lm.counter || {};
     const limits_area = $(`<div class="mt-2"></div>`).appendTo(item);
-    
-    // 設定されているものについてのみプログレスバーを表示
-    if (lm.max_total_count) {
-        limiter_plan_page.make_progress('Count', counter.total_count, lm.max_total_count, limiter_plan_page.fmt_num).appendTo(limits_area);
-    }
-    if (lm.max_total_time) {
-        limiter_plan_page.make_progress('Time (s)', counter.total_time, lm.max_total_time, (v) => v != null ? `${typeof v === 'number' ? v.toFixed(1) : v}s` : '-').appendTo(limits_area);
-    }
-    if (lm.max_total_input) {
-        limiter_plan_page.make_progress('Input', counter.total_input, lm.max_total_input, limiter_plan_page.fmt_bytes).appendTo(limits_area);
-    }
-    if (lm.max_total_process) {
-        limiter_plan_page.make_progress('Process', counter.total_process, lm.max_total_process, limiter_plan_page.fmt_bytes).appendTo(limits_area);
-    }
-    if (lm.max_total_output) {
-        limiter_plan_page.make_progress('Output', counter.total_output, lm.max_total_output, limiter_plan_page.fmt_bytes).appendTo(limits_area);
-    }
-    if (lm.max_total_credits) {
-        limiter_plan_page.make_progress('Credits', counter.total_credits, lm.max_total_credits, limiter_plan_page.fmt_num, lm.service_credits).appendTo(limits_area);
-    }
-    if (lm.max_registrations) {
-        limiter_plan_page.make_progress('Registrations', counter.total_registrations, lm.max_registrations, limiter_plan_page.fmt_num).appendTo(limits_area);
-    }
+    // プログレスバーを表示
+    limiter_plan_page.make_progress('Count', counter.total_count, lm.max_total_count, limiter_plan_page.fmt_num).appendTo(limits_area);
+    limiter_plan_page.make_progress('Time (s)', counter.total_time, lm.max_total_time, (v) => v != null ? `${typeof v === 'number' ? v.toFixed(1) : v}s` : '-').appendTo(limits_area);
+    limiter_plan_page.make_progress('Input', counter.total_input, lm.max_total_input, limiter_plan_page.fmt_bytes).appendTo(limits_area);
+    limiter_plan_page.make_progress('Process', counter.total_process, lm.max_total_process, limiter_plan_page.fmt_bytes).appendTo(limits_area);
+    limiter_plan_page.make_progress('Output', counter.total_output, lm.max_total_output, limiter_plan_page.fmt_bytes).appendTo(limits_area);
+    limiter_plan_page.make_progress('Credits', counter.total_credits, lm.max_total_credits, limiter_plan_page.fmt_num, lm.service_credits).appendTo(limits_area);
+    limiter_plan_page.make_progress('Registrations', counter.total_registrations, lm.max_registrations, limiter_plan_page.fmt_num).appendTo(limits_area);
     if (counter.last_reset) {
         const time_ago = limiter_plan_page.fmt_time_ago(counter.last_reset);
         const formatted_datetime = limiter_plan_page.fmt_datetime(counter.last_reset);

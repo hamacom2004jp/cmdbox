@@ -50,8 +50,8 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
                      description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
                 dict(opt="load_history", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
-                     description_ja="カウンターの履歴も取得するかどうかを指定します。Trueを指定すると、カウンターの履歴も取得します。",
-                     description_en="Specify whether to retrieve the counter history as well. If you set this to True, the counter history will also be retrieved."),
+                     description_ja="履歴も取得するかどうかを指定します。Trueを指定すると、履歴も取得します。",
+                     description_en="Specify whether to retrieve the history as well. If you set this to True, the history will also be retrieved."),
             ]
         )
 

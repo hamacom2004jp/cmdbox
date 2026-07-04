@@ -74,7 +74,7 @@ class LimiterEvidences(feature.OneshotResultEdgeFeature, validator.Validator):
                 logger.warning("client_data is required when scope is 'client'.")
                 common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, result, None
-            evidences = self._get_evidences(Path(client_data), args.limiter_name, include_history=args.include_history)
+            evidences = self._load_evidences(Path(client_data), args.limiter_name, include_history=args.include_history)
             out = dict(success=dict(data=evidences))
             common.print_format(out, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_SUCCESS, out, None
@@ -111,15 +111,13 @@ class LimiterEvidences(feature.OneshotResultEdgeFeature, validator.Validator):
     def is_cluster_redirect(self):
         return False
 
-    @staticmethod
-    def _get_evidences(data_dir: Path, limiter_name: str, include_history: bool = False) -> List[Dict[str, Any]]:
+    @classmethod
+    def _load_evidences(cls, data_dir: Path, limiter_name: str, include_history: bool = False) -> List[Dict[str, Any]]:
         """Get list of evidence files for a limiter"""
         evidences: List[Dict[str, Any]] = []
         limiter_dir = Path(data_dir) / limiter.Limiter.LIMITER_DIR
-        
         if not limiter_dir.exists() or not limiter_dir.is_dir():
             return evidences
-        
         # Find all evidence files matching the limiter name pattern
         pattern = f"evidence-{limiter_name}-*.json"
         for p in sorted(limiter_dir.glob(pattern), reverse=True):
@@ -134,16 +132,7 @@ class LimiterEvidences(feature.OneshotResultEdgeFeature, validator.Validator):
                 filepath=str(p),
                 **evidence_content,
             ))
-        
         return evidences
-
-    def _load_limiter_evidences(self, data_dir:Path, limiter_name:str, include_history:bool, logger:logging.Logger) -> List[Dict[str, Any]]:
-        """Load limiter evidences (internal helper method)"""
-        try:
-            return self._get_evidences(data_dir, limiter_name, include_history=include_history)
-        except Exception as e:
-            logger.warning(f"Failed to load evidences for limiter '{limiter_name}': {e}")
-            return []
 
     def svrun(self, data_dir: Path, logger: logging.Logger, redis_cli: redis_client.RedisClient, msg: List[str],
               sessions: Dict[str, Dict[str, Any]]) -> int:
@@ -157,7 +146,7 @@ class LimiterEvidences(feature.OneshotResultEdgeFeature, validator.Validator):
                 return self.RESP_WARN
 
             include_history = payload.get('include_history', False)
-            evidences = self._load_limiter_evidences(data_dir, limiter_name, include_history, logger)
+            evidences = LimiterEvidences._load_evidences(data_dir, limiter_name, include_history=include_history)
             result = dict(success=dict(data=evidences))
             redis_cli.rpush(reskey, result)
             return self.RESP_SUCCESS

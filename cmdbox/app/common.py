@@ -1012,5 +1012,21 @@ def get_tzoffset_str() -> str:
     hours = abs(total_seconds) // 3600
     minutes = (abs(total_seconds) % 3600) // 60
     sign = "+" if total_seconds >= 0 else "-"
-
     return f"{sign}{hours:02}:{minutes:02}"
+
+def datetimestr2filename(dt_str: str) -> str:
+    """
+    日時文字列をファイル名用のYYYYMMDD_HHMMSS形式に変換
+    
+    Args:
+        dt_str: ISO形式（2024-01-01T00:00:00）またはYYYYMMDD_HHMMSS形式の日時文字列
+
+    Returns:
+        YYYYMMDD_HHMMSS形式の文字列
+    """
+    try:
+        dt = datetime.datetime.fromisoformat(dt_str)
+        return dt.strftime('%Y%m%d_%H%M%S')
+    except (ValueError, TypeError):
+        # すでに YYYYMMDD_HHMMSS 形式かもしれない
+        return dt_str

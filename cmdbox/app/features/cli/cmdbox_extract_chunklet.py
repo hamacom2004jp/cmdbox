@@ -194,6 +194,7 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator, lim
         class Data(resdata.Data):
             file: Union[Path, str, None] = pydantic.Field(default=None, description="ファイルパス")
             data: Union[List[ContentRecord], None] = pydantic.Field(default=None, description="処理結果のデータ")
+            chunk_count: Union[int, None] = pydantic.Field(default=None, description="チャンク数")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
@@ -290,10 +291,18 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator, lim
             for i, chunk in enumerate(chunks):
                 data = dict(content=chunk.content, metadata=chunk.metadata.to_dict())
                 res_data.append(data)
-            ret = dict(success=dict(file=abspath, data=res_data))
+            ret = dict(success=dict(file=abspath, data=res_data, chunk_count=len(res_data)))
             logger.info(f"extract success. abspath={abspath}")
             return ret
         except Exception as e:
             logger.error(f"extract error: {str(e)}", exc_info=True)
             ret = dict(error=f"extract error: {str(e)}")
             return ret
+
+    def apprun_credit(self, data_dir, logger, args, msg):
+        chunk_count = msg.get('success', {}).get('chunk_count', 1)
+        return chunk_count
+
+    def svrun_credit(self, data_dir, logger, redis_cli, msg, sessions):
+        chunk_count = msg.get('success', {}).get('chunk_count', 1)
+        return chunk_count

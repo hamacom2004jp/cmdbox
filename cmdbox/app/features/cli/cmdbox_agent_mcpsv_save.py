@@ -143,17 +143,8 @@ class AgentMcpSave(feature.OneshotResultEdgeFeature, validator.Validator, limite
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
 
-    def apprun_registrations(self, data_dir, logger, args, msg):
-        raise NotImplementedError("In the Limiter settings, please use `scope=server`.")
-
     def svrun_registrations(self, data_dir, logger, opt, msg):
         agent_dir = data_dir / '.agent'
-        count = 0
-        if agent_dir.exists() and agent_dir.is_dir():
-            paths = agent_dir.glob(f"mcpsv-*.json")
-            for p in sorted(paths):
-                name = p.name
-                if not name.startswith('mcpsv-') or not name.endswith('.json'):
-                    continue
-                count += 1
+        paths = agent_dir.glob(f"mcpsv-*.json")
+        count = len(list(paths))
         return count

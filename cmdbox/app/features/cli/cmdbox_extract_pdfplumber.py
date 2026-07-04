@@ -188,6 +188,7 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature, validator.Validator, l
         class Data(resdata.Data):
             file: Union[Path, str, None] = pydantic.Field(default=None, description="ファイルパス")
             data: Union[List[ContentRecord], None] = pydantic.Field(default=None, description="処理結果のデータ")
+            pages: Union[int, None] = pydantic.Field(default=None, description="PDFのページ数")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
@@ -252,7 +253,7 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature, validator.Validator, l
                 raise IOError(f"File not found. {abspath}")
             if args.chunk_size is None: raise ValueError("chunk_size is required.")
             if args.chunk_overlap is None: raise ValueError("chunk_overlap is required.")
-            import torch # 先にtorchをimportしないと循環参照エラーが発生する
+            #import torch # 先にtorchをimportしないと循環参照エラーが発生する
             from langchain_text_splitters import (
                 MarkdownTextSplitter,
                 RecursiveCharacterTextSplitter,
@@ -330,10 +331,18 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature, validator.Validator, l
                             doc_tables += [dict(content=header_md+t, metadata=dict(source=str(abspath), page=page.page_number, table=True)) for t in table_chunk]
                     else:
                         docs += [dict(content=t, metadata=dict(source=str(abspath), page=page.page_number)) for t in texts]
-            ret = dict(success=dict(file=abspath, data=docs+doc_tables))
+            ret = dict(success=dict(file=abspath, data=docs+doc_tables, pages=len(pdf.pages)))
             logger.info(f"extract success. abspath={abspath}")
             return ret
         except Exception as e:
             logger.error(f"extract error: {str(e)}", exc_info=True)
             ret = dict(error=f"extract error: {str(e)}")
             return ret
+
+    def apprun_credit(self, data_dir, logger, args, msg):
+        pages = msg.get('success', {}).get('pages', 1)
+        return pages
+
+    def svrun_credit(self, data_dir, logger, redis_cli, msg, sessions):
+        pages = msg.get('success', {}).get('pages', 1)
+        return pages

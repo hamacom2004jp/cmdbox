@@ -556,7 +556,9 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                                                 ids=dict(agent_session_id=agent_session.id)),)
                     redis_cli.rpush(reskey, outputs)
                     raise e
-            msg = dict(success=dict(message=f"Chat '{name}' successfully.", ressize=len(convert.str2b64str(common.to_str(resval)))), end=True)
+            msg = dict(success=dict(message=f"Chat '{name}' successfully.",
+                                    ressize=len(convert.str2b64str(common.to_str(resval)))),
+                                    end=True)
             redis_cli.rpush(reskey, msg)
             await run_iter.aclose()
             return self.RESP_SUCCESS
@@ -578,3 +580,6 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
     def svrun_output_bytes(self, data_dir, logger, opt, msg, msg_size):
         msg_size = msg.get('success', {}).get('ressize', msg_size)
         return msg_size
+
+    def svrun_credit(self, data_dir, logger, opt, msg):
+        return 1

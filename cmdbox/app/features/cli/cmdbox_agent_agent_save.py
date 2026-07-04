@@ -1,7 +1,7 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.options import Options
-from cmdbox.app.features.cli import cmdbox_agent_agent_list
+from cmdbox.app.features.cli import cmdbox_agent_agent_list, cmdbox_agent_mcpsv_list, cmdbox_llm_list
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -15,6 +15,8 @@ class AgentAgentSave(feature.OneshotResultEdgeFeature, validator.Validator, limi
     def __init__(self, appcls, ver, language = None):
         super().__init__(appcls, ver, language)
         self.agent_list = cmdbox_agent_agent_list.AgentAgentList(appcls, ver, language)
+        self.mcpsv_list = cmdbox_agent_mcpsv_list.AgentMcpList(appcls, ver, language)
+        self.llm_list = cmdbox_llm_list.LLMList(appcls, ver, language)
 
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
@@ -174,36 +176,15 @@ When generating `<thinking>` output, you must consider the following points:
                     description_ja="A2A Server起動時のAPI Keyを指定します。 また`a2asv_delegated_auth` が無効な場合は、Agent実行時に使用も使用されます。",
                     description_en="Specify the API Key when starting the A2A Server. Additionally, if `a2asv_delegated_auth` is disabled, it will also be used when running the Agent.",),
                 dict(opt="llm", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
-                    callcmd="async () => {await cmdbox.callcmd('llm','list',{},(res)=>{"
-                            + "const val = $(\"[name='llm']\").val();"
-                            + "$(\"[name='llm']\").empty().append('<option></option>');"
-                            + "res['data'].map(elm=>{$(\"[name='llm']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
-                            + "$(\"[name='llm']\").val(val);"
-                            + "},$(\"[name='title']\").val(),'llm');"
-                            + "}",
+                    choice_fn=self.choice_llms,
                     description_ja="Agentが参照するLLM設定名を指定します。",
                     description_en="Specify the LLM configuration name referenced by the Agent."),
                 dict(opt="mcpservers", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=[],
-                    callcmd="async () => {await cmdbox.callcmd('agent','mcpsv_list',{},(res)=>{"
-                            + "const val = $(\"[name='mcpservers']\").val();"
-                            + "$(\"[name='mcpservers']\").empty().append('<option></option>');"
-                            + "res['data'].map(elm=>{$(\"[name='mcpservers']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
-                            + "$(\"[name='mcpservers']\").val(val);"
-                            + "},$(\"[name='title']\").val(),'mcpservers');"
-                            + "}",
+                    choice_fn=self.choice_mcvpservers,
                     description_ja="Agentが利用するMCPサーバー名を指定します。",
                     description_en="Specify the MCP server name used by the Agent."),
                 dict(opt="subagents", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=[],
-                    callcmd="async () => {await cmdbox.callcmd('agent','agent_list',{},(res)=>{"
-                            + "const val = $(\"[name='subagents']\").val();"
-                            + "$(\"[name='subagents']\").empty().append('<option></option>');"
-                            + "res['data'].map(elm=>{"
-                            + "  if (elm[\"name\"] === $(\"[name='agent_name']\").val()) return;"
-                            + "  $(\"[name='subagents']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');"
-                            + "});"
-                            + "$(\"[name='subagents']\").val(val);"
-                            + "},$(\"[name='title']\").val(),'subagents');"
-                            + "}",
+                    choice_fn=self.choice_subagents,
                     description_ja="Agentが利用するサブエージェント名を指定します。",
                     description_en="Specify the subagent name used by the agent."),
                 dict(opt="agent_description", type=Options.T_TEXT, default=description, required=False, multi=False, hide=False, choice=None,
@@ -220,6 +201,33 @@ When generating `<thinking>` output, you must consider the following points:
                     description_en="Specify parameters corresponding to placeholders embedded in `agent_instruction` or `agent_system_instruction`. Example: `{\"key\": \"value\"}`"),
             ]
         )
+
+    def choice_mcvpservers(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
+        logger = common.default_logger(False, ver=self.ver, webcall=webmode)
+        args = argparse.Namespace(**opt)
+        st, res, _ = self.mcpsv_list.apprun(logger, args, 0.0, [])
+        if st != self.RESP_SUCCESS:
+            return []
+        ret = [k.get('name') for k in res.get('success', {}).get('data', [])]
+        return [''] + ret
+
+    def choice_subagents(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
+        logger = common.default_logger(False, ver=self.ver, webcall=webmode)
+        args = argparse.Namespace(**opt)
+        st, res, _ = self.agent_list.apprun(logger, args, 0.0, [])
+        if st != self.RESP_SUCCESS:
+            return []
+        ret = [k.get('name') for k in res.get('success', {}).get('data', [])]
+        return [''] + ret
+
+    def choice_llms(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
+        logger = common.default_logger(False, ver=self.ver, webcall=webmode)
+        args = argparse.Namespace(**opt)
+        st, res, _ = self.llm_list.apprun(logger, args, 0.0, [])
+        if st != self.RESP_SUCCESS:
+            return []
+        ret = [k.get('name') for k in res.get('success', {}).get('data', [])]
+        return [''] + ret
 
     def list_mcvpservers(self, data_dir: str) -> List[str]:
         agent_dir = Path(data_dir) / ".agent"
@@ -365,19 +373,10 @@ When generating `<thinking>` output, you must consider the following points:
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
 
-    def apprun_registrations(self, data_dir, logger, args, msg):
-        raise NotImplementedError("In the Limiter settings, please use `scope=server`.")
-
     def svrun_registrations(self, data_dir, logger, opt, msg):
         agent_dir = data_dir / '.agent'
-        count = 0
-        if agent_dir.exists() and agent_dir.is_dir():
-            paths = agent_dir.glob(f"agent-*.json")
-            for p in sorted(paths):
-                name = p.name
-                if not name.startswith('agent-') or not name.endswith('.json'):
-                    continue
-                count += 1
+        paths = agent_dir.glob(f"agent-*.json")
+        count = len(list(paths))
         return count
 
     def init_test(self) -> None:

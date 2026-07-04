@@ -1,6 +1,6 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
-from cmdbox.app.features.cli import cmdbox_tts_say
+from cmdbox.app.features.cli import cmdbox_tts_say, cmdbox_agent_agent_list, cmdbox_datasource_list, cmdbox_rag_list
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -12,6 +12,12 @@ import re
 
 
 class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.LimitedFeature):
+    def __init__(self, appcls, ver, language = None):
+        super().__init__(appcls, ver, language)
+        self.agent_list = cmdbox_agent_agent_list.AgentAgentList(appcls, ver, language)
+        self.ds_list = cmdbox_datasource_list.DatasourceList(appcls, ver, language)
+        self.rag_list = cmdbox_rag_list.RagList(appcls, ver, language)
+
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
 
@@ -65,23 +71,11 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator, lim
                     description_ja="保存するRunnerの名前を指定します。",
                     description_en="Specify the name of the runner configuration to save."),
                 dict(opt="agent", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
-                    callcmd="async () => {await cmdbox.callcmd('agent','agent_list',{},(res)=>{"
-                            + "const val = $(\"[name='agent']\").val();"
-                            + "$(\"[name='agent']\").empty().append('<option></option>');"
-                            + "res['data'].map(elm=>{$(\"[name='agent']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
-                            + "$(\"[name='agent']\").val(val);"
-                            + "},$(\"[name='title']\").val(),'agent');"
-                            + "}",
+                    choice_fn=self.choice_agents,
                     description_ja="Runnerが参照するAgent設定名を指定します。",
                     description_en="Specify the Agent configuration name referenced by the Runner."),
                 dict(opt="session_datasource", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=[],
-                    callcmd="async () => {await cmdbox.callcmd('datasource','list',{},(res)=>{"
-                            + "const val = $(\"[name='session_datasource']\").val();"
-                            + "$(\"[name='session_datasource']\").empty().append('<option></option>');"
-                            + "res['data'].map(elm=>{$(\"[name='session_datasource']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
-                            + "$(\"[name='session_datasource']\").val(val);"
-                            + "},$(\"[name='title']\").val(),'session_datasource');"
-                            + "}",
+                    choice_fn=self.choice_ds,
                     description_ja="セッションの保存先データソースを指定します。",
                     description_en="Specify the data source where sessions will be saved."),
                 dict(opt="tts_engine", type=Options.T_STR, default="voicevox", required=True, multi=False, hide=False,
@@ -90,13 +84,7 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator, lim
                      description_ja="使用するTTSエンジンを指定します。",
                      description_en="Specify the TTS engine to use."),
                 dict(opt="rag", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=[],
-                    callcmd="async () => {await cmdbox.callcmd('rag','list',{},(res)=>{"
-                            + "const val = $(\"[name='rag']\").val();"
-                            + "$(\"[name='rag']\").empty().append('<option></option>');"
-                            + "res['data'].map(elm=>{$(\"[name='rag']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
-                            + "$(\"[name='rag']\").val(val);"
-                            + "},$(\"[name='title']\").val(),'rag');"
-                            + "}",
+                    choice_fn=self.choice_rags,
                     description_ja="Runnerが参照するRAG設定名を指定します。",
                     description_en="Specify the RAG configuration name referenced by the Runner."),
                 dict(opt="voicevox_model", type=Options.T_STR, default=None, required=False, multi=False, hide=False,
@@ -106,7 +94,34 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator, lim
                      description_en="Specify the model of the TTS engine to use."),
             ]
         )
-    
+
+    def choice_agents(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
+        logger = common.default_logger(False, ver=self.ver, webcall=webmode)
+        args = argparse.Namespace(**opt)
+        st, res, _ = self.agent_list.apprun(logger, args, 0.0, [])
+        if st != self.RESP_SUCCESS:
+            return []
+        ret = [k.get('name') for k in res.get('success', {}).get('data', [])]
+        return [''] + ret
+
+    def choice_ds(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
+        logger = common.default_logger(False, ver=self.ver, webcall=webmode)
+        args = argparse.Namespace(**opt)
+        st, res, _ = self.ds_list.apprun(logger, args, 0.0, [])
+        if st != self.RESP_SUCCESS:
+            return []
+        ret = [k.get('name') for k in res.get('success', {}).get('data', [])]
+        return [''] + ret
+
+    def choice_rags(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
+        logger = common.default_logger(False, ver=self.ver, webcall=webmode)
+        args = argparse.Namespace(**opt)
+        st, res, _ = self.rag_list.apprun(logger, args, 0.0, [])
+        if st != self.RESP_SUCCESS:
+            return []
+        ret = [k.get('name') for k in res.get('success', {}).get('data', [])]
+        return [''] + ret
+
     def list_agents(self, data_dir: str) -> List[str]:
         agent_dir = Path(data_dir) / ".agent"
         if not agent_dir.exists() or not agent_dir.is_dir():
@@ -181,17 +196,8 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator, lim
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
 
-    def apprun_registrations(self, data_dir, logger, args, msg):
-        raise NotImplementedError("In the Limiter settings, please use `scope=server`.")
-
     def svrun_registrations(self, data_dir, logger, opt, msg):
         agent_dir = data_dir / '.agent'
-        count = 0
-        if agent_dir.exists() and agent_dir.is_dir():
-            paths = agent_dir.glob(f"runner-*.json")
-            for p in sorted(paths):
-                name = p.name
-                if not name.startswith('runner-') or not name.endswith('.json'):
-                    continue
-                count += 1
+        paths = agent_dir.glob(f"runner-*.json")
+        count = len(list(paths))
         return count

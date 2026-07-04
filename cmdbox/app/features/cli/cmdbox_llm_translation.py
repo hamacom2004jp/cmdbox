@@ -273,3 +273,9 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
 
         result = {w: lang_cache.get(w, w) for w in words}
         return self.RESP_SUCCESS, dict(success=dict(data=result))
+
+    def svrun_credit(self, data_dir, logger, opt, msg):
+        data = msg.get('success', {}).get('data', [])
+        if not data:
+            return 0
+        return len(data)
