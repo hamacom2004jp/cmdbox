@@ -146,17 +146,8 @@ class ExtractSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
 
-    def apprun_registrations(self, data_dir, logger, args, msg):
-        raise NotImplementedError("In the Limiter settings, please use `scope=server`.")
-
     def svrun_registrations(self, data_dir, logger, opt, msg):
         extract_dir = data_dir / '.agent'
-        count = 0
-        if extract_dir.exists() and extract_dir.is_dir():
-            paths = extract_dir.glob(f"extract-*.json")
-            for p in sorted(paths):
-                name = p.name
-                if not name.startswith('extract-') or not name.endswith('.json'):
-                    continue
-                count += 1
+        paths = extract_dir.glob(f"extract-*.json")
+        count = len(list(paths))
         return count

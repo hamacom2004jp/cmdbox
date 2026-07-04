@@ -188,17 +188,8 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
             redis_cli.rpush(reskey, msg)
             return self.RESP_WARN
 
-    def apprun_registrations(self, data_dir, logger, args, msg):
-        raise NotImplementedError("In the Limiter settings, please use `scope=server`.")
-
     def svrun_registrations(self, data_dir, logger, opt, msg):
         llm_dir = data_dir / '.agent'
-        count = 0
-        if llm_dir.exists() and llm_dir.is_dir():
-            paths = llm_dir.glob(f"llm-*.json")
-            for p in sorted(paths):
-                name = p.name
-                if not name.startswith('llm-') or not name.endswith('.json'):
-                    continue
-                count += 1
+        paths = llm_dir.glob(f"llm-*.json")
+        count = len(list(paths))
         return count
