@@ -1,5 +1,5 @@
 from cmdbox.app import common, client
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import cache, convert, redis_client, resdata, validator
 from cmdbox.app.features.cli.datasource import datasource_base
 from cmdbox.app.options import Options
 from pathlib import Path
@@ -50,6 +50,7 @@ class DatasourceList(datasource_base.DatasourceBase, validator.Validator):
             ]
         )
 
+    @cache.apprun_cache(exclude_fn=lambda args: hasattr(args,'kwd') and args.kwd)
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         payload = dict(kwd=args.kwd)

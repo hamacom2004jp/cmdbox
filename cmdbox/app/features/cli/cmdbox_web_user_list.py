@@ -1,5 +1,5 @@
 from cmdbox.app import common, feature, web
-from cmdbox.app.commons import resdata, validator
+from cmdbox.app.commons import cache, resdata, validator
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, List, Union
 import argparse
@@ -47,6 +47,7 @@ class WebUserList(feature.UnsupportEdgeFeature, validator.Validator):
             ]
         )
 
+    @cache.apprun_cache(exclude_fn=lambda args: hasattr(args,'user_name') and args.user_name)
     @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """

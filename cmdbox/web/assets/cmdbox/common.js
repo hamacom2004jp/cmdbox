@@ -2013,6 +2013,7 @@ cmdbox.callcmd = async (mode, cmd, params, callback, title, opt_name, err_i18n=t
         mode: mode,
         cmd: cmd,
         ...params,
+        cache_clear: true
     };
     let res = await fetch('exec_cmd', {
         method: 'POST',

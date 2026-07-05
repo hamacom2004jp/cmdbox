@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import cache, convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -36,7 +36,7 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
                     description_en="Specify the service name of the inference server. If omitted, `server` is used."),
                 dict(opt="retry_count", type=Options.T_INT, default=3, required=False, multi=False, hide=True, choice=None,
                     description_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",
-                    description_en="Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."),
+                    description_en="Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever."),
                 dict(opt="retry_interval", type=Options.T_INT, default=5, required=False, multi=False, hide=True, choice=None,
                     description_ja="Redisサーバーに再接続までの秒数を指定します。",
                     description_en="Specifies the number of seconds before reconnecting to the Redis server."),
@@ -49,6 +49,7 @@ class LLMList(feature.OneshotResultEdgeFeature, validator.Validator):
             ]
         )
 
+    @cache.apprun_cache(exclude_fn=lambda args: hasattr(args,'kwd') and args.kwd)
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
         payload = dict(kwd=args.kwd)

@@ -11,9 +11,6 @@ import re
 
 
 class AgentAgentLoad(feature.OneshotResultEdgeFeature, validator.Validator):
-    def __init__(self, appcls, ver, language = None):
-        super().__init__(appcls, ver, language)
-        self._cache = cache.MemoryCache()
 
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
@@ -48,23 +45,15 @@ class AgentAgentLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=True, choice=None,
                     description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                     description_en="Specify the maximum waiting time until the server responds."),
-                 dict(opt="agent_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                dict(opt="agent_name", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="読み込むAgent設定の名前を指定します。",
                      description_en="Specify the name of the agent configuration to load."),
-                dict(opt="cache_timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=False, choice=None,
-                     description_ja="設定をキャッシュする時間を秒数で指定します。",
-                     description_en="Specify the duration, in seconds, for which settings should be cached."),
             ]
        )
 
+    @cache.apprun_cache(args_key='agent_name')
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        # キャッシュが有効で、かつキャッシュが存在し、有効期限が切れていない場合はキャッシュを返す
-        cached = self._cache.get(args.agent_name)
-        if cached is not None:
-            ret = dict(success=cached)
-            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_SUCCESS, ret, None
 
         payload = dict(agent_name=args.agent_name)
         payload_b64 = convert.str2b64str(common.to_str(payload))
@@ -75,9 +64,6 @@ class AgentAgentLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in ret:
             return self.RESP_WARN, ret, cl
-
-        # 読み込んだ設定をキャッシュする
-        self._cache.set(args.agent_name, ret.get('success', None), args.cache_timeout)
         return self.RESP_SUCCESS, ret, cl
 
     def output_schema(self) -> type:

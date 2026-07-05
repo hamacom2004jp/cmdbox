@@ -1,5 +1,5 @@
 from cmdbox.app import common, client, feature
-from cmdbox.app.commons import convert, redis_client, resdata, validator
+from cmdbox.app.commons import cache, convert, redis_client, resdata, validator
 from cmdbox.app.options import Options
 from cmdbox.app.features.cli import cmdbox_tts_say
 from pathlib import Path
@@ -69,6 +69,7 @@ class TtsList(feature.UnsupportEdgeFeature, validator.Validator):
             ]
         )
 
+    @cache.apprun_cache
     @validator.apprun_check
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """

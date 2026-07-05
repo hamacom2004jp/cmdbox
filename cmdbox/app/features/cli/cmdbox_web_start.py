@@ -188,7 +188,8 @@ class WebStart(feature.UnsupportEdgeFeature, validator.Validator):
                     redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                     client_only=args.client_only, doc_root=args.doc_root, gui_html=args.gui_html, filer_html=args.filer_html,
                     result_html=args.result_html, users_html=args.users_html, agent_html=args.agent_html, audit_html=args.audit_html,
-                    assets=args.assets, limiter_html=args.limiter_html, signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=args.gui_mode)
+                    assets=args.assets, limiter_html=args.limiter_html, signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=args.gui_mode,
+                    cache_clear=args.cache_clear, cache_timeout=args.cache_timeout,)
         return w
 
     def start(self, w:web.Web, logger:logging.Logger, args:argparse.Namespace) -> None:

@@ -67,6 +67,7 @@ class Web:
                  filer_html:str=None, result_html:str=None, users_html:str=None, agent_html:str=None,
                  audit_html:str=None, assets:List[str]=None, limiter_html:str=None,
                  signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
+                 cache_clear:bool=False, cache_timeout:int=60,
                  web_features_packages:List[str]=None, web_features_prefix:List[str]=[]):
         """
         cmdboxクライアント側のwebapiサービス
@@ -94,6 +95,8 @@ class Web:
             signin_html (str, optional): ログイン画面のHTMLファイル. Defaults to None.
             signin_file (str, optional): ログイン情報のファイル. Defaults to args.signin_file.
             gui_mode (bool, optional): GUIモードかどうか. Defaults to False.
+            cache_clear (bool, optional): キャッシュをクリアするかどうか. Defaults to False.
+            cache_timeout (int, optional): キャッシュの有効期限(秒). Defaults to 60.
             web_features_packages (List[str], optional): webfeatureのパッケージ名のリスト. Defaults to None.
             web_features_prefix (List[str], optional): webfeatureのパッケージのモジュール名のプレフィックス. Defaults to None.
         """
@@ -147,6 +150,8 @@ class Web:
         self.limiter_html_data = None
         self.agent_html_data = None
         self.signin_html_data = None
+        self.cache_clear = cache_clear
+        self.cache_timeout = cache_timeout
         self.gui_mode = gui_mode
         self.web_features_packages = web_features_packages
         self.web_features_prefix = web_features_prefix

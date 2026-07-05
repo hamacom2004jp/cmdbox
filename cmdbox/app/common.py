@@ -486,7 +486,7 @@ def loadopt(opt_path:str, webmode:bool=False) -> dict:
         if webmode:
             if 'mode' not in opt or 'cmd' not in opt:
                 return opt
-            refs = options.Options.getInstance().get_cmd_choices(opt['mode'], opt['cmd'], webmode)
+            refs = options.Options.getInstance().get_cmd_choices(opt['mode'], opt['cmd'], webmode, opt)
             for r in refs:
                 if 'opt' not in r:
                     continue

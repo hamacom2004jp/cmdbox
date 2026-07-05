@@ -71,9 +71,6 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
                 dict(opt="nosave", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
                     description_ja="翻訳結果を保存しない場合は指定します。",
                     description_en="Specify if the translation result should not be saved."),
-                dict(opt="clear_cache", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
-                    description_ja="翻訳キャッシュをクリアする場合は指定します。",
-                    description_en="Specify if the translation cache should be cleared."),
             ]
         )
 
@@ -84,9 +81,9 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
         words = args.words if isinstance(args.words, list) else [args.words]
 
         # キャッシュクリアオプションが指定された場合はキャッシュをクリアする
-        if args.clear_cache: self.translation_cache = {}
+        if args.cache_clear: self.translation_cache = {}
 
-        # 翻訳キャッシュを確認し、要求された単語がすべて存在する場合はキャッシュから返す
+        # キャッシュを確認し、要求された単語がすべて存在する場合はキャッシュから返す
         lang_cache = self.translation_cache.get(args.target_lang, {})
         if all(word in lang_cache for word in words):
             result = {word: lang_cache[word] for word in words}
@@ -191,7 +188,7 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
         common.save_file(cache_path, lambda f: json.dump(cache, f, ensure_ascii=False, indent=2),
                          encoding='utf-8', nolock=False)
 
-    def _clear_cache(self, data_dir: Path) -> None:
+    def _cache_clear(self, data_dir: Path) -> None:
         """
         翻訳キャッシュをクリアします。
 

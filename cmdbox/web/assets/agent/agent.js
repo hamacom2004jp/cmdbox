@@ -155,7 +155,7 @@ agentView.exec_cmd = async (mode, cmd, opt={}, error_func=null, loading=true, ss
         return;
     }
     const opt_def = cmdbox.get_server_opt(false, $('#filer_form'));
-    opt = {...opt_def, ...opt, 'mode':mode, 'cmd':cmd, 'user_name':agentView.user['name']};
+    opt = {...opt_def, ...opt, 'mode':mode, 'cmd':cmd, 'user_name':agentView.user['name'], 'cache_clear':true};
     if (loading) cmdbox.show_loading();
     if (sse_cb) {
         const queryString = new URLSearchParams(opt).toString();

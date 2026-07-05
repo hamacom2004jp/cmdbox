@@ -348,6 +348,14 @@ class Options:
             type=Options.T_INT, default=feature.Feature.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choice=None,
             description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
             description_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands.",)
+        self._options["cache_clear"] = dict(
+            type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False], web="mask",
+            description_ja="キャッシュをクリアする場合は指定します。",
+            description_en="Specify if the cache should be cleared.")
+        self._options["cache_timeout"] = dict(
+            type=Options.T_INT, default=60, required=False, multi=False, hide=True, choice=None, web="mask",
+            description_ja="キャッシュの有効期限（秒）を指定します。",
+            description_en="Specify the cache timeout in seconds.")
 
     def init_debugoption(self):
         # デバックオプションを追加
@@ -364,6 +372,8 @@ class Options:
         self._options["output_no_validate"]["opt"] = "output_no_validate"
         self._options["capture_stdout"]["opt"] = "capture_stdout"
         self._options["capture_maxsize"]["opt"] = "capture_maxsize"
+        self._options["cache_clear"]["opt"] = "cache_clear"
+        self._options["cache_timeout"]["opt"] = "cache_timeout"
 
         for key, mode in self._options["cmd"].items():
             if type(mode) is not dict:
@@ -398,6 +408,10 @@ class Options:
                     c["choice"].append(self._options["capture_stdout"])
                 if "capture_maxsize" not in [_o['opt'] for _o in c["choice"]]:
                     c["choice"].append(self._options["capture_maxsize"])
+                if "cache_clear" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["cache_clear"])
+                if "cache_timeout" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["cache_timeout"])
 
                 if c["opt"] not in [_o['opt'] for _o in self._options["cmd"]["choice"]]:
                     self._options["cmd"]["choice"] += [c]

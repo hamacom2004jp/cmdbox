@@ -214,6 +214,8 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         opt['data'] = web.data
         opt['client_data'] = web.data
         opt['signin_file'] = web.signin.signin_file
+        opt['cache_clear'] = web.cache_clear
+        opt['cache_timeout'] = web.cache_timeout
         if req.session is not None and 'signin' in req.session and req.session['signin'] is not None:
             if 'groups' in req.session['signin'] and req.session['signin']['groups'] is not None:
                 opt['groups'] = req.session['signin']['groups']
