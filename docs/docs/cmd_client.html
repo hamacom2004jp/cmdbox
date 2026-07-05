@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( client mode ) &mdash; cmdbox 2026/06/24 documentation</title>
+  <title>Command Reference ( client mode ) &mdash; cmdbox 2026/07/05 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=7fd32c64"></script>
+      <script src="../_static/documentation_options.js?v=00f234ef"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -1253,7 +1253,15 @@
 <td><p>client | current | server</p></td>
 <td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-even"><td><p>--exist_ok &lt;exist_ok&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Specify whether to ignore the error if the directory already exists.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1261,7 +1269,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1269,7 +1277,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1730,7 +1738,15 @@
 <td><p>client | current | server</p></td>
 <td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-even"><td><p>--notexist_ok &lt;notexist_ok&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Specify whether to ignore the error if the directory does not exist.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1738,7 +1754,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1746,7 +1762,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1946,7 +1962,15 @@
 <td><p>client | current | server</p></td>
 <td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-even"><td><p>--notexist_ok &lt;notexist_ok&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Specify whether to ignore the error if the directory does not exist.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1954,7 +1978,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1962,7 +1986,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>

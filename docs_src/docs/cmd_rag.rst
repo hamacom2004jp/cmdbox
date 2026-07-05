@@ -202,7 +202,6 @@ rag ( load ) : ``cmdbox -m rag -c load <Option>``
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","120","","Specify the maximum waiting time until the server responds."
     "--rag_name <rag_name>","str","","required","","","Specify the name of the RAG configuration to load."
-    "--cache_timeout <cache_timeout>","int","","","60","","Specify the duration, in seconds, for which settings should be cached."
 
 **Output Schema**
 

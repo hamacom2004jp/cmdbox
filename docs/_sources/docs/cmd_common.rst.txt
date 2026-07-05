@@ -35,3 +35,5 @@ Common Options
     "-a, --output_json_append","","Save the processing result json file by appending."
     "--capture_stdout","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
     "--capture_maxsize <size>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+    "--cache_clear","","Specify if the cache should be cleared."
+    "--cache_timeout <sec>","","Specify the cache timeout in seconds."

@@ -47,7 +47,8 @@ groups:                        # A list of groups, each of which is a map that c
 - gid: 1                       # An ID that identifies a group. No two groups can have the same ID.
   name: admin                  # A name that identifies the group. No two groups can have the same name.
   home: /.groups/admin         # The home directory of the group, used for file operations.
-  startpage: /gui
+  startpage: /gui              # The group's start page.
+                               # This is the page to which users belonging to the group are redirected when they access the “/” path.
 - gid: 2
   name: develop
   home: /.groups/develop
@@ -139,6 +140,10 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     cmds: [list, load, check]
     rule: allow
   - groups: [admin, user]
+    mode: embed
+    cmds: [list]
+    rule: allow
+  - groups: [admin, user]
     mode: extract
     cmds: [list, pdfplumber, chunklet]
     coercion:
@@ -146,6 +151,10 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     rule: allow
   - groups: [admin, user]
     mode: rag
+    cmds: [list]
+    rule: allow
+  - groups: [admin, guest, user]
+    mode: datasource
     cmds: [list]
     rule: allow
   - groups: [admin, user]
@@ -177,6 +186,10 @@ cmdrule:                       # A list of command rules, Specify a rule that de
   - groups: [admin, editor]
     mode: llm
     cmds: [del, load, save]
+    rule: allow
+  - groups: [admin, editor]
+    mode: embed
+    cmds: [del, load, save, start, stop]
     rule: allow
 pathrule:                      # List of RESTAPI rules, rules that determine whether or not a RESTAPI can be executed when a user in web mode accesses it.
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.

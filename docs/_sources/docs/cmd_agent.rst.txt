@@ -145,7 +145,6 @@ agent ( agent_load ) : ``cmdbox -m agent -c agent_load <Option>``
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
     "--agent_name <agent_name>","str","","required","","","Specify the name of the agent configuration to load."
-    "--cache_timeout <cache_timeout>","int","","","60","","Specify the duration, in seconds, for which settings should be cached."
 
 **Output Schema**
 
@@ -609,7 +608,6 @@ agent ( mcpsv_load ) : ``cmdbox -m agent -c mcpsv_load <Option>``
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
     "--mcpserver_name <mcpserver_name>","str","","required","","","Specify the name of the MCP server configuration to load."
-    "--cache_timeout <cache_timeout>","int","","","60","","Specify the duration, in seconds, for which settings should be cached."
 
 **Output Schema**
 
@@ -862,7 +860,6 @@ agent ( runner_load ) : ``cmdbox -m agent -c runner_load <Option>``
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
     "--runner_name <runner_name>","str","","required","","","Specify the name of the runner configuration to load."
-    "--cache_timeout <cache_timeout>","int","","","60","","Specify the duration, in seconds, for which settings should be cached."
 
 **Output Schema**
 

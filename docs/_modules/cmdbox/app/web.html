@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.web &mdash; cmdbox 2026/06/07 documentation</title>
+  <title>cmdbox.app.web &mdash; cmdbox 2026/07/05 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=81b40686"></script>
+      <script src="../../../_static/documentation_options.js?v=00f234ef"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -46,6 +46,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">Command Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/limiter.html">Limiter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/authentication.html">Authentication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/tts.html">Text-to-Speech (TTS)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">Developer Information</a></li>
@@ -152,6 +153,7 @@
                  <span class="n">filer_html</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">result_html</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">users_html</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">agent_html</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">audit_html</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">assets</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limiter_html</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">signin_html</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signin_file</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gui_mode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">cache_clear</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cache_timeout</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
                  <span class="n">web_features_packages</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web_features_prefix</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">[]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        cmdboxクライアント側のwebapiサービス</span>
@@ -179,6 +181,8 @@
 <span class="sd">            signin_html (str, optional): ログイン画面のHTMLファイル. Defaults to None.</span>
 <span class="sd">            signin_file (str, optional): ログイン情報のファイル. Defaults to args.signin_file.</span>
 <span class="sd">            gui_mode (bool, optional): GUIモードかどうか. Defaults to False.</span>
+<span class="sd">            cache_clear (bool, optional): キャッシュをクリアするかどうか. Defaults to False.</span>
+<span class="sd">            cache_timeout (int, optional): キャッシュの有効期限(秒). Defaults to 60.</span>
 <span class="sd">            web_features_packages (List[str], optional): webfeatureのパッケージ名のリスト. Defaults to None.</span>
 <span class="sd">            web_features_prefix (List[str], optional): webfeatureのパッケージのモジュール名のプレフィックス. Defaults to None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -232,6 +236,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">limiter_html_data</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">agent_html_data</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signin_html_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_clear</span> <span class="o">=</span> <span class="n">cache_clear</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_timeout</span> <span class="o">=</span> <span class="n">cache_timeout</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gui_mode</span> <span class="o">=</span> <span class="n">gui_mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">web_features_packages</span> <span class="o">=</span> <span class="n">web_features_packages</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">web_features_prefix</span> <span class="o">=</span> <span class="n">web_features_prefix</span>

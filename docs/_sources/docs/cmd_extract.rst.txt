@@ -53,7 +53,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
             "content": "string",
             "metadata": {}
           }
-        ]
+        ],
+        "chunk_count": 0
       },
       "warn": {},
       "error": {},
@@ -70,6 +71,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.file","Path | str | null","no","null","ファイルパス"
     "success.data","list[ContentRecord] | null","no","null","処理結果のデータ"
+    "success.chunk_count","int | null","no","null","チャンク数"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
@@ -217,7 +219,6 @@ extract ( load ) : ``cmdbox -m extract -c load <Option>``
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","120","","Specify the maximum waiting time until the server responds."
     "--extract_name <extract_name>","str","","required","","","Specify the name of the extraction configuration to load."
-    "--cache_timeout <cache_timeout>","int","","","60","","Specify the duration, in seconds, for which settings should be cached."
 
 **Output Schema**
 
@@ -319,7 +320,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
             "content": "string",
             "metadata": {}
           }
-        ]
+        ],
+        "pages": 0
       },
       "warn": {},
       "error": {},
@@ -336,6 +338,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.file","Path | str | null","no","null","ファイルパス"
     "success.data","list[ContentRecord] | null","no","null","処理結果のデータ"
+    "success.pages","int | null","no","null","PDFのページ数"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"

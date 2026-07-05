@@ -206,7 +206,7 @@ llm ( list ) : ``cmdbox -m llm -c list <Option>``
     "--port <port>","int","","required","6379","","Specify the service port of the Redis server."
     "--password <password>","passwd","","required","password","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
     "--svname <svname>","str","","required","cmdbox","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
     "--kwd <kwd>","str","","","","","Specify the name you want to search for. Searches for partial matches."
@@ -278,7 +278,6 @@ llm ( load ) : ``cmdbox -m llm -c load <Option>``
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
     "--llmname <llmname>","str","","required","","","Specify the name of the LLM configuration to load."
-    "--cache_timeout <cache_timeout>","int","","","60","","Specify the duration, in seconds, for which settings should be cached."
 
 **Output Schema**
 
@@ -435,7 +434,6 @@ llm ( translation ) : ``cmdbox -m llm -c translation <Option>``
     "--words <words>","str","multi","required","","","Specify the list of words to translate. Multiple values can be specified."
     "--target_lang <target_lang>","str","","required","en_US","","Specify the target language."
     "--nosave <nosave>","bool","","","False","True | False","Specify if the translation result should not be saved."
-    "--clear_cache <clear_cache>","bool","","","False","True | False","Specify if the translation cache should be cleared."
 
 **Output Schema**
 
