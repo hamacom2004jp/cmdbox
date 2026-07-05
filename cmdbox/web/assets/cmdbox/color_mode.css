@@ -286,59 +286,59 @@ body::after {
 
 /* ミッドナイトモード */
 [data-bs-theme="midnight"] {
-    --bs-body-bg: #1a233a; /* ダークネイビー */
-    --bs-body-color: #d7dbe8; /* ライトブルーグレー */
+    --bs-body-bg: #1A0F2E; /* ダークパープル (よふかしのうたの夜のイメージ) */
+    --bs-body-color: #E8D5FF; /* ライト紫 */
     --bs-emphasis-color: #fff;
-    --bs-secondary-color: #283552; /* ディープネイビー */
-    --bs-secondary-bg: #131a2c;
-    --bs-tertiary-color: #546e7a; /* ブルーグレー */
-    --bs-tertiary-bg: #283552;
-    --bs-link-color: #64b5f6; /* ライトブルー */
-    --bs-link-hover-color: #42a5f5; /* ブルー */
-    --bs-code-color: #ffb300; /* アンバー */
-    --bs-highlight-bg: #25324e;
-    --bs-highlight-border-color: #1a233a;
+    --bs-secondary-color: #4B1B7D; /* 深紫 */
+    --bs-secondary-bg: #2D1B4E;
+    --bs-tertiary-color: #6B4FA8; /* ミディアムパープル */
+    --bs-tertiary-bg: #4B1B7D;
+    --bs-link-color: #FF1493; /* ネオンピンク */
+    --bs-link-hover-color: #FF69B4; /* ホットピンク */
+    --bs-code-color: #FFD700; /* ゴールド */
+    --bs-highlight-bg: #3D2B5F;
+    --bs-highlight-border-color: #1A0F2E;
   
-    --bs-primary: #64b5f6; /* ライトブルー */
-    --bs-primary-rgb: 100, 181, 246;
+    --bs-primary: #FF1493; /* ネオンピンク (よふかしのうたのアクセント) */
+    --bs-primary-rgb: 255, 20, 147;
     --bs-primary-text: #000;
-    --bs-primary-bg-subtle: #2d4263;
-    --bs-primary-border-subtle: #1e2b40;
-    --bs-secondary: #283552; /* ディープネイビー */
-    --bs-secondary-rgb: 40, 53, 82;
+    --bs-primary-bg-subtle: #6B1B5F;
+    --bs-primary-border-subtle: #4B0F3F;
+    --bs-secondary: #4B1B7D; /* 深紫 */
+    --bs-secondary-rgb: 75, 27, 125;
     --bs-secondary-text: #fff;
-    --bs-secondary-bg-subtle: #141b2d;
-    --bs-secondary-border-subtle: #0d111f;
-    --bs-success: #66bb6a; /* ライトグリーン */
+    --bs-secondary-bg-subtle: #2D0F4F;
+    --bs-secondary-border-subtle: #1A0830;
+    --bs-success: #66BB6A; /* ライトグリーン */
     --bs-success-rgb: 102, 187, 106;
     --bs-success-text: #000;
-    --bs-success-bg-subtle: #2a402e;
-    --bs-success-border-subtle: #1b291f;
-    --bs-info: #b0bec5; /* ブルーグレー */
-    --bs-info-rgb: 176, 190, 197;
+    --bs-success-bg-subtle: #2A402E;
+    --bs-success-border-subtle: #1B291F;
+    --bs-info: #FFB6C1; /* ライトピンク */
+    --bs-info-rgb: 255, 182, 193;
     --bs-info-text: #000;
-    --bs-info-bg-subtle: #32373a;
-    --bs-info-border-subtle: #212426;
-    --bs-warning: #ffca28; /* イエローアンバー */
-    --bs-warning-rgb: 255, 202, 40;
+    --bs-info-bg-subtle: #5F3B4B;
+    --bs-info-border-subtle: #3F2630;
+    --bs-warning: #FFD700; /* ゴールド */
+    --bs-warning-rgb: 255, 215, 0;
     --bs-warning-text: #000;
-    --bs-warning-bg-subtle: #4d3e10;
-    --bs-warning-border-subtle: #332a0b;
-    --bs-danger: #ef5350; /* ライトレッド */
-    --bs-danger-rgb: 239, 83, 80;
+    --bs-warning-bg-subtle: #4D4300;
+    --bs-warning-border-subtle: #332B00;
+    --bs-danger: #FF6B9D; /* バーベナピンク */
+    --bs-danger-rgb: 255, 107, 157;
     --bs-danger-text: #fff;
-    --bs-danger-bg-subtle: #451e1d;
-    --bs-danger-border-subtle: #2e1312;
-    --bs-light: #e0e0e0; /* ライトグレー */
-    --bs-light-rgb: 224, 224, 224;
+    --bs-danger-bg-subtle: #5F1F3F;
+    --bs-danger-border-subtle: #3F0F20;
+    --bs-light: #E8D5FF; /* ライト紫 */
+    --bs-light-rgb: 232, 213, 255;
     --bs-light-text: #000;
-    --bs-light-bg-subtle: #37474f;
-    --bs-light-border-subtle: #263238;
-    --bs-dark: #283552; /* ディープネイビー */
-    --bs-dark-rgb: 40, 53, 82;
+    --bs-light-bg-subtle: #4B3B6F;
+    --bs-light-border-subtle: #3D2B5F;
+    --bs-dark: #4B1B7D; /* 深紫 */
+    --bs-dark-rgb: 75, 27, 125;
     --bs-dark-text: #fff;
-    --bs-dark-bg-subtle: #141b2d;
-    --bs-dark-border-subtle: #0d111f;
+    --bs-dark-bg-subtle: #2D0F4F;
+    --bs-dark-border-subtle: #1A0830;
   
     --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
     --bs-border-width: 1px;
