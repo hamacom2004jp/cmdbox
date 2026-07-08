@@ -425,7 +425,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
                         } else {
                             const opt = cmdbox.get_server_opt(false, fsapi.right);
                             const thum_size = "0";
-                            const constr = btoa(`${opt['host']}\t${opt['port']}\t${opt['svname']}\t${opt['password']}\t${encodeURIComponent(_p)}\t${opt['scope']}\t${thum_size}`);
+                            const constr = btoa(`${encodeURIComponent(_p)}\t${opt['scope']}\t${thum_size}`);
                             fsapi.viewer(_p, res['data'], `filer/download/${constr}?r=${cmdbox.random_string(8)}`, _mime);
                         }
                     }).finally(() => {
@@ -450,6 +450,19 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
                     }).finally(() => {
                         cmdbox.hide_loading();
                     });
+                }};
+                // ダウンロードURL関数の生成
+                const mk_dl_url = (_p, _mime, _size, _l) => {return async ()=>{
+                    const opt = cmdbox.get_server_opt(false, fsapi.right);
+                    const constr = btoa(`${encodeURIComponent(_p)}\t${opt['scope']}\t0`);
+                    const url = `${window.location.origin}${window.location.pathname.slice(0, window.location.pathname.lastIndexOf('/'))}/filer/download/${constr}}`;
+                    const res = await cmdbox.sv_exec_cmd({mode:'url',cmd:'add',target_url:url});
+                    if (!res || !res.success || !res.success.data || !res.success.data.url_id) {
+                        cmdbox.message(res, true, true);
+                        return;
+                    }
+                    const gen_url = `${window.location.origin}${window.location.pathname.slice(0, window.location.pathname.lastIndexOf('/'))}/ru/${res.success.data.url_id}`;
+                    cmdbox.message(`Download URL: ${gen_url}`, true, true);
                 }};
                 // ファイルリストの生成
                 const mk_tr = (_t, _p, _e, _n, _l) => {
@@ -483,6 +496,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
                     } else {
                         tr.find('.dropdown-menu').append('<li><a class="dropdown-item view" href="#">View</a></li>');
                         tr.find('.dropdown-menu').append('<li><a class="dropdown-item edit" href="#">Edit</a></li>');
+                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item dl_url" href="#">Download URL</a></li>');
                         tr.find('.dropdown-menu').append('<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>');
                         if (!_l) {
                             tr.find('.dropdown-menu').append('<li><a class="dropdown-item copy" href="#">Copy</a></li>');
@@ -497,6 +511,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
                     tr.find('.move').off('click').on('click', mk_move(_t, _p, _e, _n["is_dir"], _l));
                     tr.find('.view').off('click').on('click', mk_view(_p, tr.find('.mime_type').text(), tr.find('.file_size').text(), _l));
                     tr.find('.edit').off('click').on('click', mk_editer(_p, tr.find('.mime_type').text(), tr.find('.file_size').text(), _l));
+                    tr.find('.dl_url').off('click').on('click', mk_dl_url(_p, tr.find('.mime_type').text(), tr.find('.file_size').text(), _l));
                     tr.find('.droudown').off('contextmenu').on('contextmenu', (e) => {
                         const fl = target.find('.file-list');
                         fl.find('.dropdown-menu').hide();

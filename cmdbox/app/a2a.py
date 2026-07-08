@@ -15,13 +15,8 @@ from typing import Callable, List, Dict, Any, Tuple
 from starlette.applications import Starlette
 from starlette.middleware.sessions import SessionMiddleware
 import argparse
-import glob
 import logging
-import locale
-import json
 import time
-import re
-import os
 
 
 class A2a(mcp.Mcp):

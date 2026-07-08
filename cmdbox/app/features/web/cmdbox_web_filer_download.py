@@ -24,12 +24,13 @@ class FilerDownload(cmdbox_web_exec_cmd.ExecCmd):
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             try:
-                host, port, svname, password, path, scope, img_thumbnail = convert.b64str2str(constr).split('\t')
+                path, scope, img_thumbnail = convert.b64str2str(constr).split('\t')
                 path = urllib.parse.unquote(path)
                 data_dir = web.data if scope == 'client' else Path.cwd()
                 data_dir = None if scope == 'server' else data_dir
-                opt = dict(host=host, port=port, svname=svname, password=password, svpath=path, scope=scope,
-                           img_thumbnail=img_thumbnail, mode='client', cmd='file_download', client_data=data_dir)
+                opt = dict(host=web.redis_host, port=web.redis_port, svname=web.svname, password=web.redis_password,
+                           svpath=path, scope=scope, img_thumbnail=img_thumbnail,
+                           mode='client', cmd='file_download', client_data=data_dir)
                 opt['capture_stdout'] = nothread = True
                 web.options.audit_exec(req, res, web)
                 ret = await self.exec_cmd(req, res, web, 'file_download', opt, nothread, self.appcls)

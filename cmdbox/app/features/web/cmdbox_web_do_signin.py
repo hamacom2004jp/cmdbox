@@ -29,11 +29,11 @@ class DoSignin(cmdbox_web_signin.Signin):
         @app.post('/dosignin/', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def do_signin(req:Request, res:Response):
             return await do_signin_token(None, '', req, res)
-        @app.post('/dosignin/{next}', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.post('/dosignin/{next:path}', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def do_signin(next:str, req:Request, res:Response):
             return await do_signin_token(None, next, req, res)
 
-        @app.get('/dosignin_token/{token}/{next}', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.get('/dosignin_token/{token}/{next:path}', response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def do_signin_token(token:str, next:str, req:Request, res:Response):
             form = await req.form()
             name = form.get('name')
@@ -143,6 +143,7 @@ class DoSignin(cmdbox_web_signin.Signin):
             # セッションに保存
             _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None), home=user.get('home', None)),
                          email, passwd, None, group_names, group_homes, group_sps, gids)
+            next = f"../{next}" if next.find('/') >= 0 else next
             next = f"../{next}" if token_ok else next
             if notify_passchange:
                 web.options.audit_exec(req, res, web, body=dict(msg='Signin succeeded. However, you should change your password.'), audit_type='auth', user=name)
@@ -258,7 +259,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
                 raise HTTPException(status_code=400, detail=f'Failed to get token. {e}')
 
-        @app.get('/oauth2/google/session/{access_token}/{next}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.get('/oauth2/google/session/{access_token}/{next:path}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_google_session(access_token:str, next:str, req:Request, res:Response):
             return await oauth2_login_session(self.google_signin, access_token, next, req, res)
 
@@ -275,7 +276,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
                 raise HTTPException(status_code=400, detail=f'Failed to get token. {e}')
 
-        @app.get('/oauth2/github/session/{access_token}/{next}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.get('/oauth2/github/session/{access_token}/{next:path}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_github_session(access_token:str, next:str, req:Request, res:Response):
             return await oauth2_login_session(self.github_signin, access_token, next, req, res)
 
@@ -292,7 +293,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
                 raise HTTPException(status_code=400, detail=f'Failed to get token. {e}')
 
-        @app.get('/oauth2/azure/session/{access_token}/{next}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.get('/oauth2/azure/session/{access_token}/{next:path}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_azure_session(access_token:str, next:str, req:Request, res:Response):
             return await oauth2_login_session(self.azure_signin, access_token, next, req, res)
 
@@ -326,7 +327,7 @@ class DoSignin(cmdbox_web_signin.Signin):
             form = await req.form()
             return await saml_login_callback('azure', self.azure_saml_signin, form, None, req, res)
 
-        @app.get('/saml/azure/session/{saml_token}/{next}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.get('/saml/azure/session/{saml_token}/{next:path}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def saml_azure_session(saml_token:str, next:str, req:Request, res:Response):
             form = json.loads(convert.b64str2str(saml_token))
             return await saml_login_callback('azure', self.azure_saml_signin, form, next, req, res)

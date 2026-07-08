@@ -249,7 +249,7 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
             )
             if st != self.RESP_SUCCESS:
                 return st, chat_result
-
+            content = ''
             try:
                 data = chat_result.get('success', {}).get('data', [])
                 if data:
@@ -265,7 +265,7 @@ class LLMTranslation(cmdbox_llm_chat.LLMChat):
                     if not nosave:
                         self._save_cache(data_dir, cache)
             except Exception as e:
-                logger.warning(f"Failed to parse LLM translation response: {e}", exc_info=True)
+                logger.warning(f"Failed to parse LLM translation response: {e}: {content}", exc_info=True)
                 # キャッシュ保存は失敗しても既キャッシュ分は返す
 
         result = {w: lang_cache.get(w, w) for w in words}

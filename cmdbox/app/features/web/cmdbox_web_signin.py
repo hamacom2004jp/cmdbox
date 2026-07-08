@@ -31,8 +31,8 @@ class Signin(feature.WebFeature):
         @app.api_route('/{full_path:path}/signin/', methods=['GET', 'POST'], response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def _signin(req:Request, res:Response, full_path:str=None):
             return await _signin(None, req, res, full_path)
-        @app.api_route('/signin/{next}', methods=['GET', 'POST'], response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
-        @app.api_route('/{full_path:path}/signin/{next}', methods=['GET', 'POST'], response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.api_route('/signin/{next:path}', methods=['GET', 'POST'], response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.api_route('/{full_path:path}/signin/{next:path}', methods=['GET', 'POST'], response_class=HTMLResponse, responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def _signin(next:str, req:Request, res:Response, full_path:str=None):
             signin.Signin._enable_cors(req, res)
             im = req.headers.get('If-None-Match')
@@ -54,7 +54,7 @@ class Signin(feature.WebFeature):
         @app.get('/oauth2/google/', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_google(req:Request, res:Response):
             return await oauth2_google('/', req, res)
-        @app.get('/oauth2/google/{next}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.get('/oauth2/google/{next:path}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_google(next:str, req:Request, res:Response):
             if web.signin is None or web.signin.signin_file_data is None:
                 return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
@@ -72,7 +72,7 @@ class Signin(feature.WebFeature):
         @app.get('/oauth2/github/', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_github(req:Request, res:Response):
             return await oauth2_github('/', req, res)
-        @app.get('/oauth2/github/{next}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.get('/oauth2/github/{next:path}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_github(next:str, req:Request, res:Response):
             if web.signin is None or web.signin.signin_file_data is None:
                 return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
@@ -90,7 +90,7 @@ class Signin(feature.WebFeature):
         @app.get('/oauth2/azure/', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_azure(req:Request, res:Response):
             return await oauth2_azure('/', req, res)
-        @app.get('/oauth2/azure/{next}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.get('/oauth2/azure/{next:path}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def oauth2_azure(next:str, req:Request, res:Response):
             if web.signin is None or web.signin.signin_file_data is None:
                 return RedirectResponse(url=f'../../{next}') # nginxのリバプロ対応のための相対パス
@@ -117,7 +117,7 @@ class Signin(feature.WebFeature):
         @app.get('/saml/{prov}/', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def saml_login(prov:str, req:Request, res:Response):
             return await saml_login(prov, '/', req, res)
-        @app.get('/saml/{prov}/{next}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        @app.get('/saml/{prov}/{next:path}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
         async def saml_login(prov:str, next:str, req:Request, res:Response):
             """
             SAML認証のログイン処理を行います
