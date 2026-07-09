@@ -2254,3 +2254,22 @@ cmdbox.process_i18n = async (target, nosave, llmname) => {
         });
     });
 }
+/**
+ * URLを短縮化したものを返す
+ * @param {string} url 短縮化したいURL
+ * @param {number} period 短縮化URLの有効期限(秒数)
+ * @returns {Promise<string>} 短縮化されたURL
+ */
+cmdbox.add_url = async (url, period=600) => {
+    const target_url = URL.parse(url);
+    const ctx_Path_mt = document.cookie.match(/context_path="?([^;"]+)"?/);
+    const ctx_Path = ctx_Path_mt && ctx_Path_mt.length>0 ? ctx_Path_mt[1] : '/';
+    const base_url = `${window.location.origin}${ctx_Path}`;
+    const res = await cmdbox.sv_exec_cmd({mode:'url',cmd:'add',target_url:url,base_url:base_url,period:period});
+    if (!res || !res.success || !res.success.data || !res.success.data.short_url) {
+        cmdbox.message(res, true, true);
+        return;
+    }
+    const gen_url = `${res.success.data.short_url}`;
+    return gen_url;
+}

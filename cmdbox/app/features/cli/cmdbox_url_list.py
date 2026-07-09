@@ -84,7 +84,9 @@ class UrlList(feature.OneshotResultEdgeFeature, validator.Validator):
                         url_data = json.load(f)
                     results.append(dict(
                         url_id=url_data.get('url_id', json_file.stem),
+                        short_url=url_data.get('short_url', None),
                         target_url=url_data.get('target_url', None),
+                        base_url=url_data.get('base_url', None),
                         period=url_data.get('period', None),
                         saved_at=url_data.get('saved_at', None),
                         period_dt=url_data.get('period_dt', None),
@@ -105,7 +107,9 @@ class UrlList(feature.OneshotResultEdgeFeature, validator.Validator):
     def output_schema(self) -> type:
         class UrlInfo(resdata.Base):
             url_id: Union[str, None] = pydantic.Field(default=None, description="URL ID")
+            short_url: Union[str, None] = pydantic.Field(default=None, description="生成された短縮URL")
             target_url: Union[str, None] = pydantic.Field(default=None, description="リダイレクト先URL")
+            base_url: Union[str, None] = pydantic.Field(default=None, description="短縮URLのベースURL")
             period: Union[int, None] = pydantic.Field(default=None, description="有効期限の秒数")
             saved_at: Union[str, None] = pydantic.Field(default=None, description="保存日時")
             period_dt: Union[str, None] = pydantic.Field(default=None, description="期限切れ日時")

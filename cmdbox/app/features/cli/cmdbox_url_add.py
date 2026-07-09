@@ -46,6 +46,9 @@ class UrlAdd(feature.OneshotResultEdgeFeature, validator.Validator):
             description_ja="短縮URLを追加します。target_urlとperiodを指定すると、url_idが生成され、.urlsフォルダにurl_id.jsonファイルが作成されます。",
             description_en="Add a short URL. When target_url and period are specified, a url_id is generated and a url_id.json file is created in the .urls folder.",
             choice=[
+                dict(opt="base_url", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
+                     description_ja="短縮URLのベースURLを指定します。",
+                     description_en="Specify the base URL for the short URL."),
                 dict(opt="target_url", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="短縮URLのリダイレクト先となるURLを指定します。",
                      description_en="Specify the URL that the short URL will redirect to."),
@@ -86,7 +89,9 @@ class UrlAdd(feature.OneshotResultEdgeFeature, validator.Validator):
             period_dt = (saved_at + timedelta(seconds=period)).isoformat()
             url_data = {
                 "url_id": url_id,
+                "short_url": f'{args.base_url.rstrip("/")}/ru/{url_id}',
                 "target_url": args.target_url,
+                "base_url": args.base_url,
                 "period": period,
                 "saved_at": saved_at.isoformat(),
                 "period_dt": period_dt
@@ -96,7 +101,9 @@ class UrlAdd(feature.OneshotResultEdgeFeature, validator.Validator):
             # 結果を返す
             msg = dict(success=dict(data=dict(
                 url_id=url_id,
+                short_url=url_data["short_url"],
                 target_url=args.target_url,
+                base_url=args.base_url,
                 period=url_data["period"],
                 saved_at=url_data["saved_at"],
                 period_dt=url_data["period_dt"],
@@ -115,7 +122,9 @@ class UrlAdd(feature.OneshotResultEdgeFeature, validator.Validator):
 
         class UrlData(resdata.Base):
             url_id: Union[str, None] = pydantic.Field(default=None, description="生成されたURL ID")
+            short_url: Union[str, None] = pydantic.Field(default=None, description="生成された短縮URL")
             target_url: Union[str, None] = pydantic.Field(default=None, description="リダイレクト先URL")
+            base_url: Union[str, None] = pydantic.Field(default=None, description="短縮URLのベースURL")
             period: Union[int, None] = pydantic.Field(default=None, description="有効期限の秒数")
             saved_at: Union[str, None] = pydantic.Field(default=None, description="保存日時")
             period_dt: Union[str, None] = pydantic.Field(default=None, description="期限切れ日時")

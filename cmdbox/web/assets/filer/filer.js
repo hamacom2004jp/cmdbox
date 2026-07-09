@@ -456,12 +456,12 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
                     const opt = cmdbox.get_server_opt(false, fsapi.right);
                     const constr = btoa(`${encodeURIComponent(_p)}\t${opt['scope']}\t0`);
                     const url = `${window.location.origin}${window.location.pathname.slice(0, window.location.pathname.lastIndexOf('/'))}/filer/download/${constr}}`;
-                    const res = await cmdbox.sv_exec_cmd({mode:'url',cmd:'add',target_url:url});
-                    if (!res || !res.success || !res.success.data || !res.success.data.url_id) {
-                        cmdbox.message(res, true, true);
+                    const show_url = await cmdbox.add_url(url);
+                    if (!show_url) {
+                        cmdbox.message({warn: `Failed to generate download URL.`}, true, true);
                         return;
                     }
-                    const gen_url = `${window.location.origin}${window.location.pathname.slice(0, window.location.pathname.lastIndexOf('/'))}/ru/${res.success.data.url_id}`;
+                    const gen_url = `${show_url}`;
                     cmdbox.message(`Download URL: ${gen_url}`, true, true);
                 }};
                 // ファイルリストの生成
@@ -567,7 +567,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
                         });
                     });
                     drop_area.find('h5').text(`DRAG AND DROP FILES`);
-                    drop_area.css('background-color', 'var(--bs-tertiary-bg)');
+                    drop_area.css('background-color', 'var(--area-bg-color-10)');
                 } else {
                     drop_area.find('h5').text(`Don't have permission to upload files.`);
                     drop_area.css('background-color', '');
