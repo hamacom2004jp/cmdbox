@@ -55,7 +55,7 @@ agentView.list_llm = async () => {
             return;
         }
         const container_ul = $(`<ul class="sf-list-group"/>`).appendTo(container);
-        list.forEach(async item => {
+        const promises = list.map(async item => {
             const res = await agentView.exec_cmd('llm', 'load', { llmname: item.name });
             if (!res || !res.success) {
                 $(`
@@ -70,7 +70,7 @@ agentView.list_llm = async () => {
             }
             const config = res.success || {};
             const itemEl = $(`
-                <li class="sf-list-item" style="cursor: pointer;">
+                <li class="sf-list-item" style="cursor: pointer;" data-priority="${config.llmpriority}">
                     <div>
                         <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.llmname}</span>
                         <span>( ${config.llmpriority} ) ${config.llmprov} / ${config.llmmodel}</span>
@@ -116,9 +116,19 @@ agentView.list_llm = async () => {
                     cmdbox.hide_loading();
                 }
             });
-
-            container.append(itemEl);
         });
+        await Promise.all(promises);
+        const ul = container.find('ul');
+        const sortedItems = ul.find('li').sort((a, b) => {
+            const pA = $(a).attr('data-priority');
+            const pB = $(b).attr('data-priority');
+            try {
+                return parseInt(pA) - parseInt(pB);
+            } catch (e) {
+                return pA.localeCompare(pB);
+            }
+        });
+        ul.append(sortedItems);
     } catch (e) {
         console.error(e);
         container.html(`<div class="text-danger p-3">Error: ${e.message}</div>`);

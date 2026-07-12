@@ -350,13 +350,12 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     gap: 10px;
 }
 .btn-footer-action {
-    flex: 1;
     background: transparent;
     border: 1px solid var(--bs-emphasis-color);
     color: var(--bs-emphasis-color);
     font-family: var(--font-header);
     font-size: 1rem;
-    padding: 8px 5px;
+    padding: 6px 20px;
     transition: all 0.3s;
     text-align: center;
     text-transform: uppercase;

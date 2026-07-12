@@ -62,6 +62,9 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator, lim
                     choice_fn=self.choice_ds,
                     description_ja="セッションの保存先データソースを指定します。",
                     description_en="Specify the data source where sessions will be saved."),
+                dict(opt="runner_priority", type=Options.T_INT, default=9999, required=True, multi=False, hide=False, choice=None,
+                     description_ja="Runnerを使用するときの優先度を指定します。小さい値ほど優先されます。",
+                     description_en="Specifies the priority when using the runner. Lower values indicate higher priority."),
                 dict(opt="tts_engine", type=Options.T_STR, default="voicevox", required=True, multi=False, hide=False,
                      choice=["", "voicevox"],
                      choice_show=dict(voicevox=["voicevox_ver", "voicevox_whl"]),
@@ -131,6 +134,7 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator, lim
             voicevox_model=args.voicevox_model if hasattr(args, 'voicevox_model') else None,
             rag=list(set(args.rag)) if hasattr(args, 'rag') and args.rag is not None else None,
             session_datasource=args.session_datasource if hasattr(args, 'session_datasource') else None,
+            runner_priority=args.runner_priority if hasattr(args, 'runner_priority') else 1,
         )
 
         payload_b64 = convert.str2b64str(common.to_str(configure))

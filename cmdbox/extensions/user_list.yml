@@ -47,7 +47,7 @@ groups:                        # A list of groups, each of which is a map that c
 - gid: 1                       # An ID that identifies a group. No two groups can have the same ID.
   name: admin                  # A name that identifies the group. No two groups can have the same name.
   home: /.groups/admin         # The home directory of the group, used for file operations.
-  startpage: /gui              # The group's start page.
+  startpage: /agent            # The group's start page.
                                # This is the page to which users belonging to the group are redirected when they access the “/” path.
 - gid: 2
   name: develop

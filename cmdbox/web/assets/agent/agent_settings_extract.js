@@ -135,8 +135,6 @@ agentView.list_extract = async () => {
                     cmdbox.hide_loading();
                 }
             });
-
-            container.append(itemEl);
         });
     } catch (e) {
         console.error(e);

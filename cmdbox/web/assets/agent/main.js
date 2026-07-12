@@ -67,6 +67,47 @@ $(() => {
             cmdbox.init_modal_button();
             // 多言語対応のためのテキスト翻訳を処理
             setTimeout(() => {cmdbox.process_i18n();}, 100);
+            // ツールメニュー初期化
+            const tools = async (sel, url) => {
+                const res = await fetch(url, {method: 'GET'});
+                const menu = await res.json();
+                for (let key in menu) {
+                    const m = menu[key];
+                    const li = $('<li>');
+                    const css_class = m["css_class"] ? m["css_class"] : '';
+                    const href = m["href"] ? m["href"] : '#';
+                    const target = m["target"] ? m["target"] : '_self';
+                    const onclick = m["onclick"] ? m["onclick"] : '';
+                    const html = m["html"] ? m["html"] : '';
+                    const a = $('<a>').attr('class', css_class).attr('href', href).attr('onclick', onclick).attr('target', target);
+                    a.addClass('i18n').html(html);
+                    li.append(a);
+                    $(sel).append(li);
+                }
+                cmdbox.process_i18n($(sel));
+            };
+            // ユーザー情報メニュー初期化
+            cmdbox.init_user_info_menu().then(async () => {
+                // ツールメニュー初期化
+                const bar = $('.nav-sidebar-content');
+                const res = await fetch('gui/toolmenu', {method: 'GET'});
+                const item = await res.json();
+                const menu_ul = bar.find('.tools_menu ul');
+                for (let key in item) {
+                    const m = item[key];
+                    if (m["href"]=="agent") continue;
+                    const li = $('<li>').appendTo(menu_ul);
+                    const a = $('<a class="dropdown-item i18n"/>').appendTo(li);
+                    a.html(m["html"] || '');
+                    a.addClass(m["css_class"] ? m["css_class"] : '');
+                    a.attr('href', m["href"] ? m["href"] : '#');
+                    a.attr('target', m["target"] ? m["target"] : '_self');
+                    a.attr('onclick', m["onclick"] ? m["onclick"] : '');
+                }
+                cmdbox.process_i18n(menu_ul);
+                // デフォルトのRunnerを設定
+                agentView.setDefaultRunner();
+            });
         } finally {
             cmdbox.hide_loading();
         }

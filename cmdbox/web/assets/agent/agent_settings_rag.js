@@ -159,8 +159,6 @@ agentView.list_rag = async () => {
                     cmdbox.hide_loading();
                 }
             });
-
-            container.append(itemEl);
         });
     } catch (e) {
         console.error(e);

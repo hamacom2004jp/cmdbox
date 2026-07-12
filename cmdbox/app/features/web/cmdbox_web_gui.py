@@ -196,3 +196,26 @@ class Gui(feature.WebFeature):
         if 'stdin' in cmd_opt and cmd_opt['stdin']:
             curl_fileup.add(f'-F "input_file=@&lt;input_file&gt;"')
         return " ".join(curl_fileup)
+
+    def toolmenu(self, web:Web) -> Dict[str, Any]:
+        """
+        ツールメニューの情報を返します
+
+        Args:
+            web (Web): Webオブジェクト
+        
+        Returns:
+            Dict[str, Any]: ツールメニュー情報
+        
+        Sample:
+            {
+                'filer': {
+                    'html': 'Filer',
+                    'href': 'filer',
+                    'target': '_blank',
+                    'css_class': 'dropdown-item'
+                    'onclick': 'alert("filer")'
+                }
+            }
+        """
+        return dict(command=dict(html='Command', href='gui', target='_blank', css_class='dropdown-item'))

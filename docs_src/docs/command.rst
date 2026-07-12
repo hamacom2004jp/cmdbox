@@ -28,4 +28,5 @@ See below for available options for the various commands.
    Server <cmd_server.rst>
    Test <cmd_test.rst>
    TTS <cmd_tts.rst>
+   URL <cmd_url.rst>
    Web <cmd_web.rst>

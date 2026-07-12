@@ -75,6 +75,7 @@ class AgentRunnerLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             tts_engine: Union[str, None] = pydantic.Field(default=None, description="TTSエンジン名")
             rag: Union[List[str], None] = pydantic.Field(default=None, description="RAG設定リスト")
             voicevox_model: Union[str, None] = pydantic.Field(default=None, description="VOICEVOXモデル")
+            runner_priority: Union[int, None] = pydantic.Field(default=None, description="ランナー優先度")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result

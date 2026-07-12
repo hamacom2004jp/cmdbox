@@ -79,12 +79,12 @@ list_pipe_func_then = () => {
                     pipe_modal.find(`[name="${key}"]`).val(val);
                 }
             });
-            $('#cmd_del').show();
+            $('#pipe_del').show();
             pipe_modal.find('[name="title_disabled"]').val(pipe_modal.find('[name="title"]').hide().val()).show();
         } else {
             // 新規パイプラインファイルの作成
             modal_title = 'New Pipeline';
-            $('#cmd_del').hide();
+            $('#pipe_del').hide();
             pipe_modal.find('[name="title"]').val('');
             pipe_modal.find('[name="title"]').css('border-top-right-radius','6px').css('border-bottom-right-radius','6px').show();
             pipe_modal.find('[name="title_disabled"]').val('').hide();

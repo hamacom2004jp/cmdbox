@@ -292,8 +292,8 @@ limiter_plan_page.render_plans = async (plans) => {
         if (is_plan_save) {
             // 操作ボタン
             const btn_row = $(`<div class="d-flex gap-2 mt-3"></div>`).appendTo(card_body);
+            const btn_del = $(`<button type="button" class="btn btn-sm btn-outline-danger me-auto i18n">Delete</button>`).appendTo(btn_row);
             const btn_edit = $(`<button type="button" class="btn btn-sm btn-outline-info i18n">Edit</button>`).appendTo(btn_row);
-            const btn_del = $(`<button type="button" class="btn btn-sm btn-outline-danger i18n">Delete</button>`).appendTo(btn_row);
             btn_edit.on('click', async () => await limiter_plan_page.open_edit_modal(plan.name));
             btn_del.on('click', () => limiter_plan_page.delete_plan(plan.name));
         }

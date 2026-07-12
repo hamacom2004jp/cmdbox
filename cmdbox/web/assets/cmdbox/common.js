@@ -363,8 +363,8 @@ cmdbox.editapikey = async () => {
         const exp = user['apikeys'][name];
     });*/
     const footer = $(`<div class="modal-footer"/>`).appendTo(form);
+    const delapikey_btn = $(`<button type="button" class="btn btn-outline-danger me-auto i18n">Del apikey</button>`).appendTo(footer);
     $('<button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>').appendTo(footer);
-    const delapikey_btn = $(`<button type="button" class="btn btn-outline-danger i18n">Del apikey</button>`).appendTo(footer);
     delapikey_btn.off('click').on('click', async (event) => {
         const apikey_name = await cmdbox.prompt('Please enter the apikey name.', true);
         if (!apikey_name) return;
@@ -578,6 +578,46 @@ cmdbox.passchange = async () => {
     cmdbox.process_i18n(chpass_modal);
     chpass_modal.modal('show');
 };
+cmdbox.init_user_info_menu = async () => {
+    try {
+        const user = await cmdbox.user_info();
+        if (!user) return;
+        const user_info_menu = $('.user_info');
+        user_info_menu.removeClass('d-none').addClass('d-flex');
+
+        if (!user_info_menu.find('.dropdown-menu .changepass-menu-item').length) {
+            const changepass_item = $(`<li><a class="dropdown-item changepass-menu-item i18n" href="#" onclick="cmdbox.passchange();">Change Password</a></li>`);
+            user_info_menu.find('.dropdown-menu').append(changepass_item);
+        }
+        if (!user_info_menu.find('.dropdown-menu .edituserlanguage-menu-item').length) {
+            const edituserlanguage_item = $(`<li><a class="dropdown-item edituserlanguage-menu-item i18n" href="#" onclick="cmdbox.editUserLanguage();">Change Language</a></li>`);
+            user_info_menu.find('.dropdown-menu').append(edituserlanguage_item);
+        }
+        if (!user_info_menu.find('.dropdown-menu .editapikey-menu-item').length) {
+            const editapikey_item = $(`<li><a class="dropdown-item editapikey-menu-item i18n" href="#" onclick="cmdbox.editapikey();">Edit ApiKey</a></li>`);
+            user_info_menu.find('.dropdown-menu').append(editapikey_item);
+        }
+        if (!user_info_menu.find('.dropdown-menu .changecolor-menu-item').length) {
+            const changecolor_item = $(`<li><span class="dropdown-item changecolor-menu-item"><span class="i18n">Change Color : </span>`
+                + `<select class="d-inline-block change_color_mode"></select>`
+                + `</span></li>`);
+            user_info_menu.find('.dropdown-menu').append(changecolor_item);
+            // カラーモード対応
+            cmdbox.change_color_mode();
+        }
+        if (!user_info_menu.find('.dropdown-menu .signout-menu-item').length) {
+            const parts = location.pathname.split('/');
+            const sitepath = parts[parts.length-1];
+            const signout_item = $(`<li><a class="dropdown-item signout-menu-item i18n" href="#" onclick="cmdbox.signout('${sitepath}');">Sign out</a></li>`);
+            user_info_menu.find('.dropdown-menu').append(`<li><hr class="dropdown-divider"></li>`).append(signout_item);
+        }
+        user_info_menu.find('.user_info_note').html(`<span class="i18n">Groups: </span>${user['groups'].join(', ')}`);
+        user_info_menu.find('.username').text(user['name']);
+        cmdbox.process_i18n(user_info_menu);
+    } catch (e) {
+        cmdbox.message({'error': `Failed to initialize user info menu: ${e}`}, true, true);
+    }
+};
 $(()=>{
     // サインアウトメニューを表示
     fetch('usesignout', {method: 'GET'}).then(async res => {
@@ -586,40 +626,7 @@ $(()=>{
             const json = await res.json();
             const usesignout = json['success']['usesignout'];
             if (!usesignout) return;
-            const user = await cmdbox.user_info();
-            if (!user) return;
-            const user_info_menu = $('.user_info');
-            user_info_menu.removeClass('d-none').addClass('d-flex');
-
-            if (!user_info_menu.find('.dropdown-menu .changepass-menu-item').length) {
-                const changepass_item = $(`<li><a class="dropdown-item changepass-menu-item i18n" href="#" onclick="cmdbox.passchange();">Change Password</a></li>`);
-                user_info_menu.find('.dropdown-menu').append(changepass_item);
-            }
-            if (!user_info_menu.find('.dropdown-menu .edituserlanguage-menu-item').length) {
-                const edituserlanguage_item = $(`<li><a class="dropdown-item edituserlanguage-menu-item i18n" href="#" onclick="cmdbox.editUserLanguage();">Change Language</a></li>`);
-                user_info_menu.find('.dropdown-menu').append(edituserlanguage_item);
-            }
-            if (!user_info_menu.find('.dropdown-menu .editapikey-menu-item').length) {
-                const editapikey_item = $(`<li><a class="dropdown-item editapikey-menu-item i18n" href="#" onclick="cmdbox.editapikey();">Edit ApiKey</a></li>`);
-                user_info_menu.find('.dropdown-menu').append(editapikey_item);
-            }
-            if (!user_info_menu.find('.dropdown-menu .changecolor-menu-item').length) {
-                const changecolor_item = $(`<li><span class="dropdown-item changecolor-menu-item"><span class="i18n">Change Color : </span>`
-                    + `<select class="d-inline-block change_color_mode"></select>`
-                    + `</span></li>`);
-                user_info_menu.find('.dropdown-menu').append(changecolor_item);
-                // カラーモード対応
-                cmdbox.change_color_mode();
-            }
-            if (!user_info_menu.find('.dropdown-menu .signout-menu-item').length) {
-                const parts = location.pathname.split('/');
-                const sitepath = parts[parts.length-1];
-                const signout_item = $(`<li><a class="dropdown-item signout-menu-item i18n" href="#" onclick="cmdbox.signout('${sitepath}');">Sign out</a></li>`);
-                user_info_menu.find('.dropdown-menu').append(`<li><hr class="dropdown-divider"></li>`).append(signout_item);
-            }
-            user_info_menu.find('.user_info_note').html(`<span class="i18n">Groups: </span>${user['groups'].join(', ')}`);
-            user_info_menu.find('.username').text(user['name']);
-            cmdbox.process_i18n(user_info_menu);
+            await cmdbox.init_user_info_menu();
         } catch (e) {}
     });
     cmdbox.appid('.navbar-brand');

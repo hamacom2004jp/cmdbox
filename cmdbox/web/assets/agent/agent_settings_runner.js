@@ -1,7 +1,7 @@
 agentView.get_runner_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('agent', 'runner_save');
     const vform_names = ['runner_name', 'agent', 'session_datasource',
-                        'rag', 'tts_engine', 'voicevox_model'];
+                        'rag', 'tts_engine', 'voicevox_model', 'runner_priority'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
 };
@@ -76,7 +76,7 @@ agentView.list_runner = async () => {
         }
 
         const container_ul = $(`<ul class="sf-list-group"/>`).appendTo(container);
-        list.forEach(async item => {
+        const promises = list.map(async item => {
             const res = await agentView.exec_cmd('agent', 'runner_load', { runner_name: item.name });
             if (!res || !res.success) {
                 $(`
@@ -91,9 +91,10 @@ agentView.list_runner = async () => {
             }
             const config = res.success || {};
             const itemEl = $(`
-                <li class="sf-list-item">
+                <li class="sf-list-item" style="cursor: pointer;" data-priority="${config.runner_priority || 9999}">
                     <div>
-                        <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">${config.runner_name}</span>
+                        <span class="d-block glow-text-cyan system-font" style="font-size: 0.9em;">
+                        ( ${config.runner_priority || '-'} ) ${config.runner_name}</span>
                         <span>
                             Agent: ${config.agent || 'None'},
                             Session Store: ${config.session_datasource || 'None'},
@@ -157,9 +158,19 @@ agentView.list_runner = async () => {
                     cmdbox.hide_loading();
                 }
             });
-
-            container.append(itemEl);
         });
+        await Promise.all(promises);
+        const ul = container.find('ul');
+        const sortedItems = ul.find('li').sort((a, b) => {
+            const pA = $(a).attr('data-priority');
+            const pB = $(b).attr('data-priority');
+            try {
+                return parseInt(pA) - parseInt(pB);
+            } catch (e) {
+                return pA.localeCompare(pB);
+            }
+        });
+        ul.append(sortedItems);
     } catch (e) {
         console.error(e);
         container.html(`<div class="text-danger p-3">Error: ${e.message}</div>`);
@@ -239,7 +250,7 @@ agentView.show_runner_select_modal = async () => {
             const li = $(`<li class="d-flex sf-list-item"/>`).appendTo(ul);
             const div1 = $(`<div class="d-inline-block"/>`).appendTo(li);
             const head = $(`<span class="d-block glow-text-cyan system-font" style="font-size: 1em;"></span>`).appendTo(div1);
-            head.html(`${config.runner_name}`);
+            head.html(`( ${config.runner_priority || '-'} ) ${config.runner_name}`);
             const body = $(`<span></span>`).appendTo(div1);
             body.html(`Agent: ${config.agent || 'None'},
                        Session Store: ${config.session_datasource || 'None'},
@@ -257,7 +268,26 @@ agentView.show_runner_select_modal = async () => {
         $('#runner_select_modal').modal('show');
     }
 };
-
+agentView.setDefaultRunner = async () => {
+    try {
+        const res = await agentView.exec_cmd('agent', 'runner_list');
+        if (!res || !res.success) {
+            console.warn(res);
+            return;
+        }
+        const list = res.success['data'] || [];
+        if (list.length === 0) {
+            cmdbox.message('No Runner configured. Please register one in the settings screen.', true);
+            return;
+        }
+        list.sort((a, b) => (a.runner_priority || 9999) - (b.runner_priority || 9999));
+        const defaultRunner = list[0];
+        agentView.select_runner(defaultRunner.name);
+        agentView.runner_conf = defaultRunner;
+    } catch (e) {
+        console.error(e);
+    }
+};
 agentView.select_runner = async (runner_name) => {
     try {
         // display_runner_nameに選択されたrunnerの名前を表示

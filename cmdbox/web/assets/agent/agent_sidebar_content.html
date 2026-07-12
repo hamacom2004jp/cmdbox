@@ -11,4 +11,22 @@
         <i class="fas fa-cog fa-2xl"></i>
         <span class="nav-label i18n">Settings</span>
     </button>
+    <div class="dropdown tools_menu">
+        <button class="btn btn-nav-action p-2" data-bs-toggle="dropdown" title="Tools" style="border:none;">
+            <i class="fa-solid fa-ellipsis fa-2xl p-2"></i>
+            <span class="nav-label i18n">Tools</span>
+        </button>
+        <ul class="dropdown-menu text-small shadow" style="position:absolute;inset:0px 0px auto auto;margin:0px;transform:translate(0px, 34px);" data-popper-placement="bottom-end">
+        </ul>
+    </div>
+    <div class="d-none dropdown user_info mt-auto mb-3">
+        <button class="btn btn-nav-action p-2" data-bs-toggle="dropdown" title="UserInfo" style="border:none;">
+            <i class="fa-solid fa-circle-user fa-2xl p-2"></i>
+            <span class="nav-label username">UserName</span>
+        </button>
+        <ul class="dropdown-menu text-small shadow" style="position:absolute;inset:0px 0px auto auto;margin:0px;transform:translate(0px, 34px);" data-popper-placement="bottom-end">
+            <div class="user_info_note ps-3 pe-3"></div>
+            <li><hr class="dropdown-divider"></li>
+        </ul>
+    </div>
 </div>

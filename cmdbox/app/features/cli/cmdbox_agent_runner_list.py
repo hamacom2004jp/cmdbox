@@ -65,8 +65,12 @@ class AgentRunnerList(feature.OneshotResultEdgeFeature, validator.Validator):
         return self.RESP_SUCCESS, ret, cl
 
     def output_schema(self) -> type:
+        class RunnerInfo(pydantic.BaseModel):
+            name: str = pydantic.Field(description="ランナー名")
+            path: str = pydantic.Field(description="設定ファイルパス")
+            runner_priority: Union[int, None] = pydantic.Field(default=None, description="ランナー優先度")
         class Data(resdata.Data):
-            data: List[resdata.NamePath] = pydantic.Field(default_factory=list, description="処理結果のデータ")
+            data: List[RunnerInfo] = pydantic.Field(default_factory=list, description="処理結果のデータ")
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
@@ -100,7 +104,15 @@ class AgentRunnerList(feature.OneshotResultEdgeFeature, validator.Validator):
                     name = p.name
                     if not name.startswith('runner-') or not name.endswith('.json'):
                         continue
-                    results.append(dict(name=name[7:-5], path=str(p)))
+                    runner_info = dict(name=name[7:-5], path=str(p))
+                    try:
+                        with p.open('r', encoding='utf-8') as f:
+                            data = json.load(f)
+                            runner_info['runner_priority'] = data.get('runner_priority', 9999)
+                    except Exception as e:
+                        logger.warning(f"Failed to read runner_priority from {p}: {e}")
+                        runner_info['runner_priority'] = None
+                    results.append(runner_info)
 
             msg = dict(success=results)
             redis_cli.rpush(reskey, msg)

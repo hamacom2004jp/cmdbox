@@ -361,8 +361,8 @@ limiter_page._render_limiter_item = (parent, lm, show_counter, is_limiter_save) 
     if (is_limiter_save) {
         // 操作ボタン
         const btn_row = $(`<div class="d-flex gap-2 mt-2"></div>`).appendTo(item);
+        const btn_del = $(`<button type="button" class="btn btn-sm btn-outline-danger me-auto i18n">Delete</button>`).appendTo(btn_row);
         const btn_edit = $(`<button type="button" class="btn btn-sm btn-outline-info i18n">Edit</button>`).appendTo(btn_row);
-        const btn_del = $(`<button type="button" class="btn btn-sm btn-outline-danger i18n">Delete</button>`).appendTo(btn_row);
         btn_edit.on('click', () => limiter_page.open_edit_modal(lm.limiter_name));
         btn_del.on('click', () => limiter_page.delete_limiter(lm.limiter_name));
     }

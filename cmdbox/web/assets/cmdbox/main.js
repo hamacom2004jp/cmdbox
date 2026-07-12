@@ -104,6 +104,7 @@ $(() => {
         const menu = await res.json();
         for (let key in menu) {
             const m = menu[key];
+            if (m["href"]=="gui") continue;
             const li = $('<li>');
             const css_class = m["css_class"] ? m["css_class"] : '';
             const href = m["href"] ? m["href"] : '#';
