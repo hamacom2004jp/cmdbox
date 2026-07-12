@@ -19,6 +19,13 @@ The Limiter functionality is implemented using the following modules:
 - `cmdbox.app.features.cli.cmdbox_limiter_del`: Delete a restriction configuration.
 - `cmdbox.app.features.cli.cmdbox_limiter_counter`: Retrieve restriction counters.
 - `cmdbox.app.features.cli.cmdbox_limiter_targets`: List Features that inherit from `LimitedFeature`.
+- `cmdbox.app.features.cli.cmdbox_limiter_evidences`: Retrieve evidence files for limiter configurations.
+- `cmdbox.app.features.cli.cmdbox_limiter_plan_save`: Add or save plan configurations that bundle multiple limiters.
+- `cmdbox.app.features.cli.cmdbox_limiter_plan_load`: Load a plan configuration.
+- `cmdbox.app.features.cli.cmdbox_limiter_plan_list`: List registered plan configurations.
+- `cmdbox.app.features.cli.cmdbox_limiter_plan_del`: Delete a plan configuration.
+- `cmdbox.app.features.cli.cmdbox_limiter_billing_calc`: Calculate billing data based on plan evidences.
+- `cmdbox.app.features.cli.cmdbox_limiter_billing_load`: Load billing data for a plan.
 
 Restriction configurations are stored at `data_dir/.limiter/limiter-{name}.json` and
 counters are stored at `data_dir/.limiter/counter-{name}.json`.
@@ -222,6 +229,205 @@ To filter by mode or command:
         --scope server \
         --filter_target_mode mymode \
         --filter_target_cmd mycommand
+
+Retrieving Evidence Files
+==========================
+
+Use the `evidences` command to retrieve evidence files for a limiter configuration. Evidence files contain counter history and other information saved when the counter reset timing is reached.
+
+.. code-block:: bash
+
+    cmdbox -m limiter -c evidences \
+        --host localhost --port 6379 --password password --svname cmdbox \
+        --limiter_name my_limit \
+        --scope server
+
+To include counter history in the results:
+
+.. code-block:: bash
+
+    cmdbox -m limiter -c evidences \
+        --host localhost --port 6379 --password password --svname cmdbox \
+        --limiter_name my_limit \
+        --scope server \
+        --include_history
+
+Managing Plans
+===============
+
+Plans bundle multiple restriction configurations together to support various billing models and service management scenarios.
+
+Creating a Plan
+^^^^^^^^^^^^^^^^
+
+Use the `plan_save` command to create or update a plan configuration that bundles multiple limiters.
+
+.. code-block:: bash
+
+    cmdbox -m limiter -c plan_save \
+        --host localhost --port 6379 --password password --svname cmdbox \
+        --plan_name my_plan \
+        --plan_title "My Service Plan" \
+        --plan_desc "Description of my plan" \
+        --limiters limiter1 limiter2 limiter3 \
+        --plan_start 2024-01-01T00:00:00 \
+        --plan_end 2024-12-31T23:59:59 \
+        --billing_type period \
+        --billing_period_unit month \
+        --billing_period_qty 1 \
+        --billing_currency JPY \
+        --billing_unit_price 10000
+
+Key plan configuration options:
+
+.. list-table::
+    :widths: 30 70
+    :header-rows: 1
+
+    * - Option
+      - Description
+    * - ``--plan_name``
+      - Identifier name for the plan (required).
+    * - ``--plan_title``
+      - Title of the plan.
+    * - ``--plan_desc``
+      - Description of the plan.
+    * - ``--limiters``
+      - Limiter configuration names to include in the plan (can be specified multiple times, required).
+    * - ``--plan_start``
+      - Start datetime when the plan becomes active.
+    * - ``--plan_end``
+      - End datetime when the plan expires.
+    * - ``--open_date``
+      - Datetime when user access begins.
+    * - ``--suspend_date``
+      - Datetime when user access is suspended.
+    * - ``--notice_date``
+      - Datetime to notify about suspension before the actual suspension date.
+    * - ``--billing_type``
+      - Billing model: `period` (fixed period billing) or `metered` (usage-based billing).
+    * - ``--billing_period_unit``
+      - Period unit for period-based billing: `hour`, `day`, `month`, or `year`.
+    * - ``--billing_period_qty``
+      - Number of period units for period-based billing.
+    * - ``--billing_limiter``
+      - Limiter name to calculate metered billing from.
+    * - ``--billing_limiter_item``
+      - Counter item for metered billing: `registrations`, `count`, `time`, `input`, `process`, `output`, or `credits`. Default is `credits`.
+    * - ``--billing_min_amount``
+      - Minimum billing amount for metered billing.
+    * - ``--billing_max_amount``
+      - Maximum billing amount for metered billing.
+    * - ``--billing_currency``
+      - Currency code for billing (default: `JPY`).
+    * - ``--billing_unit_price``
+      - Unit price for billing (required).
+
+Loading a Plan
+^^^^^^^^^^^^^^^
+
+Use the `plan_load` command to retrieve a plan configuration.
+
+.. code-block:: bash
+
+    cmdbox -m limiter -c plan_load \
+        --host localhost --port 6379 --password password --svname cmdbox \
+        --plan_name my_plan
+
+Listing Plans
+^^^^^^^^^^^^^^
+
+Use the `plan_list` command to display all registered plans.
+
+.. code-block:: bash
+
+    cmdbox -m limiter -c plan_list \
+        --host localhost --port 6379 --password password --svname cmdbox
+
+To search by keyword (partial match):
+
+.. code-block:: bash
+
+    cmdbox -m limiter -c plan_list \
+        --host localhost --port 6379 --password password --svname cmdbox \
+        --kwd my_
+
+Deleting a Plan
+^^^^^^^^^^^^^^^^
+
+Use the `plan_del` command to delete a plan configuration.
+
+.. code-block:: bash
+
+    cmdbox -m limiter -c plan_del \
+        --host localhost --port 6379 --password password --svname cmdbox \
+        --plan_name my_plan
+
+Billing Data Calculation
+=========================
+
+The Limiter module supports automatic billing calculation based on plan configurations and evidence files.
+
+Calculating Billing Data
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use the `billing_calc` command to calculate billing data for plans based on their evidences.
+
+.. code-block:: bash
+
+    cmdbox -m limiter -c billing_calc \
+        --host localhost --port 6379 --password password --svname cmdbox
+
+To calculate billing for a specific plan:
+
+.. code-block:: bash
+
+    cmdbox -m limiter -c billing_calc \
+        --host localhost --port 6379 --password password --svname cmdbox \
+        --plan_name my_plan
+
+Billing calculation:
+
+- Retrieves all active plan configurations (or a specific plan if specified).
+- Gathers evidence files for each limiter in the plan.
+- Calculates billing amounts based on the plan's billing type (period or metered).
+- **For period billing**: Returns the fixed unit price for the period.
+- **For metered billing**: Calculates based on the specified counter item (e.g., credits consumed, execution count, etc.) multiplied by the unit price, with optional minimum and maximum limits.
+- Saves billing data files without overwriting existing files.
+
+Output fields:
+
+.. list-table::
+    :widths: 30 70
+    :header-rows: 1
+
+    * - Field
+      - Description
+    * - ``billing_file``
+      - Path to the saved billing data file.
+    * - ``plan_name``
+      - Identifier name of the plan.
+    * - ``billing_limiter``
+      - Limiter name used for metered billing calculation.
+    * - ``last_reset``
+      - Datetime of the last counter reset.
+    * - ``billing_amount``
+      - Calculated billing amount.
+    * - ``billing_currency``
+      - Currency code for the billing.
+    * - ``skipped``
+      - Set to `true` if a billing data file already exists for this billing period.
+
+Loading Billing Data
+^^^^^^^^^^^^^^^^^^^^^
+
+Use the `billing_load` command to retrieve billing data for a plan.
+
+.. code-block:: bash
+
+    cmdbox -m limiter -c billing_load \
+        --host localhost --port 6379 --password password --svname cmdbox \
+        --plan_name my_plan
 
 Developer Guide: Implementing a Limiter-Enabled Command
 ========================================================

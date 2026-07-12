@@ -132,11 +132,16 @@
                 </div>
                 <div class="modal-body">
                     <div id="session_tab">
-                        <ul class="sf-list-group">
+                        <div class="d-flex mb-2">
+                            <button type="button" id="btn_select_all_sessions" class="btn btn-sm btn-outline-secondary ms-auto i18n">Select All</button>
+                            <button type="button" id="btn_deselect_all_sessions" class="btn btn-sm btn-outline-secondary ms-2 i18n">Deselect All</button>
+                        </div>
+                        <ul class="sf-list-group overflow-auto" style="max-height: calc(100% - 50px);">
                         </ul>
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button id="btn_delete_selected_sessions" type="button" class="btn btn-danger me-auto i18n">Delete Selected</button>
                     <button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">CLOSE</button>
                 </div>
             </div>

@@ -814,7 +814,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
         "data": [
           {
             "name": "string",
-            "path": "<class 'pathlib.Path'>"
+            "path": "string",
+            "runner_priority": 0
           }
         ]
       },
@@ -831,9 +832,10 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "Field","Type","Required","Default","Description"
     "success","Data | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
-    "success.data","list[NamePath]","no","(必須)","処理結果のデータ"
-    "success.data.name","str","yes","(必須)","名前"
-    "success.data.path","Path | str | null","no","null","パス"
+    "success.data","list[RunnerInfo]","no","(必須)","処理結果のデータ"
+    "success.data.name","str","yes","(必須)","ランナー名"
+    "success.data.path","str","yes","(必須)","設定ファイルパス"
+    "success.data.runner_priority","int | null","no","null","ランナー優先度"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
@@ -882,7 +884,8 @@ This command implements ``output_schema()`` returning ``Result`` model.
         "rag": [
           "string"
         ],
-        "voicevox_model": "string"
+        "voicevox_model": "string",
+        "runner_priority": 0
       },
       "warn": {},
       "error": {},
@@ -903,6 +906,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.tts_engine","str | null","no","null","TTSエンジン名"
     "success.rag","list[str] | null","no","null","RAG設定リスト"
     "success.voicevox_model","str | null","no","null","VOICEVOXモデル"
+    "success.runner_priority","int | null","no","null","ランナー優先度"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
@@ -931,6 +935,7 @@ agent ( runner_save ) : ``cmdbox -m agent -c runner_save <Option>``
     "--runner_name <runner_name>","str","","required","","","Specify the name of the runner configuration to save."
     "--agent <agent>","str","","required","","","Specify the Agent configuration name referenced by the Runner."
     "--session_datasource <session_datasource>","str","","required","","","Specify the data source where sessions will be saved."
+    "--runner_priority <runner_priority>","int","","required","9999","","Specifies the priority when using the runner. Lower values indicate higher priority."
     "--tts_engine <tts_engine>","str","","required","voicevox"," | voicevox","Specify the TTS engine to use."
     "--rag <rag>","str","multi","","","","Specify the RAG configuration name referenced by the Runner."
     "--voicevox_model <voicevox_model>","str","","","","No.7アナウンス | No.7ノーマル | No.7読み聞かせ | Voidollノーマル | WhiteCULかなしい | WhiteCULたのしい | WhiteCULびえーん | WhiteCULノーマル | †聖騎士 紅桜†ノーマル | あいえるたんノーマル | ずんだもんあまあま | ずんだもんささやき | ずんだもんなみだめ | ずんだもんセクシー | ずんだもんツンツン | ずんだもんノーマル | ずんだもんヒソヒソ | ずんだもんヘロヘロ | ぞん子ノーマル | ぞん子低血圧 | ぞん子実況風 | ぞん子覚醒 | ちび式じいノーマル | もち子さんのんびり | もち子さんセクシー／あん子 | もち子さんノーマル | もち子さん喜び | もち子さん怒り | もち子さん泣き | ナースロボ＿タイプＴノーマル | ナースロボ＿タイプＴ内緒話 | ナースロボ＿タイプＴ恐怖 | ナースロボ＿タイプＴ楽々 | ユーレイちゃんささやき | ユーレイちゃんツクモちゃん | ユーレイちゃんノーマル | ユーレイちゃん哀しみ | ユーレイちゃん甘々 | 中国うさぎおどろき | 中国うさぎこわがり | 中国うさぎへろへろ | 中国うさぎノーマル | 中部つるぎおどおど | 中部つるぎノーマル | 中部つるぎヒソヒソ | 中部つるぎ怒り | 中部つるぎ絶望と敗北 | 九州そらあまあま | 九州そらささやき | 九州そらセクシー | 九州そらツンツン | 九州そらノーマル | 冥鳴ひまりノーマル | 剣崎雌雄ノーマル | 四国めたんあまあま | 四国めたんささやき | 四国めたんセクシー | 四国めたんツンツン | 四国めたんノーマル | 四国めたんヒソヒソ | 小夜/SAYOノーマル | 後鬼ぬいぐるみver. | 後鬼人間ver. | 後鬼人間（怒り）ver. | 後鬼鬼ver. | 春日部つむぎノーマル | 春歌ナナノーマル | 東北きりたんノーマル | 東北ずん子ノーマル | 東北イタコノーマル | 栗田まろんノーマル | 櫻歌ミコノーマル | 櫻歌ミコロリ | 櫻歌ミコ第二形態 | 波音リツクイーン | 波音リツノーマル | 満別花丸ささやき | 満別花丸ぶりっ子 | 満別花丸ノーマル | 満別花丸ボーイ | 満別花丸元気 | 猫使アルうきうき | 猫使アルおちつき | 猫使アルつよつよ | 猫使アルへろへろ | 猫使アルノーマル | 猫使ビィおちつき | 猫使ビィつよつよ | 猫使ビィノーマル | 猫使ビィ人見知り | 玄野武宏ツンギレ | 玄野武宏ノーマル | 玄野武宏喜び | 玄野武宏悲しみ | 琴詠ニアノーマル | 白上虎太郎おこ | 白上虎太郎びえーん | 白上虎太郎びくびく | 白上虎太郎ふつう | 白上虎太郎わーい | 雀松朱司ノーマル | 離途シリアス | 離途ノーマル | 雨晴はうノーマル | 青山龍星かなしみ | 青山龍星しっとり | 青山龍星ノーマル | 青山龍星不機嫌 | 青山龍星喜び | 青山龍星囁き | 青山龍星熱血 | 麒ヶ島宗麟ノーマル | 黒沢冴白ノーマル","Specify the model of the TTS engine to use."

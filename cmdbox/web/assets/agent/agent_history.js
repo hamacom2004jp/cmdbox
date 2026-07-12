@@ -11,31 +11,23 @@ agentView.create_history = (session_id, runner_name, user_name, update_time, msg
     if (agentView.chatHistories.find(`#${session_id}`).length > 0) return;
     msg = agentView.cell_chop(msg, 300);
     const li = $(`<li id="${session_id}" class="d-flex sf-list-item"/>`).appendTo(agentView.chatHistories);
-    const div1 = $(`<div class="d-inline-block"/>`).appendTo(li);
+    const div1 = $(`<div class="d-inline-block" style="cursor: pointer;"/>`).appendTo(li);
     const head = $(`<span class="d-block glow-text-cyan system-font" style="font-size: 1em;"></span>`).appendTo(div1);
     head.html(`${update_time instanceof Date ? update_time.toLocaleString() : update_time} - ${runner_name} - ${user_name}`);
     const body = $(`<span></span>`).appendTo(div1);
     body.html(msg);
+
     const div2 = $(`<div class="d-inline-block"/>`).appendTo(li);
-    const btn_del = $(`<button class="btn btn-danger ms-auto i18n">Delete</button>`).appendTo(div2);
-    btn_del.off('click').on('click', async (e)=>{
-        if (!await cmdbox.confirm('Are you sure you want to delete this session?', true)) return;
-        // セッション削除ボタンのクリックイベント
-        e.preventDefault();
-        e.stopPropagation();
-        agentView.delete_session(session_id).then(async (res) => {
-            li.remove();
-            const sid = agentView.chatMessages.attr('data-session_id');
-            if (sid == session_id) {
-                // 削除したセッションが現在のセッションだった場合は、メッセージ一覧をクリア
-                agentView.chatMessages.html('');
-                agentView.ws && agentView.ws.close();
-                agentView.chat(cmdbox.random_string(16));
-            }
-            await agentView.list_sessions();
-        });
-    });
-    li.off('click').on('click', async (e) => {
+    const checkbox = $(`<input id="selection_${session_id}" type="checkbox" class="btn-check session_checkbox" data-session_id="${session_id}" autocomplete="off" style="cursor: pointer;"/>`).prependTo(div2);
+    $(`<label class="btn btn-outline-secondary" for="selection_${session_id}" style="cursor:pointer;">Select</label>`).appendTo(div2);
+
+    div1.off('click').on('click', async (e) => {
+        // チェックボックスがクリックされた場合はスキップ
+        if ($(e.target).is('label[for^="selection_"]')) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
         // セッションを選択したときの処理
         e.preventDefault();
         agentView.ws && agentView.ws.close();
@@ -90,6 +82,7 @@ agentView.create_history = (session_id, runner_name, user_name, update_time, msg
     });
     return li;
 };
+
 agentView.delete_session = async (session_id) => {
     const runner_name = agentView.agent_runner ? agentView.agent_runner['runner_name'] : null;
     if (!runner_name || runner_name.length <= 0) return;
@@ -97,4 +90,28 @@ agentView.delete_session = async (session_id) => {
         'runner_name': runner_name,
         'session_id': session_id
     });
-}
+};
+
+agentView.delete_selected_sessions = async () => {
+    const session_checkbox = $('.session_checkbox:checked');
+    if (session_checkbox.length <= 0) {
+        cmdbox.message({'info':'No sessions selected.'}, true);
+        return;
+    }
+    if (!await cmdbox.confirm(`Are you sure you want to delete ${session_checkbox.length} session(s)?`, true)) return;
+    const sid = agentView.chatMessages.attr('data-session_id');
+    session_checkbox.each(async (index, checkbox) => {
+        const session_id = $(checkbox).attr('data-session_id');
+        await agentView.delete_session(session_id);
+        const li = $(`#${session_id}`);
+        li.remove();
+        // 削除したセッションが現在のセッションだった場合は、メッセージ一覧をクリア
+        if (sid == session_id) {
+            agentView.chatMessages.html('');
+            agentView.ws && agentView.ws.close();
+            agentView.chat(cmdbox.random_string(16));
+        }
+    });
+    await agentView.list_sessions();
+    cmdbox.message({'success':`${session_checkbox.length} session(s) deleted.`}, true);
+};

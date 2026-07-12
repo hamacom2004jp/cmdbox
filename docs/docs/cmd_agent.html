@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/07/05 documentation</title>
+  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/07/12 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=00f234ef"></script>
+      <script src="../_static/documentation_options.js?v=afb47466"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -85,6 +85,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_test.html">Test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_url.html">URL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
 </ul>
 </li>
@@ -2853,7 +2854,8 @@
 <span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;class &#39;pathlib.Path&#39;&gt;&quot;</span>
+<span class="w">        </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;runner_priority&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">]</span>
 <span class="w">  </span><span class="p">},</span>
@@ -2894,7 +2896,7 @@
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
 <tr class="row-even"><td><p>success.data</p></td>
-<td><p>list[NamePath]</p></td>
+<td><p>list[RunnerInfo]</p></td>
 <td><p>no</p></td>
 <td><p>(必須)</p></td>
 <td><p>処理結果のデータ</p></td>
@@ -2903,45 +2905,51 @@
 <td><p>str</p></td>
 <td><p>yes</p></td>
 <td><p>(必須)</p></td>
-<td><p>名前</p></td>
+<td><p>ランナー名</p></td>
 </tr>
 <tr class="row-even"><td><p>success.data.path</p></td>
-<td><p>Path | str | null</p></td>
+<td><p>str</p></td>
+<td><p>yes</p></td>
+<td><p>(必須)</p></td>
+<td><p>設定ファイルパス</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data.runner_priority</p></td>
+<td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
-<td><p>パス</p></td>
+<td><p>ランナー優先度</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn</p></td>
+<tr class="row-even"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>warn.performance</p></td>
+<tr class="row-odd"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>error</p></td>
+<tr class="row-even"><td><p>error</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>error.performance</p></td>
+<tr class="row-odd"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>output_schema</p></td>
+<tr class="row-even"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-even"><td><p>end</p></td>
+<tr class="row-odd"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -3059,7 +3067,8 @@
 <span class="w">    </span><span class="nt">&quot;rag&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="s2">&quot;string&quot;</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;voicevox_model&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">&quot;voicevox_model&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;runner_priority&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
@@ -3133,37 +3142,43 @@
 <td><p>null</p></td>
 <td><p>VOICEVOXモデル</p></td>
 </tr>
-<tr class="row-even"><td><p>warn</p></td>
+<tr class="row-even"><td><p>success.runner_priority</p></td>
+<td><p>int | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>ランナー優先度</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn.performance</p></td>
+<tr class="row-even"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>error</p></td>
+<tr class="row-odd"><td><p>error</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>error.performance</p></td>
+<tr class="row-even"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>output_schema</p></td>
+<tr class="row-odd"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-odd"><td><p>end</p></td>
+<tr class="row-even"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -3278,7 +3293,15 @@
 <td></td>
 <td><p>Specify the data source where sessions will be saved.</p></td>
 </tr>
-<tr class="row-even"><td><p>--tts_engine &lt;tts_engine&gt;</p></td>
+<tr class="row-even"><td><p>--runner_priority &lt;runner_priority&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>9999</p></td>
+<td></td>
+<td><p>Specifies the priority when using the runner. Lower values indicate higher priority.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--tts_engine &lt;tts_engine&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -3291,7 +3314,7 @@
 </td>
 <td><p>Specify the TTS engine to use.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--rag &lt;rag&gt;</p></td>
+<tr class="row-even"><td><p>--rag &lt;rag&gt;</p></td>
 <td><p>str</p></td>
 <td><p>multi</p></td>
 <td></td>
@@ -3299,7 +3322,7 @@
 <td></td>
 <td><p>Specify the RAG configuration name referenced by the Runner.</p></td>
 </tr>
-<tr class="row-even"><td><p>--voicevox_model &lt;voicevox_model&gt;</p></td>
+<tr class="row-odd"><td><p>--voicevox_model &lt;voicevox_model&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>

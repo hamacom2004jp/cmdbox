@@ -44,6 +44,23 @@ agentView.initView = () => {
 
     // ヒストリーモーダルの shown.bs.modal イベントハンドラ
     agentView.historyModal.off('shown.bs.modal').on('shown.bs.modal', async () => {
+        // 全選択ボタン
+        $('#btn_select_all_sessions').off('click').on('click', () => {
+            $('#session_tab .session_checkbox').each(function() {
+                $(this).attr('checked','checked').prop('checked', true);
+            });
+        });
+        // 全解除ボタン
+        $('#btn_deselect_all_sessions').off('click').on('click', () => {
+            $('#session_tab .session_checkbox').each(function() {
+                $(this).attr('checked',null).prop('checked', false);
+            });
+        });
+        // 一括削除ボタン
+        $('#btn_delete_selected_sessions').off('click').on('click', () => {
+            agentView.delete_selected_sessions();
+        });
+        
         await agentView.list_sessions();
         cmdbox.process_i18n(agentView.historyModal);
     });
