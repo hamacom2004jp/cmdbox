@@ -834,7 +834,6 @@ a.list-group-item.active {
 #upload_drop_area {
     transition: all 0.3s ease;
     min-height: 300px;
-    cursor: pointer;
     flex: 1;
 }
 
@@ -849,7 +848,6 @@ a.list-group-item.active {
 }
 
 #fileTransferTabs .nav-link {
-    color: var(--text-white-50);
     border: none;
     border-bottom: 2px solid transparent;
     padding: 0.5rem 1rem;
@@ -876,13 +874,12 @@ a.list-group-item.active {
 
 /* --- Upload Panel Styles --- */
 #upload_drop_area {
-    background-color: var(--area-bg-color-10);
+    background-color: var(--area-bg-color-50);
 }
 
 #upload_file_list .list-group-item {
     background-color: transparent;
     border: 1px solid var(--bs-border-color);
-    color: var(--text-primary);
     transition: all 0.2s ease;
 }
 

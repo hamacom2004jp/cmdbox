@@ -105,7 +105,7 @@ agentView.fileuploader.updateUploadFileList = () => {
     fileList.empty();
 
     if (agentView.fileuploader.uploadFiles.length === 0) {
-        fileList.html('<li class="list-group-item text-white-50 text-center py-3">ファイルが選択されていません</li>');
+        fileList.html('<li class="list-group-item text-center py-3">ファイルが選択されていません</li>');
         return;
     }
     agentView.fileuploader.uploadFiles.forEach((file, index) => {
@@ -113,10 +113,10 @@ agentView.fileuploader.updateUploadFileList = () => {
         const listItem = `
             <li class="list-group-item d-flex justify-content-between align-items-center" id="upload_file_${index}">
                 <div class="d-flex align-items-center flex-grow-1">
-                    <i class="fa-solid fa-file me-2" style="color:var(--accent-cyan);"></i>
+                    <i class="fa-solid fa-file me-2"></i>
                     <div class="flex-grow-1">
                         <div class="text-break">${file.name}</div>
-                        <small class="text-white-50">${sizeMB} MB</small>
+                        <small>${sizeMB} MB</small>
                     </div>
                 </div>
                 <button type="button" class="btn btn-sm btn-outline-danger upload-file-remove-btn" data-index="${index}">

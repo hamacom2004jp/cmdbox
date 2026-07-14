@@ -352,6 +352,11 @@ body::after {
     --bs-secondary-rgb: var(--bs-btn-color);
     --bs-table-bg: var(--bs-tertiary-bg);
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
+
+    --area-bg-color-50: rgba(40, 53, 82, 0.5);
+    --area-bg-color-10: rgba(40, 53, 82, 0.1);
+    --area-bg-color-danger-50: rgba(255, 107, 157, 0.5);
+    --area-bg-color-danger-10: rgba(255, 107, 157, 0.1);
 }
 
 /* バーダントモード */
@@ -422,6 +427,11 @@ body::after {
     --bs-secondary-rgb: var(--bs-btn-color);
     --bs-table-bg: var(--bs-tertiary-bg);
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
+
+    --area-bg-color-50: rgba(0, 100, 0, 0.5);
+    --area-bg-color-10: rgba(0, 100, 0, 0.1);
+    --area-bg-color-danger-50: rgba(255, 69, 0, 0.5);
+    --area-bg-color-danger-10: rgba(255, 69, 0, 0.1);
 }
 
 /* ディープシーモード */
@@ -492,6 +502,11 @@ body::after {
     --bs-secondary-rgb: var(--bs-btn-color);
     --bs-table-bg: var(--bs-tertiary-bg);
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
+
+    --area-bg-color-50: rgba(0, 31, 84, 0.5);
+    --area-bg-color-10: rgba(0, 31, 84, 0.1);
+    --area-bg-color-danger-50: rgba(249, 65, 68, 0.5);
+    --area-bg-color-danger-10: rgba(249, 65, 68, 0.1);
 }
 
 /* クリムゾンモード */
@@ -562,6 +577,11 @@ body::after {
     --bs-secondary-rgb: var(--bs-btn-color);
     --bs-table-bg: var(--bs-tertiary-bg);
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
+
+    --area-bg-color-50: rgba(139, 0, 0, 0.5);
+    --area-bg-color-10: rgba(139, 0, 0, 0.1);
+    --area-bg-color-danger-50: rgba(255, 0, 0, 0.5);
+    --area-bg-color-danger-10: rgba(255, 0, 0, 0.1);
 }
 
 /* バンブルビーモード */
@@ -632,6 +652,11 @@ body::after {
     --bs-secondary-rgb: var(--bs-btn-color);
     --bs-table-bg: var(--bs-tertiary-bg);
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
+
+    --area-bg-color-50: rgba(184, 134, 11, 0.5);
+    --area-bg-color-10: rgba(184, 134, 11, 0.1);
+    --area-bg-color-danger-50: rgba(255, 69, 0, 0.5);
+    --area-bg-color-danger-10: rgba(255, 69, 0, 0.1);
 }
 
 /* スペースシップモード (Agent UI) */
@@ -869,7 +894,10 @@ body::after {
     --bs-table-bg: var(--bs-tertiary-bg);
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
 
-    --area-bg-color-10: rgba(0, 247, 255, 0.3);
+    --area-bg-color-50: rgba(0, 247, 255, 0.3);
+    --area-bg-color-10: rgba(0, 247, 255, 0.1);
+    --area-bg-color-danger-50: rgba(160, 82, 45, 0.5);
+    --area-bg-color-danger-10: rgba(160, 82, 45, 0.1);
 }
 [data-bs-theme="spaceship"] .btn-info,
 [data-bs-theme="spaceship"] .btn-outline-info {

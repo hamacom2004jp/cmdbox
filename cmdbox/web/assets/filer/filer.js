@@ -212,41 +212,46 @@ fsapi.filer = (svpath, is_local) => {
     fsapi.right.find('.filer_address_bot').off('click').on('click', ()=>{
         fsapi.tree(fsapi.right, fsapi.right.find('.filer_address').val(), fsapi.right.find('.tree-menu'), false);
     })
-    fsapi.right.find('.drop-area').off('dragover').on('dragover', (event) => {
-        fsapi.right.find('.drop-area').addClass('dragover');
+    const right_drop_area = fsapi.right.find('.drop-area');
+    right_drop_area.off('dragover').on('dragover', (event) => {
+        right_drop_area.addClass('dragover');
+        $(event.currentTarget).css('border', '3px dashed rgba(var(--bs-link-color-rgb),var(--bs-link-opacity,0.75))');
         event.preventDefault();
     });
-    fsapi.right.find('.drop-area').off('dragleave').on('dragleave', (event) => {
-        fsapi.right.find('.drop-area').removeClass('dragover');
+    right_drop_area.off('dragleave').on('dragleave', (event) => {
+        right_drop_area.removeClass('dragover');
+        $(event.currentTarget).css('border', '');
         event.preventDefault();
     });
-    fsapi.right.find('.drop-area').off('drop').on('drop', (event) => {
-        if (fsapi.right.find('.drop-area').hasClass('dragover')) {
-            fsapi.right.find('.drop-area').removeClass('dragover');
+    right_drop_area.off('drop').on('drop', (event) => {
+        if (right_drop_area.hasClass('dragover')) {
+            right_drop_area.removeClass('dragover');
             const from = event.originalEvent.dataTransfer.getData('from');
-            if (from=="local") {
-                    fsapi._upload(event);
-            }
+            fsapi._upload(event);
         }
+        $(event.currentTarget).css('border', '');
         event.preventDefault();
     });
-
-    fsapi.left.find('.drop-area').off('dragover').on('dragover', (event) => {
-        fsapi.left.find('.drop-area').addClass('dragover');
+    const left_drop_area = fsapi.left.find('.drop-area');
+    left_drop_area.off('dragover').on('dragover', (event) => {
+        left_drop_area.addClass('dragover');
+        $(event.currentTarget).css('border', '3px dashed rgba(var(--bs-link-color-rgb),var(--bs-link-opacity,0.75))');
         event.preventDefault();
     });
-    fsapi.left.find('.drop-area').off('dragleave').on('dragleave', (event) => {
-        fsapi.left.find('.drop-area').removeClass('dragover');
+    left_drop_area.off('dragleave').on('dragleave', (event) => {
+        left_drop_area.removeClass('dragover');
+        $(event.currentTarget).css('border', '');
         event.preventDefault();
     });
-    fsapi.left.find('.drop-area').off('drop').on('drop', (event) => {
-        if (fsapi.left.find('.drop-area').hasClass('dragover')) {
-            fsapi.left.find('.drop-area').removeClass('dragover');
+    left_drop_area.off('drop').on('drop', (event) => {
+        if (left_drop_area.hasClass('dragover')) {
+            left_drop_area.removeClass('dragover');
             const from = event.originalEvent.dataTransfer.getData('from');
             if (from=="server") {
                 download(event);
             }
         }
+        $(event.currentTarget).css('border', '');
         event.preventDefault();
     });
 
@@ -567,7 +572,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
                         });
                     });
                     drop_area.find('h5').text(`DRAG AND DROP FILES`);
-                    drop_area.css('background-color', 'var(--area-bg-color-10)');
+                    drop_area.css('background-color', 'var(--area-bg-color-50)');
                 } else {
                     drop_area.find('h5').text(`Don't have permission to upload files.`);
                     drop_area.css('background-color', '');

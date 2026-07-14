@@ -164,7 +164,7 @@ cmdbox.message = (res, i18n=false, nosave=false, enable_closebot=true, enable_co
             modal.find('.modal-footer .btn-outline-secondary').remove();
             const ok_btn = $(`<button type="button" class="btn btn-outline-primary i18n" data-bs-dismiss="modal">OK</button>`);
             const cancel_btn = $(`<button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Cancel</button>`);
-            modal.find('.modal-footer').append(ok_btn).append(cancel_btn);
+            modal.find('.modal-footer').append(cancel_btn).append(ok_btn);
             ok_btn.off('click').on('click', () => {resolve(true);});
             cancel_btn.off('click').on('click', () => {resolve(false);});
         }
@@ -173,7 +173,7 @@ cmdbox.message = (res, i18n=false, nosave=false, enable_closebot=true, enable_co
             modal.find('.modal-body').append(input);
             const ok_btn = $(`<button type="button" class="btn btn-outline-primary i18n" data-bs-dismiss="modal">OK</button>`);
             const cancel_btn = $(`<button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Cancel</button>`);
-            modal.find('.modal-footer').append(ok_btn).append(cancel_btn);
+            modal.find('.modal-footer').append(cancel_btn).append(ok_btn);
             ok_btn.off('click').on('click', () => {resolve(input.val());});
             cancel_btn.off('click').on('click', () => {resolve(null);});
             input.off('keypress').on('keypress', (ev) => {
