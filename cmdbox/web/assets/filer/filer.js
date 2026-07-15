@@ -491,23 +491,23 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
                         event.originalEvent.dataTransfer.setData('from', _l?'local':'server');
                     });
                     if (_n["is_dir"]) {
-                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item open" href="#">Open</a></li>');
-                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>');
+                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item open i18n" href="#">Open</a></li>');
+                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item mkdir i18n" href="#">Create Folder</a></li>');
                         if (!_l) {
-                            tr.find('.dropdown-menu').append('<li><a class="dropdown-item copy" href="#">Copy Folder</a></li>');
-                            tr.find('.dropdown-menu').append('<li><a class="dropdown-item move" href="#">Move Folder</a></li>');
+                            tr.find('.dropdown-menu').append('<li><a class="dropdown-item copy i18n" href="#">Copy Folder</a></li>');
+                            tr.find('.dropdown-menu').append('<li><a class="dropdown-item move i18n" href="#">Move Folder</a></li>');
                         }
-                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item delete" href="#">Delete</a></li>');
+                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item delete i18n" href="#">Delete</a></li>');
                     } else {
-                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item view" href="#">View</a></li>');
-                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item edit" href="#">Edit</a></li>');
-                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item dl_url" href="#">Download URL</a></li>');
-                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>');
+                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item view i18n" href="#">View</a></li>');
+                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item edit i18n" href="#">Edit</a></li>');
+                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item dl_url i18n" href="#">Download URL</a></li>');
+                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item mkdir i18n" href="#">Create Folder</a></li>');
                         if (!_l) {
-                            tr.find('.dropdown-menu').append('<li><a class="dropdown-item copy" href="#">Copy</a></li>');
-                            tr.find('.dropdown-menu').append('<li><a class="dropdown-item move" href="#">Move</a></li>');
+                            tr.find('.dropdown-menu').append('<li><a class="dropdown-item copy i18n" href="#">Copy</a></li>');
+                            tr.find('.dropdown-menu').append('<li><a class="dropdown-item move i18n" href="#">Move</a></li>');
                         }
-                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item delete" href="#">Delete</a></li>');
+                        tr.find('.dropdown-menu').append('<li><a class="dropdown-item delete i18n" href="#">Delete</a></li>');
                     }
                     tr.find('.open').off('click').on('click', mk_tree(_t, _p, _e, _l));
                     tr.find('.delete').off('click').on('click', mk_delete(_p, _e, _n["is_dir"], _l));
@@ -548,6 +548,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
                     table_body.append(tr);
                 });
             }
+            cmdbox.process_i18n(table);
             if (is_local) return;
             // ドロップエリア
             const drop_area = $('<div class="border border-2 rounded pt-4 pb-3 d-flex flex-column align-items-center justify-content-center">'

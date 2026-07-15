@@ -75,6 +75,9 @@ class LimiterPlanList(feature.OneshotResultEdgeFeature, validator.Validator):
             limiters: Union[List[str], None] = pydantic.Field(default=None, description="このプランに含まれるリミッター設定名一覧")
             plan_start: Union[str, None] = pydantic.Field(default=None, description="プラン適用開始日時")
             plan_end: Union[str, None] = pydantic.Field(default=None, description="プラン適用終了日時")
+            open_date: Union[str, None] = pydantic.Field(default=None, description="プラン適用開始日時")
+            suspend_date: Union[str, None] = pydantic.Field(default=None, description="プラン適用終了日時")
+            notice_date: Union[str, None] = pydantic.Field(default=None, description="プラン適用終了通知日時")
 
         class Data(resdata.Data):
             data: Union[List[PlanInfo], None] = pydantic.Field(default=None, description="プラン設定一覧")
@@ -116,6 +119,9 @@ class LimiterPlanList(feature.OneshotResultEdgeFeature, validator.Validator):
                         limiters=cfg.get('limiters', []),
                         plan_start=cfg.get('plan_start', None),
                         plan_end=cfg.get('plan_end', None),
+                        open_date=cfg.get('open_date', None),
+                        suspend_date=cfg.get('suspend_date', None),
+                        notice_date=cfg.get('notice_date', None),
                     ))
 
             out = dict(success=dict(data=results))

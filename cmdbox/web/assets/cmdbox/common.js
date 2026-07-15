@@ -647,6 +647,8 @@ $(()=>{
             if (params.get('error') == 'notfound') msgelem.text('The account is not found.');
             if (params.get('error') == 'invalid') msgelem.text('The account is invalid.');
             if (params.get('warn') == 'passchange') msgelem.text('Your password has not been changed or is about to expire. Please change your password.');
+            if (params.get('error') == 'planoutofperiod') msgelem.text('Your plan is currently inactive.');
+            if (params.get('warn') == 'plannotice') msgelem.text('Your plan is about to expire.');
             $('<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>').appendTo(elem);
             $('body').prepend(elem);
         }

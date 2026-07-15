@@ -60,7 +60,7 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_ja="プランの説明を指定します。",
                      description_en="Specify the description of the plan."),
                 dict(opt="limiters", type=Options.T_STR, default=None, required=True, multi=True, hide=False, choice=[],
-                     choice_fn = self.choice_limiters,
+                     choice_fn=self.choice_limiters,
                      description_ja="このプランに含まれるリミッター設定名を指定します。",
                      description_en="Specify the limiter configuration names included in this plan."),
                 # プラン期間設定
@@ -94,13 +94,14 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_en="Specify the billing period quantity (for period-based billing)."),
                 # 従量課金用オプション
                 dict(opt="billing_limiter", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=[],
-                     callcmd="async () => {await cmdbox.callcmd('limiter','list',{},(res)=>{"
-                             + "const val = $(\"[name='billing_limiter']\").val();"
-                             + "$(\"[name='billing_limiter']\").empty().append('<option></option>');"
-                             + "res['data'].map(elm=>{$(\"[name='billing_limiter']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
-                             + "$(\"[name='billing_limiter']\").val(val);"
-                             + "},$(\"[name='title']\").val(),'billing_limiter');"
-                             + "}",
+                     choice_fn=self.choice_limiters,
+                     #callcmd="async () => {await cmdbox.callcmd('limiter','list',{},(res)=>{"
+                     #        + "const val = $(\"[name='billing_limiter']\").val();"
+                     #        + "$(\"[name='billing_limiter']\").empty().append('<option></option>');"
+                     #        + "res['data'].map(elm=>{$(\"[name='billing_limiter']\").append('<option value=\"'+elm[\"name\"]+'\">'+elm[\"name\"]+'</option>');});"
+                     #        + "$(\"[name='billing_limiter']\").val(val);"
+                     #        + "},$(\"[name='title']\").val(),'billing_limiter');"
+                     #        + "}",
                      description_ja="請求対象のリミッター名を指定します（従量課金の場合）。このリミッターの指定した項目を基に請求されます。",
                      description_en="Specify the limiter name to be billed (for metered billing). Billing is based on the specified item of this limiter."),
                 dict(opt="billing_limiter_item", type=Options.T_STR, default="credits", required=False, multi=False, hide=False, choice=["registrations", "count", "time", "input", "process", "output", "credits"],
@@ -308,7 +309,8 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                     logger.warning(out)
                     redis_cli.rpush(reskey, out)
                     return self.RESP_WARN
-
+            """
+            # open_date/suspend_dateは単にログイン可能期間を示すため、limiterとの比較は不要
             # open_date/suspend_date とリミッターの exec_period_start/exec_period_end を比較
             if (open_date or suspend_date) and limiters:
                 mismatched_dates = []
@@ -332,7 +334,7 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                     logger.warning(out)
                     redis_cli.rpush(reskey, out)
                     return self.RESP_WARN
-
+            """
             # plan_end とリミッターの history_end を比較
             if plan_end and limiters:
                 mismatched_history_end = []

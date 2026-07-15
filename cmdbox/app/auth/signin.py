@@ -1,5 +1,5 @@
 from cmdbox.app import common, options
-from cmdbox.app.commons import redis_client
+from cmdbox.app.commons import convert, redis_client
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
@@ -10,6 +10,7 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import copy
 import contextvars
+import datetime
 import importlib
 import inspect
 import logging
@@ -1040,6 +1041,94 @@ class Signin(object):
         """
         return self.__class__.get_email(data)
 
+    def is_open_within_period(self, group_names:List[str]) -> bool:
+        """
+        limiterモードのplan_listコマンドを実行して、
+        現在設定されている利用可能期間内かどうかを判定する関数
+
+        Args:
+            group_names (List[str]): ユーザグループ名リスト
+        Returns:
+            bool: 期間内のプランが1つでも存在する場合はTrue、それ以外はFalse
+        """
+        # buildinグループが存在する場合は期間内とみなす
+        buildin = [g.get('buildin', False) for g in self.signin_file_data['groups'] if g['name'] in group_names]
+        if any(buildin):
+            return True # buildinグループが存在する場合は期間内とみなす
+
+        # plan_listコマンドの実行ペイロードを構築
+        payload = dict(kwd='*')
+        payload_b64 = convert.str2b64str(common.to_str(payload))
+        
+        # plan_listコマンドを実行
+        ret = self.redis_cli.send_cmd('limiter_plan_list', [payload_b64],
+                                        retry_count=3, retry_interval=5, timeout=60, nowait=False)
+        if 'success' not in ret or 'data' not in ret.get('success', {}):
+            return False # 成功レスポンスがない場合は期間外とみなす
+        plans = ret['success']['data']
+        if not plans:
+            return True  # プランが存在しない場合は期間内とみなす
+
+        # プラン一覧から期間内のプランを探す
+        now = datetime.datetime.now()
+        for plan in plans:
+            open_date = plan.get('open_date')
+            suspend_date = plan.get('suspend_date')
+            try:
+                start_dt = None
+                end_dt = None
+                if open_date:
+                    start_dt = datetime.datetime.fromisoformat(open_date)
+                if suspend_date:
+                    end_dt = datetime.datetime.fromisoformat(suspend_date)
+            except (ValueError, TypeError):
+                continue
+            if start_dt is None and end_dt is None:
+                continue # どちらも指定されていない場合は考慮しない
+            if start_dt is not None and end_dt is not None and start_dt <= now <= end_dt:
+                return True # 期間内のプランが見つかった場合はTrue
+            if start_dt is not None and end_dt is None and start_dt <= now:
+                return True # 期間内のプランが見つかった場合はTrue
+            if start_dt is None and end_dt is not None and now <= end_dt:
+                return True # 期間内のプランが見つかった場合はTrue
+        return False
+
+    def is_notice_expired(self) -> bool:
+        """
+        limiterモードのplan_listコマンドを実行して、
+        現在設定されている通知期限が過ぎたかどうかを判定する関数
+
+        Returns:
+            bool: 通知期限が過ぎている場合はTrue、それ以外はFalse
+        """
+        # plan_listコマンドの実行ペイロードを構築
+        payload = dict(kwd='*')
+        payload_b64 = convert.str2b64str(common.to_str(payload))
+        
+        # plan_listコマンドを実行
+        ret = self.redis_cli.send_cmd('limiter_plan_list', [payload_b64],
+                                        retry_count=3, retry_interval=5, timeout=60, nowait=False)
+        if 'success' not in ret or 'data' not in ret.get('success', {}):
+            return False # 成功レスポンスがない場合は期間外とみなす
+        plans = ret['success']['data']
+        if not plans:
+            return False  # プランが存在しない場合は期間外とみなす
+
+        # プラン一覧から期間内のプランを探す
+        now = datetime.datetime.now()
+        for plan in plans:
+            notice_date = plan.get('notice_date')
+            try:
+                notice_dt = None
+                if notice_date:
+                    notice_dt = datetime.datetime.fromisoformat(notice_date)
+            except (ValueError, TypeError):
+                continue
+            if notice_dt is None:
+                continue # 通知期限が指定されていない場合は考慮しない
+            if now >= notice_dt:
+                return True # 通知期限が過ぎている場合はTrue
+        return False
 
 request_scope = contextvars.ContextVar('request_scope', default=None)
 

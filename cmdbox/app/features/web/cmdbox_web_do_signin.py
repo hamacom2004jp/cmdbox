@@ -133,18 +133,32 @@ class DoSignin(cmdbox_web_signin.Signin):
                     if datetime.datetime.now() > last_update + datetime.timedelta(days=period):
                         web.options.audit_exec(req, res, web, body=dict(msg='Password is expired.'), audit_type='auth', user=name)
                         return RedirectResponse(url=f'/signin/{next}?error=expirationofpassword')
+                    # プランの有効期間内かをチェック
+                    if not web.signin.is_open_within_period(group_names):
+                        return RedirectResponse(url=f'/signin/{next}?error=planoutofperiod')
                     if datetime.datetime.now() > last_update + datetime.timedelta(days=notify):
                         # セッションに保存
                         _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None), home=user.get('home', None)),
                                      email, passwd, None, group_names, group_homes, group_sps, gids)
                         next = f"../{next}" if token_ok else next
                         web.options.audit_exec(req, res, web, body=dict(msg='Signin succeeded. However, you should change your password.'), audit_type='auth', user=name)
+                        # プラン有効期限通知をチェック
+                        if web.signin.is_notice_expired():
+                            return RedirectResponse(url=f'../{next}?warn=plannotice', headers=dict(signin="success"))
+                        # パスワード有効期限通知
                         return RedirectResponse(url=f'../{next}?warn=passchange', headers=dict(signin="success"))
+            # プランの有効期間内かをチェック
+            if not web.signin.is_open_within_period(group_names):
+                return RedirectResponse(url=f'/signin/{next}?error=planoutofperiod')
             # セッションに保存
             _set_session(req, dict(uid=uid, name=name, apikeys=user.get('apikeys', None), home=user.get('home', None)),
                          email, passwd, None, group_names, group_homes, group_sps, gids)
             next = f"../{next}" if next.find('/') >= 0 else next
             next = f"../{next}" if token_ok else next
+            # プラン有効期限通知をチェック
+            if web.signin.is_notice_expired():
+                return RedirectResponse(url=f'../{next}?warn=plannotice', headers=dict(signin="success"))
+            # パスワード有効期限通知をチェック
             if notify_passchange:
                 web.options.audit_exec(req, res, web, body=dict(msg='Signin succeeded. However, you should change your password.'), audit_type='auth', user=name)
                 return RedirectResponse(url=f'../{next}?warn=passchange', headers=dict(signin="success"))
@@ -309,14 +323,21 @@ class DoSignin(cmdbox_web_signin.Signin):
                 group_names, gids = signin.get_groups(access_token, user)
                 group_homes = list(set(web.signin.__class__.group_home(signin_data, group_names)))
                 group_sps = list(set(web.signin.__class__.group_startpage(signin_data, group_names)))
+                # プランの有効期間内かをチェック
+                if not web.signin.is_open_within_period(group_names):
+                    return RedirectResponse(url=f'/signin/{next}?error=planoutofperiod')
                 # セッションに保存
                 _set_session(req, user, email, None, access_token, group_names, group_homes, group_sps, gids)
                 #return RedirectResponse(url=f'../../{next}', headers=dict(signin="success")) # nginxのリバプロ対応のための相対パス
-                html = """
-                <html><head><meta http-equiv="refresh" content="0;url=../../{next}"></head>
+                # プラン有効期限通知をチェック
+                notice_query = ''
+                if web.signin.is_notice_expired():
+                    notice_query = '?warn=plannotice'
+                html = f"""
+                <html><head><meta http-equiv="refresh" content="0;url=../../{next}{notice_query}"></head>
                 <body style="background-color:#212529;color:#fff;">loading..</body>
-                <script type="text/javascript">window.location.href="../../{next}";</script></html>
-                """.format(next=next)
+                <script type="text/javascript">window.location.href="../../{next}{notice_query}";</script></html>
+                """
                 return HTMLResponse(content=html, headers=dict(signin="success"))
             except Exception as e:
                 web.logger.warning(f'Failed to get token. {e}', exc_info=True)
@@ -364,14 +385,21 @@ class DoSignin(cmdbox_web_signin.Signin):
                     group_names, gids = saml_signin.get_groups(None, user)
                     group_homes = list(set(web.signin.__class__.group_home(signin_data, group_names)))
                     group_sps = list(set(web.signin.__class__.group_startpage(signin_data, group_names)))
+                    # プランの有効期間内かをチェック
+                    if not web.signin.is_open_within_period(group_names):
+                        return RedirectResponse(url=f'/signin/{next}?error=planoutofperiod')
                     # セッションに保存
                     _set_session(req, user, email, None, None, group_names, group_homes, group_sps, gids)
+                    # プラン有効期限通知をチェック
+                    notice_query = ''
+                    if web.signin.is_notice_expired():
+                        notice_query = '?warn=plannotice'
                     # SAML場合、ブラウザ制限によりリダイレクトでセッションクッキーが消えるので、HTMLで移動する
-                    html = """
-                    <html><head><meta http-equiv="refresh" content="0;url=../../{next}"></head>
+                    html = f"""
+                    <html><head><meta http-equiv="refresh" content="0;url=../../{next}{notice_query}"></head>
                     <body style="background-color:#212529;color:#fff;">loading..</body>
-                    <script type="text/javascript">window.location.href="../../{next}";</script></html>
-                    """.format(next=next)
+                    <script type="text/javascript">window.location.href="../../{next}{notice_query}";</script></html>
+                    """
                     return HTMLResponse(content=html, headers=dict(signin="success"))
             else:
                 msg = f"Error when processing SAML Response: {', '.join(errors)} {auth.get_last_error_reason()}"
