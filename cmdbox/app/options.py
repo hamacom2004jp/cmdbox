@@ -864,7 +864,7 @@ class Options:
             return _wrapper
         return _audit_write
 
-    def audit_exec(self, *args, body:Dict[str, Any]=None, audit_type:str=None, tags:List[str]=None, src:str=None, title:str=None, user:str=None, **kwargs) -> None:
+    def audit_exec(self, *args, body:Dict[str, Any]=None, audit_type:str=None, tags:List[str]=None, src:str=None, title:str=None, user:str=None, **kwargs) -> Dict[str, Any]:
         """
         監査ログを書き込みます。
 
@@ -964,3 +964,15 @@ class Options:
         audit_write_args = argparse.Namespace(**{k:common.chopdq(v) for k,v in opt.items()})
         if func_feature is None or func_feature is not None and func_feature.audited_by(logger, audit_write_args):
             self.audit_write.apprun(logger, audit_write_args, tm=0.0, pf=[])
+        ret = self.audit_write_args.copy()
+        del ret['mode']
+        del ret['cmd']
+        ret['pg_enabled'] = opt.get('pg_enabled')
+        ret['pg_host'] = opt.get('pg_host')
+        ret['pg_port'] = opt.get('pg_port')
+        ret['pg_user'] = opt.get('pg_user')
+        ret['pg_password'] = opt.get('pg_password')
+        ret['pg_dbname'] = opt.get('pg_dbname')
+        ret['retention_period_days'] = opt.get('retention_period_days')
+        ret['buffered_interval'] = opt.get('buffered_interval')
+        return ret

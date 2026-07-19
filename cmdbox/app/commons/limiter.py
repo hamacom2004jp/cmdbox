@@ -676,11 +676,33 @@ return cjson.encode(c)
         # ファイルから読んだ場合、Redis にも同期しておく（Redis 再起動後の復元）
         if not load_history and self.redis_client is not None:
             try:
-                self.redis_client.hset(
-                    f"{self.redis_client.lmtname}_{self.REDIS_COUNTER_HASH}",
-                    limiter_name,
-                    json.dumps(counter)
-                )
+                redis_key = f"{self.redis_client.lmtname}_{self.REDIS_COUNTER_HASH}"
+                raw = self.redis_client.hget(redis_key, limiter_name)
+                if raw is None:
+                    # Redis にデータがない場合は、ファイルから読んだカウンタをそのまま保存する
+                    self.redis_client.hset(redis_key, limiter_name, json.dumps(counter))
+                else:
+                    # Redis にデータがある場合は、ファイルから読んだカウンタとマージして保存する
+                    text = raw.decode('utf-8') if isinstance(raw, bytes) else raw
+                    share_counter = json.loads(text)
+                    merged_counter = dict(counter)
+                    for k in self.COUNTER_VALKEYS:
+                        merged_counter[k] = max(counter.get(k, 0), share_counter.get(k, 0))
+                    # リセット日時と最終更新日時もマージする
+                    for ts_key in ('last_reset', 'last_update'):
+                        shared_ts = share_counter.get(ts_key)
+                        current_ts = counter.get(ts_key)
+                        if shared_ts and not current_ts:
+                            merged_counter[ts_key] = shared_ts
+                        elif shared_ts and current_ts:
+                            try:
+                                if datetime.fromisoformat(str(shared_ts)) > datetime.fromisoformat(str(current_ts)):
+                                    merged_counter[ts_key] = shared_ts
+                            except Exception:
+                                pass
+                    # Redis にマージしたカウンタを保存する
+                    counter = merged_counter
+                    self.redis_client.hset(redis_key, limiter_name, json.dumps(counter))
             except Exception:
                 pass
         return counter
@@ -1074,6 +1096,8 @@ return cjson.encode(c)
             if not self.matches(config, command_options):
                 continue
             counter = self.load_counter(data_dir, limiter_name)
+            if self.needs_reset(config, counter):
+                counter = self.reset_counter(limiter_name)
             # 実行可能期間チェック
             period_start = config.get('exec_period_start')
             if period_start:

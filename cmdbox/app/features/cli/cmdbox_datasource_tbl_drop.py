@@ -66,12 +66,12 @@ class DatasourceTblDrop(datasource_base.DatasourceBase, validator.Validator):
             tblname = self.validate_identifier(payload['tblname'])
             if_exists = payload.get('if_exists', False)
             ie_clause = 'IF EXISTS ' if if_exists else ''
-            conn, dbtype = self.get_connection(payload)
-            qualified_tbl = self.qualified_name(schema, tblname, dbtype)
-            sql = f"DROP TABLE {ie_clause}{qualified_tbl}"
-            with conn.cursor() as cur:
-                cur.execute(sql)
-            conn.commit()
+            with self.get_context(payload) as (conn, dbtype):
+                qualified_tbl = self.qualified_name(schema, tblname, dbtype)
+                sql = f"DROP TABLE {ie_clause}{qualified_tbl}"
+                with conn.cursor() as cur:
+                    cur.execute(sql)
+                conn.commit()
             return dict(success=dict(data=f"Table '{qualified_tbl}' dropped."))
         except Exception as e:
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)

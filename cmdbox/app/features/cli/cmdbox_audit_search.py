@@ -336,7 +336,8 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
                 else:
                     return col
         try:
-            with self.initdb(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname) as conn:
+            self.initdb(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname)
+            with self.get_context(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname) as conn:
                 def dict_factory(cursor, row):
                     return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
                 conn.row_factory = dict_row if pg_enabled else dict_factory

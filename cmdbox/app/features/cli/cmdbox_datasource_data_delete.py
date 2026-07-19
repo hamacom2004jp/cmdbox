@@ -65,14 +65,14 @@ class DatasourceDataDelete(datasource_base.DatasourceBase, validator.Validator):
             schema = payload.get('schema') or None
             tblname = self.validate_identifier(payload['tblname'])
             where_data: Dict[str, Any] = payload['where_data'] if payload.get('where_data') else {}
-            conn, dbtype = self.get_connection(payload)
-            qualified_tbl = self.qualified_name(schema, tblname, dbtype)
-            where_clause, where_vals = self.build_where(where_data, dbtype)
-            sql = f"DELETE FROM {qualified_tbl} {where_clause}".strip()
-            with conn.cursor() as cur:
-                cur.execute(sql, where_vals)
-                rowcount = cur.rowcount
-            conn.commit()
+            with self.get_context(payload) as (conn, dbtype):
+                qualified_tbl = self.qualified_name(schema, tblname, dbtype)
+                where_clause, where_vals = self.build_where(where_data, dbtype)
+                sql = f"DELETE FROM {qualified_tbl} {where_clause}".strip()
+                with conn.cursor() as cur:
+                    cur.execute(sql, where_vals)
+                    rowcount = cur.rowcount
+                conn.commit()
             return dict(success=dict(data=f"{rowcount} row(s) deleted from '{qualified_tbl}'."))
         except Exception as e:
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)

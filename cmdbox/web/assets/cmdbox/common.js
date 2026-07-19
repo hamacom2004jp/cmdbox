@@ -135,6 +135,11 @@ cmdbox.prompt = (res, i18n=false, nosave=false) => {
  */
 cmdbox.message = (res, i18n=false, nosave=false, enable_closebot=true, enable_confirm=false, enable_prompt=false) => {
     return new Promise((resolve) => {
+        if (typeof res === 'object') {
+            if (typeof res.success === 'string') res = res.success;
+            else if (typeof res.warn === 'string') res = res.warn;
+            else if (typeof res.error === 'string') res = res.error;
+        }
         const msg = JSON.stringify(res).replace(/\\n/g, '\n').replace(/\\/g, '').replace(/^"|"$/g, '').replace(/\\t/g, '&emsp;');
         const modal = $(`<div class="modal fade" tabindex="-1" style="z-index:5000;">
             <div class="modal-dialog">
@@ -578,6 +583,236 @@ cmdbox.passchange = async () => {
     cmdbox.process_i18n(chpass_modal);
     chpass_modal.modal('show');
 };
+/**
+ * ユーザーアイコン設定
+ */
+cmdbox.userIconChange = async () => {
+    const currentIcon = await cmdbox.load_user_icon();
+    const modal = $(`<div class="modal fade" tabindex="-1"/>`);
+    const dialog = $(`<div class="modal-dialog" role="document"><div class="modal-content"/></div>`).appendTo(modal);
+    const content = dialog.find('.modal-content');
+    const header = $(`<div class="modal-header"/>`).appendTo(content);
+    header.append('<h5 class="modal-title i18n">Change User Icon</h5>');
+    header.append('<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>');
+    const body = $(`<div class="modal-body"/>`).appendTo(content);
+    // Canvas プレビューエリア（最初に配置）
+    const canvasDiv = $(`<div class="mb-3"/>`).appendTo(body);
+    const canvasContainer = $(`<div class="user-icon-preview"/>`).appendTo(canvasDiv);
+    const canvas = $(`<canvas id="icon-canvas" style="cursor: grab;"/>`).appendTo(canvasContainer)[0];
+    // ファイルアップロード
+    const uploadDiv = $(`<div class="text-end"/>`).appendTo(body);
+    const fileInput = $(`<input type="file" class="form-control" accept="image/*" id="icon-file-input"/>`).appendTo(uploadDiv);
+    const fileInfo = $(`<small class="form-text text-muted i18n">Max image size: 1 MB.</small>`).appendTo(uploadDiv);
+    let uploadedImage = null;
+    let canvasContext = canvas.getContext('2d');
+    let offsetX = 0;
+    let offsetY = 0;
+    let scale = 1;
+    let isDrawing = false;
+    let startX = 0;
+    let startY = 0;
+    const drawCanvas = () => {
+        const containerWidth = canvasContainer.width();
+        const containerHeight = canvasContainer.height();
+        const size = Math.min(containerWidth, containerHeight) - 20;
+        canvas.width = containerWidth;
+        canvas.height = containerHeight;
+        // 円形マスク用のPath
+        canvasContext.save();
+        canvasContext.beginPath();
+        canvasContext.arc(canvas.width / 2, canvas.height / 2, size / 2, 0, Math.PI * 2);
+        canvasContext.clip();
+        if (uploadedImage) {
+            // 画像を描画
+            const imgWidth = uploadedImage.width;
+            const imgHeight = uploadedImage.height;
+            const imgRatio = imgWidth / imgHeight;
+            let drawWidth = size * scale;
+            let drawHeight = (size / imgRatio) * scale;
+            if (imgRatio > 1) {
+                drawHeight = size * scale;
+                drawWidth = (size * imgRatio) * scale;
+            }
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            canvasContext.drawImage(
+                uploadedImage,
+                centerX - drawWidth / 2 + offsetX,
+                centerY - drawHeight / 2 + offsetY,
+                drawWidth,
+                drawHeight
+            );
+        }
+        canvasContext.restore();
+        // 円形の枠線
+        canvasContext.strokeStyle = 'var(--bs-modal-border-color)';
+        canvasContext.lineWidth = 2;
+        canvasContext.beginPath();
+        canvasContext.arc(canvas.width / 2, canvas.height / 2, size / 2, 0, Math.PI * 2);
+        canvasContext.stroke();
+    };
+    fileInput.off('change').on('change', async () => {
+        const file = fileInput[0].files[0];
+        if (!file) return;
+        // ファイルサイズチェック（1MBまで）
+        if (file.size > 1024 * 1024) {
+            cmdbox.message({'error': 'File size exceeds 1 MB limit'}, true, true);
+            fileInput.val('');
+            return;
+        }
+        cmdbox.show_loading();
+        try {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    uploadedImage = img;
+                    offsetX = 0;
+                    offsetY = 0;
+                    scale = 1;
+                    drawCanvas();
+                    cmdbox.hide_loading();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        } catch (e) {
+            cmdbox.hide_loading();
+            cmdbox.message({'error': `Failed to load image: ${e}`}, true, true);
+        }
+    });
+    // ドラッグ操作
+    $(canvas).off('mousedown.icon').on('mousedown.icon', (e) => {
+        if (!uploadedImage) return;
+        isDrawing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        $(canvas).css('cursor', 'grabbing');
+    });
+    $(document).off('mousemove.icon').on('mousemove.icon', (e) => {
+        if (!isDrawing || !uploadedImage) return;
+        const deltaX = e.clientX - startX;
+        const deltaY = e.clientY - startY;
+        offsetX += deltaX;
+        offsetY += deltaY;
+        startX = e.clientX;
+        startY = e.clientY;
+        drawCanvas();
+    });
+    $(document).off('mouseup.icon').on('mouseup.icon', () => {
+        isDrawing = false;
+        $(canvas).css('cursor', 'grab');
+    });
+    // ホイールズーム操作
+    $(canvas).off('wheel.icon').on('wheel.icon', (e) => {
+        if (!uploadedImage) return;
+        e.preventDefault();
+        const delta = e.originalEvent.deltaY > 0 ? 0.9 : 1.1;
+        scale *= delta;
+        scale = Math.max(0.1, Math.min(3, scale)); // スケール範囲: 0.1 ~ 3
+        drawCanvas();
+    });
+    // リサイズ時の再描画
+    $(window).off('resize.icon-canvas').on('resize.icon-canvas', drawCanvas);
+    const footer = $(`<div class="modal-footer"/>`).appendTo(content);
+    // 削除ボタン
+    const deleteBtn = $(`<button type="button" class="btn btn-outline-danger i18n me-auto">Delete</button>`).appendTo(footer);
+    deleteBtn.off('click').on('click', async () => {
+        if (!await cmdbox.confirm('Are you sure you want to delete the user icon?', true)) return;
+        cmdbox.show_loading();
+        try {
+            await cmdbox.delete_user_data('profile', 'icon');
+            uploadedImage = null;
+            offsetX = 0;
+            offsetY = 0;
+            scale = 1;
+            fileInput.val('');
+            drawCanvas();
+            $('.user_icon').attr('src', `gui/user_data/icon?r=${cmdbox.random_string(8)}`);
+            cmdbox.hide_loading();
+            cmdbox.message({'success': 'Icon deleted successfully'}, true, true);
+            modal.modal('hide');
+        } catch (e) {
+            cmdbox.hide_loading();
+            cmdbox.message({'error': `Failed to delete icon: ${e}`}, true, true);
+        }
+    });
+    footer.append('<button type="button" class="btn btn-outline-secondary i18n" data-bs-dismiss="modal">Close</button>');
+    // 保存ボタン
+    const saveBtn = $(`<button type="button" class="btn btn-outline-success i18n">Save</button>`).appendTo(footer);
+    saveBtn.off('click').on('click', async () => {
+        if (!uploadedImage) {
+            cmdbox.message({'error': 'Please select an image file first'}, true, false);
+            return;
+        }
+        cmdbox.show_loading();
+        try {
+            // キャンバスからBase64を取得
+            const resultCanvas = $('<canvas/>')[0];
+            const ctx = resultCanvas.getContext('2d');
+            const size = 200;
+            resultCanvas.width = size;
+            resultCanvas.height = size;
+            // 円形マスク
+            ctx.beginPath();
+            ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+            ctx.clip();
+            // 画像を描画
+            const imgWidth = uploadedImage.width;
+            const imgHeight = uploadedImage.height;
+            const imgRatio = imgWidth / imgHeight;
+            let drawWidth = size * scale;
+            let drawHeight = (size / imgRatio) * scale;
+            if (imgRatio > 1) {
+                drawHeight = size * scale;
+                drawWidth = (size * imgRatio) * scale;
+            }
+            ctx.drawImage(
+                uploadedImage,
+                size / 2 - drawWidth / 2 + offsetX * (size / canvas.width),
+                size / 2 - drawHeight / 2 + offsetY * (size / canvas.height),
+                drawWidth,
+                drawHeight
+            );
+            const base64 = resultCanvas.toDataURL('image/png');
+            await cmdbox.save_user_data('profile', 'icon', base64);
+            cmdbox.hide_loading();
+            cmdbox.message({'success': 'Icon saved successfully'}, true, true);
+            $('.user_icon').attr('src', `gui/user_data/icon?r=${cmdbox.random_string(8)}`);
+            modal.modal('hide');
+        } catch (e) {
+            cmdbox.hide_loading();
+            cmdbox.message({'error': `Failed to save icon: ${e}`}, true, true);
+        }
+    });
+    
+    modal.on('hidden.bs.modal', () => {
+        $(window).off('resize.icon-canvas');
+        $(document).off('mousemove.icon mouseup.icon');
+        $(canvas).off('mousedown.icon wheel.icon');
+    });
+    
+    // モーダル表示後に既存アイコンを読み込み
+    modal.on('shown.bs.modal', () => {
+        if (currentIcon) {
+            const img = new Image();
+            img.onload = () => {
+                uploadedImage = img;
+                offsetX = 0;
+                offsetY = 0;
+                scale = 1;
+                drawCanvas();
+            };
+            img.src = currentIcon;
+        } else {
+            drawCanvas();
+        }
+    });
+    modal.appendTo('body');
+    modal.draggable({cursor:'move',cancel:'.modal-body'});
+    cmdbox.process_i18n(modal);
+    modal.modal('show');
+};
 cmdbox.init_user_info_menu = async () => {
     try {
         const user = await cmdbox.user_info();
@@ -585,6 +820,10 @@ cmdbox.init_user_info_menu = async () => {
         const user_info_menu = $('.user_info');
         user_info_menu.removeClass('d-none').addClass('d-flex');
 
+        if (!user_info_menu.find('.dropdown-menu .setusericon-menu-item').length) {
+            const setusericon_item = $(`<li><a class="dropdown-item setusericon-menu-item i18n" href="#" onclick="cmdbox.userIconChange();">Change User Icon</a></li>`);
+            user_info_menu.find('.dropdown-menu').append(setusericon_item);
+        }
         if (!user_info_menu.find('.dropdown-menu .changepass-menu-item').length) {
             const changepass_item = $(`<li><a class="dropdown-item changepass-menu-item i18n" href="#" onclick="cmdbox.passchange();">Change Password</a></li>`);
             user_info_menu.find('.dropdown-menu').append(changepass_item);
@@ -1596,6 +1835,17 @@ cmdbox.progress = (_min, _max, _now, _text, _show, _cycle) => {
             if (!$('#loading').is('.d-none')) cmdbox.progress(_min, _max, _now, _text, _show, _cycle);
         }, 20);
     }
+};
+/**
+ * ユーザーアイコンを取得
+ * @returns {Promise<string>} - ユーザーアイコンのURL
+ */
+cmdbox.load_user_icon = async () => {
+    const res = await fetch('gui/user_data/icon', {method:'GET'});
+    if (!res.ok) return '';
+    const b = await res.bytes();
+    const blob = new Blob([b], {type: res.headers.get('Content-Type') || 'image/png'});
+    return URL.createObjectURL(blob);
 };
 /**
  * ユーザーデータを保存

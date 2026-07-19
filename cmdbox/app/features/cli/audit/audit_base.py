@@ -62,13 +62,30 @@ class AuditBase(feature.ResultEdgeFeature):
                 dict(opt="pg_password", type=Options.T_PASSWD, default='pgsql', required=False, multi=False, hide=True, choice=None, web="mask",
                      description_ja="postgresqlのパスワードを指定する。",
                      description_en="Specify the postgresql password."),
-                dict(opt="pg_dbname", type=Options.T_STR, default='audit', required=False, multi=False, hide=True, choice=None,
+                dict(opt="pg_dbname", type=Options.T_STR, default='audit', required=False, multi=False, hide=True, choice=None, web="mask",
                      description_ja="postgresqlデータベース名を指定します。",
                      description_en="Specify the postgresql database name."),
             ]
         )
     
-    def initdb(self, data_dir:Path, logger:logging.Logger, pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str) -> Any:
+    def get_context(self, data_dir:Path, logger:logging.Logger, pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str) -> Any:
+        if pg_enabled:
+            #if logger.level == logging.DEBUG:
+            #    logger.debug(f"Initializing database with pg_enabled={pg_enabled}, pg_host={pg_host}, pg_port={pg_port}, pg_user={pg_user}, pg_dbname={pg_dbname}")
+            constr = f"host={pg_host} port={pg_port} user={pg_user} password={pg_password} dbname={pg_dbname} connect_timeout=60"
+            
+            if AuditBase._pg_pool is None:
+                AuditBase._pg_pool = ConnectionPool(constr, min_size=1, max_size=2)
+            return AuditBase._pg_pool.connection()
+        else:
+            db_path = data_dir / '.audit' / 'audit.db'
+            #if logger.level == logging.DEBUG:
+            #    logger.debug(f"Initializing database with db_path={db_path}")
+            db_path.parent.mkdir(parents=True, exist_ok=True)
+            conn = sqlite3.connect(db_path)
+            return conn
+
+    def initdb(self, data_dir:Path, logger:logging.Logger, pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str) -> None:
         """
         データベースを初期化します
 
@@ -81,18 +98,9 @@ class AuditBase(feature.ResultEdgeFeature):
             pg_user (str): PostgreSQLユーザー名
             pg_password (str): PostgreSQLパスワード
             pg_dbname (str): PostgreSQLデータベース名
-
-        Returns:
-            Any: データベース接続オブジェクト
         """
-        if pg_enabled:
-            #if logger.level == logging.DEBUG:
-            #    logger.debug(f"Initializing database with pg_enabled={pg_enabled}, pg_host={pg_host}, pg_port={pg_port}, pg_user={pg_user}, pg_dbname={pg_dbname}")
-            constr = f"host={pg_host} port={pg_port} user={pg_user} password={pg_password} dbname={pg_dbname} connect_timeout=60"
-            
-            if AuditBase._pg_pool is None:
-                AuditBase._pg_pool = ConnectionPool(constr, min_size=1, max_size=2)
-            with AuditBase._pg_pool.connection() as conn:
+        with self.get_context(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname) as conn:
+            if pg_enabled:
                 cursor = conn.cursor()
                 try:
                     cursor.execute("SELECT count(*) FROM information_schema.tables WHERE table_name='audit'")
@@ -120,37 +128,30 @@ class AuditBase(feature.ResultEdgeFeature):
                 finally:
                     conn.commit()
                     cursor.close()
-            return AuditBase._pg_pool
-        else:
-            db_path = data_dir / '.audit' / 'audit.db'
-            #if logger.level == logging.DEBUG:
-            #    logger.debug(f"Initializing database with db_path={db_path}")
-            db_path.parent.mkdir(parents=True, exist_ok=True)
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            try:
-                cursor.execute("SELECT COUNT(*) FROM sqlite_master WHERE TYPE='table' AND NAME='audit'")
-                row = cursor.fetchone()
-                #if logger.level == logging.DEBUG:
-                #    logger.debug(f"SQL query: SELECT COUNT(*) FROM sqlite_master WHERE TYPE='table' AND NAME='audit'")
-                #    logger.debug(f"SQL row  : {row}")
-                if row[0] == 0:
-                    # テーブルが存在しない場合は作成
-                    cursor.execute('''
-                        CREATE TABLE IF NOT EXISTS audit (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            audit_type TEXT,
-                            clmsg_id TEXT,
-                            clmsg_date TEXT,
-                            clmsg_src TEXT,
-                            clmsg_title TEXT,
-                            clmsg_user TEXT,
-                            clmsg_body JSON,
-                            clmsg_tag JSON,
-                            svmsg_id TEXT,
-                            svmsg_date TEXT DEFAULT CURRENT_TIMESTAMP
-                        )
-                    ''')
-            finally:
-                cursor.close()
-        return conn
+            else:
+                cursor = conn.cursor()
+                try:
+                    cursor.execute("SELECT COUNT(*) FROM sqlite_master WHERE TYPE='table' AND NAME='audit'")
+                    row = cursor.fetchone()
+                    #if logger.level == logging.DEBUG:
+                    #    logger.debug(f"SQL query: SELECT COUNT(*) FROM sqlite_master WHERE TYPE='table' AND NAME='audit'")
+                    #    logger.debug(f"SQL row  : {row}")
+                    if row[0] == 0:
+                        # テーブルが存在しない場合は作成
+                        cursor.execute('''
+                            CREATE TABLE IF NOT EXISTS audit (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                audit_type TEXT,
+                                clmsg_id TEXT,
+                                clmsg_date TEXT,
+                                clmsg_src TEXT,
+                                clmsg_title TEXT,
+                                clmsg_user TEXT,
+                                clmsg_body JSON,
+                                clmsg_tag JSON,
+                                svmsg_id TEXT,
+                                svmsg_date TEXT DEFAULT CURRENT_TIMESTAMP
+                            )
+                        ''')
+                finally:
+                    cursor.close()

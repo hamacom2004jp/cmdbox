@@ -65,15 +65,15 @@ class DatasourceDataInsert(datasource_base.DatasourceBase, validator.Validator, 
             schema = payload.get('schema') or None
             tblname = self.validate_identifier(payload['tblname'])
             data: Dict[str, Any] = payload['insert_data']
-            conn, dbtype = self.get_connection(payload)
-            qualified_tbl = self.qualified_name(schema, tblname, dbtype)
-            cols = ', '.join(self.validate_identifier(k) for k in data)
-            placeholder = '%s' if dbtype == self.DBTYPE_PG else '?'
-            placeholders = ', '.join([placeholder] * len(data))
-            sql = f"INSERT INTO {qualified_tbl} ({cols}) VALUES ({placeholders})"
-            with conn.cursor() as cur:
-                cur.execute(sql, list(data.values()))
-            conn.commit()
+            with self.get_context(payload) as (conn, dbtype):
+                qualified_tbl = self.qualified_name(schema, tblname, dbtype)
+                cols = ', '.join(self.validate_identifier(k) for k in data)
+                placeholder = '%s' if dbtype == self.DBTYPE_PG else '?'
+                placeholders = ', '.join([placeholder] * len(data))
+                sql = f"INSERT INTO {qualified_tbl} ({cols}) VALUES ({placeholders})"
+                with conn.cursor() as cur:
+                    cur.execute(sql, list(data.values()))
+                conn.commit()
             return dict(success=dict(data=f"1 row inserted into '{qualified_tbl}'."))
         except Exception as e:
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
@@ -120,13 +120,13 @@ class DatasourceDataInsert(datasource_base.DatasourceBase, validator.Validator, 
         try:
             schema = payload.get('schema') or None
             tblname = self.validate_identifier(payload['tblname'])
-            conn, dbtype = self.get_connection(payload)
-            qualified_tbl = self.qualified_name(schema, tblname, dbtype)
-            sql = f"SELECT COUNT(*) FROM {qualified_tbl}"
-            with conn.cursor() as cur:
-                cur.execute(sql)
-                count = cur.fetchone()[0]
-            conn.commit()
+            with self.get_context(payload) as (conn, dbtype):
+                qualified_tbl = self.qualified_name(schema, tblname, dbtype)
+                sql = f"SELECT COUNT(*) FROM {qualified_tbl}"
+                with conn.cursor() as cur:
+                    cur.execute(sql)
+                    count = cur.fetchone()[0]
+                conn.commit()
             return count
         except Exception as e:
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)

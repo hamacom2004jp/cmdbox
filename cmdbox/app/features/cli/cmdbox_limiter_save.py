@@ -258,9 +258,32 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                     redis_cli.rpush(reskey, out)
                     return self.RESP_WARN
 
+            # 保存前の設定情報を取得
+            configure_path = data_dir / ".limiter" / f"limiter-{limiter_name}.json"
+            configure_path.parent.mkdir(parents=True, exist_ok=True)
+            org_configure = None
+            if configure_path.exists():
+                org_configure = common.load_file(configure_path, lambda x: json.load(x), mode='r', encoding='utf-8', nolock=True)
+            enable_plan_check = False
+            if org_configure:
+                def _pc(org_configure, configure, key, enable_plan_check):
+                    if enable_plan_check: return True
+                    return org_configure.get(key, None) != configure.get(key, None)
+                enable_plan_check = _pc(org_configure, configure, 'scope', enable_plan_check)
+                enable_plan_check = _pc(org_configure, configure, 'target_mode', enable_plan_check)
+                enable_plan_check = _pc(org_configure, configure, 'target_cmd', enable_plan_check)
+                enable_plan_check = _pc(org_configure, configure, 'target_option', enable_plan_check)
+                #enable_plan_check = _pc(org_configure, configure, 'exec_period_start', enable_plan_check)
+                #enable_plan_check = _pc(org_configure, configure, 'exec_period_end', enable_plan_check)
+                enable_plan_check = _pc(org_configure, configure, 'reset_datetime', enable_plan_check)
+                enable_plan_check = _pc(org_configure, configure, 'reset_period_unit', enable_plan_check)
+                enable_plan_check = _pc(org_configure, configure, 'reset_period_qty', enable_plan_check)
+                #enable_plan_check = _pc(org_configure, configure, 'max_history_interval', enable_plan_check)
+                enable_plan_check = _pc(org_configure, configure, 'history_end', enable_plan_check)
+
             # プラン設定でこのリミッターが使用されていないか確認
             limiter_dir = data_dir / ".limiter"
-            if limiter_dir.exists():
+            if enable_plan_check and limiter_dir.exists():
                 for plan_file in limiter_dir.glob("plan-*.json"):
                     try:
                         plan_name_from_file = plan_file.stem.replace('plan-', '')
@@ -269,14 +292,14 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                         plan_limiters = plan_config.get('limiters', [])
                         if limiter_name in plan_limiters:
                             plan_name = plan_config.get('plan_name', plan_name_from_file)
-                            out = dict(warn=f"Cannot save limiter '{limiter_name}' because it is used in plan '{plan_name}'.")
+                            out = dict(warn=f"The modified settings cannot be saved because the limiter '{limiter_name}' is in use by the plan '{plan_name}'.")
                             redis_cli.rpush(reskey, out)
                             return self.RESP_WARN
                         # billing_limiter をチェック
                         billing_limiter = plan_config.get('billing_limiter')
                         if billing_limiter == limiter_name:
                             plan_name = plan_config.get('plan_name', plan_name_from_file)
-                            out = dict(warn=f"Cannot save limiter '{limiter_name}' because it is used as billing_limiter in plan '{plan_name}'.")
+                            out = dict(warn=f"The modified settings cannot be saved because the limiter '{limiter_name}' is in use by the plan '{plan_name}'.")
                             redis_cli.rpush(reskey, out)
                             return self.RESP_WARN
                     except Exception as parse_err:
@@ -284,8 +307,6 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                         redis_cli.rpush(reskey, out)
                         return self.RESP_WARN
 
-            configure_path = data_dir / ".limiter" / f"limiter-{limiter_name}.json"
-            configure_path.parent.mkdir(parents=True, exist_ok=True)
             common.save_file(configure_path, lambda f: json.dump(configure, f, indent=4), encoding='utf-8', nolock=False)
             out = dict(success=f"Limiter configuration saved to '{str(configure_path)}'.")
             redis_cli.rpush(reskey, out)

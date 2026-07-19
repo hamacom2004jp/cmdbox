@@ -238,7 +238,8 @@ class AuditDelete(audit_base.AuditBase, validator.Validator):
             int: レスポンスコード
         """
         try:
-            with self.initdb(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname) as conn:
+            self.initdb(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname)
+            with self.get_context(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname) as conn:
                 cursor = conn.cursor()
                 try:
                     sql = f'DELETE FROM audit'

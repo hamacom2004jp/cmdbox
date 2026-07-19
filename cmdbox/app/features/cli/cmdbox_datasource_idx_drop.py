@@ -66,12 +66,12 @@ class DatasourceIdxDrop(datasource_base.DatasourceBase, validator.Validator):
             idxname = self.validate_identifier(payload['idxname'])
             if_exists = bool(payload.get('if_exists', False))
             ie_clause = 'IF EXISTS ' if if_exists else ''
-            conn, dbtype = self.get_connection(payload)
-            qualified_idx = self.qualified_name(schema, idxname, dbtype)
-            sql = f"DROP INDEX {ie_clause}{qualified_idx}"
-            with conn.cursor() as cur:
-                cur.execute(sql)
-            conn.commit()
+            with self.get_context(payload) as (conn, dbtype):
+                qualified_idx = self.qualified_name(schema, idxname, dbtype)
+                sql = f"DROP INDEX {ie_clause}{qualified_idx}"
+                with conn.cursor() as cur:
+                    cur.execute(sql)
+                conn.commit()
             return dict(success=dict(data=f"Index '{qualified_idx}' dropped."))
         except Exception as e:
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)

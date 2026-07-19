@@ -46,11 +46,11 @@ def apprun_check(func:Callable) -> Callable:
         # 結果のスキーマ検証
         cls = self.output_schema()
         try:
-            if issubclass(cls, pydantic.BaseModel):
+            if cls is not None and issubclass(cls, pydantic.BaseModel):
                 cls.model_validate(msg)
             return st, msg, obj
         except Exception as e:
-            if issubclass(cls, resdata.Base):
+            if cls is not None and issubclass(cls, resdata.Base):
                 info = cls.get_model_info()
                 msg = dict(warn=f"Invalid result format: {e}", output=msg, output_schema=info)
             else:

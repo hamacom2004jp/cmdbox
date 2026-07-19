@@ -309,32 +309,7 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                     logger.warning(out)
                     redis_cli.rpush(reskey, out)
                     return self.RESP_WARN
-            """
-            # open_date/suspend_dateは単にログイン可能期間を示すため、limiterとの比較は不要
-            # open_date/suspend_date とリミッターの exec_period_start/exec_period_end を比較
-            if (open_date or suspend_date) and limiters:
-                mismatched_dates = []
-                for limiter_name in limiters:
-                    try:
-                        limiter_config = self.limiter_load._load_limiter_config(data_dir, limiter_name)
-                        exec_period_start = limiter_config.get('exec_period_start')
-                        exec_period_end = limiter_config.get('exec_period_end')
-                        if open_date and exec_period_start != open_date:
-                            mismatched_dates.append(
-                                f"{limiter_name}: exec_period_start={exec_period_start} (expected open_date={open_date})")
-                        if suspend_date and exec_period_end != suspend_date:
-                            mismatched_dates.append(
-                                f"{limiter_name}: exec_period_end={exec_period_end} (expected suspend_date={suspend_date})")
-                    except FileNotFoundError:
-                        mismatched_dates.append(f"Limiter configuration '{limiter_name}' not found")
-                    except Exception as e:
-                        mismatched_dates.append(f"Failed to load limiter config for '{limiter_name}': {e}")
-                if mismatched_dates:
-                    out = dict(warn=f"The open_date/suspend_date does not match the exec_period_start/exec_period_end of the following limiters: {', '.join(mismatched_dates)}")
-                    logger.warning(out)
-                    redis_cli.rpush(reskey, out)
-                    return self.RESP_WARN
-            """
+
             # plan_end とリミッターの history_end を比較
             if plan_end and limiters:
                 mismatched_history_end = []

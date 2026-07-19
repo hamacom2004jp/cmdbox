@@ -192,7 +192,8 @@ class AuditWrite(audit_base.AuditBase, validator.Validator):
             pg_dbname = payload.get("pg_dbname")
             retention_period_days = payload.get("retention_period_days")
             svmsg_id = str(uuid.uuid4())
-            with self.initdb(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname) as conn:
+            self.initdb(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname)
+            with self.get_context(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname) as conn:
                 st = self.write(conn, reskey=msg[1], audit_type=audit_type, clmsg_id=clmsg_id, clmsg_date=clmsg_date, clmsg_src=clmsg_src,
                                 clmsg_title=clmsg_title, clmsg_user=clmsg_user, clmsg_body=clmsg_body, clmsg_tags=clmsg_tags,
                                 svmsg_id=svmsg_id, pg_enabled=pg_enabled, retention_period_days=retention_period_days,

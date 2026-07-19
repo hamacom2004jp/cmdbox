@@ -63,6 +63,7 @@ dependencies = [
     "requests",
     "rich",
     "six",
+    "starsessions[redis]",
     "tabulate",
     "uvicorn",
     "wsproto",

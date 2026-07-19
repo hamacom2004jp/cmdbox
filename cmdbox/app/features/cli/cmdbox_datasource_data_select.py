@@ -82,22 +82,22 @@ class DatasourceDataSelect(datasource_base.DatasourceBase, validator.Validator):
             order_by_raw = payload.get('order_by')
             limit = payload.get('limit')
             offset = payload.get('offset')
-            conn, dbtype = self.get_connection(payload)
-            qualified_tbl = self.qualified_name(schema, tblname, dbtype)
-            where_clause, where_vals = self.build_where(where_data, dbtype)
-            sql = f"SELECT {cols_clause} FROM {qualified_tbl}"
-            if where_clause:
-                sql += f" {where_clause}"
-            if order_by_raw:
-                order_by_clause = self.validate_order_by(order_by_raw)
-                sql += f" ORDER BY {order_by_clause}"
-            if limit is not None:
-                sql += f" LIMIT {int(limit)}"
-            if offset is not None:
-                sql += f" OFFSET {int(offset)}"
-            with conn.cursor() as cur:
-                cur.execute(sql, where_vals)
-                rows = self.fetch_as_dicts(cur)
+            with self.get_context(payload) as (conn, dbtype):
+                qualified_tbl = self.qualified_name(schema, tblname, dbtype)
+                where_clause, where_vals = self.build_where(where_data, dbtype)
+                sql = f"SELECT {cols_clause} FROM {qualified_tbl}"
+                if where_clause:
+                    sql += f" {where_clause}"
+                if order_by_raw:
+                    order_by_clause = self.validate_order_by(order_by_raw)
+                    sql += f" ORDER BY {order_by_clause}"
+                if limit is not None:
+                    sql += f" LIMIT {int(limit)}"
+                if offset is not None:
+                    sql += f" OFFSET {int(offset)}"
+                with conn.cursor() as cur:
+                    cur.execute(sql, where_vals)
+                    rows = self.fetch_as_dicts(cur)
             return dict(success=dict(data=rows))
         except Exception as e:
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)

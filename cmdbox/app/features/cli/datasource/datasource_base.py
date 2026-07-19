@@ -1,11 +1,14 @@
 from cmdbox.app import client as _cli_client, common, feature
 from cmdbox.app.commons import convert as _convert
 from pathlib import Path
+from psycopg_pool import ConnectionPool
 from typing import Any, Dict, List, Tuple
 import argparse
 import json
 import logging
 import re
+import sqlite3
+import sqlite_vec
 
 
 class _Sqlite3CursorCM:
@@ -118,45 +121,42 @@ class DatasourceBase(feature.ResultEdgeFeature):
         )
         common.save_file(ds_path, lambda f: json.dump(dsconfig, f, indent=4), encoding='utf-8', nolock=False)
 
-    def get_connection(self, dsconfig: Dict[str, Any]):
+    def get_context(self, dsconfig: Dict[str, Any]) -> Any:
         """
-        データソース設定からデータベース接続を確立します。
+        データソース設定に基づいてデータベース接続を取得し、コンテキストマネージャーとして使用できるようにします。
         Args:
             dsconfig: データソース設定の辞書
         Returns:
-            データベース接続オブジェクトとデータベース種別のタプル (connection, dbtype)
+            コンテキストマネージャーとして使用できるデータベース接続オブジェクトとデータベース種別のタプル (conn, dbtype)
         Raises:
-            ValueError: dsconfig の dbtype がサポートされていない場合
-            psycopg.Error: PostgreSQL への接続に失敗した場合
-            sqlite3.Error: SQLite への接続に失敗した場合
+            ValueError: dbtype がサポートされていない場合
         """
         dbtype = dsconfig.get('dbtype', self.DBTYPE_SQLITE)
         if dbtype == self.DBTYPE_PG:
-            import psycopg
-            conn = psycopg.connect(
-                host=dsconfig.get('db_host', 'localhost'),
-                port=int(dsconfig.get('db_port', 5432)),
-                user=dsconfig.get('db_user', 'postgres'),
-                password=dsconfig.get('db_password', ''),
-                dbname=dsconfig.get('db_name', ''),
-                connect_timeout=dsconfig.get('db_timeout', None)
-            )
-            return conn, self.DBTYPE_PG
+            pg_host=dsconfig.get('db_host', 'localhost')
+            pg_port=int(dsconfig.get('db_port', 5432))
+            pg_user=dsconfig.get('db_user', 'postgres')
+            pg_password=dsconfig.get('db_password', '')
+            pg_dbname=dsconfig.get('db_name', '')
+            pg_connect_timeout=dsconfig.get('db_timeout', None)
+            constr = f"host={pg_host} port={pg_port} user={pg_user} password={pg_password} dbname={pg_dbname} connect_timeout={pg_connect_timeout}"
+            
+            if not hasattr(DatasourceBase, '_pg_pool') or DatasourceBase._pg_pool is None:
+                DatasourceBase._pg_pool = ConnectionPool(constr, min_size=1, max_size=2)
+            return DatasourceBase._pg_pool.connection(), self.DBTYPE_PG
         elif dbtype == self.DBTYPE_SQLITE:
-            import sqlite3
-            import sqlite_vec
             db_path = dsconfig.get('db_fullpath')
             if not db_path:
                 raise ValueError("db_path is required for SQLite dbtype.")
+            db_path = Path(db_path)
+            db_path.parent.mkdir(parents=True, exist_ok=True)
             conn = sqlite3.connect(db_path)
             conn.enable_load_extension(True)
             sqlite_vec.load(conn)
             conn.enable_load_extension(False)
-            return _Sqlite3ConnectionWrapper(conn), self.DBTYPE_SQLITE
+            return conn, self.DBTYPE_SQLITE
         else:
-            raise ValueError(
-                f"Unsupported dbtype: '{dbtype}'. Supported types: {self.DBTYPES}."
-            )
+            raise ValueError(f"Unsupported dbtype: {dbtype}")
 
     def is_dbtype_postgresql(self, dsconfig: Dict[str, Any]) -> bool:
         """

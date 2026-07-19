@@ -1,12 +1,13 @@
 from cmdbox.app import common, options
 from cmdbox.app.commons import module, redis_client
-from collections import Counter
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Response
 from pathlib import Path
-from starlette.middleware.sessions import SessionMiddleware
+from redis.asyncio import Redis
+from starsessions import SessionAutoloadMiddleware, SessionMiddleware
+from starsessions.stores.redis import RedisStore
 from typing import Any, Callable, Dict, List
 from uvicorn.config import Config
-import asyncio
 import copy
 import ctypes
 import datetime
@@ -880,7 +881,14 @@ class Web:
             self.logger.debug(f"web start parameter: gunicorn_workers={self.gunicorn_workers}")
             self.logger.debug(f"web start parameter: gunicorn_timeout={self.gunicorn_timeout}")
 
-        app = FastAPI()
+        session_redis = Redis(host=self.redis_host, port=self.redis_port, password=self.redis_password, protocol=2)
+        @asynccontextmanager
+        async def _lifespan(_app: FastAPI):
+            try:
+                yield
+            finally:
+                await session_redis.aclose()
+        app = FastAPI(lifespan=_lifespan)
 
         @app.middleware("http")
         async def set_context_cookie(req:Request, call_next):
@@ -894,12 +902,16 @@ class Web:
             res.headers["Access-Control-Allow-Origin"] = "*"
             return res
 
-        mwparam = dict(path=self.session_path, max_age=self.session_timeout, secret_key=common.random_string())
+        session_store = RedisStore(connection=session_redis, prefix=f"cmdbox:{self.svname}:session.")
+        mwparam = dict(store=session_store, cookie_path=self.session_path,
+                       lifetime=self.session_timeout, rolling=True, cookie_same_site="lax")
         if self.session_domain is not None:
-            mwparam['domain'] = self.session_domain
+            mwparam['cookie_domain'] = self.session_domain
         if self.session_secure:
-            mwparam['https_only'] = True # セッションハイジャック対策
+            mwparam['cookie_https_only'] = True # セッションハイジャック対策
+        app.add_middleware(SessionAutoloadMiddleware)
         app.add_middleware(SessionMiddleware, **mwparam)
+
         self.init_webfeatures(app)
 
         if self.gui_mode:

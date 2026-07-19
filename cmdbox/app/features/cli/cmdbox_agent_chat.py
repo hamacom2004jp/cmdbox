@@ -232,7 +232,6 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         # 各種設定値の取得
         agent_name = agent_conf.get('agent_name', None)
         agent_type = agent_conf.get('agent_type', None)
-        use_planner = agent_conf.get('use_planner', False)
         a2asv_baseurl = agent_conf.get('a2asv_baseurl', "http://localhost:8071/a2a")
         a2asv_delegated_auth = agent_conf.get('a2asv_delegated_auth', False)
         a2asv_apikey = agent_conf.get('a2asv_apikey', None)
@@ -295,7 +294,6 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             llmendpoint = llm_conf.get('llmendpoint', None)
             if llmmodel is None: raise ValueError("llmmodel is required.")
             if llmapikey is None: raise ValueError("llmapikey is required.")
-            from google.adk.planners import PlanReActPlanner
             agent = Agent(
                 name=agent_name,
                 model=lite_llm.LiteLlm(
@@ -305,7 +303,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 ),
                 description=description,
                 instruction=instruction,
-                planner=PlanReActPlanner() if use_planner else None,
+                planner=self.create_agent_planner(agent_conf, llm_conf),
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs),
                 sub_agents=subagents,
             )
@@ -320,7 +318,6 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 llmendpoint = llmendpoint.split("/openai/deployments")[0]
             if llmapikey is None: raise ValueError("llmapikey is required.")
             if llmapiversion is None: raise ValueError("llmapiversion is required.")
-            from google.adk.planners import PlanReActPlanner
             if not llmmodel.startswith("azure/"):
                 llmmodel = f"azure/{llmmodel}"
             agent = Agent(
@@ -334,7 +331,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 ),
                 description=description,
                 instruction=instruction,
-                planner=PlanReActPlanner() if use_planner else None,
+                planner=self.create_agent_planner(agent_conf, llm_conf),
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs),
                 sub_agents=subagents,
             )
@@ -349,8 +346,6 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             if llmmodel is None: raise ValueError("llmmodel is required.")
             if llmlocation is None: raise ValueError("llmlocation is required.")
             if llmsvaccountfile_data is None: raise ValueError("llmsvaccountfile_data is required.")
-            from google.adk.planners import BuiltInPlanner
-            from google.genai import types
             agent = Agent(
                 name=agent_name,
                 model=lite_llm.LiteLlm(
@@ -363,10 +358,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 ),
                 description=description,
                 instruction=instruction,
-                planner=BuiltInPlanner(thinking_config=types.ThinkingConfig(
-                    include_thoughts=True,
-                    thinking_budget=1024,
-                )) if use_planner else None,
+                planner=self.create_agent_planner(agent_conf, llm_conf),
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs),
                 sub_agents=subagents,
             )
@@ -376,7 +368,6 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             llmtemperature = llm_conf.get('llmtemperature', None)
             if llmmodel is None: raise ValueError("llmmodel is required.")
             if llmendpoint is None: raise ValueError("llmendpoint is required.")
-            from google.adk.planners import PlanReActPlanner
             agent = Agent(
                 name=agent_name,
                 model=lite_llm.LiteLlm(
@@ -387,7 +378,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 ),
                 description=description,
                 instruction=instruction,
-                planner=PlanReActPlanner() if use_planner else None,
+                planner=self.create_agent_planner(agent_conf, llm_conf),
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs),
                 sub_agents=subagents,
             )
@@ -398,6 +389,36 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         if logger.level == logging.DEBUG:
             logger.debug(f"create_agent complate.")
         return agent
+
+    def create_agent_planner(self, agent_conf:Dict[str, Any], llm_conf:Dict[str, Any]) -> Any:
+        """
+        エージェントのプランナーを作成します
+        Args:
+            logger (logging.Logger): ロガー
+            agent_conf (Dict[str, Any]): エージェント設定
+        Returns:
+            Planner: プランナー
+        """
+        use_planner = agent_conf.get('use_planner', False)
+        if not use_planner:
+            return None
+
+        from google.adk.planners import PlanReActPlanner, BuiltInPlanner
+        from google.genai import types
+        llmprov = llm_conf.get('llmprov', None)
+        if llmprov == 'openai':
+            return PlanReActPlanner()
+        elif llmprov == 'azureopenai':
+            return PlanReActPlanner()
+        elif llmprov == 'vertexai':
+            return BuiltInPlanner(thinking_config=types.ThinkingConfig(
+                include_thoughts=True,
+                thinking_budget=1024,
+            ))
+        elif llmprov == 'ollama':
+            return PlanReActPlanner()
+        else:
+            raise ValueError(f"Unknown llmprov: {llmprov}")
 
     def create_tool_mcpsv(self, logger:logging.Logger, mcpsv_confs:List[Dict[str, Any]]) -> List[Any]:
         """

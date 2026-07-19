@@ -79,12 +79,12 @@ class DatasourceTblCreate(datasource_base.DatasourceBase, validator.Validator):
                 raise ValueError("At least one column definition is required.")
             col_parts = [self._build_col_def(c) for c in col_defs]
             ine_clause = 'IF NOT EXISTS ' if if_not_exists else ''
-            conn, dbtype = self.get_connection(payload)
-            qualified_tbl = self.qualified_name(schema, tblname, dbtype)
-            sql = f"CREATE TABLE {ine_clause}{qualified_tbl} ({', '.join(col_parts)})"
-            with conn.cursor() as cur:
-                cur.execute(sql)
-            conn.commit()
+            with self.get_connection(payload) as (conn, dbtype):
+                qualified_tbl = self.qualified_name(schema, tblname, dbtype)
+                sql = f"CREATE TABLE {ine_clause}{qualified_tbl} ({', '.join(col_parts)})"
+                with conn.cursor() as cur:
+                    cur.execute(sql)
+                conn.commit()
             return dict(success=dict(data=f"Table '{qualified_tbl}' created."))
         except Exception as e:
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)

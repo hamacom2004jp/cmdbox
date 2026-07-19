@@ -81,12 +81,12 @@ class DatasourceIdxCreate(datasource_base.DatasourceBase, validator.Validator):
             if_not_exists = bool(payload.get('if_not_exists', True))
             unique_clause = 'UNIQUE ' if unique else ''
             ine_clause = 'IF NOT EXISTS ' if if_not_exists else ''
-            conn, dbtype = self.get_connection(payload)
-            qualified_tbl = self.qualified_name(schema, tblname, dbtype)
-            sql = f"CREATE {unique_clause}INDEX {ine_clause}{idxname} ON {qualified_tbl} ({cols_clause})"
-            with conn.cursor() as cur:
-                cur.execute(sql)
-            conn.commit()
+            with self.get_context(payload) as (conn, dbtype):
+                qualified_tbl = self.qualified_name(schema, tblname, dbtype)
+                sql = f"CREATE {unique_clause}INDEX {ine_clause}{idxname} ON {qualified_tbl} ({cols_clause})"
+                with conn.cursor() as cur:
+                    cur.execute(sql)
+                conn.commit()
             return dict(success=dict(data=f"Index '{idxname}' created on '{qualified_tbl}'."))
         except Exception as e:
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)

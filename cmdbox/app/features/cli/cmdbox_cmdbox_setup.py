@@ -68,6 +68,9 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
                 dict(opt="retry_interval", type=Options.T_INT, default=5, required=False, multi=False, hide=True, choice=None,
                      description_ja="Redisサーバーに再接続までの秒数を指定します。",
                      description_en="Specifies the number of seconds before reconnecting to the Redis server."),
+                dict(opt="server_count", type=Options.T_INT, default=5, required=False, multi=False, hide=False, choice=None,
+                     description_ja="serverプロセス数を指定します。",
+                     description_en="Specifies the number of server processes."),
                 dict(opt="setup_file", type=Options.T_FILE, default=f".{self.ver.__appid__}_initdata/setup.yml", required=True, multi=False, hide=False, choice=None, fileio="in",
                      description_ja=f"セットアップファイルのパスを指定します。デフォルトは `.{self.ver.__appid__}_initdata/setup.yml` です。",
                      description_en=f"Specify the path to the setup file. Default is `.{self.ver.__appid__}_initdata/setup.yml`."),
@@ -91,8 +94,15 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
         # サーバーを起動
         args.svname = f"{self.ver.__appid__}_setup"
         args.data = Path(args.data).resolve() if args.data is not None else None
-        sv_start = threading.Thread(target=self.server_start.apprun, args=(logger, args, tm, pf))
-        sv_start.start()
+
+        # server_countで指定した数だけサーバープロセスを起動
+        server_count = args.server_count
+        sv_start_threads = []
+        for i in range(server_count):
+            sv_thread = threading.Thread(target=self.server_start.apprun, args=(logger, args, tm, pf))
+            sv_thread.start()
+            sv_start_threads.append(sv_thread)
+        
         has_warn = False
         try:
             # セットアップファイルをチェック
@@ -157,11 +167,13 @@ class CmdboxSetup(feature.OneshotEdgeFeature, validator.Validator):
             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_ERROR, ret, None
         finally:
-            # サーバーを停止
+            # すべてのサーバーが停止するまで待つ
             sv_stop = threading.Thread(target=self.server_stop.apprun, args=(logger, args, tm, pf))
             sv_stop.start()
-            sv_start.join()
             sv_stop.join()
+            # すべてのサーバー停止スレッドの完了を待つ
+            for sv_thread in sv_start_threads:
+                sv_thread.join()
 
         if not has_warn:
             ret = dict(success=dict(data=results))

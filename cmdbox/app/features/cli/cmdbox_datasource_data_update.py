@@ -69,18 +69,18 @@ class DatasourceDataUpdate(datasource_base.DatasourceBase, validator.Validator, 
             tblname = self.validate_identifier(payload['tblname'])
             data: Dict[str, Any] = payload['update_data']
             where_data: Dict[str, Any] = payload['where_data'] if payload.get('where_data') else {}
-            conn, dbtype = self.get_connection(payload)
-            qualified_tbl = self.qualified_name(schema, tblname, dbtype)
-            placeholder = '%s' if dbtype == self.DBTYPE_PG else '?'
-            set_parts = [f"{self.validate_identifier(k)} = {placeholder}" for k in data]
-            set_clause = ', '.join(set_parts)
-            where_clause, where_vals = self.build_where(where_data, dbtype)
-            sql = f"UPDATE {qualified_tbl} SET {set_clause} {where_clause}".strip()
-            params = list(data.values()) + where_vals
-            with conn.cursor() as cur:
-                cur.execute(sql, params)
-                rowcount = cur.rowcount
-            conn.commit()
+            with self.get_connection(payload) as (conn, dbtype):
+                qualified_tbl = self.qualified_name(schema, tblname, dbtype)
+                placeholder = '%s' if dbtype == self.DBTYPE_PG else '?'
+                set_parts = [f"{self.validate_identifier(k)} = {placeholder}" for k in data]
+                set_clause = ', '.join(set_parts)
+                where_clause, where_vals = self.build_where(where_data, dbtype)
+                sql = f"UPDATE {qualified_tbl} SET {set_clause} {where_clause}".strip()
+                params = list(data.values()) + where_vals
+                with conn.cursor() as cur:
+                    cur.execute(sql, params)
+                    rowcount = cur.rowcount
+                conn.commit()
             return dict(success=dict(data=f"{rowcount} row(s) updated in '{qualified_tbl}'."))
         except Exception as e:
             logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)

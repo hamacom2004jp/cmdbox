@@ -173,7 +173,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         tags = []
         if 'tag' in opt and isinstance(opt['tag'], list):
             tags = [t for t in opt['tag'] if t is not None and t != '']
-        web.options.audit_exec(req, res, web, tags=tags, title=title)
+        audit_write_opt = web.options.audit_exec(req, res, web, tags=tags, title=title)
         appcls = self.appcls if appcls is None else appcls
         appcls = app.CmdBoxApp if appcls is None else appcls
         web.container['cmdbox_app'] = ap = appcls.getInstance(appcls=appcls, ver=self.ver)
@@ -203,6 +203,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
             except:
                 pass
         # webモードで特定のオプションを自動的にセットする
+        opt.update(audit_write_opt)
         opt['host'] = web.redis_host
         opt['port'] = web.redis_port
         opt['password'] = web.redis_password
