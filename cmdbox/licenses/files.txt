@@ -195,6 +195,7 @@ Georg Brandl <georg@python.org>	BSD License	sphinxcontrib-serializinghtml	https:
 TODO	MIT License, Apache License, Version 2.0	sqlite-vec	https://TODO.com	0.1.9	cmdbox\licenses\LICENSE_sqlite-vec_0_1_9_MIT_License-Apache_License-Version_2_0.txt
 sysid <sysid@gmx.de>	BSD-3-Clause	sse-starlette	https://github.com/sysid/sse-starlette	3.4.5	cmdbox\licenses\LICENSE_sse-starlette_3_4_5_BSD-3-Clause.txt
 Tom Christie <tom@tomchristie.com>	BSD-3-Clause	starlette	https://github.com/Kludex/starlette	1.3.1	cmdbox\licenses\LICENSE_starlette_1_3_1_BSD-3-Clause.txt
+alex.oleshkevich	MIT License	starsessions	https://github.com/alex-oleshkevich/starsessions	2.2.1	cmdbox\licenses\LICENSE_starsessions_2_2_1_MIT_License.txt
 Joshy Cyriac <joshy@posteo.ch>	BSD-3-Clause	striprtf	https://github.com/joshy/striprtf	0.0.32	cmdbox\licenses\LICENSE_striprtf_0_0_32_BSD-3-Clause.txt
 Sergey Astanin <s.astanin@gmail.com>	MIT	tabulate	https://github.com/astanin/python-tabulate	0.10.0	cmdbox\licenses\LICENSE_tabulate_0_10_0_MIT.txt
 Sergey Astanin <s.astanin@gmail.com>	MIT License	tabulate2	https://github.com/RaSan147/python-tabulate	1.10.2	cmdbox\licenses\LICENSE_tabulate2_1_10_2_MIT_License.txt

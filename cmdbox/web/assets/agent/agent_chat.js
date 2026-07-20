@@ -187,7 +187,8 @@ agentView.chat = (session_id) => {
                 msg_content.addClass('collapsed');
                 msg_container.find('.btn-toggle-message').text('▶');
             }
-            await agentView.format_agent_message(msg_content, success.message);
+            const msg_str = agentView.parse_message(success.message);
+            await agentView.format_agent_message(msg_content, msg_str);
             agentView.scrollToBottom();
             return;
         }
@@ -199,13 +200,21 @@ agentView.chat = (session_id) => {
             msg_content = agentView.create_agent_message(agentView.message_id);
             msg_container = $(`#${agentView.message_id}`);
         }
-        await agentView.format_agent_message(msg_content, success.message);
+        const msg_str = agentView.parse_message(success.message);
+        await agentView.format_agent_message(msg_content, msg_str);
         if (msg_container.find('.message-thinking').length <= 0) {
             msg_container.find('.btn-toggle-message').remove();
         }
         msg_container.find('.spinner-grow').remove();
         await agentView.say.play(success.wav_b64);
         agentView.message_id = null;
+        // 読み込み中のスピナーを削除
+        $('.msg-content').each((index, element) => {
+            const content_elem = $(element);
+            if (content_elem.children('.spinner-grow').length > 0) {
+                content_elem.remove();
+            }
+        });
     };
     agentView.ws.onopen = () => {
         const ping = () => {
@@ -235,6 +244,42 @@ agentView.chat = (session_id) => {
         }, ping_interval);
     };
     cmdbox.hide_loading();
+};
+agentView.parse_message = (message) => {
+    if (!message || message.length <= 0) return '';
+    try {
+        const msg_json = JSON.parse(message);
+        const success = msg_json && msg_json['success'] || false;
+        const ret = [];
+        const rep = (str) => {
+            str = str.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '');
+            const elem = $(str);
+            elem.each((index, element) => {
+                const el = $(element);
+                el.html(marked.parse(el.html()));
+            });
+            if (elem.length > 0) str = elem.prop('outerHTML');
+            return str;
+        };
+        msg_json && msg_json['message'] && ret.push(`${rep(msg_json['message'])}\n`);
+        msg_json && msg_json['command'] && (ret.push(`**Command:**`) && ret.push(`- ${rep(msg_json['command'])}\n`));
+        if (msg_json && msg_json['parameters_json'] && msg_json['parameters_json'] !== '{}') {
+            ret.push('**Parameters:** ```json'+msg_json['parameters_json']+'```');
+        }
+        if (msg_json && msg_json['result_json']) {
+            try {
+                eval(`(${msg_json['result_json']})`);
+                ret.push('**Result:** ```json'+msg_json['result_json']+'```');
+            } catch (e) {
+                // LLMが最終中カッコが足りない状態で出力してくるときがある。
+                ret.push('**Result:** ```json'+msg_json['result_json']+'}```');
+            }
+        }
+        msg_json && msg_json['error'] && (ret.push(`**Error:**`) && ret.push(`- ${rep(msg_json['error'])}\n`));
+        return ret.join('\n');
+    } catch (error) {
+        return message;
+    }
 };
 agentView.create_user_message = (msg) => {
     const msgDiv = $('<div/>').appendTo(agentView.chatMessages);

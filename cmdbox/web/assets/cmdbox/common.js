@@ -139,6 +139,7 @@ cmdbox.message = (res, i18n=false, nosave=false, enable_closebot=true, enable_co
             if (typeof res.success === 'string') res = res.success;
             else if (typeof res.warn === 'string') res = res.warn;
             else if (typeof res.error === 'string') res = res.error;
+            else if (typeof res.info === 'string') res = res.info;
         }
         const msg = JSON.stringify(res).replace(/\\n/g, '\n').replace(/\\/g, '').replace(/^"|"$/g, '').replace(/\\t/g, '&emsp;');
         const modal = $(`<div class="modal fade" tabindex="-1" style="z-index:5000;">

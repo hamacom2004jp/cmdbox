@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( cmdbox mode ) &mdash; cmdbox 2026/07/12 documentation</title>
+  <title>Command Reference ( cmdbox mode ) &mdash; cmdbox 2026/07/20 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=afb47466"></script>
+      <script src="../_static/documentation_options.js?v=91640ad9"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -55,6 +55,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Cmdbox</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#cmdbox-down-cmdbox-m-cmdbox-c-down-option">cmdbox ( down ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">down</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cmdbox-exec-cmdbox-m-cmdbox-c-exec-option">cmdbox ( exec ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">exec</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cmdbox-info-cmdbox-m-cmdbox-c-info-option">cmdbox ( info ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">info</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cmdbox-initdata-install-cmdbox-m-cmdbox-c-initdata-install-option">cmdbox ( initdata_install ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">initdata_install</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cmdbox-load-cmdbox-m-cmdbox-c-load-option">cmdbox ( load ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">load</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cmdbox-logs-cmdbox-m-cmdbox-c-logs-option">cmdbox ( logs ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">logs</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
@@ -396,6 +397,99 @@
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>終了フラグ</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="cmdbox-info-cmdbox-m-cmdbox-c-info-option">
+<h2>cmdbox ( info ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">cmdbox</span> <span class="pre">-c</span> <span class="pre">info</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#cmdbox-info-cmdbox-m-cmdbox-c-info-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Display Cmdbox information.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--enable_value &lt;enable_value&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Specify whether to display only the version value. If this option is specified, other flags are ignored.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--enable_logo &lt;enable_logo&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Specify whether to include the logo.</p></td>
+</tr>
+<tr class="row-even"><td><p>--enable_version &lt;enable_version&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Specify whether to include the version information.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--enable_appid &lt;enable_appid&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Specify whether to include the AppID.</p></td>
+</tr>
+<tr class="row-even"><td><p>--enable_title &lt;enable_title&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Specify whether to include the title.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--enable_copyright &lt;enable_copyright&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Specify whether to include the copyright information.</p></td>
+</tr>
+<tr class="row-even"><td><p>--enable_description &lt;enable_description&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Specify whether to include the description.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--enable_other &lt;enable_other&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Specify whether to include other information.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1916,9 +2010,9 @@
 <td><p>str</p></td>
 <td></td>
 <td></td>
-<td><p>cmdbox==0.8.0.2</p></td>
+<td><p>cmdbox==0.8.1</p></td>
 <td></td>
-<td><p>When omitted, <cite>cmdbox==0.8.0.2</cite> is used.</p></td>
+<td><p>When omitted, <cite>cmdbox==0.8.1</cite> is used.</p></td>
 </tr>
 <tr class="row-even"><td><p>--install_from &lt;install_from&gt;</p></td>
 <td><p>str</p></td>
@@ -2377,7 +2471,15 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--setup_file &lt;setup_file&gt;</p></td>
+<tr class="row-odd"><td><p>--server_count &lt;server_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
+<td></td>
+<td><p>Specifies the number of server processes.</p></td>
+</tr>
+<tr class="row-even"><td><p>--setup_file &lt;setup_file&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td><p>required</p></td>

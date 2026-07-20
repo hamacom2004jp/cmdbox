@@ -19,7 +19,12 @@ agentView.create_history = (session_id, runner_name, user_name, update_time, msg
 
     const div2 = $(`<div class="d-inline-block"/>`).appendTo(li);
     const checkbox = $(`<input id="selection_${session_id}" type="checkbox" class="btn-check session_checkbox" data-session_id="${session_id}" autocomplete="off" style="cursor: pointer;"/>`).prependTo(div2);
-    $(`<label class="btn btn-outline-secondary" for="selection_${session_id}" style="cursor:pointer;">Select</label>`).appendTo(div2);
+    const select_label = $(`<label class="btn btn-outline-secondary i18n" for="selection_${session_id}" style="cursor:pointer;">Select</label>`).appendTo(div2);
+    select_label.on('mouseover', (e) => {
+        select_label.addClass('btn-secondary').removeClass('btn-outline-secondary');
+    }).on('mouseout', (e) => {
+        select_label.addClass('btn-outline-secondary').removeClass('btn-secondary');
+    });
 
     div1.off('click').on('click', async (e) => {
         // チェックボックスがクリックされた場合はスキップ
@@ -70,10 +75,12 @@ agentView.create_history = (session_id, runner_name, user_name, update_time, msg
                         msg_content.addClass('collapsed');
                         msg_container.find('.btn-toggle-message').text('▶');
                     }
-                    await agentView.format_agent_message(msg_content, msg);
+                    const msg_str = agentView.parse_message(msg);
+                    await agentView.format_agent_message(msg_content, msg_str);
                 } else {
                     let txt = agentView.create_agent_message(cmdbox.random_string(16));
-                    await agentView.format_agent_message(txt, msg);
+                    const msg_str = agentView.parse_message(msg);
+                    await agentView.format_agent_message(txt, msg_str);
                     txt.parent().find('.btn-toggle-message').remove();
                     agent_message_id = null;
                 }
@@ -95,7 +102,7 @@ agentView.delete_session = async (session_id) => {
 agentView.delete_selected_sessions = async () => {
     const session_checkbox = $('.session_checkbox:checked');
     if (session_checkbox.length <= 0) {
-        cmdbox.message({'info':'No sessions selected.'}, true);
+        cmdbox.message({'info':'No sessions selected.'}, true, false);
         return;
     }
     if (!await cmdbox.confirm(`Are you sure you want to delete ${session_checkbox.length} session(s)?`, true)) return;
@@ -113,5 +120,5 @@ agentView.delete_selected_sessions = async () => {
         }
     });
     await agentView.list_sessions();
-    cmdbox.message({'success':`${session_checkbox.length} session(s) deleted.`}, true);
+    cmdbox.message({'success':`Sessions deleted.`}, true, false);
 };

@@ -654,7 +654,10 @@ This command implements ``output_schema()`` returning ``Result`` model.
               "string"
             ],
             "plan_start": "string",
-            "plan_end": "string"
+            "plan_end": "string",
+            "open_date": "string",
+            "suspend_date": "string",
+            "notice_date": "string"
           }
         ]
       },

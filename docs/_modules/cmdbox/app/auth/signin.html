@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.auth.signin &mdash; cmdbox 2026/07/12 documentation</title>
+  <title>cmdbox.app.auth.signin &mdash; cmdbox 2026/07/20 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=afb47466"></script>
+      <script src="../../../../_static/documentation_options.js?v=91640ad9"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -80,7 +80,7 @@
              
   <h1>Source code for cmdbox.app.auth.signin</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">options</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">redis_client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmdbox.app.commons</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert</span><span class="p">,</span> <span class="n">redis_client</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cryptography</span><span class="w"> </span><span class="kn">import</span> <span class="n">x509</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cryptography.hazmat.primitives</span><span class="w"> </span><span class="kn">import</span> <span class="n">serialization</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cryptography.hazmat.backends</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_backend</span>
@@ -91,6 +91,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">contextvars</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
@@ -1187,8 +1188,102 @@
 <span class="sd">            str: メールアドレス</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">get_email</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
-</div>
 
+
+<div class="viewcode-block" id="Signin.is_open_within_period">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.auth.html#cmdbox.app.auth.signin.Signin.is_open_within_period">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_open_within_period</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_names</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        limiterモードのplan_listコマンドを実行して、</span>
+<span class="sd">        現在設定されている利用可能期間内かどうかを判定する関数</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            group_names (List[str]): ユーザグループ名リスト</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: 期間内のプランが1つでも存在する場合はTrue、それ以外はFalse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># buildinグループが存在する場合は期間内とみなす</span>
+        <span class="n">buildin</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;buildin&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin_file_data</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">group_names</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">buildin</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span> <span class="c1"># buildinグループが存在する場合は期間内とみなす</span>
+
+        <span class="c1"># plan_listコマンドの実行ペイロードを構築</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwd</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+        <span class="n">payload_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
+        
+        <span class="c1"># plan_listコマンドを実行</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">send_cmd</span><span class="p">(</span><span class="s1">&#39;limiter_plan_list&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">payload_b64</span><span class="p">],</span>
+                                        <span class="n">retry_count</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">retry_interval</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">nowait</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;success&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ret</span> <span class="ow">or</span> <span class="s1">&#39;data&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ret</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="p">{}):</span>
+            <span class="k">return</span> <span class="kc">False</span> <span class="c1"># 成功レスポンスがない場合は期間外とみなす</span>
+        <span class="n">plans</span> <span class="o">=</span> <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;success&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">plans</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># プランが存在しない場合は期間内とみなす</span>
+
+        <span class="c1"># プラン一覧から期間内のプランを探す</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">plan</span> <span class="ow">in</span> <span class="n">plans</span><span class="p">:</span>
+            <span class="n">open_date</span> <span class="o">=</span> <span class="n">plan</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;open_date&#39;</span><span class="p">)</span>
+            <span class="n">suspend_date</span> <span class="o">=</span> <span class="n">plan</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;suspend_date&#39;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">start_dt</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">end_dt</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">open_date</span><span class="p">:</span>
+                    <span class="n">start_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">open_date</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">suspend_date</span><span class="p">:</span>
+                    <span class="n">end_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">suspend_date</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">start_dt</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_dt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span> <span class="c1"># どちらも指定されていない場合は考慮しない</span>
+            <span class="k">if</span> <span class="n">start_dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">start_dt</span> <span class="o">&lt;=</span> <span class="n">now</span> <span class="o">&lt;=</span> <span class="n">end_dt</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span> <span class="c1"># 期間内のプランが見つかった場合はTrue</span>
+            <span class="k">if</span> <span class="n">start_dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_dt</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">start_dt</span> <span class="o">&lt;=</span> <span class="n">now</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span> <span class="c1"># 期間内のプランが見つかった場合はTrue</span>
+            <span class="k">if</span> <span class="n">start_dt</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">now</span> <span class="o">&lt;=</span> <span class="n">end_dt</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span> <span class="c1"># 期間内のプランが見つかった場合はTrue</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Signin.is_notice_expired">
+<a class="viewcode-back" href="../../../../resources/cmdbox.app.auth.html#cmdbox.app.auth.signin.Signin.is_notice_expired">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_notice_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        limiterモードのplan_listコマンドを実行して、</span>
+<span class="sd">        現在設定されている通知期限が過ぎたかどうかを判定する関数</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: 通知期限が過ぎている場合はTrue、それ以外はFalse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># plan_listコマンドの実行ペイロードを構築</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwd</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+        <span class="n">payload_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">str2b64str</span><span class="p">(</span><span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
+        
+        <span class="c1"># plan_listコマンドを実行</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">send_cmd</span><span class="p">(</span><span class="s1">&#39;limiter_plan_list&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">payload_b64</span><span class="p">],</span>
+                                        <span class="n">retry_count</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">retry_interval</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">nowait</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;success&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ret</span> <span class="ow">or</span> <span class="s1">&#39;data&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ret</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="p">{}):</span>
+            <span class="k">return</span> <span class="kc">False</span> <span class="c1"># 成功レスポンスがない場合は期間外とみなす</span>
+        <span class="n">plans</span> <span class="o">=</span> <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;success&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">plans</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># プランが存在しない場合は期間外とみなす</span>
+
+        <span class="c1"># プラン一覧から期間内のプランを探す</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">plan</span> <span class="ow">in</span> <span class="n">plans</span><span class="p">:</span>
+            <span class="n">notice_date</span> <span class="o">=</span> <span class="n">plan</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;notice_date&#39;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">notice_dt</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">notice_date</span><span class="p">:</span>
+                    <span class="n">notice_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">notice_date</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">notice_dt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span> <span class="c1"># 通知期限が指定されていない場合は考慮しない</span>
+            <span class="k">if</span> <span class="n">now</span> <span class="o">&gt;=</span> <span class="n">notice_dt</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span> <span class="c1"># 通知期限が過ぎている場合はTrue</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+</div>
 
 
 <span class="n">request_scope</span> <span class="o">=</span> <span class="n">contextvars</span><span class="o">.</span><span class="n">ContextVar</span><span class="p">(</span><span class="s1">&#39;request_scope&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>

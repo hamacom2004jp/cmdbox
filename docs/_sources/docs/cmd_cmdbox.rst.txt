@@ -108,6 +108,25 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "end","bool | null","no","null","終了フラグ"
 
 
+cmdbox ( info ) : ``cmdbox -m cmdbox -c info <Option>``
+=======================================================
+
+- Display Cmdbox information.
+
+.. csv-table::
+    :widths: 20, 8, 8, 8, 12, 18, 26
+    :header-rows: 1
+
+    "Option","Type","Multi","Required","Default","Choices","Description"
+    "--enable_value <enable_value>","bool","","","False","True | False","Specify whether to display only the version value. If this option is specified, other flags are ignored."
+    "--enable_logo <enable_logo>","bool","","","False","True | False","Specify whether to include the logo."
+    "--enable_version <enable_version>","bool","","","False","True | False","Specify whether to include the version information."
+    "--enable_appid <enable_appid>","bool","","","False","True | False","Specify whether to include the AppID."
+    "--enable_title <enable_title>","bool","","","False","True | False","Specify whether to include the title."
+    "--enable_copyright <enable_copyright>","bool","","","False","True | False","Specify whether to include the copyright information."
+    "--enable_description <enable_description>","bool","","","False","True | False","Specify whether to include the description."
+    "--enable_other <enable_other>","bool","","","False","True | False","Specify whether to include other information."
+
 cmdbox ( initdata_install ) : ``cmdbox -m cmdbox -c initdata_install <Option>``
 ===============================================================================
 
@@ -613,7 +632,7 @@ cmdbox ( server_install ) : ``cmdbox -m cmdbox -c server_install <Option>``
 
     "Option","Type","Multi","Required","Default","Choices","Description"
     "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HONE/.cmdbox` is used."
-    "--install_cmdbox <install_cmdbox>","str","","","cmdbox==0.8.0.2","","When omitted, `cmdbox==0.8.0.2` is used."
+    "--install_cmdbox <install_cmdbox>","str","","","cmdbox==0.8.1","","When omitted, `cmdbox==0.8.1` is used."
     "--install_from <install_from>","str","","","","","Specify the FROM image that will be the source of the docker image to be created."
     "--install_no_python <install_no_python>","bool","","","False","True | False","Do not install python."
     "--install_compile_python <install_compile_python>","bool","","","False","True | False","Compile and install python3; if install_no_python is specified, it is preferred."
@@ -737,6 +756,7 @@ cmdbox ( setup ) : ``cmdbox -m cmdbox -c setup <Option>``
     "--chopt <chopt>","dict","multi","","","","Change the options for the commands specified in the YML file. Specify a dictionary where the option name is the key and the new value is the value. Example: `--chopt host=redis`"
     "--retry_count <retry_count>","int","","","20","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--server_count <server_count>","int","","","5","","Specifies the number of server processes."
     "--setup_file <setup_file>","file","","required",".cmdbox_initdata/setup.yml","","Specify the path to the setup file. Default is `.cmdbox_initdata/setup.yml`."
 
 **Output Schema**
