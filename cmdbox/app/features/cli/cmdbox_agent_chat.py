@@ -74,6 +74,10 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 dict(opt="call_tts", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
                     description_ja="TTS(Text-to-Speech)機能を実行するかどうかを指定します。",
                     description_en="Specify whether to execute the TTS (Text-to-Speech) feature."),
+                dict(opt="reasoning_effort", type=Options.T_STR, default="auto", required=False, multi=False, hide=False,
+                     choice=["auto", "off", "on", "low", "medium", "high", "xhigh"],
+                    description_ja="エージェントで思考の連鎖の深さを指定します。使用するモデルによってはサポートされていない場合があります。",
+                    description_en="Specify the depth of the thought chain in the agent. Depending on the model you are using, this feature may not be supported."),
             ]
         )
 
@@ -81,17 +85,13 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
 
-        payload = dict(runner_name=args.runner_name, user_name=args.user_name, session_id=args.session_id,
-                       a2asv_apikey=args.a2asv_apikey, mcpserver_apikey=args.mcpserver_apikey, message=args.message,
-                       call_tts=args.call_tts)
-        payload_b64 = convert.str2b64str(common.to_str(payload))
-
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         msg = dict(success=[], warn=[])
         for st, res in self.apprun_generate(logger, host=args.host, port=args.port, password=args.password, svname=args.svname,
                                             retry_interval=args.retry_interval, retry_count=args.retry_count, timeout=args.timeout,
                                             runner_name=args.runner_name, user_name=args.user_name, session_id=args.session_id,
-                                            a2asv_apikey=args.a2asv_apikey, mcpserver_apikey=args.mcpserver_apikey, message=args.message, call_tts=args.call_tts):
+                                            a2asv_apikey=args.a2asv_apikey, mcpserver_apikey=args.mcpserver_apikey, message=args.message,
+                                            call_tts=args.call_tts, reasoning_effort=args.reasoning_effort):
             if st == self.RESP_SUCCESS:
                 msg['success'].append(res)
             else:
@@ -104,7 +104,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         return self.RESP_SUCCESS, msg, cl
 
     def apprun_generate(self, logger:logging.Logger, host:str, port:int, password:str, svname:str, retry_interval:int, retry_count:int, timeout:int,
-                        runner_name:str, user_name:str, session_id:str, a2asv_apikey:str, mcpserver_apikey:str, message:str, call_tts:bool):
+                        runner_name:str, user_name:str, session_id:str, a2asv_apikey:str, mcpserver_apikey:str, message:str,
+                        call_tts:bool, reasoning_effort:str):
         """
         Agentチャットを実行します
         
@@ -124,12 +125,13 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             mcpserver_apikey (str): MCPサーバーAPI Key
             message (str): メッセージ
             call_tts (bool): TTS機能を呼び出すかどうか
+            reasoning_effort (str): エージェントで思考の深さ
         Yields:
             Tuple[int, Any]: 処理結果ステータスと内容
         """
         payload = dict(runner_name=runner_name, user_name=user_name, session_id=session_id,
                        a2asv_apikey=a2asv_apikey, mcpserver_apikey=mcpserver_apikey, message=message,
-                       call_tts=call_tts)
+                       call_tts=call_tts, reasoning_effort=reasoning_effort)
         payload_b64 = convert.str2b64str(common.to_str(payload))
 
         cl = client.Client(logger, redis_host=host, redis_port=port, redis_password=password, svname=svname)
@@ -211,7 +213,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         return output_schema
 
     def create_agent(self, logger:logging.Logger, data_dir:Path, disable_remote_agent:bool,
-                     agent_conf:Dict[str, Any], llm_conf:Dict[str, Any], mcpsv_confs:List[Dict[str, Any]]) -> Any:
+                     agent_conf:Dict[str, Any], llm_conf:Dict[str, Any], mcpsv_confs:List[Dict[str, Any]],
+                     payload:Dict[str, Any]) -> Any:
         """
         エージェントを作成します
 
@@ -222,6 +225,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             agent_conf (Dict[str, Any]): エージェント設定
             llm_conf (Dict[str, Any]): LLM設定
             mcpsv_confs (List[Dict[str, Any]]): MCPサーバー設定リスト
+            payload (Dict[str, Any]): クライアントからのリクエスト情報
 
         Returns:
             Agent: エージェント
@@ -289,7 +293,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 mcpsv_confs = self._load_mcpsv_config(data_dir, agent_conf['mcpservers'])
             else:
                 mcpsv_confs = []
-            return self.create_agent(logger, data_dir, disable_remote_agent, agent_conf, llm_conf, mcpsv_confs)
+            return self.create_agent(logger, data_dir, disable_remote_agent, agent_conf, llm_conf, mcpsv_confs, payload)
 
         agent_subagents = agent_subagents if agent_subagents is not None else []
         subagents = []
@@ -300,6 +304,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                     subagents.append(subagent_obj)
 
         llmprov = llm_conf.get('llmprov', None)
+        reasoning_effort = self.get_reasoning_effort(agent_conf, payload)
+        planner = self.create_agent_planner(agent_conf, llm_conf, reasoning_effort)
         if agent_type == 'remote' and not disable_remote_agent:
             from google.adk.agents.remote_a2a_agent import RemoteA2aAgent, AGENT_CARD_WELL_KNOWN_PATH
             from a2a.client.client_factory import ClientConfig, ClientFactory
@@ -344,8 +350,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 ),
                 description=description,
                 instruction=instruction,
-                planner=self.create_agent_planner(agent_conf, llm_conf),
-                tools=self.create_tool_mcpsv(logger, mcpsv_confs),
+                planner=planner,
+                tools=self.create_tool_mcpsv(logger, mcpsv_confs, payload),
                 sub_agents=subagents,
                 output_schema=self.create_agent_output_schema(),
             )
@@ -373,8 +379,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 ),
                 description=description,
                 instruction=instruction,
-                planner=self.create_agent_planner(agent_conf, llm_conf),
-                tools=self.create_tool_mcpsv(logger, mcpsv_confs),
+                planner=planner,
+                tools=self.create_tool_mcpsv(logger, mcpsv_confs, payload),
                 sub_agents=subagents,
                 output_schema=self.create_agent_output_schema(),
             )
@@ -401,8 +407,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 ),
                 description=description,
                 instruction=instruction,
-                planner=self.create_agent_planner(agent_conf, llm_conf),
-                tools=self.create_tool_mcpsv(logger, mcpsv_confs),
+                planner=planner,
+                tools=self.create_tool_mcpsv(logger, mcpsv_confs, payload),
                 sub_agents=subagents,
                 output_schema=self.create_agent_output_schema(),
             )
@@ -422,8 +428,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 ),
                 description=description,
                 instruction=instruction,
-                planner=self.create_agent_planner(agent_conf, llm_conf),
-                tools=self.create_tool_mcpsv(logger, mcpsv_confs),
+                planner=planner,
+                tools=self.create_tool_mcpsv(logger, mcpsv_confs, payload),
                 sub_agents=subagents,
                 output_schema=self.create_agent_output_schema(),
             )
@@ -435,17 +441,36 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             logger.debug(f"create_agent complate.")
         return agent
 
-    def create_agent_planner(self, agent_conf:Dict[str, Any], llm_conf:Dict[str, Any]) -> Any:
+    def get_reasoning_effort(self, agent_conf:Dict[str, Any], payload:Dict[str, Any]) -> str:
+        """
+        エージェントの思考の深さを取得します
+        Args:
+            agent_conf (Dict[str, Any]): エージェント設定
+            payload (Dict[str, Any]): クライアントからのリクエスト情報
+        Returns:
+            str: reasoning_effortの設定
+        """
+        pay_reasoning_effort = payload.get('reasoning_effort', 'off')
+        if not pay_reasoning_effort or pay_reasoning_effort=='off':
+            return 'off'
+        conf_reasoning_effort = agent_conf.get('reasoning_effort', 'off')
+        if pay_reasoning_effort=='auto':
+            if not conf_reasoning_effort or conf_reasoning_effort=='off':
+                return 'off'
+            pay_reasoning_effort = conf_reasoning_effort
+        return pay_reasoning_effort
+
+    def create_agent_planner(self, agent_conf:Dict[str, Any], llm_conf:Dict[str, Any], reasoning_effort:str) -> Any:
         """
         エージェントのプランナーを作成します
         Args:
-            logger (logging.Logger): ロガー
             agent_conf (Dict[str, Any]): エージェント設定
+            llm_conf (Dict[str, Any]): LLM設定
+            reasoning_effort (str): エージェントの思考の深さ
         Returns:
             Planner: プランナー
         """
-        use_planner = agent_conf.get('use_planner', False)
-        if not use_planner:
+        if reasoning_effort == 'off':
             return None
 
         from google.adk.planners import PlanReActPlanner, BuiltInPlanner
@@ -465,12 +490,13 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         else:
             raise ValueError(f"Unknown llmprov: {llmprov}")
 
-    def create_tool_mcpsv(self, logger:logging.Logger, mcpsv_confs:List[Dict[str, Any]]) -> List[Any]:
+    def create_tool_mcpsv(self, logger:logging.Logger, mcpsv_confs:List[Dict[str, Any]], payload:Dict[str, Any]) -> List[Any]:
         """
         MCPサーバーツールを作成します
         Args:
             logger (logging.Logger): ロガー
             mcpsv_confs (List[Dict[str, Any]]): MCPサーバー設定リスト
+            payload (Dict[str, Any]): クライアントからのリクエスト情報
         Returns:
             List[MCPToolset]: MCPToolsetのリスト
         """
@@ -553,7 +579,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             # 設定をロードする
             runner_conf, agent_conf, llm_conf, mcpsv_confs, ds_conf = self.load_conf(runner_name, data_dir, logger)
             # Agentを作成する
-            agent = self.create_agent(logger, data_dir, False, agent_conf, llm_conf, mcpsv_confs)
+            agent = self.create_agent(logger, data_dir, False, agent_conf, llm_conf, mcpsv_confs, payload)
             # Runnerを作成する
             runner = self._create_runner(logger, runner_conf, agent, ds_conf)
             # Agentに送信するメッセージを作成

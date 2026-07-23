@@ -76,7 +76,7 @@ class AgentAgentLoad(feature.OneshotResultEdgeFeature, validator.Validator):
         class Data(resdata.Data):
             agent_name: str = pydantic.Field(default=None, description="エージェント名")
             agent_type: str = pydantic.Field(default=None, description="エージェントタイプ")
-            use_planner: Union[bool, None] = pydantic.Field(default=None, description="プランナー使用フラグ")
+            reasoning_effort: Union[str, None] = pydantic.Field(default=None, description="エージェントで思考の連鎖の深さ")
             a2asv_baseurl: Union[str, None] = pydantic.Field(default=None, description="A2AサーバーのベースURL")
             a2asv_delegated_auth: Union[bool, None] = pydantic.Field(default=None, description="A2Aサーバーの委任認証フラグ")
             a2asv_apikey: Union[str, None] = pydantic.Field(default=None, description="A2AサーバーのAPIキー")

@@ -203,11 +203,20 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
             except:
                 pass
         # webモードで特定のオプションを自動的にセットする
-        opt.update(audit_write_opt)
         opt['host'] = web.redis_host
         opt['port'] = web.redis_port
         opt['password'] = web.redis_password
         opt['svname'] = web.svname
+        if 'timeout' not in opt: opt['timeout'] = audit_write_opt['timeout']
+        if 'retry_count' not in opt: opt['retry_count'] = audit_write_opt['retry_count']
+        if 'retry_interval' not in opt: opt['retry_interval'] = audit_write_opt['retry_interval']
+        opt['pg_enabled'] = audit_write_opt['pg_enabled']
+        opt['pg_host'] = audit_write_opt['pg_host']
+        opt['pg_port'] = audit_write_opt['pg_port']
+        opt['pg_user'] = audit_write_opt['pg_user']
+        opt['pg_password'] = audit_write_opt['pg_password']
+        opt['pg_dbname'] = audit_write_opt['pg_dbname']
+        opt['retention_period_days'] = audit_write_opt['retention_period_days']
         if not 'clmsg_id' in opt:  # optに含まれる場合は処理しない
             if req.session is not None and 'signin' in req.session and req.session['signin'] is not None:
                 if 'clmsg_id' in req.session['signin'] and req.session['signin']['clmsg_id'] is not None:

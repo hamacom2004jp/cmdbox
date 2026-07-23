@@ -24,7 +24,8 @@ class Client(object):
             raise Exception("svname is empty.")
         if svname.find('-') >= 0:
             raise ValueError(f"Server name is invalid. '-' is not allowed. svname={svname}")
-        self.redis_cli = redis_client.RedisClient(logger, host=redis_host, port=redis_port, password=redis_password, svname=svname)
+        self.redis_cli = redis_client.RedisClient(logger, host=redis_host, port=redis_port, password=redis_password,
+                                                  svname=svname, org_svname=svname)
         self.is_running = False
 
     def __exit__(self, a, b, c):

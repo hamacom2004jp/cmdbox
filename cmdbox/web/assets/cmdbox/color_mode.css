@@ -1,3 +1,4 @@
+@import url(color_mode_ext.css);
 /* --- Defines Global Variables & Theme Colors --- */
 :root {
     --area-border-color: var(--bs-border-color);

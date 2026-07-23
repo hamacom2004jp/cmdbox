@@ -1,4 +1,4 @@
-from cmdbox.app import feature
+from cmdbox.app import common, feature
 from cmdbox.app.auth import signin
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
@@ -6,6 +6,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 import logging
 import urllib
 import urllib.parse
+import json
 
 
 class Signin(feature.WebFeature):
@@ -138,3 +139,14 @@ class Signin(feature.WebFeature):
                 return dict(azure=False)
             signin_data = web.signin_saml.signin_file_data
             return dict(azure=signin_data['saml']['providers']['azure']['enabled'],)
+
+        cmdbox_app = self.appcls.getInstance(appcls=self.appcls, ver=self.ver)
+        @app.post('/signin_translation/{target_lang}', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        async def load_cmd(req:Request, res:Response, target_lang:str):
+            form = await req.form()
+            words = json.loads(form.get('words', '[]'))
+            opt = dict(mode='llm', cmd='translation', target_lang=target_lang, words=words, nosave=False, timeout=180)
+            opt_list, file_dict = web.options.mk_opt_list(opt)
+            status, ret_main, obj = cmdbox_app.main(args_list=[common.chopdq(o) for o in opt_list],
+                                                    file_dict=file_dict, webcall=True)
+            return ret_main

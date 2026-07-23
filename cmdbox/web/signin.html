@@ -36,6 +36,10 @@
 </head>
 <body lang="ja" class="overflow-hidden p-2" style="background-color:rgb(33, 37, 41)">
     <script type="text/javascript">write_script_Tag("assets/cmdbox/svgicon.js")</script>
+    <div class="position-fixed top-0 end-0 mt-2 me-3" style="z-index: 1000;">
+        <a href="#" class="secondary link-success text-decoration-none me-3" style="cursor: pointer;" onclick="process_i18n('en_US')">EN</a>
+        <a href="#" class="secondary link-success text-decoration-none" style="cursor: pointer;" onclick="process_i18n('ja_JP')">JA</a>
+    </div>
     <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
         <button class="btn btn-primary py-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
             <svg class="bi my-1 theme-icon-active" width="1em" height="1em" fill="currentColor"><use href="#circle-half"></use></svg>
@@ -127,41 +131,52 @@
             <h1 class="h3 mb-3 fw-normal signin_title d-inline align-middle">Please sign in</h1>
             <div class="form-floating mt-3">
                 <input name="name" type="text" class="form-control form-signin-name" id="floatingInput" placeholder="UserName">
-                <label for="floatingInput">User Name</label>
+                <label for="floatingInput" class="i18n">User Name</label>
             </div>
             <div class="form-floating input-group">
                 <input name="password" type="password" class="form-control form-signin-password" id="floatingPassword" placeholder="Password">
                 <button class="btn btn-outline-secondary eye_buton" type="button" style="border-top-right-radius:6px;border-bottom-right-radius:6px;">
                     <svg width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16"><use href="#svg_eyeslash_btn"></use></svg>
                 </button>
-                <label for="floatingPassword">Password</label>
+                <label for="floatingPassword" class="i18n">Password</label>
             </div>
             <div class="form-check text-start my-3">
                 <input class="form-check-input form-signin-remember" type="checkbox" value="remember-me" id="flexCheckDefault">
-                <label class="form-check-label" for="flexCheckDefault">
+                <label class="form-check-label i18n" for="flexCheckDefault">
                     Remember me
                 </label>
             </div>
-            <button class="btn btn-primary w-100 py-2" type="submit">Sign in</button>
+            <button class="btn btn-primary w-100 py-2 i18n" type="submit">Sign in</button>
             <div class="mt-3">
                 <button class="btn btn-outline-primary w-100 py-2 mb-3 btn-azure" type="button" style="display:none;">
                     <svg class="bi my-1 theme-icon-active me-2" fill="currentColor" width="16" height="16"><use href="#azure"></use></svg>
-                    Sign in with Microsoft OAuth2
+                    <span class="i18n">Sign in with Microsoft OAuth2</span>
                 </button>
                 <button class="btn btn-outline-primary w-100 py-2 mb-3 btn-google" type="button" style="display:none;">
                     <svg class="bi my-1 theme-icon-active me-2" fill="currentColor" width="16" height="16"><use href="#google"></use></svg>
-                    Sign in with Google OAuth2
+                    <span class="i18n">Sign in with Google OAuth2</span>
                 </button>
                 <button class="btn btn-outline-primary w-100 py-2 mb-3 btn-github" type="button" style="display:none;">
                     <svg class="bi my-1 theme-icon-active me-2" fill="currentColor" width="16" height="16"><use href="#github"></use></svg>
-                    Sign in with Github OAuth2
+                    <span class="i18n">Sign in with Github OAuth2</span>
                 </button>
                 <button class="btn btn-outline-primary w-100 py-2 mb-3 btn-saml-azure" type="button" style="display:none;">
                     <svg class="bi my-1 theme-icon-active me-2" fill="currentColor" width="16" height="16"><use href="#azure"></use></svg>
-                    Sign in with Microsoft SAML
+                    <span class="i18n">Sign in with Microsoft SAML</span>
                 </button>
             </div>
         </form>
+    </div>
+    <!-- ローディングマスク -->
+    <div id="loading" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(0, 0, 0, 0.3);z-index:10000;">
+        <div class="text-center position-absolute top-50 start-50 w-100 translate-middle">
+            <div class="spinner-border text-light" role="status">
+                <span class="sr-only"></span>
+            </div>
+            <div>
+                <button type="button" class="btn btn-outline-danger mt-3 bbforce">Back by force</button>
+            </div>
+        </div>
     </div>
 </body>
 <script type="text/javascript">

@@ -91,6 +91,7 @@ $(() => {
         if (res.azure) btn_saml_azure.show();
         else btn_saml_azure.hide();
     });
+    process_i18n();
 });
 const get_client_data = async () => {
     const res = await fetch('gui/get_client_data', {method: 'GET'});
@@ -113,4 +114,51 @@ const ctx_path = () => {
         return cur_path.slice(0, cur_path.indexOf('signin'));
     }
     return '';
+}
+const translation = async (words, target_lang) => {
+    if (!words || words.length <= 0) return words;
+    const form = new FormData();
+    form.append('words', JSON.stringify(words));
+    const res = await fetch(`${ctx_path()}signin_translation/${target_lang}`, {
+        method: 'POST',
+        body: form
+    });
+    const ret = await res.json();
+    if (!ret || !ret.success || !ret.success.data) {
+        console.error('translation error:', ret);
+        window.alert('translation error: ' + JSON.stringify(ret));
+        return ret;
+    }
+    return ret && ret.success && ret.success.data || ret;
+}
+const process_i18n = async (target_lang) => {
+    if (target_lang) {
+        localStorage.setItem('cmdbox-signin-lang', target_lang);
+    } else {
+        target_lang = localStorage.getItem('cmdbox-signin-lang');
+    }
+    if (!target_lang) return;
+    cmdbox.show_loading();
+    const targetElems = $('.i18n');
+    const words = [];
+    targetElems.each((i, elem) => {
+        const elm = $(elem);
+        const text = elm.attr('data-i18n')?elm.attr('data-i18n'):elm.text().trim();
+        if (!text) return;
+        !elm.attr('data-i18n') && elm.attr('data-i18n', text);
+        words.push(text);
+    });
+    if (words.length <= 0) {
+        cmdbox.hide_loading();
+        return;
+    }
+    translation(words, target_lang).then((data) => {
+        targetElems.each((i, elem) => {
+            const elm = $(elem);
+            const text = elm.attr('data-i18n');
+            if (text && data[text]) elm.text(data[text]);
+        });
+    }).finally(() => {
+        cmdbox.hide_loading();
+    });
 }

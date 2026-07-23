@@ -6,6 +6,8 @@ agentView.initView = () => {
     agentView.btn_user_msg = $('#btn_user_msg');
     agentView.btn_rec = $('#btn_rec');
     agentView.btn_say = $('#btn_say');
+    agentView.bot_reasoning = $('#bot_reasoning');
+    agentView.sel_reasoning_effort = $('#sel_reasoning_effort');
     agentView.saveSettingsBtn = $('#saveSettingsBtn');
     agentView.aiCoreText = $('.core-text');
     agentView.aiCoreContainer = $('#aiCoreContainer');
@@ -82,7 +84,7 @@ agentView.initView = () => {
     // Historiesボタンも同様に無効化
     agentView.btn_histories.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
     // 音声入力ボタンも同様に無効化
-    agentView.btn_rec.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
+    agentView.btn_rec.prop('disabled', true).css('cursor', 'not-allowed');
     agentView.user_msg.off('keydown').on('keydown', (e) => {
         // Ctrl+Enterで送信
         if (e.key === 'Enter' && e.ctrlKey && !agentView.btn_user_msg.prop('disabled')) {
@@ -102,30 +104,42 @@ agentView.initView = () => {
     });
     // 音声入力ボタン
     agentView.btn_rec.off('click').on('click', () => {
-        agentView.isRecording = !agentView.isRecording;
+        agentView.isRecording = agentView.btn_rec.prop('checked');
         if (agentView.isRecording) {
-            agentView.btn_rec.css("color", "var(--accent-magenta)");
             agentView.user_msg.attr("placeholder", "Listening...");
         } else {
-            agentView.btn_rec.css("color", "");
-            agentView.user_msg.attr("placeholder", "Command...");
+            agentView.user_msg.attr("placeholder", "Input Message...");
         }
     });
     // 音声出力トグル
     agentView.btn_say.off('click').on('click', () => {
-        const icon = agentView.btn_say.find('i');
-        if (!icon.hasClass('fa-volume-up')) {
-            icon.addClass('fa-volume-up').removeClass('fa-volume-mute');
-            agentView.btn_say.css("opacity", "1");
-        } else {
-            icon.addClass('fa-volume-mute').removeClass('fa-volume-up');
-            agentView.btn_say.css("opacity", "0.5");
+        if (!agentView.btn_say.prop('checked')) {
+            agentView.chat_send(agentView.ws, 'call_tts_off');
             // 再生中の場合は停止
             if (agentView.say && agentView.say.isPlaying()) {
                 agentView.say.stop();
             }
         }
+        else {
+            agentView.chat_send(agentView.ws, 'call_tts_on');
+        }
     });
+    // Reasoningトグル
+    agentView.bot_reasoning.off('click').on('click', () => {
+        if (!agentView.bot_reasoning.prop('checked')) {
+            agentView.sel_reasoning_effort.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
+            agentView.chat_send(agentView.ws, 'call_reasoning_off');
+        } else {
+            agentView.sel_reasoning_effort.prop('disabled', false).css('opacity', '1').css('cursor', 'auto');
+            agentView.chat_send(agentView.ws, `call_reasoning_${agentView.sel_reasoning_effort.val()}`);
+        }
+    });
+    agentView.sel_reasoning_effort.off('change').on('change', () => {
+        if (agentView.bot_reasoning.prop('checked')) {
+            agentView.chat_send(agentView.ws, `call_reasoning_${agentView.sel_reasoning_effort.val()}`);
+        }
+    });
+    agentView.sel_reasoning_effort.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
     // display_runner_name クリックイベント
     $('#display_runner_name').off('click').on('click', async () => {
         await agentView.show_runner_select_modal();

@@ -159,7 +159,7 @@ class A2a(mcp.Mcp):
                     continue
                 mcpsv_confs.append(mcpsv_conf)
             # エージェントのインスタンスを生成
-            agent_obj = self.agent_chat.create_agent(logger, self.data, True, agent_conf, llm_conf, mcpsv_confs)
+            agent_obj = self.agent_chat.create_agent(logger, self.data, True, agent_conf, llm_conf, mcpsv_confs, args.__dict__)
             if agent_obj is None:
                 logger.warning(f"Agent '{agent['name']}' creation skipped.")
                 continue
@@ -169,8 +169,6 @@ class A2a(mcp.Mcp):
             agent_card = await builder.build()
             agent_card.version = self.ver.__version__
             a2a_app = agent_to_a2a.to_a2a(agent_obj, agent_card=agent_card)
-            # ルーターをセットアップ
-            await a2a_app.router.startup()
             # エージェントアプリケーションと設定を保存
             self.agent_apps[agent['name']] = a2a_app
             self.agent_confs[agent['name']] = agent_conf

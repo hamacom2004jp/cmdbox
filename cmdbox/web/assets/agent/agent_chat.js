@@ -53,9 +53,7 @@ agentView.chat = (session_id) => {
     // recボタンのクリックイベント
     agentView.btn_rec.off('click').on('click', async () => {
         // 録音を終了
-        if (agentView.btn_rec.hasClass('rec_on')) {
-            agentView.btn_rec.removeClass('rec_on');
-            agentView.btn_rec.find('use').attr('href', '#btn_mic');
+        if (!agentView.btn_rec.prop('checked')) {
             // 録音中を停止
             if (agentView.recognition) {
                 agentView.recognition.stop();
@@ -70,8 +68,6 @@ agentView.chat = (session_id) => {
             cmdbox.message({'error':'Speech Recognition API is not supported in this browser.'}, true);
             return;
         }
-        agentView.btn_rec.addClass('rec_on');
-        agentView.btn_rec.find('use').attr('href', '#btn_mic_fill');
         let finalTranscript = agentView.user_msg.val();
         agentView.recognition = new SpeechRecognition();
         agentView.recognition.lang = 'ja-JP'; // 言語設定
@@ -97,8 +93,7 @@ agentView.chat = (session_id) => {
                 agentView.recognition.restart();
                 return; // no-speechエラーは無視して再度認識を開始
             }
-            agentView.btn_rec.removeClass('rec_on');
-            agentView.btn_rec.find('use').attr('href', '#btn_mic');
+            agentView.btn_rec.prop('checked', false);
             cmdbox.message({'error':`Speech Recognition error: ${event.error}`}, true);
         };
         agentView.recognition.onend = () => {
@@ -107,7 +102,7 @@ agentView.chat = (session_id) => {
             agentView.recognition.restart();
         };
         agentView.recognition.restart = () => {
-            if (agentView.btn_rec.hasClass('rec_on')) {
+            if (agentView.btn_rec.prop('checked')) {
                 setTimeout(() => {
                     try {
                         agentView.recognition.start();
@@ -218,7 +213,7 @@ agentView.chat = (session_id) => {
     };
     agentView.ws.onopen = () => {
         const ping = () => {
-            agentView.ws.send('ping');
+            agentView.chat_send(agentView.ws, 'ping');
             agentView.chat_reconnect_count = 0; // pingが成功したら再接続回数をリセット
         };
         agentView.btn_say.prop('disabled', false);
@@ -248,7 +243,8 @@ agentView.chat = (session_id) => {
 agentView.parse_message = (message) => {
     if (!message || message.length <= 0) return '';
     try {
-        const msg_json = JSON.parse(message);
+        message = message.trim();
+        const msg_json = JSON.parse(message.tr);
         const success = msg_json && msg_json['success'] || false;
         const ret = [];
         const rep = (str) => {
@@ -431,8 +427,7 @@ agentView.say = {};
 agentView.say.source = null;
 agentView.say.audioContext = null;
 agentView.say.isStart = () => {
-    const icon = agentView.btn_say.find('i');
-    return agentView.btn_say.hasClass('say_on') && icon.hasClass('fa-volume-up');
+    return agentView.btn_say.prop('checked');
 };
 agentView.say.isPlaying = () => {
     return agentView.say.source !== null && agentView.say.audioContext !== null;

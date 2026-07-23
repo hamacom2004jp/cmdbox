@@ -194,6 +194,7 @@ def svrun_check_limit(func: Callable) -> Callable:
         if isinstance(self, LimitedFeature):
             limit_st, ret, limit, command_options = _svrun_pre(self, data_dir, logger, redis_cli, msg, sessions)
             if limit_st == Limiter.CHECK_DENY:
+                if isinstance(ret, dict): ret['end'] = True
                 logger.warning(ret)
                 redis_cli.rpush(msg[1], ret)
                 st = self.RESP_WARN
@@ -229,6 +230,7 @@ def async_svrun_check_limit(func: Callable) -> Callable:
         if isinstance(self, LimitedFeature):
             limit_st, ret, limit, command_options = _svrun_pre(self, data_dir, logger, redis_cli, msg, sessions)
             if limit_st == Limiter.CHECK_DENY:
+                if isinstance(ret, dict): ret['end'] = True
                 logger.warning(ret)
                 redis_cli.rpush(msg[1], ret)
                 st = self.RESP_WARN

@@ -103,9 +103,9 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
             timeout = _options.get_cmd_opt('agent', 'chat', 'timeout').get('default', 120)
 
             from google.genai import types
+            call_reasoning = 'off'
+            call_tts = True
             while True:
-                outputs = None
-                call_tts = True
                 try:
                     query = await receive_text()
                     if query is None or query == '' or query == 'ping':
@@ -117,13 +117,16 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
                     elif query=='call_tts_off':
                         call_tts = False
                         continue
+                    if query.startswith('call_reasoning_'):
+                        call_reasoning = query[len('call_reasoning_'):]
+                        continue
 
                     web.options.audit_exec(sock, web, body=dict(agent_session=session_id, user=user_name, groups=groups, query=query))
                     for st, result in agent_chat.apprun_generate(web.logger, host=web.redis_host, port=web.redis_port, password=web.redis_password, svname=web.svname,
                                                               retry_interval=retry_interval, retry_count=retry_count, timeout=timeout,
                                                               runner_name=runner_name, user_name=user_name, session_id=session_id,
                                                               mcpserver_apikey=mcpserver_apikey, a2asv_apikey=a2asv_apikey,
-                                                              message=query, call_tts=call_tts):
+                                                              message=query, call_tts=call_tts, reasoning_effort=call_reasoning):
 
                         if st != cmdbox_agent_chat.AgentChat.RESP_SUCCESS:
                             yield common.to_str(result)

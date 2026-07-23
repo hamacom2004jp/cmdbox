@@ -309,7 +309,7 @@ agentView.select_runner = async (runner_name) => {
         // Historiesボタンも有効化
         agentView.btn_histories.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
         // 音声入力ボタンも有効化
-        agentView.btn_rec.prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
+        agentView.btn_rec.prop('disabled', false).css('cursor', 'pointer');
         // モーダルを閉じる
         $('#runner_select_modal').modal('hide');
         // メッセージ一覧をクリア

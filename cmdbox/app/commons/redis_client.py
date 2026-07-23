@@ -11,7 +11,8 @@ import threading
 
 
 class RedisClient(object):
-    def __init__(self, logger:logging.Logger, host:str = "localhost", port:int = 6379, password:str = None, svname:str="server"):
+    def __init__(self, logger:logging.Logger, host:str = "localhost", port:int = 6379,
+                 password:str = None, svname:str="server", org_svname:str=None):
         """
         Redisクライアントを初期化します。
         
@@ -21,16 +22,18 @@ class RedisClient(object):
             port (int): Redisのポート番号
             password (str): Redisのパスワード
             svname (str): サーバー名
+            org_svname (str): 元のサーバー名（suffixが含まれていないsvname）省略した時はsvnameからsuffixを除いたsvnameを使用する
         """
         self.logger = logger
         self.host = host
         self.port = port
         self.password = password
         self.svname = f"sv-{svname}"
+        self.org_svname = org_svname if org_svname else svname.rsplit('-', 1)[0]
         self.hbname = f"hb-{svname}"
         self.siname = f"showimg-{svname}"
-        self.memname = f"mem-{svname}"
-        self.lmtname = f"lmt-{svname}"
+        self.memname = f"mem-{self.org_svname}"
+        self.lmtname = f"lmt-{self.org_svname}"
         self.redis_cli = self.connect()
 
     def connect(self):

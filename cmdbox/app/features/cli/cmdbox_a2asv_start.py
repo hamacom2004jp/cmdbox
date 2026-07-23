@@ -91,6 +91,10 @@ class A2aSvStart(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="gunicorn_timeout", type=Options.T_INT, default=900, required=False, multi=False, hide=True, choice=None,
                      description_ja="gunicornワーカーのタイムアウトの時間を秒で指定します。",
                      description_en="Specify the timeout duration of the gunicorn worker in seconds."),
+                dict(opt="reasoning_effort", type=Options.T_STR, default="auto", required=False, multi=False, hide=False,
+                     choice=["auto", "off", "on", "low", "medium", "high", "xhigh"], choice_edit=True,
+                    description_ja="エージェントで思考の連鎖の深さを指定します。'auto', 'off', 'on', 'low', 'medium', 'high', 'xhigh' などが指定できますが、使用するモデルによってはサポートされていない場合があります。",
+                    description_en="Use the agent to specify the depth of the thought chain. You can specify values such as 'auto', 'off', 'on', 'low', 'medium', 'high', or 'xhigh', but depending on the model you're using, some of these may not be supported."),
             ]
         )
 
