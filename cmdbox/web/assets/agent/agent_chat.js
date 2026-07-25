@@ -166,7 +166,7 @@ agentView.chat = (session_id) => {
         console.log(packet);
         if (success.flags && !success.flags['final_response']) {
             // 「考え中」を表示
-            if (!agentView.message_id) {
+            if (agentView.message_id==null) {
                 agentView.message_id = cmdbox.random_string(16);
                 msg_container = $(`#${agentView.message_id}`);
             }
@@ -244,7 +244,7 @@ agentView.parse_message = (message) => {
     if (!message || message.length <= 0) return '';
     try {
         message = message.trim();
-        const msg_json = JSON.parse(message.tr);
+        const msg_json = JSON.parse(message);
         const success = msg_json && msg_json['success'] || false;
         const ret = [];
         const rep = (str) => {

@@ -158,10 +158,13 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             final_response: bool = pydantic.Field(default=False, description="最終レスポンスフラグ")
             function_call: bool = pydantic.Field(default=False, description="関数呼び出しフラグ")
             function_response: bool = pydantic.Field(default=False, description="関数レスポンスフラグ")
+        class Message(resdata.Base):
+            role: Union[str, None] = pydantic.Field(default=None, description="メッセージの役割")
+            content: Union[str, None] = pydantic.Field(default=None, description="メッセージの内容")
         class Data(resdata.Data):
             ids: Union[Ids, None] = pydantic.Field(default=None, description="セッション・イベントID情報")
             flags: Union[Flags, None] = pydantic.Field(default=None, description="フラグ情報")
-            message: Union[str, None] = pydantic.Field(default=None, description="メッセージ")
+            message: Union[Message, str, None] = pydantic.Field(default=None, description="メッセージ")
             wav_b64: Union[str, None] = pydantic.Field(default=None, description="Base64エンコードされたWAVデータ")
             ressize: Union[int, None] = pydantic.Field(default=None, description="Agentが返したレスポンスのサイズ")
         class Result(resdata.Result):
@@ -681,6 +684,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         mcpserver_apikey = payload.get('mcpserver_apikey')
 
         from google.adk.agents.run_config import RunConfig, StreamingMode
+        from google.adk.events import Event
         signin.set_request_scope(dict(mcpserver_apikey=mcpserver_apikey, a2asv_apikey=a2asv_apikey))
         run_config = RunConfig(streaming_mode=StreamingMode.NONE)
         resval = []
@@ -691,6 +695,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                                                 run_config=run_config)) as run_iter:
             try:
                 async for event in run_iter:
+                    ev:Event = event
+                    ev_json = ev.model_dump_json()
                     outputs = dict(success=dict(),)
                     success = outputs['success']
                     ids = outputs['success']['ids'] = dict()

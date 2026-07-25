@@ -585,7 +585,7 @@ return cjson.encode(c)
     # 設定 / カウンタの入出力
     # ------------------------------------------------------------------
 
-    def load_configs(self, data_dir: Path) -> List[Dict[str, Any]]:
+    def load_configs(self, data_dir: Path, scope: str = 'server') -> List[Dict[str, Any]]:
         """
         data_dir 以下のすべての制限設定をロードします。
 
@@ -595,26 +595,28 @@ return cjson.encode(c)
 
         Args:
             data_dir (Path): データディレクトリ
+            scope (str): スコープ。'server' または 'client'（デフォルト: 'server'）
         Returns:
             List[Dict[str, Any]]: 制限設定のリスト
         """
         if self.redis_client is not None:
             try:
                 now = time.time()
+                redis_key = f"{self.redis_client.lmtname}_{scope}_limiter:config"
                 if now - self._last_config_loaded >= self._reload_interval:
                     configs = self._load_configs_from_file(data_dir)
                     configs = sorted(configs, key=lambda c: c.get('limiter_name', ''))
                     self._last_config_loaded = now
                     pipe = self.redis_client.pipeline()
-                    pipe.delete(f"{self.redis_client.lmtname}_{self.REDIS_CONFIG_HASH}")
+                    pipe.delete(redis_key)
                     for cfg in configs:
                         name = cfg.get('limiter_name', '')
                         if name:
-                            pipe.hset(f"{self.redis_client.lmtname}_{self.REDIS_CONFIG_HASH}", name, json.dumps(cfg))
+                            pipe.hset(redis_key, name, json.dumps(cfg))
                     pipe.execute()
                     return configs
-                if self.redis_client.exists(f"{self.redis_client.lmtname}_{self.REDIS_CONFIG_HASH}"):
-                    raw = self.redis_client.hgetall(f"{self.redis_client.lmtname}_{self.REDIS_CONFIG_HASH}")
+                if self.redis_client.exists(redis_key):
+                    raw = self.redis_client.hgetall(redis_key)
                     if raw:
                         configs: List[Dict[str, Any]] = []
                         for v in raw.values():
@@ -646,7 +648,7 @@ return cjson.encode(c)
                 pass
         return configs
 
-    def load_counter(self, data_dir: Path, limiter_name: str, load_history: bool = False) -> Dict[str, Any]:
+    def load_counter(self, data_dir: Path, limiter_name: str, scope: str = 'server', load_history: bool = False) -> Dict[str, Any]:
         """
         指定した制限設定のカウンタをロードします。
 
@@ -657,15 +659,17 @@ return cjson.encode(c)
         Args:
             data_dir (Path): データディレクトリ
             limiter_name (str): 制限設定の識別名
+            scope (str): スコープ。'server' または 'client'（デフォルト: 'server'）
             load_history (bool): カウンタの履歴も読み込むかどうか
         Returns:
             Dict[str, Any]: カウンタ
         """
         now = time.time()
+        redis_key = f"{self.redis_client.lmtname}_{scope}_limiter:counter" if self.redis_client is not None else None
         if now - self._last_counter_loaded < self._reload_interval:
             if self.redis_client is not None and not load_history:
                 try:
-                    raw = self.redis_client.hget(f"{self.redis_client.lmtname}_{self.REDIS_COUNTER_HASH}", limiter_name)
+                    raw = self.redis_client.hget(redis_key, limiter_name)
                     if raw is not None:
                         text = raw.decode('utf-8') if isinstance(raw, bytes) else raw
                         last_json = json.loads(text)
@@ -678,7 +682,6 @@ return cjson.encode(c)
         # ファイルから読んだ場合、Redis にも同期しておく（Redis 再起動後の復元）
         if not load_history and self.redis_client is not None:
             try:
-                redis_key = f"{self.redis_client.lmtname}_{self.REDIS_COUNTER_HASH}"
                 raw = self.redis_client.hget(redis_key, limiter_name)
                 if raw is None:
                     # Redis にデータがない場合は、ファイルから読んだカウンタをそのまま保存する
@@ -745,7 +748,7 @@ return cjson.encode(c)
             return self._init_counter(limiter_name)
 
     def save_counter(self, data_dir: Path, limiter_name: str, counter: Dict[str, Any],
-                     max_history_interval: Optional[int] = None) -> None:
+                     scope: str = 'server', max_history_interval: Optional[int] = None) -> None:
         """
         指定した制限設定のカウンタを保存します。
 
@@ -757,11 +760,13 @@ return cjson.encode(c)
             data_dir (Path): データディレクトリ
             limiter_name (str): 制限設定の識別名
             counter (Dict[str, Any]): 保存するカウンタ
+            scope (str): スコープ。'server' または 'client'（デフォルト: 'server'）
             max_history_interval (Optional[int]): 履歴保持最大期間（秒）。指定した場合、ファイル保存後に古い履歴を削除します。
         """
         if self.redis_client is not None:
             try:
-                raw = self.redis_client.hget(f"{self.redis_client.lmtname}_{self.REDIS_COUNTER_HASH}", limiter_name)
+                redis_key = f"{self.redis_client.lmtname}_{scope}_limiter:counter"
+                raw = self.redis_client.hget(redis_key, limiter_name)
                 if raw is not None:
                     text = raw.decode('utf-8') if isinstance(raw, bytes) else raw
                     share_counter = json.loads(text)
@@ -771,8 +776,7 @@ return cjson.encode(c)
                     # Redis 上のカウンタとマージする
                     for k in self.COUNTER_VALKEYS:
                         counter[k] = max(counter.get(k, 0), share_counter.get(k, 0))
-                self.redis_client.hset(
-                    f"{self.redis_client.lmtname}_{self.REDIS_COUNTER_HASH}", limiter_name, json.dumps(counter))
+                self.redis_client.hset(redis_key, limiter_name, json.dumps(counter))
             except Exception:
                 pass
             now = time.time()
@@ -802,6 +806,7 @@ return cjson.encode(c)
 
     def _atomic_increment_redis(self, data_dir: Path, limiter_name: str,
                                 deltas: Dict[str, Any], last_update: str,
+                                scope: str = 'server',
                                 reset: bool = False,
                                 max_history_interval: Optional[int] = None) -> Dict[str, Any]:
         """
@@ -814,12 +819,13 @@ return cjson.encode(c)
             limiter_name (str): 制限設定の識別名
             deltas (Dict[str, Any]): 加算するデルタ値の辞書
             last_update (str): 最終更新日時 (ISO 形式)
+            scope (str): スコープ。'server' または 'client'（デフォルト: 'server'）
             reset (bool): True の場合、カウンタを 0 にリセットしてからデルタを適用します
             max_history_interval (Optional[int]): 履歴保持最大期間（秒）
         Returns:
             Dict[str, Any]: 更新後のカウンタ
         """
-        redis_key = f"{self.redis_client.lmtname}_{self.REDIS_COUNTER_HASH}"
+        redis_key = f"{self.redis_client.lmtname}_{scope}_limiter:counter"
         result_raw = self.redis_client.redis_cli.eval(
             self._COUNTER_INCREMENT_LUA,
             1,
@@ -959,7 +965,8 @@ return cjson.encode(c)
         return False
 
     def _save_evidence_file(self, data_dir: Path, limiter_name: str,
-                              config: Dict[str, Any], counter: Dict[str, Any]) -> None:
+                              config: Dict[str, Any], counter: Dict[str, Any],
+                              scope: str = 'server') -> None:
         """
         リセット前のカウンター履歴とリミッター設定をエビデンスファイルに保存します。
         ファイル名: evidence-{limiter_name}-{last_reset_yyyymmdd_hhmmss}.json
@@ -969,6 +976,7 @@ return cjson.encode(c)
             limiter_name (str): 制限設定の識別名
             config (Dict[str, Any]): リミッター設定
             counter (Dict[str, Any]): リセット前のカウンタ（last_reset を含む）
+            scope (str): スコープ。'server' または 'client'（デフォルト: 'server'）
         """
         try:
             counter = {k: counter[k] for k in sorted(counter.keys())}
@@ -978,7 +986,7 @@ return cjson.encode(c)
                 last_reset_formatted = last_reset_dt.strftime('%Y%m%d_%H%M%S')
             except (ValueError, TypeError):
                 last_reset_formatted = datetime.now().strftime('%Y%m%d_%H%M%S')
-            history = self.load_counter(data_dir, limiter_name, load_history=True)
+            history = self.load_counter(data_dir, limiter_name, scope=scope, load_history=True)
             history.append(counter)
 
             evidence_path = Path(data_dir) / self.LIMITER_DIR / f"evidence-{limiter_name}-{last_reset_formatted}.json"
@@ -1085,7 +1093,7 @@ return cjson.encode(c)
         if scope not in ('server', 'client'):
             raise ValueError(f"Limiter.check: invalid scope '{scope}'. Must be 'server' or 'client'.")
 
-        configs = self.load_configs(data_dir)
+        configs = self.load_configs(data_dir, scope=scope)
         now = datetime.now()
 
         checkfg = self.CHECK_NOT_APPLICABLE
@@ -1097,7 +1105,7 @@ return cjson.encode(c)
                 continue
             if not self.matches(config, command_options):
                 continue
-            counter = self.load_counter(data_dir, limiter_name)
+            counter = self.load_counter(data_dir, limiter_name, scope=scope)
             if self.needs_reset(config, counter):
                 counter = self.reset_counter(limiter_name)
             # 実行可能期間チェック
@@ -1220,7 +1228,7 @@ return cjson.encode(c)
             credits (int): 使用クレジット数
             registrations (int): 登録数（又は登録サイズ）
         """
-        configs = self.load_configs(data_dir)
+        configs = self.load_configs(data_dir, scope='server')
 
         for config in configs:
             limiter_name = config.get('limiter_name')
@@ -1239,25 +1247,25 @@ return cjson.encode(c)
                     except (ValueError, TypeError):
                         pass
 
-                counter = self.load_counter(data_dir, limiter_name)
+                counter = self.load_counter(data_dir, limiter_name, scope='server')
                 needs_reset = self.needs_reset(config, counter)
                 max_history_interval = config.get('max_history_interval')
                 last_update = datetime.now().isoformat()
                 if self.redis_client is not None:
                     # Redis が有効な場合は Lua スクリプトでアトミックにインクリメント
                     if needs_reset:
-                        self._save_evidence_file(data_dir, limiter_name, config, counter)
+                        self._save_evidence_file(data_dir, limiter_name, config, counter, scope='server')
                     deltas = dict(count=count, exec_time=exec_time, input_bytes=input_bytes,
                                   process_bytes=process_bytes, output_bytes=output_bytes,
                                   credits=credits, registrations=registrations)
                     self._atomic_increment_redis(
-                        data_dir, limiter_name, deltas, last_update, needs_reset,
+                        data_dir, limiter_name, deltas, last_update, scope='server', reset=needs_reset,
                         max_history_interval=int(max_history_interval) if max_history_interval is not None else None
                     )
                 else:
                     # Redis なし: ファイルのみ（従来動作）
                     if needs_reset:
-                        self._save_evidence_file(data_dir, limiter_name, config, counter)
+                        self._save_evidence_file(data_dir, limiter_name, config, counter, scope='server')
                         counter = self.reset_counter(limiter_name)
                     counter['total_count'] = counter.get('total_count', 0) + count
                     counter['total_time'] = counter.get('total_time', 0.0) + exec_time
@@ -1270,6 +1278,8 @@ return cjson.encode(c)
                     self._save_counter_to_file(data_dir, limiter_name, counter)
                     if max_history_interval is not None:
                         self._prune_counter_history(data_dir, limiter_name, int(max_history_interval))
+            except Exception as e:
+                logger.warning(f"Limiter.update failed for '{limiter_name}': {e}", exc_info=True)
             except Exception as e:
                 logger.warning(f"Limiter.update failed for '{limiter_name}': {e}", exc_info=True)
 

@@ -59,7 +59,7 @@ agentView.create_history = (session_id, runner_name, user_name, update_time, msg
             } else {
                 // エージェントメッセージ
                 if (!event['final_response']) {
-                    if (!agent_message_id) {
+                    if (agent_message_id==null) {
                         agent_message_id = cmdbox.random_string(16);
                         msg_container = $(`#${agent_message_id}`);
                     }
