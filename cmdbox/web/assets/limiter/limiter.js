@@ -347,14 +347,15 @@ limiter_page._render_limiter_item = (parent, lm, show_counter, is_limiter_save) 
                 const dt_str = limiter_page.fmt_datetime(ev.last_reset);
                 ev_item.append(`<div class="text-truncate" title="${dt_str}"><i class="fas fa-file-alt fa-xs me-1"></i><strong>${dt_str}</strong></div>`);
             }
+            const cf = ev.config || {};
             const lc = ev.last_counter || {};
-            limiter_page.make_progress('&nbsp;Count', lc.total_count, lm.max_total_count, limiter_page.fmt_num).appendTo(ev_item);
-            limiter_page.make_progress('&nbsp;Time (s)', lc.total_time, lm.max_total_time, (v) => v != null ? `${typeof v === 'number' ? v.toFixed(1) : v}s` : '-').appendTo(ev_item);
-            limiter_page.make_progress('&nbsp;Input', lc.total_input, lm.max_total_input, limiter_page.fmt_bytes).appendTo(ev_item);
-            limiter_page.make_progress('&nbsp;Process', lc.total_process, lm.max_total_process, limiter_page.fmt_bytes).appendTo(ev_item);
-            limiter_page.make_progress('&nbsp;Output', lc.total_output, lm.max_total_output, limiter_page.fmt_bytes).appendTo(ev_item);
-            limiter_page.make_progress('&nbsp;Credits', lc.total_credits, lm.max_total_credits, limiter_page.fmt_num, lm.service_credits).appendTo(ev_item);
-            limiter_page.make_progress('&nbsp;Registrations', lc.total_registrations, lm.max_registrations, limiter_page.fmt_num).appendTo(ev_item);
+            limiter_page.make_progress('&nbsp;Count', lc.total_count, cf.max_total_count, limiter_page.fmt_num).appendTo(ev_item);
+            limiter_page.make_progress('&nbsp;Time (s)', lc.total_time, cf.max_total_time, (v) => v != null ? `${typeof v === 'number' ? v.toFixed(1) : v}s` : '-').appendTo(ev_item);
+            limiter_page.make_progress('&nbsp;Input', lc.total_input, cf.max_total_input, limiter_page.fmt_bytes).appendTo(ev_item);
+            limiter_page.make_progress('&nbsp;Process', lc.total_process, cf.max_total_process, limiter_page.fmt_bytes).appendTo(ev_item);
+            limiter_page.make_progress('&nbsp;Output', lc.total_output, cf.max_total_output, limiter_page.fmt_bytes).appendTo(ev_item);
+            limiter_page.make_progress('&nbsp;Credits', lc.total_credits, cf.max_total_credits, limiter_page.fmt_num, cf.service_credits).appendTo(ev_item);
+            limiter_page.make_progress('&nbsp;Registrations', lc.total_registrations, cf.max_registrations, limiter_page.fmt_num).appendTo(ev_item);
         });
     }
 
