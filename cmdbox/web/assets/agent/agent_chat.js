@@ -51,7 +51,8 @@ agentView.chat = (session_id) => {
         agentView.chatContainer.scrollTop(agentView.chatContainer.prop('scrollHeight'));
     });
     // recボタンのクリックイベント
-    agentView.btn_rec.off('click').on('click', async () => {
+    const rec_handler = async () => {
+        agentView.rec_set();
         // 録音を終了
         if (!agentView.btn_rec.prop('checked')) {
             // 録音中を停止
@@ -60,12 +61,14 @@ agentView.chat = (session_id) => {
                 const transcript = agentView.user_msg.val();
                 transcript && agentView.btn_user_msg.click(); // 録音が終了したら自動的にメッセージを送信
             }
+            agentView.rec_off();
             return;
         }
         // 録音を開始
         const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
         if (!SpeechRecognition) {
             cmdbox.message({'error':'Speech Recognition API is not supported in this browser.'}, true);
+            agentView.rec_off();
             return;
         }
         let finalTranscript = agentView.user_msg.val();
@@ -93,7 +96,7 @@ agentView.chat = (session_id) => {
                 agentView.recognition.restart();
                 return; // no-speechエラーは無視して再度認識を開始
             }
-            agentView.btn_rec.prop('checked', false);
+            agentView.rec_off();
             cmdbox.message({'error':`Speech Recognition error: ${event.error}`}, true);
         };
         agentView.recognition.onend = () => {
@@ -113,7 +116,9 @@ agentView.chat = (session_id) => {
             }
         };
         agentView.recognition.start();
-    });
+    };
+    agentView.btn_rec.off('click').on('click', rec_handler);
+    rec_handler();
     // ws接続
     const protocol = window.location.protocol.endsWith('s:') ? 'wss' : 'ws';
     const host = window.location.hostname;
@@ -155,11 +160,17 @@ agentView.chat = (session_id) => {
             return;
         }
         const success = packet && packet['success'] || {};
-        if (success.turn_complete) {
+        const hasStructured = !!(
+            (success.function_calls && success.function_calls.length > 0) ||
+            (success.function_responses && success.function_responses.length > 0) ||
+            (success.artifact_delta && Object.keys(success.artifact_delta).length > 0) ||
+            (success.artifacts && success.artifacts.length > 0)
+        );
+        if (success.flags && success.flags.turn_complete && !success.message && !hasStructured) {
             agentView.message_id = null;
             return;
         }
-        if (!success.message || success.message.length <= 0) {
+        if ((!success.message || success.message.length <= 0) && !hasStructured) {
             agentView.message_id = null;
             return;
         }
@@ -183,7 +194,7 @@ agentView.chat = (session_id) => {
                 msg_container.find('.btn-toggle-message').text('▶');
             }
             const msg_str = agentView.parse_message(success.message);
-            await agentView.format_agent_message(msg_content, msg_str);
+            await agentView.format_agent_message(msg_content, msg_str, success);
             agentView.scrollToBottom();
             return;
         }
@@ -196,7 +207,7 @@ agentView.chat = (session_id) => {
             msg_container = $(`#${agentView.message_id}`);
         }
         const msg_str = agentView.parse_message(success.message);
-        await agentView.format_agent_message(msg_content, msg_str);
+        await agentView.format_agent_message(msg_content, msg_str, success);
         if (msg_container.find('.message-thinking').length <= 0) {
             msg_container.find('.btn-toggle-message').remove();
         }
@@ -220,6 +231,9 @@ agentView.chat = (session_id) => {
         agentView.btn_user_msg.prop('disabled', false);
         agentView.btn_rec.prop('disabled', false);
         agentView.chat_callback_ping_handler = setInterval(() => {ping();}, ping_interval);
+        agentView.say_init();
+        agentView.rec_init();
+        agentView.reasoning_init();
     };
     agentView.ws.onerror = (event) => {
         console.error(event);
@@ -245,8 +259,60 @@ agentView.parse_message = (message) => {
     try {
         message = message.trim();
         const msg_json = JSON.parse(message);
-        const success = msg_json && msg_json['success'] || false;
         const ret = [];
+        const escapeHtml = (value) => {
+            if (value === null || value === undefined) return '';
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        };
+        const jsonToTable = (value) => {
+            if (value === null || value === undefined) {
+                return '<span class="text-muted">null</span>';
+            }
+            if (Array.isArray(value)) {
+                if (value.length <= 0) {
+                    return '<span class="text-muted">[]</span>';
+                }
+                if (typeof value[0] === 'object') {
+                    const keys = Object.keys(value[0]);
+                    const cols = keys.map((key) => {
+                        return `<th class="th">${escapeHtml(key)}</th>`;
+                    }).join('');
+                    const rows = value.map((item, index) => {
+                        const tds = keys.map((key) => {
+                            return `<td>${jsonToTable(item[key])}</td>`;
+                        }).join('');
+                        return `<tr>${tds}</tr>`;
+                    }).join('');
+                    return `<table class="table table-sm table-bordered align-middle mb-2"><thead><tr>${cols}</tr></thead><tbody>${rows}</tbody></table>`;
+                }
+                if (value.length <= 1) {
+                    return `<span>${escapeHtml(value[0])}</span>`;
+                }
+                const rows = value.map((item, index) => {
+                    return `<tr><th class="th">${index}</th><td>${jsonToTable(item)}</td></tr>`;
+                }).join('');
+                return `<table class="table table-sm table-bordered align-middle mb-2"><tbody>${rows}</tbody></table>`;
+            }
+            if (typeof value === 'object') {
+                const keys = Object.keys(value);
+                if (keys.length <= 0) {
+                    return '<span class="text-muted">{}</span>';
+                }
+                const cols = keys.map((key) => {
+                    return `<th class="th">${escapeHtml(key)}</th>`;
+                }).join('');
+                const rows = keys.map((key) => {
+                    return `<td>${jsonToTable(value[key])}</td>`;
+                }).join('');
+                return `<table class="table table-sm table-bordered align-middle mb-2"><thead><tr>${cols}</tr></thead><tbody><tr>${rows}</tr></tbody></table>`;
+            }
+            return `<span>${escapeHtml(value)}</span>`;
+        };
         const rep = (str) => {
             str = str.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '');
             const elem = $(str);
@@ -260,15 +326,23 @@ agentView.parse_message = (message) => {
         msg_json && msg_json['message'] && ret.push(`${rep(msg_json['message'])}\n`);
         msg_json && msg_json['command'] && (ret.push(`**Command:**`) && ret.push(`- ${rep(msg_json['command'])}\n`));
         if (msg_json && msg_json['parameters_json'] && msg_json['parameters_json'] !== '{}') {
-            ret.push('**Parameters:** ```json'+msg_json['parameters_json']+'```');
+            try {
+                const obj = JSON.parse(msg_json['parameters_json']);
+                ret.push('**Parameters:**');
+                ret.push(`<div class="json-table-wrap">${jsonToTable(obj)}</div>`);
+            } catch (e) {
+                ret.push('**Parameters:**');
+                ret.push(`<div class="json-table-wrap"><pre>${escapeHtml(msg_json['parameters_json'])}</pre></div>`);
+            }
         }
         if (msg_json && msg_json['result_json']) {
             try {
-                eval(`(${msg_json['result_json']})`);
-                ret.push('**Result:** ```json'+msg_json['result_json']+'```');
+                const obj = JSON.parse(msg_json['result_json']);
+                ret.push('**Result:**');
+                ret.push(`<div class="json-table-wrap">${jsonToTable(obj)}</div>`);
             } catch (e) {
-                // LLMが最終中カッコが足りない状態で出力してくるときがある。
-                ret.push('**Result:** ```json'+msg_json['result_json']+'}```');
+                ret.push('**Result:**');
+                ret.push(`<div class="json-table-wrap"><pre>${escapeHtml(msg_json['result_json'])}</pre></div>`);
             }
         }
         msg_json && msg_json['error'] && (ret.push(`**Error:**`) && ret.push(`- ${rep(msg_json['error'])}\n`));
@@ -322,48 +396,14 @@ agentView.create_agent_message = (message_id) => {
     agentView.scrollToBottom();
     return $(`#${message_id} .msg-content`).last();
 }
-agentView.format_agent_message =  async (txt, message) => {
+agentView.format_agent_message =  async (txt, message, success = null) => {
     // メッセージが空の場合は何もしない
-    if (!message || message.length <= 0) return;
+    if ((!message || message.length <= 0) && !success) return;
     txt.html('');
-    const regs_start = /```json/s;
-    const regs_json = /```json(?!```)+/s;
-    const regs_end = /```/s;
-    while (message && message.length > 0) {
+    if (message && message.length > 0) {
         try {
-            // JSON開始部分を探す
-            let start = message.match(regs_start);
-            if (!start || start.length < 0) {
-                // JSON開始部分が無い場合はそのまま表示
-                // const msg = message.replace(/\n/g, '<br/>');
-                const msg_html = marked.parse(message);
-                txt.append(msg_html);
-                break;
-            }
-            start = message.substring(0, start.index);
-            if (start) {
-                // const msg = start.replace(/\n/g, '<br/>');
-                const msg_html = marked.parse(start);
-                txt.append(msg_html);
-            }
-            message = message.replace(start+regs_start.source, '');
-
-            // JSON内容部分を探す
-            let jbody = message.match(regs_end);
-            if (!jbody || jbody.length < 0) {
-                // JSON内容部分が無い場合はそのまま表示
-                // const msg = message.replace(/\n/g, '<br/>');
-                const msg_html = marked.parse(message);
-                txt.append(msg_html);
-                break;
-            }
-            jbody = message.substring(0, jbody.index);
-            jobj = eval(`(${jbody})`);
-            message = message.replace(jbody+regs_end.source, '');
-            const rand = cmdbox.random_string(16);
-            txt.append(`<span id="${rand}"/>`);
-            agentView.recursive_json_parse(jobj);
-            render_result_func(txt.find(`#${rand}`), jobj, 256);
+            const msg_html = marked.parse(message);
+            txt.append(msg_html);
             const th = txt.find(`.table .th:first`);
             if (th.length > 0) {
                 const title = th.html();
@@ -377,15 +417,14 @@ agentView.format_agent_message =  async (txt, message) => {
             }
         } catch (e) {
             try {
-                // const msg = message.replace(/\n/g, '<br/>');
                 const msg_html = marked.parse(message);
                 txt.append(msg_html);
             } catch (e) {
                 txt.append(`${e}`);
             }
-            break;
         }
     }
+    agentView.render_structured_event(txt, success);
     // メッセージ一覧を一番下までスクロール
     agentView.chatContainer.scrollTop(agentView.chatContainer.prop('scrollHeight'));
     const msg_width = agentView.chatMessages.prop('scrollWidth');
@@ -393,6 +432,28 @@ agentView.format_agent_message =  async (txt, message) => {
         // メッセージ一覧の幅が800pxを超えたら、メッセージ一覧の幅を調整
         document.documentElement.style.setProperty('--cmdbox-width', `${msg_width}px`);
     }
+};
+
+agentView.render_structured_event = (txt, success) => {
+    if (!success) return;
+    const payload = {};
+    if (success.function_calls && success.function_calls.length > 0) {
+        payload.function_calls = success.function_calls;
+    }
+    if (success.function_responses && success.function_responses.length > 0) {
+        payload.function_responses = success.function_responses;
+    }
+    if (success.artifact_delta && Object.keys(success.artifact_delta).length > 0) {
+        payload.artifact_delta = success.artifact_delta;
+    }
+    if (success.artifacts && success.artifacts.length > 0) {
+        payload.artifacts = success.artifacts;
+    }
+    if (Object.keys(payload).length <= 0) return;
+
+    const rand = cmdbox.random_string(16);
+    txt.append(`<div class="mt-2"><span id="${rand}"></span></div>`);
+    render_result_func(txt.find(`#${rand}`), payload, 256);
 };
 agentView.recursive_json_parse = (jobj) => {
     Object.keys(jobj).forEach((key) => {

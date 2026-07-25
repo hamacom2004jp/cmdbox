@@ -11,7 +11,6 @@ import argparse
 import logging
 import json
 import pydantic
-import re
 
 
 class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeature):
@@ -158,6 +157,23 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             final_response: bool = pydantic.Field(default=False, description="最終レスポンスフラグ")
             function_call: bool = pydantic.Field(default=False, description="関数呼び出しフラグ")
             function_response: bool = pydantic.Field(default=False, description="関数レスポンスフラグ")
+            turn_complete: bool = pydantic.Field(default=False, description="ターン完了フラグ")
+            interrupted: bool = pydantic.Field(default=False, description="割り込みフラグ")
+        class FunctionCall(resdata.Base):
+            id: Union[str, None] = pydantic.Field(default=None, description="関数呼び出しID")
+            name: Union[str, None] = pydantic.Field(default=None, description="関数名")
+            args: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="関数引数")
+        class FunctionResponse(resdata.Base):
+            id: Union[str, None] = pydantic.Field(default=None, description="関数応答ID")
+            name: Union[str, None] = pydantic.Field(default=None, description="関数名")
+            response: Union[Dict[str, Any], str, None] = pydantic.Field(default=None, description="関数応答内容")
+        class Artifact(resdata.Base):
+            filename: Union[str, None] = pydantic.Field(default=None, description="アーティファクト名")
+            version: Union[int, None] = pydantic.Field(default=None, description="バージョン")
+            text: Union[str, None] = pydantic.Field(default=None, description="テキスト本文")
+            mime_type: Union[str, None] = pydantic.Field(default=None, description="MIMEタイプ")
+            inline_data_size: Union[int, None] = pydantic.Field(default=None, description="inline_dataサイズ")
+            file_uri: Union[str, None] = pydantic.Field(default=None, description="ファイルURI")
         class Message(resdata.Base):
             role: Union[str, None] = pydantic.Field(default=None, description="メッセージの役割")
             content: Union[str, None] = pydantic.Field(default=None, description="メッセージの内容")
@@ -165,6 +181,10 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             ids: Union[Ids, None] = pydantic.Field(default=None, description="セッション・イベントID情報")
             flags: Union[Flags, None] = pydantic.Field(default=None, description="フラグ情報")
             message: Union[Message, str, None] = pydantic.Field(default=None, description="メッセージ")
+            function_calls: Union[List[FunctionCall], None] = pydantic.Field(default=None, description="関数呼び出し一覧")
+            function_responses: Union[List[FunctionResponse], None] = pydantic.Field(default=None, description="関数応答一覧")
+            artifact_delta: Union[Dict[str, int], None] = pydantic.Field(default=None, description="更新されたアーティファクト一覧")
+            artifacts: Union[List[Artifact], None] = pydantic.Field(default=None, description="アーティファクト内容")
             wav_b64: Union[str, None] = pydantic.Field(default=None, description="Base64エンコードされたWAVデータ")
             ressize: Union[int, None] = pydantic.Field(default=None, description="Agentが返したレスポンスのサイズ")
         class Result(resdata.Result):
@@ -235,14 +255,9 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         """
         if logger.level == logging.DEBUG:
             logger.debug(f"create_agent processing..")
-        description = agent_conf.get("agent_description", f"{self.ver.__appid__}に登録されているコマンド提供")
-        instruction = agent_conf.get("agent_instruction", f"あなたはコマンドの意味を熟知しているエキスパートです。" + \
-                      f"ユーザーがコマンドを実行したいとき、あなたは以下の手順に従ってコマンドを確実に実行してください。\n" + \
-                      f"1. ユーザーのクエリからが実行したいコマンドを特定します。\n" + \
-                      f"2. コマンド実行に必要なパラメータのなかで、ユーザーのクエリから取得できないものは、コマンド定義にあるデフォルト値を指定して実行してください。\n" + \
-                      f"3. もしエラーが発生した場合は、ユーザーにコマンド名とパラメータとエラー内容を提示してください。\n" \
-                      f"4. コマンドの実行結果は、json文字列で出力するようにしてください。この時json文字列は「```json」と「```」で囲んだ文字列にしてください。\n")
-        agent_system_instruction = agent_conf.get("agent_system_instruction", None)
+        description = agent_conf.get("agent_description", self.agent_description)
+        instruction = agent_conf.get("agent_instruction", '')
+        agent_system_instruction = agent_conf.get("agent_system_instruction", self.agent_system_instruction)
         prompt_param = agent_conf.get("prompt_param", None)
 
         # prompt_param によるプレースホルダー置換
@@ -581,10 +596,11 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             litellm.drop_params = True
             # 設定をロードする
             runner_conf, agent_conf, llm_conf, mcpsv_confs, ds_conf = self.load_conf(runner_name, data_dir, logger)
+            artifact_root_dir = data_dir / '.users' / user_name / 'artifacts' / runner_name
             # Agentを作成する
             agent = self.create_agent(logger, data_dir, False, agent_conf, llm_conf, mcpsv_confs, payload)
             # Runnerを作成する
-            runner = self._create_runner(logger, runner_conf, agent, ds_conf)
+            runner = self._create_runner(logger, runner_conf, agent, ds_conf, artifact_root_dir)
             # Agentに送信するメッセージを作成
             from google.genai import types
             content = types.Content(role='user', parts=[types.Part(text=message)])
@@ -612,7 +628,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                     await runner.session_service.db_engine.dispose()
                 await runner.close()
 
-    def _create_runner(self, logger:logging.Logger, runner_conf:Dict[str, Any], agent:Any, ds_conf:Dict[str, Any]) -> Any:
+    def _create_runner(self, logger:logging.Logger, runner_conf:Dict[str, Any], agent:Any, ds_conf:Dict[str, Any], artifact_root_dir:Path) -> Any:
         """
         Runnerを作成します
 
@@ -621,17 +637,41 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             runner_conf (Dict[str, Any]): Runner設定
             agent (Any): エージェント
             ds_conf (Dict[str, Any]): データソース設定
+            artifact_root_dir (Path): アーティファクトのルートディレクトリ
 
         Returns:
             Runner: Runnerオブジェクト
         """
         from google.adk.runners import Runner
+        artifact_service = self._create_artifact_service(logger, artifact_root_dir)
         runner = Runner(
             app_name=runner_conf.get('runner_name', self.ver.__appid__),
             agent=agent,
             session_service=self.create_session_service(logger, ds_conf),
+            artifact_service=artifact_service,
         )
         return runner
+
+    def _create_artifact_service(self, logger:logging.Logger, artifact_root_dir:Path) -> Any:
+        """
+        Artifactサービスを作成します
+
+        Args:
+            logger (logging.Logger): ロガー
+            artifact_root_dir (Path): アーティファクトのルートディレクトリ
+
+        Returns:
+            BaseArtifactService: Artifactサービス
+        """
+        if artifact_root_dir is not None:
+            from google.adk.artifacts.file_artifact_service import FileArtifactService
+            try:
+                artifact_root_dir.mkdir(parents=True, exist_ok=True)
+                return FileArtifactService(artifact_root_dir)
+            except Exception as e:
+                logger.warning(f"Failed to initialize FileArtifactService: {e}. Falling back to InMemoryArtifactService.", exc_info=True)
+        from google.adk.artifacts.in_memory_artifact_service import InMemoryArtifactService
+        return InMemoryArtifactService()
 
     def _setup_tts_engine(self, logger:logging.Logger, data_dir:Path,
                           payload:Dict[str, Any], runner_conf:Dict[str, Any]) -> Tuple[bool, Any]:
@@ -696,7 +736,6 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             try:
                 async for event in run_iter:
                     ev:Event = event
-                    ev_json = ev.model_dump_json()
                     outputs = dict(success=dict(),)
                     success = outputs['success']
                     ids = outputs['success']['ids'] = dict()
@@ -704,30 +743,70 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                     ids['event_id'] = event.id
                     ids['invocation_id'] = event.invocation_id
                     flags = outputs['success']['flags'] = dict()
-                    if event.turn_complete:
-                        flags['turn_complete'] = True
-                    if event.interrupted:
-                        flags['interrupted'] = True
+                    flags['turn_complete'] = bool(event.turn_complete)
+                    flags['interrupted'] = bool(event.interrupted)
                     msg, is_func_call, is_func_response, is_final_response = self.gen_msg(event)
                     flags['final_response'] = is_final_response
                     flags['function_call'] = is_func_call
                     flags['function_response'] = is_func_response
-                    resval.append(outputs)
+
+                    calls = event.get_function_calls() or []
+                    if calls:
+                        success['function_calls'] = [self._serialize_function_call(c) for c in calls]
+
+                    responses = event.get_function_responses() or []
+                    if responses:
+                        success['function_responses'] = [self._serialize_function_response(r) for r in responses]
+
+                    artifacts = []
+                    if event.actions and event.actions.artifact_delta:
+                        success['artifact_delta'] = dict(event.actions.artifact_delta)
+                        if hasattr(runner, 'artifact_service') and runner.artifact_service is not None:
+                            for filename, version in event.actions.artifact_delta.items():
+                                try:
+                                    artifact_part = await runner.artifact_service.load_artifact(
+                                        app_name=runner_name,
+                                        user_id=user_name,
+                                        session_id=agent_session.id,
+                                        filename=filename,
+                                        version=version,
+                                    )
+                                    artifacts.append(self._serialize_artifact(filename, version, artifact_part))
+                                except Exception as e:
+                                    artifacts.append(dict(filename=filename, version=version, text=f"Failed to load artifact: {e}"))
+                    if artifacts:
+                        success['artifacts'] = artifacts
+
                     if msg:
                         success['message'] = msg
                         options.Options.getInstance().audit_exec(body=dict(agent_session=agent_session.id, result=msg),
                                                                     audit_type=options.Options.AT_USER, user=user_name)
                         if enable_tts and tts_engine_obj and not is_func_call and not is_func_response:
-                            tts_msg = re.sub(r'```json.*?```', '', msg, flags=re.DOTALL) # json表現部分を除去
                             try:
-                                wav_b64 = cmdbox_tts_say.TtsSay.tts_say(tts_engine_obj, tts_msg) \
-                                    if tts_msg is not None and tts_msg.strip() != '' else None
+                                try:
+                                    msg_json = json.loads(msg) if isinstance(msg, str) else msg
+                                    msg = msg_json['message'] if isinstance(msg_json, dict) and 'message' in msg_json else msg
+                                except Exception:
+                                    pass
+                                wav_b64 = cmdbox_tts_say.TtsSay.tts_say(tts_engine_obj, msg) \
+                                    if msg is not None and msg.strip() != '' else None
                                 success['wav_b64'] = wav_b64
                             except Exception as e:
                                 success['wav_b64'] = None
+
+                    has_output = any([
+                        success.get('message') is not None and str(success.get('message')).strip() != '',
+                        bool(success.get('function_calls')),
+                        bool(success.get('function_responses')),
+                        bool(success.get('artifact_delta')),
+                        bool(success.get('artifacts')),
+                    ])
+
+                    resval.append(outputs)
+                    if has_output:
                         redis_cli.rpush(reskey, outputs)
-                        if flags['final_response']:
-                            break
+                    if flags['final_response']:
+                        break
 
             except Exception as e:
                 outputs = dict(success=dict(flags=dict(final_response=True, function_call=False, function_response=False),
@@ -740,6 +819,53 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                                 end=True)
         redis_cli.rpush(reskey, msg)
         await run_iter.aclose()
+
+    @staticmethod
+    def _to_primitive(value: Any) -> Any:
+        if value is None:
+            return None
+        if isinstance(value, (str, int, float, bool, list, dict)):
+            return value
+        if hasattr(value, "model_dump"):
+            return value.model_dump(mode='json')
+        if hasattr(value, "dict"):
+            return value.dict()
+        return common.to_str(value)
+
+    @classmethod
+    def _serialize_function_call(cls, call: Any) -> Dict[str, Any]:
+        return dict(
+            id=getattr(call, 'id', None),
+            name=getattr(call, 'name', None),
+            args=cls._to_primitive(getattr(call, 'args', None)),
+        )
+
+    @classmethod
+    def _serialize_function_response(cls, response: Any) -> Dict[str, Any]:
+        return dict(
+            id=getattr(response, 'id', None),
+            name=getattr(response, 'name', None),
+            response=cls._to_primitive(getattr(response, 'response', None)),
+        )
+
+    @classmethod
+    def _serialize_artifact(cls, filename: str, version: int, artifact_part: Any) -> Dict[str, Any]:
+        row = dict(filename=filename, version=version)
+        if artifact_part is None:
+            return row
+        text = getattr(artifact_part, 'text', None)
+        if text:
+            row['text'] = text
+        inline_data = getattr(artifact_part, 'inline_data', None)
+        if inline_data is not None:
+            row['mime_type'] = getattr(inline_data, 'mime_type', None)
+            data = getattr(inline_data, 'data', None)
+            row['inline_data_size'] = len(data) if data is not None else 0
+        file_data = getattr(artifact_part, 'file_data', None)
+        if file_data is not None:
+            row['mime_type'] = row.get('mime_type', getattr(file_data, 'mime_type', None))
+            row['file_uri'] = getattr(file_data, 'file_uri', None)
+        return row
 
     def svrun_output_bytes(self, data_dir, logger, opt, msg, msg_size):
         msg_size = msg.get('success', {}).get('ressize', msg_size)

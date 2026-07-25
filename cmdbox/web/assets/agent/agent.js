@@ -103,43 +103,17 @@ agentView.initView = () => {
         agentView.chat(cmdbox.random_string(16));
     });
     // 音声入力ボタン
-    agentView.btn_rec.off('click').on('click', () => {
-        agentView.isRecording = agentView.btn_rec.prop('checked');
-        if (agentView.isRecording) {
-            agentView.user_msg.attr("placeholder", "Listening...");
-        } else {
-            agentView.user_msg.attr("placeholder", "Input Message...");
-        }
-    });
+    agentView.rec_init();
+
     // 音声出力トグル
-    agentView.btn_say.off('click').on('click', () => {
-        if (!agentView.btn_say.prop('checked')) {
-            agentView.chat_send(agentView.ws, 'call_tts_off');
-            // 再生中の場合は停止
-            if (agentView.say && agentView.say.isPlaying()) {
-                agentView.say.stop();
-            }
-        }
-        else {
-            agentView.chat_send(agentView.ws, 'call_tts_on');
-        }
-    });
+    agentView.btn_say.off('click').on('click', agentView.say_set);
+    agentView.say_init();
+
     // Reasoningトグル
-    agentView.bot_reasoning.off('click').on('click', () => {
-        if (!agentView.bot_reasoning.prop('checked')) {
-            agentView.sel_reasoning_effort.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
-            agentView.chat_send(agentView.ws, 'call_reasoning_off');
-        } else {
-            agentView.sel_reasoning_effort.prop('disabled', false).css('opacity', '1').css('cursor', 'auto');
-            agentView.chat_send(agentView.ws, `call_reasoning_${agentView.sel_reasoning_effort.val()}`);
-        }
-    });
-    agentView.sel_reasoning_effort.off('change').on('change', () => {
-        if (agentView.bot_reasoning.prop('checked')) {
-            agentView.chat_send(agentView.ws, `call_reasoning_${agentView.sel_reasoning_effort.val()}`);
-        }
-    });
-    agentView.sel_reasoning_effort.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
+    agentView.bot_reasoning.off('click').on('click', agentView.reasoning_set);
+    agentView.sel_reasoning_effort.off('change').on('change', agentView.reasoning_set);
+    agentView.reasoning_init();
+
     // display_runner_name クリックイベント
     $('#display_runner_name').off('click').on('click', async () => {
         await agentView.show_runner_select_modal();
@@ -174,6 +148,101 @@ agentView.initView = () => {
     $('.modal-dialog').draggable({cursor:'move',cancel:'button, .modal-body, .modal-footer'});
     agentView.scrollToBottom();
 }
+// 音声認識トグル
+agentView.rec_off = () => {
+    agentView.isRecording = false;
+    agentView.btn_rec.prop('checked', false);
+    agentView.user_msg.attr("placeholder", "Input Message...");
+    // localStorage.setItem('cmdbox-btn_rec', "false");
+};
+agentView.rec_on = () => {
+    agentView.isRecording = true;
+    agentView.btn_rec.prop('checked', true);
+    agentView.user_msg.attr("placeholder", "Listening...");
+    // localStorage.setItem('cmdbox-btn_rec', "true");
+};
+agentView.rec_set = () => {
+    if (!agentView.btn_rec.prop('checked')) {
+        agentView.rec_off();
+    } else {
+        agentView.rec_on();
+    }
+};
+agentView.rec_init = () => {
+    /*if (localStorage.getItem('cmdbox-btn_rec')) {
+        const saved_value = localStorage.getItem('cmdbox-btn_rec');
+        if (saved_value && saved_value === "true") {
+            agentView.rec_on();
+            return;
+        }
+    }*/
+    agentView.rec_off();
+};
+// 音声合成トグル
+agentView.say_off = () => {
+    agentView.btn_say.prop('checked', false);
+    agentView.chat_send(agentView.ws, 'call_tts_off');
+    // 再生中の場合は停止
+    if (agentView.say && agentView.say.isPlaying()) {
+        agentView.say.stop();
+    }
+    localStorage.setItem('cmdbox-btn_say', "false");
+};
+agentView.say_on = () => {
+    agentView.btn_say.prop('checked', true);
+    agentView.chat_send(agentView.ws, 'call_tts_on');
+    localStorage.setItem('cmdbox-btn_say', "true");
+};
+agentView.say_set = () => {
+    if (!agentView.btn_say.prop('checked')) {
+        agentView.say_off();
+    } else {
+        agentView.say_on();
+    }
+};
+agentView.say_init = () => {
+    if (localStorage.getItem('cmdbox-btn_say')) {
+        const saved_value = localStorage.getItem('cmdbox-btn_say');
+        if (saved_value && saved_value === "true") {
+            agentView.say_on();
+            return;
+        }
+    }
+    agentView.say_off();
+};
+// Reasoningトグル
+agentView.reasoning_off = () => {
+    agentView.bot_reasoning.prop('checked', false);
+    agentView.sel_reasoning_effort.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
+    agentView.chat_send(agentView.ws, 'call_reasoning_off');
+    localStorage.setItem('cmdbox-sel_reasoning_effort', "call_reasoning_off");
+};
+agentView.reasoning_on = () => {
+    agentView.bot_reasoning.prop('checked', true);
+    agentView.sel_reasoning_effort.prop('disabled', false).css('opacity', '1').css('cursor', 'auto');
+    agentView.chat_send(agentView.ws, `call_reasoning_${agentView.sel_reasoning_effort.val()}`);
+    localStorage.setItem('cmdbox-sel_reasoning_effort', `call_reasoning_${agentView.sel_reasoning_effort.val()}`);
+};
+agentView.reasoning_set = () => {
+    if (!agentView.bot_reasoning.prop('checked')) {
+        agentView.reasoning_off();
+    } else {
+        agentView.reasoning_on();
+    }
+};
+agentView.reasoning_init = () => {
+    if (localStorage.getItem('cmdbox-sel_reasoning_effort')) {
+        const saved_value = localStorage.getItem('cmdbox-sel_reasoning_effort');
+        if (saved_value) {
+            if (saved_value != 'call_reasoning_off') {
+                agentView.sel_reasoning_effort.val(saved_value.replace('call_reasoning_', ''));
+                agentView.reasoning_on();
+                return;
+            }
+        }
+    }
+    agentView.reasoning_off();
+};
 
 agentView.disabled = false;
 agentView.exec_cmd = async (mode, cmd, opt={}, error_func=null, loading=true, sse_cb=null) => {

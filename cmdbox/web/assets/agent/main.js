@@ -57,6 +57,52 @@ $(() => {
                     agentView.navSidebar.removeClass('expanded');
                 }
             });
+
+            const initConsoleExpandButton = () => {
+                const splitPane = $('.layout-grid > .split-pane.fixed-left').first();
+                const consolePanel = $('.console-panel').first();
+                const visualizerPanel = $('.visualizer-panel').first();
+                const btn = $('#btn_console_expand_80');
+                if (!splitPane.length || !consolePanel.length || !btn.length) return;
+
+                const updateButtonState = (expanded) => {
+                    if (expanded) {
+                        btn.attr('data-expanded', 'true');
+                        btn.find('i').removeClass('fa-expand').addClass('fa-compress');
+                    } else {
+                        btn.attr('data-expanded', 'false');
+                        btn.find('i').removeClass('fa-compress').addClass('fa-expand');
+                    }
+                };
+
+                updateButtonState(false);
+                btn.off('click').on('click', () => {
+                    const splitPaneWidth = splitPane[0].clientWidth;
+                    const dividerWidth = splitPane.children('.split-pane-divider-left').outerWidth() || 0;
+                    const minLeft = parseInt(consolePanel.css('min-width'), 10) || 350;
+                    const minRight = parseInt(visualizerPanel.css('min-width'), 10) || 0;
+                    const maxLeft = Math.max(minLeft, splitPaneWidth - minRight - dividerWidth);
+                    const isExpanded = btn.attr('data-expanded') === 'true';
+
+                    if (!isExpanded) {
+                        const currentWidth = consolePanel.outerWidth() || minLeft;
+                        const targetWidth = Math.round(window.innerWidth * 0.8);
+                        const nextWidth = Math.min(maxLeft, Math.max(minLeft, targetWidth));
+                        btn.attr('data-prev-width', String(currentWidth));
+                        splitPane.splitPane('firstComponentSize', nextWidth);
+                        updateButtonState(true);
+                    } else {
+                        const prevWidth = parseInt(btn.attr('data-prev-width'), 10);
+                        const restoreWidth = Number.isFinite(prevWidth)
+                            ? Math.min(maxLeft, Math.max(minLeft, prevWidth))
+                            : minLeft;
+                        splitPane.splitPane('firstComponentSize', restoreWidth);
+                        updateButtonState(false);
+                    }
+                });
+            };
+
+            initConsoleExpandButton();
             // agent初期化
             agentView.initView();
             // アップロード機能の初期化

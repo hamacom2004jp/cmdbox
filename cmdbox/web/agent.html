@@ -34,7 +34,7 @@
         <!-- LEFT PANEL: Console / Chat Interface -->
         <aside class="console-panel split-pane-component" style="z-index:52;">
             <div class="d-flex align-items-center console-header justify-content-between" style="height:74px;">
-                <h5 class="d-inline-block m-0 glow-text-cyan system-font">
+                <h5 class="m-0 glow-text-cyan system-font">
                     <span class="d-flex align-items-center">
                         <i class="fas fa-terminal me-2"></i>
                         <span id="display_runner_name" class="i18n" style="cursor:pointer;" title="Click to select runner">
@@ -42,6 +42,9 @@
                         </span>
                     </span>
                 </h5>
+                <button id="btn_console_expand_80" class="btn btn-sf-icon" type="button" style="border:none;">
+                    <i class="fas fa-expand"></i>
+                </button>
             </div>
 
             <div class="chat-history" id="chatContainer">
