@@ -4,6 +4,7 @@ from cmdbox.app.commons import convert
 from cmdbox.app.features.cli import cmdbox_audit_search, cmdbox_audit_write
 from cmdbox.app.features.web import cmdbox_web_load_cmd
 from cmdbox.app.web import Web
+from datetime import datetime
 from fastapi import FastAPI, Depends, Request, Response, HTTPException
 from fastapi.responses import PlainTextResponse, StreamingResponse
 from starlette.datastructures import UploadFile
@@ -226,9 +227,13 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         opt['signin_file'] = web.signin.signin_file
         opt['cache_clear'] = opt['cache_clear'] if 'cache_clear' in opt else web.cache_clear
         opt['cache_timeout'] = web.cache_timeout
+        opt['meta'] = opt['meta'] if 'meta' in opt else {}
         if req.session is not None and 'signin' in req.session and req.session['signin'] is not None:
             if 'groups' in req.session['signin'] and req.session['signin']['groups'] is not None:
                 opt['groups'] = req.session['signin']['groups']
+            if 'name' in req.session['signin'] and req.session['signin']['name'] is not None:
+                opt['meta'].update(dict(last_access_user=req.session['signin']['name']))
+        opt['meta'].update(dict(last_access_date=datetime.now().isoformat()))
         opt = self.coercion_param(req.session, opt.copy())
         ap.sv = None
         ap.cl = None

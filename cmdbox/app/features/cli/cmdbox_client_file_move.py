@@ -76,6 +76,9 @@ class ClientFileMove(feature.UnsupportEdgeFeature, validator.Validator, limiter.
                 dict(opt="to_rjpath", type=Options.T_FILE, default=None, required=False, multi=True, hide=False, choice=None, web="mask",
                      description_ja="指定したパスが要求されたパスにマッチする場合、アクセスが拒否されます。正規表現として解釈します。",
                      description_en="If the specified path matches the requested path, access will be denied. Interpreted as a regular expression.",),
+                dict(opt="meta", type=Options.T_DICT, default=None, required=False, multi=True, hide=False, choice=None,
+                     description_ja="メタデータを指定します。",
+                     description_en="Specify the metadata."),
                 dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
                      description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
@@ -113,9 +116,10 @@ class ClientFileMove(feature.UnsupportEdgeFeature, validator.Validator, limiter.
         to_fwpaths = [str(p).replace('"','') for p in args.to_fwpath] if args.to_fwpath is not None else ["/"]
         from_rjpaths = [str(p).replace('"','') for p in args.from_rjpath] if args.from_rjpath is not None else []
         to_rjpaths = [str(p).replace('"','') for p in args.to_rjpath] if args.to_rjpath is not None else []
+        meta = args.meta if args.meta is not None else {}
         ret = cl.file_move(str(args.from_path).replace('"',''), str(args.to_path).replace('"',''),
                            from_fwpaths=from_fwpaths, to_fwpaths=to_fwpaths,
-                           from_rjpaths=from_rjpaths, to_rjpaths=to_rjpaths,
+                           from_rjpaths=from_rjpaths, to_rjpaths=to_rjpaths, meta=meta,
                            scope=args.scope, client_data=client_data,
                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -168,11 +172,13 @@ class ClientFileMove(feature.UnsupportEdgeFeature, validator.Validator, limiter.
         to_fwpaths = payload.get("to_fwpaths")
         from_rjpaths = payload.get("from_rjpaths")
         to_rjpaths = payload.get("to_rjpaths")
-        st = self.file_move(msg[1], from_path, to_path, from_fwpaths, to_fwpaths, from_rjpaths, to_rjpaths, data_dir, logger, redis_cli, sessions)
+        meta = payload.get("meta", {})
+        st = self.file_move(msg[1], from_path, to_path, from_fwpaths, to_fwpaths,
+                            from_rjpaths, to_rjpaths, meta, data_dir, logger, redis_cli, sessions)
         return st
 
     def file_move(self, reskey:str, from_path:str, to_path:str, from_fwpaths:List[str], to_fwpaths:List[str],
-                  from_rjpaths:List[str], to_rjpaths:List[str], data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
+                  from_rjpaths:List[str], to_rjpaths:List[str], meta:Dict[str, Any], data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ファイルを移動する
 
@@ -184,6 +190,7 @@ class ClientFileMove(feature.UnsupportEdgeFeature, validator.Validator, limiter.
             to_fwpaths (List[str], optional): 移動先の範囲外パスのリスト.
             from_rjpaths (List[str], optional): 移動元の範囲外パスのリスト.
             to_rjpaths (List[str], optional): 移動先の範囲外パスのリスト.
+            meta (Dict[str, Any], optional): メタデータ. Defaults to None.
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
@@ -194,7 +201,7 @@ class ClientFileMove(feature.UnsupportEdgeFeature, validator.Validator, limiter.
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_move(from_path, to_path, from_fwpaths, to_fwpaths, from_rjpaths, to_rjpaths)
+            rescode, msg = f.file_move(from_path, to_path, from_fwpaths, to_fwpaths, from_rjpaths, to_rjpaths, meta)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

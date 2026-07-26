@@ -161,7 +161,7 @@ def load_file(file_path:Path, func, mode='r', encoding='utf-8', nolock=True) -> 
         except:
             pass
 
-def save_file(file_path:Path, func, mode='w', encoding='utf-8', nolock=True) -> None:
+def save_file(file_path:Path, func, mode='w', encoding='utf-8', nolock=True, meta:Dict[str, Any]=None) -> None:
     """
     ファイルに書き込みます。書き込み時に排他ロックします。
 
@@ -171,16 +171,18 @@ def save_file(file_path:Path, func, mode='w', encoding='utf-8', nolock=True) -> 
         mode (str, optional): ファイルモード. Defaults to 'w'.
         encoding (str, optional): エンコーディング. Defaults to 'utf-8'.
         nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to True.
+        meta (Dict[str, Any], optional): メタデータ. Defaults to None.
     """
-    def _save(file_path, func, mode, encoding):
+    def _save(file_path, func, mode, encoding, meta):
         if 'b' in mode:
             with open(file_path, mode) as f:
                 func(f)
         else:
             with open(file_path, mode, encoding=encoding) as f:
                 func(f)
+        save_meta(file_path, meta, encoding=encoding)
     if nolock:
-        _save(file_path, func, mode, encoding)
+        _save(file_path, func, mode, encoding, meta)
         return
     lock_file = f'{file_path}.lock'
     try:
@@ -192,7 +194,7 @@ def save_file(file_path:Path, func, mode='w', encoding='utf-8', nolock=True) -> 
                 else:
                     import fcntl
                     fcntl.lockf(fd, fcntl.LOCK_EX)
-                _save(file_path, func, mode, encoding)
+                _save(file_path, func, mode, encoding, meta)
             finally:
                 if sys.platform == 'win32':
                     msvcrt.locking(fd.fileno(), msvcrt.LK_UNLCK, 0)
@@ -203,6 +205,63 @@ def save_file(file_path:Path, func, mode='w', encoding='utf-8', nolock=True) -> 
             os.remove(lock_file)
         except:
             pass
+
+def save_meta(file_path:Path, meta:Dict[str, Any], encoding='utf-8') -> None:
+    """
+    メタデータを保存します。
+
+    Args:
+        file_path (Path): ファイルのパス
+        meta (Dict[str, Any]): メタデータ
+        encoding (str, optional): エンコーディング. Defaults to 'utf-8'.
+    """
+    if meta is None or type(meta) is not dict or len(meta) == 0:
+        return
+    meta_dir = Path(file_path).parent / '.meta'
+    if meta_dir.is_file():
+        os.remove(meta_dir)
+    meta_dir.mkdir(parents=True, exist_ok=True)
+    meta_file = meta_dir / f'{Path(file_path).name}.json'
+    old_meta = load_meta(meta_file, encoding=encoding)
+    with open(meta_file, 'w', encoding=encoding) as f:
+        meta = {k: v for k, v in {**old_meta, **meta}.items() if v}
+        json.dump(meta, f)
+
+def load_meta(file_path:Path, encoding='utf-8') -> Dict[str, Any]:
+    """
+    メタデータを読み込みます。
+
+    Args:
+        file_path (Path): ファイルのパス
+        encoding (str, optional): エンコーディング. Defaults to 'utf-8'.
+
+    Returns:
+        Dict[str, Any]: 読み込んだメタデータ
+    """
+    meta_dir = Path(file_path).parent / '.meta'
+    if meta_dir.is_file():
+        os.remove(meta_dir)
+    meta_file = meta_dir / f'{Path(file_path).name}.json'
+    if not meta_file.exists():
+        return {}
+    with open(meta_file, 'r', encoding=encoding) as f:
+        return json.load(f)
+
+def remove_meta(file_path:Path) -> None:
+    """
+    メタデータを削除します。
+
+    Args:
+        file_path (Path): ファイルのパス
+    """
+    meta_dir = Path(file_path).parent / '.meta'
+    if meta_dir.is_file():
+        os.remove(meta_dir)
+    meta_file = meta_dir / f'{Path(file_path).name}.json'
+    if meta_file.exists():
+        os.remove(meta_file)
+    if not any(meta_dir.iterdir()):
+        meta_dir.rmdir()
 
 class CommonValue:
     _map = dict()

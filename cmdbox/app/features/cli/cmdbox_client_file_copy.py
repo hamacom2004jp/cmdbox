@@ -82,6 +82,9 @@ class ClientFileCopy(feature.UnsupportEdgeFeature, validator.Validator, limiter.
                      test_true={"server":True,
                                 "client":False,
                                 "current":False}),
+                dict(opt="meta", type=Options.T_DICT, default=None, required=False, multi=True, hide=False, choice=None,
+                     description_ja="メタデータを指定します。",
+                     description_en="Specify the metadata."),
                 dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
                      description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
@@ -122,7 +125,7 @@ class ClientFileCopy(feature.UnsupportEdgeFeature, validator.Validator, limiter.
         ret = cl.file_copy(str(args.from_path).replace('"',''), str(args.to_path).replace('"',''), overwrite=args.overwrite,
                            from_fwpaths=from_fwpaths, to_fwpaths=to_fwpaths,
                            from_rjpaths=from_rjpaths, to_rjpaths=to_rjpaths,
-                           scope=args.scope, client_data=client_data,
+                           meta=args.meta, scope=args.scope, client_data=client_data,
                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
@@ -175,8 +178,9 @@ class ClientFileCopy(feature.UnsupportEdgeFeature, validator.Validator, limiter.
         to_fwpaths = payload.get("to_fwpaths", None)
         from_rjpaths = payload.get("from_rjpaths", None)
         to_rjpaths = payload.get("to_rjpaths", None)
+        meta = payload.get("meta", None)
         st = self.file_copy(msg[1], from_path, to_path, overwrite,
-                            from_fwpaths, to_fwpaths, from_rjpaths, to_rjpaths,
+                            from_fwpaths, to_fwpaths, from_rjpaths, to_rjpaths, meta,
                             data_dir, logger, redis_cli, sessions)
         return st
 
@@ -190,7 +194,7 @@ class ClientFileCopy(feature.UnsupportEdgeFeature, validator.Validator, limiter.
 
     def file_copy(self, reskey:str, from_path:str, to_path:str, overwrite:bool,
                   from_fwpaths:List[str], to_fwpaths:List[str], 
-                  from_rjpaths:List[str], to_rjpaths:List[str],
+                  from_rjpaths:List[str], to_rjpaths:List[str], meta:Dict[str, Any],
                   data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ファイルをコピーする
@@ -204,6 +208,7 @@ class ClientFileCopy(feature.UnsupportEdgeFeature, validator.Validator, limiter.
             to_fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             from_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
             to_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            meta (Dict[str, Any], optional): メタデータ. Defaults to None.
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
@@ -214,7 +219,8 @@ class ClientFileCopy(feature.UnsupportEdgeFeature, validator.Validator, limiter.
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_copy(from_path, to_path, overwrite, from_fwpaths, to_fwpaths, from_rjpaths, to_rjpaths)
+            rescode, msg = f.file_copy(from_path, to_path, overwrite, from_fwpaths, to_fwpaths,
+                                       from_rjpaths, to_rjpaths, meta)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

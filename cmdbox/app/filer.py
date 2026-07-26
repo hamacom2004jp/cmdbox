@@ -77,6 +77,8 @@ class Filer(object):
         rjpaths = rjpaths if isinstance(rjpaths, list) else [rjpaths] if rjpaths is not None and rjpaths != "********" else []
         if rjpaths is not None and any(re.match(rjpath, rpath) for rjpath in rjpaths):
             return False, dict(warn=f"The specified path ( {rpath} ) is rejected.")
+        if re.search(r'\.meta/', rpath):
+            return False, dict(warn=f"The specified path ( {rpath} ) is rejected.")
         return True, None
 
     def file_list(self, current_path:str, recursive:bool=False,
@@ -128,7 +130,8 @@ class Filer(object):
                 if not file_list.exists():
                     return tpath_key, None
                 if any(fwpath.startswith(tpath) or tpath.startswith(fwpath) for fwpath in fwpaths) \
-                    and not any(re.match(rjpath, tpath) for rjpath in rjpaths):
+                    and not any(re.match(rjpath, tpath) for rjpath in rjpaths) \
+                    and not re.search(r'\.meta/', tpath):
                     if not listregs_pt.match(file_list.name):
                         return tpath_key, None
                     return tpath_key, dict(name=cpart,
@@ -155,7 +158,8 @@ class Filer(object):
                 if not f.exists():
                     continue
                 if any(fwpath.startswith(path) or path.startswith(fwpath) for fwpath in fwpaths) \
-                    and not any(re.match(rjpath, path) for rjpath in rjpaths):
+                    and not any(re.match(rjpath, path) for rjpath in rjpaths) \
+                    and not re.search(r'\.meta/', path):
                     if not listregs_pt.match(f.name):
                         continue
                     children[key] = dict(name=f.name,
@@ -299,7 +303,9 @@ class Filer(object):
             self.logger.warning(f"Failed to download {abspath}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to download {abspath}. {e}")
 
-    def file_upload(self, current_path:str, file_name:str, file_data:bytes, mkdir:bool, overwrite:bool, fwpaths:List[str]=None, rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+    def file_upload(self, current_path:str, file_name:str, file_data:bytes, mkdir:bool,
+                    overwrite:bool, fwpaths:List[str]=None, rjpaths:List[str]=None,
+                    meta: Dict[str, Any]=None) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルをアップロードする
 
@@ -311,10 +317,12 @@ class Filer(object):
             overwrite (bool): 上書きするかどうか
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            meta (Dict[str, Any], optional): メタデータ. Defaults to None.
 
         Returns:
             int: レスポンスコード
             dict: メッセージ
+            meta (Dict[str, Any], optional): メタデータ. Defaults to None.
         """
         chk, abspath, msg = self._file_exists(current_path, exists_chk=False)
         if not chk:
@@ -340,7 +348,11 @@ class Filer(object):
                 save_path.parent.mkdir(parents=True, exist_ok=True)
             def _w(f):
                 f.write(file_data)
-            common.save_file(Path(save_path), _w, mode='wb', nolock=False)
+            if meta and 'last_access_user' in meta and 'last_update_user' not in meta:
+                meta['last_update_user'] = meta['last_access_user']
+            if meta and 'last_access_date' in meta and 'last_update_date' not in meta:
+                meta['last_update_date'] = meta['last_access_date']
+            common.save_file(Path(save_path), _w, mode='wb', nolock=False, meta=meta)
             return self.RESP_SUCCESS, dict(success=f"Uploaded {save_path}")
         except Exception as e:
             self.logger.warning(f"Failed to upload {save_path}. {e}")
@@ -372,6 +384,7 @@ class Filer(object):
 
         try:
             abspath.unlink(missing_ok=notexist_ok)
+            common.remove_meta(abspath)
             ret_path = str(Path(current_path).parent).replace("\\","/")
             return self.RESP_SUCCESS, dict(success=dict(path=ret_path, msg=f"Removed {abspath}"))
         except Exception as e:
@@ -379,7 +392,7 @@ class Filer(object):
             return self.RESP_WARN, dict(warn=f"Failed to remove {abspath}. {e}")
 
     def file_copy(self, from_path:str, to_path:str, overwrite:bool, from_fwpaths:List[str]=None, to_fwpaths:List[str]=None,
-                  from_rjpaths:List[str]=None, to_rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+                  from_rjpaths:List[str]=None, to_rjpaths:List[str]=None, meta:Dict[str, Any]=None) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルをコピーする
 
@@ -391,6 +404,7 @@ class Filer(object):
             to_fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             from_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
             to_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            meta (Dict[str, Any], optional): メタデータ. Defaults to None.
 
         Returns:
             int: レスポンスコード
@@ -416,6 +430,11 @@ class Filer(object):
             ret_path = shutil.copytree(from_abspath, to_abspath, dirs_exist_ok=True)
         elif from_abspath.is_file():
             ret_path = shutil.copy(from_abspath, to_abspath)
+            if meta and 'last_access_user' in meta and 'last_update_user' not in meta:
+                meta['last_update_user'] = meta['last_access_user']
+            if meta and 'last_access_date' in meta and 'last_update_date' not in meta:
+                meta['last_update_date'] = meta['last_access_date']
+            common.save_meta(to_abspath, meta)
         else:
             self.logger.warning(f"Path {from_abspath} is not file or directory.")
             return self.RESP_WARN, dict(warn=f"Path {from_abspath} is not file or directory.")
@@ -427,7 +446,7 @@ class Filer(object):
                                                     msg=f"Copy from '{from_path}' to '{to_path}'. write '{ret_path}'"))
 
     def file_move(self, from_path:str, to_path:str, from_fwpaths:List[str]=None, to_fwpaths:List[str]=None,
-                  from_rjpaths:List[str]=None, to_rjpaths:List[str]=None) -> Tuple[int, Dict[str, Any]]:
+                  from_rjpaths:List[str]=None, to_rjpaths:List[str]=None, meta:Dict[str, Any]=None) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルを移動する
 
@@ -438,6 +457,7 @@ class Filer(object):
             to_fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             from_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
             to_rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            meta (Dict[str, Any], optional): メタデータ. Defaults to None.
 
         Returns:
             int: レスポンスコード
@@ -457,7 +477,13 @@ class Filer(object):
         if not chk:
             return self.RESP_WARN, msg
 
+        if meta and 'last_access_user' in meta and 'last_update_user' not in meta:
+            meta['last_update_user'] = meta['last_access_user']
+        if meta and 'last_access_date' in meta and 'last_update_date' not in meta:
+            meta['last_update_date'] = meta['last_access_date']
         ret_path = shutil.move(from_abspath, to_abspath)
+        common.save_meta(to_abspath, meta)
+        common.remove_meta(from_abspath)
 
         return self.RESP_SUCCESS, dict(success=dict(path=Path(to_path).parent,
                                                     to_path=to_path,
