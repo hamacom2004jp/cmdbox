@@ -64,6 +64,7 @@ dependencies = [
     "rich",
     "six",
     "starsessions[redis]",
+    "sqlite_vec",
     "tabulate",
     "uvicorn",
     "wsproto",
@@ -100,8 +101,7 @@ rag = [
     "tabulate2>=1.10.2,<2.0",
     "langchain_community",
     "markdown",
-    "pdfplumber",
-    "sqlite_vec",
+    "pdfplumber"
 ]
 omni = [
     "accelerate>=1.12.0",

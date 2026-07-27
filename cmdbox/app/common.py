@@ -206,7 +206,7 @@ def save_file(file_path:Path, func, mode='w', encoding='utf-8', nolock=True, met
         except:
             pass
 
-def save_meta(file_path:Path, meta:Dict[str, Any], encoding='utf-8') -> None:
+def save_meta(file_path:Path, meta:Dict[str, Any], encoding='utf-8') -> Dict[str, Any]:
     """
     メタデータを保存します。
 
@@ -214,18 +214,21 @@ def save_meta(file_path:Path, meta:Dict[str, Any], encoding='utf-8') -> None:
         file_path (Path): ファイルのパス
         meta (Dict[str, Any]): メタデータ
         encoding (str, optional): エンコーディング. Defaults to 'utf-8'.
+    Returns:
+        Dict[str, Any]: 保存したメタデータ
     """
     if meta is None or type(meta) is not dict or len(meta) == 0:
-        return
+        return {}
     meta_dir = Path(file_path).parent / '.meta'
     if meta_dir.is_file():
         os.remove(meta_dir)
     meta_dir.mkdir(parents=True, exist_ok=True)
     meta_file = meta_dir / f'{Path(file_path).name}.json'
-    old_meta = load_meta(meta_file, encoding=encoding)
+    old_meta = load_meta(file_path, encoding=encoding)
     with open(meta_file, 'w', encoding=encoding) as f:
         meta = {k: v for k, v in {**old_meta, **meta}.items() if v}
         json.dump(meta, f)
+        return meta
 
 def load_meta(file_path:Path, encoding='utf-8') -> Dict[str, Any]:
     """

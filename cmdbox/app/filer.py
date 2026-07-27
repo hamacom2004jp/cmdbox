@@ -140,6 +140,7 @@ class Filer(object):
                                     children=children,
                                     size=file_list.stat().st_size,
                                     last=_ts2str(file_list.stat().st_mtime),
+                                    meta=common.load_meta(file_list),
                                     depth=len(tparts))
             for f in sorted(list(file_list.iterdir())):
                 parts = str(f)[data_dir_len:].replace("\\","/").split("/")
@@ -256,7 +257,7 @@ class Filer(object):
             return self.RESP_WARN, dict(warn=f"Failed to remove {abspath}. {e}")
 
     def file_download(self, current_path:str, img_thumbnail:float=0.0,
-                      fwpaths:List[str]=None, rjpaths:List[str]=None, etag:str=None) -> Tuple[int, Dict[str, Any]]:
+                      fwpaths:List[str]=None, rjpaths:List[str]=None, meta:Dict[str, Any]=None, etag:str=None) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルをダウンロードする
 
@@ -265,6 +266,7 @@ class Filer(object):
             img_thumbnail (float, optional): サムネイルのサイズ, by default 0.0
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            meta (Dict[str, Any], optional): メタデータ. Defaults to None.
             etag (str, optional): ETag. Defaults to None.
 
         Returns:
@@ -295,10 +297,11 @@ class Filer(object):
                 return data
             file_etag = str(abspath.stat().st_mtime_ns)
             if etag is not None and etag == file_etag:
-                return self.RESP_SUCCESS, dict(success=dict(name=fname, data="", mime_type=mime_type, etag=file_etag, not_modified=True))
+                return self.RESP_SUCCESS, dict(success=dict(name=fname, data="", mime_type=mime_type, etag=file_etag, not_modified=True, meta={}))
             else:
                 data = common.load_file(abspath, _r, mode='rb', nolock=True)
-            return self.RESP_SUCCESS, dict(success=dict(name=fname, data=data, mime_type=mime_type, etag=file_etag, not_modified=False))
+                meta = common.save_meta(abspath, meta)
+            return self.RESP_SUCCESS, dict(success=dict(name=fname, data=data, mime_type=mime_type, etag=file_etag, not_modified=False, meta=meta))
         except Exception as e:
             self.logger.warning(f"Failed to download {abspath}. {e}")
             return self.RESP_WARN, dict(warn=f"Failed to download {abspath}. {e}")

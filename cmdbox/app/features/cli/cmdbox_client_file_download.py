@@ -61,6 +61,9 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limite
                 dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None, web="mask",
                      description_ja="指定したパスが範囲外であるかどうかを判定するパスを指定します。このパスの配下でない場合エラーにします。",
                      description_en="Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.",),
+                dict(opt="rjpath", type=Options.T_FILE, default=None, required=False, multi=True, hide=False, choice=None, web="mask",
+                     description_ja="指定したパスが要求されたパスにマッチする場合、アクセスが拒否されます。正規表現として解釈します。",
+                     description_en="If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."),
                 dict(opt="etag", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="ETagを指定します。サーバー側でファイルのETagと一致する場合、ファイルコンテンツはダウンロードされずに空が返されます。",
                      description_en="Specify the ETag. If the ETag matches the file's ETag on the server, the file content will not be downloaded and an empty response will be returned."),
@@ -77,6 +80,9 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limite
                 dict(opt="img_thumbnail", type=Options.T_FLOAT, default=0.0, required=False, multi=False, hide=True, choice=None,
                      description_ja="対象が画像だった場合のサムネイルのピクセル単位のサイズを指定します。",
                      description_en="Specifies the size in pixels of the thumbnail if the subject is an image."),
+                dict(opt="meta", type=Options.T_DICT, default=None, required=False, multi=True, hide=False, choice=None,
+                     description_ja="メタデータを指定します。",
+                     description_en="Specify the metadata."),
                 dict(opt="retry_count", type=Options.T_INT, default=3, required=False, multi=False, hide=True, choice=None,
                      description_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",
                      description_en="Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."),
@@ -113,8 +119,9 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limite
         client_data = Path(str(args.client_data).replace('"','')) if args.client_data is not None else None
         download_file = Path(str(args.download_file).replace('"','')) if args.download_file is not None else None
         fwpaths = [str(p).replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
+        rjpaths = [str(p).replace('"','') for p in args.rjpath] if args.rjpath is not None else []
         ret = cl.file_download(str(args.svpath).replace('"',''), download_file, scope=args.scope, client_data=client_data,
-                               fwpaths=fwpaths, etag=args.etag, rpath=args.rpath, img_thumbnail=args.img_thumbnail,
+                               fwpaths=fwpaths, rjpaths=rjpaths, meta=args.meta, etag=args.etag, rpath=args.rpath, img_thumbnail=args.img_thumbnail,
                                retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
@@ -130,6 +137,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limite
             mime_type: Union[str, None] = pydantic.Field(default=None, description="MIMEタイプ")
             etag: Union[str, None] = pydantic.Field(default=None, description="ETag")
             not_modified: Union[bool, None] = pydantic.Field(default=None, description="未更新フラグ")
+            meta: Union[Dict[str, Any], None] = pydantic.Field(default=None, description="メタデータ")
             rpath: Union[str, Path, None] = pydantic.Field(default=None, description="リクエストパス")
             svpath: Union[str, Path, None] = pydantic.Field(default=None, description="サーバーパス")
         class Result(resdata.Result):
@@ -164,16 +172,19 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limite
         payload = json.loads(convert.b64str2str(msg[2]))
         svpath = payload.get("svpath")
         fwpaths = payload.get("fwpaths")
+        rjpaths = payload.get("rjpaths")
+        meta = payload.get("meta")
         etag = payload.get("etag")
         img_thumbnail = payload.get("img_thumbnail", 0.0)
         if img_thumbnail == 'None':
             img_thumbnail = 0.0
         else:
             img_thumbnail = float(img_thumbnail)
-        st = self.file_download(msg[1], svpath, img_thumbnail, fwpaths, etag, data_dir, logger, redis_cli, sessions)
+        st = self.file_download(msg[1], svpath, img_thumbnail, fwpaths, rjpaths, meta, etag, data_dir, logger, redis_cli, sessions)
         return st
 
-    def file_download(self, reskey:str, current_path:str, img_thumbnail:float, fwpaths:List[str], etag:str,
+    def file_download(self, reskey:str, current_path:str, img_thumbnail:float,
+                      fwpaths:List[str], rjpaths:List[str], meta:Dict[str, Any], etag:str,
                       data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
         """
         ファイルをダウンロードする
@@ -182,6 +193,8 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limite
             reskey (str): レスポンスキー
             current_path (str): ファイルパス
             fwpaths (List[str]): 範囲内かどうかを示すパスのリスト
+            rjpaths (List[str]): 範囲外かどうかを示すパスのリスト
+            meta (Dict[str, Any]): メタデータ
             img_thumbnail (float, optional): サムネイルサイズ. Defaults to 0.0.
             etag (str, optional): ETag. Defaults to None.
             data_dir (Path): データディレクトリ
@@ -194,7 +207,7 @@ class ClientFileDownload(feature.OneshotEdgeFeature, validator.Validator, limite
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_download(current_path, img_thumbnail, fwpaths=fwpaths, etag=etag)
+            rescode, msg = f.file_download(current_path, img_thumbnail, fwpaths=fwpaths, rjpaths=rjpaths, meta=meta, etag=etag)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

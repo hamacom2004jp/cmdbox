@@ -173,7 +173,7 @@ class Client(object):
             return dict(warn=f"scope is invalid. {scope}")
     
     def file_download(self, svpath:str, download_file:Path, scope:str="client", client_data:Path=None,
-                      fwpaths:List[str]=None, rjpaths:List[str]=None,
+                      fwpaths:List[str]=None, rjpaths:List[str]=None, meta:Dict[str, Any]=None,
                       etag:str=None, rpath:str="", img_thumbnail:float=0.0,
                       retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
@@ -186,6 +186,7 @@ class Client(object):
             client_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            meta (Dict[str, Any], optional): メタデータ. Defaults to None.
             etag (str, optional): ETag. Defaults to None.
             rpath (str, optional): リクエストパス. Defaults to "".
             img_thumbnail (float, optional): サムネイル画像のサイズ. Defaults to 0.0.
@@ -199,15 +200,16 @@ class Client(object):
         if scope == "client":
             if client_data is not None:
                 f = filer.Filer(client_data, self.logger)
-                _, res_json = f.file_download(svpath, img_thumbnail, fwpaths, rjpaths, etag=etag)
+                _, res_json = f.file_download(svpath, img_thumbnail, fwpaths, rjpaths, meta, etag=etag)
             else:
                 self.logger.warning(f"client_data is empty.")
                 return dict(warn=f"client_data is empty.")
         elif scope == "current":
             f = filer.Filer(Path.cwd(), self.logger)
-            _, res_json = f.file_download(svpath, img_thumbnail, fwpaths, rjpaths, etag=etag)
+            _, res_json = f.file_download(svpath, img_thumbnail, fwpaths, rjpaths, meta, etag=etag)
         elif scope == "server":
-            payload = dict(svpath=svpath, img_thumbnail=img_thumbnail, fwpaths=fwpaths, rjpaths=rjpaths, etag=etag)
+            payload = dict(svpath=svpath, img_thumbnail=img_thumbnail,
+                           fwpaths=fwpaths, rjpaths=rjpaths, meta=meta, etag=etag)
             payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
             res_json = self.redis_cli.send_cmd('client_file_download', [payload_b64],
                                                retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
