@@ -1,5 +1,5 @@
-from cmdbox.app import common, feature
-from cmdbox.app.commons import limiter, redis_client, resdata, validator
+from cmdbox.app import common, client, feature
+from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.features.cli import cmdbox_limiter_counter, cmdbox_limiter_evidences, cmdbox_limiter_list, cmdbox_limiter_load
 from cmdbox.app.options import Options
 from typing import Dict, Any, Tuple, List, Union
@@ -105,21 +105,10 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
 
         return True
 
-    @validator.apprun_check
-    def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        options = Options.getInstance()
+    def _collect_targets(self, options: Options, lt: List[Dict[str, Any]], filter_target_mode: Union[str, None],
+                         filter_target_cmd: Union[str, None], filter_limiter_name: Union[str, None],
+                         resolver_fn) -> List[Dict[str, Any]]:
         results: List[Dict[str, Any]] = []
-        st, res, _ = self.limiter_list.apprun(logger, args, tm, pf)
-        if st != self.RESP_SUCCESS:
-            common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return st, res, None
-        lt = res.get('success', {}).get('data', [])
-
-        # 絞り込み条件を取得
-        filter_target_mode = getattr(args, 'filter_target_mode', None)
-        filter_target_cmd = getattr(args, 'filter_target_cmd', None)
-        filter_limiter_name = getattr(args, 'filter_limiter_name', None)
-
         for mode in options.get_mode_keys():
             # target_mode で絞り込み
             if filter_target_mode and str(mode) != str(filter_target_mode):
@@ -143,31 +132,10 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
 
                     if not self._limiter_matches(entry, feat_mode, feat_cmd):
                         continue
-                    load_args = copy.copy(args)
-                    load_args.limiter_name = entry['name']
-                    # 制限設定をロード
-                    st_l, res_l, _ = self.limiter_load.apprun(logger, load_args, tm, pf)
-                    if st_l == self.RESP_SUCCESS:
-                        cfg = res_l.get('success', {}).get('data', {})
-                    else:
-                        cfg = {'limiter_name': entry['name']}
-                    cfg = {k:v for k,v in cfg.items() if v}
-                    # Counter を取得
-                    st, res, _ = self.limiter_counter.apprun(logger, load_args, tm, pf)
-                    if st != self.RESP_SUCCESS:
-                        cfg['counter'] = {}
-                    else:
-                        cfg['counter'] = res.get('success', {}).get('data', {})
-                    # Evidences を取得
-                    ev_args = copy.copy(args)
-                    ev_args.limiter_name = entry['name']
-                    ev_args.include_history = getattr(args, 'include_history', False)
-                    st_e, res_e, _ = self.limiter_evidences.apprun(logger, ev_args, tm, pf)
-                    if st_e == self.RESP_SUCCESS:
-                        cfg['evidences'] = res_e.get('success', {}).get('data', [])
-                    else:
-                        cfg['evidences'] = []
+
+                    cfg = resolver_fn(entry)
                     matched_limiters.append(cfg)
+
                 if filter_limiter_name and not matched_limiters:
                     continue
                 results.append(dict(
@@ -175,6 +143,90 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
                     cmd=feat_cmd,
                     limiters=matched_limiters,
                 ))
+        return results
+
+    def _resolve_limiter_client(self, logger: logging.Logger, args: argparse.Namespace, tm: float,
+                                pf: List[Dict[str, float]], entry: Dict[str, Any]) -> Dict[str, Any]:
+        load_args = copy.copy(args)
+        load_args.limiter_name = entry['name']
+        # 制限設定をロード
+        st_l, res_l, _ = self.limiter_load.apprun(logger, load_args, tm, pf)
+        if st_l == self.RESP_SUCCESS:
+            cfg = res_l.get('success', {}).get('data', {})
+        else:
+            cfg = {'limiter_name': entry['name']}
+        cfg = {k: v for k, v in cfg.items() if v}
+
+        # Counter を取得
+        st_c, res_c, _ = self.limiter_counter.apprun(logger, load_args, tm, pf)
+        if st_c != self.RESP_SUCCESS:
+            cfg['counter'] = {}
+        else:
+            cfg['counter'] = res_c.get('success', {}).get('data', {})
+
+        # Evidences を取得
+        ev_args = copy.copy(args)
+        ev_args.limiter_name = entry['name']
+        ev_args.include_history = getattr(args, 'include_history', False)
+        st_e, res_e, _ = self.limiter_evidences.apprun(logger, ev_args, tm, pf)
+        if st_e == self.RESP_SUCCESS:
+            cfg['evidences'] = res_e.get('success', {}).get('data', [])
+        else:
+            cfg['evidences'] = []
+        return cfg
+
+    def _resolve_limiter_server(self, data_dir: Any, logger: logging.Logger, redis_cli: redis_client.RedisClient,
+                                limiter_name: str, include_history: bool) -> Dict[str, Any]:
+        try:
+            cfg = self.limiter_load._load_limiter_config(data_dir, limiter_name)
+        except FileNotFoundError:
+            cfg = {'limiter_name': limiter_name}
+        cfg = {k: v for k, v in cfg.items() if v}
+        cfg['counter'] = self.limiter_counter._load_limiter_counter(data_dir, limiter_name, redis_cli, logger, False)
+        cfg['evidences'] = self.limiter_evidences._load_evidences(data_dir, limiter_name, include_history=include_history)
+        return cfg
+
+    @validator.apprun_check
+    def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
+        scope = getattr(args, 'scope', 'server')
+
+        if scope == 'server':
+            payload = dict(
+                filter_target_mode=getattr(args, 'filter_target_mode', None),
+                filter_target_cmd=getattr(args, 'filter_target_cmd', None),
+                filter_limiter_name=getattr(args, 'filter_limiter_name', None),
+                include_history=getattr(args, 'include_history', False),
+            )
+            payload_b64 = convert.str2b64str(common.to_str(payload))
+            cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
+            ret = cl.redis_cli.send_cmd(self.get_svcmd(), [payload_b64],
+                                        retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout, nowait=False)
+            common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            if 'success' not in ret:
+                return self.RESP_WARN, ret, cl
+            return self.RESP_SUCCESS, ret, cl
+
+        options = Options.getInstance()
+        st, res, _ = self.limiter_list.apprun(logger, args, tm, pf)
+        if st != self.RESP_SUCCESS:
+            common.print_format(res, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return st, res, None
+        lt = res.get('success', {}).get('data', [])
+
+        # 絞り込み条件を取得
+        filter_target_mode = getattr(args, 'filter_target_mode', None)
+        filter_target_cmd = getattr(args, 'filter_target_cmd', None)
+        filter_limiter_name = getattr(args, 'filter_limiter_name', None)
+
+        results = self._collect_targets(
+            options,
+            lt,
+            filter_target_mode,
+            filter_target_cmd,
+            filter_limiter_name,
+            lambda entry: self._resolve_limiter_client(logger, args, tm, pf, entry),
+        )
+
         ret = dict(success=dict(data=results))
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         return self.RESP_SUCCESS, ret, None
@@ -189,3 +241,52 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
         class Result(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
+
+    def is_cluster_redirect(self):
+        return False
+
+    def svrun(self, data_dir: Any, logger: logging.Logger, redis_cli: redis_client.RedisClient, msg: List[str],
+              sessions: Dict[str, Dict[str, Any]]) -> int:
+        reskey = msg[1]
+        try:
+            payload = json.loads(convert.b64str2str(msg[2]))
+            options = Options.getInstance()
+            filter_target_mode = payload.get('filter_target_mode', None)
+            filter_target_cmd = payload.get('filter_target_cmd', None)
+            filter_limiter_name = payload.get('filter_limiter_name', None)
+            include_history = payload.get('include_history', False)
+
+            lt: List[Dict[str, Any]] = []
+            limiter_dir = data_dir / '.limiter'
+            if limiter_dir.exists() and limiter_dir.is_dir():
+                for p in sorted(limiter_dir.glob("limiter-*.json")):
+                    name = p.stem
+                    if not name.startswith('limiter-'):
+                        continue
+                    with p.open('r', encoding='utf-8') as f:
+                        cfg = json.load(f)
+                    lt.append(dict(
+                        name=name[len('limiter-'):],
+                        limiter_title=cfg.get('limiter_title', None),
+                        target_mode=cfg.get('target_mode', None),
+                        target_cmd=cfg.get('target_cmd', None),
+                        target_option=cfg.get('target_option', None),
+                        history_end=cfg.get('history_end', None),
+                    ))
+
+            results = self._collect_targets(
+                options,
+                lt,
+                filter_target_mode,
+                filter_target_cmd,
+                filter_limiter_name,
+                lambda entry: self._resolve_limiter_server(data_dir, logger, redis_cli, entry['name'], include_history),
+            )
+
+            redis_cli.rpush(reskey, dict(success=dict(data=results)))
+            return self.RESP_SUCCESS
+        except Exception as e:
+            result = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}")
+            logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
+            redis_cli.rpush(reskey, result)
+            return self.RESP_WARN

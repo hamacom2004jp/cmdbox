@@ -61,7 +61,7 @@ def _apprun_post(self:'LimitedFeature', stime:float, msg:Dict[str, Any], data_di
     registrations = self.apprun_registrations(data_dir, logger, args, msg)
     limit.update(feat=self, data_dir=data_dir, logger=logger, command_options=args.__dict__,
                     count=count, exec_time=exec_time, input_bytes=input_bytes, process_bytes=process_bytes,
-                    output_bytes=output_bytes, credits=credits, registrations=registrations)
+                    output_bytes=output_bytes, credits=credits, registrations=registrations, scope='client')
 
 def apprun_check_limit(func: Callable) -> Callable:
     """
@@ -174,7 +174,7 @@ def _svrun_post(self:'LimitedFeature', data_dir:Path, logger:logging.Logger, red
     registrations = self.svrun_registrations(data_dir, logger, command_options, resval)
     limit.update(feat=self, data_dir=data_dir, logger=logger, command_options=command_options,
                     count=count, exec_time=exec_time, input_bytes=input_bytes, process_bytes=process_bytes,
-                    output_bytes=output_bytes, credits=credits, registrations=registrations)
+                    output_bytes=output_bytes, credits=credits, registrations=registrations, scope='server')
     redis_cli.last_ressize = None
     redis_cli.last_resval = None
 
@@ -1208,7 +1208,8 @@ return cjson.encode(c)
                process_bytes: int = 0,
                output_bytes: int = 0,
                credits: int = 0,
-               registrations: int = 0) -> None:
+               registrations: int = 0,
+               scope: str = 'server') -> None:
         """
         コマンド実行後にカウンタを更新します。
 
@@ -1227,8 +1228,9 @@ return cjson.encode(c)
             output_bytes (int): 出力バイト数
             credits (int): 使用クレジット数
             registrations (int): 登録数（又は登録サイズ）
+            scope (str): スコープ。'server' または 'client'（デフォルト: 'server'）
         """
-        configs = self.load_configs(data_dir, scope='server')
+        configs = self.load_configs(data_dir, scope=scope)
 
         for config in configs:
             limiter_name = config.get('limiter_name')
@@ -1247,25 +1249,25 @@ return cjson.encode(c)
                     except (ValueError, TypeError):
                         pass
 
-                counter = self.load_counter(data_dir, limiter_name, scope='server')
+                counter = self.load_counter(data_dir, limiter_name, scope=scope)
                 needs_reset = self.needs_reset(config, counter)
                 max_history_interval = config.get('max_history_interval')
                 last_update = datetime.now().isoformat()
                 if self.redis_client is not None:
                     # Redis が有効な場合は Lua スクリプトでアトミックにインクリメント
                     if needs_reset:
-                        self._save_evidence_file(data_dir, limiter_name, config, counter, scope='server')
+                        self._save_evidence_file(data_dir, limiter_name, config, counter, scope=scope)
                     deltas = dict(count=count, exec_time=exec_time, input_bytes=input_bytes,
                                   process_bytes=process_bytes, output_bytes=output_bytes,
                                   credits=credits, registrations=registrations)
                     self._atomic_increment_redis(
-                        data_dir, limiter_name, deltas, last_update, scope='server', reset=needs_reset,
+                        data_dir, limiter_name, deltas, last_update, scope=scope, reset=needs_reset,
                         max_history_interval=int(max_history_interval) if max_history_interval is not None else None
                     )
                 else:
                     # Redis なし: ファイルのみ（従来動作）
                     if needs_reset:
-                        self._save_evidence_file(data_dir, limiter_name, config, counter, scope='server')
+                        self._save_evidence_file(data_dir, limiter_name, config, counter, scope=scope)
                         counter = self.reset_counter(limiter_name)
                     counter['total_count'] = counter.get('total_count', 0) + count
                     counter['total_time'] = counter.get('total_time', 0.0) + exec_time

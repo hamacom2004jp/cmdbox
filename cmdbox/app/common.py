@@ -263,7 +263,7 @@ def remove_meta(file_path:Path) -> None:
     meta_file = meta_dir / f'{Path(file_path).name}.json'
     if meta_file.exists():
         os.remove(meta_file)
-    if not any(meta_dir.iterdir()):
+    if meta_dir.is_dir() and not any(meta_dir.iterdir()):
         meta_dir.rmdir()
 
 class CommonValue:
