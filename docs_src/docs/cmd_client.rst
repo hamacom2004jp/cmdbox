@@ -27,6 +27,7 @@ client ( file_copy ) : ``cmdbox -m client -c file_copy <Option>``
     "--from_rjpath <from_rjpath>","file","multi","","","","If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."
     "--to_rjpath <to_rjpath>","file","multi","","","","If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."
     "--overwrite <overwrite>","bool","","","False","True | False","Overwrites the copy even if it exists at the destination."
+    "--meta <meta>","dict","multi","","","","Specify the metadata."
     "--scope <scope>","str","","required","client","client | current | server","Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory."
     "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
@@ -94,11 +95,13 @@ client ( file_download ) : ``cmdbox -m client -c file_download <Option>``
     "--svname <svname>","str","","required","cmdbox","","Specify the service name of the inference server. If omitted, `server` is used."
     "--svpath <svpath>","file","","required","/","","Specify the directory path to get the list of files."
     "--fwpath <fwpath>","file","multi","required","","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
+    "--rjpath <rjpath>","file","multi","","","","If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."
     "--etag <etag>","str","","","","","Specify the ETag. If the ETag matches the file's ETag on the server, the file content will not be downloaded and an empty response will be returned."
     "--scope <scope>","str","","required","client","client | current | server","Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory."
     "--rpath <rpath>","str","","","","","Specifies the request path. This value is returned in the response without any modification."
     "--download_file <download_file>","file","","","","","Specify the destination path of the client."
     "--img_thumbnail <img_thumbnail>","float","","","0.0","","Specifies the size in pixels of the thumbnail if the subject is an image."
+    "--meta <meta>","dict","multi","","","","Specify the metadata."
     "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","15","","Specify the maximum waiting time until the server responds."
@@ -122,6 +125,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
         "mime_type": "string",
         "etag": "string",
         "not_modified": false,
+        "meta": {},
         "rpath": "string",
         "svpath": "string"
       },
@@ -143,6 +147,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.mime_type","str | null","no","null","MIMEタイプ"
     "success.etag","str | null","no","null","ETag"
     "success.not_modified","bool | null","no","null","未更新フラグ"
+    "success.meta","dict[str, any] | null","no","null","メタデータ"
     "success.rpath","str | Path | null","no","null","リクエストパス"
     "success.svpath","str | Path | null","no","null","サーバーパス"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
@@ -363,6 +368,7 @@ client ( file_move ) : ``cmdbox -m client -c file_move <Option>``
     "--to_fwpath <to_fwpath>","file","multi","required","","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
     "--from_rjpath <from_rjpath>","file","multi","","","","If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."
     "--to_rjpath <to_rjpath>","file","multi","","","","If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."
+    "--meta <meta>","dict","multi","","","","Specify the metadata."
     "--scope <scope>","str","","required","client","client | current | server","Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory."
     "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
@@ -561,6 +567,7 @@ client ( file_upload ) : ``cmdbox -m client -c file_upload <Option>``
     "--upload_file <upload_file>","file","","","","","Specify the source path of the client."
     "--mkdir <mkdir>","bool","","","False","True | False","If there is no in between folder, create one."
     "--overwrite <overwrite>","bool","","","False","True | False","Overwrites the file even if it exists at the upload destination."
+    "--meta <meta>","dict","multi","","","","Specify the metadata."
     "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","15","","Specify the maximum waiting time until the server responds."

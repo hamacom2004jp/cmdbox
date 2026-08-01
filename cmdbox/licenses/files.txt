@@ -234,6 +234,7 @@ Chris Guidry <guid@omg.lol>	MIT License	uncalled-for	https://github.com/chrisgui
 Andrey Petrov <andrey.petrov@shazow.net>	MIT	urllib3	https://github.com/urllib3/urllib3/blob/main/CHANGES.rst	2.7.0	cmdbox\licenses\LICENSE_urllib3_2_7_0_MIT.txt
 Amin Alaee <mohammadamin.alaee@gmail.com>	BSD-3-Clause	uuid_utils	https://github.com/aminalaee/uuid-utils	0.16.2	cmdbox\licenses\LICENSE_uuid_utils_0_16_2_BSD-3-Clause.txt
 Tom Christie <tom@tomchristie.com>	BSD-3-Clause	uvicorn	https://uvicorn.dev/	0.50.0	cmdbox\licenses\LICENSE_uvicorn_0_50_0_BSD-3-Clause.txt
+Hiroshiba <hihokaruta@gmail.com>	MIT	voicevox_core	UNKNOWN	0.16.3	cmdbox\licenses\LICENSE_voicevox_core_0_16_3_MIT.txt
 Mickaël Schoentgen	Apache Software License	watchdog	https://github.com/gorakhargosh/watchdog	6.0.0	cmdbox\licenses\LICENSE_watchdog_6_0_0_Apache_Software_License.txt
 Samuel Colvin <s@muelcolvin.com>	MIT License	watchfiles	https://github.com/samuelcolvin/watchfiles	1.2.0	cmdbox\licenses\LICENSE_watchfiles_1_2_0_MIT_License.txt
 Jeff Quast <contact@jeffquast.com>	MIT	wcwidth	https://github.com/jquast/wcwidth	0.8.2	cmdbox\licenses\LICENSE_wcwidth_0_8_2_MIT.txt

@@ -922,7 +922,7 @@ cmdbox.init_version_modal = () => {
                 if(i==0) {
                     div.addClass('d-flex');
                     div.addClass('m-3');
-                    div.append(`<h4><pre class="m-0">${v}</pre></h4>`);
+                    $(`<h4><pre class="m-0">${v}</pre></h4>`).css('font-size', 'small').appendTo(div);
                 } else if(i==1) {
                     div.addClass('m-3');
                     div.append(`<h4>${v}</h4>`);

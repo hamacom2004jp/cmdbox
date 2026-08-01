@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( client mode ) &mdash; cmdbox 2026/07/20 documentation</title>
+  <title>Command Reference ( client mode ) &mdash; cmdbox 2026/08/01 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=91640ad9"></script>
+      <script src="../_static/documentation_options.js?v=16e07ade"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -236,7 +236,15 @@
 <td><p>True | False</p></td>
 <td><p>Overwrites the copy even if it exists at the destination.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;scope&gt;</p></td>
+<tr class="row-odd"><td><p>--meta &lt;meta&gt;</p></td>
+<td><p>dict</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the metadata.</p></td>
+</tr>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -244,7 +252,7 @@
 <td><p>client | current | server</p></td>
 <td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -252,7 +260,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -260,7 +268,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -465,7 +473,15 @@
 <td></td>
 <td><p>Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error.</p></td>
 </tr>
-<tr class="row-even"><td><p>--etag &lt;etag&gt;</p></td>
+<tr class="row-even"><td><p>--rjpath &lt;rjpath&gt;</p></td>
+<td><p>file</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>If the specified path matches the requested path, access will be denied. Interpreted as a regular expression.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--etag &lt;etag&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -473,7 +489,7 @@
 <td></td>
 <td><p>Specify the ETag. If the ETag matches the file's ETag on the server, the file content will not be downloaded and an empty response will be returned.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;scope&gt;</p></td>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -481,7 +497,7 @@
 <td><p>client | current | server</p></td>
 <td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
-<tr class="row-even"><td><p>--rpath &lt;rpath&gt;</p></td>
+<tr class="row-odd"><td><p>--rpath &lt;rpath&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -489,7 +505,7 @@
 <td></td>
 <td><p>Specifies the request path. This value is returned in the response without any modification.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--download_file &lt;download_file&gt;</p></td>
+<tr class="row-even"><td><p>--download_file &lt;download_file&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -497,13 +513,21 @@
 <td></td>
 <td><p>Specify the destination path of the client.</p></td>
 </tr>
-<tr class="row-even"><td><p>--img_thumbnail &lt;img_thumbnail&gt;</p></td>
+<tr class="row-odd"><td><p>--img_thumbnail &lt;img_thumbnail&gt;</p></td>
 <td><p>float</p></td>
 <td></td>
 <td></td>
 <td><p>0.0</p></td>
 <td></td>
 <td><p>Specifies the size in pixels of the thumbnail if the subject is an image.</p></td>
+</tr>
+<tr class="row-even"><td><p>--meta &lt;meta&gt;</p></td>
+<td><p>dict</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the metadata.</p></td>
 </tr>
 <tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
@@ -546,6 +570,7 @@
 <span class="w">    </span><span class="nt">&quot;mime_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;etag&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;not_modified&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;meta&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
 <span class="w">    </span><span class="nt">&quot;rpath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;svpath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
 <span class="w">  </span><span class="p">},</span>
@@ -615,49 +640,55 @@
 <td><p>null</p></td>
 <td><p>未更新フラグ</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.rpath</p></td>
+<tr class="row-odd"><td><p>success.meta</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>メタデータ</p></td>
+</tr>
+<tr class="row-even"><td><p>success.rpath</p></td>
 <td><p>str | Path | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>リクエストパス</p></td>
 </tr>
-<tr class="row-even"><td><p>success.svpath</p></td>
+<tr class="row-odd"><td><p>success.svpath</p></td>
 <td><p>str | Path | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>サーバーパス</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn</p></td>
+<tr class="row-even"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>warn.performance</p></td>
+<tr class="row-odd"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>error</p></td>
+<tr class="row-even"><td><p>error</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>error.performance</p></td>
+<tr class="row-odd"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>output_schema</p></td>
+<tr class="row-even"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-even"><td><p>end</p></td>
+<tr class="row-odd"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -1494,7 +1525,15 @@
 <td></td>
 <td><p>If the specified path matches the requested path, access will be denied. Interpreted as a regular expression.</p></td>
 </tr>
-<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
+<tr class="row-even"><td><p>--meta &lt;meta&gt;</p></td>
+<td><p>dict</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the metadata.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--scope &lt;scope&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -1502,7 +1541,7 @@
 <td><p>client | current | server</p></td>
 <td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1510,7 +1549,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1518,7 +1557,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -2211,7 +2250,15 @@
 <td><p>True | False</p></td>
 <td><p>Overwrites the file even if it exists at the upload destination.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-odd"><td><p>--meta &lt;meta&gt;</p></td>
+<td><p>dict</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the metadata.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -2219,7 +2266,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -2227,7 +2274,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>

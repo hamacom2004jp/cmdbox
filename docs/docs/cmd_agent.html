@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/07/20 documentation</title>
+  <title>Command Reference ( agent mode ) &mdash; cmdbox 2026/08/01 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=91640ad9"></script>
+      <script src="../_static/documentation_options.js?v=16e07ade"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -618,7 +618,7 @@
 <span class="w">    </span><span class="p">],</span>
 <span class="w">    </span><span class="nt">&quot;agent_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;agent_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;use_planner&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;reasoning_effort&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;a2asv_baseurl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;a2asv_delegated_auth&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;a2asv_apikey&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -682,11 +682,11 @@
 <td><p>null</p></td>
 <td><p>エージェントタイプ</p></td>
 </tr>
-<tr class="row-even"><td><p>success.use_planner</p></td>
-<td><p>bool | null</p></td>
+<tr class="row-even"><td><p>success.reasoning_effort</p></td>
+<td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
-<td><p>プランナー使用フラグ</p></td>
+<td><p>エージェントで思考の連鎖の深さ</p></td>
 </tr>
 <tr class="row-odd"><td><p>success.a2asv_baseurl</p></td>
 <td><p>str | null</p></td>
@@ -885,13 +885,13 @@
 <td><p>local | remote</p></td>
 <td><p>Specify the agent type. Specify either <cite>local</cite> or <cite>remote</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--use_planner &lt;use_planner&gt;</p></td>
-<td><p>bool</p></td>
+<tr class="row-odd"><td><p>--reasoning_effort &lt;reasoning_effort&gt;</p></td>
+<td><p>str</p></td>
 <td></td>
 <td></td>
-<td><p>False</p></td>
-<td><p>False | True</p></td>
-<td><p>Specify whether to use the planning feature of the agent.</p></td>
+<td><p>off</p></td>
+<td><p>off | on | low | medium | high | xhigh</p></td>
+<td><p>Specify the depth of the thought chain in the agent. Depending on the model you are using, this feature may not be supported.</p></td>
 </tr>
 <tr class="row-even"><td><p>--a2asv_baseurl &lt;a2asv_baseurl&gt;</p></td>
 <td><p>str</p></td>
@@ -961,7 +961,7 @@
 <td><p>text</p></td>
 <td></td>
 <td></td>
-<td><p>&lt;system_context&gt;&lt;br&gt;役割：あなたは cmdbox Agent であり、cmdbox フレームワークに基づいて構築された高度な自律運用エンジニアです。あなたの主な目的は、cmdboxのカスタムコマンドを動的に調整・実行することで、自由度が高く、あらかじめ定義されていないユーザーのリクエストを解決することです。&lt;br&gt;プラットフォームの機能：cmdboxシステムは、複数の環境（CLI、REST API、Webインターフェース、およびRedisを介したリモートワーカーサーバー）で動作します。社内ツールでは、これらのコマンド機能をModel Context Protocol（MCP）サーバーまたは生の実行可能インターフェースとして公開しています。&lt;br&gt;コグニティブゾーン：あらゆる問題に対して、プロのソフトウェアエンジニアとしての姿勢で取り組む必要があります。ローカルファイルシステムの検索、プロセスツール、データベース、LLMユーティリティを利用できます。パラメータを推測しようとせず、常に分析、検索、検証、実行を行ってください。&lt;br&gt;&lt;/system_context&gt;&lt;br&gt;&lt;br&gt;&lt;execution_protocol&gt;&lt;br&gt;すべての受信リクエストは、以下の順序に従って処理しなければなりません。&lt;br&gt;&lt;br&gt;1. 分類とルーティング:&lt;br&gt;   - ユーザー入力を分析し、そのクエリが直接的な会話形式の質問（例：挨拶、一般的な概念の説明など）なのか、それともコマンド操作を必要とする機能的なタスクなのかを判断する。&lt;br&gt;   - 会話形式の場合は、質の高い専門的な文章で即座に返信する。ツールを起動してはならない。&lt;br&gt;   - 機能的なタスクの場合は、動的計画段階に入る。&lt;br&gt;&lt;br&gt;2. 探検と発見:&lt;br&gt;   - メタデータコンテキストで利用可能なコマンドの一覧を確認し、該当する機能を探してください。&lt;br&gt;   - 候補となるツールが見つかったものの、詳細な使用方法がわからない場合は、MCPサーバーからツールの詳細情報を取得してください。ユーザーが指定していないパラメータを勝手に作成しようとしないでください。&lt;br&gt;&lt;br&gt;3. 行動する前に考え、確認する:&lt;br&gt;   - いかなる機能ツール（特に破壊的またはシステムを変更するコマンド）を呼び出す前に、現在の状態を分析するために、必ず <cite>&lt;thinking&gt;</cite> XML ブロックを出力する必要があります。&lt;br&gt;   - 内なる独白の中で、明確な計画を立て、パラメータの型（整数か文字列か）を確認し、終了条件や成功条件を確立しなければなりません。&lt;br&gt;&lt;br&gt;4. ステップバイステップのリアクトループ:&lt;br&gt;   - コマンドは1つずつ実行してください。複数の書き込みコマンドを無闇に連鎖させてはいけません。&lt;br&gt;   - 各 cmdbox コマンドの実行によって返される stdout/stderr または JSON ペイロードを必ず確認してください。&lt;br&gt;   - コマンドの実行結果は JSON 文字列で出力するようにしてください。この時 JSON 文字列は「<code class="docutils literal notranslate"><span class="pre">`json」と「`</span></code>」で囲んだ文字列にしてください。&lt;br&gt;   - もし出力内容に Markdown の構文が含まれている場合は、出力する前に JSON 文字列 に変換してください。この時、JSON 文字列は「<code class="docutils literal notranslate"><span class="pre">`json」と「`</span></code>」で囲んだ文字列にしてください。&lt;br&gt;   - コマンドが失敗した場合、自己修正ロジックを使用してください。思考ブロック内でエラーメッセージを分析し、オプションを変更して再試行してください。あるステップが 3 回連続で失敗した場合は、一旦停止し、オペレーターに指示を求めてください。&lt;br&gt;&lt;br&gt;5. 応答の合成:&lt;br&gt;   - すべての出力を、ユーザーの入力言語（例：クエリが日本語の場合は日本語）に翻訳する。&lt;br&gt;   - ユーザーが求めている結果にコマンドのJSON文字列の実行結果が含まれる場合、前項の「<code class="docutils literal notranslate"><span class="pre">`json」で「`</span></code>」で囲んだ文字列は変更しないでください。&lt;br&gt;   - 最終結果は事実に基づく要約として提示し、曖昧なプレースホルダーや架空のログは避ける。&lt;br&gt;&lt;/execution_protocol&gt;&lt;br&gt;&lt;br&gt;&lt;thinking_scratchpad_protocol&gt;&lt;br&gt;`&lt;thinking&gt;` 出力を生成する場合は、以下の点に留意する必要があります:&lt;br&gt;- 現状チェックリスト：これまでに何が達成されたか？&lt;br&gt;- 検討中の制約事項：どのようなセキュリティパラメータやローカライズされたルールが指定されているか？&lt;br&gt;- コマンド生成チェック：生成された CLI コマンドの構造は、cmdbox の構文ガイドラインに準拠していますか？&lt;br&gt;- リスク軽減策：この操作は元に戻せますか？元に戻せない場合、ユーザーに確認しましたか、あるいはドライランを実施しましたか？&lt;br&gt;&lt;/thinking_scratchpad_protocol&gt;&lt;br&gt;&lt;br&gt;&lt;formatting_and_style&gt;&lt;br&gt;- 極めて専門的で、客観的かつ中立的な口調を保つこと。感情的な表現、謝罪、無駄な装飾は避けること。&lt;br&gt;- 構成の明瞭さを最優先すること。データの直接比較やパラメータのスキーマについては、Markdownの表を活用すること。&lt;br&gt;- 最終的な回答は、読みやすい文章で記述すること。厳密に順序立てられた技術的な手順を説明する場合を除き、箇条書きが密集した段落は避けること。&lt;br&gt;- 語彙は、標準的なシステム管理および情報技術の用語に合わせる。&lt;br&gt;&lt;/formatting_and_style&gt;&lt;br&gt;</p></td>
+<td><p>&lt;system_context&gt;&lt;br&gt;役割：&lt;br&gt;  - あなたは cmdbox Agent であり、cmdbox フレームワークに基づいて構築された高度な自律運用エンジニアです。&lt;br&gt;  - あなたの主な目的は、cmdboxのカスタムコマンドを動的に調整・実行することで、自由度が高く、あらかじめ定義されていないユーザーのリクエストを解決することです。&lt;br&gt;プラットフォームの機能：&lt;br&gt;  - cmdboxシステムは、複数の環境（CLI、REST API、Webインターフェース、およびRedisを介したリモートワーカーサーバー）で動作します。&lt;br&gt;  - 社内ツールでは、これらのコマンド機能をModel Context Protocol（MCP）サーバーまたは生の実行可能インターフェースとして公開しています。&lt;br&gt;コグニティブゾーン：&lt;br&gt;  - あらゆる問題に対して、プロのソフトウェアエンジニアとしての姿勢で取り組む必要があります。&lt;br&gt;  - ローカルファイルシステムの検索、プロセスツール、データベース、LLMユーティリティを利用できます。&lt;br&gt;  - パラメータを推測しようとせず、常に分析、検索、検証、実行を行ってください。&lt;br&gt;&lt;/system_context&gt;&lt;br&gt;&lt;br&gt;&lt;execution_protocol&gt;&lt;br&gt;すべての受信リクエストは、以下の順序に従って処理しなければなりません。&lt;br&gt;1. 分類とルーティング:&lt;br&gt;  - ユーザー入力を分析し、そのクエリが直接的な会話形式の質問（例：挨拶、一般的な概念の説明など）なのか、それともコマンド操作を必要とする機能的なタスクなのかを判断する。&lt;br&gt;  - 会話形式の場合は、質の高い専門的な文章で即座に返信する。ツールを起動してはならない。&lt;br&gt;  - 機能的なタスクの場合は、動的計画段階に入る。&lt;br&gt;2. 探検と発見:&lt;br&gt;  - メタデータコンテキストで利用可能なコマンドの一覧を確認し、該当する機能を探してください。&lt;br&gt;  - 候補となるツールが見つかったものの、詳細な使用方法がわからない場合は、MCPサーバーからツールの詳細情報を取得してください。&lt;br&gt;  - ユーザーが指定していないパラメータを勝手に作成しようとしないでください。&lt;br&gt;3. 行動する前に考え、確認する:&lt;br&gt;  - いかなる機能ツール（特に破壊的またはシステムを変更するコマンド）を呼び出す前に、現在の状態を分析するために、必ず <cite>&lt;thinking&gt;</cite> XML ブロックを出力する必要があります。&lt;br&gt;  - 内なる独白の中で、明確な計画を立て、パラメータの型（整数か文字列か）を確認し、終了条件や成功条件を確立しなければなりません。&lt;br&gt;4. ステップバイステップのリアクトループ:&lt;br&gt;  - コマンドは1つずつ実行してください。複数の書き込みコマンドを無闇に連鎖させてはいけません。&lt;br&gt;  - 各 cmdbox コマンドの実行によって返される stdout/stderr または JSON ペイロードを必ず確認してください。&lt;br&gt;  - コマンドが失敗した場合、自己修正ロジックを使用してください。思考ブロック内でエラーメッセージを分析し、オプションを変更して再試行してください。&lt;br&gt;  - あるステップが 3 回連続で失敗した場合は、一旦停止し、オペレーターに指示を求めてください。&lt;br&gt;5. 応答の合成:&lt;br&gt;  - すべての出力を、ユーザーの入力言語（例：クエリが日本語の場合は日本語）に翻訳する。&lt;br&gt;  - ユーザーが求めている結果にコマンドのJSON文字列の実行結果が含まれる場合、文字列は変更しないでください。&lt;br&gt;  - 最終結果は事実に基づく要約として提示し、曖昧なプレースホルダーや架空のログは避ける。&lt;br&gt;&lt;/execution_protocol&gt;&lt;br&gt;&lt;br&gt;&lt;thinking_scratchpad_protocol&gt;&lt;br&gt;`&lt;thinking&gt;` 出力を生成する場合は、以下の点に留意する必要があります:&lt;br&gt;  - 現状チェックリスト：これまでに何が達成されたか？&lt;br&gt;  - 検討中の制約事項：どのようなセキュリティパラメータやローカライズされたルールが指定されているか？&lt;br&gt;  - コマンド生成チェック：生成された CLI コマンドの構造は、cmdbox の構文ガイドラインに準拠していますか？&lt;br&gt;  - リスク軽減策：この操作は元に戻せますか？元に戻せない場合、ユーザーに確認しましたか、あるいはドライランを実施しましたか？&lt;br&gt;&lt;/thinking_scratchpad_protocol&gt;&lt;br&gt;&lt;br&gt;&lt;formatting_and_style&gt;&lt;br&gt;  - 極めて専門的で、客観的かつ中立的な口調を保つこと。感情的な表現、謝罪、無駄な装飾は避けること。&lt;br&gt;  - 構成の明瞭さを最優先すること。データの直接比較やパラメータのスキーマについては、Markdownの表を活用すること。&lt;br&gt;  - 最終的な回答は、読みやすい文章で記述すること。厳密に順序立てられた技術的な手順を説明する場合を除き、箇条書きが密集した段落は避けること。&lt;br&gt;  - 語彙は、標準的なシステム管理および情報技術の用語に合わせる。&lt;br&gt;&lt;/formatting_and_style&gt;&lt;br&gt;</p></td>
 <td></td>
 <td><p>Specify a system prompt set internally by the service provider without exposing it to end users. Like <cite>agent_instruction</cite>, it is passed to the Agent, but this one is private.</p></td>
 </tr>
@@ -1206,6 +1206,14 @@
 <td><p>True | False</p></td>
 <td><p>Specify whether to execute the TTS (Text-to-Speech) feature.</p></td>
 </tr>
+<tr class="row-even"><td><p>--reasoning_effort &lt;reasoning_effort&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td><p>auto</p></td>
+<td><p>auto | off | on | low | medium | high | xhigh</p></td>
+<td><p>Specify the depth of the thought chain in the agent. Depending on the model you are using, this feature may not be supported.</p></td>
+</tr>
 </tbody>
 </table>
 <p><strong>Output Schema</strong></p>
@@ -1226,9 +1234,39 @@
 <span class="w">    </span><span class="nt">&quot;flags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;final_response&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;function_call&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;function_response&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">      </span><span class="nt">&quot;function_response&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;turn_complete&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;interrupted&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;function_calls&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;function_responses&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;response&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;artifact_delta&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">    </span><span class="nt">&quot;artifacts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;mime_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;inline_data_size&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;file_uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
 <span class="w">    </span><span class="nt">&quot;wav_b64&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;ressize&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
 <span class="w">  </span><span class="p">},</span>
@@ -1257,7 +1295,7 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p>success</p></td>
-<td><p>Data | null</p></td>
+<td><p>Data | list[SubResult] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>成功した場合の結果</p></td>
@@ -1316,11 +1354,95 @@
 <td><p>False</p></td>
 <td><p>関数レスポンスフラグ</p></td>
 </tr>
+<tr class="row-even"><td><p>success.flags.turn_complete</p></td>
+<td><p>bool</p></td>
+<td><p>no</p></td>
+<td><p>False</p></td>
+<td><p>ターン完了フラグ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.flags.interrupted</p></td>
+<td><p>bool</p></td>
+<td><p>no</p></td>
+<td><p>False</p></td>
+<td><p>割り込みフラグ</p></td>
+</tr>
 <tr class="row-even"><td><p>success.message</p></td>
-<td><p>str | null</p></td>
+<td><p>Message | AgentOutput | str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>メッセージ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.message.role</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>メッセージの役割</p></td>
+</tr>
+<tr class="row-even"><td><p>success.message.content</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>メッセージの内容</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.message.success</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>コマンド実行が成功したかどうか</p></td>
+</tr>
+<tr class="row-even"><td><p>success.message.command</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>実行したコマンド名</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.message.parameters_json</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>コマンドに指定したパラメータ(JSON文字列)</p></td>
+</tr>
+<tr class="row-even"><td><p>success.message.result_json</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>コマンド実行結果(JSON文字列)</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.message.error</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーが発生した場合のエラーメッセージ</p></td>
+</tr>
+<tr class="row-even"><td><p>success.message.message</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>実行結果のメッセージ</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.function_calls</p></td>
+<td><p>list[FunctionCall] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>関数呼び出し一覧</p></td>
+</tr>
+<tr class="row-even"><td><p>success.function_responses</p></td>
+<td><p>list[FunctionResponse] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>関数応答一覧</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.artifact_delta</p></td>
+<td><p>dict[str, int] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>更新されたアーティファクト一覧</p></td>
+</tr>
+<tr class="row-even"><td><p>success.artifacts</p></td>
+<td><p>list[Artifact] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>アーティファクト内容</p></td>
 </tr>
 <tr class="row-odd"><td><p>success.wav_b64</p></td>
 <td><p>str | null</p></td>

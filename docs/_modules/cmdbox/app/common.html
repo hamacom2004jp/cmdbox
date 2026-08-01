@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.common &mdash; cmdbox 2026/07/05 documentation</title>
+  <title>cmdbox.app.common &mdash; cmdbox 2026/08/01 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=00f234ef"></script>
+      <script src="../../../_static/documentation_options.js?v=16e07ade"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -88,7 +88,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rich.console</span><span class="w"> </span><span class="kn">import</span> <span class="n">Console</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">tabulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">tabulate</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
@@ -262,7 +262,7 @@
 
 <div class="viewcode-block" id="save_file">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.save_file">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">meta</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    ファイルに書き込みます。書き込み時に排他ロックします。</span>
 
@@ -272,16 +272,18 @@
 <span class="sd">        mode (str, optional): ファイルモード. Defaults to &#39;w&#39;.</span>
 <span class="sd">        encoding (str, optional): エンコーディング. Defaults to &#39;utf-8&#39;.</span>
 <span class="sd">        nolock (bool, optional): 排他ロックを行わない場合はTrue. Defaults to True.</span>
+<span class="sd">        meta (Dict[str, Any], optional): メタデータ. Defaults to None.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_save</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_save</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">meta</span><span class="p">):</span>
         <span class="k">if</span> <span class="s1">&#39;b&#39;</span> <span class="ow">in</span> <span class="n">mode</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">func</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">func</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">save_meta</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">nolock</span><span class="p">:</span>
-        <span class="n">_save</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span>
+        <span class="n">_save</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
         <span class="k">return</span>
     <span class="n">lock_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s1">.lock&#39;</span>
     <span class="k">try</span><span class="p">:</span>
@@ -293,7 +295,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="kn">import</span><span class="w"> </span><span class="nn">fcntl</span>
                     <span class="n">fcntl</span><span class="o">.</span><span class="n">lockf</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">fcntl</span><span class="o">.</span><span class="n">LOCK_EX</span><span class="p">)</span>
-                <span class="n">_save</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span>
+                <span class="n">_save</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
             <span class="k">finally</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s1">&#39;win32&#39;</span><span class="p">:</span>
                     <span class="n">msvcrt</span><span class="o">.</span><span class="n">locking</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="n">msvcrt</span><span class="o">.</span><span class="n">LK_UNLCK</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -304,6 +306,102 @@
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">lock_file</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="save_meta">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.save_meta">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_meta</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">meta</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;%Y/%m/</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    メタデータを保存します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path (Path): ファイルのパス</span>
+<span class="sd">        meta (Dict[str, Any]): メタデータ</span>
+<span class="sd">        encoding (str, optional): エンコーディング. Defaults to &#39;utf-8&#39;.</span>
+<span class="sd">        format (str, optional): 日時フォーマット. Defaults to &#39;%Y/%m/%d %H:%M:%S&#39;.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict[str, Any]: 保存したメタデータ</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">meta</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">dict</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{}</span>
+    <span class="n">meta_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;.meta&#39;</span>
+    <span class="k">if</span> <span class="n">meta_dir</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">meta_dir</span><span class="p">)</span>
+    <span class="n">meta_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">meta_file</span> <span class="o">=</span> <span class="n">meta_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.json&#39;</span>
+    <span class="n">old_meta</span> <span class="o">=</span> <span class="n">load_meta</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">meta_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">{</span><span class="o">**</span><span class="n">old_meta</span><span class="p">,</span> <span class="o">**</span><span class="n">meta</span><span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="p">}</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">meta</span></div>
+
+
+<div class="viewcode-block" id="load_meta">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.load_meta">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_meta</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;%Y/%m/</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    メタデータを読み込みます。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path (Path): ファイルのパス</span>
+<span class="sd">        encoding (str, optional): エンコーディング. Defaults to &#39;utf-8&#39;.</span>
+<span class="sd">        format (str, optional): 日時フォーマット. Defaults to &#39;%Y/%m/%d %H:%M:%S&#39;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict[str, Any]: 読み込んだメタデータ</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">meta_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;.meta&#39;</span>
+    <span class="k">if</span> <span class="n">meta_dir</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">meta_dir</span><span class="p">)</span>
+    <span class="n">meta_file</span> <span class="o">=</span> <span class="n">meta_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.json&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">meta_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">{}</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">meta_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">format_dtvalue</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="format_dtvalue">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.format_dtvalue">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_dtvalue</span><span class="p">(</span><span class="n">d</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="nb">format</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;%Y/%m/</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    isoformatの文字列の値をフォーマットします。</span>
+<span class="sd">    dictの値がdictの場合は再帰的に処理します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        d (Union[dict, str]): フォーマットする辞書またはisoformatの文字列</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># datetime型に変換してからフォーマットする</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="nb">format</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="c1"># datetimeじゃなかったら何もしない</span>
+            <span class="k">return</span> <span class="n">d</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">format_dtvalue</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="remove_meta">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.common.remove_meta">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_meta</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span><span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    メタデータを削除します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path (Path): ファイルのパス</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">meta_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;.meta&#39;</span>
+    <span class="k">if</span> <span class="n">meta_dir</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">meta_dir</span><span class="p">)</span>
+    <span class="n">meta_file</span> <span class="o">=</span> <span class="n">meta_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.json&#39;</span>
+    <span class="k">if</span> <span class="n">meta_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">meta_file</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">meta_dir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">meta_dir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
+        <span class="n">meta_dir</span><span class="o">.</span><span class="n">rmdir</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="CommonValue">

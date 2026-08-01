@@ -31,6 +31,7 @@ a2asv ( start ) : ``cmdbox -m a2asv -c start <Option>``
     "--signin_file <signin_file>","file","","required",".cmdbox/user_list.yml","","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
     "--gunicorn_workers <gunicorn_workers>","int","","","6","","Specifies the number of gunicorn workers, valid only in Linux environment. If -1 or unspecified, the number of CPUs is used."
     "--gunicorn_timeout <gunicorn_timeout>","int","","","900","","Specify the timeout duration of the gunicorn worker in seconds."
+    "--reasoning_effort <reasoning_effort>","str","","","auto","auto | off | on | low | medium | high | xhigh","Use the agent to specify the depth of the thought chain. You can specify values such as 'auto', 'off', 'on', 'low', 'medium', 'high', or 'xhigh', but depending on the model you're using, some of these may not be supported."
 
 **Output Schema**
 

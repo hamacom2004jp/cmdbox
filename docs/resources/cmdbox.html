@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox package &mdash; cmdbox 2026/07/20 documentation</title>
+  <title>cmdbox package &mdash; cmdbox 2026/08/01 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=91640ad9"></script>
+      <script src="../_static/documentation_options.js?v=16e07ade"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -145,6 +145,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.encrypt"><code class="docutils literal notranslate"><span class="pre">encrypt()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.exec_svrun_sync"><code class="docutils literal notranslate"><span class="pre">exec_svrun_sync()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.exec_sync"><code class="docutils literal notranslate"><span class="pre">exec_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.format_dtvalue"><code class="docutils literal notranslate"><span class="pre">format_dtvalue()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.gen_uuid"><code class="docutils literal notranslate"><span class="pre">gen_uuid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.get_common_value"><code class="docutils literal notranslate"><span class="pre">get_common_value()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.get_tzoffset_str"><code class="docutils literal notranslate"><span class="pre">get_tzoffset_str()</span></code></a></li>
@@ -154,6 +155,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.is_japan"><code class="docutils literal notranslate"><span class="pre">is_japan()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.load_config"><code class="docutils literal notranslate"><span class="pre">load_config()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.load_file"><code class="docutils literal notranslate"><span class="pre">load_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.load_meta"><code class="docutils literal notranslate"><span class="pre">load_meta()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.load_yml"><code class="docutils literal notranslate"><span class="pre">load_yml()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.loadopt"><code class="docutils literal notranslate"><span class="pre">loadopt()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.loaduser"><code class="docutils literal notranslate"><span class="pre">loaduser()</span></code></a></li>
@@ -163,11 +165,13 @@
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.perf_counter"><code class="docutils literal notranslate"><span class="pre">perf_counter()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.print_format"><code class="docutils literal notranslate"><span class="pre">print_format()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.random_string"><code class="docutils literal notranslate"><span class="pre">random_string()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.remove_meta"><code class="docutils literal notranslate"><span class="pre">remove_meta()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.reset_logger"><code class="docutils literal notranslate"><span class="pre">reset_logger()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.result_format"><code class="docutils literal notranslate"><span class="pre">result_format()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.rmdirs"><code class="docutils literal notranslate"><span class="pre">rmdirs()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.safe_fname"><code class="docutils literal notranslate"><span class="pre">safe_fname()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.save_file"><code class="docutils literal notranslate"><span class="pre">save_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.save_meta"><code class="docutils literal notranslate"><span class="pre">save_meta()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.save_yml"><code class="docutils literal notranslate"><span class="pre">save_yml()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.saveopt"><code class="docutils literal notranslate"><span class="pre">saveopt()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="cmdbox.app.html#cmdbox.app.common.saveuser"><code class="docutils literal notranslate"><span class="pre">saveuser()</span></code></a></li>

@@ -162,7 +162,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
         ],
         "agent_name": "string",
         "agent_type": "string",
-        "use_planner": false,
+        "reasoning_effort": "string",
         "a2asv_baseurl": "string",
         "a2asv_delegated_auth": false,
         "a2asv_apikey": "string",
@@ -193,7 +193,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.agent_name","str","no","null","エージェント名"
     "success.agent_type","str","no","null","エージェントタイプ"
-    "success.use_planner","bool | null","no","null","プランナー使用フラグ"
+    "success.reasoning_effort","str | null","no","null","エージェントで思考の連鎖の深さ"
     "success.a2asv_baseurl","str | null","no","null","A2AサーバーのベースURL"
     "success.a2asv_delegated_auth","bool | null","no","null","A2Aサーバーの委任認証フラグ"
     "success.a2asv_apikey","str | null","no","null","A2AサーバーのAPIキー"
@@ -231,7 +231,7 @@ agent ( agent_save ) : ``cmdbox -m agent -c agent_save <Option>``
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
     "--agent_name <agent_name>","str","","required","","","Specify the name of the agent configuration to save."
     "--agent_type <agent_type>","str","","required","local","local | remote","Specify the agent type. Specify either `local` or `remote`."
-    "--use_planner <use_planner>","bool","","","False","False | True","Specify whether to use the planning feature of the agent."
+    "--reasoning_effort <reasoning_effort>","str","","","off","off | on | low | medium | high | xhigh","Specify the depth of the thought chain in the agent. Depending on the model you are using, this feature may not be supported."
     "--a2asv_baseurl <a2asv_baseurl>","str","","","http://localhost:8071/a2a/<agent_name>","","Specify the base URL for the A2A Server."
     "--a2asv_delegated_auth <a2asv_delegated_auth>","bool","","","False","True | False","Authenticate the A2A Server using the API Key of the currently logged-in user."
     "--a2asv_apikey <a2asv_apikey>","passwd","","","","","Specify the API Key when starting the A2A Server. Additionally, if `a2asv_delegated_auth` is disabled, it will also be used when running the Agent."
@@ -240,7 +240,7 @@ agent ( agent_save ) : ``cmdbox -m agent -c agent_save <Option>``
     "--subagents <subagents>","str","multi","","","","Specify the subagent name used by the agent."
     "--agent_description <agent_description>","text","","","cmdboxに登録されているコマンド提供","","Specify a description of the agent's capabilities. The model uses this to determine whether to delegate control to the agent. A single line description is sufficient and recommended."
     "--agent_instruction <agent_instruction>","text","","","","","Specify instructions for the LLM model used by the agent. These will guide the agent's behavior."
-    "--agent_system_instruction <agent_system_instruction>","text","","","<system_context><br>役割：あなたは cmdbox Agent であり、cmdbox フレームワークに基づいて構築された高度な自律運用エンジニアです。あなたの主な目的は、cmdboxのカスタムコマンドを動的に調整・実行することで、自由度が高く、あらかじめ定義されていないユーザーのリクエストを解決することです。<br>プラットフォームの機能：cmdboxシステムは、複数の環境（CLI、REST API、Webインターフェース、およびRedisを介したリモートワーカーサーバー）で動作します。社内ツールでは、これらのコマンド機能をModel Context Protocol（MCP）サーバーまたは生の実行可能インターフェースとして公開しています。<br>コグニティブゾーン：あらゆる問題に対して、プロのソフトウェアエンジニアとしての姿勢で取り組む必要があります。ローカルファイルシステムの検索、プロセスツール、データベース、LLMユーティリティを利用できます。パラメータを推測しようとせず、常に分析、検索、検証、実行を行ってください。<br></system_context><br><br><execution_protocol><br>すべての受信リクエストは、以下の順序に従って処理しなければなりません。<br><br>1. 分類とルーティング:<br>   - ユーザー入力を分析し、そのクエリが直接的な会話形式の質問（例：挨拶、一般的な概念の説明など）なのか、それともコマンド操作を必要とする機能的なタスクなのかを判断する。<br>   - 会話形式の場合は、質の高い専門的な文章で即座に返信する。ツールを起動してはならない。<br>   - 機能的なタスクの場合は、動的計画段階に入る。<br><br>2. 探検と発見:<br>   - メタデータコンテキストで利用可能なコマンドの一覧を確認し、該当する機能を探してください。<br>   - 候補となるツールが見つかったものの、詳細な使用方法がわからない場合は、MCPサーバーからツールの詳細情報を取得してください。ユーザーが指定していないパラメータを勝手に作成しようとしないでください。<br><br>3. 行動する前に考え、確認する:<br>   - いかなる機能ツール（特に破壊的またはシステムを変更するコマンド）を呼び出す前に、現在の状態を分析するために、必ず `<thinking>` XML ブロックを出力する必要があります。<br>   - 内なる独白の中で、明確な計画を立て、パラメータの型（整数か文字列か）を確認し、終了条件や成功条件を確立しなければなりません。<br><br>4. ステップバイステップのリアクトループ:<br>   - コマンドは1つずつ実行してください。複数の書き込みコマンドを無闇に連鎖させてはいけません。<br>   - 各 cmdbox コマンドの実行によって返される stdout/stderr または JSON ペイロードを必ず確認してください。<br>   - コマンドの実行結果は JSON 文字列で出力するようにしてください。この時 JSON 文字列は「```json」と「```」で囲んだ文字列にしてください。<br>   - もし出力内容に Markdown の構文が含まれている場合は、出力する前に JSON 文字列 に変換してください。この時、JSON 文字列は「```json」と「```」で囲んだ文字列にしてください。<br>   - コマンドが失敗した場合、自己修正ロジックを使用してください。思考ブロック内でエラーメッセージを分析し、オプションを変更して再試行してください。あるステップが 3 回連続で失敗した場合は、一旦停止し、オペレーターに指示を求めてください。<br><br>5. 応答の合成:<br>   - すべての出力を、ユーザーの入力言語（例：クエリが日本語の場合は日本語）に翻訳する。<br>   - ユーザーが求めている結果にコマンドのJSON文字列の実行結果が含まれる場合、前項の「```json」で「```」で囲んだ文字列は変更しないでください。<br>   - 最終結果は事実に基づく要約として提示し、曖昧なプレースホルダーや架空のログは避ける。<br></execution_protocol><br><br><thinking_scratchpad_protocol><br>`<thinking>` 出力を生成する場合は、以下の点に留意する必要があります:<br>- 現状チェックリスト：これまでに何が達成されたか？<br>- 検討中の制約事項：どのようなセキュリティパラメータやローカライズされたルールが指定されているか？<br>- コマンド生成チェック：生成された CLI コマンドの構造は、cmdbox の構文ガイドラインに準拠していますか？<br>- リスク軽減策：この操作は元に戻せますか？元に戻せない場合、ユーザーに確認しましたか、あるいはドライランを実施しましたか？<br></thinking_scratchpad_protocol><br><br><formatting_and_style><br>- 極めて専門的で、客観的かつ中立的な口調を保つこと。感情的な表現、謝罪、無駄な装飾は避けること。<br>- 構成の明瞭さを最優先すること。データの直接比較やパラメータのスキーマについては、Markdownの表を活用すること。<br>- 最終的な回答は、読みやすい文章で記述すること。厳密に順序立てられた技術的な手順を説明する場合を除き、箇条書きが密集した段落は避けること。<br>- 語彙は、標準的なシステム管理および情報技術の用語に合わせる。<br></formatting_and_style><br>","","Specify a system prompt set internally by the service provider without exposing it to end users. Like `agent_instruction`, it is passed to the Agent, but this one is private."
+    "--agent_system_instruction <agent_system_instruction>","text","","","<system_context><br>役割：<br>  - あなたは cmdbox Agent であり、cmdbox フレームワークに基づいて構築された高度な自律運用エンジニアです。<br>  - あなたの主な目的は、cmdboxのカスタムコマンドを動的に調整・実行することで、自由度が高く、あらかじめ定義されていないユーザーのリクエストを解決することです。<br>プラットフォームの機能：<br>  - cmdboxシステムは、複数の環境（CLI、REST API、Webインターフェース、およびRedisを介したリモートワーカーサーバー）で動作します。<br>  - 社内ツールでは、これらのコマンド機能をModel Context Protocol（MCP）サーバーまたは生の実行可能インターフェースとして公開しています。<br>コグニティブゾーン：<br>  - あらゆる問題に対して、プロのソフトウェアエンジニアとしての姿勢で取り組む必要があります。<br>  - ローカルファイルシステムの検索、プロセスツール、データベース、LLMユーティリティを利用できます。<br>  - パラメータを推測しようとせず、常に分析、検索、検証、実行を行ってください。<br></system_context><br><br><execution_protocol><br>すべての受信リクエストは、以下の順序に従って処理しなければなりません。<br>1. 分類とルーティング:<br>  - ユーザー入力を分析し、そのクエリが直接的な会話形式の質問（例：挨拶、一般的な概念の説明など）なのか、それともコマンド操作を必要とする機能的なタスクなのかを判断する。<br>  - 会話形式の場合は、質の高い専門的な文章で即座に返信する。ツールを起動してはならない。<br>  - 機能的なタスクの場合は、動的計画段階に入る。<br>2. 探検と発見:<br>  - メタデータコンテキストで利用可能なコマンドの一覧を確認し、該当する機能を探してください。<br>  - 候補となるツールが見つかったものの、詳細な使用方法がわからない場合は、MCPサーバーからツールの詳細情報を取得してください。<br>  - ユーザーが指定していないパラメータを勝手に作成しようとしないでください。<br>3. 行動する前に考え、確認する:<br>  - いかなる機能ツール（特に破壊的またはシステムを変更するコマンド）を呼び出す前に、現在の状態を分析するために、必ず `<thinking>` XML ブロックを出力する必要があります。<br>  - 内なる独白の中で、明確な計画を立て、パラメータの型（整数か文字列か）を確認し、終了条件や成功条件を確立しなければなりません。<br>4. ステップバイステップのリアクトループ:<br>  - コマンドは1つずつ実行してください。複数の書き込みコマンドを無闇に連鎖させてはいけません。<br>  - 各 cmdbox コマンドの実行によって返される stdout/stderr または JSON ペイロードを必ず確認してください。<br>  - コマンドが失敗した場合、自己修正ロジックを使用してください。思考ブロック内でエラーメッセージを分析し、オプションを変更して再試行してください。<br>  - あるステップが 3 回連続で失敗した場合は、一旦停止し、オペレーターに指示を求めてください。<br>5. 応答の合成:<br>  - すべての出力を、ユーザーの入力言語（例：クエリが日本語の場合は日本語）に翻訳する。<br>  - ユーザーが求めている結果にコマンドのJSON文字列の実行結果が含まれる場合、文字列は変更しないでください。<br>  - 最終結果は事実に基づく要約として提示し、曖昧なプレースホルダーや架空のログは避ける。<br></execution_protocol><br><br><thinking_scratchpad_protocol><br>`<thinking>` 出力を生成する場合は、以下の点に留意する必要があります:<br>  - 現状チェックリスト：これまでに何が達成されたか？<br>  - 検討中の制約事項：どのようなセキュリティパラメータやローカライズされたルールが指定されているか？<br>  - コマンド生成チェック：生成された CLI コマンドの構造は、cmdbox の構文ガイドラインに準拠していますか？<br>  - リスク軽減策：この操作は元に戻せますか？元に戻せない場合、ユーザーに確認しましたか、あるいはドライランを実施しましたか？<br></thinking_scratchpad_protocol><br><br><formatting_and_style><br>  - 極めて専門的で、客観的かつ中立的な口調を保つこと。感情的な表現、謝罪、無駄な装飾は避けること。<br>  - 構成の明瞭さを最優先すること。データの直接比較やパラメータのスキーマについては、Markdownの表を活用すること。<br>  - 最終的な回答は、読みやすい文章で記述すること。厳密に順序立てられた技術的な手順を説明する場合を除き、箇条書きが密集した段落は避けること。<br>  - 語彙は、標準的なシステム管理および情報技術の用語に合わせる。<br></formatting_and_style><br>","","Specify a system prompt set internally by the service provider without exposing it to end users. Like `agent_instruction`, it is passed to the Agent, but this one is private."
     "--prompt_param <prompt_param>","dict","multi","","","","Specify parameters corresponding to placeholders embedded in `agent_instruction` or `agent_system_instruction`. Example: `{""key"": ""value""}`"
 
 **Output Schema**
@@ -305,6 +305,7 @@ agent ( chat ) : ``cmdbox -m agent -c chat <Option>``
     "--mcpserver_apikey <mcpserver_apikey>","passwd","","","","","Specify the API Key of the remote MCP server."
     "--message <message>","text","","required","","","Specify the message to send to the Runner."
     "--call_tts <call_tts>","bool","","","False","True | False","Specify whether to execute the TTS (Text-to-Speech) feature."
+    "--reasoning_effort <reasoning_effort>","str","","","auto","auto | off | on | low | medium | high | xhigh","Specify the depth of the thought chain in the agent. Depending on the model you are using, this feature may not be supported."
 
 **Output Schema**
 
@@ -328,9 +329,39 @@ This command implements ``output_schema()`` returning ``Result`` model.
         "flags": {
           "final_response": false,
           "function_call": false,
-          "function_response": false
+          "function_response": false,
+          "turn_complete": false,
+          "interrupted": false
         },
-        "message": "string",
+        "message": {
+          "role": "string",
+          "content": "string"
+        },
+        "function_calls": [
+          {
+            "id": "string",
+            "name": "string",
+            "args": {}
+          }
+        ],
+        "function_responses": [
+          {
+            "id": "string",
+            "name": "string",
+            "response": {}
+          }
+        ],
+        "artifact_delta": {},
+        "artifacts": [
+          {
+            "filename": "string",
+            "version": 0,
+            "text": "string",
+            "mime_type": "string",
+            "inline_data_size": 0,
+            "file_uri": "string"
+          }
+        ],
         "wav_b64": "string",
         "ressize": 0
       },
@@ -345,7 +376,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     :header-rows: 1
 
     "Field","Type","Required","Default","Description"
-    "success","Data | null","no","null","成功した場合の結果"
+    "success","Data | list[SubResult] | null","no","null","成功した場合の結果"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.ids","Ids | null","no","null","セッション・イベントID情報"
     "success.ids.agent_session_id","str","no","null","エージェントセッションID"
@@ -355,7 +386,21 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.flags.final_response","bool","no","False","最終レスポンスフラグ"
     "success.flags.function_call","bool","no","False","関数呼び出しフラグ"
     "success.flags.function_response","bool","no","False","関数レスポンスフラグ"
-    "success.message","str | null","no","null","メッセージ"
+    "success.flags.turn_complete","bool","no","False","ターン完了フラグ"
+    "success.flags.interrupted","bool","no","False","割り込みフラグ"
+    "success.message","Message | AgentOutput | str | null","no","null","メッセージ"
+    "success.message.role","str | null","no","null","メッセージの役割"
+    "success.message.content","str | null","no","null","メッセージの内容"
+    "success.message.success","bool | null","no","null","コマンド実行が成功したかどうか"
+    "success.message.command","str | null","no","null","実行したコマンド名"
+    "success.message.parameters_json","str | null","no","null","コマンドに指定したパラメータ(JSON文字列)"
+    "success.message.result_json","str | null","no","null","コマンド実行結果(JSON文字列)"
+    "success.message.error","str | null","no","null","エラーが発生した場合のエラーメッセージ"
+    "success.message.message","str | null","no","null","実行結果のメッセージ"
+    "success.function_calls","list[FunctionCall] | null","no","null","関数呼び出し一覧"
+    "success.function_responses","list[FunctionResponse] | null","no","null","関数応答一覧"
+    "success.artifact_delta","dict[str, int] | null","no","null","更新されたアーティファクト一覧"
+    "success.artifacts","list[Artifact] | null","no","null","アーティファクト内容"
     "success.wav_b64","str | null","no","null","Base64エンコードされたWAVデータ"
     "success.ressize","int | null","no","null","Agentが返したレスポンスのサイズ"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
