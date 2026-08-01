@@ -1,4 +1,7 @@
 const agentView = {};
+agentView.get_user_msg = () => agentView.user_msg.val();
+agentView.set_user_msg = (value) => { agentView.user_msg.val(value); };
+agentView.set_user_msg_placeholder = (value) => { agentView.user_msg.attr('placeholder', value); };
 agentView.initView = () => {
     // --- 各コンテナのエレメント取得 ---
     agentView.chatContainer = $('#chatContainer');
@@ -85,7 +88,7 @@ agentView.initView = () => {
     agentView.btn_histories.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
     // 音声入力ボタンも同様に無効化
     agentView.btn_rec.prop('disabled', true).css('cursor', 'not-allowed');
-    agentView.user_msg.off('keydown').on('keydown', (e) => {
+    agentView.user_msg.off('keydown.cmdbox').on('keydown.cmdbox', (e) => {
         // Ctrl+Enterで送信
         if (e.key === 'Enter' && e.ctrlKey && !agentView.btn_user_msg.prop('disabled')) {
             e.preventDefault();
@@ -152,13 +155,13 @@ agentView.initView = () => {
 agentView.rec_off = () => {
     agentView.isRecording = false;
     agentView.btn_rec.prop('checked', false);
-    agentView.user_msg.attr("placeholder", "Input Message...");
+    agentView.set_user_msg_placeholder("Input Message...");
     // localStorage.setItem('cmdbox-btn_rec', "false");
 };
 agentView.rec_on = () => {
     agentView.isRecording = true;
     agentView.btn_rec.prop('checked', true);
-    agentView.user_msg.attr("placeholder", "Listening...");
+    agentView.set_user_msg_placeholder("Listening...");
     // localStorage.setItem('cmdbox-btn_rec', "true");
 };
 agentView.rec_set = () => {

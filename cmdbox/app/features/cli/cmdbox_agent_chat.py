@@ -6,11 +6,58 @@ from cmdbox.app.features.cli.agent import agant_base
 from cmdbox.app.options import Options
 from contextlib import aclosing
 from pathlib import Path
-from typing import Dict, Any, Tuple, List, Union
+from typing import Callable, Dict, Any, Optional, Tuple, List, Union
 import argparse
 import logging
 import json
 import pydantic
+
+
+class AgentOutput(pydantic.BaseModel):
+    """Agentの出力スキーマ。
+
+    google-adk の output_schema には dict も渡せますが、SetModelResponseTool は
+    type[BaseModel] のときだけフィールド毎の型付きツール宣言を生成します。dict を渡すと
+    google-adk<=2.3.0 では宣言生成時に例外、2.4.0 以降は検証なしの単一パラメータ
+    (response: object) に退化し、モデルは埋めるべき構造を知らされません。
+
+    全フィールドを Optional にしています。必須にすると、コマンドを実行しない通常の
+    会話ターンでモデルが command / result_json を捏造せざるを得なくなり、捏造しなければ
+    pydantic の検証エラーがそのまま最終回答として利用者に返ります。
+
+    なお tool 経路では SetModelResponseTool がツール宣言を model_fields[].annotation
+    だけから組み立て直すため、下記の description と既定値はモデルに渡りません
+    (フィールド名6個が、すべて required として提示されます)。いずれも実害はありません:
+    フィールド名自体が内容を表しており、どのフィールドに何を入れるかは agent_instruction
+    側で指示するのが本来の役割で、応答の検証は従来どおり本モデルで行われます。
+    native 経路ではスキーマがそのまま送られ、description も届きます。
+    """
+    success: Optional[bool] = pydantic.Field(
+        default=None, description="コマンド実行が成功したかどうか")
+    command: Optional[str] = pydantic.Field(
+        default=None, description="実行したコマンド名")
+    parameters_json: Optional[str] = pydantic.Field(
+        default=None, description="コマンドに指定したパラメータ(JSON文字列)")
+    result_json: Optional[str] = pydantic.Field(
+        default=None, description="コマンド実行結果(JSON文字列)")
+    error: Optional[str] = pydantic.Field(
+        default=None, description="エラーが発生した場合のエラーメッセージ")
+    message: Optional[str] = pydantic.Field(
+        default=None, description="実行結果のメッセージ")
+
+    @classmethod
+    def _none_junk(cls, v: Any) -> Any:
+        """モデルが「値なし」の意味で入れてくる文字列を None に正規化します。
+
+        ローカルモデルはフィールドを省略せず "None" / "null" / "" を入れてくることがあり、
+        そのまま検証すると SetModelResponseTool.run_async が検証エラーを最終回答として
+        返してしまいます。
+        """
+        if isinstance(v, str) and v.strip() in ('', 'None', 'null'):
+            return None
+        return v
+
+    _normalize_none_junk = pydantic.field_validator('*', mode='before')(_none_junk)
 
 
 class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeature):
@@ -95,7 +142,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 msg['success'].append(res)
             else:
                 msg['warn'].append(res)
-            
+
         if len(msg['success']) <= 0:
             del msg['success']
         if len(msg['warn']) > 0:
@@ -180,60 +227,103 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         class Data(resdata.Data):
             ids: Union[Ids, None] = pydantic.Field(default=None, description="セッション・イベントID情報")
             flags: Union[Flags, None] = pydantic.Field(default=None, description="フラグ情報")
-            message: Union[Message, str, None] = pydantic.Field(default=None, description="メッセージ")
+            message: Union[Message, AgentOutput, str, None] = pydantic.Field(default=None, description="メッセージ")
             function_calls: Union[List[FunctionCall], None] = pydantic.Field(default=None, description="関数呼び出し一覧")
             function_responses: Union[List[FunctionResponse], None] = pydantic.Field(default=None, description="関数応答一覧")
             artifact_delta: Union[Dict[str, int], None] = pydantic.Field(default=None, description="更新されたアーティファクト一覧")
             artifacts: Union[List[Artifact], None] = pydantic.Field(default=None, description="アーティファクト内容")
             wav_b64: Union[str, None] = pydantic.Field(default=None, description="Base64エンコードされたWAVデータ")
             ressize: Union[int, None] = pydantic.Field(default=None, description="Agentが返したレスポンスのサイズ")
-        class Result(resdata.Result):
+        class SubResult(resdata.Result):
             success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+        class Result(resdata.Result):
+            success: Union[Data, List[SubResult], None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result
 
     def is_cluster_redirect(self):
         return False
 
-    def create_agent_output_schema(self) -> Dict[str, Any]:
+    def create_agent_output_schema(self) -> type:
         """
         Agentの出力スキーマを作成します。
         JSON形式での出力構造を定義します。
 
         Returns:
-            Dict[str, Any]: JSON Schema形式のスキーマ
+            type: pydantic BaseModel のサブクラス (AgentOutput)
         """
-        output_schema = dict(
-            type="object",
-            properties=dict(
-                success=dict(
-                    type="boolean",
-                    description="コマンド実行が成功したかどうか"
-                ),
-                command=dict(
-                    type="string",
-                    description="実行したコマンド名"
-                ),
-                parameters_json=dict(
-                    type="string",
-                    description="コマンドに指定したパラメータ(JSON文字列)"
-                ),
-                result_json=dict(
-                    type="string",
-                    description="コマンド実行結果(JSON文字列)"
-                ),
-                error=dict(
-                    type="string",
-                    description="エラーが発生した場合のエラーメッセージ"
-                ),
-                message=dict(
-                    type="string",
-                    description="実行結果のメッセージ"
-                )
-            ),
-            required=["success", "command", "parameters_json", "result_json", "error", "message"],
-            additionalProperties=False
-        )
-        return output_schema
+        return AgentOutput
+
+    def supports_native_output_schema_with_tools(self, llm_conf:Dict[str, Any]) -> bool:
+        """
+        output_schema を tools と同一リクエストで送れるプロバイダーかどうかを返します。
+
+        google-adk は output_schema の適用方法を2通り持ちます。native 経路は
+        response_format(json_schema) としてリクエストに載せる方法、tool 経路は
+        スキーマをパラメータに持つ set_model_response ツールとして公開する方法です。
+        google.adk.utils.output_schema_utils.can_use_output_schema_with_tools() は
+        LiteLlm インスタンスに対して常に True を返すため、常に native が選ばれます。
+
+        しかし native 経路が使えるのは OpenAI / Azure OpenAI のようなマネージド API に
+        限られます。ローカル推論サーバー(ollama / vLLM 等)は response_format を
+        guided decoding で実装しており、その文法はツール呼び出し形式の生成を禁止するため、
+        両方を同時に送るとツール呼び出しが一切できなくなります(モデルはスキーマだけを
+        埋めて回答し、実行していないツールの結果を捏造します)。
+
+        False を返したプロバイダーには create_agent_before_model_callback() が
+        tool 経路へ切り替えるコールバックを設定します。
+
+        Args:
+            llm_conf (Dict[str, Any]): LLM設定
+
+        Returns:
+            bool: native 経路が使えるなら True
+        """
+        return llm_conf.get('llmprov', None) != 'ollama'
+
+    # google-adk の _OutputSchemaRequestProcessor が set_model_response ツールを追加する際に
+    # 付与する指示と同じ内容。native 経路から手動で切り替える場合も同じ指示を出す。
+    SET_MODEL_RESPONSE_INSTRUCTION = (
+        'IMPORTANT: You have access to other tools, but you must provide '
+        'your final response using the set_model_response tool with the '
+        'required structured format. After using any other tools needed '
+        'to complete the task, always call set_model_response with your '
+        'final answer in the specified schema format.'
+    )
+
+    def create_agent_before_model_callback(self, llm_conf:Dict[str, Any]) -> Optional[Callable]:
+        """
+        Agentに設定する before_model_callback を作成します。
+
+        supports_native_output_schema_with_tools() が False のプロバイダーに対して、
+        google-adk が選んだ native 経路を取り消し、set_model_response ツール経路へ
+        切り替えるコールバックを返します。google-adk 側の後処理は set_model_response
+        という名前の function response だけを見ているため、ツールを手動で足しても
+        最終回答の組み立ては通常どおり動作します。
+
+        Args:
+            llm_conf (Dict[str, Any]): LLM設定
+
+        Returns:
+            Optional[Callable]: before_model_callback。切り替え不要なら None
+        """
+        if self.supports_native_output_schema_with_tools(llm_conf):
+            return None
+        from google.adk.tools.set_model_response_tool import SetModelResponseTool
+        output_schema = self.create_agent_output_schema()
+
+        def swap_native_output_schema_to_tool(callback_context:Any, llm_request:Any) -> None:
+            config = getattr(llm_request, 'config', None)
+            if config is None or config.response_schema is None:
+                # native 経路が選ばれていない = google-adk 側が既に tool 経路を組んでいる
+                # (または output_schema なし)。取り消すものが無いので何もしない。
+                return None
+            config.response_schema = None
+            config.response_mime_type = None
+            llm_request.append_tools([SetModelResponseTool(output_schema)])
+            llm_request.append_instructions([self.SET_MODEL_RESPONSE_INSTRUCTION])
+            return None
+
+        return swap_native_output_schema_to_tool
 
     def create_agent(self, logger:logging.Logger, data_dir:Path, disable_remote_agent:bool,
                      agent_conf:Dict[str, Any], llm_conf:Dict[str, Any], mcpsv_confs:List[Dict[str, Any]],
@@ -372,6 +462,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs, payload),
                 sub_agents=subagents,
                 output_schema=self.create_agent_output_schema(),
+                before_model_callback=self.create_agent_before_model_callback(llm_conf),
             )
         elif llmprov == 'azureopenai':
             llmmodel = llm_conf.get('llmmodel', None)
@@ -401,6 +492,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs, payload),
                 sub_agents=subagents,
                 output_schema=self.create_agent_output_schema(),
+                before_model_callback=self.create_agent_before_model_callback(llm_conf),
             )
         elif llmprov == 'vertexai':
             llmprojectid = llm_conf.get('llmprojectid', None)
@@ -429,6 +521,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs, payload),
                 sub_agents=subagents,
                 output_schema=self.create_agent_output_schema(),
+                before_model_callback=self.create_agent_before_model_callback(llm_conf),
             )
         elif llmprov == 'ollama':
             llmmodel = llm_conf.get('llmmodel', None)
@@ -450,6 +543,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 tools=self.create_tool_mcpsv(logger, mcpsv_confs, payload),
                 sub_agents=subagents,
                 output_schema=self.create_agent_output_schema(),
+                before_model_callback=self.create_agent_before_model_callback(llm_conf),
             )
         elif disable_remote_agent:
             return None

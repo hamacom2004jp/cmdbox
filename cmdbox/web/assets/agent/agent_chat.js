@@ -27,10 +27,10 @@ agentView.chat = (session_id) => {
     agentView.message_id = null;
     //agentView.btn_user_msg.prop('disabled', true); // 初期状態で送信ボタンを無効化
     // 送信ボタンのクリックイベント
-    agentView.btn_user_msg.off('click').on('click', async () => {
-        const msg = agentView.user_msg.val();
+    agentView.btn_user_msg.off('click.cmdbox').on('click.cmdbox', async () => {
+        const msg = agentView.get_user_msg() ?? '';
         if (msg.length <= 0) return;
-        agentView.user_msg.val('');
+        agentView.set_user_msg('');
         // 入力内容をユーザーメッセージとして表示
         agentView.create_user_message(msg);
         agentView.create_history(session_id, msg);
@@ -58,7 +58,7 @@ agentView.chat = (session_id) => {
             // 録音中を停止
             if (agentView.recognition) {
                 agentView.recognition.stop();
-                const transcript = agentView.user_msg.val();
+                const transcript = agentView.get_user_msg();
                 transcript && agentView.btn_user_msg.click(); // 録音が終了したら自動的にメッセージを送信
             }
             agentView.rec_off();
@@ -71,7 +71,7 @@ agentView.chat = (session_id) => {
             agentView.rec_off();
             return;
         }
-        let finalTranscript = agentView.user_msg.val();
+        let finalTranscript = agentView.get_user_msg();
         agentView.recognition = new SpeechRecognition();
         agentView.recognition.lang = 'ja-JP'; // 言語設定
         agentView.recognition.interimResults = true; // 中間結果を取得する
@@ -88,7 +88,7 @@ agentView.chat = (session_id) => {
                     interimTranscript = transcript;
                 }
             }
-            agentView.user_msg.val(finalTranscript + interimTranscript);
+            agentView.set_user_msg(finalTranscript + interimTranscript);
         };
         agentView.recognition.onerror = (event) => {
             console.error(`Speech Recognition error: ${event.error}`);
@@ -314,13 +314,17 @@ agentView.parse_message = (message) => {
             return `<span>${escapeHtml(value)}</span>`;
         };
         const rep = (str) => {
-            str = str.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '');
-            const elem = $(str);
-            elem.each((index, element) => {
-                const el = $(element);
-                el.html(marked.parse(el.html()));
-            });
-            if (elem.length > 0) str = elem.prop('outerHTML');
+            try {
+                str = str.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '');
+                const elem = $(str);
+                elem.each((index, element) => {
+                    const el = $(element);
+                    el.html(marked.parse(el.html()));
+                });
+                if (elem.length > 0) str = elem.prop('outerHTML');
+            } catch (e) {
+                console.error(`Failed to parse message: ${str}`, e);
+            }
             return str;
         };
         msg_json && msg_json['message'] && ret.push(`${rep(msg_json['message'])}\n`);
