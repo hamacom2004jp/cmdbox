@@ -71,13 +71,14 @@ agentView.chat = (session_id) => {
             agentView.rec_off();
             return;
         }
-        let finalTranscript = agentView.get_user_msg();
         agentView.recognition = new SpeechRecognition();
         agentView.recognition.lang = 'ja-JP'; // 言語設定
         agentView.recognition.interimResults = true; // 中間結果を取得する
         agentView.recognition.maxAlternatives = 1; // 最小の候補数
         agentView.recognition.continuous = false; // 連続認識を無効にする
+        let lastTranscript = '';
         agentView.recognition.onresult = (event) => {
+            let finalTranscript = agentView.get_user_msg();
             let interimTranscript = '';
             for (let i = event.resultIndex; i < event.results.length; i++) {
                 let transcript = event.results[i][0].transcript;
@@ -88,6 +89,8 @@ agentView.chat = (session_id) => {
                     interimTranscript = transcript;
                 }
             }
+            if (interimTranscript && interimTranscript.startsWith(lastTranscript)) return; // 中間結果が前回と同じ場合は更新しない
+            lastTranscript = interimTranscript;
             agentView.set_user_msg(finalTranscript + interimTranscript);
         };
         agentView.recognition.onerror = (event) => {

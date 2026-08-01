@@ -259,19 +259,18 @@ cmdbox.versions = async () => {
  * @param {string} sel - セレクタ
  */
 cmdbox.appid = async (sel) => {
-    {
-        const res = await fetch(`${cmdbox.ctx_path()}gui/title`, {method: 'GET'});
-        if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
-        const title = await res.text()
-        $(sel).text(title);
-    }{
-        const res = await fetch(`${cmdbox.ctx_path()}gui/appid`, {method: 'GET'});
-        if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
-        const appid = await res.text()
-        const head = $('head');
-        head.append(`<title>${appid}</title>`);
-        head.append(`<link rel="icon" type="image/x-icon" href="assets/${appid}/favicon.ico">`);
-    }
+    const res_title = await fetch(`${cmdbox.ctx_path()}gui/title`, {method: 'GET'});
+    if (res_title.status != 200) cmdbox.message({'error':`${res_title.status}: ${res_title.statusText}`}, true, true);
+    const title = await res_title.text()
+    $(sel).text(title);
+
+    const res_appid = await fetch(`${cmdbox.ctx_path()}gui/appid`, {method: 'GET'});
+    if (res_appid.status != 200) cmdbox.message({'error':`${res_appid.status}: ${res_appid.statusText}`}, true, true);
+    const appid = await res_appid.text()
+    const head = $('head');
+    head.append(`<title>${title}</title>`);
+    head.append(`<link rel="icon" type="image/x-icon" href="assets/${appid}/favicon.ico">`);
+    return appid;
 };
 /**
  * 指定のセレクタの前要素にロゴアイコンを設定

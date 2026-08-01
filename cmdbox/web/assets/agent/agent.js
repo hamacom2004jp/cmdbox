@@ -172,6 +172,10 @@ agentView.rec_set = () => {
     }
 };
 agentView.rec_init = () => {
+    agentView.btn_rec.css('cursor', 'pointer');
+    agentView.btn_rec.parent().find('.form-check-label').css('cursor', 'pointer').off('click').on('click', (e) => {
+        e.stopPropagation();
+    });
     /*if (localStorage.getItem('cmdbox-btn_rec')) {
         const saved_value = localStorage.getItem('cmdbox-btn_rec');
         if (saved_value && saved_value === "true") {
@@ -204,6 +208,10 @@ agentView.say_set = () => {
     }
 };
 agentView.say_init = () => {
+    agentView.btn_say.css('cursor', 'pointer');
+    agentView.btn_say.parent().find('.form-check-label').css('cursor', 'pointer').off('click').on('click', (e) => {
+        e.stopPropagation();
+    });
     if (localStorage.getItem('cmdbox-btn_say')) {
         const saved_value = localStorage.getItem('cmdbox-btn_say');
         if (saved_value && saved_value === "true") {
@@ -234,6 +242,7 @@ agentView.reasoning_set = () => {
     }
 };
 agentView.reasoning_init = () => {
+    agentView.bot_reasoning.css('cursor', 'pointer');
     if (localStorage.getItem('cmdbox-sel_reasoning_effort')) {
         const saved_value = localStorage.getItem('cmdbox-sel_reasoning_effort');
         if (saved_value) {
