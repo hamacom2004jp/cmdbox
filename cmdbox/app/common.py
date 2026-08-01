@@ -7,7 +7,7 @@ from importlib import resources
 from pathlib import Path
 from rich.console import Console
 from tabulate import tabulate
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any, Union
 import argparse
 import asyncio
 import datetime
@@ -206,7 +206,7 @@ def save_file(file_path:Path, func, mode='w', encoding='utf-8', nolock=True, met
         except:
             pass
 
-def save_meta(file_path:Path, meta:Dict[str, Any], encoding='utf-8') -> Dict[str, Any]:
+def save_meta(file_path:Path, meta:Dict[str, Any], encoding='utf-8', format:str='%Y/%m/%d %H:%M:%S') -> Dict[str, Any]:
     """
     メタデータを保存します。
 
@@ -214,6 +214,7 @@ def save_meta(file_path:Path, meta:Dict[str, Any], encoding='utf-8') -> Dict[str
         file_path (Path): ファイルのパス
         meta (Dict[str, Any]): メタデータ
         encoding (str, optional): エンコーディング. Defaults to 'utf-8'.
+        format (str, optional): 日時フォーマット. Defaults to '%Y/%m/%d %H:%M:%S'.
     Returns:
         Dict[str, Any]: 保存したメタデータ
     """
@@ -224,19 +225,20 @@ def save_meta(file_path:Path, meta:Dict[str, Any], encoding='utf-8') -> Dict[str
         os.remove(meta_dir)
     meta_dir.mkdir(parents=True, exist_ok=True)
     meta_file = meta_dir / f'{Path(file_path).name}.json'
-    old_meta = load_meta(file_path, encoding=encoding)
+    old_meta = load_meta(file_path, encoding=encoding, format=format)
     with open(meta_file, 'w', encoding=encoding) as f:
         meta = {k: v for k, v in {**old_meta, **meta}.items() if v}
         json.dump(meta, f)
         return meta
 
-def load_meta(file_path:Path, encoding='utf-8') -> Dict[str, Any]:
+def load_meta(file_path:Path, encoding='utf-8', format:str='%Y/%m/%d %H:%M:%S') -> Dict[str, Any]:
     """
     メタデータを読み込みます。
 
     Args:
         file_path (Path): ファイルのパス
         encoding (str, optional): エンコーディング. Defaults to 'utf-8'.
+        format (str, optional): 日時フォーマット. Defaults to '%Y/%m/%d %H:%M:%S'.
 
     Returns:
         Dict[str, Any]: 読み込んだメタデータ
@@ -248,7 +250,29 @@ def load_meta(file_path:Path, encoding='utf-8') -> Dict[str, Any]:
     if not meta_file.exists():
         return {}
     with open(meta_file, 'r', encoding=encoding) as f:
-        return json.load(f)
+        ret = json.load(f)
+        format_dtvalue(ret, format)
+        return ret
+
+def format_dtvalue(d:Union[dict, str], format:str='%Y/%m/%d %H:%M:%S') -> None:
+    """
+    isoformatの文字列の値をフォーマットします。
+    dictの値がdictの場合は再帰的に処理します。
+
+    Args:
+        d (Union[dict, str]): フォーマットする辞書またはisoformatの文字列
+    """
+    if isinstance(d, str):
+        try:
+            # datetime型に変換してからフォーマットする
+            dt = datetime.datetime.fromisoformat(d)
+            return dt.strftime(format)
+        except (ValueError, TypeError):
+            # datetimeじゃなかったら何もしない
+            return d
+    elif isinstance(d, dict):
+        for k, v in d.items():
+            d[k] = format_dtvalue(v, format)
 
 def remove_meta(file_path:Path) -> None:
     """

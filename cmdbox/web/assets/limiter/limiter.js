@@ -80,22 +80,6 @@ limiter_page.fmt_time_ago = (datestr) => {
 };
 
 /**
- * datetime文字列を人間が読みやすい形式に変換（例：2024-01-01 10:30:45）
- */
-limiter_page.fmt_datetime = (datestr) => {
-    if (!datestr) return '-';
-    try {
-        const parts = datestr.split('T');
-        if (parts.length !== 2) return datestr;
-        const date_part = parts[0];
-        const time_part = parts[1].split('.')[0];
-        return `${date_part} ${time_part}`;
-    } catch (e) {
-        return datestr || '-';
-    }
-};
-
-/**
  * datetime文字列から datetime-local input 用の文字列に変換
  */
 limiter_page.to_dt_local = (s) => {
@@ -309,7 +293,7 @@ limiter_page._render_limiter_item = (parent, lm, show_counter, is_limiter_save) 
     // リセット
     if (lm.reset_datetime || lm.reset_period_unit && lm.reset_period_qty) {
         let rf = '';
-        if (lm.reset_datetime) rf += limiter_page.fmt_datetime(lm.reset_datetime);
+        if (lm.reset_datetime) rf += cmdbox.toDateStr(new Date(lm.reset_datetime));
         if (lm.reset_period_unit && lm.reset_period_qty) rf += ` (every ${lm.reset_period_qty} ${lm.reset_period_unit})`;
         limiter_page.make_progress('Reset', rf, null, null).appendTo(item);
     }
@@ -329,7 +313,7 @@ limiter_page._render_limiter_item = (parent, lm, show_counter, is_limiter_save) 
 
     if (last_reset) {
         const time_ago = limiter_page.fmt_time_ago(last_reset);
-        const formatted_datetime = limiter_page.fmt_datetime(last_reset);
+        const formatted_datetime = cmdbox.toDateStr(new Date(last_reset));
         limiter_page.make_progress('Last reset', `${formatted_datetime} (${time_ago})`, null).appendTo(progress_area);
     }
 
@@ -344,7 +328,7 @@ limiter_page._render_limiter_item = (parent, lm, show_counter, is_limiter_save) 
         evidences.forEach((ev, idx) => {
             const ev_item = $(`<div class="small border rounded p-1 mb-2"></div>`).appendTo(evidences_list);
             if (ev.last_reset) {
-                const dt_str = limiter_page.fmt_datetime(ev.last_reset);
+                const dt_str = cmdbox.toDateStr(new Date(ev.last_reset));
                 ev_item.append(`<div class="text-truncate" title="${dt_str}"><i class="fas fa-file-alt fa-xs me-1"></i><strong>${dt_str}</strong></div>`);
             }
             const cf = ev.config || {};

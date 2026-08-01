@@ -108,7 +108,8 @@ class Filer(object):
         #        return self.RESP_WARN, dict(warn=f"The specified path ( {current_path} ) is Unauthorized.")
 
         def _ts2str(ts):
-            return datetime.datetime.fromtimestamp(ts)
+            ts = datetime.datetime.fromtimestamp(ts)
+            return common.format_dtvalue(ts.isoformat())
 
         #current_path = f'/{current_path}' if not current_path.startswith('/') else current_path
         current_path_parts = current_path.replace('\\', '/').split("/")
@@ -131,7 +132,7 @@ class Filer(object):
                     return tpath_key, None
                 if any(fwpath.startswith(tpath) or tpath.startswith(fwpath) for fwpath in fwpaths) \
                     and not any(re.match(rjpath, tpath) for rjpath in rjpaths) \
-                    and not re.search(r'\.meta/', tpath):
+                    and not re.search(r'\.meta/', tpath) and not re.search(r'\.meta$', tpath):
                     if not listregs_pt.match(file_list.name):
                         return tpath_key, None
                     return tpath_key, dict(name=cpart,
@@ -160,7 +161,7 @@ class Filer(object):
                     continue
                 if any(fwpath.startswith(path) or path.startswith(fwpath) for fwpath in fwpaths) \
                     and not any(re.match(rjpath, path) for rjpath in rjpaths) \
-                    and not re.search(r'\.meta/', path):
+                    and not re.search(r'\.meta/', path) and not re.search(r'\.meta$', path):
                     if not listregs_pt.match(f.name):
                         continue
                     children[key] = dict(name=f.name,
@@ -169,6 +170,7 @@ class Filer(object):
                                         mime_type=mime_type,
                                         size=f.stat().st_size,
                                         last=_ts2str(f.stat().st_mtime),
+                                        meta=common.load_meta(f),
                                         depth=len(parts))
 
             tparts = str(file_list)[data_dir_len:].replace("\\","/").split("/")

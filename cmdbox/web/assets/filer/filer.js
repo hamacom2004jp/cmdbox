@@ -137,13 +137,14 @@ fsapi.filer = (svpath, is_local) => {
             cmdbox.progress(0, list_downloads.length, fsapi.download_now, '', true, false)
             const opt = cmdbox.get_server_opt(false, fsapi.right);
             list_downloads.forEach(async path => {
-                opt['mode'] = 'client';
-                opt['cmd'] = 'file_download';
-                opt['svpath'] = path['svpath'];
-                opt['rpath'] = path['rpath'];
-                opt['capture_maxsize'] = 1024**3*10;
+                const _opt = {...opt};
+                _opt['mode'] = 'client';
+                _opt['cmd'] = 'file_download';
+                _opt['svpath'] = path['svpath'];
+                _opt['rpath'] = path['rpath'];
+                _opt['capture_maxsize'] = 1024**3*10;
                 //opt['svpath'] = event.originalEvent.dataTransfer.getData('path');
-                jobs.push(cmdbox.sv_exec_cmd(opt).then(async res => {
+                jobs.push(cmdbox.sv_exec_cmd(_opt).then(async res => {
                     if (res && res['success']) res = [res];
                     if (!res[0] || !res[0]['success']) {
                         fsapi.download_now ++;
@@ -326,9 +327,61 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
             target.find('.filer_address').val(node['path']);
             // ファイル選択エリアのクリックイベント
             const table = $('<table class="table table-bordered table-hover table-sm">'
-                                        + '<thead><tr><th class="th" scope="col">-</th><th class="th" scope="col">name</th><th class="th" scope="col">mime</th><th class="th" scope="col">size</th><th class="th" scope="col">last</th></tr></thead>'
+                                        + '<thead><tr>'
+                                        + '<th class="th" scope="col">-</th>'
+                                        + '<th class="th" scope="col"><div class="dropdown"><a class="dropdown-toggle" href="#">name</a><ul class="dropdown-menu"/></div></th>'
+                                        + '<th class="th" scope="col">mime</th>'
+                                        + '<th class="th" scope="col">size</th>'
+                                        + '<th class="th" scope="col">last</th>'
+                                        + '</tr></thead>'
                                         + '</table>');
+            const table_head = table.find('thead');
             const table_body = $('<tbody></tbody>');
+            // 列項目選択のためのドロップダウンメニューの生成
+            table_head.find('th:first').css('min-width', '32px').css('width', '8%');
+            table_head.find('div.dropdown').off('contextmenu').on('contextmenu', (e) => {
+                const fl = target.find('.file-list');
+                fl.find('.dropdown-menu').hide();
+                const meta_keys = new Set();
+                target.find('.meta').each((_, el) => {
+                    meta_keys.add($(el).data('key'));
+                });
+                if (meta_keys.size > 0) {
+                    const dropdown = table_head.find('.dropdown-menu');
+                    dropdown.html('');
+                    meta_keys.forEach((key) => {
+                        const li = $(`<li class="small"><div class="form-check form-switch mx-2"></div></li>`);
+                        const sw = $(`<input class="form-check-input" type="checkbox" role="switch" id="meta_sw_${key}" data-key="${key}">`).appendTo(li.find('.form-check'));
+                        const lv = $(`<label class="form-check-label text-nowrap i18n" for="meta_sw_${key}">${key}</label>`).appendTo(li.find('.form-check'));
+                        dropdown.append(li);
+                        lv.css('cursor', 'pointer');
+                        sw.css('cursor', 'pointer');
+                        sw.off('click').on('click', (e) => {
+                            e.stopPropagation();
+                            const sw = $(e.currentTarget);
+                            const checked = sw.prop('checked');
+                            const meta_key = sw.data('key');
+                            if (!checked) {
+                                target.find(`.meta[data-key="${meta_key}"]`).hide();
+                                localStorage.setItem(`cmdbox-sw_meta_key_${meta_key}`, "false");
+                            } else {
+                                target.find(`.meta[data-key="${meta_key}"]`).show();
+                                localStorage.setItem(`cmdbox-sw_meta_key_${meta_key}`, "true");
+                            }
+                        });
+                        lv.off('click').on('click', (e) => {
+                            e.stopPropagation();
+                            sw.prop('checked', !sw.prop('checked'));
+                            sw.trigger('click');
+                        });
+                        sw.prop('checked', localStorage.getItem(`cmdbox-sw_meta_key_${key}`) === "true");
+                    });
+                    cmdbox.process_i18n(dropdown);
+                    dropdown.show();
+                }
+                e.preventDefault();
+                return false;
+            });
             target.find('.file-list').html('');
             target.find('.file-list').append(table);
             table.append(table_body);
@@ -477,8 +530,8 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
                     const tr = $('<tr>'
                             + `<td><img src="assets/tree-menu/image/${png}"></td>`
                             + '<td>'
-                                + '<div class="droudown">'
-                                    + `<a class="dropdown-toggle" href="#">${_n['name']}</a>`
+                                + '<div class="dropdown">'
+                                    + `<a class="dropdown-toggle" href="#" data-name="${_n['name']}">${_n['name']}</a>`
                                     + '<ul class="dropdown-menu"/>'
                                 + '</div>'
                             + '</td>'
@@ -517,7 +570,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
                     tr.find('.view').off('click').on('click', mk_view(_p, tr.find('.mime_type').text(), tr.find('.file_size').text(), _l));
                     tr.find('.edit').off('click').on('click', mk_editer(_p, tr.find('.mime_type').text(), tr.find('.file_size').text(), _l));
                     tr.find('.dl_url').off('click').on('click', mk_dl_url(_p, tr.find('.mime_type').text(), tr.find('.file_size').text(), _l));
-                    tr.find('.droudown').off('contextmenu').on('contextmenu', (e) => {
+                    tr.find('.dropdown').off('contextmenu').on('contextmenu', (e) => {
                         const fl = target.find('.file-list');
                         fl.find('.dropdown-menu').hide();
                         //tr.find('.dropdown-menu').css('top', `calc(${e.pageY}px - ${fl.css('top')})`).css('left', `calc(${e.pageX}px - ${fl.css('left')})`).show();
@@ -547,6 +600,39 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
                     const tr = mk_tr(target, n['path'], current_ul_elem, n, is_local);
                     table_body.append(tr);
                 });
+                // メタ情報の列を追加
+                const table_head_tr = table_head.find('tr');
+                Object.entries(children).forEach(([k, n]) => {
+                    n['meta'] && Object.keys(n['meta']).forEach((key) => {
+                        const is_show = localStorage.getItem(`cmdbox-sw_meta_key_${key}`) === "true";
+                        if (table_head.find(`th.meta[data-key="${key}"]`).length <= 0) {
+                            const th = $(`<th class="th meta small i18n" scope="col" data-key="${key}">${key}</th>`).hide().appendTo(table_head_tr);
+                            if (is_show) th.show();
+                        }
+                        table_body.find('tr').each((_, el) => {
+                            const tr = $(el);
+                            let td = tr.find(`td.meta[data-key="${key}"]`);
+                            if (td.length <= 0) {
+                                td = $(`<td class="meta small" data-key="${key}">-</td>`).hide().appendTo(tr);
+                            }
+                            if (is_show) td.show();
+                            if (tr.find('[data-name]').data('name') != n['name']) return;
+                            td.text(n['meta'][key]);
+                        });
+                    });
+                });
+                // メタ情報が無かったらヘッダーのリンクを除去
+                const meta_keys = new Set();
+                table_body.find('td.meta').each((_, el) => {
+                    meta_keys.add($(el).data('key'));
+                });
+                if (meta_keys.size <= 0) {
+                    const a = table_head.find('a.dropdown-toggle');
+                    const name = a.text();
+                    a.parent().parent().text(name);
+                }
+                // 翻訳
+                cmdbox.process_i18n(table_head);
             }
             cmdbox.process_i18n(table);
             if (is_local) return;
@@ -591,6 +677,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
         }).off('click').on('click', (e) => {
             target.find('.file-list').find('.dropdown-menu').hide();
         });
+        /*
         const ul_elem = $('<ul class="dropdown-menu file-list-dropdown-menu"/>');
         fl_elem.append(ul_elem);
         ul_elem.append($('<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>'));
@@ -608,6 +695,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
             }
         }};
         ul_elem.find('.mkdir').off('click').on('click', _mk_mkdir(target, current_ul_elem, is_local));
+        */
     }).catch((e) => {
         console.log(e);
     }).finally(() => {
