@@ -51,6 +51,7 @@ $(() => {
             const navbar_html = await fetch('assets/agent/agent_navbar.html').then(res => res.text());
             $('#navHeadbar').append(navbar_html);
             cmdbox.set_logoicon('.navbar-brand');
+            cmdbox.appid('.navbar-brand');
 
             // --- サイドバー初期化 ---
             agentView.navSidebar = $('#navSidebar');
