@@ -6,8 +6,9 @@ agentView.chat_listeners = [];
  * チャットメッセージを送信
  * @param {WebSocket} ws WebSocketオブジェクト
  * @param {string} msg 送信メッセージ
+ * @param {boolean} from_system システムメッセージかどうか
  */
-agentView.chat_send = (ws, msg) => {
+agentView.chat_send = (ws, msg, from_system=false) => {
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
     ws.send(msg);
 };
@@ -227,7 +228,7 @@ agentView.chat = (session_id) => {
     };
     agentView.ws.onopen = () => {
         const ping = () => {
-            agentView.chat_send(agentView.ws, 'ping');
+            agentView.chat_send(agentView.ws, 'ping', true);
             agentView.chat_reconnect_count = 0; // pingが成功したら再接続回数をリセット
         };
         agentView.btn_say.prop('disabled', false);

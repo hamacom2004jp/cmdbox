@@ -1,4 +1,7 @@
 <div class="nav-sidebar-content">
+    <button id="btn_toggle_sidebar" class="btn btn-nav-toggle ms-1 mt-3 me-auto" title="Toggle sidebar" style="border:none;">
+        <i class="fas fa-bars fa-xl"></i>
+    </button>
     <button id="btn_filetrancefer" class="btn btn-nav-action" data-bs-toggle="modal" data-bs-target="#fileTranceferModal" title="Files" style="border:none;">
         <i class="fa-solid fa-folder-open fa-2xl"></i>
         <span class="nav-label i18n">Files</span>
@@ -19,14 +22,4 @@
         <i class="fas fa-history fa-2xl"></i>
         <span class="nav-label i18n">Histories</span>
     </button>
-    <div class="d-none dropdown user_info mt-auto mb-3">
-        <button class="btn btn-nav-action gap-1" data-bs-toggle="dropdown" title="UserInfo" style="border:none;">
-            <img class="user_icon me-1" src="gui/user_data/icon" width="30" height="30">
-            <span class="nav-label username align-middle">UserName</span>
-        </button>
-        <ul class="dropdown-menu text-small shadow" style="position:absolute;inset:0px 0px auto auto;margin:0px;transform:translate(0px, 34px);" data-popper-placement="bottom-end">
-            <div class="user_info_note ps-3 pe-3"></div>
-            <li><hr class="dropdown-divider"></li>
-        </ul>
-    </div>
 </div>

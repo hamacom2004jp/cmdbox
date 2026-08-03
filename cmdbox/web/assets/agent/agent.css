@@ -145,7 +145,7 @@ h1, h2, h3, h4, h5, .system-font { font-family: var(--font-header); }
     transition: all 0.5s ease;
     opacity: 1;
     transform: scale(1);
-    top: calc(100vh / 2 - 150px);
+    top: calc(100vh / 2 - 200px);
     right: calc((100vw - var(--console-panel-width)) / 2 - 150px);
     z-index: 50;
     pointer-events: auto;

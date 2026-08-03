@@ -1,6 +1,6 @@
 const agentView = {};
-agentView.get_user_msg = () => agentView.user_msg.val();
-agentView.set_user_msg = (value) => { agentView.user_msg.val(value); };
+agentView.get_user_msg = () => agentView.user_msg.html();
+agentView.set_user_msg = (value) => { agentView.user_msg.html(value); };
 agentView.set_user_msg_placeholder = (value) => { agentView.user_msg.attr('placeholder', value); };
 agentView.initView = () => {
     // --- 各コンテナのエレメント取得 ---
@@ -117,8 +117,8 @@ agentView.initView = () => {
     agentView.sel_reasoning_effort.off('change').on('change', agentView.reasoning_set);
     agentView.reasoning_init();
 
-    // display_runner_name クリックイベント
-    $('#display_runner_name').off('click').on('click', async () => {
+    // ドロップダウン内Runner名クリックイベント
+    $('#display_runner_name_menu').off('click').on('click', async () => {
         await agentView.show_runner_select_modal();
     });
 
@@ -188,7 +188,7 @@ agentView.rec_init = () => {
 // 音声合成トグル
 agentView.say_off = () => {
     agentView.btn_say.prop('checked', false);
-    agentView.chat_send(agentView.ws, 'call_tts_off');
+    agentView.chat_send(agentView.ws, 'call_tts_off', true);
     // 再生中の場合は停止
     if (agentView.say && agentView.say.isPlaying()) {
         agentView.say.stop();
@@ -197,7 +197,7 @@ agentView.say_off = () => {
 };
 agentView.say_on = () => {
     agentView.btn_say.prop('checked', true);
-    agentView.chat_send(agentView.ws, 'call_tts_on');
+    agentView.chat_send(agentView.ws, 'call_tts_on', true);
     localStorage.setItem('cmdbox-btn_say', "true");
 };
 agentView.say_set = () => {
@@ -225,13 +225,13 @@ agentView.say_init = () => {
 agentView.reasoning_off = () => {
     agentView.bot_reasoning.prop('checked', false);
     agentView.sel_reasoning_effort.prop('disabled', true).css('opacity', '0.5').css('cursor', 'not-allowed');
-    agentView.chat_send(agentView.ws, 'call_reasoning_off');
+    agentView.chat_send(agentView.ws, 'call_reasoning_off', true);
     localStorage.setItem('cmdbox-sel_reasoning_effort', "call_reasoning_off");
 };
 agentView.reasoning_on = () => {
     agentView.bot_reasoning.prop('checked', true);
     agentView.sel_reasoning_effort.prop('disabled', false).css('opacity', '1').css('cursor', 'auto');
-    agentView.chat_send(agentView.ws, `call_reasoning_${agentView.sel_reasoning_effort.val()}`);
+    agentView.chat_send(agentView.ws, `call_reasoning_${agentView.sel_reasoning_effort.val()}`, true);
     localStorage.setItem('cmdbox-sel_reasoning_effort', `call_reasoning_${agentView.sel_reasoning_effort.val()}`);
 };
 agentView.reasoning_set = () => {

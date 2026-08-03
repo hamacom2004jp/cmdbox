@@ -42,6 +42,16 @@ $(() => {
             // SVGロゴ初期化
             init_svglogo();
             $('.split-pane').splitPane();
+
+            // チャット入力エリアの読込み
+            const chat_input_html = await fetch('assets/agent/agent_chat_input.html').then(res => res.text());
+            $('#chatInputArea').append(chat_input_html);
+
+            // ナビゲーションバーの読込み
+            const navbar_html = await fetch('assets/agent/agent_navbar.html').then(res => res.text());
+            $('#navHeadbar').append(navbar_html);
+            cmdbox.set_logoicon('.navbar-brand');
+
             // --- サイドバー初期化 ---
             agentView.navSidebar = $('#navSidebar');
             agentView.navSidebar.find('.nav-sidebar-content').remove();

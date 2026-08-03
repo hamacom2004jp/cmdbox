@@ -290,8 +290,8 @@ agentView.setDefaultRunner = async () => {
 };
 agentView.select_runner = async (runner_name) => {
     try {
-        // display_runner_nameに選択されたrunnerの名前を表示
-        $('#display_runner_name').html(`${runner_name}`);
+        // 入力欄メニュー内のRunner名表示を同期
+        $('#display_runner_name_menu').html(`${runner_name}`);
         $('#display_runner_msg').html(`STARTING AGENT RUNNER ...`);
         cmdbox.show_loading();
         const item_data = await agentView.exec_cmd('agent', 'runner_load',{ runner_name: runner_name }, null, false);
