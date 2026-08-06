@@ -49,6 +49,10 @@ fsapi.filer = (svpath, is_local) => {
         const formData = new FormData();
         if (drop_path) {
             const relative = async (formData, entry, path) => {
+                if (!entry) {
+                    cmdbox.hide_loading();
+                    return;
+                }
                 if (entry.kind === 'file') {
                     const f = await entry.getFile();
                     let p = path + '/' + entry.name;
@@ -80,6 +84,10 @@ fsapi.filer = (svpath, is_local) => {
             Object.keys(files).map((key) => {
                 formData.append('files', files[key], files[key].webkitRelativePath);
             });
+        }
+        if (Array.from(formData.entries()).length <= 0) {
+            cmdbox.hide_loading();
+            return;
         }
         svpath = fsapi.right.find('.filer_address').val();
         // https://developer.mozilla.org/ja/docs/Web/API/fetch
