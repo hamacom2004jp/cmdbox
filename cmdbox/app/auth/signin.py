@@ -411,6 +411,10 @@ class Signin(object):
                 group['home'] = re.sub(r'^/+', '', group['home'])
             if 'startpage' not in group or group['startpage'] is None:
                 group['startpage'] = None
+            if 'readonly' not in group or group['readonly'] is None or type(group['readonly']) is not bool:
+                group['readonly'] = False
+            if 'hidden' not in group or group['hidden'] is None or type(group['hidden']) is not bool:
+                group['hidden'] = False
             gids.add(group['gid'])
             gnames.add(group['name'])
         # cmdruleのフォーマットチェック

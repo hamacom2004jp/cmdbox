@@ -25,4 +25,5 @@ class LoadUrl(cmdbox_web_exec_cmd.ExecCmd):
             if 'success' not in ret or 'data' not in ret['success'] or 'target_url' not in ret['success']['data']:
                 return common.to_str(ret)
             target_url = ret['success']['data']['target_url']
+            web.options.audit_exec(req, res, web, body=opt)
             return RedirectResponse(url=target_url, status_code=302)

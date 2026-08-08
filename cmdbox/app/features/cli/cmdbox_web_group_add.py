@@ -100,7 +100,7 @@ class WebGroupAdd(feature.UnsupportEdgeFeature, validator.Validator, limiter.Lim
         w = web.Web(logger, self.default_data, appcls=self.appcls, ver=self.ver,
                     redis_host=self.default_host, redis_port=self.default_port, redis_password=self.default_pass, svname=self.default_svname,
                     signin_file=args.signin_file)
-        groups = w.group_list(None)
+        groups = w.group_list(None, ret_hidden=False)
         return len(groups)
 
     def svrun_registrations(self, data_dir, logger, opt, msg):

@@ -17,4 +17,5 @@ class Usesignout(feature.WebFeature):
         async def usesignout(req:Request, res:Response):
             if web.signin_file is not None:
                 return dict(success={'usesignout': True})
+            web.options.audit_exec(req, res, web)
             return dict(success={'usesignout': False})

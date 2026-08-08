@@ -25,7 +25,7 @@ class SavePipe(feature.WebFeature):
             if not title or not opt:
                 return dict(warn='Title and opt are required.')
             ret = self.save_pipe(web, title, json.loads(opt))
-            web.options.audit_exec(req, res, web)
+            web.options.audit_exec(req, res, web, body=form)
             return ret
 
     def save_pipe(self, web:Web, title:str, opt:Dict[str, Any]) -> Dict[str, str]:

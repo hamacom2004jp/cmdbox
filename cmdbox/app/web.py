@@ -376,6 +376,28 @@ class Web:
             raise ValueError(f"ApiKey name is not found.")
         if len([u for u in signin_data['users'] if u['name'] == user['name']]) <= 0:
             raise ValueError(f"User name is not exists.")
+        """
+        apikeys = self.user_data(None, user['uid'], user['name'], 'apikey')
+        if not apikeys:
+            apikeys = dict()
+        if user['apikey_name'] in apikeys:
+            raise ValueError(f"ApiKey name is already exists.")
+        apikey = common.random_string(64)
+        apikey[user['apikey_name']] = apikey
+        if signin_data['apikey']['gen_jwt']['enabled']:
+            cls = self.signin.__class__
+            claims = cls.gen_jwt_claims.copy() if cls.gen_jwt_claims is not None else dict()
+            claims['exp'] = int(time.time()) + int(claims.get('exp', 3600))
+            claims['uid'] = user['uid']
+            claims['name'] = user['name']
+            claims['groups'] = user['groups']
+            claims['email'] = user['email']
+            claims['apikey_name'] = user['apikey_name']
+            apikey = jwt.encode(claims, cls.gen_jwt_privatekey, algorithm=cls.gen_jwt_algorithm)
+            apikeys[user['apikey_name']] = apikey
+        self.user_data(None, user['uid'], user['name'], 'apikey', user['apikey_name'], apikeys[user['apikey_name']])
+        return apikeys[user['apikey_name']]
+        """
         apikey:str = None
         for u in signin_data['users']:
             if u['name'] == user['name']:
@@ -472,7 +494,7 @@ class Web:
         if 'groups' not in user or type(user['groups']) is not list:
             raise ValueError(f"User groups is not found or empty.")
         for gn in user['groups']:
-            if len(self.group_list(gn)) <= 0:
+            if len(self.group_list(gn, ret_hidden=True)) <= 0:
                 raise ValueError(f"Group is not found. ({gn})")
         if len([u for u in signin_data['users'] if u['uid'] == user['uid']]) > 0:
             raise ValueError(f"User uid is already exists.")
@@ -534,7 +556,7 @@ class Web:
         if 'groups' not in user or type(user['groups']) is not list:
             raise ValueError(f"User groups is not found or empty.")
         for gn in user['groups']:
-            if len(self.group_list(gn)) <= 0:
+            if len(self.group_list(gn, ret_hidden=True)) <= 0:
                 raise ValueError(f"Group is not found. ({gn})")
         if len([u for u in signin_data['users'] if u['uid'] == user['uid']]) <= 0:
             raise ValueError(f"User uid is not found.")
@@ -601,12 +623,13 @@ class Web:
         self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data, nolock=False)
 
-    def group_list(self, name:str=None) -> List[Dict[str, Any]]:
+    def group_list(self, name:str=None, ret_hidden:bool=False) -> List[Dict[str, Any]]:
         """
         サインインファイルのグループ一覧を取得する
 
         Args:
             name (str, optional): グループ名. Defaults to None.
+            ret_hidden (bool, optional): hidden設定が有効化されているグループを返すかどうか. Defaults to False.
 
         Returns:
             List[Dict[str, Any]]: グループ一覧
@@ -615,7 +638,10 @@ class Web:
         if signin_data is None:
             raise ValueError(f'signin_file_data is None. ({self.signin_file})')
         if name is None or name == '':
-            return copy.deepcopy(signin_data['groups'])
+            ret = copy.deepcopy(signin_data['groups'])
+            if not ret_hidden:
+                ret = [g for g in ret if 'hidden' not in g or g['hidden'] is False]
+            return ret
         for g in copy.deepcopy(signin_data['groups']):
             if g['name'] == name:
                 return [g]
@@ -655,6 +681,10 @@ class Web:
         # buildin設定が有効化されているグループは追加できない
         if 'buildin' in group and group['buildin']:
             raise ValueError(f"You cannot add a built-in group.")
+        # readonly設定はFalseで保存する
+        group['readonly'] = False
+        # hidden設定はFalseで保存する
+        group['hidden'] = False
         group['home'] = f".groups/{group['name']}"
         signin_data['groups'].append(group)
         if self.signin_file is None:
@@ -697,8 +727,15 @@ class Web:
                     raise ValueError(f"You cannot set a built-in group as a parent group.")
         for g in signin_data['groups']:
             if str(g['gid']) == str(group['gid']):
+                # buildin設定が有効化されているグループは編集できない
                 if 'buildin' in g and g['buildin']:
                     raise ValueError(f"You cannot edit a built-in group.")
+                # readonly設定が有効化されているグループは編集できない
+                if 'readonly' in g and g['readonly']:
+                    raise ValueError(f"You cannot edit a read-only group.")
+                # hidden設定が有効化されているグループは編集できない
+                if 'hidden' in g and g['hidden']:
+                    raise ValueError(f"You cannot edit a hidden group.")
                 g['name'] = group['name']
                 g['startpage'] = group['startpage'] if 'startpage' in group else None
                 g['parent'] = group['parent'] if 'parent' in group else None
@@ -751,10 +788,18 @@ class Web:
                 pathrule_group_ids += [g['gid'] for g in signin_data['groups'] if g['name'] == group]
         if gid in pathrule_group_ids:
             raise ValueError(f"Group gid is used by pathrule group.")
-        # グループがbuildin設定がされていないことをチェック
+        # グループの各設定が有効でないことをチェック
         for g in signin_data['groups']:
-            if 'buildin' in g and g['buildin'] and g['gid'] == gid:
-                raise ValueError(f"This group is a built-in group.")
+            if g['gid'] == gid:
+                # グループがbuildin設定がされていないことをチェック
+                if 'buildin' in g and g['buildin']:
+                    raise ValueError(f"This group is a built-in group.")
+                # readonly設定が有効化されているグループは削除できない
+                if 'readonly' in g and g['readonly']:
+                    raise ValueError(f"This group is a read-only group.")
+                # hidden設定が有効化されているグループは削除できない
+                if 'hidden' in g and g['hidden']:
+                    raise ValueError(f"This group is a hidden group.")
 
         # グループ削除
         groups = [g for g in signin_data['groups'] if g['gid'] != gid]

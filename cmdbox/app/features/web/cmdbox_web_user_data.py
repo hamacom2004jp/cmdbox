@@ -52,6 +52,7 @@ class UserData(feature.WebFeature):
                 return dict(warn='Category and key are required.')
             sess = req.session['signin']
             web.user_data(req, sess['uid'], sess['name'], categoly, key, val)
+            web.options.audit_exec(req, res, web, body=form)
             return dict(success=f'user_data "{categoly}:{key}:val" saved.')
 
         @app.post('/gui/user_data/delete', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
@@ -69,6 +70,7 @@ class UserData(feature.WebFeature):
                 return dict(warn='Category and key are required.')
             sess = req.session['signin']
             web.user_data(req, sess['uid'], sess['name'], categoly, key, delkey=True)
+            web.options.audit_exec(req, res, web, body=form)
             return dict(success=f'user_data "{categoly}:{key}:val" deleted.')
 
         @app.get('/gui/user_data/icon', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)

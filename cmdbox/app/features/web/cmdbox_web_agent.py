@@ -86,8 +86,7 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
                         mcpserver_apikey = apikeys.values().__iter__().__next__()
                         a2asv_apikey = mcpserver_apikey
 
-            startmsg = "こんにちは！何かお手伝いできることはありますか？" if common.is_japan(language=web.language) else "Hello! Is there anything I can help you with?"
-            yield json.dumps(dict(success=dict(message=startmsg)), default=common.default_json_enc)
+            yield json.dumps(dict(success=dict(message=self.get_startmsg(web))), default=common.default_json_enc)
             def _replace_match(match_obj):
                 json_str = match_obj.group(0)
                 try:
@@ -149,6 +148,17 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
                     web.logger.warning(f'chat error.', exc_info=True)
                     yield json.dumps(dict(message=f'<pre>{traceback.format_exc()}</pre>'), default=common.default_json_enc)
                     break
+
+    def get_startmsg(self, web:Web) -> str:
+        """
+        チャットの開始メッセージを返します
+
+        Args:
+            web (Web): Webオブジェクト
+        Returns:
+            str: 開始メッセージ
+        """
+        return "こんにちは！何かお手伝いできることはありますか？" if common.is_japan(language=web.language) else "Hello! Is there anything I can help you with?"
 
     class SSEDisconnect(Exception):
         """

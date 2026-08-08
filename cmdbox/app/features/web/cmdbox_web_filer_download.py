@@ -32,7 +32,7 @@ class FilerDownload(cmdbox_web_exec_cmd.ExecCmd):
                            svpath=path, scope=scope, img_thumbnail=img_thumbnail,
                            mode='client', cmd='file_download', client_data=data_dir)
                 opt['capture_stdout'] = nothread = True
-                web.options.audit_exec(req, res, web)
+                web.options.audit_exec(req, res, web, body=dict(scope=scope, svpath=path))
                 ret = await self.exec_cmd(req, res, web, 'file_download', opt, nothread, self.appcls)
                 if len(ret) == 0 or 'success' not in ret[0] or 'data' not in ret[0]['success']:
                     return common.to_str(ret)

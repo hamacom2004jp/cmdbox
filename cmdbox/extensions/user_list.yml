@@ -49,32 +49,46 @@ groups:                        # A list of groups, each of which is a map that c
   home: /.groups/admin         # The home directory of the group, used for file operations.
   startpage: /agent            # The group's start page.
                                # This is the page to which users belonging to the group are redirected when they access the “/” path.
+  readonly: true               # Whether the group is read-only. If True, the settings for this group cannot be changed.
+  hidden: false                # Whether the group is hidden. If True, it will not be returned in the group list.
 - gid: 2
   name: develop
   home: /.groups/develop
   startpage: /gui
   buildin: true                # Whether the group is a built-in group. Built-in groups cannot be deleted.
+  readonly: true
+  hidden: true
 - gid: 3
   name: master
   home: /.groups/master
   startpage: /gui
   buildin: true
+  readonly: true
+  hidden: true
 - gid: 4
   name: guest
   home: /.groups/guest
   startpage: /agent
+  readonly: true
+  hidden: false
 - gid: 101
   name: user
   home: /.groups/user
   startpage: /agent
+  readonly: true
+  hidden: false
 - gid: 102
   name: readonly
   parent: user                 # The parent group of the group. If the parent group is not specified, the group is a top-level group.
   home: /.groups/readonly
+  readonly: true
+  hidden: false
 - gid: 103
   name: editor
   parent: user
   home: /.groups/editor
+  readonly: true
+  hidden: false
 cmdrule:                       # A list of command rules, Specify a rule that determines whether or not a command is executable when executed by a user in web mode.
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
   rules:                       # Specify rules to allow or deny execution of the command, depending on the group the user belongs to.

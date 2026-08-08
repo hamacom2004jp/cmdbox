@@ -216,6 +216,7 @@ const list_cmd_func_then = () => {
             if (!mode_tag_id) {
                 cmd_modal.find(`#${empty_tag_id}`).val(mode);
             }
+            cmd_modal.find('[name="save_mode"]').val('add');
         }
         //row_content.find('is-invalid, is-valid').removeClass('is-invalid').removeClass('is-valid');
         cmd_modal.find('[name="modal_mode"]').val('');
@@ -264,6 +265,7 @@ const list_cmd_func_then = () => {
                 const input_elem = $(elem);
                 input_elem.change();
             });
+            cmd_modal.find('[name="save_mode"]').val('update');
             cmd_modal.find('#cmd_del').show();
             cmd_modal.find('#cmd_copy').show();
             cmd_modal.find('[name="title_disabled"]').val(cmd_modal.find('[name="title"]').hide().val()).show();
@@ -346,6 +348,7 @@ const list_cmd_func_then = () => {
         cmd_modal.find('[name="cmd_disabled"]').val('').hide();
         cmd_modal.find('[name="name"]').show();
         cmd_modal.find('[name="name_disabled"]').val('').hide();
+        cmd_modal.find('[name="save_mode"]').val('add');
         cmdbox.process_i18n(cmd_modal);
     });
     // コマンドファイルの保存

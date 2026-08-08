@@ -5,6 +5,7 @@ from fastapi.routing import APIRoute
 from datetime import datetime
 from pathlib import Path
 from starlette.routing import Route
+from starlette.datastructures import FormData
 from typing import List, Dict, Any 
 import argparse
 import functools
@@ -357,7 +358,7 @@ class Options:
             description_ja="キャッシュの有効期限（秒）を指定します。",
             description_en="Specify the cache timeout in seconds.")
         self._options["save_mode"] = dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=True, choice=['','add','update'], web="mask",
+            type=Options.T_STR, default=None, required=False, multi=False, hide=True, choice=['','add','update'], web="readonly",
             description_ja="保存モードを指定します。 `add` は新規追加、`update` は既存のオプションを更新します。省略した場合はコマンド標準の処理を行います。",
             description_en="Specify the save mode. `add` adds a new option, and `update` updates an existing option. If omitted, the command performs its default action.")
 
@@ -918,6 +919,8 @@ class Options:
         opt['pg_password'] = 'postgres' if opt.get('pg_password') is None else opt['pg_password']
         opt['pg_dbname'] = 'audit' if opt.get('pg_dbname') is None else opt['pg_dbname']
         logger = self.default_logger
+        if isinstance(body, FormData):
+            body = dict(**body)
         clmsg_body = body.copy() if body is not None else dict()
         func_feature = None
         audited_by = True

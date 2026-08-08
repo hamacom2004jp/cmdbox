@@ -58,7 +58,8 @@ class FilerUpload(cmdbox_web_exec_cmd.ExecCmd):
                 opt['svpath'] = str(svpath / Path(raw_filename).parent)
                 opt['upload_file'] = str(upload_file).replace('"','')
                 shutil.copyfileobj(fv.file, Path(opt['upload_file']).open('wb'))
-                web.options.audit_exec(req, res, web)
+                web.options.audit_exec(req, res, web,
+                                       body=dict(scope=opt.get('scope'), svpath=svpath, upload_file=opt.get('upload_file')))
                 ret = await self.exec_cmd(req, res, web, "file_upload", opt, nothread=True)
                 if type(ret) is dict and 'success' not in ret:
                     return str(ret)

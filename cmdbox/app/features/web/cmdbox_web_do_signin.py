@@ -70,7 +70,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                     return RedirectResponse(url=f'/signin/{next}?error=1')
                 user = [u for u in signin_data['users'] if u['name'] == name and u['hash'] != 'oauth2' and u['hash'] != 'saml']
                 if len(user) <= 0:
-                    web.options.audit_exec(req, res, web, body=dict(msg='signin failed.'), audit_type='auth')
+                    web.options.audit_exec(req, res, web, body=dict(msg='signin failed.'), audit_type='auth', user=name)
                     return RedirectResponse(url=f'/signin/{next}?error=1')
                 user = user[0]
             if web.logger.level == logging.DEBUG:
