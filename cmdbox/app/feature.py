@@ -168,6 +168,27 @@ class Feature(object):
         except:
             pass
 
+    def check_save_mode(self, name, configure:Dict[str, Any], configure_path:Path,) -> Tuple[bool, Dict[str, Any]]:
+        """
+        設定の保存モードをチェックします
+
+        Args:
+            name (str): エージェント名
+            configure (Dict[str, Any]): 設定内容
+            configure_path (Path): 設定ファイルパス
+        Returns:
+            Tuple[bool, Dict[str, Any]]: チェック結果, 警告メッセージ
+        """
+        if configure_path.exists() and configure.get('save_mode') == 'add':
+            msg = dict(warn=f"Configuration '{name}' already exists. Use `update` mode to overwrite.")
+            return False, msg
+        if not configure_path.exists() and configure.get('save_mode') == 'update':
+            msg = dict(warn=f"Configuration '{name}' does not exist. Use `add` mode to create a new configuration.")
+            return False, msg
+        if 'save_mode' in configure:
+            del configure['save_mode']
+        return True, None
+
 class OneshotEdgeFeature(Feature):
     """
     一度だけ実行するエッジ機能の基底クラス

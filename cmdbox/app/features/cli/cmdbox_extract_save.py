@@ -104,6 +104,7 @@ class ExtractSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter
             client_data=args.client_data if hasattr(args, 'client_data') else None,
             loadpath=args.loadpath if hasattr(args, 'loadpath') else None,
             loadregs=args.loadregs if hasattr(args, 'loadregs') else None,
+            save_mode=args.save_mode if hasattr(args, 'save_mode') else None,
         )
 
         payload_b64 = convert.str2b64str(common.to_str(payload))
@@ -132,8 +133,13 @@ class ExtractSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter
         reskey = msg[1]
         try:
             configure = json.loads(convert.b64str2str(msg[2]))
-            configure_path = data_dir / ".agent" / f"extract-{configure['extract_name']}.json"
+            name = configure.get('extract_name')
+            configure_path = data_dir / ".agent" / f"extract-{name}.json"
             configure_path.parent.mkdir(parents=True, exist_ok=True)
+            chk, msg = self.check_save_mode(name, configure, configure_path)
+            if not chk:
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
             with configure_path.open('w', encoding='utf-8') as f:
                 json.dump(configure, f, indent=4)
             msg = dict(success=f"Extract configuration saved to '{str(configure_path)}'.")

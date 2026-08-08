@@ -83,6 +83,7 @@ class AgentAgentLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             llm: Union[str, None] = pydantic.Field(default=None, description="LLM名")
             mcpservers: Union[List[str], None] = pydantic.Field(default=None, description="MCPサーバーリスト")
             subagents: Union[List[str], None] = pydantic.Field(default=None, description="サブエージェントリスト")
+            skill_names: Union[List[str], None] = pydantic.Field(default=None, description="スキル名リスト")
             agent_description: Union[str, None] = pydantic.Field(default=None, description="エージェントの説明")
             agent_instruction: Union[str, None] = pydantic.Field(default=None, description="エージェントへの指示")
             agent_system_instruction: Union[str, None] = pydantic.Field(default=None, description="サービス提供側が内部的に設定するシステムプロンプト")

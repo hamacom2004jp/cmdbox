@@ -190,6 +190,7 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
             reset_period_qty=args.reset_period_qty if hasattr(args, 'reset_period_qty') else None,
             max_history_interval=args.max_history_interval if hasattr(args, 'max_history_interval') else None,
             history_end=str(args.history_end) if hasattr(args, 'history_end') and args.history_end is not None else None,
+            save_mode=args.save_mode if hasattr(args, 'save_mode') else None,
         )
 
         if args.scope == 'client':
@@ -202,6 +203,9 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
             data_dir = Path(client_data)
             configure_path = data_dir / ".limiter" / f"limiter-{args.limiter_name}.json"
             configure_path.parent.mkdir(parents=True, exist_ok=True)
+            chk, msg = self.check_save_mode(args.limiter_name, configure, configure_path)
+            if not chk:
+                return self.RESP_WARN, msg, None
             common.save_file(configure_path, lambda f: json.dump(configure, f, indent=4), encoding='utf-8', nolock=False)
             out = dict(success=f"Limiter configuration saved to '{str(configure_path)}'.")
             common.print_format(out, args.format, tm, args.output_json, args.output_json_append, pf=pf)
@@ -258,9 +262,13 @@ class LimiterSave(feature.OneshotResultEdgeFeature, validator.Validator):
                     redis_cli.rpush(reskey, out)
                     return self.RESP_WARN
 
-            # 保存前の設定情報を取得
             configure_path = data_dir / ".limiter" / f"limiter-{limiter_name}.json"
             configure_path.parent.mkdir(parents=True, exist_ok=True)
+            chk, msg = self.check_save_mode(limiter_name, configure, configure_path)
+            if not chk:
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
+            # 保存前の設定情報を取得
             org_configure = None
             if configure_path.exists():
                 org_configure = common.load_file(configure_path, lambda x: json.load(x), mode='r', encoding='utf-8', nolock=True)

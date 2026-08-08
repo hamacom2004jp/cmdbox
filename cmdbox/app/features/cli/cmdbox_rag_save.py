@@ -115,6 +115,7 @@ class RagSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
             extract=list(set(args.extract)) if hasattr(args, 'extract') and args.extract is not None else None,
             llm_name=args.llm_name if hasattr(args, 'llm_name') else None,
             embed_vector_dim=args.embed_vector_dim if hasattr(args, 'embed_vector_dim') else None,
+            save_mode=args.save_mode if hasattr(args, 'save_mode') else None,
         )
 
         payload_b64 = convert.str2b64str(common.to_str(payload))
@@ -143,9 +144,13 @@ class RagSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
         reskey = msg[1]
         try:
             configure = json.loads(convert.b64str2str(msg[2]))
-
-            configure_path = data_dir / ".agent" / f"rag-{configure['rag_name']}.json"
+            name = configure.get('rag_name')
+            configure_path = data_dir / ".agent" / f"rag-{name}.json"
             configure_path.parent.mkdir(parents=True, exist_ok=True)
+            chk, msg = self.check_save_mode(name, configure, configure_path)
+            if not chk:
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
             with configure_path.open('w', encoding='utf-8') as f:
                 json.dump(configure, f, indent=4)
             msg = dict(success=f"RAG configuration saved to '{str(configure_path)}'.")

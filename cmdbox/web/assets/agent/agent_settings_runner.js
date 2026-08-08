@@ -9,6 +9,7 @@ agentView.get_runner_form_def = async () => {
 agentView.build_runner_form = async () => {
     const form = $('#form_runner_edit');
     form.empty();
+    form.append('<input type="hidden" name="save_mode" value="update">');
     const defs = await agentView.get_runner_form_def();
     const model = $('#runner_edit_modal');
     defs.forEach((row, i) => {
@@ -25,6 +26,7 @@ agentView.list_runner = async () => {
             $('#form_runner_edit [name="runner_name"]').prop('readonly', false);
             $('#form_runner_edit [name="session_datasource"]').trigger('change');
             $('#btn_del_runner').hide();
+            $('[name="save_mode"]').val('add');
             cmdbox.process_i18n($('#runner_edit_modal'));
             $('#runner_edit_modal').modal('show');
             // Agentリストをロード
@@ -154,6 +156,7 @@ agentView.list_runner = async () => {
                         res['data'].map(elm=>{$('[name="rag"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
                         form.find('[name="rag"]').val(config.rag);
                     },$('[name="title"]').val(),'rag');
+                    $('[name="save_mode"]').val('update');
                 } finally {
                     cmdbox.hide_loading();
                 }
@@ -179,7 +182,7 @@ agentView.list_runner = async () => {
 
 agentView.save_runner = async () => {
     const form = $('#form_runner_edit');
-    const data = {};
+    const data = {save_mode: $('[name="save_mode"]').val()};
     const array = form.serializeArray();
     
     // Helper to handle multiple values for same name (for mcpservers)

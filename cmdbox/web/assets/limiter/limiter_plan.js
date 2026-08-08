@@ -19,6 +19,7 @@ limiter_plan_page.get_plan_form_def = async () => {
 limiter_plan_page.build_plan_form = async () => {
     const form = $('#plan_form_content');
     form.empty();
+    form.append('<input type="hidden" name="save_mode" value="update">');
     const defs = await limiter_plan_page.get_plan_form_def();
     const modal = $('#plan_modal');
     defs.forEach((row, i) => {
@@ -322,6 +323,7 @@ limiter_plan_page.open_edit_modal = async (name) => {
         modal.find('.modal-title').text('New Plan');
         // デフォルト値を設定
         const form = $('#plan_form_content');
+        form.find('[name="save_mode"]').val('add');
         form.find('[name="billing_type"]').val('period');
         cmdbox.process_i18n(modal);
         cmdbox.hide_loading();
@@ -393,6 +395,7 @@ limiter_plan_page.open_edit_modal = async (name) => {
         });
         billing_limiter.val(cfg.billing_limiter);
     }
+    form.find('[name="save_mode"]').val('update');
     modal.find('.choice_show').change();
     cmdbox.process_i18n(modal);
     cmdbox.hide_loading();
@@ -433,7 +436,7 @@ limiter_plan_page._render_limiter_item_in_plan = (parent, lm) => {
  */
 limiter_plan_page.save_plan = async () => {
     const form = $('#plan_form_content');
-    const data = {};
+    const data = {save_mode: $('[name="save_mode"]').val()};
     form.serializeArray().forEach(item => {
         if (item.value) {
             // limiters は改行区切りの複数値

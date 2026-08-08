@@ -356,6 +356,10 @@ class Options:
             type=Options.T_INT, default=60, required=False, multi=False, hide=True, choice=None, web="mask",
             description_ja="キャッシュの有効期限（秒）を指定します。",
             description_en="Specify the cache timeout in seconds.")
+        self._options["save_mode"] = dict(
+            type=Options.T_STR, default=None, required=False, multi=False, hide=True, choice=['','add','update'], web="mask",
+            description_ja="保存モードを指定します。 `add` は新規追加、`update` は既存のオプションを更新します。省略した場合はコマンド標準の処理を行います。",
+            description_en="Specify the save mode. `add` adds a new option, and `update` updates an existing option. If omitted, the command performs its default action.")
 
     def init_debugoption(self):
         # デバックオプションを追加
@@ -374,6 +378,7 @@ class Options:
         self._options["capture_maxsize"]["opt"] = "capture_maxsize"
         self._options["cache_clear"]["opt"] = "cache_clear"
         self._options["cache_timeout"]["opt"] = "cache_timeout"
+        self._options["save_mode"]["opt"] = "save_mode"
 
         for key, mode in self._options["cmd"].items():
             if type(mode) is not dict:
@@ -412,6 +417,8 @@ class Options:
                     c["choice"].append(self._options["cache_clear"])
                 if "cache_timeout" not in [_o['opt'] for _o in c["choice"]]:
                     c["choice"].append(self._options["cache_timeout"])
+                if "save_mode" not in [_o['opt'] for _o in c["choice"]]:
+                    c["choice"].append(self._options["save_mode"])
 
                 if c["opt"] not in [_o['opt'] for _o in self._options["cmd"]["choice"]]:
                     self._options["cmd"]["choice"] += [c]

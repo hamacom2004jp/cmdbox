@@ -16,6 +16,8 @@ agentView.initSettingsView = () => {
             agentView.list_llm();
         } else if (target === '#mcpsv_settings') {
             agentView.list_mcpsv();
+        } else if (target === '#skill_settings') {
+            agentView.list_skill();
         } else if (target === '#runner_settings') {
             agentView.list_runner();
         } else if (target === '#rag_settings') {
@@ -41,6 +43,9 @@ agentView.initSettingsView = () => {
     }));
     promises.push(cmdbox.check_cmd('agent', 'mcpsv_load').then((res) => {
         !res && $('[data-bs-target="#mcpsv_settings"]').hide();
+    }));
+    promises.push(cmdbox.check_cmd('skill', 'list').then((res) => {
+        !res && $('[data-bs-target="#skill_settings"]').hide();
     }));
     promises.push(cmdbox.check_cmd('tts', 'install').then((res) => {
         !res && $('[data-bs-target="#tts_settings"]').hide();

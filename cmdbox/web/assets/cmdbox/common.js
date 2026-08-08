@@ -2256,6 +2256,56 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
     }
 }
 /**
+ * 指定したIDのinput要素にローカルファイルを選択するダイアログを表示し、選択されたファイルをサーバーにアップロードして、input要素の値にアップロード先のパスを設定します。
+ * @param {string} unique_id - ユニークID
+ * @returns {void}
+ */
+cmdbox.choice_local_file = (unique_id) => {
+    const picker = $(`#picker_${unique_id}`).length>0?$(`#picker_${unique_id}`):$(`<input id="picker_${unique_id}" type="file" style="display:none;">`);
+    $('body').append(picker);
+    picker.off('change').on('change', async function() {
+        let upload_target = null;
+        try {
+            const files = this.files;
+            if (!files || files.length <= 0) return;
+            cmdbox.show_loading();
+            const user = await cmdbox.user_info();
+            const user_name = user && user['name'] ? user['name'] : 'USER';
+            const svpath = `/.users/${user_name}/.temp/`;
+            const formData = new FormData();
+            const file = files[0];
+            formData.append('files', file);
+            upload_target = $('<form class="d-none"><input class="filer_scope" type="hidden" value="client"></form>');
+            $('body').append(upload_target);
+            cmdbox.file_upload(upload_target, svpath, formData, false,
+                undefined,
+                (target, upath, data) => {
+                    if (data != 'upload success') {
+                        cmdbox.message(data, true, true);
+                        cmdbox.hide_loading();
+                        return;
+                    }
+                    $(`[id="${unique_id}"]`).val(`${svpath}${file.name}`);
+                    cmdbox.hide_loading();
+                },
+                (target, upath, data) => {
+                    cmdbox.message(data, true, true);
+                    cmdbox.hide_loading();
+                }
+            );
+        } catch (e) {
+            cmdbox.hide_loading();
+            cmdbox.message({'error': `${e}`}, true, true);
+        } finally {
+            picker.remove();
+            if (upload_target) upload_target.remove();
+        }
+    });
+    picker.click();
+    return;
+};
+
+/**
  * コマンドボタンを実行します
  * @param {object} mode - モード
  * @param {string} cmd - コマンド

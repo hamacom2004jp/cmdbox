@@ -33,6 +33,10 @@ $(() => {
             const datasource_edit_html = await fetch('assets/agent/agent_settings_datasource.html').then(res => res.text());
             $('.layout-grid').append(datasource_edit_html);
 
+            // skill追加/編集モーダルの読込み
+            const skill_edit_html = await fetch('assets/agent/agent_settings_skill.html').then(res => res.text());
+            $('.layout-grid').append(skill_edit_html);
+
             // ファイラー画面の読込み
             const files_html = await fetch('assets/agent/agent_files.html').then(res => res.text());
             $('.layout-grid').append(files_html);
@@ -122,27 +126,6 @@ $(() => {
             cmdbox.init_version_modal();
             // モーダルボタン初期化
             cmdbox.init_modal_button();
-            // 多言語対応のためのテキスト翻訳を処理
-            setTimeout(() => {cmdbox.process_i18n();}, 100);
-            // ツールメニュー初期化
-            const tools = async (sel, url) => {
-                const res = await fetch(url, {method: 'GET'});
-                const menu = await res.json();
-                for (let key in menu) {
-                    const m = menu[key];
-                    const li = $('<li>');
-                    const css_class = m["css_class"] ? m["css_class"] : '';
-                    const href = m["href"] ? m["href"] : '#';
-                    const target = m["target"] ? m["target"] : '_self';
-                    const onclick = m["onclick"] ? m["onclick"] : '';
-                    const html = m["html"] ? m["html"] : '';
-                    const a = $('<a>').attr('class', css_class).attr('href', href).attr('onclick', onclick).attr('target', target);
-                    a.addClass('i18n').html(html);
-                    li.append(a);
-                    $(sel).append(li);
-                }
-                cmdbox.process_i18n($(sel));
-            };
             // ユーザー情報メニュー初期化
             cmdbox.init_user_info_menu().then(async () => {
                 // ツールメニュー初期化
@@ -161,9 +144,9 @@ $(() => {
                     a.attr('target', m["target"] ? m["target"] : '_self');
                     a.attr('onclick', m["onclick"] ? m["onclick"] : '');
                 }
-                cmdbox.process_i18n(menu_ul);
+                await cmdbox.process_i18n();
                 // デフォルトのRunnerを設定
-                agentView.setDefaultRunner();
+                await agentView.setDefaultRunner();
             });
         } finally {
             cmdbox.hide_loading();

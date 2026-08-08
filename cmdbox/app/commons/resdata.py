@@ -65,6 +65,7 @@ class Data(Base):
     """
     model_config = Base.forbid_on()  # 定義されていないフィールドを禁止
     #data: Union[Dict[str, Any], List[Any], str, int, float, bool, None] = None
+    save_mode: Union[str, None] = Field(default=None, description="保存モード")
     performance: Union[List[KeyVal], None] = Field(default=None, description="パフォーマンス情報のリスト")
 
 class Result(Base):

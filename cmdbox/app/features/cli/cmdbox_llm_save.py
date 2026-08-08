@@ -112,6 +112,7 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
             llmseed=args.llmseed if hasattr(args, 'llmseed') else None,
             llmtemperature=args.llmtemperature if hasattr(args, 'llmtemperature') else None,
             llmpriority=args.llmpriority if hasattr(args, 'llmpriority') else None,
+            save_mode=args.save_mode if hasattr(args, 'save_mode') else None,
         )
 
         if hasattr(args, 'llmsvaccountfile') and args.llmsvaccountfile is not None:
@@ -173,9 +174,13 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
         reskey = msg[1]
         try:
             configure = json.loads(convert.b64str2str(msg[2]))
-
-            configure_path = data_dir / ".agent" / f"llm-{configure['llmname']}.json"
+            name = configure.get('llmname')
+            configure_path = data_dir / ".agent" / f"llm-{name}.json"
             configure_path.parent.mkdir(parents=True, exist_ok=True)
+            chk, msg = self.check_save_mode(name, configure, configure_path)
+            if not chk:
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
             common.save_file(configure_path, lambda f: json.dump(configure, f, indent=4),
                              encoding='utf-8', nolock=False)
             msg = dict(success=f"LLM configuration saved to '{str(configure_path)}'.")

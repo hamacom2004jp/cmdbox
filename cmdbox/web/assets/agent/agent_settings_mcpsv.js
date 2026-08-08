@@ -9,6 +9,7 @@ agentView.get_mcpsv_form_def = async () => {
 agentView.build_mcpsv_form = async () => {
     const form = $('#form_mcpsv_edit');
     form.empty();
+    form.append('<input type="hidden" name="save_mode" value="update">');
     const defs = await agentView.get_mcpsv_form_def();
     const model = $('#mcpsv_edit_modal');
     defs.forEach((row, i) => {
@@ -24,6 +25,7 @@ agentView.list_mcpsv = async () => {
             agentView.build_mcpsv_form();
             $('#form_mcpsv_edit [name="mcpserver_name"]').prop('readonly', false);
             $('#btn_del_mcpsv').hide();
+            $('[name="save_mode"]').val('add');
             cmdbox.process_i18n($('#mcpsv_edit_modal'));
             $('#mcpsv_edit_modal').modal('show');
         } finally {
@@ -128,6 +130,7 @@ agentView.list_mcpsv = async () => {
                         res['data'].map(elm=>{$('[name="mcp_tools"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
                         form.find('[name="mcp_tools"]').val(config.mcpserver_mcp_tools);
                     },$('[name="title"]').val(),'mcp_tools');
+                    $('[name="save_mode"]').val('update');
                 } finally {
                     cmdbox.hide_loading();
                 }
@@ -141,7 +144,7 @@ agentView.list_mcpsv = async () => {
 
 agentView.save_mcpsv = async () => {
     const form = $('#form_mcpsv_edit');
-    const data = {};
+    const data = {save_mode: $('[name="save_mode"]').val()};
     form.find(':input').each((i, elem) => {
         const val = $(elem).val();
         if (val) data[elem.name] = val;

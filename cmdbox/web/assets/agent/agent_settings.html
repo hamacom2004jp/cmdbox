@@ -20,6 +20,7 @@
                             <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#datasource_settings">Datasource Settings</a>
                             <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#llm_settings">LLM Settings</a>
                             <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#mcpsv_settings">MCPSV Settings</a>
+                            <!-- a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#skill_settings">Skill Settings</a -->
                             <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#tts_settings">TTS Settings</a>
                             <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#runner_settings">Runner Settings</a>
                             <a href="#" class="list-group-item list-group-item-action i18n" data-bs-target="#rag_settings">RAG Settings</a>
@@ -77,6 +78,18 @@
                                 </div>
                                 <div id="mcpsv_list_container" class="list-group">
                                     <!-- MCPSV List Items will be injected here -->
+                                </div>
+                            </div>
+                            <div id="skill_settings" class="settings-content d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 glow-text-cyan system-font i18n">Skill Settings</h6>
+                                    <button id="btn_add_skill" class="btn btn-sf ms-3">
+                                        <svg class="bi bi-plus" width="16" height="16" fill="currentColor"><use href="#btn_plus"></use></svg>
+                                        <span class="i18n">Install Skill</span>
+                                    </button>
+                                </div>
+                                <div id="skill_list_container" class="list-group">
+                                    <!-- Skill List Items will be injected here -->
                                 </div>
                             </div>
                             <div id="tts_settings" class="settings-content d-none">

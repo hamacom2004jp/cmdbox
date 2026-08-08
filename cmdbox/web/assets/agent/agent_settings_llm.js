@@ -9,6 +9,7 @@ agentView.get_llm_form_def = async () => {
 agentView.build_llm_form = async () => {
     const form = $('#form_llm_edit');
     form.empty();
+    form.append('<input type="hidden" name="save_mode" value="update">');
     const defs = await agentView.get_llm_form_def();
     const model = $('#llm_edit_modal');
     defs.forEach((row, i) => {
@@ -25,6 +26,7 @@ agentView.list_llm = async () => {
             $('#form_llm_edit [name="llmname"]').prop('readonly', false);
             $('#form_llm_edit [name="llmprov"]').trigger('change');
             $('#btn_del_llm').hide();
+            $('[name="save_mode"]').val('add');
             cmdbox.process_i18n($('#llm_edit_modal'));
             $('#llm_edit_modal').modal('show');
         } finally {
@@ -110,6 +112,7 @@ agentView.list_llm = async () => {
                             cmdbox.message(res, true, true);
                         }
                     });
+                    $('[name="save_mode"]').val('update');
                     cmdbox.process_i18n($('#llm_edit_modal'));
                     $('#llm_edit_modal').modal('show');
                 } finally {
@@ -137,7 +140,7 @@ agentView.list_llm = async () => {
 
 agentView.save_llm = async () => {
     const form = $('#form_llm_edit');
-    const data = {};
+    const data = {save_mode: $('[name="save_mode"]').val()};
     form.serializeArray().forEach(item => {
         if (item.value) data[item.name] = item.value;
     });

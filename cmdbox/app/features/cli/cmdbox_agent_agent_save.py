@@ -1,7 +1,12 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.options import Options
-from cmdbox.app.features.cli import cmdbox_agent_agent_list, cmdbox_agent_mcpsv_list, cmdbox_llm_list
+from cmdbox.app.features.cli import (
+    cmdbox_agent_agent_list,
+    cmdbox_agent_mcpsv_list,
+    cmdbox_llm_list,
+    cmdbox_skill_list,
+)
 from cmdbox.app.features.cli.agent import agant_base
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -18,6 +23,7 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
         self.agent_list = cmdbox_agent_agent_list.AgentAgentList(appcls, ver, language)
         self.mcpsv_list = cmdbox_agent_mcpsv_list.AgentMcpList(appcls, ver, language)
         self.llm_list = cmdbox_llm_list.LLMList(appcls, ver, language)
+        self.skill_list = cmdbox_skill_list.SkillList(appcls, ver, language)
 
     def get_mode(self) -> Union[str, List[str]]:
         return 'agent'
@@ -58,7 +64,7 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
                     description_en="Specify the name of the agent configuration to save."),
                 dict(opt="agent_type", type=Options.T_STR, default='local', required=True, multi=False, hide=False,
                     choice=['local', 'remote'],
-                    choice_show=dict(local=["llm", "mcpservers", "subagents", "agent_description", "agent_instruction", "prompt_param"],
+                    choice_show=dict(local=["llm", "mcpservers", "subagents", "skill_name", "agent_description", "agent_instruction", "prompt_param"],
                                      remote=["a2asv_baseurl", "a2asv_delegated_auth", "a2asv_apikey", "agent_description"]),
                     description_ja="Agentの種類を指定します。`local` または `remote` を指定します。",
                     description_en="Specify the agent type. Specify either `local` or `remote`."),
@@ -87,6 +93,10 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
                     choice_fn=self.choice_subagents,
                     description_ja="Agentが利用するサブエージェント名を指定します。",
                     description_en="Specify the subagent name used by the agent."),
+                dict(opt="skill_names", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=[],
+                    choice_fn=self.choice_skills,
+                    description_ja="Agentが利用するスキル名を指定します。複数指定できます。",
+                    description_en="Specify skill names used by the agent. Multiple values are allowed."),
                 dict(opt="agent_description", type=Options.T_TEXT, default=self.agent_description, required=False, multi=False, hide=False, choice=None,
                     description_ja="Agentの能力に関する説明を指定します。モデルはこれを使用して、制御をエージェントに委譲するかどうかを決定します。一行の説明で十分であり、推奨されます。",
                     description_en="Specify a description of the agent's capabilities. The model uses this to determine whether to delegate control to the agent. A single line description is sufficient and recommended."),
@@ -124,6 +134,15 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
         logger = common.default_logger(False, ver=self.ver, webcall=webmode)
         args = argparse.Namespace(**opt)
         st, res, _ = self.llm_list.apprun(logger, args, 0.0, [])
+        if st != self.RESP_SUCCESS:
+            return []
+        ret = [k.get('name') for k in res.get('success', {}).get('data', [])]
+        return [''] + ret
+
+    def choice_skills(self, o:Dict[str, Any], webmode:bool, opt:Dict[str, Any]) -> Any:
+        logger = common.default_logger(False, ver=self.ver, webcall=webmode)
+        args = argparse.Namespace(**opt)
+        st, res, _ = self.skill_list.apprun(logger, args, 0.0, [])
         if st != self.RESP_SUCCESS:
             return []
         ret = [k.get('name') for k in res.get('success', {}).get('data', [])]
@@ -171,6 +190,16 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
             ret.append(svname)
         return ret
 
+    def list_skills(self, data_dir: str) -> List[str]:
+        skills_dir = Path(data_dir) / '.skills'
+        if not skills_dir.exists() or not skills_dir.is_dir():
+            return []
+        ret: List[str] = []
+        for p in sorted(skills_dir.iterdir()):
+            if p.is_dir() and (p / 'SKILL.md').exists():
+                ret.append(p.name)
+        return ret
+
     @limiter.apprun_check_limit
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
@@ -199,10 +228,12 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
             llm=args.llm if hasattr(args, 'llm') else None,
             mcpservers=list(set(args.mcpservers)) if hasattr(args, 'mcpservers') and args.mcpservers is not None else None,
             subagents=list(set(args.subagents)) if hasattr(args, 'subagents') and args.subagents is not None else None,
+            skill_names=list(set(args.skill_names)) if hasattr(args, 'skill_names') and args.skill_names is not None else None,
             agent_description=args.agent_description if hasattr(args, 'agent_description') else None,
             agent_instruction=args.agent_instruction if hasattr(args, 'agent_instruction') else None,
             agent_system_instruction=args.agent_system_instruction if hasattr(args, 'agent_system_instruction') else None,
             prompt_param=args.prompt_param if hasattr(args, 'prompt_param') else None,
+            save_mode=args.save_mode if hasattr(args, 'save_mode') else None,
         )
 
         payload_b64 = convert.str2b64str(common.to_str(configure))
@@ -257,10 +288,22 @@ class AgentAgentSave(agant_base.AgentBase, validator.Validator, limiter.LimitedF
                             msg = dict(warn=f"An agent cannot include itself as a subagent.")
                             redis_cli.rpush(reskey, msg)
                             return self.RESP_WARN
+                if configure.get('skill_names', None) is not None:
+                    configure['skill_names'] = list(set(configure['skill_names']))
+                    entries = self.list_skills(data_dir)
+                    for s in configure['skill_names']:
+                        if s not in entries:
+                            msg = dict(warn=f"Specified skill '{s}' not found.")
+                            redis_cli.rpush(reskey, msg)
+                            return self.RESP_WARN
 
             name = configure.get('agent_name')
             configure_path = data_dir / ".agent" / f"agent-{name}.json"
             configure_path.parent.mkdir(parents=True, exist_ok=True)
+            chk, msg = self.check_save_mode(name, configure, configure_path)
+            if not chk:
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
             with configure_path.open('w', encoding='utf-8') as f:
                 json.dump(configure, f, indent=4)
             msg = dict(success=f"Agent configuration saved to '{str(configure_path)}'.")

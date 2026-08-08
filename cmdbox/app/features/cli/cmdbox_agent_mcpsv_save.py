@@ -99,6 +99,7 @@ class AgentMcpSave(feature.OneshotResultEdgeFeature, validator.Validator, limite
             mcpserver_delegated_auth=args.mcpserver_delegated_auth,
             mcpserver_transport=args.mcpserver_transport,
             mcpserver_mcp_tools=args.mcp_tools,
+            save_mode=args.save_mode if hasattr(args, 'save_mode') else None,
         )
 
         payload_b64 = convert.str2b64str(common.to_str(configure))
@@ -131,6 +132,10 @@ class AgentMcpSave(feature.OneshotResultEdgeFeature, validator.Validator, limite
             name = configure.get('mcpserver_name')
             configure_path = data_dir / ".agent" / f"mcpsv-{name}.json"
             configure_path.parent.mkdir(parents=True, exist_ok=True)
+            chk, msg = self.check_save_mode(name, configure, configure_path)
+            if not chk:
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
             with configure_path.open('w', encoding='utf-8') as f:
                 json.dump(configure, f, indent=4)
             msg = dict(success=f"MCP server configuration saved to '{str(configure_path)}'.")

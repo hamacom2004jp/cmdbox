@@ -8,6 +8,7 @@ agentView.get_datasource_form_def = async () => {
 agentView.build_datasource_form = async () => {
     const form = $('#form_datasource_edit');
     form.empty();
+    form.append('<input type="hidden" name="save_mode" value="update">');
     const defs = await agentView.get_datasource_form_def();
     const model = $('#datasource_edit_modal');
     defs.forEach((row, i) => {
@@ -25,6 +26,7 @@ agentView.list_datasource = async () => {
             $('#form_datasource_edit [name="dbtype"]').trigger('change');
             $('#form_datasource_edit [name="scope"]').trigger('change');
             $('#btn_del_datasource').hide();
+            $('[name="save_mode"]').val('add');
             cmdbox.process_i18n($('#datasource_edit_modal'));
             $('#datasource_edit_modal').modal('show');
         } finally {
@@ -107,6 +109,7 @@ agentView.list_datasource = async () => {
                             cmdbox.message(res, true, true);
                         }
                     });
+                    $('[name="save_mode"]').val('update');
                     cmdbox.process_i18n($('#datasource_edit_modal'));
                     $('#datasource_edit_modal').modal('show');
                 } finally {
@@ -122,7 +125,7 @@ agentView.list_datasource = async () => {
 
 agentView.save_datasource = async () => {
     const form = $('#form_datasource_edit');
-    const data = {};
+    const data = {save_mode: $('[name="save_mode"]').val()};
     form.find(':input').each((i, elem) => {
         const val = $(elem).val();
         if (val) data[elem.name] = val;

@@ -2,7 +2,7 @@ agentView.get_agent_form_def = async () => {
     const opts = await cmdbox.get_cmd_choices('agent', 'agent_save');
     const vform_names = ['agent_name', 'agent_type', 'reasoning_effort',
                          'a2asv_baseurl', 'a2asv_delegated_auth', 'a2asv_apikey',
-                         'llm', 'mcpservers', 'subagents',
+                         'llm', 'mcpservers', 'subagents',/* 'skill_names',*/
                          'agent_description', 'agent_system_instruction','agent_instruction','prompt_param'];
     const ret = opts.filter(o => vform_names.includes(o.opt));
     return ret;
@@ -11,6 +11,7 @@ agentView.get_agent_form_def = async () => {
 agentView.build_agent_form = async () => {
     const form = $('#form_agent_edit');
     form.empty();
+    form.append('<input type="hidden" name="save_mode" value="update">');
     const defs = await agentView.get_agent_form_def();
     const model = $('#agent_edit_modal');
     defs.forEach((row, i) => {
@@ -26,6 +27,7 @@ agentView.list_agent = async () => {
             await agentView.build_agent_form();
             $('#form_agent_edit [name="agent_name"]').prop('readonly', false);
             $('#btn_del_agent').hide();
+            $('[name="save_mode"]').val('add');
             $('[name="agent_type"]').trigger('change');
             cmdbox.process_i18n($('#agent_edit_modal'));
             $('#agent_edit_modal').modal('show');
@@ -44,6 +46,11 @@ agentView.list_agent = async () => {
                 $("[name='subagents']").empty().append('<option></option>');
                 res['data'].map(elm=>{$('[name="subagents"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
             },$('[name="title"]').val(),'subagents');
+            // Skillリストをロード
+            await cmdbox.callcmd('skill','list',{},(res)=>{
+                $("[name='skill_names']").empty().append('<option></option>');
+                res['data'].map(elm=>{$('[name="skill_names"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+            },$('[name="title"]').val(),'skill_names');
         } finally {
             cmdbox.hide_loading();
         }
@@ -168,6 +175,16 @@ agentView.list_agent = async () => {
                             $(e).val(v);
                         });
                     },$('[name="title"]').val(),'subagents');
+                    // Skillリストをロード
+                    await cmdbox.callcmd('skill','list',{},(res)=>{
+                        $("[name='skill_names']").empty().append('<option></option>');
+                        res['data'].map(elm=>{$('[name="skill_names"]').append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
+                        config.skill_names && config.skill_names.forEach((v, i) => {
+                            const e = form.find('[name="skill_names"]')[i];
+                            $(e).val(v);
+                        });
+                    },$('[name="title"]').val(),'skill_names');
+                    $('[name="save_mode"]').val('update');
                 } finally {
                     cmdbox.hide_loading();
                 }
@@ -181,7 +198,7 @@ agentView.list_agent = async () => {
 
 agentView.save_agent = async () => {
     const form = $('#form_agent_edit');
-    const data = {};
+    const data = {save_mode: $('[name="save_mode"]').val()};
     const array = form.serializeArray();
     
     // Helper to handle multiple values for same name (for mcpservers)
@@ -199,6 +216,12 @@ agentView.save_agent = async () => {
     // Ensure mcpservers is array if present
     if (multiMap['mcpservers'] && !Array.isArray(multiMap['mcpservers'])) {
         multiMap['mcpservers'] = [multiMap['mcpservers']];
+    }
+    if (multiMap['subagents'] && !Array.isArray(multiMap['subagents'])) {
+        multiMap['subagents'] = [multiMap['subagents']];
+    }
+    if (multiMap['skill_names'] && !Array.isArray(multiMap['skill_names'])) {
+        multiMap['skill_names'] = [multiMap['skill_names']];
     }
     
     Object.assign(data, multiMap);

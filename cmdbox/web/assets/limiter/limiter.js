@@ -21,6 +21,7 @@ limiter_page.get_limiter_form_def = async () => {
 limiter_page.build_limiter_form = async () => {
     const form = $('#limiter_form_content');
     form.empty();
+    form.append('<input type="hidden" name="save_mode" value="update">');
     const defs = await limiter_page.get_limiter_form_def();
     const modal = $('#limiter_modal');
     defs.forEach((row, i) => {
@@ -387,6 +388,7 @@ limiter_page.open_edit_modal = async (name, defaults) => {
                 form.find('[name="target_cmd"]').val(defaults.target_cmd);
             }
         }
+        form.find('[name="save_mode"]').val('add');
         cmdbox.process_i18n(modal);
         cmdbox.hide_loading();
         modal.modal('show');
@@ -432,7 +434,7 @@ limiter_page.open_edit_modal = async (name, defaults) => {
         res.map(elm=>{form.find("[name='target_cmd']").append('<option value="'+elm+'">'+elm+'</option>');});
         form.find('[name="target_cmd"]').val(cfg['target_cmd']);
     }
-
+    form.find('[name="save_mode"]').val('update');
     cmdbox.process_i18n(modal);
     cmdbox.hide_loading();
     modal.modal('show');
@@ -444,7 +446,7 @@ limiter_page.open_edit_modal = async (name, defaults) => {
  */
 limiter_page.save_limiter = async () => {
     const form = $('#limiter_form_content');
-    const data = {};
+    const data = {save_mode: $('[name="save_mode"]').val()};
     form.serializeArray().forEach(item => {
         if (item.value) data[item.name] = item.value;
     });

@@ -192,6 +192,7 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
             billing_max_amount=args.billing_max_amount if hasattr(args, 'billing_max_amount') else None,
             billing_unit_price=args.billing_unit_price if hasattr(args, 'billing_unit_price') else None,
             billing_currency=args.billing_currency if hasattr(args, 'billing_currency') and args.billing_currency is not None else "JPY",
+            save_mode=args.save_mode if hasattr(args, 'save_mode') else None,
         )
 
         configure_b64 = convert.str2b64str(common.to_str(configure))
@@ -224,6 +225,12 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
             if not plan_name:
                 out = dict(warn="plan_name is required.")
                 redis_cli.rpush(reskey, out)
+                return self.RESP_WARN
+            configure_path = data_dir / ".limiter" / f"plan-{plan_name}.json"
+            configure_path.parent.mkdir(parents=True, exist_ok=True)
+            chk, msg = self.check_save_mode(plan_name, configure, configure_path)
+            if not chk:
+                redis_cli.rpush(reskey, msg)
                 return self.RESP_WARN
 
             # plan_start は open_date 以降、plan_end は suspend_date 以前であることを確認
@@ -329,8 +336,6 @@ class LimiterPlanSave(feature.OneshotResultEdgeFeature, validator.Validator):
                     redis_cli.rpush(reskey, out)
                     return self.RESP_WARN
 
-            configure_path = data_dir / ".limiter" / f"plan-{plan_name}.json"
-            configure_path.parent.mkdir(parents=True, exist_ok=True)
             common.save_file(configure_path, lambda f: json.dump(configure, f, indent=4), encoding='utf-8', nolock=False)
             out = dict(success=f"Plan configuration saved to '{str(configure_path)}'.")
             redis_cli.rpush(reskey, out)

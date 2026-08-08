@@ -135,6 +135,7 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator, lim
             rag=list(set(args.rag)) if hasattr(args, 'rag') and args.rag is not None else None,
             session_datasource=args.session_datasource if hasattr(args, 'session_datasource') else None,
             runner_priority=args.runner_priority if hasattr(args, 'runner_priority') else 1,
+            save_mode=args.save_mode if hasattr(args, 'save_mode') else None,
         )
 
         payload_b64 = convert.str2b64str(common.to_str(configure))
@@ -172,6 +173,10 @@ class AgentRunnerSave(feature.OneshotResultEdgeFeature, validator.Validator, lim
             name = configure.get('runner_name')
             configure_path = data_dir / ".agent" / f"runner-{name}.json"
             configure_path.parent.mkdir(parents=True, exist_ok=True)
+            chk, msg = self.check_save_mode(name, configure, configure_path)
+            if not chk:
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
             with configure_path.open('w', encoding='utf-8') as f:
                 json.dump(configure, f, indent=4)
             msg = dict(success=f"Runner configuration saved to '{str(configure_path)}'.")

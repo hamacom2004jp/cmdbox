@@ -8,6 +8,7 @@ agentView.get_rag_form_def = async () => {
 agentView.build_rag_form = async () => {
     const form = $('#form_rag_edit');
     form.empty();
+    form.append('<input type="hidden" name="save_mode" value="update">');
     const defs = await agentView.get_rag_form_def();
     const model = $('#rag_edit_modal');
     defs.forEach((row, i) => {
@@ -25,6 +26,7 @@ agentView.list_rag = async () => {
             $('#form_rag_edit [name="rag_datasource"]').trigger('change');
             $('#btn_del_rag').hide();
             $('#btn_build_rag').hide();
+            $('[name="save_mode"]').val('add');
             cmdbox.process_i18n($('#rag_edit_modal'));
             $('#rag_edit_modal').modal('show');
             // LLM（embedding）リストをロード
@@ -153,6 +155,7 @@ agentView.list_rag = async () => {
                         res['data'].map(elm=>{$("[name='extract']").append('<option value="'+elm["name"]+'">'+elm["name"]+'</option>');});
                         form.find('[name="extract"]').val(config.extract);
                     },$('[name="title"]').val(),'extract');
+                    $('[name="save_mode"]').val('update');
                     cmdbox.process_i18n($('#rag_edit_modal'));
                     $('#rag_edit_modal').modal('show');
                 } finally {
@@ -168,7 +171,7 @@ agentView.list_rag = async () => {
 
 agentView.save_rag = async () => {
     const form = $('#form_rag_edit');
-    const data = {};
+    const data = {save_mode: $('[name="save_mode"]').val()};
     form.serializeArray().forEach(item => {
         if (item.value) data[item.name] = item.value;
     });

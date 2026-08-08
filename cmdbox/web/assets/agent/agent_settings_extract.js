@@ -8,6 +8,7 @@ agentView.get_extract_form_def = async () => {
 agentView.build_extract_form = async () => {
     const form = $('#form_extract_edit');
     form.empty();
+    form.append('<input type="hidden" name="save_mode" value="update">');
     const defs = await agentView.get_extract_form_def();
     const model = $('#extract_edit_modal');
     defs.forEach((row, i) => {
@@ -24,6 +25,7 @@ agentView.list_extract = async () => {
             $('#form_extract_edit [name="extract_name"]').prop('readonly', false);
             $('#form_extract_edit [name="extract_type"]').trigger('change');
             $('#btn_del_extract').hide();
+            $('[name="save_mode"]').val('add');
             cmdbox.process_i18n($('#extract_edit_modal'));
             $('#extract_edit_modal').modal('show');
 
@@ -129,6 +131,7 @@ agentView.list_extract = async () => {
                         res['data'].forEach(elm=>{$('[name="extract_cmd"]').append('<option value="'+elm["title"]+'">'+elm["title"]+'</option>');});
                         form.find('[name="extract_cmd"]').val(config.extract_cmd);
                     },$('[name="title"]').val(),'extract_cmd');
+                    $('[name="save_mode"]').val('update');
                     cmdbox.process_i18n($('#extract_edit_modal'));
                     $('#extract_edit_modal').modal('show');
                 } finally {
@@ -144,7 +147,7 @@ agentView.list_extract = async () => {
 
 agentView.save_extract = async () => {
     const form = $('#form_extract_edit');
-    const data = {};
+    const data = {save_mode: $('[name="save_mode"]').val()};
     form.serializeArray().forEach(item => {
         if (item.value) data[item.name] = item.value;
     });

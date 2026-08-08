@@ -101,6 +101,7 @@ class DatasourceSave(datasource_base.DatasourceBase, validator.Validator, limite
             db_name=args.db_name if hasattr(args, 'db_name') else None,
             db_timeout=args.db_timeout if hasattr(args, 'db_timeout') else None,
             db_path=args.db_path if hasattr(args, 'db_path') else None,
+            save_mode=args.save_mode if hasattr(args, 'save_mode') else None,
         )
         payload_b64 = convert.str2b64str(common.to_str(payload))
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
@@ -127,6 +128,13 @@ class DatasourceSave(datasource_base.DatasourceBase, validator.Validator, limite
         reskey = msg[1]
         try:
             payload = json.loads(convert.b64str2str(msg[2]))
+            name = payload.get('dsname')
+            configure_path = data_dir / ".datasource" / f"datasource-{name}.json"
+            configure_path.parent.mkdir(parents=True, exist_ok=True)
+            chk, msg = self.check_save_mode(name, payload, configure_path)
+            if not chk:
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
             self.save_datasource(
                 data_dir,
                 dsname=payload['dsname'],

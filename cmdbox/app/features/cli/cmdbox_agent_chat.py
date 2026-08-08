@@ -449,6 +449,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             llmendpoint = llm_conf.get('llmendpoint', None)
             if llmmodel is None: raise ValueError("llmmodel is required.")
             if llmapikey is None: raise ValueError("llmapikey is required.")
+            tools = self.create_agent_tools(logger, data_dir, agent_conf, mcpsv_confs, payload)
             agent = Agent(
                 name=agent_name,
                 model=lite_llm.LiteLlm(
@@ -459,7 +460,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 description=description,
                 instruction=instruction,
                 planner=planner,
-                tools=self.create_tool_mcpsv(logger, mcpsv_confs, payload),
+                tools=tools,
                 sub_agents=subagents,
                 output_schema=self.create_agent_output_schema(),
                 before_model_callback=self.create_agent_before_model_callback(llm_conf),
@@ -477,6 +478,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             if llmapiversion is None: raise ValueError("llmapiversion is required.")
             if not llmmodel.startswith("azure/"):
                 llmmodel = f"azure/{llmmodel}"
+            tools = self.create_agent_tools(logger, data_dir, agent_conf, mcpsv_confs, payload)
             agent = Agent(
                 name=agent_name,
                 model=lite_llm.LiteLlm(
@@ -489,7 +491,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 description=description,
                 instruction=instruction,
                 planner=planner,
-                tools=self.create_tool_mcpsv(logger, mcpsv_confs, payload),
+                tools=tools,
                 sub_agents=subagents,
                 output_schema=self.create_agent_output_schema(),
                 before_model_callback=self.create_agent_before_model_callback(llm_conf),
@@ -505,6 +507,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             if llmmodel is None: raise ValueError("llmmodel is required.")
             if llmlocation is None: raise ValueError("llmlocation is required.")
             if llmsvaccountfile_data is None: raise ValueError("llmsvaccountfile_data is required.")
+            tools = self.create_agent_tools(logger, data_dir, agent_conf, mcpsv_confs, payload)
             agent = Agent(
                 name=agent_name,
                 model=lite_llm.LiteLlm(
@@ -518,7 +521,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 description=description,
                 instruction=instruction,
                 planner=planner,
-                tools=self.create_tool_mcpsv(logger, mcpsv_confs, payload),
+                tools=tools,
                 sub_agents=subagents,
                 output_schema=self.create_agent_output_schema(),
                 before_model_callback=self.create_agent_before_model_callback(llm_conf),
@@ -529,6 +532,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             llmtemperature = llm_conf.get('llmtemperature', None)
             if llmmodel is None: raise ValueError("llmmodel is required.")
             if llmendpoint is None: raise ValueError("llmendpoint is required.")
+            tools = self.create_agent_tools(logger, data_dir, agent_conf, mcpsv_confs, payload)
             agent = Agent(
                 name=agent_name,
                 model=lite_llm.LiteLlm(
@@ -540,7 +544,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 description=description,
                 instruction=instruction,
                 planner=planner,
-                tools=self.create_tool_mcpsv(logger, mcpsv_confs, payload),
+                tools=tools,
                 sub_agents=subagents,
                 output_schema=self.create_agent_output_schema(),
                 before_model_callback=self.create_agent_before_model_callback(llm_conf),
@@ -666,6 +670,64 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 header_provider=_warp(mcpserver_apikey, mcpserver_delegated_auth),
             )
             tools.append(toolset)
+        return tools
+
+    def create_tool_skills(self, logger:logging.Logger, data_dir:Path, agent_conf:Dict[str, Any]) -> List[Any]:
+        """
+        SkillToolset を作成します
+
+        Args:
+            logger (logging.Logger): ロガー
+            data_dir (Path): データディレクトリパス
+            agent_conf (Dict[str, Any]): エージェント設定
+
+        Returns:
+            List[Any]: SkillToolset のリスト
+        """
+        skill_names = agent_conf.get('skill_name', None)
+        if skill_names is None:
+            return []
+        if not isinstance(skill_names, list):
+            skill_names = [skill_names]
+        skill_names = list(dict.fromkeys([s for s in skill_names if isinstance(s, str) and s.strip() != '']))
+        if len(skill_names) <= 0:
+            return []
+
+        from google.adk.skills import load_skill_from_dir
+        from google.adk.tools.skill_toolset import SkillToolset
+
+        skills = []
+        for skill_name in skill_names:
+            skill_dir = data_dir / '.skills' / skill_name
+            if not skill_dir.exists() or not skill_dir.is_dir() or not (skill_dir / 'SKILL.md').exists():
+                raise FileNotFoundError(f"Specified skill '{skill_name}' not found at '{skill_dir}'.")
+            skill = load_skill_from_dir(skill_dir)
+            skills.append(skill)
+            if logger.level == logging.DEBUG:
+                logger.debug(f"Loaded skill '{skill_name}' from '{skill_dir}'.")
+
+        if len(skills) <= 0:
+            return []
+
+        return [SkillToolset(skills=skills)]
+
+    def create_agent_tools(self, logger:logging.Logger, data_dir:Path, agent_conf:Dict[str, Any],
+                           mcpsv_confs:List[Dict[str, Any]], payload:Dict[str, Any]) -> List[Any]:
+        """
+        Agent用ツール群(MCP + Skill)を作成します
+
+        Args:
+            logger (logging.Logger): ロガー
+            data_dir (Path): データディレクトリパス
+            agent_conf (Dict[str, Any]): エージェント設定
+            mcpsv_confs (List[Dict[str, Any]]): MCPサーバー設定リスト
+            payload (Dict[str, Any]): クライアントからのリクエスト情報
+
+        Returns:
+            List[Any]: Agentへ渡すツール一覧
+        """
+        tools = self.create_tool_mcpsv(logger, mcpsv_confs, payload)
+        tools.extend(self.create_tool_skills(logger, data_dir, agent_conf))
         return tools
 
     @limiter.async_svrun_check_limit
