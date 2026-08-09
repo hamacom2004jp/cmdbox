@@ -19,7 +19,7 @@ def _apprun_pre(self:'LimitedFeature', logger:logging.Logger, args:argparse.Name
         logger (logging.Logger): ロガー
         args (argparse.Namespace): コマンドの引数を含むNamespaceオブジェクト
     Returns:
-        Tuple[int, Dict[str, Any], Any]: ステータス、メッセージ、制限オブジェクト
+        Tuple[int, Dict[str, Any], List[str], Any]: ステータス、メッセージ、制限違反した制限設定のリスト、制限オブジェクト
     """
     mode = getattr(args, 'mode', None)
     cmd = getattr(args, 'cmd', None)
@@ -36,16 +36,18 @@ def _apprun_pre(self:'LimitedFeature', logger:logging.Logger, args:argparse.Name
         return -1, msg, None
     redis_cli = redis_client.RedisClient(logger, host=host, port=port, password=password, svname=svname) if host and port and password and svname else None
     limit = Limiter.getInstance(redis_cli, flush_interval=60, reload_interval=60)
-    st, msg = limit.check(feat=self, data_dir=Path(client_data_path), logger=logger, command_options=args.__dict__, scope='client')
-    return st, msg, limit
+    st, msg, deny_limiter_names = limit.check(feat=self, data_dir=Path(client_data_path), logger=logger, command_options=args.__dict__, scope='client')
+    return st, msg, deny_limiter_names, limit
 
-def _apprun_post(self:'LimitedFeature', stime:float, msg:Dict[str, Any], data_dir:Path, logger:logging.Logger, args:argparse.Namespace, limit:'Limiter'):
+def _apprun_post(self:'LimitedFeature', stime:float, msg:Dict[str, Any], deny_limiter_names:List[str],
+                 data_dir:Path, logger:logging.Logger, args:argparse.Namespace, limit:'Limiter'):
     """
     コマンド実行後のカウンタ更新を行います。
 
     Args:
         stime (float): コマンド実行開始時間
         msg (Dict[str, Any]): コマンドの実行結果
+        deny_limiter_names (List[str]): 制限違反した制限設定のリスト
         data_dir (Path): データディレクトリのパス
         logger (logging.Logger): ロガー
         args (argparse.Namespace): コマンドの引数
@@ -59,9 +61,10 @@ def _apprun_post(self:'LimitedFeature', stime:float, msg:Dict[str, Any], data_di
     count = self.apprun_count(data_dir, logger, args, msg)
     process_bytes = self.apprun_process_bytes(data_dir, logger, args, msg)
     registrations = self.apprun_registrations(data_dir, logger, args, msg)
-    limit.update(feat=self, data_dir=data_dir, logger=logger, command_options=args.__dict__,
-                    count=count, exec_time=exec_time, input_bytes=input_bytes, process_bytes=process_bytes,
-                    output_bytes=output_bytes, credits=credits, registrations=registrations, scope='client')
+    limit.update(feat=self, deny_limiter_names=deny_limiter_names,
+                 data_dir=data_dir, logger=logger, command_options=args.__dict__,
+                 count=count, exec_time=exec_time, input_bytes=input_bytes, process_bytes=process_bytes,
+                 output_bytes=output_bytes, credits=credits, registrations=registrations, scope='client')
 
 def apprun_check_limit(func: Callable) -> Callable:
     """
@@ -79,7 +82,7 @@ def apprun_check_limit(func: Callable) -> Callable:
         if not isinstance(self, LimitedFeature):
             return func(self, logger, args, tm, pf)
         # コマンドの実行前に制限チェック
-        limit_st, msg, limit = _apprun_pre(self, logger, args)
+        limit_st, msg, deny_limiter_names, limit = _apprun_pre(self, logger, args)
         if limit_st == Limiter.CHECK_DENY:
             return feature.Feature.RESP_WARN, msg, None
         stime = common.perf_counter()
@@ -88,7 +91,7 @@ def apprun_check_limit(func: Callable) -> Callable:
         if st == feature.Feature.RESP_SUCCESS and limit_st == Limiter.CHECK_ALLOW:
             try:
                 # コマンド実行後のカウンタ更新
-                _apprun_post(self, stime, msg, Path(args.client_data), logger, args, limit)
+                _apprun_post(self, stime, msg, deny_limiter_names, Path(args.client_data), logger, args, limit)
             except Exception as e:
                 st = feature.Feature.RESP_ERROR
                 msg = dict(error=f"Failed to update limiter counter: {e}")
@@ -112,7 +115,7 @@ def async_apprun_check_limit(func: Callable) -> Callable:
         if not isinstance(self, LimitedFeature):
             return await func(self, logger, args, tm, pf)
         # コマンドの実行前に制限チェック
-        limit_st, msg, limit = _apprun_pre(self, logger, args)
+        limit_st, msg, deny_limiter_names, limit = _apprun_pre(self, logger, args)
         if limit_st == Limiter.CHECK_DENY:
             return feature.Feature.RESP_WARN, msg, None
         stime = common.perf_counter()
@@ -122,7 +125,7 @@ def async_apprun_check_limit(func: Callable) -> Callable:
         if st == feature.Feature.RESP_SUCCESS and limit_st == Limiter.CHECK_ALLOW:
             try:
             # コマンド実行後のカウンタ更新
-                _apprun_post(self, stime, msg, Path(args.client_data), logger, args, limit)
+                _apprun_post(self, stime, msg, deny_limiter_names, Path(args.client_data), logger, args, limit)
             except Exception as e:
                 st = feature.Feature.RESP_ERROR
                 msg = dict(error=f"Failed to update limiter counter: {e}")
@@ -143,18 +146,20 @@ def _svrun_pre(self:'LimitedFeature', data_dir:Path, logger:logging.Logger, redi
         sessions (Dict[str, Dict[str, Any]]): セッション情報
 
     Returns:
-        Tuple[int, Dict[str, Any], Any, Dict[str, Any]]: ステータス、メッセージ、制限オブジェクト、コマンドオプション
+        Tuple[int, Dict[str, Any], List[str], Any, Dict[str, Any]]: ステータス、メッセージ、制限違反した制限設定のリスト、制限オブジェクト、コマンドオプション
     """
     command_options = self.svrun_parse_options(data_dir, logger, redis_cli, msg, sessions=sessions)
     limit = Limiter.getInstance(redis_cli, flush_interval=60, reload_interval=60)
-    st, ret = limit.check(feat=self, data_dir=data_dir, logger=logger, command_options=command_options, scope='server')
-    return st, ret, limit, command_options
+    st, ret, deny_limiter_names = limit.check(feat=self, data_dir=data_dir, logger=logger, command_options=command_options, scope='server')
+    return st, ret, deny_limiter_names, limit, command_options
 
-def _svrun_post(self:'LimitedFeature', data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str], command_options:Dict[str, Any], limit:'Limiter', stime:float):
+def _svrun_post(self:'LimitedFeature', deny_limiter_names:List[str],
+                data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str], command_options:Dict[str, Any], limit:'Limiter', stime:float):
     """
     svrunの実行後に制限カウンタを更新します。
 
     Args:
+        deny_limiter_names (List[str]): 制限違反した制限設定のリスト
         data_dir (Path): データディレクトリのパス
         logger (logging.Logger): ロガー
         redis_cli (redis_client.RedisClient): Redisクライアント
@@ -172,9 +177,10 @@ def _svrun_post(self:'LimitedFeature', data_dir:Path, logger:logging.Logger, red
     count = self.svrun_count(data_dir, logger, command_options, resval)
     process_bytes = self.svrun_process_bytes(data_dir, logger, command_options, resval)
     registrations = self.svrun_registrations(data_dir, logger, command_options, resval)
-    limit.update(feat=self, data_dir=data_dir, logger=logger, command_options=command_options,
-                    count=count, exec_time=exec_time, input_bytes=input_bytes, process_bytes=process_bytes,
-                    output_bytes=output_bytes, credits=credits, registrations=registrations, scope='server')
+    limit.update(feat=self, deny_limiter_names=deny_limiter_names,
+                 data_dir=data_dir, logger=logger, command_options=command_options,
+                 count=count, exec_time=exec_time, input_bytes=input_bytes, process_bytes=process_bytes,
+                 output_bytes=output_bytes, credits=credits, registrations=registrations, scope='server')
     redis_cli.last_ressize = None
     redis_cli.last_resval = None
 
@@ -192,7 +198,7 @@ def svrun_check_limit(func: Callable) -> Callable:
     #@functools.wraps(func)
     def wrapper(self:'LimitedFeature', data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str], sessions:Dict[str, Dict[str, Any]]) -> int:
         if isinstance(self, LimitedFeature):
-            limit_st, ret, limit, command_options = _svrun_pre(self, data_dir, logger, redis_cli, msg, sessions)
+            limit_st, ret, deny_limiter_names, limit, command_options = _svrun_pre(self, data_dir, logger, redis_cli, msg, sessions)
             if limit_st == Limiter.CHECK_DENY:
                 if isinstance(ret, dict): ret['end'] = True
                 logger.warning(ret)
@@ -203,7 +209,7 @@ def svrun_check_limit(func: Callable) -> Callable:
                 st = common.exec_svrun_sync(functools.partial(func, self), data_dir, logger, redis_cli, msg, sessions)
                 if st == self.RESP_SUCCESS and limit_st == Limiter.CHECK_ALLOW:
                     try:
-                        _svrun_post(self, data_dir, logger, redis_cli, msg, command_options, limit, stime)
+                        _svrun_post(self, deny_limiter_names, data_dir, logger, redis_cli, msg, command_options, limit, stime)
                     except Exception as e:
                         st = self.RESP_ERROR
                         ret = dict(error=f"Failed to update limiter counter: {e}")
@@ -228,7 +234,7 @@ def async_svrun_check_limit(func: Callable) -> Callable:
     #@functools.wraps(func)
     async def wrapper(self:'LimitedFeature', data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str], sessions:Dict[str, Dict[str, Any]]) -> int:
         if isinstance(self, LimitedFeature):
-            limit_st, ret, limit, command_options = _svrun_pre(self, data_dir, logger, redis_cli, msg, sessions)
+            limit_st, ret, deny_limiter_names, limit, command_options = _svrun_pre(self, data_dir, logger, redis_cli, msg, sessions)
             if limit_st == Limiter.CHECK_DENY:
                 if isinstance(ret, dict): ret['end'] = True
                 logger.warning(ret)
@@ -240,7 +246,7 @@ def async_svrun_check_limit(func: Callable) -> Callable:
                 st = await _func(data_dir, logger, redis_cli, msg, sessions)
                 if st == self.RESP_SUCCESS and limit_st == Limiter.CHECK_ALLOW:
                     try:
-                        _svrun_post(self, data_dir, logger, redis_cli, msg, command_options, limit, stime)
+                        _svrun_post(self, deny_limiter_names, data_dir, logger, redis_cli, msg, command_options, limit, stime)
                     except Exception as e:
                         st = self.RESP_ERROR
                         ret = dict(error=f"Failed to update limiter counter: {e}")
@@ -728,10 +734,11 @@ return cjson.encode(c)
         if not counter_path.exists():
             return self._init_counter(limiter_name)
         try:
-            last = None
-            counters = []
             with counter_path.open('r', encoding='utf-8') as f:
-                for line in f:
+                lines = f.readlines()
+            if load_history:
+                counters = []
+                for line in lines:
                     stripped = line.strip()
                     if stripped:
                         last = stripped
@@ -743,7 +750,19 @@ return cjson.encode(c)
                             counters.append(last_json)
                         except Exception:
                             pass
-            return counters if load_history else (last if last else self._init_counter(limiter_name))
+                return counters
+            else:
+                for line in reversed(lines):
+                    stripped = line.strip()
+                    if stripped:
+                        try:
+                            last_json:Dict[str, Any] = json.loads(stripped)
+                            enable = any(last_json.get(k) for k in self.COUNTER_VALKEYS)
+                            if not enable: continue
+                            return last_json
+                        except Exception:
+                            pass
+                return self._init_counter(limiter_name)
         except Exception:
             return self._init_counter(limiter_name)
 
@@ -1073,7 +1092,8 @@ return cjson.encode(c)
         コマンド実行が量的制限に違反していないかをチェックします。
 
         マッチするすべての制限設定に対してチェックを行い、
-        いずれか 1 つでも違反していた場合は ``(非0, メッセージ)`` を返します。
+        複数の設定がマッチした場合は、すべての設定に違反している場合のみ ``(非0, メッセージ)`` を返します。
+        1 つ以上の設定がパスした場合は ``(0, None)`` を返します。
         すべての制限をパスした場合は ``(0, None)`` を返します。
 
         登録最大数のチェックには :meth:`get_current_registrations` を呼び出します。
@@ -1085,8 +1105,10 @@ return cjson.encode(c)
             command_options (Dict[str, Any]): 実行コマンドのオプション
             scope (str): 対象とする制限設定のスコープ。``'server'`` または ``'client'`` のみ有効。
         Returns:
-            Tuple[int, Optional[str]]:
+            Tuple[int, Optional[str], List[str]]:
                 許可する場合は ``Limiter.CHECK_ALLOW``、制限違反の場合は ``Limiter.CHECK_DENY`` 、制限が適用されない場合は ``Limiter.CHECK_NOT_APPLICABLE`` を返します。
+                2 番目の要素は、制限違反の場合に表示するメッセージです。
+                3 番目の要素は、制限違反した制限設定の ``limiter_name`` のリストです。
         Raises:
             ValueError: ``scope`` が ``'server'`` でも ``'client'`` でもない場合。
         """
@@ -1097,6 +1119,9 @@ return cjson.encode(c)
         now = datetime.now()
 
         checkfg = self.CHECK_NOT_APPLICABLE
+        config_violations = []  # (limiter_name, deny_message) のリスト
+        matched_configs = []    # マッチしたconfigのlimiter_name
+
         for config in configs:
             if config.get('scope') != scope:
                 continue
@@ -1105,102 +1130,140 @@ return cjson.encode(c)
                 continue
             if not self.matches(config, command_options):
                 continue
+
+            matched_configs.append(limiter_name)
             counter = self.load_counter(data_dir, limiter_name, scope=scope)
             if self.needs_reset(config, counter):
                 counter = self.reset_counter(limiter_name)
+
+            config_violated = False
+            deny_message = None
+
             # 実行可能期間チェック
             period_start = config.get('exec_period_start')
             if period_start:
                 try:
                     if now < datetime.fromisoformat(period_start):
-                        return self.CHECK_DENY, dict(warn=
+                        config_violated = True
+                        deny_message = dict(warn=
                             f"Limiter '{limiter_name}': command is not yet within the "
                             f"executable period (starts: {period_start})."
                         )
                 except (ValueError, TypeError):
                     logger.warning(f"Limiter '{limiter_name}': invalid exec_period_start value: {period_start}")
 
-            period_end = config.get('exec_period_end')
-            if period_end:
-                try:
-                    if now > datetime.fromisoformat(period_end):
-                        return self.CHECK_DENY, dict(warn=
-                            f"Limiter '{limiter_name}': the executable period has expired "
-                            f"(ended: {period_end})."
-                        )
-                except (ValueError, TypeError):
-                    logger.warning(f"Limiter '{limiter_name}': invalid exec_period_end value: {period_end}")
+            if not config_violated:
+                period_end = config.get('exec_period_end')
+                if period_end:
+                    try:
+                        if now > datetime.fromisoformat(period_end):
+                            config_violated = True
+                            deny_message = dict(warn=
+                                f"Limiter '{limiter_name}': the executable period has expired "
+                                f"(ended: {period_end})."
+                            )
+                    except (ValueError, TypeError):
+                        logger.warning(f"Limiter '{limiter_name}': invalid exec_period_end value: {period_end}")
 
             # 登録（又は登録最大サイズ）最大数チェック
-            max_registrations = config.get('max_registrations')
-            if max_registrations is not None:
-                if counter.get('total_registrations', 0) >= int(max_registrations):
-                    return self.CHECK_DENY, dict(warn=
-                        f"Limiter '{limiter_name}': maximum number of registrations "
-                        f"({max_registrations}) has been reached."
-                    )
+            if not config_violated:
+                max_registrations = config.get('max_registrations')
+                if max_registrations is not None:
+                    if counter.get('total_registrations', 0) >= int(max_registrations):
+                        config_violated = True
+                        deny_message = dict(warn=
+                            f"Limiter '{limiter_name}': maximum number of registrations "
+                            f"({max_registrations}) has been reached."
+                        )
 
             # 実行最大回数チェック
-            max_total_count = config.get('max_total_count')
-            if max_total_count is not None:
-                if counter.get('total_count', 0) >= int(max_total_count):
-                    return self.CHECK_DENY, dict(warn=
-                        f"Limiter '{limiter_name}': maximum execution count "
-                        f"({max_total_count}) has been reached."
-                    )
+            if not config_violated:
+                max_total_count = config.get('max_total_count')
+                if max_total_count is not None:
+                    if counter.get('total_count', 0) >= int(max_total_count):
+                        config_violated = True
+                        deny_message = dict(warn=
+                            f"Limiter '{limiter_name}': maximum execution count "
+                            f"({max_total_count}) has been reached."
+                        )
 
             # 実行可能総時間チェック
-            max_total_time = config.get('max_total_time')
-            if max_total_time is not None:
-                if counter.get('total_time', 0) >= int(max_total_time):
-                    return self.CHECK_DENY, dict(warn=
-                        f"Limiter '{limiter_name}': maximum total execution time "
-                        f"({max_total_time}s) has been reached."
-                    )
+            if not config_violated:
+                max_total_time = config.get('max_total_time')
+                if max_total_time is not None:
+                    if counter.get('total_time', 0) >= int(max_total_time):
+                        config_violated = True
+                        deny_message = dict(warn=
+                            f"Limiter '{limiter_name}': maximum total execution time "
+                            f"({max_total_time}s) has been reached."
+                        )
 
             # 入力総バイト数チェック
-            max_total_input = config.get('max_total_input')
-            if max_total_input is not None:
-                if counter.get('total_input', 0) >= int(max_total_input):
-                    return self.CHECK_DENY, dict(warn=
-                        f"Limiter '{limiter_name}': maximum total input bytes "
-                        f"({max_total_input}) has been reached."
-                    )
+            if not config_violated:
+                max_total_input = config.get('max_total_input')
+                if max_total_input is not None:
+                    if counter.get('total_input', 0) >= int(max_total_input):
+                        config_violated = True
+                        deny_message = dict(warn=
+                            f"Limiter '{limiter_name}': maximum total input bytes "
+                            f"({max_total_input}) has been reached."
+                        )
 
             # 処理総バイト数チェック
-            max_total_process = config.get('max_total_process')
-            if max_total_process is not None:
-                if counter.get('total_process', 0) >= int(max_total_process):
-                    return self.CHECK_DENY, dict(warn=
-                        f"Limiter '{limiter_name}': maximum total process bytes "
-                        f"({max_total_process}) has been reached."
-                    )
+            if not config_violated:
+                max_total_process = config.get('max_total_process')
+                if max_total_process is not None:
+                    if counter.get('total_process', 0) >= int(max_total_process):
+                        config_violated = True
+                        deny_message = dict(warn=
+                            f"Limiter '{limiter_name}': maximum total process bytes "
+                            f"({max_total_process}) has been reached."
+                        )
 
             # 出力総バイト数チェック
-            max_total_output = config.get('max_total_output')
-            if max_total_output is not None:
-                if counter.get('total_output', 0) >= int(max_total_output):
-                    return self.CHECK_DENY, dict(warn=
-                        f"Limiter '{limiter_name}': maximum total output bytes "
-                        f"({max_total_output}) has been reached."
-                    )
+            if not config_violated:
+                max_total_output = config.get('max_total_output')
+                if max_total_output is not None:
+                    if counter.get('total_output', 0) >= int(max_total_output):
+                        config_violated = True
+                        deny_message = dict(warn=
+                            f"Limiter '{limiter_name}': maximum total output bytes "
+                            f"({max_total_output}) has been reached."
+                        )
 
             # クレジット最大数チェック
-            max_total_credits = config.get('max_total_credits')
-            service_credits = config.get('service_credits')
-            if max_total_credits is not None:
-                service_credits = service_credits if service_credits else 0
-                if counter.get('total_credits', 0) >= int(max_total_credits) + int(service_credits):
-                    return self.CHECK_DENY, dict(warn=
-                        f"Limiter '{limiter_name}': maximum total credits "
-                        f"({max_total_credits} + {service_credits}) has been reached."
-                    )
+            if not config_violated:
+                max_total_credits = config.get('max_total_credits')
+                service_credits = config.get('service_credits')
+                if max_total_credits is not None:
+                    service_credits = service_credits if service_credits else 0
+                    if counter.get('total_credits', 0) >= int(max_total_credits) + int(service_credits):
+                        config_violated = True
+                        deny_message = dict(warn=
+                            f"Limiter '{limiter_name}': maximum total credits "
+                            f"({max_total_credits} + {service_credits}) has been reached."
+                        )
 
-            checkfg = self.CHECK_ALLOW
+            # このconfigの結果を記録
+            if config_violated:
+                config_violations.append((limiter_name, deny_message))
+            else:
+                checkfg = self.CHECK_ALLOW
 
-        return checkfg, None
+        # マッチしたconfigがある場合、すべてが違反しているかを判定
+        if matched_configs:
+            deny_limiter_names = [v[0] for v in config_violations]
+            if len(config_violations) == len(matched_configs):
+                # すべてのマッチしたconfigが違反している場合、最初の違反メッセージを返す
+                return self.CHECK_DENY, config_violations[0][1], deny_limiter_names
+            else:
+                # 1つ以上がパスしている場合
+                return self.CHECK_ALLOW, None, deny_limiter_names
 
-    def update(self, *, feat:LimitedFeature, data_dir: Path, logger: logging.Logger,
+        return checkfg, None, []
+
+    def update(self, *, feat:LimitedFeature, deny_limiter_names: List[str],
+               data_dir: Path, logger: logging.Logger,
                command_options: Dict[str, Any],
                count: int = 1,
                exec_time: float = 0.0,
@@ -1218,6 +1281,7 @@ return cjson.encode(c)
 
         Args:
             feat (LimitedFeature): 対象の機能
+            deny_limiter_names (List[str]): 違反した制限設定の limiter_name のリスト
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             command_options (Dict[str, Any]): 実行コマンドのオプション
@@ -1238,7 +1302,9 @@ return cjson.encode(c)
                 continue
             if not self.matches(config, command_options):
                 continue
-
+            if limiter_name in deny_limiter_names:
+                # 違反した制限設定はカウンタ更新をスキップ
+                continue
             try:
                 # history_end が設定されていて現在時刻が超過している場合はカウンター更新をスキップ
                 history_end_str = config.get('history_end')

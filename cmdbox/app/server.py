@@ -3,12 +3,22 @@ from cmdbox.app import common, filer, feature, options
 from cmdbox.app.commons import redis_client
 from redis import exceptions
 from typing import List, Dict, Any
+import json
 import logging
 import redis
 import time
-
+import threading
 
 class Server(filer.Filer):
+    # Redis Luaスクリプト: カウンタのアトミックインクリメント
+    # KEYS[1]: hash key
+    # ARGV[1]: field name, ARGV[2]: increment value
+    _COUNTER_INCREMENT_LUA = """
+local current = tonumber(redis.call('HGET', KEYS[1], ARGV[1])) or 0
+local new_value = current + tonumber(ARGV[2])
+redis.call('HSET', KEYS[1], ARGV[1], new_value)
+return new_value
+"""
 
     def __init__(self, data_dir:Path, logger:logging.Logger, redis_host:str="localhost", redis_port:int=6379, redis_password:str=None, svname:str='server'):
         """
@@ -114,14 +124,11 @@ class Server(filer.Filer):
     def _run_server(self):
         self.logger.info(f"start server. svname={self.svname}")
         ltime = time.time()
-        receive_cnt = 0
-        success_cnt = 0
-        warn_cnt = 0
-        error_cnt = 0
-        self.redis_cli.hset(self.redis_cli.hbname, 'receive_cnt', receive_cnt)
-        self.redis_cli.hset(self.redis_cli.hbname, 'success_cnt', success_cnt)
-        self.redis_cli.hset(self.redis_cli.hbname, 'warn_cnt', warn_cnt)
-        self.redis_cli.hset(self.redis_cli.hbname, 'error_cnt', error_cnt)
+        # Luaスクリプトを使用したアトミックなカウンタ管理
+        self.redis_cli.hset(self.redis_cli.hbname, 'receive_cnt', 0)
+        self.redis_cli.hset(self.redis_cli.hbname, 'success_cnt', 0)
+        self.redis_cli.hset(self.redis_cli.hbname, 'warn_cnt', 0)
+        self.redis_cli.hset(self.redis_cli.hbname, 'error_cnt', 0)
 
         def _publish(msg_str):
             # 各サーバーにメッセージを配布する
@@ -130,6 +137,58 @@ class Server(filer.Filer):
                 hb = hb.decode()
                 sv = hb.replace("hb-", "sv-")
                 self.redis_cli.rpush(sv, msg_str)
+
+        def _process(msg:list[str], to_cluster:bool, logger:logging.Logger,
+                     svname:str, data_dir:Path, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]):
+            try:
+                st = None
+                redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, redis_cli.hbname, 'receive_cnt', 1)
+                redis_cli.hset(redis_cli.hbname, 'status', 'processing')
+
+                svcmd_feature:feature.Feature = self.options.get_svcmd_feature(msg[0])
+                if svcmd_feature is not None:
+                    if to_cluster and svcmd_feature.is_cluster_redirect():
+                        _publish(msg_str)
+                        return
+                    if msg[0] == 'server_stop':
+                        self.is_running = False
+                    if logger.level == logging.DEBUG:
+                        logger.debug(f"svname:{svname}, msg: {msg}"[:300])
+                    try:
+                        st = common.exec_svrun_sync(svcmd_feature.svrun, data_dir, logger, redis_cli, msg, sessions)
+                    except Exception as e:
+                        redis_cli.rpush(msg[1], dict(warn=f"Unknown error occurred. {e}: {msg}."))
+                        logger.error(f"Unknown error occurred. {e}: {msg}.", exc_info=True)
+                        st = self.RESP_ERROR
+                else:
+                    logger.warning(f"Unknown command {msg}")
+                    st = self.RESP_WARN
+
+                if st==self.RESP_SUCCESS:
+                    redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, redis_cli.hbname, 'success_cnt', 1)
+                elif st==self.RESP_WARN:
+                    redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, redis_cli.hbname, 'warn_cnt', 1)
+                elif st==self.RESP_ERROR:
+                    redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, redis_cli.hbname, 'error_cnt', 1)
+                redis_cli.hset(redis_cli.hbname, 'ctime', time.time())
+            except exceptions.TimeoutError:
+                pass
+            except exceptions.ConnectionError as e:
+                logger.warning(f"Connection to the server was lost. {e}", exc_info=True)
+            except OSError as e:
+                logger.warning(f"OSError. {e}. This message is not executable in the server environment. ({msg})", exc_info=True)
+                if msg is not None and len(msg) > 1:
+                    redis_cli.rpush(msg[1], dict(warn=f"OSError. {e}. This message is not executable in the server environment. ({msg[0]})"))
+                redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, redis_cli.hbname, 'error_cnt', 1)
+            except IndexError as e:
+                logger.warning(f"IndexError. {e}. The message received by the server is invalid. ({msg})", exc_info=True)
+                if msg is not None and len(msg) > 1:
+                    redis_cli.rpush(msg[1], dict(warn=f"IndexError. {e}. The message received by the server is invalid. ({msg[0]})"))
+                redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, redis_cli.hbname, 'error_cnt', 1)
+            except KeyboardInterrupt as e:
+                self.is_running = False
+            except Exception as e:
+                logger.warning(f"Unknown error occurred. {e}. Service will be stopped due to unknown cause.({msg})", exc_info=True)
 
         while self.is_running:
             try:
@@ -157,40 +216,9 @@ class Server(filer.Filer):
                     time.sleep(1)
                     continue
 
-                st = None
-                receive_cnt += 1
-                self.redis_cli.hset(self.redis_cli.hbname, 'receive_cnt', receive_cnt)
-                self.redis_cli.hset(self.redis_cli.hbname, 'status', 'processing')
+                th = threading.Thread(target=_process, args=(msg, to_cluster, self.logger, self.svname, self.data_dir, self.redis_cli, self.sessions))
+                th.start()
 
-                svcmd_feature:feature.Feature = self.options.get_svcmd_feature(msg[0])
-                if svcmd_feature is not None:
-                    if to_cluster and svcmd_feature.is_cluster_redirect():
-                        _publish(msg_str)
-                        continue
-                    if msg[0] == 'server_stop':
-                        self.is_running = False
-                    if self.logger.level == logging.DEBUG:
-                        self.logger.debug(f"svname:{self.svname}, msg: {msg}"[:300])
-                    try:
-                        st = common.exec_svrun_sync(svcmd_feature.svrun, self.data_dir, self.logger, self.redis_cli, msg, self.sessions)
-                    except Exception as e:
-                        self.redis_cli.rpush(msg[1], dict(warn=f"Unknown error occurred. {e}: {msg}."))
-                        self.logger.error(f"Unknown error occurred. {e}: {msg}.", exc_info=True)
-                        st = self.RESP_ERROR
-                else:
-                    self.logger.warning(f"Unknown command {msg}")
-                    st = self.RESP_WARN
-
-                if st==self.RESP_SUCCESS:
-                    success_cnt += 1
-                    self.redis_cli.hset(self.redis_cli.hbname, 'success_cnt', success_cnt)
-                elif st==self.RESP_WARN:
-                    warn_cnt += 1
-                    self.redis_cli.hset(self.redis_cli.hbname, 'warn_cnt', warn_cnt)
-                elif st==self.RESP_ERROR:
-                    error_cnt += 1
-                    self.redis_cli.hset(self.redis_cli.hbname, 'error_cnt', error_cnt)
-                self.redis_cli.hset(self.redis_cli.hbname, 'ctime', time.time())
             except exceptions.TimeoutError:
                 pass
             except exceptions.ConnectionError as e:
@@ -202,15 +230,13 @@ class Server(filer.Filer):
                 self.logger.warning(f"OSError. {e}. This message is not executable in the server environment. ({msg})", exc_info=True)
                 if msg is not None and len(msg) > 1:
                     self.redis_cli.rpush(msg[1], dict(warn=f"OSError. {e}. This message is not executable in the server environment. ({msg[0]})"))
-                error_cnt += 1
-                self.redis_cli.hset(self.redis_cli.hbname, 'error_cnt', error_cnt)
+                self.redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, self.redis_cli.hbname, 'error_cnt', 1)
                 pass
             except IndexError as e:
                 self.logger.warning(f"IndexError. {e}. The message received by the server is invalid. ({msg})", exc_info=True)
                 if msg is not None and len(msg) > 1:
                     self.redis_cli.rpush(msg[1], dict(warn=f"IndexError. {e}. The message received by the server is invalid. ({msg[0]})"))
-                error_cnt += 1
-                self.redis_cli.hset(self.redis_cli.hbname, 'error_cnt', error_cnt)
+                self.redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, self.redis_cli.hbname, 'error_cnt', 1)
                 pass
             except KeyboardInterrupt as e:
                 self.is_running = False

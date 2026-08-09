@@ -195,7 +195,8 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                         # self.limiter_load を使用して limiter 設定を取得
                         limiter_cfg = self.limiter_load._load_limiter_config(data_dir, limiter_name)
                         # self.limiter_counter を使用してカウンター情報を取得
-                        counter_data = self.limiter_counter._load_limiter_counter(data_dir, limiter_name, redis_cli, logger, False)
+                        counter_data = self.limiter_counter._load_limiter_counter(data_dir, limiter_name, redis_cli, logger,
+                                                                                  scope='server', load_history=include_history)
                         limiter_cfg['counter'] = counter_data
                         limiter_details.append(limiter_cfg)
                     except FileNotFoundError as e:

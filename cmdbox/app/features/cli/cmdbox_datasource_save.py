@@ -89,6 +89,10 @@ class DatasourceSave(datasource_base.DatasourceBase, validator.Validator, limite
             result = dict(warn="client_data is required when scope is 'client'.")
             logger.warning("client_data is required when scope is 'client'.")
             return self.RESP_WARN, result, None
+        if args.dbtype == 'sqlite' and not args.db_path:
+            result = dict(warn="db_path is required when dbtype is 'sqlite'.")
+            logger.warning("db_path is required when dbtype is 'sqlite'.")
+            return self.RESP_WARN, result, None
         payload = dict(
             dsname=args.dsname,
             dbtype=args.dbtype,

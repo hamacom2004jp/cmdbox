@@ -74,7 +74,7 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
                 return self.RESP_WARN, result, None
             redis_cli = redis_client.RedisClient(logger, host=args.host, port=args.port, password=args.password, svname=args.svname)
             lmt = limiter.Limiter(redis_client=redis_cli)
-            counter = lmt.load_counter(Path(client_data), args.limiter_name)
+            counter = lmt.load_counter(Path(client_data), args.limiter_name, scope=scope)
             out = dict(success=dict(data=counter))
             common.print_format(out, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_SUCCESS, out, None
@@ -111,11 +111,12 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
     def is_cluster_redirect(self):
         return False
 
-    def _load_limiter_counter(self, data_dir: Path, limiter_name: str, redis_cli: redis_client.RedisClient, logger: logging.Logger, load_history: bool = False) -> Dict[str, Any]:
+    def _load_limiter_counter(self, data_dir: Path, limiter_name: str, redis_cli: redis_client.RedisClient, logger: logging.Logger,
+                              scope: str = 'server', load_history: bool = False) -> Dict[str, Any]:
         """Load limiter counter (internal helper method)"""
         try:
             lmt = limiter.Limiter.getInstance(redis_client=redis_cli, flush_interval=60, reload_interval=60)
-            return lmt.load_counter(data_dir, limiter_name, load_history)
+            return lmt.load_counter(data_dir, limiter_name, scope=scope, load_history=load_history)
         except Exception as e:
             logger.warning(f"Failed to load counter for limiter '{limiter_name}': {e}")
             return {}
@@ -132,7 +133,7 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
                 redis_cli.rpush(reskey, result)
                 return self.RESP_WARN
 
-            counter = self._load_limiter_counter(data_dir, limiter_name, redis_cli, logger, load_history)
+            counter = self._load_limiter_counter(data_dir, limiter_name, redis_cli, logger, scope='server', load_history=load_history)
             result = dict(success=dict(data=counter))
             redis_cli.rpush(reskey, result)
             return self.RESP_SUCCESS

@@ -176,13 +176,14 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
         return cfg
 
     def _resolve_limiter_server(self, data_dir: Any, logger: logging.Logger, redis_cli: redis_client.RedisClient,
-                                limiter_name: str, include_history: bool) -> Dict[str, Any]:
+                                limiter_name: str, scope: str = 'server', include_history: bool = False) -> Dict[str, Any]:
         try:
             cfg = self.limiter_load._load_limiter_config(data_dir, limiter_name)
         except FileNotFoundError:
             cfg = {'limiter_name': limiter_name}
         cfg = {k: v for k, v in cfg.items() if v}
-        cfg['counter'] = self.limiter_counter._load_limiter_counter(data_dir, limiter_name, redis_cli, logger, False)
+        cfg['counter'] = self.limiter_counter._load_limiter_counter(data_dir, limiter_name, redis_cli, logger,
+                                                                    scope=scope, load_history=include_history)
         cfg['evidences'] = self.limiter_evidences._load_evidences(data_dir, limiter_name, include_history=include_history)
         return cfg
 
@@ -280,7 +281,8 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
                 filter_target_mode,
                 filter_target_cmd,
                 filter_limiter_name,
-                lambda entry: self._resolve_limiter_server(data_dir, logger, redis_cli, entry['name'], include_history),
+                lambda entry: self._resolve_limiter_server(data_dir, logger, redis_cli, entry['name'],
+                                                           scope='server', include_history=include_history),
             )
 
             redis_cli.rpush(reskey, dict(success=dict(data=results)))
