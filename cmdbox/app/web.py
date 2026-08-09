@@ -304,6 +304,51 @@ class Web:
                 return dict(success="Password changed.")
         return dict(warn="User not found.")
 
+    def get_user_apikeys(self, signin_data:Dict[str, Any], user:Dict[str, Any], include_legacy:bool=True) -> Dict[str, str]:
+        """
+        ユーザーのApiKey一覧を取得する（user_data優先、必要に応じてsignin_fileをフォールバック）
+
+        Args:
+            signin_data (Dict[str, Any]): サインインファイルデータ
+            user (Dict[str, Any]): ユーザー情報
+            include_legacy (bool, optional): signin_fileのapikeysをフォールバックとして含めるか. Defaults to True.
+
+        Returns:
+            Dict[str, str]: ApiKey名とApiKeyのマップ
+        """
+        if user is None:
+            return dict()
+        uid = user.get('uid', None)
+        user_name = user.get('name', None)
+        apikeys = dict()
+        if uid is not None and user_name:
+            user_apikeys = self.user_data(None, uid, user_name, 'apikey')
+            if isinstance(user_apikeys, dict):
+                apikeys = copy.deepcopy(user_apikeys)
+        if include_legacy and isinstance(user.get('apikeys', None), dict):
+            # 既存のsignin_file由来データは、未移行キーの救済としてのみマージする
+            for k, v in user['apikeys'].items():
+                if k not in apikeys:
+                    apikeys[k] = v
+        return apikeys
+
+    def save_user_apikeys(self, uid:str, user_name:str, apikeys:Dict[str, str]):
+        """
+        ユーザーのApiKey一覧をuser_dataへ保存する
+
+        Args:
+            uid (str): ユーザーID
+            user_name (str): ユーザー名
+            apikeys (Dict[str, str]): 保存するApiKey一覧
+        """
+        current = self.user_data(None, uid, user_name, 'apikey')
+        current = current if isinstance(current, dict) else dict()
+        for k in list(current.keys()):
+            if k not in apikeys:
+                self.user_data(None, uid, user_name, 'apikey', k, delkey=True)
+        for k, v in apikeys.items():
+            self.user_data(None, uid, user_name, 'apikey', k, v)
+
     def user_list(self, name:str=None) -> List[Dict[str, Any]]:
         """
         サインインファイルのユーザー一覧を取得する
@@ -322,6 +367,11 @@ class Web:
         ret = []
         for u in copy.deepcopy(signin_data['users']):
             u['password'] = '********'
+            apikeys = self.get_user_apikeys(signin_data, u, include_legacy=True)
+            if len(apikeys) > 0:
+                u['apikeys'] = apikeys
+            elif 'apikeys' in u:
+                del u['apikeys']
             if 'apikeys' in u:
                 for an, ak in u['apikeys'].items():
                     exp = '-'
@@ -401,12 +451,11 @@ class Web:
         apikey:str = None
         for u in signin_data['users']:
             if u['name'] == user['name']:
-                if 'apikeys' not in u:
-                    u['apikeys'] = dict()
-                if user['apikey_name'] in u['apikeys']:
+                apikeys = self.get_user_apikeys(signin_data, u, include_legacy=True)
+                if user['apikey_name'] in apikeys:
                     raise ValueError(f"ApiKey name is already exists.")
                 apikey = common.random_string(64)
-                u['apikeys'][user['apikey_name']] = apikey
+                apikeys[user['apikey_name']] = apikey
                 if signin_data['apikey']['gen_jwt']['enabled']:
                     cls = self.signin.__class__
                     claims = cls.gen_jwt_claims.copy() if cls.gen_jwt_claims is not None else dict()
@@ -417,12 +466,15 @@ class Web:
                     claims['email'] = u['email']
                     claims['apikey_name'] = user['apikey_name']
                     apikey = jwt.encode(claims, cls.gen_jwt_privatekey, algorithm=cls.gen_jwt_algorithm)
-                    u['apikeys'][user['apikey_name']] = apikey
+                    apikeys[user['apikey_name']] = apikey
+                self.save_user_apikeys(u['uid'], u['name'], apikeys)
+                # 互換性維持のため、移行期間はsignin_fileにも同期する
+                u['apikeys'] = copy.deepcopy(apikeys)
 
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"apikey_add: {self.signin_file}")
         self.signin.signin_file_data = signin_data
-        common.save_yml(self.signin_file, signin_data, nolock=False)
+        #common.save_yml(self.signin_file, signin_data, nolock=False)
         return apikey
 
     def apikey_del(self, user:Dict[str, Any]):
@@ -446,14 +498,18 @@ class Web:
         apikey:str = None
         for u in signin_data['users']:
             if u['name'] == user['name']:
-                if 'apikeys' not in u:
+                apikeys = self.get_user_apikeys(signin_data, u, include_legacy=True)
+                if user['apikey_name'] not in apikeys:
                     continue
-                if user['apikey_name'] not in u['apikeys']:
-                    continue
-                apikey = u['apikeys'][user['apikey_name']]
-                del u['apikeys'][user['apikey_name']]
-                if len(u['apikeys']) <= 0:
-                    del u['apikeys']
+                apikey = apikeys[user['apikey_name']]
+                del apikeys[user['apikey_name']]
+                self.save_user_apikeys(u['uid'], u['name'], apikeys)
+                # 互換性維持のため、移行期間はsignin_fileにも同期する
+                if len(apikeys) <= 0:
+                    if 'apikeys' in u:
+                        del u['apikeys']
+                else:
+                    u['apikeys'] = copy.deepcopy(apikeys)
         if apikey is None:
             raise ValueError(f"ApiKey name is not exists.")
 
@@ -462,7 +518,7 @@ class Web:
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"apikey_del: {self.signin_file}")
         self.signin.signin_file_data = signin_data
-        common.save_yml(self.signin_file, signin_data, nolock=False)
+        #common.save_yml(self.signin_file, signin_data, nolock=False)
 
     def user_add(self, user:Dict[str, Any]):
         """

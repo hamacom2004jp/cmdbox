@@ -187,7 +187,7 @@ class Signin(object):
             user = Signin._find_user_by_name(name, signin_file_data)
             if user is not None:
                 #req.session['signin']['apikeys'] = user.get('apikeys', None)
-                req.session['apikeys'] = user.get('apikeys', None)
+                req.session['apikeys'] = Signin._resolve_user_apikeys(signin_file_data, user)
             return None
         if logger.level == logging.DEBUG:
             logger.debug(f"Not found siginin session. Try check_apikey. path={req.url.path}")
@@ -222,9 +222,10 @@ class Signin(object):
         find_user = None
         jwt_enabled = signin_file_data['apikey']['verify_jwt']['enabled']
         for user in signin_file_data['users']:
-            if 'apikeys' not in user:
+            apikeys = Signin._resolve_user_apikeys(signin_file_data, user)
+            if not apikeys:
                 continue
-            for ak, key in user['apikeys'].items():
+            for ak, key in apikeys.items():
                 if apikey == key:
                     if jwt_enabled:
                         publickey = None
@@ -240,6 +241,7 @@ class Signin(object):
                                             options={'verify_iss': issuer is not None,
                                                      'verify_aud': audience is not None},)
                         claims.update(user)
+                        claims['apikeys'] = apikeys
                         find_user = claims
                         find_user['uid'] = find_user['uid'] if 'uid' in find_user else -1
                         find_user['name'] = find_user['name'] if 'name' in find_user else None
@@ -247,7 +249,8 @@ class Signin(object):
                         find_user['email'] = find_user['email'] if 'email' in find_user else None
                         find_user['apikey_name'] = find_user['apikey_name'] if 'apikey_name' in find_user else None
                     else:
-                        find_user = user
+                        find_user = copy.deepcopy(user)
+                        find_user['apikeys'] = apikeys
         if find_user is None:
             logger.warning(f"No matching user found for apikey.")
             return RedirectResponse(url=f'/signin{req.url.path}?error=apikeyfail')
@@ -309,6 +312,32 @@ class Signin(object):
         copy_signin_data = copy.deepcopy(signin_file_data)
         users = [u for u in copy_signin_data['users'] if u['name'] == name]
         return users[0] if len(users) > 0 else None
+
+    @classmethod
+    def _resolve_user_apikeys(cls, signin_file_data:Dict[str, Any], user:Dict[str, Any]) -> Dict[str, str]:
+        """
+        ユーザーのApiKey一覧を取得する（user_data優先、signin_fileをフォールバック）
+
+        Args:
+            signin_file_data (Dict[str, Any]): サインインファイルデータ
+            user (Dict[str, Any]): ユーザー情報
+
+        Returns:
+            Dict[str, str]: ApiKey名とApiKeyのマップ
+        """
+        apikeys = dict()
+        try:
+            web_cls = cls.get_webcls()
+            if web_cls is not None:
+                webobj = web_cls.getInstance()
+                apikeys = webobj.get_user_apikeys(signin_file_data, user, include_legacy=True)
+        except Exception:
+            apikeys = dict()
+        if isinstance(apikeys, dict) and len(apikeys) > 0:
+            return apikeys
+        if user is not None and isinstance(user.get('apikeys', None), dict):
+            return copy.deepcopy(user.get('apikeys', dict()))
+        return dict()
 
     @classmethod
     def load_pem_private_key(cls, data:bytes, passphrase:str=None):
@@ -821,9 +850,10 @@ class Signin(object):
             logger.debug(f"hashed apikey: {apikey}")
         find_user = None
         for user in signin_file_data['users']:
-            if 'apikeys' not in user:
+            apikeys = cls._resolve_user_apikeys(signin_file_data, user)
+            if not apikeys:
                 continue
-            for ak, key in user['apikeys'].items():
+            for ak, key in apikeys.items():
                 if apikey == key:
                     find_user = user
         if find_user is None:
