@@ -36,7 +36,10 @@ def _apprun_pre(self:'LimitedFeature', logger:logging.Logger, args:argparse.Name
         return -1, msg, None
     redis_cli = redis_client.RedisClient(logger, host=host, port=port, password=password, svname=svname) if host and port and password and svname else None
     limit = Limiter.getInstance(redis_cli, flush_interval=60, reload_interval=60)
-    st, msg, deny_limiter_names = limit.check(feat=self, data_dir=Path(client_data_path), logger=logger, command_options=args.__dict__, scope='client')
+    current_registrations = self.apprun_registrations(Path(client_data_path), logger, args, msg={})
+    st, msg, deny_limiter_names = limit.check(feat=self, data_dir=Path(client_data_path), logger=logger,
+                                              command_options=args.__dict__, current_registrations=current_registrations,
+                                              scope='client')
     return st, msg, deny_limiter_names, limit
 
 def _apprun_post(self:'LimitedFeature', stime:float, msg:Dict[str, Any], deny_limiter_names:List[str],
@@ -150,7 +153,10 @@ def _svrun_pre(self:'LimitedFeature', data_dir:Path, logger:logging.Logger, redi
     """
     command_options = self.svrun_parse_options(data_dir, logger, redis_cli, msg, sessions=sessions)
     limit = Limiter.getInstance(redis_cli, flush_interval=60, reload_interval=60)
-    st, ret, deny_limiter_names = limit.check(feat=self, data_dir=data_dir, logger=logger, command_options=command_options, scope='server')
+    current_registrations = self.svrun_registrations(data_dir, logger, opt=command_options, msg={})
+    st, ret, deny_limiter_names = limit.check(feat=self, data_dir=data_dir, logger=logger,
+                                              command_options=command_options, current_registrations=current_registrations,
+                                              scope='server')
     return st, ret, deny_limiter_names, limit, command_options
 
 def _svrun_post(self:'LimitedFeature', deny_limiter_names:List[str],
@@ -1086,7 +1092,7 @@ return cjson.encode(c)
     # チェック / 更新
     # ------------------------------------------------------------------
     def check(self, *, feat:LimitedFeature, data_dir: Path, logger: logging.Logger,
-              command_options: Dict[str, Any],
+              command_options: Dict[str, Any], current_registrations: int,
               scope: str = 'server') -> Tuple[int, Optional[str]]:
         """
         コマンド実行が量的制限に違反していないかをチェックします。
@@ -1103,6 +1109,7 @@ return cjson.encode(c)
             data_dir (Path): データディレクトリ
             logger (logging.Logger): ロガー
             command_options (Dict[str, Any]): 実行コマンドのオプション
+            current_registrations (int): 現在の登録数
             scope (str): 対象とする制限設定のスコープ。``'server'`` または ``'client'`` のみ有効。
         Returns:
             Tuple[int, Optional[str], List[str]]:
@@ -1121,6 +1128,12 @@ return cjson.encode(c)
         checkfg = self.CHECK_NOT_APPLICABLE
         config_violations = []  # (limiter_name, deny_message) のリスト
         matched_configs = []    # マッチしたconfigのlimiter_name
+
+        def _safe_int(val: Any) -> int:
+            try:
+                return int(val)
+            except (ValueError, TypeError):
+                return 0
 
         for config in configs:
             if config.get('scope') != scope:
@@ -1169,7 +1182,8 @@ return cjson.encode(c)
             if not config_violated:
                 max_registrations = config.get('max_registrations')
                 if max_registrations is not None:
-                    if counter.get('total_registrations', 0) >= int(max_registrations):
+                    current_registrations = _safe_int(current_registrations)
+                    if current_registrations >= _safe_int(max_registrations):
                         config_violated = True
                         deny_message = dict(warn=
                             f"Limiter '{limiter_name}': maximum number of registrations "
@@ -1180,7 +1194,7 @@ return cjson.encode(c)
             if not config_violated:
                 max_total_count = config.get('max_total_count')
                 if max_total_count is not None:
-                    if counter.get('total_count', 0) >= int(max_total_count):
+                    if counter.get('total_count', 0) >= _safe_int(max_total_count):
                         config_violated = True
                         deny_message = dict(warn=
                             f"Limiter '{limiter_name}': maximum execution count "
@@ -1191,7 +1205,7 @@ return cjson.encode(c)
             if not config_violated:
                 max_total_time = config.get('max_total_time')
                 if max_total_time is not None:
-                    if counter.get('total_time', 0) >= int(max_total_time):
+                    if counter.get('total_time', 0) >= _safe_int(max_total_time):
                         config_violated = True
                         deny_message = dict(warn=
                             f"Limiter '{limiter_name}': maximum total execution time "
@@ -1202,7 +1216,7 @@ return cjson.encode(c)
             if not config_violated:
                 max_total_input = config.get('max_total_input')
                 if max_total_input is not None:
-                    if counter.get('total_input', 0) >= int(max_total_input):
+                    if counter.get('total_input', 0) >= _safe_int(max_total_input):
                         config_violated = True
                         deny_message = dict(warn=
                             f"Limiter '{limiter_name}': maximum total input bytes "
@@ -1213,7 +1227,7 @@ return cjson.encode(c)
             if not config_violated:
                 max_total_process = config.get('max_total_process')
                 if max_total_process is not None:
-                    if counter.get('total_process', 0) >= int(max_total_process):
+                    if counter.get('total_process', 0) >= _safe_int(max_total_process):
                         config_violated = True
                         deny_message = dict(warn=
                             f"Limiter '{limiter_name}': maximum total process bytes "
@@ -1224,7 +1238,7 @@ return cjson.encode(c)
             if not config_violated:
                 max_total_output = config.get('max_total_output')
                 if max_total_output is not None:
-                    if counter.get('total_output', 0) >= int(max_total_output):
+                    if counter.get('total_output', 0) >= _safe_int(max_total_output):
                         config_violated = True
                         deny_message = dict(warn=
                             f"Limiter '{limiter_name}': maximum total output bytes "
@@ -1237,7 +1251,7 @@ return cjson.encode(c)
                 service_credits = config.get('service_credits')
                 if max_total_credits is not None:
                     service_credits = service_credits if service_credits else 0
-                    if counter.get('total_credits', 0) >= int(max_total_credits) + int(service_credits):
+                    if counter.get('total_credits', 0) >= _safe_int(max_total_credits) + _safe_int(service_credits):
                         config_violated = True
                         deny_message = dict(warn=
                             f"Limiter '{limiter_name}': maximum total credits "

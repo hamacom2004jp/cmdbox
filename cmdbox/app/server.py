@@ -216,7 +216,8 @@ return new_value
                     time.sleep(1)
                     continue
 
-                th = threading.Thread(target=_process, args=(msg, to_cluster, self.logger, self.svname, self.data_dir, self.redis_cli, self.sessions))
+                th = threading.Thread(target=_process, name=f"svrun_{msg[0]}", daemon=True,
+                                      args=(msg, to_cluster, self.logger, self.svname, self.data_dir, self.redis_cli, self.sessions))
                 th.start()
 
             except exceptions.TimeoutError:

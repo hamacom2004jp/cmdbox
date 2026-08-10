@@ -103,7 +103,7 @@ limiter_page.make_progress = (label, current, max, fmt_func, service=null) => {
         </div>`);
     }
     service = service || 0;
-    const pct = max > 0 ? Math.min(100, Math.round((current || 0) / (max + service) * 100)) : 0;
+    const pct = max > 0 ? Math.trunc((current || 0) / (max + service) * 100) : 0;
     const color = pct >= 90 ? 'bg-danger' : pct >= 70 ? 'bg-warning' : 'bg-info';
     const cur_str = fmt_func ? fmt_func(current || 0) : (current || 0);
     const max_str = fmt_func ? fmt_func(max + service) : max + service;
