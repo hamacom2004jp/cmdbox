@@ -29,6 +29,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
 
     {
       "success": {
+        "save_mode": "string",
         "performance": [
           {
             "key": "string",
@@ -59,6 +60,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
 
     "Field","Type","Required","Default","Description"
     "success","Data | null","no","null","成功した場合の結果"
+    "success.save_mode","str | null","no","null","保存モード"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.data","UrlData | null","no","null","URL情報"
     "success.data.url_id","str | null","no","null","生成されたURL ID"
@@ -71,8 +73,10 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.data.file_path","str | null","no","null","作成されたJSONファイルのパス"
     "success.data.msg","str | null","no","null","処理結果のメッセージ"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn.save_mode","str | null","no","null","保存モード"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error.save_mode","str | null","no","null","保存モード"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
@@ -99,6 +103,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
 
     {
       "success": {
+        "save_mode": "string",
         "performance": [
           {
             "key": "string",
@@ -120,12 +125,15 @@ This command implements ``output_schema()`` returning ``Result`` model.
 
     "Field","Type","Required","Default","Description"
     "success","Data | null","no","null","成功した場合の結果"
+    "success.save_mode","str | null","no","null","保存モード"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.url_id","str | null","no","null","削除されたURL ID"
     "success.msg","str | null","no","null","処理結果のメッセージ"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn.save_mode","str | null","no","null","保存モード"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error.save_mode","str | null","no","null","保存モード"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
@@ -151,6 +159,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
 
     {
       "success": {
+        "save_mode": "string",
         "performance": [
           {
             "key": "string",
@@ -182,12 +191,15 @@ This command implements ``output_schema()`` returning ``Result`` model.
 
     "Field","Type","Required","Default","Description"
     "success","Data | null","no","null","成功した場合の結果"
+    "success.save_mode","str | null","no","null","保存モード"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.data","list[UrlInfo] | null","no","null","URL情報のリスト"
     "success.msg","str | null","no","null","処理結果のメッセージ"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn.save_mode","str | null","no","null","保存モード"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error.save_mode","str | null","no","null","保存モード"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"
@@ -214,6 +226,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
 
     {
       "success": {
+        "save_mode": "string",
         "performance": [
           {
             "key": "string",
@@ -242,6 +255,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
 
     "Field","Type","Required","Default","Description"
     "success","Data | null","no","null","成功した場合の結果"
+    "success.save_mode","str | null","no","null","保存モード"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.data","UrlData | null","no","null","URL情報"
     "success.data.url_id","str | null","no","null","URL ID"
@@ -252,8 +266,10 @@ This command implements ``output_schema()`` returning ``Result`` model.
     "success.data.saved_at","str | null","no","null","保存日時"
     "success.data.period_dt","str | null","no","null","期限切れ日時"
     "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn.save_mode","str | null","no","null","保存モード"
     "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error.save_mode","str | null","no","null","保存モード"
     "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "output_schema","dict[str, any] | null","no","null","スキーマ情報"
     "end","bool | null","no","null","終了フラグ"

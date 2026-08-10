@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.auth.signin &mdash; cmdbox 2026/07/20 documentation</title>
+  <title>cmdbox.app.auth.signin &mdash; cmdbox 2026/08/10 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=91640ad9"></script>
+      <script src="../../../../_static/documentation_options.js?v=d6572e83"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -291,7 +291,7 @@
             <span class="n">user</span> <span class="o">=</span> <span class="n">Signin</span><span class="o">.</span><span class="n">_find_user_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">signin_file_data</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1">#req.session[&#39;signin&#39;][&#39;apikeys&#39;] = user.get(&#39;apikeys&#39;, None)</span>
-                <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;apikeys&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">req</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Signin</span><span class="o">.</span><span class="n">_resolve_user_apikeys</span><span class="p">(</span><span class="n">signin_file_data</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Not found siginin session. Try check_apikey. path=</span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -326,9 +326,10 @@
         <span class="n">find_user</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">jwt_enabled</span> <span class="o">=</span> <span class="n">signin_file_data</span><span class="p">[</span><span class="s1">&#39;apikey&#39;</span><span class="p">][</span><span class="s1">&#39;verify_jwt&#39;</span><span class="p">][</span><span class="s1">&#39;enabled&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">signin_file_data</span><span class="p">[</span><span class="s1">&#39;users&#39;</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="s1">&#39;apikeys&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user</span><span class="p">:</span>
+            <span class="n">apikeys</span> <span class="o">=</span> <span class="n">Signin</span><span class="o">.</span><span class="n">_resolve_user_apikeys</span><span class="p">(</span><span class="n">signin_file_data</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">apikeys</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="k">for</span> <span class="n">ak</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">ak</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">apikeys</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">apikey</span> <span class="o">==</span> <span class="n">key</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">jwt_enabled</span><span class="p">:</span>
                         <span class="n">publickey</span> <span class="o">=</span> <span class="kc">None</span>
@@ -344,6 +345,7 @@
                                             <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;verify_iss&#39;</span><span class="p">:</span> <span class="n">issuer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
                                                      <span class="s1">&#39;verify_aud&#39;</span><span class="p">:</span> <span class="n">audience</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">},)</span>
                         <span class="n">claims</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+                        <span class="n">claims</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">apikeys</span>
                         <span class="n">find_user</span> <span class="o">=</span> <span class="n">claims</span>
                         <span class="n">find_user</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">find_user</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;uid&#39;</span> <span class="ow">in</span> <span class="n">find_user</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
                         <span class="n">find_user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">find_user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">find_user</span> <span class="k">else</span> <span class="kc">None</span>
@@ -351,7 +353,8 @@
                         <span class="n">find_user</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">find_user</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;email&#39;</span> <span class="ow">in</span> <span class="n">find_user</span> <span class="k">else</span> <span class="kc">None</span>
                         <span class="n">find_user</span><span class="p">[</span><span class="s1">&#39;apikey_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">find_user</span><span class="p">[</span><span class="s1">&#39;apikey_name&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;apikey_name&#39;</span> <span class="ow">in</span> <span class="n">find_user</span> <span class="k">else</span> <span class="kc">None</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">find_user</span> <span class="o">=</span> <span class="n">user</span>
+                        <span class="n">find_user</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+                        <span class="n">find_user</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">apikeys</span>
         <span class="k">if</span> <span class="n">find_user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No matching user found for apikey.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/signin</span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">?error=apikeyfail&#39;</span><span class="p">)</span>
@@ -413,6 +416,32 @@
         <span class="n">copy_signin_data</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">signin_file_data</span><span class="p">)</span>
         <span class="n">users</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">copy_signin_data</span><span class="p">[</span><span class="s1">&#39;users&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">name</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">users</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_user_apikeys</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">signin_file_data</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">user</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ユーザーのApiKey一覧を取得する（user_data優先、signin_fileをフォールバック）</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            signin_file_data (Dict[str, Any]): サインインファイルデータ</span>
+<span class="sd">            user (Dict[str, Any]): ユーザー情報</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, str]: ApiKey名とApiKeyのマップ</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">apikeys</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">web_cls</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_webcls</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">web_cls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">webobj</span> <span class="o">=</span> <span class="n">web_cls</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
+                <span class="n">apikeys</span> <span class="o">=</span> <span class="n">webobj</span><span class="o">.</span><span class="n">get_user_apikeys</span><span class="p">(</span><span class="n">signin_file_data</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">include_legacy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">apikeys</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">apikeys</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">apikeys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">apikeys</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;apikeys&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;apikeys&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Signin.load_pem_private_key">
 <a class="viewcode-back" href="../../../../resources/cmdbox.app.auth.html#cmdbox.app.auth.signin.Signin.load_pem_private_key">[docs]</a>
@@ -526,6 +555,10 @@
                 <span class="n">group</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^/+&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">])</span>
             <span class="k">if</span> <span class="s1">&#39;startpage&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">group</span> <span class="ow">or</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;startpage&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">group</span><span class="p">[</span><span class="s1">&#39;startpage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="s1">&#39;readonly&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">group</span> <span class="ow">or</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;readonly&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;readonly&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">:</span>
+                <span class="n">group</span><span class="p">[</span><span class="s1">&#39;readonly&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="s1">&#39;hidden&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">group</span> <span class="ow">or</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;hidden&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;hidden&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">:</span>
+                <span class="n">group</span><span class="p">[</span><span class="s1">&#39;hidden&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">gids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;gid&#39;</span><span class="p">])</span>
             <span class="n">gnames</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
         <span class="c1"># cmdruleのフォーマットチェック</span>
@@ -950,9 +983,10 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;hashed apikey: </span><span class="si">{</span><span class="n">apikey</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">find_user</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">signin_file_data</span><span class="p">[</span><span class="s1">&#39;users&#39;</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="s1">&#39;apikeys&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user</span><span class="p">:</span>
+            <span class="n">apikeys</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_resolve_user_apikeys</span><span class="p">(</span><span class="n">signin_file_data</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">apikeys</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="k">for</span> <span class="n">ak</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">ak</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">apikeys</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">apikey</span> <span class="o">==</span> <span class="n">key</span><span class="p">:</span>
                     <span class="n">find_user</span> <span class="o">=</span> <span class="n">user</span>
         <span class="k">if</span> <span class="n">find_user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

@@ -2117,7 +2117,11 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
             return () => {
                 const current_path = $(`[id="${tid}"]`).val();
                 const scope = cmd_modal.find(`[name*="scope"]`);
-                const is_current = scope.length<=0 || scope.val()=='current';
+                if (scope.length<=0) {
+                    cmdbox.choice_local_file(tid);
+                    return;
+                }
+                const is_current = scope.val()=='current';
                 fmodal.filer_modal_func(tid, tn, current_path, false, is_current);
             }
         }
@@ -2275,7 +2279,7 @@ cmdbox.choice_local_file = (unique_id) => {
             const formData = new FormData();
             const file = files[0];
             formData.append('files', file);
-            upload_target = $('<form class="d-none"><input class="filer_scope" type="hidden" value="client"></form>');
+            upload_target = $('<form class="d-none"><input class="filer_scope" type="hidden" value="current"></form>');
             $('body').append(upload_target);
             cmdbox.file_upload(upload_target, svpath, formData, false,
                 undefined,

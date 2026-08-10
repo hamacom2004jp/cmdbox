@@ -1,0 +1,979 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Command Reference ( skill mode ) &mdash; cmdbox 2026/08/10 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d6572e83"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            cmdbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audit.html">Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="limiter.html">Limiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tts.html">Text-to-Speech (TTS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cmdbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Command Reference ( skill mode )</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/cmd_skill.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="command-reference-skill-mode">
+<h1>Command Reference ( skill mode )<a class="headerlink" href="#command-reference-skill-mode" title="Link to this heading"></a></h1>
+<p>List of skill mode commands.</p>
+<section id="skill-create-cmdbox-m-skill-c-create-option">
+<h2>skill ( create ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">skill</span> <span class="pre">-c</span> <span class="pre">create</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#skill-create-cmdbox-m-skill-c-create-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Create an Agent Skill zip from a command definition file.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--data &lt;data&gt;</p></td>
+<td><p>dir</p></td>
+<td></td>
+<td></td>
+<td><p>C:Usershama.cmdbox</p></td>
+<td></td>
+<td><p>When omitted, <cite>$HOME/.cmdbox</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--from_cmd_title &lt;from_cmd_title&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td></td>
+<td></td>
+<td><p>Specify the command title to convert into a skill.</p></td>
+</tr>
+<tr class="row-even"><td><p>--skill_name &lt;skill_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the skill name. If omitted, generated from from_cmd_title.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--skill_instruction &lt;skill_instruction&gt;</p></td>
+<td><p>text</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the instruction body in SKILL.md.</p></td>
+</tr>
+<tr class="row-even"><td><p>--output_file &lt;output_file&gt;</p></td>
+<td><p>file</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Output zip file path. If omitted, creates <cite>&lt;skill_name&gt;.zip</cite> in current directory.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--overwrite &lt;overwrite&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Overwrite when output file already exists.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;from_cmd_title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;skill_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;output_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;skill_md&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;command_ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.from_cmd_title</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>元コマンドタイトル</p></td>
+</tr>
+<tr class="row-even"><td><p>success.skill_name</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>作成したスキル名</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.output_file</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>作成したzipファイル</p></td>
+</tr>
+<tr class="row-even"><td><p>success.skill_md</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>zip内SKILL.mdパス</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.command_ref</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>zip内コマンド参照JSONパス</p></td>
+</tr>
+<tr class="row-even"><td><p>warn</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>output_schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-odd"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="skill-install-cmdbox-m-skill-c-install-option">
+<h2>skill ( install ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">skill</span> <span class="pre">-c</span> <span class="pre">install</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#skill-install-cmdbox-m-skill-c-install-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Install an Agent Skills zip archive into the data directory.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>120</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--skill_file &lt;skill_file&gt;</p></td>
+<td><p>file</p></td>
+<td></td>
+<td><p>required</p></td>
+<td></td>
+<td></td>
+<td><p>Specify the skill zip file to install.</p></td>
+</tr>
+<tr class="row-even"><td><p>--skill_name &lt;skill_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td></td>
+<td></td>
+<td><p>Specify destination skill name. If omitted, inferred from zip name.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--overwrite &lt;overwrite&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Overwrite when the target skill already exists.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;skill_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;skill_md&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.skill_name</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキル名</p></td>
+</tr>
+<tr class="row-even"><td><p>success.path</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>インストール先パス</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.skill_md</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>SKILL.mdパス</p></td>
+</tr>
+<tr class="row-even"><td><p>warn</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>output_schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-odd"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="skill-list-cmdbox-m-skill-c-list-option">
+<h2>skill ( list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">skill</span> <span class="pre">-c</span> <span class="pre">list</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#skill-list-cmdbox-m-skill-c-list-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>List installed Agent Skills.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>120</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--kwd &lt;kwd&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>Specify the name of the skill you want to search for. The search will be performed using grep.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;has_skill_md&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data</p></td>
+<td><p>list[SkillRecord] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-even"><td><p>warn</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>output_schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-odd"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="skill-uninstall-cmdbox-m-skill-c-uninstall-option">
+<h2>skill ( uninstall ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">skill</span> <span class="pre">-c</span> <span class="pre">uninstall</span> <span class="pre">&lt;Option&gt;</span></code><a class="headerlink" href="#skill-uninstall-cmdbox-m-skill-c-uninstall-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Uninstall an installed Agent Skill.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 12.0%" />
+<col style="width: 18.0%" />
+<col style="width: 26.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Multi</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Choices</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;host&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>localhost</p></td>
+<td></td>
+<td><p>Specify the service host of the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;port&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>6379</p></td>
+<td></td>
+<td><p>Specify the service port of the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;password&gt;</p></td>
+<td><p>passwd</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>password</p></td>
+<td></td>
+<td><p>Specify the access password of the Redis server (optional). If omitted, <cite>password</cite> is used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;svname&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td><p>cmdbox</p></td>
+<td></td>
+<td><p>Specify the service name of the inference server. If omitted, <cite>server</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>120</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--skill_name &lt;skill_name&gt;</p></td>
+<td><p>str</p></td>
+<td></td>
+<td><p>required</p></td>
+<td></td>
+<td></td>
+<td><p>Specify skill name to uninstall.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Schema</strong></p>
+<p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>success</p></td>
+<td><p>Data | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>成功した場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>success.data</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>処理結果のデータ</p></td>
+</tr>
+<tr class="row-even"><td><p>warn</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-odd"><td><p>error</p></td>
+<td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>エラーがある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
+<td><p>list[KeyVal] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>パフォーマンス情報のリスト</p></td>
+</tr>
+<tr class="row-even"><td><p>output_schema</p></td>
+<td><p>dict[str, any] | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>スキーマ情報</p></td>
+</tr>
+<tr class="row-odd"><td><p>end</p></td>
+<td><p>bool | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>終了フラグ</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

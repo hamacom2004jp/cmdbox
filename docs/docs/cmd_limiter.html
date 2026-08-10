@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( limiter mode ) &mdash; cmdbox 2026/08/01 documentation</title>
+  <title>Command Reference ( limiter mode ) &mdash; cmdbox 2026/08/10 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=16e07ade"></script>
+      <script src="../_static/documentation_options.js?v=d6572e83"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -220,6 +220,7 @@
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -268,23 +269,35 @@
 <td><p>null</p></td>
 <td><p>成功した場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.performance</p></td>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data</p></td>
+<tr class="row-odd"><td><p>success.data</p></td>
 <td><p>list[BillingResult] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>請求データ処理結果一覧</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn</p></td>
+<tr class="row-even"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
 </tr>
 <tr class="row-even"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
@@ -298,19 +311,25 @@
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>error.performance</p></td>
+<tr class="row-even"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>output_schema</p></td>
+<tr class="row-even"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-even"><td><p>end</p></td>
+<tr class="row-odd"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -425,6 +444,7 @@
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -478,107 +498,119 @@
 <td><p>null</p></td>
 <td><p>成功した場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.performance</p></td>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data</p></td>
+<tr class="row-odd"><td><p>success.data</p></td>
 <td><p>BillingData | list[BillingData] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>請求データ（last_reset指定時は単一、未指定時は配列）</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.plan_name</p></td>
+<tr class="row-even"><td><p>success.data.plan_name</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>プランの識別名</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.plan_title</p></td>
+<tr class="row-odd"><td><p>success.data.plan_title</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>プランのタイトル</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.billing_limiter</p></td>
+<tr class="row-even"><td><p>success.data.billing_limiter</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>請求対象のリミッター名</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.billing_limiter_item</p></td>
+<tr class="row-odd"><td><p>success.data.billing_limiter_item</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>credits</p></td>
 <td><p>請求計算に使用するリミッター項目</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.billing_type</p></td>
+<tr class="row-even"><td><p>success.data.billing_type</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>請求タイプ（period or metered）</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.billing_currency</p></td>
+<tr class="row-odd"><td><p>success.data.billing_currency</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>JPY</p></td>
 <td><p>請求通貨</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.billing_unit_price</p></td>
+<tr class="row-even"><td><p>success.data.billing_unit_price</p></td>
 <td><p>float | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>請求単価</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.billing_min_amount</p></td>
+<tr class="row-odd"><td><p>success.data.billing_min_amount</p></td>
 <td><p>float | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>請求の最小金額</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.billing_max_amount</p></td>
+<tr class="row-even"><td><p>success.data.billing_max_amount</p></td>
 <td><p>float | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>請求の最大金額</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.billing_amount</p></td>
+<tr class="row-odd"><td><p>success.data.billing_amount</p></td>
 <td><p>float | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>計算された請求金額</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.last_reset</p></td>
+<tr class="row-even"><td><p>success.data.last_reset</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>リセット日時</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.calc_datetime</p></td>
+<tr class="row-odd"><td><p>success.data.calc_datetime</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>請求計算日時</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.evidence_filename</p></td>
+<tr class="row-even"><td><p>success.data.evidence_filename</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>エビデンスファイル名</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.last_counter</p></td>
+<tr class="row-odd"><td><p>success.data.last_counter</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>リセット時点のカウンター</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn</p></td>
+<tr class="row-even"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
 </tr>
 <tr class="row-even"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
@@ -592,19 +624,25 @@
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>error.performance</p></td>
+<tr class="row-even"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>output_schema</p></td>
+<tr class="row-even"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-even"><td><p>end</p></td>
+<tr class="row-odd"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -725,6 +763,7 @@
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -774,83 +813,95 @@
 <td><p>null</p></td>
 <td><p>成功した場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.performance</p></td>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data</p></td>
+<tr class="row-odd"><td><p>success.data</p></td>
 <td><p>Counter | list[Counter] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>処理結果のデータ</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.limiter_name</p></td>
+<tr class="row-even"><td><p>success.data.limiter_name</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>制限設定の識別名</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.total_count</p></td>
+<tr class="row-odd"><td><p>success.data.total_count</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>実行回数</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.total_time</p></td>
+<tr class="row-even"><td><p>success.data.total_time</p></td>
 <td><p>float | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>実行総時間（秒）</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.total_input</p></td>
+<tr class="row-odd"><td><p>success.data.total_input</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>入力総バイト数</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.total_process</p></td>
+<tr class="row-even"><td><p>success.data.total_process</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>処理総バイト数</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.total_output</p></td>
+<tr class="row-odd"><td><p>success.data.total_output</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>出力総バイト数</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.total_credits</p></td>
+<tr class="row-even"><td><p>success.data.total_credits</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>コマンドの最大クレジット数</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.total_registrations</p></td>
+<tr class="row-odd"><td><p>success.data.total_registrations</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>登録総数</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.last_reset</p></td>
+<tr class="row-even"><td><p>success.data.last_reset</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>最終リセット日時</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.last_update</p></td>
+<tr class="row-odd"><td><p>success.data.last_update</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>最終更新日時</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn</p></td>
+<tr class="row-even"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
 </tr>
 <tr class="row-even"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
@@ -864,19 +915,25 @@
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>error.performance</p></td>
+<tr class="row-even"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>output_schema</p></td>
+<tr class="row-even"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-even"><td><p>end</p></td>
+<tr class="row-odd"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -989,6 +1046,7 @@
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -1027,23 +1085,35 @@
 <td><p>null</p></td>
 <td><p>成功した場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.performance</p></td>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data</p></td>
+<tr class="row-odd"><td><p>success.data</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>処理結果のデータ</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn</p></td>
+<tr class="row-even"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
 </tr>
 <tr class="row-even"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
@@ -1057,19 +1127,25 @@
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>error.performance</p></td>
+<tr class="row-even"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>output_schema</p></td>
+<tr class="row-even"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-even"><td><p>end</p></td>
+<tr class="row-odd"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -1191,6 +1267,7 @@
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -1241,23 +1318,35 @@
 <td><p>null</p></td>
 <td><p>成功した場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.performance</p></td>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data</p></td>
+<tr class="row-odd"><td><p>success.data</p></td>
 <td><p>list[Evidence] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>処理結果のデータ</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn</p></td>
+<tr class="row-even"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
 </tr>
 <tr class="row-even"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
@@ -1271,19 +1360,25 @@
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>error.performance</p></td>
+<tr class="row-even"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>output_schema</p></td>
+<tr class="row-even"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-even"><td><p>end</p></td>
+<tr class="row-odd"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -1396,6 +1491,7 @@
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -1445,59 +1541,71 @@
 <td><p>null</p></td>
 <td><p>成功した場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.performance</p></td>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data</p></td>
+<tr class="row-odd"><td><p>success.data</p></td>
 <td><p>list[LimiterRecord]</p></td>
 <td><p>no</p></td>
 <td><p>(必須)</p></td>
 <td><p>処理結果のデータ</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.name</p></td>
+<tr class="row-even"><td><p>success.data.name</p></td>
 <td><p>str</p></td>
 <td><p>yes</p></td>
 <td><p>(必須)</p></td>
 <td><p>制限設定の識別名</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.limiter_title</p></td>
+<tr class="row-odd"><td><p>success.data.limiter_title</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>制限設定の表示名</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.target_mode</p></td>
+<tr class="row-even"><td><p>success.data.target_mode</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>対象コマンドのモード名</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.target_cmd</p></td>
+<tr class="row-odd"><td><p>success.data.target_cmd</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>対象コマンドのコマンド名</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.target_option</p></td>
+<tr class="row-even"><td><p>success.data.target_option</p></td>
 <td><p>list[dict[str, any]] | dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>対象コマンドの条件</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.history_end</p></td>
+<tr class="row-odd"><td><p>success.data.history_end</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>カウンター記録の最終日時</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn</p></td>
+<tr class="row-even"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
 </tr>
 <tr class="row-even"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
@@ -1511,19 +1619,25 @@
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>error.performance</p></td>
+<tr class="row-even"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>output_schema</p></td>
+<tr class="row-even"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-even"><td><p>end</p></td>
+<tr class="row-odd"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -1636,6 +1750,7 @@
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -1698,149 +1813,161 @@
 <td><p>null</p></td>
 <td><p>成功した場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.performance</p></td>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data</p></td>
+<tr class="row-odd"><td><p>success.data</p></td>
 <td><p>Configure | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>処理結果のデータ</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.scope</p></td>
+<tr class="row-even"><td><p>success.data.scope</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スコープ</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.limiter_name</p></td>
+<tr class="row-odd"><td><p>success.data.limiter_name</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>制限設定の識別名</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.limiter_title</p></td>
+<tr class="row-even"><td><p>success.data.limiter_title</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>制限設定の表示名</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.target_mode</p></td>
+<tr class="row-odd"><td><p>success.data.target_mode</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>対象コマンドのモード名</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.target_cmd</p></td>
+<tr class="row-even"><td><p>success.data.target_cmd</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>対象コマンドのコマンド名</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.target_option</p></td>
+<tr class="row-odd"><td><p>success.data.target_option</p></td>
 <td><p>list[dict[str, any]] | dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>対象コマンドの条件</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.max_registrations</p></td>
+<tr class="row-even"><td><p>success.data.max_registrations</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>登録最大数（又は登録最大サイズ）</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.max_total_count</p></td>
+<tr class="row-odd"><td><p>success.data.max_total_count</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>実行最大回数</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.max_total_time</p></td>
+<tr class="row-even"><td><p>success.data.max_total_time</p></td>
 <td><p>float | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>実行可能総時間（秒）</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.max_total_input</p></td>
+<tr class="row-odd"><td><p>success.data.max_total_input</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>入力総バイト数の上限</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.max_total_process</p></td>
+<tr class="row-even"><td><p>success.data.max_total_process</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>処理総バイト数の上限</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.max_total_output</p></td>
+<tr class="row-odd"><td><p>success.data.max_total_output</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>出力総バイト数の上限</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.max_total_credits</p></td>
+<tr class="row-even"><td><p>success.data.max_total_credits</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>コマンドの最大クレジット数</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.service_credits</p></td>
+<tr class="row-odd"><td><p>success.data.service_credits</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>サービスクレジット数</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.exec_period_start</p></td>
+<tr class="row-even"><td><p>success.data.exec_period_start</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>実行可能期間の開始日時</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.exec_period_end</p></td>
+<tr class="row-odd"><td><p>success.data.exec_period_end</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>実行可能期間の終了日時</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.reset_datetime</p></td>
+<tr class="row-even"><td><p>success.data.reset_datetime</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>カウンタリセット日時</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.reset_period_unit</p></td>
+<tr class="row-odd"><td><p>success.data.reset_period_unit</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>リセット単位（hour/day/month/year）</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.reset_period_qty</p></td>
+<tr class="row-even"><td><p>success.data.reset_period_qty</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>リセット間隔の数量</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.max_history_interval</p></td>
+<tr class="row-odd"><td><p>success.data.max_history_interval</p></td>
 <td><p>float | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>履歴保存期間の最大間隔（秒）</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.history_end</p></td>
+<tr class="row-even"><td><p>success.data.history_end</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>カウンター記録の最終日時</p></td>
 </tr>
-<tr class="row-even"><td><p>warn</p></td>
+<tr class="row-odd"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
 </tr>
 <tr class="row-odd"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
@@ -1854,19 +1981,25 @@
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>error.performance</p></td>
+<tr class="row-odd"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>output_schema</p></td>
+<tr class="row-odd"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-odd"><td><p>end</p></td>
+<tr class="row-even"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -1971,6 +2104,7 @@
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -2009,23 +2143,35 @@
 <td><p>null</p></td>
 <td><p>成功した場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.performance</p></td>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data</p></td>
+<tr class="row-odd"><td><p>success.data</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>処理結果のデータ</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn</p></td>
+<tr class="row-even"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
 </tr>
 <tr class="row-even"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
@@ -2039,19 +2185,25 @@
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>error.performance</p></td>
+<tr class="row-even"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>output_schema</p></td>
+<tr class="row-even"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-even"><td><p>end</p></td>
+<tr class="row-odd"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -2156,6 +2308,7 @@
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -2212,23 +2365,35 @@
 <td><p>null</p></td>
 <td><p>成功した場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.performance</p></td>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data</p></td>
+<tr class="row-odd"><td><p>success.data</p></td>
 <td><p>list[PlanInfo] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>プラン設定一覧</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn</p></td>
+<tr class="row-even"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
 </tr>
 <tr class="row-even"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
@@ -2242,19 +2407,25 @@
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>error.performance</p></td>
+<tr class="row-even"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>output_schema</p></td>
+<tr class="row-even"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-even"><td><p>end</p></td>
+<tr class="row-odd"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -2367,6 +2538,7 @@
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -2469,149 +2641,161 @@
 <td><p>null</p></td>
 <td><p>成功した場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.performance</p></td>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data</p></td>
+<tr class="row-odd"><td><p>success.data</p></td>
 <td><p>Configure | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>プラン設定データ</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.plan_name</p></td>
+<tr class="row-even"><td><p>success.data.plan_name</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>プランの識別名</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.plan_title</p></td>
+<tr class="row-odd"><td><p>success.data.plan_title</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>プランのタイトル</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.plan_desc</p></td>
+<tr class="row-even"><td><p>success.data.plan_desc</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>プランの説明</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.limiters</p></td>
+<tr class="row-odd"><td><p>success.data.limiters</p></td>
 <td><p>list[LimiterDetail] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>このプランに含まれるリミッター設定の詳細情報</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.plan_start</p></td>
+<tr class="row-even"><td><p>success.data.plan_start</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>プラン適用開始日時</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.plan_end</p></td>
+<tr class="row-odd"><td><p>success.data.plan_end</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>プラン適用終了日時</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.open_date</p></td>
+<tr class="row-even"><td><p>success.data.open_date</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>ユーザー利用開始日時</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.suspend_date</p></td>
+<tr class="row-odd"><td><p>success.data.suspend_date</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>ユーザー利用停止日時</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.notice_date</p></td>
+<tr class="row-even"><td><p>success.data.notice_date</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>利用停止日の通知日時</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.billing_type</p></td>
+<tr class="row-odd"><td><p>success.data.billing_type</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>請求タイプ（period or metered）</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.billing_period_unit</p></td>
+<tr class="row-even"><td><p>success.data.billing_period_unit</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>請求期間単位</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.billing_period_qty</p></td>
+<tr class="row-odd"><td><p>success.data.billing_period_qty</p></td>
 <td><p>int | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>請求期間数量</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.billing_limiter</p></td>
+<tr class="row-even"><td><p>success.data.billing_limiter</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>請求対象のリミッター名</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.billing_limiter_item</p></td>
+<tr class="row-odd"><td><p>success.data.billing_limiter_item</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>credits</p></td>
 <td><p>請求計算に使用するリミッター項目（registrations/count/time/input/process/output/credits）</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.billing_min_amount</p></td>
+<tr class="row-even"><td><p>success.data.billing_min_amount</p></td>
 <td><p>float | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>請求の最小金額</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.billing_max_amount</p></td>
+<tr class="row-odd"><td><p>success.data.billing_max_amount</p></td>
 <td><p>float | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>請求の最大金額</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.billing_unit_price</p></td>
+<tr class="row-even"><td><p>success.data.billing_unit_price</p></td>
 <td><p>float | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>請求単価</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.billing_currency</p></td>
+<tr class="row-odd"><td><p>success.data.billing_currency</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>JPY</p></td>
 <td><p>請求に使用する通貨（JPY, USD, EUR等）</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.current_billing_qty</p></td>
+<tr class="row-even"><td><p>success.data.current_billing_qty</p></td>
 <td><p>float | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>現在の請求対象量</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.current_billing_amount</p></td>
+<tr class="row-odd"><td><p>success.data.current_billing_amount</p></td>
 <td><p>float | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>現在の請求金額</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.billing_data</p></td>
+<tr class="row-even"><td><p>success.data.billing_data</p></td>
 <td><p>list[BillingData] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>請求データリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>warn</p></td>
+<tr class="row-odd"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
 </tr>
 <tr class="row-odd"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
@@ -2625,19 +2809,25 @@
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>error.performance</p></td>
+<tr class="row-odd"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>output_schema</p></td>
+<tr class="row-odd"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-odd"><td><p>end</p></td>
+<tr class="row-even"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -2878,6 +3068,7 @@
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -2916,23 +3107,35 @@
 <td><p>null</p></td>
 <td><p>成功した場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.performance</p></td>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data</p></td>
+<tr class="row-odd"><td><p>success.data</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>処理結果のデータ</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn</p></td>
+<tr class="row-even"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
 </tr>
 <tr class="row-even"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
@@ -2946,19 +3149,25 @@
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>error.performance</p></td>
+<tr class="row-even"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>output_schema</p></td>
+<tr class="row-even"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-even"><td><p>end</p></td>
+<tr class="row-odd"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -3223,6 +3432,7 @@
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -3261,23 +3471,35 @@
 <td><p>null</p></td>
 <td><p>成功した場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.performance</p></td>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data</p></td>
+<tr class="row-odd"><td><p>success.data</p></td>
 <td><p>str | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>処理結果のデータ</p></td>
 </tr>
-<tr class="row-odd"><td><p>warn</p></td>
+<tr class="row-even"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-odd"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
 </tr>
 <tr class="row-even"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
@@ -3291,19 +3513,25 @@
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-even"><td><p>error.performance</p></td>
+<tr class="row-even"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-odd"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-odd"><td><p>output_schema</p></td>
+<tr class="row-even"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-even"><td><p>end</p></td>
+<tr class="row-odd"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
@@ -3440,6 +3668,7 @@
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -3486,41 +3715,53 @@
 <td><p>null</p></td>
 <td><p>成功した場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.performance</p></td>
+<tr class="row-odd"><td><p>success.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>success.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data</p></td>
+<tr class="row-odd"><td><p>success.data</p></td>
 <td><p>list[TargetRecord]</p></td>
 <td><p>no</p></td>
 <td><p>(必須)</p></td>
 <td><p>処理結果のデータ</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.mode</p></td>
+<tr class="row-even"><td><p>success.data.mode</p></td>
 <td><p>str | list[str]</p></td>
 <td><p>yes</p></td>
 <td><p>(必須)</p></td>
 <td><p>フィーチャーのモード</p></td>
 </tr>
-<tr class="row-even"><td><p>success.data.cmd</p></td>
+<tr class="row-odd"><td><p>success.data.cmd</p></td>
 <td><p>str</p></td>
 <td><p>yes</p></td>
 <td><p>(必須)</p></td>
 <td><p>フィーチャーのコマンド</p></td>
 </tr>
-<tr class="row-odd"><td><p>success.data.limiters</p></td>
+<tr class="row-even"><td><p>success.data.limiters</p></td>
 <td><p>list[dict[str, any]]</p></td>
 <td><p>no</p></td>
 <td><p>(必須)</p></td>
 <td><p>適合する制限設定の詳細内容リスト</p></td>
 </tr>
-<tr class="row-even"><td><p>warn</p></td>
+<tr class="row-odd"><td><p>warn</p></td>
 <td><p>dict[str, any] | list[any] | Data | str | bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>警告がある場合の結果</p></td>
+</tr>
+<tr class="row-even"><td><p>warn.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
 </tr>
 <tr class="row-odd"><td><p>warn.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
@@ -3534,19 +3775,25 @@
 <td><p>null</p></td>
 <td><p>エラーがある場合の結果</p></td>
 </tr>
-<tr class="row-odd"><td><p>error.performance</p></td>
+<tr class="row-odd"><td><p>error.save_mode</p></td>
+<td><p>str | null</p></td>
+<td><p>no</p></td>
+<td><p>null</p></td>
+<td><p>保存モード</p></td>
+</tr>
+<tr class="row-even"><td><p>error.performance</p></td>
 <td><p>list[KeyVal] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>パフォーマンス情報のリスト</p></td>
 </tr>
-<tr class="row-even"><td><p>output_schema</p></td>
+<tr class="row-odd"><td><p>output_schema</p></td>
 <td><p>dict[str, any] | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>
 <td><p>スキーマ情報</p></td>
 </tr>
-<tr class="row-odd"><td><p>end</p></td>
+<tr class="row-even"><td><p>end</p></td>
 <td><p>bool | null</p></td>
 <td><p>no</p></td>
 <td><p>null</p></td>

@@ -26,6 +26,7 @@ See below for available options for the various commands.
    MCPServer <cmd_mcpsv.rst>
    RAG <cmd_rag.rst>
    Server <cmd_server.rst>
+   Skill <cmd_skill.rst>
    Test <cmd_test.rst>
    TTS <cmd_tts.rst>
    URL <cmd_url.rst>

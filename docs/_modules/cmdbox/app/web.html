@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.web &mdash; cmdbox 2026/07/20 documentation</title>
+  <title>cmdbox.app.web &mdash; cmdbox 2026/08/10 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=91640ad9"></script>
+      <script src="../../../_static/documentation_options.js?v=d6572e83"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -396,6 +396,57 @@
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s2">&quot;User not found.&quot;</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="Web.get_user_apikeys">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.get_user_apikeys">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_user_apikeys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">user</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">include_legacy</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ユーザーのApiKey一覧を取得する（user_data優先、必要に応じてsignin_fileをフォールバック）</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            signin_data (Dict[str, Any]): サインインファイルデータ</span>
+<span class="sd">            user (Dict[str, Any]): ユーザー情報</span>
+<span class="sd">            include_legacy (bool, optional): signin_fileのapikeysをフォールバックとして含めるか. Defaults to True.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, str]: ApiKey名とApiKeyのマップ</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">uid</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;uid&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">user_name</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">apikeys</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">uid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">user_name</span><span class="p">:</span>
+            <span class="n">user_apikeys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">user_name</span><span class="p">,</span> <span class="s1">&#39;apikey&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">user_apikeys</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">apikeys</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">user_apikeys</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">include_legacy</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;apikeys&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="c1"># 既存のsignin_file由来データは、未移行キーの救済としてのみマージする</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">apikeys</span><span class="p">:</span>
+                    <span class="n">apikeys</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">apikeys</span></div>
+
+
+<div class="viewcode-block" id="Web.save_user_apikeys">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.save_user_apikeys">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_user_apikeys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">user_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">apikeys</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ユーザーのApiKey一覧をuser_dataへ保存する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            uid (str): ユーザーID</span>
+<span class="sd">            user_name (str): ユーザー名</span>
+<span class="sd">            apikeys (Dict[str, str]): 保存するApiKey一覧</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">user_name</span><span class="p">,</span> <span class="s1">&#39;apikey&#39;</span><span class="p">)</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">current</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">current</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">apikeys</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">user_name</span><span class="p">,</span> <span class="s1">&#39;apikey&#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">delkey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">apikeys</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">user_name</span><span class="p">,</span> <span class="s1">&#39;apikey&#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="Web.user_list">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.user_list">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">user_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
@@ -416,6 +467,11 @@
         <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">signin_data</span><span class="p">[</span><span class="s1">&#39;users&#39;</span><span class="p">]):</span>
             <span class="n">u</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;********&#39;</span>
+            <span class="n">apikeys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_user_apikeys</span><span class="p">(</span><span class="n">signin_data</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">include_legacy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">apikeys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">u</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">apikeys</span>
+            <span class="k">elif</span> <span class="s1">&#39;apikeys&#39;</span> <span class="ow">in</span> <span class="n">u</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]</span>
             <span class="k">if</span> <span class="s1">&#39;apikeys&#39;</span> <span class="ow">in</span> <span class="n">u</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">an</span><span class="p">,</span> <span class="n">ak</span> <span class="ow">in</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="n">exp</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
@@ -473,15 +529,36 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ApiKey name is not found.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">&#39;users&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]])</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;User name is not exists.&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        apikeys = self.user_data(None, user[&#39;uid&#39;], user[&#39;name&#39;], &#39;apikey&#39;)</span>
+<span class="sd">        if not apikeys:</span>
+<span class="sd">            apikeys = dict()</span>
+<span class="sd">        if user[&#39;apikey_name&#39;] in apikeys:</span>
+<span class="sd">            raise ValueError(f&quot;ApiKey name is already exists.&quot;)</span>
+<span class="sd">        apikey = common.random_string(64)</span>
+<span class="sd">        apikey[user[&#39;apikey_name&#39;]] = apikey</span>
+<span class="sd">        if signin_data[&#39;apikey&#39;][&#39;gen_jwt&#39;][&#39;enabled&#39;]:</span>
+<span class="sd">            cls = self.signin.__class__</span>
+<span class="sd">            claims = cls.gen_jwt_claims.copy() if cls.gen_jwt_claims is not None else dict()</span>
+<span class="sd">            claims[&#39;exp&#39;] = int(time.time()) + int(claims.get(&#39;exp&#39;, 3600))</span>
+<span class="sd">            claims[&#39;uid&#39;] = user[&#39;uid&#39;]</span>
+<span class="sd">            claims[&#39;name&#39;] = user[&#39;name&#39;]</span>
+<span class="sd">            claims[&#39;groups&#39;] = user[&#39;groups&#39;]</span>
+<span class="sd">            claims[&#39;email&#39;] = user[&#39;email&#39;]</span>
+<span class="sd">            claims[&#39;apikey_name&#39;] = user[&#39;apikey_name&#39;]</span>
+<span class="sd">            apikey = jwt.encode(claims, cls.gen_jwt_privatekey, algorithm=cls.gen_jwt_algorithm)</span>
+<span class="sd">            apikeys[user[&#39;apikey_name&#39;]] = apikey</span>
+<span class="sd">        self.user_data(None, user[&#39;uid&#39;], user[&#39;name&#39;], &#39;apikey&#39;, user[&#39;apikey_name&#39;], apikeys[user[&#39;apikey_name&#39;]])</span>
+<span class="sd">        return apikeys[user[&#39;apikey_name&#39;]]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">apikey</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">&#39;users&#39;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="s1">&#39;apikeys&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">u</span><span class="p">:</span>
-                    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;apikey_name&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]:</span>
+                <span class="n">apikeys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_user_apikeys</span><span class="p">(</span><span class="n">signin_data</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">include_legacy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;apikey_name&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">apikeys</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ApiKey name is already exists.&quot;</span><span class="p">)</span>
                 <span class="n">apikey</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">random_string</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span>
-                <span class="n">u</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">][</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;apikey_name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">apikey</span>
+                <span class="n">apikeys</span><span class="p">[</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;apikey_name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">apikey</span>
                 <span class="k">if</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">&#39;apikey&#39;</span><span class="p">][</span><span class="s1">&#39;gen_jwt&#39;</span><span class="p">][</span><span class="s1">&#39;enabled&#39;</span><span class="p">]:</span>
                     <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="vm">__class__</span>
                     <span class="n">claims</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">gen_jwt_claims</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">gen_jwt_claims</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">()</span>
@@ -492,12 +569,15 @@
                     <span class="n">claims</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span>
                     <span class="n">claims</span><span class="p">[</span><span class="s1">&#39;apikey_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;apikey_name&#39;</span><span class="p">]</span>
                     <span class="n">apikey</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">claims</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">gen_jwt_privatekey</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">gen_jwt_algorithm</span><span class="p">)</span>
-                    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">][</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;apikey_name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">apikey</span>
+                    <span class="n">apikeys</span><span class="p">[</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;apikey_name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">apikey</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_user_apikeys</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">],</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">apikeys</span><span class="p">)</span>
+                <span class="c1"># 互換性維持のため、移行期間はsignin_fileにも同期する</span>
+                <span class="n">u</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">apikeys</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;apikey_add: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">signin_data</span>
-        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1">#common.save_yml(self.signin_file, signin_data, nolock=False)</span>
         <span class="k">return</span> <span class="n">apikey</span></div>
 
 
@@ -524,14 +604,18 @@
         <span class="n">apikey</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">&#39;users&#39;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="s1">&#39;apikeys&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">u</span><span class="p">:</span>
+                <span class="n">apikeys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_user_apikeys</span><span class="p">(</span><span class="n">signin_data</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">include_legacy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;apikey_name&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">apikeys</span><span class="p">:</span>
                     <span class="k">continue</span>
-                <span class="k">if</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;apikey_name&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]:</span>
-                    <span class="k">continue</span>
-                <span class="n">apikey</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">][</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;apikey_name&#39;</span><span class="p">]]</span>
-                <span class="k">del</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">][</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;apikey_name&#39;</span><span class="p">]]</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="k">del</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]</span>
+                <span class="n">apikey</span> <span class="o">=</span> <span class="n">apikeys</span><span class="p">[</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;apikey_name&#39;</span><span class="p">]]</span>
+                <span class="k">del</span> <span class="n">apikeys</span><span class="p">[</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;apikey_name&#39;</span><span class="p">]]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_user_apikeys</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">],</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">apikeys</span><span class="p">)</span>
+                <span class="c1"># 互換性維持のため、移行期間はsignin_fileにも同期する</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">apikeys</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39;apikeys&#39;</span> <span class="ow">in</span> <span class="n">u</span><span class="p">:</span>
+                        <span class="k">del</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;apikeys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">apikeys</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">apikey</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ApiKey name is not exists.&quot;</span><span class="p">)</span>
 
@@ -539,9 +623,9 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;signin_file is None.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;apikey_del: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">signin_data</span>
-        <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">signin_data</span></div>
 
+        <span class="c1">#common.save_yml(self.signin_file, signin_data, nolock=False)</span>
 
 <div class="viewcode-block" id="Web.user_add">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.user_add">[docs]</a>
@@ -575,7 +659,7 @@
         <span class="k">if</span> <span class="s1">&#39;groups&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;User groups is not found or empty.&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">gn</span> <span class="ow">in</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group_list</span><span class="p">(</span><span class="n">gn</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group_list</span><span class="p">(</span><span class="n">gn</span><span class="p">,</span> <span class="n">ret_hidden</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Group is not found. (</span><span class="si">{</span><span class="n">gn</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">&#39;users&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;User uid is already exists.&quot;</span><span class="p">)</span>
@@ -640,7 +724,7 @@
         <span class="k">if</span> <span class="s1">&#39;groups&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;User groups is not found or empty.&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">gn</span> <span class="ow">in</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group_list</span><span class="p">(</span><span class="n">gn</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group_list</span><span class="p">(</span><span class="n">gn</span><span class="p">,</span> <span class="n">ret_hidden</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Group is not found. (</span><span class="si">{</span><span class="n">gn</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">&#39;users&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]])</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;User uid is not found.&quot;</span><span class="p">)</span>
@@ -713,12 +797,13 @@
 
 <div class="viewcode-block" id="Web.group_list">
 <a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.group_list">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">group_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">group_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ret_hidden</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        サインインファイルのグループ一覧を取得する</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name (str, optional): グループ名. Defaults to None.</span>
+<span class="sd">            ret_hidden (bool, optional): hidden設定が有効化されているグループを返すかどうか. Defaults to False.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            List[Dict[str, Any]]: グループ一覧</span>
@@ -727,7 +812,10 @@
         <span class="k">if</span> <span class="n">signin_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;signin_file_data is None. (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">signin_data</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">])</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">signin_data</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ret_hidden</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">ret</span> <span class="k">if</span> <span class="s1">&#39;hidden&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">or</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;hidden&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">ret</span>
         <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">signin_data</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]):</span>
             <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
                 <span class="k">return</span> <span class="p">[</span><span class="n">g</span><span class="p">]</span>
@@ -770,6 +858,10 @@
         <span class="c1"># buildin設定が有効化されているグループは追加できない</span>
         <span class="k">if</span> <span class="s1">&#39;buildin&#39;</span> <span class="ow">in</span> <span class="n">group</span> <span class="ow">and</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;buildin&#39;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;You cannot add a built-in group.&quot;</span><span class="p">)</span>
+        <span class="c1"># readonly設定はFalseで保存する</span>
+        <span class="n">group</span><span class="p">[</span><span class="s1">&#39;readonly&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># hidden設定はFalseで保存する</span>
+        <span class="n">group</span><span class="p">[</span><span class="s1">&#39;hidden&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">group</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;.groups/</span><span class="si">{</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">signin_data</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -815,8 +907,15 @@
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;You cannot set a built-in group as a parent group.&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;gid&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;gid&#39;</span><span class="p">]):</span>
+                <span class="c1"># buildin設定が有効化されているグループは編集できない</span>
                 <span class="k">if</span> <span class="s1">&#39;buildin&#39;</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;buildin&#39;</span><span class="p">]:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;You cannot edit a built-in group.&quot;</span><span class="p">)</span>
+                <span class="c1"># readonly設定が有効化されているグループは編集できない</span>
+                <span class="k">if</span> <span class="s1">&#39;readonly&#39;</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;readonly&#39;</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;You cannot edit a read-only group.&quot;</span><span class="p">)</span>
+                <span class="c1"># hidden設定が有効化されているグループは編集できない</span>
+                <span class="k">if</span> <span class="s1">&#39;hidden&#39;</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;hidden&#39;</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;You cannot edit a hidden group.&quot;</span><span class="p">)</span>
                 <span class="n">g</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
                 <span class="n">g</span><span class="p">[</span><span class="s1">&#39;startpage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;startpage&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;startpage&#39;</span> <span class="ow">in</span> <span class="n">group</span> <span class="k">else</span> <span class="kc">None</span>
                 <span class="n">g</span><span class="p">[</span><span class="s1">&#39;parent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;parent&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;parent&#39;</span> <span class="ow">in</span> <span class="n">group</span> <span class="k">else</span> <span class="kc">None</span>
@@ -872,10 +971,18 @@
                 <span class="n">pathrule_group_ids</span> <span class="o">+=</span> <span class="p">[</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;gid&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">group</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">gid</span> <span class="ow">in</span> <span class="n">pathrule_group_ids</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Group gid is used by pathrule group.&quot;</span><span class="p">)</span>
-        <span class="c1"># グループがbuildin設定がされていないことをチェック</span>
+        <span class="c1"># グループの各設定が有効でないことをチェック</span>
         <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="s1">&#39;buildin&#39;</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;buildin&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;gid&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">gid</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This group is a built-in group.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;gid&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">gid</span><span class="p">:</span>
+                <span class="c1"># グループがbuildin設定がされていないことをチェック</span>
+                <span class="k">if</span> <span class="s1">&#39;buildin&#39;</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;buildin&#39;</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This group is a built-in group.&quot;</span><span class="p">)</span>
+                <span class="c1"># readonly設定が有効化されているグループは削除できない</span>
+                <span class="k">if</span> <span class="s1">&#39;readonly&#39;</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;readonly&#39;</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This group is a read-only group.&quot;</span><span class="p">)</span>
+                <span class="c1"># hidden設定が有効化されているグループは削除できない</span>
+                <span class="k">if</span> <span class="s1">&#39;hidden&#39;</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">and</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;hidden&#39;</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This group is a hidden group.&quot;</span><span class="p">)</span>
 
         <span class="c1"># グループ削除</span>
         <span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;gid&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">gid</span><span class="p">]</span>
