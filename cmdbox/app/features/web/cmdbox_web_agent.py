@@ -7,8 +7,10 @@ from fastapi import FastAPI, Depends, HTTPException, Request, Response, WebSocke
 from fastapi.responses import HTMLResponse
 from starlette.websockets import WebSocketDisconnect
 from typing import Dict, Any, Tuple, List, Union
+import datetime
 import logging
 import json
+import jwt
 import re
 import time
 import traceback
@@ -69,31 +71,10 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
         async def _chat(session:Dict[str, Any], runner_name:str, session_id:str, sock, res:Response, receive_text=None):
             if web.logger.level == logging.DEBUG:
                 web.logger.debug(f"agent_chat: connected")
-            # ユーザー名を取得する
-            user_name = common.random_string(16)
-            groups = []
-            mcpserver_apikey = None
-            a2asv_apikey = None
-            if 'signin' in session:
-                user_name = session['signin']['name']
-                groups = session['signin']['groups']
-                mcpserver_apikey = session['signin'].get('apikey', None)
-                a2asv_apikey = session['signin'].get('apikey', None)
-                if mcpserver_apikey is None:
-                    #apikeys = session['signin'].get('apikeys', None)
-                    apikeys = session.get('apikeys', None)
-                    if apikeys is not None and isinstance(apikeys, dict) and len(apikeys) > 0:
-                        mcpserver_apikey = apikeys.values().__iter__().__next__()
-                        a2asv_apikey = mcpserver_apikey
 
-            yield json.dumps(dict(success=dict(message=self.get_startmsg(web))), default=common.default_json_enc)
-            def _replace_match(match_obj):
-                json_str = match_obj.group(0)
-                try:
-                    data = json.loads(json_str) # ユニコード文字列をエンコード
-                    return json.dumps(data, ensure_ascii=False, default=common.default_json_enc)
-                except json.JSONDecodeError:
-                    return json_str
+            # ユーザー情報を取得する
+            user_name, groups, mcpserver_apikey, a2asv_apikey = self.get_user_info(web, session)
+            yield json.dumps(dict(success=dict(message=self.get_startmsg(web, user_name, groups, mcpserver_apikey, a2asv_apikey))), default=common.default_json_enc)
 
             agent_chat = cmdbox_agent_chat.AgentChat(self.appcls, self.ver)
             _options = options.Options.getInstance(self.appcls, self.ver)
@@ -149,16 +130,89 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
                     yield json.dumps(dict(message=f'<pre>{traceback.format_exc()}</pre>'), default=common.default_json_enc)
                     break
 
-    def get_startmsg(self, web:Web) -> str:
+    def get_startmsg(self, web:Web, user_name:str, groups:List[str], mcpserver_apikey:Union[str, None], a2asv_apikey:Union[str, None]) -> str:
         """
         チャットの開始メッセージを返します
 
         Args:
             web (Web): Webオブジェクト
+            user_name (str): ユーザー名
+            groups (List[str]): ユーザーが所属するグループ
+            mcpserver_apikey (Union[str, None]): MCPサーバーのAPIキー
+            a2asv_apikey (Union[str, None]): A2ASVのAPIキー
         Returns:
             str: 開始メッセージ
         """
-        return "こんにちは！何かお手伝いできることはありますか？" if common.is_japan(language=web.language) else "Hello! Is there anything I can help you with?"
+        if mcpserver_apikey is None or a2asv_apikey is None:
+            if common.is_japan(language=web.language):
+                return "有効なAPIキーが設定されていません。ユーザーメニューから設定し、リロードしてからご利用ください。"
+            else:
+                return "A valid API key has not been configured. Please configure it from the user menu, reload the page, and then use the service."
+
+        if common.is_japan(language=web.language):
+            return "こんにちは！何かお手伝いできることはありますか？"
+        else:
+            return "Hello! Is there anything I can help you with?"
+
+    def get_user_info(self, web:Web, session:Dict[str, Any]) -> Tuple[str, List[str], Union[str, None], Union[str, None]]:
+        user_name = common.random_string(16)
+        groups = []
+        mcpserver_apikey = None
+        a2asv_apikey = None
+        if 'signin' in session:
+            user_name = session['signin']['name']
+            groups = session['signin']['groups']
+            mcpserver_apikey = session['signin'].get('apikey', None)
+            a2asv_apikey = session['signin'].get('apikey', None)
+            if mcpserver_apikey is None:
+                #apikeys = session['signin'].get('apikeys', None)
+                apikeys = session.get('apikeys', None)
+                if apikeys is not None and isinstance(apikeys, dict) and len(apikeys) > 0:
+                    # 有効なAPIキーを選択する（JWTデコード成功かつ有効期限内）
+                    valid_apikey = self._select_valid_apikey(web, apikeys)
+                    if valid_apikey is not None:
+                        mcpserver_apikey = valid_apikey
+                        a2asv_apikey = valid_apikey
+        return user_name, groups, mcpserver_apikey, a2asv_apikey
+
+    def _select_valid_apikey(self, web:Web, apikeys:Dict[str, str]) -> Union[str, None]:
+        """
+        複数のAPIキーから有効なものを選択する
+        有効性の判定：JWTデコードが成功かつ有効期限内
+
+        Args:
+            web (Web): Webオブジェクト
+            apikeys (Dict[str, str]): APIキー名とAPIキーのマップ
+
+        Returns:
+            Union[str, None]: 有効なAPIキー、存在しない場合はNone
+        """
+        cls = web.signin.__class__
+        for apikey_name, apikey_value in apikeys.items():
+            try:
+                # JWT公開鍵の取得
+                publickey = None
+                if cls.verify_jwt_certificate is not None:
+                    publickey = cls.verify_jwt_certificate.public_key()
+                if publickey is None and cls.verify_jwt_publickey is not None:
+                    publickey = cls.verify_jwt_publickey
+                
+                # JWTをデコード（有効期限確認を含む）
+                t = jwt.decode(apikey_value, publickey, algorithms=[cls.verify_jwt_algorithm],
+                               issuer=cls.verify_jwt_issuer, audience=cls.verify_jwt_audience,
+                               options={'verify_iss': cls.verify_jwt_issuer is not None,
+                                        'verify_aud': cls.verify_jwt_audience is not None})
+                # デコード成功 = 有効期限内のAPIキー
+                return apikey_value
+            except jwt.exceptions.InvalidTokenError:
+                # JWTデコード失敗（無効またはデコード失敗）
+                continue
+            except Exception:
+                # その他のエラー
+                continue
+        
+        # 有効なAPIキーが見つからない場合
+        return None
 
     class SSEDisconnect(Exception):
         """

@@ -441,7 +441,6 @@ limiter_page.open_edit_modal = async (name, defaults) => {
 };
 
 /**
-
  * 制限設定を保存
  */
 limiter_page.save_limiter = async () => {
