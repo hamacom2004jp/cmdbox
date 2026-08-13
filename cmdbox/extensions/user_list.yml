@@ -213,10 +213,6 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     mode: embed
     cmds: [del, load, save, start, stop]
     rule: allow
-  - groups: [admin, editor]
-    mode: skill
-    cmds: [create, install, uninstall]
-    rule: allow
 pathrule:                      # List of RESTAPI rules, rules that determine whether or not a RESTAPI can be executed when a user in web mode accesses it.
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.
   rules:                       # Specify rules to allow or deny execution of the RESTAPI, depending on the group the user belongs to.

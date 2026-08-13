@@ -876,6 +876,12 @@ a.list-group-item.active {
 #upload_drop_area {
     background-color: var(--area-bg-color-50);
 }
+[data-bs-theme="dark"] #upload_drop_area,
+[data-bs-theme="coffeeshop"] #upload_drop_area,
+[data-bs-theme="darkheroine"] #upload_drop_area,
+[data-bs-theme="spaceship"] #upload_drop_area {
+    background-color: var(--area-bg-color-10);
+}
 
 #upload_file_list .list-group-item {
     background-color: transparent;

@@ -2,6 +2,15 @@
     <button id="btn_toggle_sidebar" class="btn btn-nav-toggle ms-1 mt-3 me-auto" title="Toggle sidebar" style="border:none;">
         <i class="fas fa-bars fa-xl"></i>
     </button>
+    <button id="btn_new_chat" class="btn btn-nav-action" title="New Chat" style="border:none;">
+        <i class="fa-solid fa-comment-medical fa-2xl"></i>
+        <span class="nav-label i18n">New Chat</span>
+    </button>
+    <button id="btn_histories" class="btn btn-nav-action" data-bs-toggle="modal" data-bs-target="#historyModal" title="Histories" style="border:none;">
+        <i class="fas fa-history fa-2xl"></i>
+        <span class="nav-label i18n">Histories</span>
+    </button>
+    <hr class="nav-sidebar-divider my-2 mx-2">
     <button id="btn_filetrancefer" class="btn btn-nav-action" data-bs-toggle="modal" data-bs-target="#fileTranceferModal" title="Files" style="border:none;">
         <i class="fa-solid fa-folder-open fa-2xl"></i>
         <span class="nav-label i18n">Files</span>
@@ -11,15 +20,11 @@
         <span class="nav-label i18n">Settings</span>
     </button>
     <div class="dropdown tools_menu">
-        <button class="btn btn-nav-action gap-0 px-2" data-bs-toggle="dropdown" title="Tools" style="border:none;">
-            <svg width="30" height="30" fill="currentColor" class="mx-1"><use href="#btn_cmdbox"></use></svg>
-            <span class="nav-label text-left i18n">Tools</span>
+        <button class="btn btn-nav-action px-3" data-bs-toggle="dropdown" title="Tools" style="border:none;">
+            <i class="fa-solid fa-ellipsis fa-2xl"></i>
+            <span class="nav-label i18n">Tools</span>
         </button>
         <ul class="dropdown-menu text-small shadow" style="position:absolute;inset:0px 0px auto auto;margin:0px;transform:translate(0px, 34px);" data-popper-placement="bottom-end">
         </ul>
     </div>
-    <button id="btn_histories" class="btn btn-nav-action" data-bs-toggle="modal" data-bs-target="#historyModal" title="Histories" style="border:none;">
-        <i class="fas fa-history fa-2xl"></i>
-        <span class="nav-label i18n">Histories</span>
-    </button>
 </div>

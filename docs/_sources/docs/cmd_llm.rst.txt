@@ -389,7 +389,7 @@ llm ( save ) : ``cmdbox -m llm -c save <Option>``
     "--llmapikey <llmapikey>","passwd","","","","","Specify API key for llm provider connection."
     "--llmapiversion <llmapiversion>","str","","","","","Specifies the API version for llm provider connections."
     "--llmendpoint <llmendpoint>","str","","","","","Specifies the endpoint for llm provider connections."
-    "--llmmodel <llmmodel>","str","","","text-multilingual-embedding-002","","Specifies the llm model."
+    "--llmmodel <llmmodel>","str","","required","","","Specifies the llm model."
     "--llmseed <llmseed>","int","","","13","","Specifies the seed value when using llm model."
     "--llmtemperature <llmtemperature>","float","","","0.1","","Specifies the temperature when using llm model."
     "--llmpriority <llmpriority>","int","","required","1","","Specifies the priority when using llm model. Lower values indicate higher priority."

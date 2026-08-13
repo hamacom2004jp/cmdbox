@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( skill mode ) &mdash; cmdbox 2026/08/10 documentation</title>
+  <title>Command Reference ( skill mode ) &mdash; cmdbox 2026/08/13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,12 +14,14 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=d6572e83"></script>
+      <script src="../_static/documentation_options.js?v=e1afa4e9"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Command Reference ( test mode )" href="cmd_test.html" />
+    <link rel="prev" title="Command Reference ( server mode )" href="cmd_server.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,10 +43,40 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command.html">Command Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="command.html">Command Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cmd_a2asv.html">A2AServer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_agent.html">Agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_audit.html">Audit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html">Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmd.html">Cmd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_cmdbox.html">Cmdbox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">Common Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_datasource.html">Datasource</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_edge.html">Edge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_excel.html">Excel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_extract.html">Extract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_limiter.html">Limiter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_llm.html">LLM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_mcpsv.html">MCPServer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_rag.html">RAG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_server.html">Server</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Skill</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#skill-create-cmdbox-m-skill-c-create-option">skill ( create ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">skill</span> <span class="pre">-c</span> <span class="pre">create</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#skill-install-cmdbox-m-skill-c-install-option">skill ( install ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">skill</span> <span class="pre">-c</span> <span class="pre">install</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#skill-list-cmdbox-m-skill-c-list-option">skill ( list ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">skill</span> <span class="pre">-c</span> <span class="pre">list</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#skill-uninstall-cmdbox-m-skill-c-uninstall-option">skill ( uninstall ) : <code class="docutils literal notranslate"><span class="pre">cmdbox</span> <span class="pre">-m</span> <span class="pre">skill</span> <span class="pre">-c</span> <span class="pre">uninstall</span> <span class="pre">&lt;Option&gt;</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_test.html">Test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_tts.html">TTS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_url.html">URL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_web.html">Web</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audit.html">Audit</a></li>
 <li class="toctree-l1"><a class="reference internal" href="limiter.html">Limiter</a></li>
@@ -69,6 +101,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="command.html">Command Reference</a></li>
       <li class="breadcrumb-item active">Command Reference ( skill mode )</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/docs/cmd_skill.rst.txt" rel="nofollow"> View page source</a>
@@ -951,7 +984,10 @@
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cmd_server.html" class="btn btn-neutral float-left" title="Command Reference ( server mode )" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmd_test.html" class="btn btn-neutral float-right" title="Command Reference ( test mode )" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

@@ -901,7 +901,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                     flags = outputs['success']['flags'] = dict()
                     flags['turn_complete'] = bool(event.turn_complete)
                     flags['interrupted'] = bool(event.interrupted)
-                    msg, is_func_call, is_func_response, is_final_response = self.gen_msg(event)
+                    msg, is_func_call, is_func_response, is_final_response = self.__class__.gen_msg(event)
                     flags['final_response'] = is_final_response
                     flags['function_call'] = is_func_call
                     flags['function_response'] = is_func_response

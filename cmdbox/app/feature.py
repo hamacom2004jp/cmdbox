@@ -173,21 +173,23 @@ class Feature(object):
         設定の保存モードをチェックします
 
         Args:
-            name (str): エージェント名
+            name (str): 設定名
             configure (Dict[str, Any]): 設定内容
             configure_path (Path): 設定ファイルパス
         Returns:
             Tuple[bool, Dict[str, Any]]: チェック結果, 警告メッセージ
         """
+        msg = None
+        ret = True
         if configure_path.exists() and configure.get('save_mode') == 'add':
             msg = dict(warn=f"Configuration '{name}' already exists. Use `update` mode to overwrite.")
-            return False, msg
+            ret = False
         if not configure_path.exists() and configure.get('save_mode') == 'update':
             msg = dict(warn=f"Configuration '{name}' does not exist. Use `add` mode to create a new configuration.")
-            return False, msg
+            ret = False
         if 'save_mode' in configure:
             del configure['save_mode']
-        return True, None
+        return ret, msg
 
 class OneshotEdgeFeature(Feature):
     """

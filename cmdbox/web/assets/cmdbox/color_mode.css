@@ -1286,7 +1286,7 @@ body::after {
     color: var(--bs-body-color);
 }
 [data-bs-theme="darkheroine"] #btn_toggle_sidebar {
-    color: var(--bs-body-bg);
+    color: var(--bs-body-color);
 }
 [data-bs-theme="darkheroine"] .doc-link {
     color: var(--mono-ink);

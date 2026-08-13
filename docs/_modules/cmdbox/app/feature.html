@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.feature &mdash; cmdbox 2026/08/10 documentation</title>
+  <title>cmdbox.app.feature &mdash; cmdbox 2026/08/13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=d6572e83"></script>
+      <script src="../../../_static/documentation_options.js?v=e1afa4e9"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -291,21 +291,23 @@
 <span class="sd">        設定の保存モードをチェックします</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            name (str): エージェント名</span>
+<span class="sd">            name (str): 設定名</span>
 <span class="sd">            configure (Dict[str, Any]): 設定内容</span>
 <span class="sd">            configure_path (Path): 設定ファイルパス</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            Tuple[bool, Dict[str, Any]]: チェック結果, 警告メッセージ</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">configure_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">configure</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;save_mode&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;add&#39;</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Configuration &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; already exists. Use `update` mode to overwrite.&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">msg</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">configure_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">configure</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;save_mode&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;update&#39;</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Configuration &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; does not exist. Use `add` mode to create a new configuration.&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">msg</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="s1">&#39;save_mode&#39;</span> <span class="ow">in</span> <span class="n">configure</span><span class="p">:</span>
             <span class="k">del</span> <span class="n">configure</span><span class="p">[</span><span class="s1">&#39;save_mode&#39;</span><span class="p">]</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">None</span></div>
+        <span class="k">return</span> <span class="n">ret</span><span class="p">,</span> <span class="n">msg</span></div>
 </div>
 
 

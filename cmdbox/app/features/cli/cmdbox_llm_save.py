@@ -79,7 +79,7 @@ class LLMSave(feature.OneshotResultEdgeFeature, validator.Validator, limiter.Lim
                 dict(opt="llmendpoint", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja="llmのプロバイダ接続のためのエンドポイントを指定します。",
                      description_en="Specifies the endpoint for llm provider connections."),
-                dict(opt="llmmodel", type=Options.T_STR, default="text-multilingual-embedding-002", required=False, multi=False, hide=False, choice=None,
+                dict(opt="llmmodel", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="llmモデルを指定します。",
                      description_en="Specifies the llm model."),
                 dict(opt="llmseed", type=Options.T_INT, default=13, required=False, multi=False, hide=False, choice=None,
