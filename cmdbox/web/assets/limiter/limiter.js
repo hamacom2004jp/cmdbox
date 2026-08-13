@@ -266,6 +266,7 @@ limiter_page.render_targets = async (targets) => {
             limiter_page._render_limiter_item(card_body, lm, true, is_limiter_save);
         }
     }
+    cmdbox.process_i18n();
     cmdbox.hide_loading();
 };
 
