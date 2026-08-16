@@ -11,7 +11,7 @@ import logging
 import time
 
 
-def _apprun_pre(self:'LimitedFeature', logger:logging.Logger, args:argparse.Namespace) -> Tuple[int, Dict[str, Any], Any]:
+def _apprun_pre(self:'LimitedFeature', logger:logging.Logger, args:argparse.Namespace) -> Tuple[int, Dict[str, Any], List[str], Any]:
     """
     コマンドの実行制限を検証します。
 
@@ -30,10 +30,10 @@ def _apprun_pre(self:'LimitedFeature', logger:logging.Logger, args:argparse.Name
     client_data_path = getattr(args, 'client_data', None)
     if not (host and port and password and svname):
         msg = dict(warn=f"The limiter check is enabled, but the connection information for the Redis server is incomplete. mode={mode}, cmd={cmd}")
-        return -1, msg, None
+        return -1, msg, [], None
     if not client_data_path or not Path(client_data_path).is_dir():
         msg = dict(warn=f"The limiter check is enabled, but the client_data option is not enabled. mode={mode}, cmd={cmd}")
-        return -1, msg, None
+        return -1, msg, [], None
     redis_cli = redis_client.RedisClient(logger, host=host, port=port, password=password, svname=svname) if host and port and password and svname else None
     limit = Limiter.getInstance(redis_cli, flush_interval=60, reload_interval=60)
     current_registrations = self.apprun_registrations(Path(client_data_path), logger, args, msg={})
@@ -136,7 +136,8 @@ def async_apprun_check_limit(func: Callable) -> Callable:
         return st, msg, obj
     return wrapper
 
-def _svrun_pre(self:'LimitedFeature', data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str], sessions:Dict[str, Dict[str, Any]]) -> Tuple[int, Dict[str, Any], Any, Dict[str, Any]]:
+def _svrun_pre(self:'LimitedFeature', data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient,
+               msg:List[str], sessions:Dict[str, Dict[str, Any]]) -> Tuple[int, Dict[str, Any], List[str], Any, Dict[str, Any]]:
     """
     svrunの実行前に制限チェックを行います。
 

@@ -163,7 +163,7 @@ class DatasourceSave(datasource_base.DatasourceBase, validator.Validator, limite
             return self.RESP_WARN
 
     def apprun_registrations(self, data_dir, logger, args, msg):
-        raise NotImplementedError("In the Limiter settings, please use `scope=server`.")
+        return 0
 
     def svrun_registrations(self, data_dir, logger, opt, msg):
         datasource_dir = data_dir / '.datasource'
