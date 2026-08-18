@@ -1,5 +1,6 @@
 from cmdbox.app import common, client, feature
 from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
+from cmdbox.app.features.cli import cmdbox_limiter_load
 from cmdbox.app.options import Options
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -10,6 +11,10 @@ import pydantic
 
 
 class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
+    def __init__(self, appcls: str, ver: str, language: str):
+        super().__init__(appcls=appcls, ver=ver, language=language)
+        self.limiter_load = cmdbox_limiter_load.LimiterLoad(appcls=appcls, ver=ver, language=language)
+
     def get_mode(self) -> Union[str, List[str]]:
         return 'limiter'
 
@@ -52,6 +57,9 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="load_history", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
                      description_ja="履歴も取得するかどうかを指定します。Trueを指定すると、履歴も取得します。",
                      description_en="Specify whether to retrieve the history as well. If you set this to True, the history will also be retrieved."),
+                dict(opt="reflesh_counter", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
+                     description_ja="カウンタを最新化するかどうかを指定します。Trueを指定すると、カウンタが最新化されます。",
+                     description_en="Specifies whether to update the counter. If set to True, the counter is updated."),
             ]
         )
 
@@ -72,15 +80,18 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
                 logger.warning("client_data is required when scope is 'client'.")
                 common.print_format(result, args.format, tm, args.output_json, args.output_json_append, pf=pf)
                 return self.RESP_WARN, result, None
+            client_data = Path(client_data)
             redis_cli = redis_client.RedisClient(logger, host=args.host, port=args.port, password=args.password, svname=args.svname)
             lmt = limiter.Limiter(redis_client=redis_cli)
-            counter = lmt.load_counter(Path(client_data), args.limiter_name, scope=scope)
+            if args.reflesh_counter:
+                self._reflesh_counter(lmt, client_data, args.limiter_name, scope=scope, logger=logger, args=args)
+            counter = lmt.load_counter(client_data, args.limiter_name, scope=scope)
             out = dict(success=dict(data=counter))
             common.print_format(out, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_SUCCESS, out, None
 
         # scope == 'server'
-        payload = dict(limiter_name=args.limiter_name, load_history=args.load_history)
+        payload = dict(limiter_name=args.limiter_name, load_history=args.load_history, reflesh_counter=args.reflesh_counter)
         payload_b64 = convert.str2b64str(common.to_str(payload))
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.redis_cli.send_cmd(self.get_svcmd(), [payload_b64],
@@ -111,6 +122,16 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
     def is_cluster_redirect(self):
         return False
 
+    def _reflesh_counter(self, lmt: limiter.Limiter, data_dir: Path, limiter_name: str, scope: str, logger: logging.Logger, args: argparse.Namespace):
+        config = self.limiter_load._load_limiter_config(data_dir, limiter_name)
+        _options = Options.getInstance(self.appcls, ver=self.ver)
+        feat:limiter.LimitedFeature = _options.get_cmd_attr(config.get('target_mode'), config.get('target_cmd'), 'feature')
+        command_options = dict(mode=config.get('target_mode'), cmd=config.get('target_cmd'), **config.get('target_options', {}))
+        registration = feat.apprun_registrations(data_dir=data_dir, logger=logger, args=args, msg={})
+        lmt.update(feat=feat, deny_limiter_names=[], data_dir=data_dir, logger=logger, command_options=command_options,
+                    count=0, exec_time=0.0, input_bytes=0, process_bytes=0, output_bytes=0, credits=0,
+                    registrations=registration, scope=scope)
+
     def _load_limiter_counter(self, data_dir: Path, limiter_name: str, redis_cli: redis_client.RedisClient, logger: logging.Logger,
                               scope: str = 'server', load_history: bool = False) -> Dict[str, Any]:
         """Load limiter counter (internal helper method)"""
@@ -128,10 +149,16 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
             payload = json.loads(convert.b64str2str(msg[2]))
             limiter_name = payload.get('limiter_name')
             load_history = payload.get('load_history', False)
+            reflesh_counter = payload.get('reflesh_counter', False)
             if not limiter_name:
                 result = dict(warn="limiter_name is required.")
                 redis_cli.rpush(reskey, result)
                 return self.RESP_WARN
+
+            if reflesh_counter:
+                lmt = limiter.Limiter.getInstance(redis_client=redis_cli, flush_interval=60, reload_interval=60)
+                self._reflesh_counter(lmt, data_dir, limiter_name, scope='server',
+                                      logger=logger, args=argparse.Namespace())
 
             counter = self._load_limiter_counter(data_dir, limiter_name, redis_cli, logger, scope='server', load_history=load_history)
             result = dict(success=dict(data=counter))

@@ -203,7 +203,8 @@ limiter_page.load_targets = async () => {
     const payload = {
         mode: 'limiter',
         cmd: 'targets',
-        scope: scope
+        scope: scope,
+        reflesh_counter: true
     };
     // フィルタ条件がある場合のみ追加
     if (filter_target_mode) payload.filter_target_mode = filter_target_mode.trim();

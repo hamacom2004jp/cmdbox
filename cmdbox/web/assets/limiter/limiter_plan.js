@@ -198,7 +198,9 @@ limiter_plan_page.render_plans = async (plans) => {
         
         // リミッター詳細を読み込んで表示
         try {
-            const res = await cmdbox.sv_exec_cmd({ mode: 'limiter', cmd: 'plan_load', plan_name: plan.name, include_history: false });
+            const res = await cmdbox.sv_exec_cmd({
+                mode: 'limiter', cmd: 'plan_load', plan_name: plan.name,
+                include_history: false, reflesh_counter: true });
             const data_list = Array.isArray(res) ? res : [res];
             const first = data_list[0];
             if (first && first['success']) {

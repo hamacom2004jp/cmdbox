@@ -57,12 +57,16 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                 dict(opt="include_history", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
                      description_ja="エビデンスファイルの履歴情報を含めるかどうかを指定します。`True` の場合、履歴情報は出力されます。",
                      description_en="Specifies whether to include history information in the evidence file. If set to `True`, the history information is included in the output."),
+                dict(opt="reflesh_counter", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
+                     description_ja="カウンタを最新化するかどうかを指定します。Trueを指定すると、カウンタが最新化されます。",
+                     description_en="Specifies whether to update the counter. If set to True, the counter is updated."),
             ]
         )
 
     @validator.apprun_check
     def apprun(self, logger: logging.Logger, args: argparse.Namespace, tm: float, pf: List[Dict[str, float]] = []) -> Tuple[int, Dict[str, Any], Any]:
-        payload = dict(plan_name=args.plan_name, include_history=getattr(args, 'include_history', False))
+        payload = dict(plan_name=args.plan_name, include_history=getattr(args, 'include_history', False),
+                       reflesh_counter=getattr(args, 'reflesh_counter', False))
         payload_b64 = convert.str2b64str(common.to_str(payload))
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
         ret = cl.redis_cli.send_cmd(self.get_svcmd(), [payload_b64],
@@ -175,6 +179,7 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
             payload = json.loads(convert.b64str2str(msg[2]))
             plan_name = payload.get('plan_name')
             include_history = payload.get('include_history', False)
+            reflesh_counter = payload.get('reflesh_counter', False)
             if not plan_name:
                 out = dict(warn="plan_name is required.")
                 redis_cli.rpush(reskey, out)
@@ -195,6 +200,9 @@ class LimiterPlanLoad(feature.OneshotResultEdgeFeature, validator.Validator):
                         # self.limiter_load を使用して limiter 設定を取得
                         limiter_cfg = self.limiter_load._load_limiter_config(data_dir, limiter_name)
                         # self.limiter_counter を使用してカウンター情報を取得
+                        if reflesh_counter:
+                            lmt = limiter.Limiter.getInstance(redis_client=redis_cli, flush_interval=60, reload_interval=60)
+                            self.limiter_counter._reflesh_counter(lmt, data_dir, limiter_name, scope='server', logger=logger, args=argparse.Namespace())
                         counter_data = self.limiter_counter._load_limiter_counter(data_dir, limiter_name, redis_cli, logger,
                                                                                   scope='server', load_history=include_history)
                         limiter_cfg['counter'] = counter_data
