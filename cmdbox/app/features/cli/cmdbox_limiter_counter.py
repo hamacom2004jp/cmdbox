@@ -127,7 +127,12 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
         _options = Options.getInstance(self.appcls, ver=self.ver)
         feat:limiter.LimitedFeature = _options.get_cmd_attr(config.get('target_mode'), config.get('target_cmd'), 'feature')
         command_options = dict(mode=config.get('target_mode'), cmd=config.get('target_cmd'), **config.get('target_options', {}))
-        registration = feat.apprun_registrations(data_dir=data_dir, logger=logger, args=args, msg={})
+        if scope == 'client':
+            registration = feat.apprun_registrations(data_dir=data_dir, logger=logger, args=args, msg={})
+        elif scope == 'server':
+            registration = feat.svrun_registrations(data_dir=data_dir, logger=logger, opt=args.__dict__, msg={})
+        else:
+            registration = 0
         lmt.update(feat=feat, deny_limiter_names=[], data_dir=data_dir, logger=logger, command_options=command_options,
                     count=0, exec_time=0.0, input_bytes=0, process_bytes=0, output_bytes=0, credits=0,
                     registrations=registration, scope=scope)
