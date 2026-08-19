@@ -7,6 +7,7 @@ import argparse
 import logging
 import json
 import pydantic
+import unicodedata
 
 
 class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limiter.LimitedFeature):
@@ -111,7 +112,8 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
         client_data = Path(str(args.client_data).replace('"','')) if args.client_data is not None else None
-        upload_file = Path(str(args.upload_file).replace('"','')) if args.upload_file is not None else None
+        upload_file = unicodedata.normalize('NFC', args.upload_file) if args.upload_file is not None else None
+        upload_file = Path(str(upload_file).replace('"','')) if upload_file is not None else None
         fwpaths = [str(p).replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
         rjpaths = [str(p).replace('"','') for p in args.rjpath] if args.rjpath is not None else []
         ret = cl.file_upload(str(args.svpath).replace('"',''), upload_file, scope=args.scope, client_data=client_data,
@@ -138,7 +140,7 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
         Returns:
             bool: メッセージを転送する場合はTrue
         """
-        return True
+        return False
 
     @limiter.svrun_check_limit
     def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],

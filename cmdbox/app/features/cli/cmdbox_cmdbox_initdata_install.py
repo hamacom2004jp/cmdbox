@@ -7,6 +7,8 @@ from typing import Dict, Any, Tuple, List, Union
 import argparse
 import logging
 import pydantic
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 class CmdboxInitdataInstall(cmdbox_base.CmdboxBase, validator.Validator):
@@ -73,6 +75,9 @@ class CmdboxInitdataInstall(cmdbox_base.CmdboxBase, validator.Validator):
                 dict(opt="overwrite", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
                      description_ja="アップロード先に存在していても上書きします。",
                      description_en="Overwrites the file even if it exists at the upload destination."),
+                dict(opt="concurrent_max_file_size", type=Options.T_INT, default=50, required=False, multi=False, hide=True, choice=None,
+                     description_ja="同時にアップロード可能な最大ファイルサイズを指定します（Mバイト単位）。",
+                     description_en="Specifies the maximum file size that can be uploaded concurrently (in megabytes)."),
                 dict(opt="retry_count", type=Options.T_INT, default=3, required=False, multi=False, hide=True, choice=None,
                      description_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",
                      description_en="Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever."),
@@ -132,15 +137,104 @@ class CmdboxInitdataInstall(cmdbox_base.CmdboxBase, validator.Validator):
             msg = dict(warn=results)
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg, cl
+
+        concurrent_max_bytes = args.concurrent_max_file_size * 1024 * 1024  # Mバイトをバイトに変換
+        
+        # ファイル情報を収集（ファイルサイズを含める）
+        file_list = []
+        oversize_files = []
         for svp in upload_paths:
-            ret = cl.file_upload(svp, upload_paths[svp], scope=args.scope, client_data=client_data,
-                                 fwpaths=fwpaths, rjpaths=rjpaths, mkdir=args.mkdir, overwrite=args.overwrite,
-                                 retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
-            msg = dict(file=str(upload_paths[svp]))
-            if 'success' not in ret:
+            try:
+                file_size = upload_paths[svp].stat().st_size
+                if file_size >= concurrent_max_bytes:
+                    oversize_files.append(dict(file=str(upload_paths[svp]), size=file_size, limit=concurrent_max_bytes))
+                file_list.append((svp, upload_paths[svp], file_size))
+            except Exception as e:
+                msg = dict(file=str(upload_paths[svp]), msg=f"Failed to get file size: {str(e)}")
+                results.append(msg)
                 has_warn = True
-                msg['msg'] = ret.get('warn', 'Unknown warning')
-            results.append(msg)
+
+        if oversize_files:
+            msg = dict(error=dict(
+                message="One or more files are greater than or equal to concurrent_max_file_size.",
+                files=oversize_files,
+            ))
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_ERROR, msg, cl
+        
+        if has_warn:
+            msg = dict(warn=results)
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+            return self.RESP_WARN, msg, cl
+        
+        # マルチスレッド処理でアップロード
+        lock = threading.Lock()
+        processing_size = 0
+        file_queue = list(file_list)
+        
+        def upload_task(svp: str, file_path: Path, file_size: int) -> Tuple[str, Dict[str, Any], bool]:
+            """
+            ファイルをアップロードするタスク
+            
+            Returns:
+                (svp, msg_dict, is_warning)
+            """
+            try:
+                ret = cl.file_upload(svp, file_path, scope=args.scope, client_data=client_data,
+                                     fwpaths=fwpaths, rjpaths=rjpaths, mkdir=args.mkdir, overwrite=args.overwrite,
+                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
+                msg = dict(file=str(file_path))
+                if 'success' not in ret:
+                    has_warn = True
+                    msg['msg'] = ret.get('warn', 'Unknown warning')
+                    return (svp, msg, True)
+                return (svp, msg, False)
+            except Exception as e:
+                msg = dict(file=str(file_path), msg=str(e))
+                return (svp, msg, True)
+            finally:
+                # 処理完了時に処理中サイズから減らす
+                with lock:
+                    nonlocal processing_size
+                    processing_size -= file_size
+        
+        # スレッドプール実行
+        with ThreadPoolExecutor() as executor:
+            futures = {}
+            queue_index = 0
+            
+            # 初期段階で処理可能なファイルをキューに追加
+            while queue_index < len(file_queue):
+                svp, file_path, file_size = file_queue[queue_index]
+                with lock:
+                    if processing_size + file_size <= concurrent_max_bytes:
+                        processing_size += file_size
+                        future = executor.submit(upload_task, svp, file_path, file_size)
+                        futures[future] = (svp, file_path, file_size)
+                        queue_index += 1
+                    else:
+                        break
+            
+            # 処理を監視し、完了したら次のファイルを追加
+            for future in as_completed(futures):
+                svp, msg, is_warn = future.result()
+                if is_warn:
+                    has_warn = True
+                results.append(msg)
+                del futures[future]
+                
+                # 次のファイルを追加
+                while queue_index < len(file_queue):
+                    svp, file_path, file_size = file_queue[queue_index]
+                    with lock:
+                        if processing_size + file_size <= concurrent_max_bytes:
+                            processing_size += file_size
+                            future = executor.submit(upload_task, svp, file_path, file_size)
+                            futures[future] = (svp, file_path, file_size)
+                            queue_index += 1
+                            break
+                        else:
+                            break
 
         msg = dict(success=results) if not has_warn else dict(warn=results)
         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

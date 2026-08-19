@@ -7,6 +7,7 @@ import datetime
 import mimetypes
 import re
 import shutil
+import os
 
 class Filer(object):
     RESP_SUCCESS:int = 0
@@ -18,6 +19,22 @@ class Filer(object):
         self.data_dir = data_dir.resolve() if isinstance(data_dir, Path) else Path(data_dir).resolve()
         self.logger = logger
         common.mkdirs(self.data_dir)
+
+    def _normalize_path(self, path: Path) -> Path:
+        """
+        OS依存の表記差異を吸収して比較用に正規化します。
+
+        Args:
+            path (Path): 正規化対象パス
+        Returns:
+            Path: 正規化後パス
+        """
+        p = str(path)
+        # Windows の拡張長パスプレフィックスを除去して比較差分を防ぐ
+        if p.startswith('\\\\?\\'):
+            p = p[4:]
+        p = os.path.normcase(os.path.normpath(p))
+        return Path(p)
 
     def _file_exists(self, current_path:str, not_exists:bool=False, exists_chk:bool=True) -> Tuple[bool, Path, Dict[str, Any]]:
         """
@@ -39,7 +56,8 @@ class Filer(object):
         current_path = current_path.replace("\\","/").replace("//","/")
         cp = current_path[1:] if current_path.startswith('/') else current_path
         abspath:Path = (self.data_dir / cp).resolve()
-        if not str(abspath).startswith(str(self.data_dir)):
+        data_dir = self.data_dir.resolve()
+        if not self._normalize_path(abspath).is_relative_to(self._normalize_path(data_dir)):
             self.logger.warning(f"Path {abspath} is out of data directory. current_path={current_path}")
             return False, abspath, dict(warn=f"Path {abspath} is out of data directory. current_path={current_path}")
         # パス存在チェックを行わない場合は、パスが存在するかどうかに関わらず成功とする

@@ -126,7 +126,7 @@ class ClientFileRmdir(feature.UnsupportEdgeFeature, validator.Validator):
         Returns:
             bool: メッセージを転送する場合はTrue
         """
-        return True
+        return False
 
     def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
               sessions:Dict[str, Dict[str, Any]]) -> int:
