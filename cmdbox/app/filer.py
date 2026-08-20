@@ -87,7 +87,7 @@ class Filer(object):
         """
         _, from_abspath, _ = self._file_exists(path, exists_chk=exists_chk)
         rpath = path.replace('\\','/') # windowsパス対応のため、バックスラッシュをスラッシュに変換
-        rpath = rpath if rpath.endswith('/') else f"{rpath}/" # ディレクトリパスの末尾にスラッシュを付与
+        rpath = f"{rpath}/" if from_abspath.is_dir() and not rpath.endswith('/') else rpath # ディレクトリパスの末尾にスラッシュを付与
         if fwpaths is None:
             return False, dict(warn=f"fwpaths is None.")
         if not any(from_abspath.is_relative_to(self._file_exists(fwpath)[1]) for fwpath in fwpaths):

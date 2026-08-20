@@ -112,14 +112,12 @@ class CmdboxInitdataInstall(cmdbox_base.CmdboxBase, validator.Validator):
         rjpaths = [str(p).replace('"', '') for p in args.rjpath] if args.rjpath is not None else []
         svpath = str(args.svpath).replace('"', '')
 
-        results = []
-        has_warn = False
         upload_paths = dict()
         for path in initdata_paths:
             if not path.exists():
-                results.append(dict(file=str(path), result=dict(error="Path not found")))
-                has_warn = True
-                continue
+                msg = dict(error=f"Path not found: {str(path)}")
+                logger.error(msg)
+                return self.RESP_WARN, msg, cl
             _path = str(path.resolve())
             if path.is_dir():
                 for p in path.rglob("*"):
@@ -129,53 +127,35 @@ class CmdboxInitdataInstall(cmdbox_base.CmdboxBase, validator.Validator):
                         _p = str(Path(svpath) / _p).replace("\\", "/")
                         upload_paths[_p] = p
             else:
-                # ディレクトリ以外が指定された場合はエラーとする
                 msg = dict(warn=f"{str(path)} is not a directory.")
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
+                logger.warning(msg)
                 return self.RESP_WARN, msg, cl
-        if has_warn:
-            msg = dict(warn=results)
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, cl
 
         concurrent_max_bytes = args.concurrent_max_file_size * 1024 * 1024  # Mバイトをバイトに変換
         
         # ファイル情報を収集（ファイルサイズを含める）
         file_list = []
-        oversize_files = []
         for svp in upload_paths:
             try:
                 file_size = upload_paths[svp].stat().st_size
                 if file_size >= concurrent_max_bytes:
-                    oversize_files.append(dict(file=str(upload_paths[svp]), size=file_size, limit=concurrent_max_bytes))
+                    msg = dict(warn=f"File size exceeds limit: {upload_paths[svp]} ({file_size} bytes), limit: {concurrent_max_bytes} bytes")
+                    logger.warning(msg)
+                    return self.RESP_WARN, msg, cl
                 file_list.append((svp, upload_paths[svp], file_size))
             except Exception as e:
-                msg = dict(file=str(upload_paths[svp]), msg=f"Failed to get file size: {str(e)}")
-                results.append(msg)
-                has_warn = True
+                msg = dict(warn=f"Failed to get file size: {upload_paths[svp]}: {e}")
+                logger.warning(msg)
+                return self.RESP_WARN, msg, cl
 
-        if oversize_files:
-            msg = dict(error=dict(
-                message="One or more files are greater than or equal to concurrent_max_file_size.",
-                files=oversize_files,
-            ))
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_ERROR, msg, cl
-        
-        if has_warn:
-            msg = dict(warn=results)
-            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return self.RESP_WARN, msg, cl
-        
         # マルチスレッド処理でアップロード
         lock = threading.Lock()
         processing_size = 0
         file_queue = list(file_list)
-        
+
         def upload_task(svp: str, file_path: Path, file_size: int) -> Tuple[str, Dict[str, Any], bool]:
             """
             ファイルをアップロードするタスク
-            
             Returns:
                 (svp, msg_dict, is_warning)
             """
@@ -183,26 +163,26 @@ class CmdboxInitdataInstall(cmdbox_base.CmdboxBase, validator.Validator):
                 ret = cl.file_upload(svp, file_path, scope=args.scope, client_data=client_data,
                                      fwpaths=fwpaths, rjpaths=rjpaths, mkdir=args.mkdir, overwrite=args.overwrite,
                                      retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
-                msg = dict(file=str(file_path))
+                msg = dict(scope=args.scope, svpath=svp)
                 if 'success' not in ret:
-                    has_warn = True
                     msg['msg'] = ret.get('warn', 'Unknown warning')
-                    return (svp, msg, True)
-                return (svp, msg, False)
+                    return (svp, dict(warn=msg, file=str(file_path)), True)
+                return (svp, dict(success=msg), False)
             except Exception as e:
-                msg = dict(file=str(file_path), msg=str(e))
-                return (svp, msg, True)
+                msg = dict(svpath=svp, file=str(file_path), msg=str(e))
+                return (svp, dict(warn=msg), True)
             finally:
                 # 処理完了時に処理中サイズから減らす
                 with lock:
                     nonlocal processing_size
                     processing_size -= file_size
-        
+
+        has_warn = False
         # スレッドプール実行
         with ThreadPoolExecutor() as executor:
             futures = {}
             queue_index = 0
-            
+
             # 初期段階で処理可能なファイルをキューに追加
             while queue_index < len(file_queue):
                 svp, file_path, file_size = file_queue[queue_index]
@@ -214,15 +194,16 @@ class CmdboxInitdataInstall(cmdbox_base.CmdboxBase, validator.Validator):
                         queue_index += 1
                     else:
                         break
-            
+
             # 処理を監視し、完了したら次のファイルを追加
             for future in as_completed(futures):
                 svp, msg, is_warn = future.result()
                 if is_warn:
                     has_warn = True
-                results.append(msg)
+                    logger.warning(msg)
+                else:
+                    logger.info(msg)
                 del futures[future]
-                
                 # 次のファイルを追加
                 while queue_index < len(file_queue):
                     svp, file_path, file_size = file_queue[queue_index]
@@ -235,14 +216,9 @@ class CmdboxInitdataInstall(cmdbox_base.CmdboxBase, validator.Validator):
                             break
                         else:
                             break
-
-        msg = dict(success=results) if not has_warn else dict(warn=results)
-        common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-
         if has_warn:
-            return self.RESP_WARN, msg, cl
-
-        return self.RESP_SUCCESS, msg, cl
+            return self.RESP_WARN, dict(warn=f'completed with warnings'), cl
+        return self.RESP_SUCCESS, dict(success=f'completed successfully'), cl
 
     def output_schema(self) -> type:
         class FileResult(resdata.Base):
@@ -251,5 +227,5 @@ class CmdboxInitdataInstall(cmdbox_base.CmdboxBase, validator.Validator):
         class Data(resdata.Data):
             data: Union[List[FileResult], None] = pydantic.Field(default=None, description="アップロード結果リスト")
         class Result(resdata.Result):
-            success: Union[Data, None] = pydantic.Field(default=None, description="成功した場合の結果")
+            success: Union[Data, str, None] = pydantic.Field(default=None, description="成功した場合の結果")
         return Result

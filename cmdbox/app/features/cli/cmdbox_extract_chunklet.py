@@ -62,7 +62,7 @@ class ExtractChunklet(feature.OneshotResultEdgeFeature, validator.Validator, lim
                 dict(opt="rjpath", type=Options.T_FILE, default=None, required=False, multi=True, hide=False, choice=None, web="mask",
                      description_ja="指定したパスが要求されたパスにマッチする場合、アクセスが拒否されます。正規表現として解釈します。",
                      description_en="If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."),
-                dict(opt="loadpath", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None,
+                dict(opt="loadpath", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None, fileio="in",
                      description_ja="読み込みファイルパスを指定します。",
                      description_en="Specify the source file path."),
                 dict(opt="chunk_lang", type=Options.T_STR, default='auto', required=False, multi=False, hide=False,

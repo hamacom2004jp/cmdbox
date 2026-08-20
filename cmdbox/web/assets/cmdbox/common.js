@@ -2112,12 +2112,12 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
     if(row.type=='file'){
         const btn = $('<button class="btn btn-secondary" type="button">file</button>');
         input_elem.parent().append(btn);
-        const mk_func = (tid, tn) => {
+        const mk_func = (tid, tn, fileio) => {
             // tid, tnの値を残すためにクロージャーにする
             return () => {
                 const current_path = $(`[id="${tid}"]`).val();
                 const scope = cmd_modal.find(`[name*="scope"]`);
-                if (scope.length<=0) {
+                if (fileio=="in" && scope.length<=0) {
                     cmdbox.choice_local_file(tid);
                     return;
                 }
@@ -2125,7 +2125,7 @@ cmdbox.add_form_func = (i, cmd_modal, row_content, row, next_elem, lcolsize=12, 
                 fmodal.filer_modal_func(tid, tn, current_path, false, is_current);
             }
         }
-        btn.click(mk_func(input_elem.attr('id'), input_elem.attr('name')));
+        btn.click(mk_func(input_elem.attr('id'), input_elem.attr('name'), row.fileio));
     }
     // ディレクトリタイプの場合はファイラーモーダルを開くボタンを追加
     if(row.type=='dir'){

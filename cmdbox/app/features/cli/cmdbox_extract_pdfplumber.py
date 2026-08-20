@@ -56,7 +56,7 @@ class ExtractPdfplumber(feature.OneshotResultEdgeFeature, validator.Validator, l
                 dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
                      description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
-                dict(opt="loadpath", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None,
+                dict(opt="loadpath", type=Options.T_FILE, default=None, required=True, multi=False, hide=False, choice=None, fileio="in",
                      description_ja="読み込みファイルパスを指定します。",
                      description_en="Specify the source file path."),
                 dict(opt="fwpath", type=Options.T_FILE, default=None, required=True, multi=True, hide=False, choice=None, web="mask",
