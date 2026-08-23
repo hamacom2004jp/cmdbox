@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( limiter mode ) &mdash; cmdbox 2026/08/13 documentation</title>
+  <title>Command Reference ( limiter mode ) &mdash; cmdbox 2026/08/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=e1afa4e9"></script>
+      <script src="../_static/documentation_options.js?v=4cffd425"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -220,30 +220,30 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;billing_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;plan_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;billing_limiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;last_reset&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;billing_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;billing_currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;skipped&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">        </span><span class="nt">"billing_file"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"plan_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"billing_limiter"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"last_reset"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"billing_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"billing_currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"skipped"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">]</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -444,35 +444,35 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;plan_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;plan_title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_limiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_limiter_item&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_unit_price&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_min_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_max_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;last_reset&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;calc_datetime&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;evidence_filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;last_counter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"plan_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"plan_title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_limiter"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_limiter_item"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_unit_price"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_min_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_max_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"last_reset"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"calc_datetime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"evidence_filename"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"last_counter"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -758,36 +758,44 @@
 <td><p>True | False</p></td>
 <td><p>Specify whether to retrieve the history as well. If you set this to True, the history will also be retrieved.</p></td>
 </tr>
+<tr class="row-even"><td><p>--reflesh_counter &lt;reflesh_counter&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Specifies whether to update the counter. If set to True, the counter is updated.</p></td>
+</tr>
 </tbody>
 </table>
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;limiter_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;total_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;total_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;total_input&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;total_process&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;total_output&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;total_credits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;total_registrations&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;last_reset&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;last_update&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"limiter_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"total_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"total_time"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"total_input"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"total_process"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"total_output"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"total_credits"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"total_registrations"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"last_reset"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"last_update"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -1046,20 +1054,20 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -1267,32 +1275,32 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;filepath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;limiter_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;last_counter&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;last_reset&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;config&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">        </span><span class="nt">&quot;history&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="nt">"filename"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"filepath"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"limiter_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"last_counter"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"last_reset"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"config"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">        </span><span class="nt">"history"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">          </span><span class="p">{}</span>
 <span class="w">        </span><span class="p">]</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">]</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -1491,31 +1499,31 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;limiter_title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;target_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;target_cmd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;target_option&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"limiter_title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"target_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"target_cmd"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"target_option"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">          </span><span class="p">{}</span>
 <span class="w">        </span><span class="p">],</span>
-<span class="w">        </span><span class="nt">&quot;history_end&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">        </span><span class="nt">"history_end"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">]</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -1750,44 +1758,44 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;limiter_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;limiter_title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;target_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;target_cmd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;target_option&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"scope"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"limiter_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"limiter_title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"target_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"target_cmd"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"target_option"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">        </span><span class="p">{}</span>
 <span class="w">      </span><span class="p">],</span>
-<span class="w">      </span><span class="nt">&quot;max_registrations&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;max_total_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;max_total_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;max_total_input&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;max_total_process&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;max_total_output&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;max_total_credits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;service_credits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;exec_period_start&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;exec_period_end&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;reset_datetime&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;reset_period_unit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;reset_period_qty&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;max_history_interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;history_end&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">      </span><span class="nt">"max_registrations"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"max_total_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"max_total_time"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"max_total_input"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"max_total_process"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"max_total_output"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"max_total_credits"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"service_credits"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"exec_period_start"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"exec_period_end"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"reset_datetime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"reset_period_unit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"reset_period_qty"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"max_history_interval"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"history_end"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -2104,20 +2112,20 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -2308,38 +2316,38 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;plan_title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;plan_desc&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;billing_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;billing_limiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;billing_limiter_item&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;billing_currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;limiters&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">          </span><span class="s2">&quot;string&quot;</span>
+<span class="w">        </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"plan_title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"plan_desc"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"billing_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"billing_limiter"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"billing_limiter_item"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"billing_currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"limiters"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="s2">"string"</span>
 <span class="w">        </span><span class="p">],</span>
-<span class="w">        </span><span class="nt">&quot;plan_start&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;plan_end&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;open_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;suspend_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;notice_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">        </span><span class="nt">"plan_start"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"plan_end"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"open_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"suspend_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"notice_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">]</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -2533,89 +2541,97 @@
 <td><p>True | False</p></td>
 <td><p>Specifies whether to include history information in the evidence file. If set to <cite>True</cite>, the history information is included in the output.</p></td>
 </tr>
+<tr class="row-odd"><td><p>--reflesh_counter &lt;reflesh_counter&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Specifies whether to update the counter. If set to True, the counter is updated.</p></td>
+</tr>
 </tbody>
 </table>
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;plan_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;plan_title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;plan_desc&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;limiters&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"plan_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"plan_title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"plan_desc"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"limiters"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">        </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;limiter_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;limiter_title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;target_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;target_cmd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;target_option&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="nt">"limiter_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"limiter_title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"target_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"target_cmd"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"target_option"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">            </span><span class="p">{}</span>
 <span class="w">          </span><span class="p">],</span>
-<span class="w">          </span><span class="nt">&quot;max_registrations&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;max_total_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;max_total_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;max_total_input&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;max_total_process&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;max_total_output&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;max_total_credits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;service_credits&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;exec_period_start&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;exec_period_end&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;reset_datetime&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;reset_period_unit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;reset_period_qty&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;max_history_interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;counter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">          </span><span class="nt">"max_registrations"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"max_total_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"max_total_time"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"max_total_input"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"max_total_process"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"max_total_output"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"max_total_credits"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"service_credits"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"exec_period_start"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"exec_period_end"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"reset_datetime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"reset_period_unit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"reset_period_qty"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"max_history_interval"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"counter"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">      </span><span class="p">],</span>
-<span class="w">      </span><span class="nt">&quot;plan_start&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;plan_end&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;open_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;suspend_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;notice_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_period_unit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_period_qty&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_limiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_limiter_item&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_min_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_max_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_unit_price&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;current_billing_qty&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;current_billing_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;billing_data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="nt">"plan_start"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"plan_end"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"open_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"suspend_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"notice_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_period_unit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_period_qty"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_limiter"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_limiter_item"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_min_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_max_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_unit_price"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"current_billing_qty"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"current_billing_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"billing_data"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">        </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;plan_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;plan_title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;billing_limiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;billing_limiter_item&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;billing_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;billing_currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;billing_unit_price&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;billing_min_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;billing_max_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;billing_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;last_reset&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;last_counter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">          </span><span class="nt">&quot;calc_datetime&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;evidence_filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">          </span><span class="nt">"plan_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"plan_title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"billing_limiter"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"billing_limiter_item"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"billing_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"billing_currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"billing_unit_price"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"billing_min_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"billing_max_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"billing_amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"last_reset"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"last_counter"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">          </span><span class="nt">"calc_datetime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"evidence_filename"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">      </span><span class="p">]</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -3068,20 +3084,20 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -3432,20 +3448,20 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -3663,33 +3679,41 @@
 <td><p>True | False</p></td>
 <td><p>Specifies whether to include history information in the evidence file. If set to <cite>True</cite>, the history information is included in the output.</p></td>
 </tr>
+<tr class="row-even"><td><p>--reflesh_counter &lt;reflesh_counter&gt;</p></td>
+<td><p>bool</p></td>
+<td></td>
+<td></td>
+<td><p>False</p></td>
+<td><p>True | False</p></td>
+<td><p>Specifies whether to update the counter. If set to True, the counter is updated.</p></td>
+</tr>
 </tbody>
 </table>
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;cmd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;limiters&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="nt">"mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"cmd"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"limiters"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">          </span><span class="p">{}</span>
 <span class="w">        </span><span class="p">]</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">]</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>

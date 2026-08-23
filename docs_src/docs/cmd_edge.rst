@@ -32,7 +32,7 @@ edge ( config ) : ``cmdbox -m edge -c config <Option>``
     "--saml_port <saml_port>","int","","","8091","","Specifies the callback port when SAML authentication is used. If omitted, `8091` is used."
     "--saml_tenant_id <saml_tenant_id>","str","","","","","Specifies the tenant ID when SAML authentication is used."
     "--saml_timeout <saml_timeout>","int","","","60","","Specify the timeout period before SAML authentication completes."
-    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, f`$HONE/.cmdbox` is used."
+    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, f`$HOME/.cmdbox` is used."
     "--svcert_no_verify <svcert_no_verify>","bool","","","False","False | True","Do not verify server certificates during HTTPS requests."
     "--timeout <timeout>","int","","","30","","Specifies the timeout period before the request completes."
 
@@ -88,7 +88,7 @@ edge ( start ) : ``cmdbox -m edge -c start <Option>``
     :header-rows: 1
 
     "Option","Type","Multi","Required","Default","Choices","Description"
-    "--data <data>","dir","","required","C:\Users\hama\.cmdbox","","When omitted, f`$HONE/.cmdbox` is used."
+    "--data <data>","dir","","required","C:\Users\hama\.cmdbox","","When omitted, f`$HOME/.cmdbox` is used."
 
 **Output Schema**
 

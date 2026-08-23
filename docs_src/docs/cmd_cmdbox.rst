@@ -156,6 +156,7 @@ cmdbox ( initdata_install ) : ``cmdbox -m cmdbox -c initdata_install <Option>``
     "--initdata_path <initdata_path>","dir","multi","","","","Specify the path(s) of the initial data file(s) to install."
     "--mkdir <mkdir>","bool","","","True","True | False","If there is no in between folder, create one."
     "--overwrite <overwrite>","bool","","","False","True | False","Overwrites the file even if it exists at the upload destination."
+    "--concurrent_max_file_size <concurrent_max_file_size>","int","","","50","","Specifies the maximum file size that can be uploaded concurrently (in megabytes)."
     "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server. If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
@@ -193,7 +194,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
     :header-rows: 1
 
     "Field","Type","Required","Default","Description"
-    "success","Data | null","no","null","成功した場合の結果"
+    "success","Data | str | null","no","null","成功した場合の結果"
     "success.save_mode","str | null","no","null","保存モード"
     "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
     "success.data","list[FileResult] | null","no","null","アップロード結果リスト"
@@ -675,8 +676,8 @@ cmdbox ( server_install ) : ``cmdbox -m cmdbox -c server_install <Option>``
     :header-rows: 1
 
     "Option","Type","Multi","Required","Default","Choices","Description"
-    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HONE/.cmdbox` is used."
-    "--install_cmdbox <install_cmdbox>","str","","","cmdbox==0.8.3","","When omitted, `cmdbox==0.8.3` is used."
+    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HOME/.cmdbox` is used."
+    "--install_cmdbox <install_cmdbox>","str","","","cmdbox==0.8.3.3","","When omitted, `cmdbox==0.8.3.3` is used."
     "--install_from <install_from>","str","","","","","Specify the FROM image that will be the source of the docker image to be created."
     "--install_no_python <install_no_python>","bool","","","False","True | False","Do not install python."
     "--install_compile_python <install_compile_python>","bool","","","False","True | False","Compile and install python3; if install_no_python is specified, it is preferred."
@@ -743,7 +744,7 @@ cmdbox ( server_load ) : ``cmdbox -m cmdbox -c server_load <Option>``
     :header-rows: 1
 
     "Option","Type","Multi","Required","Default","Choices","Description"
-    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HONE/.cmdbox` is used."
+    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HOME/.cmdbox` is used."
     "--image_file <image_file>","file","","","","","Specify the source image file."
     "--install_tag <install_tag>","str","","","","","If specified, you can add to the tag name of the docker image to create."
     "--install_use_gpu <install_use_gpu>","bool","","","False","True | False","Install with a module configuration that uses the GPU."

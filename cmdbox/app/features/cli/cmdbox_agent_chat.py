@@ -433,11 +433,15 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                 timeout=httpx.Timeout(600.0),
                 event_hooks={'request': [_create_dynamic_header_provider()]},
             )
+            if a2asv_baseurl is None:
+                raise ValueError("a2asv_baseurl is required for remote agent.")
+            if a2asv_baseurl.endswith('/'):
+                a2asv_baseurl = a2asv_baseurl[:-1]
             config = ClientConfig(httpx_client=custom_httpx_client)
             factory = ClientFactory(config=config)
             agent = RemoteA2aAgent(
                 name=agent_name,
-                agent_card=a2asv_baseurl + AGENT_CARD_WELL_KNOWN_PATH,
+                agent_card=f"{a2asv_baseurl}{AGENT_CARD_WELL_KNOWN_PATH}",
                 a2a_client_factory=factory,
             )
             if logger.level == logging.DEBUG:

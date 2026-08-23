@@ -18,7 +18,7 @@ cmd ( check ) : ``cmdbox -m cmd -c check <Option>``
     "Option","Type","Multi","Required","Default","Choices","Description"
     "--chk_mode <chk_mode>","str","","required","","","Specifies the mode to be checked."
     "--chk_cmd <chk_cmd>","str","","required","","","Specifies the command to be checked."
-    "--data <data>","dir","","required","C:\Users\hama\.cmdbox","","When omitted, `$HONE/.cmdbox` is used."
+    "--data <data>","dir","","required","C:\Users\hama\.cmdbox","","When omitted, `$HOME/.cmdbox` is used."
     "--signin_file <signin_file>","file","","required",".cmdbox/user_list.yml","","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
     "--groups <groups>","str","multi","","","","Specifies that `signin_file`, if specified, should return the list of commands allowed for this user group."
 
@@ -74,7 +74,7 @@ cmd ( list ) : ``cmdbox -m cmd -c list <Option>``
     :header-rows: 1
 
     "Option","Type","Multi","Required","Default","Choices","Description"
-    "--data <data>","dir","","required","C:\Users\hama\.cmdbox","","When omitted, `$HONE/.cmdbox` is used."
+    "--data <data>","dir","","required","C:\Users\hama\.cmdbox","","When omitted, `$HOME/.cmdbox` is used."
     "--kwd <kwd>","str","","","","","Specify the name you want to search for. Searches for partial matches."
     "--match_mode <match_mode>","str","","","","","Specify the mode condition of the command you want to search in. Searches for partial matches."
     "--match_cmd <match_cmd>","str","","","","","Specify the cmd condition of the command you want to search in. Searches for partial matches."
@@ -144,7 +144,7 @@ cmd ( load ) : ``cmdbox -m cmd -c load <Option>``
     :header-rows: 1
 
     "Option","Type","Multi","Required","Default","Choices","Description"
-    "--data <data>","dir","","required","C:\Users\hama\.cmdbox","","When omitted, `$HONE/.cmdbox` is used."
+    "--data <data>","dir","","required","C:\Users\hama\.cmdbox","","When omitted, `$HOME/.cmdbox` is used."
     "--signin_file <signin_file>","file","","required",".cmdbox/user_list.yml","","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
     "--groups <groups>","str","multi","","","","Specifies that `signin_file`, if specified, should return the list of commands allowed for this user group."
     "--cmd_title <cmd_title>","str","","required","","","Specify the name of the command to be read."

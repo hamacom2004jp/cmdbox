@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( client mode ) &mdash; cmdbox 2026/08/13 documentation</title>
+  <title>Command Reference ( client mode ) &mdash; cmdbox 2026/08/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=e1afa4e9"></script>
+      <script src="../_static/documentation_options.js?v=4cffd425"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -282,24 +282,24 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;to_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;from_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;ret_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;msg&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"to_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"from_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"ret_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"msg"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -578,27 +578,27 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;mime_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;etag&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;not_modified&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;meta&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">    </span><span class="nt">&quot;rpath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;svpath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"mime_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"etag"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"not_modified"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">    </span><span class="nt">"rpath"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"svpath"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -911,24 +911,24 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;file_func&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;from_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;to_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;executable&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="nt">"file_func"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"from_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"to_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"executable"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -1183,11 +1183,11 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -1392,21 +1392,21 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;msg&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"msg"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -1659,24 +1659,24 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;to_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;from_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;ret_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;msg&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"to_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"from_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"ret_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"msg"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -1923,21 +1923,21 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;msg&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"msg"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -2166,21 +2166,21 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;msg&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"msg"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -2433,20 +2433,20 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -2658,11 +2658,11 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -2827,24 +2827,24 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;svname&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;redis_host&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;redis_port&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;redis_password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;data_dir&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">"svname"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"redis_host"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"redis_port"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"redis_password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"data_dir"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -3003,22 +3003,22 @@
 <p><strong>Output Schema</strong></p>
 <p>This command implements <code class="docutils literal notranslate"><span class="pre">output_schema()</span></code> returning <code class="docutils literal notranslate"><span class="pre">Result</span></code> model.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;save_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;performance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"save_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"performance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">        </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;timezone&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span>
+<span class="w">    </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"timezone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;warn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;output_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="nt">"warn"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"output_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>

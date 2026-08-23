@@ -20,7 +20,7 @@ gui ( start ) : ``cmdbox -m gui -c start <Option>``
     "--port <port>","int","","required","6379","","Specify the service port of the Redis server."
     "--password <password>","passwd","","required","password","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
     "--svname <svname>","str","","required","cmdbox","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HONE/.cmdbox` is used."
+    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HOME/.cmdbox` is used."
     "--allow_host <allow_host>","str","","","0.0.0.0","","If omitted, `0.0.0.0` is used."
     "--listen_port <listen_port>","int","","","8081","","If omitted, `8081` is used."
     "--ssl_listen_port <ssl_listen_port>","int","","","8443","","If omitted, `8443` is used."
@@ -100,7 +100,7 @@ gui ( stop ) : ``cmdbox -m gui -c stop <Option>``
     :header-rows: 1
 
     "Option","Type","Multi","Required","Default","Choices","Description"
-    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HONE/.cmdbox` is used."
+    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HOME/.cmdbox` is used."
 
 **Output Schema**
 

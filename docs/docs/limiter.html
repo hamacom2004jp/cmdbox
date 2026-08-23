@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Limiter &mdash; cmdbox 2026/08/13 documentation</title>
+  <title>Limiter &mdash; cmdbox 2026/08/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=e1afa4e9"></script>
+      <script src="../_static/documentation_options.js?v=4cffd425"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -376,8 +376,8 @@ counters are stored at <cite>data_dir/.limiter/counter-{name}.json</cite>.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmdbox<span class="w"> </span>-m<span class="w"> </span>limiter<span class="w"> </span>-c<span class="w"> </span>plan_save<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--host<span class="w"> </span>localhost<span class="w"> </span>--port<span class="w"> </span><span class="m">6379</span><span class="w"> </span>--password<span class="w"> </span>password<span class="w"> </span>--svname<span class="w"> </span>cmdbox<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--plan_name<span class="w"> </span>my_plan<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--plan_title<span class="w"> </span><span class="s2">&quot;My Service Plan&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--plan_desc<span class="w"> </span><span class="s2">&quot;Description of my plan&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--plan_title<span class="w"> </span><span class="s2">"My Service Plan"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--plan_desc<span class="w"> </span><span class="s2">"Description of my plan"</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--limiters<span class="w"> </span>limiter1<span class="w"> </span>limiter2<span class="w"> </span>limiter3<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--plan_start<span class="w"> </span><span class="m">2024</span>-01-01T00:00:00<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--plan_end<span class="w"> </span><span class="m">2024</span>-12-31T23:59:59<span class="w"> </span><span class="se">\</span>
@@ -569,16 +569,16 @@ counters are stored at <cite>data_dir/.limiter/counter-{name}.json</cite>.</p>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">MyFeature</span><span class="p">(</span><span class="n">LimitedFeature</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;mymode&#39;</span>
+        <span class="k">return</span> <span class="s1">'mymode'</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;mycommand&#39;</span>
+        <span class="k">return</span> <span class="s1">'mycommand'</span>
 
     <span class="nd">@apprun_check_limit</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="p">[]):</span>
         <span class="c1"># The restriction check runs automatically before execution.</span>
         <span class="c1"># The counter is updated automatically after execution.</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="s2">&quot;done&quot;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="s2">"done"</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="kc">None</span>
 </pre></div>
 </div>
@@ -601,7 +601,7 @@ counters are stored at <cite>data_dir/.limiter/counter-{name}.json</cite>.</p>
 <span class="k">class</span><span class="w"> </span><span class="nc">MyAsyncFeature</span><span class="p">(</span><span class="n">LimitedFeature</span><span class="p">):</span>
     <span class="nd">@async_apprun_check_limit</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="p">[]):</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="s2">&quot;done&quot;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="s2">"done"</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SUCCESS</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="kc">None</span>
 </pre></div>
 </div>

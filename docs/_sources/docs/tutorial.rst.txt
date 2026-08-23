@@ -18,7 +18,8 @@ How to run the cmdbox sample project in VSCode
 
     python -m venv .venv
     . .venv/bin/activate
-    pip install -r requirements.txt
+    pip install -e .[app]
+    pip uninstall -y cmdbox
 
 - Run the project.
 

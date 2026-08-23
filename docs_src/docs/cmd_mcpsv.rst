@@ -20,7 +20,7 @@ mcpsv ( start ) : ``cmdbox -m mcpsv -c start <Option>``
     "--port <port>","int","","required","6379","","Specify the service port of the Redis server."
     "--password <password>","passwd","","required","password","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
     "--svname <svname>","str","","required","cmdbox","","Specify the service name of the inference server. If omitted, `server` is used."
-    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HONE/.cmdbox` is used."
+    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HOME/.cmdbox` is used."
     "--allow_host <allow_host>","str","","","0.0.0.0","","If omitted, `0.0.0.0` is used."
     "--mcpsv_listen_port <mcpsv_listen_port>","int","","","8091","","If omitted, `8091` is used."
     "--ssl_mcpsv_listen_port <ssl_mcpsv_listen_port>","int","","","8453","","If omitted, `8453` is used."
@@ -84,7 +84,7 @@ mcpsv ( stop ) : ``cmdbox -m mcpsv -c stop <Option>``
     :header-rows: 1
 
     "Option","Type","Multi","Required","Default","Choices","Description"
-    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HONE/.cmdbox` is used."
+    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HOME/.cmdbox` is used."
 
 **Output Schema**
 

@@ -287,7 +287,7 @@ rag ( regist ) : ``cmdbox -m rag -c regist <Option>``
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."
     "--timeout <timeout>","int","","","120","","Specify the maximum waiting time until the server responds."
     "--rag_name <rag_name>","str","","required","","","Specify the name of the RAG configuration to use for registration."
-    "--data <data>","dir","","required","C:\Users\hama\.cmdbox","","When omitted, `$HONE/.cmdbox` is used."
+    "--data <data>","dir","","required","C:\Users\hama\.cmdbox","","When omitted, `$HOME/.cmdbox` is used."
     "--signin_file <signin_file>","file","","required",".cmdbox/user_list.yml","","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
     "--groups <groups>","str","multi","required","","","Specifies that `signin_file`, if specified, should return the list of commands allowed for this user group."
 
@@ -423,7 +423,7 @@ rag ( search ) : ``cmdbox -m rag -c search <Option>``
     "--filter_origin_name <filter_origin_name>","str","","","","","Specifies the origin_name of the filter condition."
     "--filter_dict <filter_dict>","dict","multi","","","","Specify arbitrary filter conditions, allowing multiple cmeta item names and values. Item values can be ambiguously searched by using `％`.  You can use the value of the query parameter by including the notation {args.query}."
     "--sort_dict <sort_dict>","dict","multi","",""," | ASC | DESC","Specifies the sort conditions when no query is specified. Multiple cmeta field names and sort orders (`ASC` (ascending) or `DESC` (descending)) can be specified."
-    "--data <data>","dir","","required","C:\Users\hama\.cmdbox","","When omitted, `$HONE/.cmdbox` is used."
+    "--data <data>","dir","","required","C:\Users\hama\.cmdbox","","When omitted, `$HOME/.cmdbox` is used."
     "--signin_file <signin_file>","file","","required",".cmdbox/user_list.yml","","Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'."
     "--groups <groups>","str","multi","required","","","Specifies that `signin_file`, if specified, should return the list of commands allowed for this user group."
 

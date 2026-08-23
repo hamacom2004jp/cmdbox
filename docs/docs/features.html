@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Features &mdash; cmdbox 2026/08/13 documentation</title>
+  <title>Features &mdash; cmdbox 2026/08/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=e1afa4e9"></script>
+      <script src="../_static/documentation_options.js?v=4cffd425"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -120,37 +120,37 @@
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">rule</span><span class="p">:</span><span class="w">                             </span><span class="c1"># Specify the rules for applying default values and forced arguments for each command line option.</span>
 <span class="w">                                        </span><span class="c1">#   e.g. mode: web</span>
 <span class="w">      </span><span class="nt">default</span><span class="p">:</span><span class="w">                          </span><span class="c1"># Specify a default value for each item to be set when a rule is matched.</span>
-<span class="w">                                        </span><span class="c1">#   e.g. doc_root: f&quot;{Path(self.ver.__file__).parent / &#39;web&#39;}&quot;</span>
+<span class="w">                                        </span><span class="c1">#   e.g. doc_root: f"{Path(self.ver.__file__).parent / 'web'}"</span>
 <span class="w">      </span><span class="nt">coercion</span><span class="p">:</span><span class="w">                         </span><span class="c1"># Specify a coercion value for each item to be set when a rule is matched.</span>
-<span class="w">                                        </span><span class="c1">#   e.g. doc_root: f&quot;{Path(self.ver.__file__).parent / &#39;web&#39;}&quot;</span>
+<span class="w">                                        </span><span class="c1">#   e.g. doc_root: f"{Path(self.ver.__file__).parent / 'web'}"</span>
 <span class="nt">aliases</span><span class="p">:</span><span class="w">                                </span><span class="c1"># Specify the alias for the specified command.</span>
 <span class="w">  </span><span class="nt">cli</span><span class="p">:</span><span class="w">                                  </span><span class="c1"># Specify the alias for the command line.</span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specifies the command from which the alias originates.</span>
-<span class="w">        </span><span class="nt">mode</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specify the mode of the source command. The exact match &quot;mode&quot; is selected.</span>
+<span class="w">        </span><span class="nt">mode</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specify the mode of the source command. The exact match "mode" is selected.</span>
 <span class="w">                                        </span><span class="c1">#   e.g. client</span>
-<span class="w">        </span><span class="nt">cmd</span><span class="p">:</span><span class="w">                            </span><span class="c1"># Specify the source command to be aliased. The regex match &quot;cmd&quot; is selected.</span>
+<span class="w">        </span><span class="nt">cmd</span><span class="p">:</span><span class="w">                            </span><span class="c1"># Specify the source command to be aliased. The regex match "cmd" is selected.</span>
 <span class="w">                                        </span><span class="c1">#   e.g. (.+)_(.+)</span>
 <span class="w">      </span><span class="nt">target</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specifies the command to be aliased to.</span>
 <span class="w">        </span><span class="nt">mode</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specify the mode of the target command. Create an alias for this “mode”.</span>
 <span class="w">                                        </span><span class="c1">#   e.g. CLIENT</span>
-<span class="w">        </span><span class="nt">cmd</span><span class="p">:</span><span class="w">                            </span><span class="c1"># Specify the target command to be aliased. Create an alias for this “cmd”, referring to the regular expression group of source by &quot;{n}&quot;.</span>
+<span class="w">        </span><span class="nt">cmd</span><span class="p">:</span><span class="w">                            </span><span class="c1"># Specify the target command to be aliased. Create an alias for this “cmd”, referring to the regular expression group of source by "{n}".</span>
 <span class="w">                                        </span><span class="c1">#   e.g. {2}_{1}</span>
 <span class="w">        </span><span class="nt">move</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specify whether to move the regular expression group of the source to the target.</span>
 <span class="w">                                        </span><span class="c1">#   e.g. true</span>
 <span class="w">  </span><span class="nt">web</span><span class="p">:</span><span class="w">                                  </span><span class="c1"># Specify the alias for the RESTAPI.</span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specifies the RESTAPI from which the alias originates.</span>
-<span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specify the path of the source RESTAPI. The regex match &quot;path&quot; is selected.</span>
+<span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specify the path of the source RESTAPI. The regex match "path" is selected.</span>
 <span class="w">                                        </span><span class="c1">#   e.g. /exec_(.+)</span>
 <span class="w">      </span><span class="nt">target</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specifies the RESTAPI to be aliased to.</span>
-<span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specify the path of the target RESTAPI. Create an alias for this “path”, referring to the regular expression group of source by &quot;{n}&quot;.</span>
+<span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specify the path of the target RESTAPI. Create an alias for this “path”, referring to the regular expression group of source by "{n}".</span>
 <span class="w">                                        </span><span class="c1">#   e.g. /{1}_exec</span>
 <span class="w">        </span><span class="nt">move</span><span class="p">:</span><span class="w">                           </span><span class="c1"># Specify whether to move the regular expression group of the source to the target.</span>
 <span class="w">                                        </span><span class="c1">#   e.g. true</span>
 <span class="nt">agentrule</span><span class="p">:</span><span class="w">                              </span><span class="c1"># Specifies a list of rules that determine which commands the agent can execute.</span>
 <span class="w">  </span><span class="nt">policy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w">                       </span><span class="c1"># Specify the default policy for the rule. The value can be allow or deny or default.</span>
 <span class="w">  </span><span class="nt">rules</span><span class="p">:</span><span class="w">                                </span><span class="c1"># Specify the rules for the commands that the agent can execute according to the group to which the user belongs.</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cmd</span><span class="w">                           </span><span class="c1"># Specify the &quot;mode&quot; as the condition for applying the rule.</span>
-<span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">load</span><span class="p p-Indicator">]</span><span class="w">                  </span><span class="c1"># Specify the &quot;cmd&quot; to which the rule applies. Multiple items can be specified in a list.</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cmd</span><span class="w">                           </span><span class="c1"># Specify the "mode" as the condition for applying the rule.</span>
+<span class="w">    </span><span class="nt">cmds</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">load</span><span class="p p-Indicator">]</span><span class="w">                  </span><span class="c1"># Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.</span>
 <span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allow</span><span class="w">                         </span><span class="c1"># Specifies whether the specified command is allowed or not. Values are allow or deny.</span>
 <span class="nt">audit</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">                         </span><span class="c1"># Specify whether to enable the audit function.</span>
@@ -191,62 +191,62 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Feature</span><span class="p">:</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appcls</span><span class="p">,</span> <span class="n">ver</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        constructor</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            appcls (Type[cmdbox.app.CmdBoxApp]): Application class inheriting from cmdbox.app.CmdBoxApp</span>
 <span class="sd">            ver (Type[cmdbox.app.Version]): New application version class</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ver</span> <span class="o">=</span> <span class="n">ver</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">appcls</span> <span class="o">=</span> <span class="n">appcls</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns the mode name of this function</span>
 <span class="sd">        Returns a string corresponding to the mode option on the command line.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Union[str, List[str]]: mode name</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns the command name of this function</span>
 <span class="sd">        Returns a string corresponding to the cmd option on the command line.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: command name</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns the options for this function.</span>
 <span class="sd">        The options returned here correspond to the command line options.</span>
-<span class="sd">        I can&#39;t explain it well, so please refer to the classes in the cmdbox.app.features.cli package.</span>
+<span class="sd">        I can't explain it well, so please refer to the classes in the cmdbox.app.features.cli package.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Dict[str, Any]: option</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_svcmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns the name of the server-side command for this function.</span>
 <span class="sd">        If the command is not executed on the server side, return None.</span>
-<span class="sd">        I can&#39;t explain it well, so please refer to the classes in the cmdbox.app.features.cli package.</span>
+<span class="sd">        I can't explain it well, so please refer to the classes in the cmdbox.app.features.cli package.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: Server-side command name</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">apprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">tm</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">pf</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Performs client-side processing.</span>
-<span class="sd">        I can&#39;t explain it well, so please refer to the classes in the cmdbox.app.features.cli package.</span>
+<span class="sd">        I can't explain it well, so please refer to the classes in the cmdbox.app.features.cli package.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            logger (logging.Logger): logger</span>
@@ -256,24 +256,24 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tuple[int, Dict[str, Any], Any]: Exit Code, Result, Object</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">is_cluster_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        If the message is addressed to a cluster, returns whether the message should be forwarded or not.</span>
 <span class="sd">        This function returns True when the function should be performed on all servers with the same name if more than one server is started.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if you want to forward the message.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">svrun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_cli</span><span class="p">:</span><span class="n">redis_client</span><span class="o">.</span><span class="n">RedisClient</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
             <span class="n">sessions</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Performs server-side processing.</span>
-<span class="sd">        I can&#39;t explain it well, so please refer to the classes in the cmdbox.app.features.cli package.</span>
+<span class="sd">        I can't explain it well, so please refer to the classes in the cmdbox.app.features.cli package.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            data_dir (Path): Server-side data directory</span>
@@ -284,11 +284,11 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            int: exit code</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">edgerun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">tool</span><span class="p">:</span><span class="n">edge</span><span class="o">.</span><span class="n">Tool</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">prevres</span><span class="p">:</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Performs edge-side execution of this function</span>
 
 <span class="sd">        Args:</span>
@@ -300,12 +300,12 @@
 
 <span class="sd">        Yields:</span>
 <span class="sd">            Tuple[int, Dict[str, Any]]: exit_code, result</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">status</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">tool</span><span class="o">.</span><span class="n">exec_cmd</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">prevres</span><span class="p">)</span>
         <span class="k">yield</span> <span class="n">status</span><span class="p">,</span> <span class="n">res</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">audited_by</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns whether this feature is subject to audit logging.</span>
 
 <span class="sd">        Args:</span>
@@ -314,21 +314,21 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if audit logging should be performed</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;client_only&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_only</span><span class="p">:</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'client_only'</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_only</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">put_resqueue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Stores the command execution result in the result queue.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            resqueue (queue.Queue): The queue to store the result</span>
 <span class="sd">            msg (Dict[str, Any]): The message to store</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;_resqueue&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">_resqueue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">'_resqueue'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">_resqueue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">q</span><span class="p">:</span><span class="n">queue</span><span class="o">.</span><span class="n">Queue</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">_resqueue</span>
                 <span class="n">q</span><span class="o">.</span><span class="n">put_nowait</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
@@ -340,29 +340,29 @@
 <li><p>For details, refer to the <cite>cmdbox.app.feature</cite> module.</p></li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">OneshotEdgeFeature</span><span class="p">(</span><span class="n">Feature</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Base class for edge functions that execute only once.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">OneshotNotifyEdgeFeature</span><span class="p">(</span><span class="n">OneshotEdgeFeature</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Base class for edge functionality that provides notification of execution results.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">ResultEdgeFeature</span><span class="p">(</span><span class="n">Feature</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Base class for edge functionality that displays execution results in a web browser.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">OneshotResultEdgeFeature</span><span class="p">(</span><span class="n">ResultEdgeFeature</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Base class for edge functionality that displays the result of a one-time execution in a web browser.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">UnsupportEdgeFeature</span><span class="p">(</span><span class="n">Feature</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Base class for unsupported edge features.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </pre></div>
 </div>
 <section id="implementation-of-the-get-option-self-dict-str-any-method">
@@ -374,15 +374,15 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
         <span class="n">use_redis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">USE_REDIS_FALSE</span><span class="p">,</span> <span class="n">nouse_webmode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_agent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">description_ja</span><span class="o">=</span><span class="s2">&quot;MCP サーバ設定を保存します。&quot;</span><span class="p">,</span>
-        <span class="n">description_en</span><span class="o">=</span><span class="s2">&quot;Saves MCP server configuration.&quot;</span><span class="p">,</span>
+        <span class="n">description_ja</span><span class="o">=</span><span class="s2">"MCP サーバ設定を保存します。"</span><span class="p">,</span>
+        <span class="n">description_en</span><span class="o">=</span><span class="s2">"Saves MCP server configuration."</span><span class="p">,</span>
         <span class="n">choice</span><span class="o">=</span><span class="p">[</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">&quot;host&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_host</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">&quot;mask&quot;</span><span class="p">,</span>
-                <span class="n">description_ja</span><span class="o">=</span><span class="s2">&quot;Redisサーバーのサービスホストを指定します。&quot;</span><span class="p">,</span>
-                <span class="n">description_en</span><span class="o">=</span><span class="s2">&quot;Specify the service host of the Redis server.&quot;</span><span class="p">),</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">&quot;port&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_port</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">&quot;mask&quot;</span><span class="p">,</span>
-                <span class="n">description_ja</span><span class="o">=</span><span class="s2">&quot;Redisサーバーのサービスポートを指定します。&quot;</span><span class="p">,</span>
-                <span class="n">description_en</span><span class="o">=</span><span class="s2">&quot;Specify the service port of the Redis server.&quot;</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"host"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_STR</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_host</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                <span class="n">description_ja</span><span class="o">=</span><span class="s2">"Redisサーバーのサービスホストを指定します。"</span><span class="p">,</span>
+                <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the service host of the Redis server."</span><span class="p">),</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">"port"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Options</span><span class="o">.</span><span class="n">T_INT</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_port</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">web</span><span class="o">=</span><span class="s2">"mask"</span><span class="p">,</span>
+                <span class="n">description_ja</span><span class="o">=</span><span class="s2">"Redisサーバーのサービスポートを指定します。"</span><span class="p">,</span>
+                <span class="n">description_en</span><span class="o">=</span><span class="s2">"Specify the service port of the Redis server."</span><span class="p">),</span>
         <span class="p">]</span>
     <span class="p">)</span>
 </pre></div>
@@ -435,7 +435,7 @@
 <ul class="simple">
 <li><p>Options when type is a dictionary.</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">choice</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dictkey1&quot;</span><span class="p">,</span><span class="s2">&quot;dictkey2&quot;</span><span class="p">,</span><span class="s2">&quot;dictkey3&quot;</span><span class="p">],</span> <span class="n">val</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dictval1&quot;</span><span class="p">,</span><span class="s2">&quot;dictval2&quot;</span><span class="p">,</span><span class="s2">&quot;dictval3&quot;</span><span class="p">])</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">choice</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="p">[</span><span class="s2">"dictkey1"</span><span class="p">,</span><span class="s2">"dictkey2"</span><span class="p">,</span><span class="s2">"dictkey3"</span><span class="p">],</span> <span class="n">val</span><span class="o">=</span><span class="p">[</span><span class="s2">"dictval1"</span><span class="p">,</span><span class="s2">"dictval2"</span><span class="p">,</span><span class="s2">"dictval3"</span><span class="p">])</span>
 </pre></div>
 </div>
 </dd>
@@ -451,7 +451,7 @@
 <li><p>choice_fn: A function that generates the choices dynamically.</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">choice_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">webmode</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    オプションのchoiceを動的に生成する関数</span>
 
 <span class="sd">    Args:</span>
@@ -461,7 +461,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Any: choice information</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">choices</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">return</span> <span class="n">choices</span>
 </pre></div>
@@ -470,14 +470,14 @@
 </li>
 <li><p>choice_show: Specify the other options to display when this option is selected.</p>
 <blockquote>
-<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">choice_show</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">choice1</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;opt1&quot;</span><span class="p">,</span> <span class="s2">&quot;opt2&quot;</span><span class="p">],</span> <span class="n">choice2</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;opt3&quot;</span><span class="p">],</span> <span class="n">choice3</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;opt4&quot;</span><span class="p">,</span> <span class="s2">&quot;opt5&quot;</span><span class="p">]),</span>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">choice_show</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">choice1</span><span class="o">=</span><span class="p">[</span><span class="s2">"opt1"</span><span class="p">,</span> <span class="s2">"opt2"</span><span class="p">],</span> <span class="n">choice2</span><span class="o">=</span><span class="p">[</span><span class="s2">"opt3"</span><span class="p">],</span> <span class="n">choice3</span><span class="o">=</span><span class="p">[</span><span class="s2">"opt4"</span><span class="p">,</span> <span class="s2">"opt5"</span><span class="p">]),</span>
 </pre></div>
 </div>
 </div></blockquote>
 </li>
 <li><p>callcmd: Add a command button and specify the JavaScript function to be called when the command button is pressed.</p>
 <blockquote>
-<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">callcmd</span><span class="o">=</span><span class="s2">&quot;()=&gt;{cmdbox.callcmd(&#39;cmd&#39;,&#39;list&#39;,{&#39;kwd&#39;:&#39;*&#39;},(res)=&gt;{console.log(res);},$(</span><span class="se">\&quot;</span><span class="s2">[name=&#39;title&#39;]</span><span class="se">\&quot;</span><span class="s2">).val(),&#39;tag&#39;);}&quot;</span><span class="p">,</span>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">callcmd</span><span class="o">=</span><span class="s2">"()=&gt;{cmdbox.callcmd('cmd','list',{'kwd':'*'},(res)=&gt;{console.log(res);},$(</span><span class="se">\"</span><span class="s2">[name='title']</span><span class="se">\"</span><span class="s2">).val(),'tag');}"</span><span class="p">,</span>
 </pre></div>
 </div>
 </div></blockquote>

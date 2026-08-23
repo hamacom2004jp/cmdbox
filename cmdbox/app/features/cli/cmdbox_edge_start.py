@@ -39,8 +39,8 @@ class EdgeStart(feature.UnsupportEdgeFeature, validator.Validator):
             description_en="Start Edge mode.",
             choice=[
                 dict(opt="data", type=Options.T_DIR, default=self.default_data, required=True, multi=False, hide=True, choice=None, web="mask",
-                     description_ja=f"省略した時は f`$HONE/.{self.ver.__appid__}` を使用します。",
-                     description_en=f"When omitted, f`$HONE/.{self.ver.__appid__}` is used."),
+                     description_ja=f"省略した時は f`$HOME/.{self.ver.__appid__}` を使用します。",
+                     description_en=f"When omitted, f`$HOME/.{self.ver.__appid__}` is used."),
             ]
         )
 

@@ -191,6 +191,7 @@ limiter ( counter ) : ``cmdbox -m limiter -c counter <Option>``
     "--limiter_name <limiter_name>","str","","required","","","Specify the identifier name of the limiter configuration to get the counter for."
     "--scope <scope>","str","","required","server","client | current | server","Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory."
     "--load_history <load_history>","bool","","","False","True | False","Specify whether to retrieve the history as well. If you set this to True, the history will also be retrieved."
+    "--reflesh_counter <reflesh_counter>","bool","","","False","True | False","Specifies whether to update the counter. If set to True, the counter is updated."
 
 **Output Schema**
 
@@ -738,6 +739,7 @@ limiter ( plan_load ) : ``cmdbox -m limiter -c plan_load <Option>``
     "--timeout <timeout>","int","","","60","","Specify the maximum waiting time until the server responds."
     "--plan_name <plan_name>","str","","required","","","Specify the identifier name of the plan to load."
     "--include_history <include_history>","bool","","","False","True | False","Specifies whether to include history information in the evidence file. If set to `True`, the history information is included in the output."
+    "--reflesh_counter <reflesh_counter>","bool","","","False","True | False","Specifies whether to update the counter. If set to True, the counter is updated."
 
 **Output Schema**
 
@@ -1047,6 +1049,7 @@ limiter ( targets ) : ``cmdbox -m limiter -c targets <Option>``
     "--filter_target_cmd <filter_target_cmd>","str","","","","","Filter by target command. If specified, returns results for that command only."
     "--filter_limiter_name <filter_limiter_name>","str","","","","","Filter by limiter name. If specified, returns results for that limiter only."
     "--include_history <include_history>","bool","","","False","True | False","Specifies whether to include history information in the evidence file. If set to `True`, the history information is included in the output."
+    "--reflesh_counter <reflesh_counter>","bool","","","False","True | False","Specifies whether to update the counter. If set to True, the counter is updated."
 
 **Output Schema**
 

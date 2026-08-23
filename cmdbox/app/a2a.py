@@ -11,9 +11,10 @@ from cmdbox.app.features.cli import (
 )
 from fastapi import FastAPI, Depends, HTTPException, Request, Response
 from pathlib import Path
-from typing import Callable, List, Dict, Any, Tuple
+from typing import List, Dict, Any
 from starlette.applications import Starlette
 from starlette.middleware.sessions import SessionMiddleware
+import asyncio
 import argparse
 import logging
 import time
@@ -33,6 +34,51 @@ class A2a(mcp.Mcp):
         self.mcpsv_load = cmdbox_agent_mcpsv_load.AgentMcpLoad(self.appcls, self.ver)
         self.agent_apps:Dict[str, Starlette] = {}
         self.agent_confs:Dict[str, Dict[str, Any]] = {}
+        self.agent_lifespans:Dict[str, Dict[str, Any]] = {}
+
+    async def _startup_agent_app(self, agent_name:str, app:Starlette) -> None:
+        """Start lifespan for a delegated ASGI app once and keep it alive."""
+        recv_q:asyncio.Queue = asyncio.Queue()
+        send_q:asyncio.Queue = asyncio.Queue()
+        async def _receive() -> Dict[str, Any]:
+            return await recv_q.get()
+        async def _send(message:Dict[str, Any]) -> None:
+            await send_q.put(message)
+        scope = dict(type='lifespan', asgi=dict(version='3.0', spec_version='2.0'))
+        task = asyncio.create_task(app(scope, _receive, _send))
+        try:
+            await recv_q.put(dict(type='lifespan.startup'))
+            msg = await asyncio.wait_for(send_q.get(), timeout=60)
+            if msg.get('type') != 'lifespan.startup.complete':
+                err = msg.get('message', f"Unexpected startup response: {msg}")
+                raise RuntimeError(f"Agent '{agent_name}' lifespan startup failed. {err}")
+            self.agent_lifespans[agent_name] = dict(task=task, recv_q=recv_q, send_q=send_q)
+        except Exception:
+            if not task.done():
+                task.cancel()
+            raise
+
+    async def _shutdown_agent_apps(self, logger:logging.Logger) -> None:
+        """Shutdown delegated ASGI apps and clear lifespan state."""
+        for agent_name, state in list(self.agent_lifespans.items()):
+            task:asyncio.Task = state['task']
+            recv_q:asyncio.Queue = state['recv_q']
+            send_q:asyncio.Queue = state['send_q']
+            try:
+                await recv_q.put(dict(type='lifespan.shutdown'))
+                msg = await asyncio.wait_for(send_q.get(), timeout=15)
+                if msg.get('type') != 'lifespan.shutdown.complete':
+                    logger.warning(f"Agent '{agent_name}' lifespan shutdown returned: {msg}")
+            except Exception as e:
+                logger.warning(f"Agent '{agent_name}' lifespan shutdown failed: {e}")
+            finally:
+                if not task.done():
+                    task.cancel()
+                try:
+                    await task
+                except Exception:
+                    pass
+        self.agent_lifespans = {}
 
     async def create_a2aserver(self, logger:logging.Logger, args:argparse.Namespace, web:_web.Web) -> Any:
         """
@@ -56,6 +102,10 @@ class A2a(mcp.Mcp):
         app.add_middleware(SessionMiddleware, **mwparam)
         # エージェントを読込み
         await self.reload_a2aserver(logger, args)
+
+        @app.on_event("shutdown")
+        async def _shutdown_a2a_apps():
+            await self._shutdown_agent_apps(logger)
 
         @app.api_route("/a2a/{agent_name}/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
         async def a2a_proxy(agent_name:str, path:str, req:Request, res:Response, scope=Depends(signin.create_request_scope)):
@@ -107,7 +157,9 @@ class A2a(mcp.Mcp):
             logger.debug(f"google-adk a2a loading..")
         from google.adk.a2a.utils import agent_to_a2a, agent_card_builder
 
+        await self._shutdown_agent_apps(logger)
         self.agent_apps = {}
+        self.agent_confs = {}
         # エージェント一覧を取得
         if logger.level == logging.DEBUG:
             logger.debug(f"agent instance loading..")
@@ -128,10 +180,9 @@ class A2a(mcp.Mcp):
             if agent_conf is None:
                 logger.warning(f"Agent config '{agent['name']}' is empty.")
                 continue
-            if agent_conf.get('agent_type', None) == 'remote' \
-                and ('a2asv_apikey' not in agent_conf or agent_conf['a2asv_apikey'] is None):
-                logger.warning(f"Agent config '{agent['name']}' does not have apikey.")
-                continue
+            if agent_conf.get('agent_type', None) == 'remote':
+                logger.info(f"Skip: Agent config, because it is a remote agent: '{agent['name']}'")
+                continue # RemoteAgentはA2Aサーバーでの起動しない
             # LLM情報を取得
             _args = argparse.Namespace(**(args.__dict__ | dict(llmname=agent_conf['llm'])))
             status, llm_conf, _ = common.exec_sync(self.llm_load.apprun, logger, _args, time.time(), [])
@@ -154,21 +205,38 @@ class A2a(mcp.Mcp):
                 if mcpsv_conf is None:
                     logger.warning(f"MCPServer config '{mcpserver_name}' is empty.")
                     continue
-                if 'mcpserver_apikey' not in mcpsv_conf or mcpsv_conf['mcpserver_apikey'] is None:
+                if mcpsv_conf.get('mcpserver_apikey', None) is None and not mcpsv_conf.get('mcpserver_delegated_auth', False):
                     logger.warning(f"MCPServer config '{mcpserver_name}' does not have apikey.")
                     continue
                 mcpsv_confs.append(mcpsv_conf)
+            if len(mcpsv_confs) <= 0:
+                logger.warning(f"Agent '{agent['name']}' has no valid MCPServer config.")
+                continue
             # エージェントのインスタンスを生成
             agent_obj = self.agent_chat.create_agent(logger, self.data, True, agent_conf, llm_conf, mcpsv_confs, args.__dict__)
             if agent_obj is None:
                 logger.warning(f"Agent '{agent['name']}' creation skipped.")
                 continue
+            # A2A ServerのURLを取得
+            a2asv_baseurl:str = agent_conf.get('a2asv_baseurl', None)
+            if a2asv_baseurl is None:
+                logger.warning(f"Agent '{agent['name']}' has no a2asv_baseurl.")
+                continue
+            if a2asv_baseurl.find('/a2a/') < 0:
+                logger.warning(f"Agent '{agent['name']}' has invalid a2asv_baseurl: {a2asv_baseurl}")
+                continue
+            a2asv_baseurl = a2asv_baseurl[0:a2asv_baseurl.find('/a2a/')]
             # エージェントカードを生成
             builder = agent_card_builder.AgentCardBuilder(agent=agent_obj,
-                                                          rpc_url=f"{agent_conf['a2asv_baseurl']}/{agent['name']}")
+                                                          rpc_url=f"{a2asv_baseurl}/a2a/{agent['name']}")
             agent_card = await builder.build()
             agent_card.version = self.ver.__version__
             a2a_app = agent_to_a2a.to_a2a(agent_obj, agent_card=agent_card)
+            try:
+                await self._startup_agent_app(agent['name'], a2a_app)
+            except Exception as e:
+                logger.warning(f"Agent '{agent['name']}' lifespan startup failed: {e}")
+                continue
             # エージェントアプリケーションと設定を保存
             self.agent_apps[agent['name']] = a2a_app
             self.agent_confs[agent['name']] = agent_conf

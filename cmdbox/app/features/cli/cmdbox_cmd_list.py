@@ -42,8 +42,8 @@ class CmdList(feature.OneshotResultEdgeFeature, validator.Validator, testable.Un
             description_en="Obtains a list of commands under the data folder.",
             choice=[
                 dict(opt="data", type=Options.T_DIR, default=self.default_data, required=True, multi=False, hide=False, choice=None, web="mask",
-                     description_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
-                     description_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
+                     description_ja=f"省略した時は `$HOME/.{self.ver.__appid__}` を使用します。",
+                     description_en=f"When omitted, `$HOME/.{self.ver.__appid__}` is used."),
                 dict(opt="kwd", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                      description_ja=f"検索したい名前を指定します。中間マッチで検索します。",
                      description_en=f"Specify the name you want to search for. Searches for partial matches."),

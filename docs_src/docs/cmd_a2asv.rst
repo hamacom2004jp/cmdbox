@@ -6,6 +6,68 @@ Command Reference ( a2asv mode )
 
 List of a2asv mode commands.
 
+a2asv ( reload ) : ``cmdbox -m a2asv -c reload <Option>``
+=========================================================
+
+- Reload agents on the A2A server.
+
+.. csv-table::
+    :widths: 20, 8, 8, 8, 12, 18, 26
+    :header-rows: 1
+
+    "Option","Type","Multi","Required","Default","Choices","Description"
+    "--a2asv_reload_url <a2asv_reload_url>","str","","required","http://localhost:8071/a2a_reload","","Specify the base URL of the A2A server. e.g. http://localhost:8071/a2a_reload"
+    "--a2asv_apikey <a2asv_apikey>","passwd","","","","","Specify the API Key of the A2A server."
+    "--send_method <send_method>","str","","required","POST","GET | POST","Specify the HTTP method to send to `/a2a_reload`."
+    "--send_verify <send_verify>","bool","","","False","False | True","Specify whether to enable HTTPS certificate verification."
+    "--send_timeout <send_timeout>","int","","","120","","Specify timeout seconds waiting for A2A server response."
+
+**Output Schema**
+
+This command implements ``output_schema()`` returning ``Result`` model.
+
+.. code-block:: json
+
+    {
+      "success": {
+        "save_mode": "string",
+        "performance": [
+          {
+            "key": "string",
+            "value": null
+          }
+        ],
+        "status_code": 0,
+        "url": "string",
+        "data": {}
+      },
+      "warn": {},
+      "error": {},
+      "output_schema": {},
+      "end": false
+    }
+
+.. csv-table::
+    :widths: 25, 10, 10, 15, 40
+    :header-rows: 1
+
+    "Field","Type","Required","Default","Description"
+    "success","Data | null","no","null","成功した場合の結果"
+    "success.save_mode","str | null","no","null","保存モード"
+    "success.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "success.status_code","int | null","no","null","HTTPステータスコード"
+    "success.url","str | null","no","null","呼び出したURL"
+    "success.data","dict[str, any] | str | null","no","null","レスポンスデータ"
+    "warn","dict[str, any] | list[any] | Data | str | bool | null","no","null","警告がある場合の結果"
+    "warn.save_mode","str | null","no","null","保存モード"
+    "warn.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "error","dict[str, any] | list[any] | Data | str | bool | null","no","null","エラーがある場合の結果"
+    "error.save_mode","str | null","no","null","保存モード"
+    "error.performance","list[KeyVal] | null","no","null","パフォーマンス情報のリスト"
+    "output_schema","dict[str, any] | null","no","null","スキーマ情報"
+    "end","bool | null","no","null","終了フラグ"
+
+
 a2asv ( start ) : ``cmdbox -m a2asv -c start <Option>``
 =======================================================
 
@@ -85,7 +147,7 @@ a2asv ( stop ) : ``cmdbox -m a2asv -c stop <Option>``
     :header-rows: 1
 
     "Option","Type","Multi","Required","Default","Choices","Description"
-    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HONE/.cmdbox` is used."
+    "--data <data>","dir","","","C:\Users\hama\.cmdbox","","When omitted, `$HOME/.cmdbox` is used."
 
 **Output Schema**
 
