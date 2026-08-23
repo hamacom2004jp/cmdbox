@@ -37,6 +37,7 @@
             "args": ["-m","server","-c","start","--debug", "--data", "./.server_data"],
             "module": "cmdbox",
             "console": "integratedTerminal",
+            "consoleTitle": "cmdbox server",
             "cwd": "${workspaceFolder}",
             "justMyCode": false
         },
@@ -47,6 +48,7 @@
             "args": ["-m","server","-c","start","--debug", "--data", "./.server_data"],
             "module": "cmdbox",
             "console": "integratedTerminal",
+            "consoleTitle": "cmdbox server2",
             "cwd": "${workspaceFolder}",
             "justMyCode": false
         },
@@ -59,6 +61,7 @@
                      "--debug", "--gunicorn_workers", "5", "--data", "./.client_data"],
             "module": "cmdbox",
             "console": "integratedTerminal",
+            "consoleTitle": "cmdbox web",
             "cwd": "${workspaceFolder}",
             "justMyCode": false
         },
@@ -70,6 +73,7 @@
                      "--debug", "--gunicorn_workers", "5", "--data", "./.client_data"],
             "module": "cmdbox",
             "console": "integratedTerminal",
+            "consoleTitle": "cmdbox mcpsv",
             "cwd": "${workspaceFolder}",
             "justMyCode": false
         },
@@ -81,6 +85,7 @@
                      "--debug", "--gunicorn_workers", "5", "--data", "./.client_data"],
             "module": "cmdbox",
             "console": "integratedTerminal",
+            "consoleTitle": "cmdbox a2asv",
             "cwd": "${workspaceFolder}",
             "justMyCode": false
         },
@@ -91,6 +96,7 @@
             "args": ["-m","edge","-c","config","--debug"],
             "module": "cmdbox",
             "console": "integratedTerminal",
+            "consoleTitle": "cmdbox edge config",
             "cwd": "${workspaceFolder}",
             "justMyCode": false
         },
@@ -101,6 +107,7 @@
             "args": ["-m","edge","-c","start"],
             "module": "cmdbox",
             "console": "integratedTerminal",
+            "consoleTitle": "cmdbox edge start",
             "cwd": "${workspaceFolder}",
             "justMyCode": false
         },
@@ -111,6 +118,7 @@
             "args": ["-m","cmdbox","-c","setup","--data",".server_data","--chopt","data=.client_data","--chopt","client_data=.client_data"],
             "module": "cmdbox",
             "console": "integratedTerminal",
+            "consoleTitle": "cmdbox setup",
             "cwd": "${workspaceFolder}",
             "justMyCode": false
         }

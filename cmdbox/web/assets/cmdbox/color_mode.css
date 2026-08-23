@@ -2,6 +2,7 @@
 /* --- Defines Global Variables & Theme Colors --- */
 :root {
     --area-border-color: var(--bs-border-color);
+    --area-bg-color-100: rgba(0, 247, 255, 1);
     --area-bg-color-50: rgba(0, 247, 255, 0.5);
     --area-bg-color-10: rgba(0, 247, 255, 0.1);
     --area-bg-color-danger-50: rgba(255, 0, 230, 0.5);
@@ -126,7 +127,7 @@ body::after {
     border-radius: 50%;
     margin: 0 auto;
 }
-/* ライトモード (基本) - 必要に応じて調整 */
+/* ライトモード */
 [data-bs-theme="light"] {
     --bs-body-bg: #fff;
     --bs-body-color: #212529;
@@ -230,6 +231,8 @@ body::after {
     --bs-tooltip-transition: opacity .15s ease-in-out;
     --bs-popover-transition: opacity .15s ease-in-out;
     --bs-carousel-transition: transform .6s ease-in-out;
+
+    --area-bg-color-100: var(--bs-body-color);
 }
   
 /* ダークモード - 必要に応じて調整 */
@@ -295,7 +298,7 @@ body::after {
 
 /* ミッドナイトモード */
 [data-bs-theme="midnight"] {
-    --bs-body-bg: #1A0F2E; /* ダークパープル (よふかしのうたの夜のイメージ) */
+    --bs-body-bg: #1A0F2E; /* ダークパープル */
     --bs-body-color: #E8D5FF; /* ライト紫 */
     --bs-emphasis-color: #fff;
     --bs-secondary-color: #4B1B7D; /* 深紫 */
@@ -308,7 +311,7 @@ body::after {
     --bs-highlight-bg: #3D2B5F;
     --bs-highlight-border-color: #1A0F2E;
   
-    --bs-primary: #FF1493; /* ネオンピンク (よふかしのうたのアクセント) */
+    --bs-primary: #FF1493; /* ネオンピンク */
     --bs-primary-rgb: 255, 20, 147;
     --bs-primary-text: #000;
     --bs-primary-bg-subtle: #6B1B5F;
@@ -362,6 +365,7 @@ body::after {
     --bs-table-bg: var(--bs-tertiary-bg);
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
 
+    --area-bg-color-100: rgba(175, 0, 97, 1);/*FF1493*/
     --area-bg-color-50: rgba(40, 53, 82, 0.5);
     --area-bg-color-10: rgba(40, 53, 82, 0.1);
     --area-bg-color-danger-50: rgba(255, 107, 157, 0.5);
@@ -437,6 +441,7 @@ body::after {
     --bs-table-bg: var(--bs-tertiary-bg);
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
 
+    --area-bg-color-100: var(--bs-link-color);
     --area-bg-color-50: rgba(0, 100, 0, 0.5);
     --area-bg-color-10: rgba(0, 100, 0, 0.1);
     --area-bg-color-danger-50: rgba(255, 69, 0, 0.5);
@@ -512,6 +517,7 @@ body::after {
     --bs-table-bg: var(--bs-tertiary-bg);
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
 
+    --area-bg-color-100: rgba(0, 31, 200, 1);
     --area-bg-color-50: rgba(0, 31, 84, 0.5);
     --area-bg-color-10: rgba(0, 31, 84, 0.1);
     --area-bg-color-danger-50: rgba(249, 65, 68, 0.5);
@@ -587,6 +593,7 @@ body::after {
     --bs-table-bg: var(--bs-tertiary-bg);
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
 
+    --area-bg-color-100: rgba(139, 0, 0, 1);
     --area-bg-color-50: rgba(139, 0, 0, 0.5);
     --area-bg-color-10: rgba(139, 0, 0, 0.1);
     --area-bg-color-danger-50: rgba(255, 0, 0, 0.5);
@@ -662,6 +669,7 @@ body::after {
     --bs-table-bg: var(--bs-tertiary-bg);
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
 
+    --area-bg-color-100: rgba(184, 134, 11, 1);
     --area-bg-color-50: rgba(184, 134, 11, 0.5);
     --area-bg-color-10: rgba(184, 134, 11, 0.1);
     --area-bg-color-danger-50: rgba(255, 69, 0, 0.5);
@@ -903,6 +911,7 @@ body::after {
     --bs-table-bg: var(--bs-tertiary-bg);
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
 
+    --area-bg-color-100: var(--bs-emphasis-color);
     --area-bg-color-50: rgba(0, 247, 255, 0.3);
     --area-bg-color-10: rgba(0, 247, 255, 0.1);
     --area-bg-color-danger-50: rgba(160, 82, 45, 0.5);
@@ -1064,6 +1073,7 @@ body::after {
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
 
     --area-border-color: rgba(255, 32, 128, 0.45);
+    --area-bg-color-100: rgba(255, 32, 128, 1);
     --area-bg-color-50: rgba(255, 32, 128, 0.5);
     --area-bg-color-10: rgba(255, 32, 128, 0.9);
     --area-bg-color-danger-50: rgba(221, 17, 85, 0.5);
@@ -1140,6 +1150,7 @@ body::after {
     --bs-tertiary-bg-rgb: var(--bs-tertiary-bg);
 
     --area-border-color: rgba(41, 121, 184, 0.4);
+    --area-bg-color-100: rgba(41, 121, 184, 1);
     --area-bg-color-50: rgba(41, 121, 184, 0.5);
     --area-bg-color-10: rgba(41, 121, 184, 0.9);
     --area-bg-color-danger-50: rgba(198, 40, 40, 0.5);
@@ -1271,6 +1282,7 @@ body::after {
 
     /* --- エリア色 --- */
     --area-border-color: rgba(0, 0, 0, 0.25);
+    --area-bg-color-100: rgba(0, 0, 0, 1);
     --area-bg-color-50: rgba(0, 0, 0, 0.50);
     --area-bg-color-10: rgba(0, 0, 0, 0.85);
     --area-bg-color-danger-50: rgba(0, 0, 0, 0.50);
