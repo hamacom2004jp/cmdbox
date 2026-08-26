@@ -17,13 +17,23 @@ class GetCmdChoices(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
-            form = await req.form()
-            mode = form.get('mode')
-            cmd = form.get('cmd')
-            language = form.get('language')
-            if not mode or not cmd:
+            try:
+                opt:dict = await req.json()
+            except Exception as e:
+                raise HTTPException(status_code=400, detail=f'Invalid JSON: {e}')
+            opt['mode'] = mode = opt.get('mode', None)
+            opt['cmd'] = cmd = opt.get('cmd', None)
+            opt['host'] = web.redis_host
+            opt['port'] = web.redis_port
+            opt['password'] = web.redis_password
+            opt['svname'] = web.svname
+            opt['retry_count'] = opt.get('retry_count', web.retry_count)
+            opt['retry_interval'] = opt.get('retry_interval', web.retry_interval)
+            opt['timeout'] = opt.get('timeout', web.timeout)
+            opt['language'] = language = opt.get('language', web.language)
+            if not opt.get('mode', None) or not opt.get('cmd', None):
                 return dict(warn='Mode and cmd are required.')
-            ret = web.options.get_cmd_choices(mode, cmd, True).copy()
+            ret = web.options.get_cmd_choices(mode, cmd, True, opt).copy()
             fobj = web.options.get_cmd_attr(mode, cmd, 'feature')
             desc = web.options.get_cmd_attr(mode, cmd, 'description_en' if not common.is_japan(language=language) else 'description_ja')
             desc_nouse_webmode = '\U00002B55 Web' if not web.options.get_cmd_attr(mode, cmd, 'nouse_webmode') else '\U0000274C Web'

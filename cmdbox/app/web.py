@@ -64,6 +64,7 @@ class Web:
 
     def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None, language:str=None,
                  redis_host:str="localhost", redis_port:int=6379, redis_password:str=None, svname:str='server',
+                 retry_count:int=3, retry_interval:int=5, timeout:int=60,
                  client_only:bool=False, doc_root:Path=None, gui_html:str=None,
                  filer_html:str=None, result_html:str=None, users_html:str=None, agent_html:str=None,
                  audit_html:str=None, assets:List[str]=None, limiter_html:str=None,
@@ -83,6 +84,9 @@ class Web:
             redis_port (int, optional): Redisサーバーのポート番号. Defaults to 6379.
             redis_password (str, optional): Redisサーバーのパスワード. Defaults to None.
             svname (str, optional): サーバーのサービス名. Defaults to 'server'.
+            retry_count (int, optional): Redisサーバーへの再接続回数. Defaults to 3.
+            retry_interval (int, optional): Redisサーバーに再接続までの秒数. Defaults to 5.
+            timeout (int, optional): サーバーの応答が返ってくるまでの最大待ち時間. Defaults to 60.
             client_only (bool, optional): クライアントのみのサービスかどうか. Defaults to False.
             doc_root (Path, optional): カスタムファイルのドキュメントルート. フォルダ指定のカスタムファイルのパスから、doc_rootのパスを除去したパスでURLマッピングします。Defaults to None.
             gui_html (str, optional): GUIのHTMLファイル. Defaults to None.
@@ -112,6 +116,9 @@ class Web:
         self.redis_port = redis_port
         self.redis_password = redis_password
         self.svname = svname
+        self.retry_count = retry_count
+        self.retry_interval = retry_interval
+        self.timeout = timeout
         self.client_only = client_only
         if self.client_only:
             self.svname = 'client'

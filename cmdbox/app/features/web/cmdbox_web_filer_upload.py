@@ -44,7 +44,8 @@ class FilerUpload(cmdbox_web_exec_cmd.ExecCmd):
             raise HTTPException(status_code=400, detail="Missing 'svpath' query parameter.")
         web.logger.info(f"filer_upload: svpath={svpath}")
         opt = dict(mode='client', cmd='file_upload',
-                   host=q.get('host'), port=q.get('port'), password=q.get('password'), svname=q.get('svname'),
+                   host=web.redis_host, port=web.redis_port, password=web.redis_password, svname=web.svname,
+                   retry_count=web.retry_count, retry_interval=web.retry_interval, timeout=web.timeout,
                    scope=q.get("scope"), client_data=q.get('client_data'), overwrite=('overwrite' in q))
         form = await req.form()
         with tempfile.TemporaryDirectory() as tmpdir:

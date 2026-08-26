@@ -126,7 +126,10 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
         config = self.limiter_load._load_limiter_config(data_dir, limiter_name)
         _options = Options.getInstance(self.appcls, ver=self.ver)
         feat:limiter.LimitedFeature = _options.get_cmd_attr(config.get('target_mode'), config.get('target_cmd'), 'feature')
-        command_options = dict(mode=config.get('target_mode'), cmd=config.get('target_cmd'), **config.get('target_options', {}))
+        target_option = config.get('target_option', {})
+        target_option = target_option if isinstance(target_option, dict) else {}
+        command_options = dict(mode=config.get('target_mode'), cmd=config.get('target_cmd'), **target_option)
+        args = argparse.Namespace(**vars(args), **target_option)
         if scope == 'client':
             registration = feat.apprun_registrations(data_dir=data_dir, logger=logger, args=args, msg={})
         elif scope == 'server':

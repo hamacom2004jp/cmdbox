@@ -61,6 +61,15 @@ class A2aSvStart(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="data", type=Options.T_DIR, default=self.default_data, required=False, multi=False, hide=False, choice=None, web="mask",
                      description_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
                      description_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
+                dict(opt="retry_count", type=Options.T_INT, default=3, required=False, multi=False, hide=True, choice=None,
+                    description_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",
+                    description_en="Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."),
+                dict(opt="retry_interval", type=Options.T_INT, default=5, required=False, multi=False, hide=True, choice=None,
+                    description_ja="Redisサーバーに再接続までの秒数を指定します。",
+                    description_en="Specifies the number of seconds before reconnecting to the Redis server."),
+                dict(opt="timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=True, choice=None,
+                    description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
+                    description_en="Specify the maximum waiting time until the server responds."),
                 dict(opt="allow_host", type=Options.T_STR, default="0.0.0.0", required=False, multi=False, hide=False, choice=None,
                      description_ja="省略した時は `0.0.0.0` を使用します。",
                      description_en="If omitted, `0.0.0.0` is used."),
@@ -114,6 +123,7 @@ class A2aSvStart(feature.UnsupportEdgeFeature, validator.Validator):
             # ツール側で参照できるようにするためにインスタンス化
             _web = web.Web.getInstance(logger, Path(args.data), appcls=self.appcls, ver=self.ver, language=args.language,
                                        redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
+                                       retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                                        signin_file=args.signin_file)
 
             sign = signin.getDefaultInstance(logger, signin_file, signin_data, _web.redis_cli, self.appcls, self.ver, self.language)

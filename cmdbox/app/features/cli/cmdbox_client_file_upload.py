@@ -8,6 +8,7 @@ import logging
 import json
 import pydantic
 import unicodedata
+import os
 
 
 class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limiter.LimitedFeature):
@@ -172,11 +173,40 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
         return st
 
     def apprun_registrations(self, data_dir, logger, args, msg):
-        total_size = sum(f.stat().st_size for f in data_dir.rglob('*') if f.is_file())
+        svpath = args.svpath if hasattr(args, 'svpath') else ''
+        svpath = str(svpath).replace('"','').replace('\\','/').replace('//','/')
+        svpath = svpath if not svpath.startswith('/') else svpath[1:]
+        return self._apprun_registrations(data_dir / svpath, logger, args, msg)
+
+    def _apprun_registrations(self, data_dir, logger, args, msg):
+        #total_size = sum(f.stat().st_size for f in data_dir.rglob('*') if f.is_file())
+        total_size = 0
+        try:
+            for entry in os.scandir(data_dir):
+                if entry.is_file(follow_symlinks=False):
+                    total_size += entry.stat().st_size
+                elif entry.is_dir(follow_symlinks=False):
+                    total_size += self._apprun_registrations(entry.path, logger, args, msg)
+        except PermissionError as e:
+            logger.warning(f"Failed to calculate total size: {e}", exc_info=True)
         return total_size
 
     def svrun_registrations(self, data_dir, logger, opt, msg):
-        total_size = sum(f.stat().st_size for f in data_dir.rglob('*') if f.is_file())
+        svpath = opt.get('svpath', '')
+        svpath = str(svpath).replace('"','').replace('\\','/').replace('//','/')
+        svpath = svpath if not svpath.startswith('/') else svpath[1:]
+        return self._svrun_registrations(data_dir / svpath, logger, opt, msg)
+
+    def _svrun_registrations(self, data_dir, logger, opt, msg):
+        total_size = 0
+        try:
+            for entry in os.scandir(data_dir):
+                if entry.is_file(follow_symlinks=False):
+                    total_size += entry.stat().st_size
+                elif entry.is_dir(follow_symlinks=False):
+                    total_size += self._svrun_registrations(entry.path, logger, opt, msg)
+        except PermissionError as e:
+            logger.warning(f"Failed to calculate total size: {e}", exc_info=True)
         return total_size
 
     def file_upload(self, reskey:str, current_path:str, file_name:str, file_data:bytes, mkdir:bool, overwrite:bool,

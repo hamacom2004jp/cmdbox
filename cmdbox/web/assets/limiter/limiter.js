@@ -419,6 +419,9 @@ limiter_page.open_edit_modal = async (name, defaults) => {
     // 設定値を form にセット
     const form = $('#limiter_form_content');
     Object.keys(cfg).forEach(key => {
+        if (key === 'target_option') {
+            return;
+        }
         const input = form.find(`[name="${key}"]`);
         if (input.length > 0) {
             if (key === 'exec_period_start' || key === 'exec_period_end' || key === 'reset_datetime') {
@@ -429,6 +432,23 @@ limiter_page.open_edit_modal = async (name, defaults) => {
             }
         }
     });
+    if (cfg['target_option'] && typeof cfg['target_option'] === 'object' && !Array.isArray(cfg['target_option'])) {
+        const entries = Object.entries(cfg['target_option']);
+        if (entries.length > 0) {
+            entries.forEach((entry, i) => {
+                const [k, v] = entry;
+                if (i > 0) {
+                    const add_btn = form.find('[name="target_option"]').last().parent().find('.add_buton');
+                    if (add_btn.length > 0) add_btn.first().click();
+                }
+                const target_inputs = form.find('[name="target_option"]');
+                const key_input = target_inputs.eq(i * 2);
+                const val_input = target_inputs.eq(i * 2 + 1);
+                key_input.val(k);
+                val_input.val(v);
+            });
+        }
+    }
     if (cfg['target_mode']) {
         form.find('[name="target_mode"]').val(cfg['target_mode']);
         const res = await get_cmds(cfg['target_mode']);
@@ -447,10 +467,36 @@ limiter_page.open_edit_modal = async (name, defaults) => {
  */
 limiter_page.save_limiter = async () => {
     const form = $('#limiter_form_content');
-    const data = {save_mode: $('[name="save_mode"]').val()};
-    form.serializeArray().forEach(item => {
-        if (item.value) data[item.name] = item.value;
+    const data = {save_mode: form.find('[name="save_mode"]').val()};
+    const dict_buf = {};
+
+    form.find('input, select, textarea').each((i, elem) => {
+        const data_name = $(elem).attr('name');
+        if (!data_name || data_name === 'save_mode') return;
+        const data_type = $(elem).attr('param_data_type');
+        const data_index = parseInt($(elem).attr('param_data_index'));
+        const data_val = $(elem).val();
+        if (data_type === 'dict') {
+            if (!data[data_name]) {
+                data[data_name] = {};
+                dict_buf[data_name] = {};
+            }
+            if (data_index % 2 === 0) {
+                dict_buf[data_name].key = data_val || '';
+            } else if (dict_buf[data_name].key) {
+                data[data_name][dict_buf[data_name].key] = data_val || '';
+                delete dict_buf[data_name].key;
+            }
+            return;
+        }
+        if (data_val) {
+            data[data_name] = data_val;
+        }
     });
+
+    if (data.target_option && Object.keys(data.target_option).length === 0) {
+        delete data.target_option;
+    }
 
     if (!data.limiter_name || !data.limiter_name.trim()) {
         cmdbox.message({ warn: 'Limiter Name is required.' }, true, true);

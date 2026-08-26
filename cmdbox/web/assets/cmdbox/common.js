@@ -2382,14 +2382,20 @@ cmdbox.load_cmd = async (title) => {
  * コマンド選択肢取得
  * @param {string} mode - モード
  * @param {string} cmd - コマンド
+ * @param {object} opt - オプション
  * @returns {Promise} - コマンドオプション
  */
-cmdbox.get_cmd_choices = async (mode, cmd) => {
+cmdbox.get_cmd_choices = async (mode, cmd, opt={}) => {
     const formData = new FormData();
     formData.append('mode', mode);
     formData.append('cmd', cmd);
     formData.append('language', await cmdbox.getUserLanguage());
-    const res = await fetch('gui/get_cmd_choices', {method: 'POST', body: formData});
+    const _opt = {mode:mode, cmd:cmd, language: await cmdbox.getUserLanguage(), ...opt?opt:{}};
+    const res = await fetch('gui/get_cmd_choices', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(_opt)
+    });
     if (res.status != 200) cmdbox.message({'error':`${res.status}: ${res.statusText}`}, true, true);
     return await res.json();
 }

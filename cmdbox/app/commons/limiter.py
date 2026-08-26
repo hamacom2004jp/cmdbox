@@ -1,5 +1,5 @@
 from cmdbox.app import common, feature
-from cmdbox.app.commons import redis_client
+from cmdbox.app.commons import convert, redis_client
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
@@ -285,6 +285,12 @@ class LimitedFeature(feature.Feature):
         Returns:
             Dict[str, Any]: 解析結果
         """
+        opt = {}
+        try:
+            if len(msg) > 2:
+                opt = json.loads(convert.b64str2str(msg[2]))
+        except Exception as e:
+            pass
         ret = dict(
             host=redis_cli.host,
             port=redis_cli.port,
@@ -292,6 +298,7 @@ class LimitedFeature(feature.Feature):
             svname=redis_cli.svname,
             mode=self.get_mode(),
             cmd=self.get_cmd(),
+            **opt
         )
         return ret
     
