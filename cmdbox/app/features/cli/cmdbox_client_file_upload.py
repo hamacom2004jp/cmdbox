@@ -182,6 +182,8 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
         #total_size = sum(f.stat().st_size for f in data_dir.rglob('*') if f.is_file())
         total_size = 0
         try:
+            if not os.path.exists(data_dir):
+                return 0
             for entry in os.scandir(data_dir):
                 if entry.is_file(follow_symlinks=False):
                     total_size += entry.stat().st_size
@@ -200,6 +202,8 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
     def _svrun_registrations(self, data_dir, logger, opt, msg):
         total_size = 0
         try:
+            if not os.path.exists(data_dir):
+                return 0
             for entry in os.scandir(data_dir):
                 if entry.is_file(follow_symlinks=False):
                     total_size += entry.stat().st_size
