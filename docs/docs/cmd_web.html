@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( web mode ) &mdash; cmdbox 2026/08/23 documentation</title>
+  <title>Command Reference ( web mode ) &mdash; cmdbox 2026/08/27 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=4cffd425"></script>
+      <script src="../_static/documentation_options.js?v=b08ece82"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -1621,7 +1621,31 @@
 <td></td>
 <td><p>When omitted, <cite>$HOME/.cmdbox</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--allow_host &lt;allow_host&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-even"><td><p>--allow_host &lt;allow_host&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -1629,7 +1653,7 @@
 <td></td>
 <td><p>If omitted, <cite>0.0.0.0</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--listen_port &lt;listen_port&gt;</p></td>
+<tr class="row-odd"><td><p>--listen_port &lt;listen_port&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1637,7 +1661,7 @@
 <td></td>
 <td><p>If omitted, <cite>8081</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--ssl_listen_port &lt;ssl_listen_port&gt;</p></td>
+<tr class="row-even"><td><p>--ssl_listen_port &lt;ssl_listen_port&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1645,7 +1669,7 @@
 <td></td>
 <td><p>If omitted, <cite>8443</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--ssl_cert &lt;ssl_cert&gt;</p></td>
+<tr class="row-odd"><td><p>--ssl_cert &lt;ssl_cert&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -1653,7 +1677,7 @@
 <td></td>
 <td><p>Specify the SSL server certificate file.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--ssl_key &lt;ssl_key&gt;</p></td>
+<tr class="row-even"><td><p>--ssl_key &lt;ssl_key&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -1661,7 +1685,7 @@
 <td></td>
 <td><p>Specify the SSL server private key file.</p></td>
 </tr>
-<tr class="row-even"><td><p>--ssl_keypass &lt;ssl_keypass&gt;</p></td>
+<tr class="row-odd"><td><p>--ssl_keypass &lt;ssl_keypass&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -1669,7 +1693,7 @@
 <td></td>
 <td><p>Specify the composite password for the SSL server private key file.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--ssl_ca_certs &lt;ssl_ca_certs&gt;</p></td>
+<tr class="row-even"><td><p>--ssl_ca_certs &lt;ssl_ca_certs&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -1677,7 +1701,7 @@
 <td></td>
 <td><p>Specify the SSL server CA certificate file.</p></td>
 </tr>
-<tr class="row-even"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<tr class="row-odd"><td><p>--signin_file &lt;signin_file&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -1685,7 +1709,7 @@
 <td></td>
 <td><p>Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--session_domain &lt;session_domain&gt;</p></td>
+<tr class="row-even"><td><p>--session_domain &lt;session_domain&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -1693,7 +1717,7 @@
 <td></td>
 <td><p>Specify the domain for which the signed-in user's session is valid.</p></td>
 </tr>
-<tr class="row-even"><td><p>--session_path &lt;session_path&gt;</p></td>
+<tr class="row-odd"><td><p>--session_path &lt;session_path&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -1701,7 +1725,7 @@
 <td></td>
 <td><p>Specify the session timeout in seconds for signed-in users.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--session_secure &lt;session_secure&gt;</p></td>
+<tr class="row-even"><td><p>--session_secure &lt;session_secure&gt;</p></td>
 <td><p>bool</p></td>
 <td></td>
 <td></td>
@@ -1709,7 +1733,7 @@
 <td><p>True | False</p></td>
 <td><p>Set the Secure flag for the signed-in user's session.</p></td>
 </tr>
-<tr class="row-even"><td><p>--session_timeout &lt;session_timeout&gt;</p></td>
+<tr class="row-odd"><td><p>--session_timeout &lt;session_timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1717,7 +1741,7 @@
 <td></td>
 <td><p>Specify the session timeout in seconds for signed-in users.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--gunicorn_workers &lt;gunicorn_workers&gt;</p></td>
+<tr class="row-even"><td><p>--gunicorn_workers &lt;gunicorn_workers&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1725,7 +1749,7 @@
 <td></td>
 <td><p>Specifies the number of gunicorn workers, valid only in Linux environment. If -1 or unspecified, the number of CPUs is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--gunicorn_timeout &lt;gunicorn_timeout&gt;</p></td>
+<tr class="row-odd"><td><p>--gunicorn_timeout &lt;gunicorn_timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -1733,7 +1757,7 @@
 <td></td>
 <td><p>Specify the timeout duration of the gunicorn worker in seconds.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_only &lt;client_only&gt;</p></td>
+<tr class="row-even"><td><p>--client_only &lt;client_only&gt;</p></td>
 <td><p>bool</p></td>
 <td></td>
 <td></td>
@@ -1741,7 +1765,7 @@
 <td><p>True | False</p></td>
 <td><p>Do not make connections to the server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--outputs_key &lt;outputs_key&gt;</p></td>
+<tr class="row-odd"><td><p>--outputs_key &lt;outputs_key&gt;</p></td>
 <td><p>str</p></td>
 <td><p>multi</p></td>
 <td></td>
@@ -1749,7 +1773,7 @@
 <td></td>
 <td><p>Specify items to be displayed on the showimg and webcap screens. If omitted, all items are displayed.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--doc_root &lt;doc_root&gt;</p></td>
+<tr class="row-even"><td><p>--doc_root &lt;doc_root&gt;</p></td>
 <td><p>dir</p></td>
 <td></td>
 <td></td>
@@ -1757,7 +1781,7 @@
 <td></td>
 <td><p>Document root for custom files. URL mapping from the path of a folder-specified custom file with the path of doc_root removed.</p></td>
 </tr>
-<tr class="row-even"><td><p>--gui_html &lt;gui_html&gt;</p></td>
+<tr class="row-odd"><td><p>--gui_html &lt;gui_html&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -1765,7 +1789,7 @@
 <td></td>
 <td><p>Specify <cite>gui.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--filer_html &lt;filer_html&gt;</p></td>
+<tr class="row-even"><td><p>--filer_html &lt;filer_html&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -1773,7 +1797,7 @@
 <td></td>
 <td><p>Specify <cite>filer.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--result_html &lt;result_html&gt;</p></td>
+<tr class="row-odd"><td><p>--result_html &lt;result_html&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -1781,7 +1805,7 @@
 <td></td>
 <td><p>Specify <cite>result.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--users_html &lt;users_html&gt;</p></td>
+<tr class="row-even"><td><p>--users_html &lt;users_html&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -1789,7 +1813,7 @@
 <td></td>
 <td><p>Specify <cite>users.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--agent_html &lt;agent_html&gt;</p></td>
+<tr class="row-odd"><td><p>--agent_html &lt;agent_html&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -1797,7 +1821,7 @@
 <td></td>
 <td><p>Specify <cite>agent.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--audit_html &lt;audit_html&gt;</p></td>
+<tr class="row-even"><td><p>--audit_html &lt;audit_html&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -1805,7 +1829,7 @@
 <td></td>
 <td><p>Specify <cite>audit.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--assets &lt;assets&gt;</p></td>
+<tr class="row-odd"><td><p>--assets &lt;assets&gt;</p></td>
 <td><p>file</p></td>
 <td><p>multi</p></td>
 <td></td>
@@ -1813,7 +1837,7 @@
 <td></td>
 <td><p>Specify the asset file required when using html files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--limiter_html &lt;limiter_html&gt;</p></td>
+<tr class="row-even"><td><p>--limiter_html &lt;limiter_html&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -1821,7 +1845,7 @@
 <td></td>
 <td><p>Specify <cite>limiter.html</cite>. If omitted, the cmdbox built-in HTML file is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--signin_html &lt;signin_html&gt;</p></td>
+<tr class="row-odd"><td><p>--signin_html &lt;signin_html&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>

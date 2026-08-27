@@ -165,7 +165,7 @@ audit ( search ) : ``cmdbox -m audit -c search <Option>``
     "--pg_dbname <pg_dbname>","str","","","audit","","Specify the postgresql database name."
     "--select <select>","dict","multi","","","","Specify the items to be retrieved. If not specified, all items are acquired."
     "--select_date_format <select_date_format>","str","","",""," | %Y/%m/%d %H:%M | %Y/%m/%d %H | %Y/%m/%d | %Y/%m | %Y | %m | %u","Specifies the format of the date and time of the acquisition item."
-    "--filter_audit_type <filter_audit_type>","str","","",""," | user | admin | system | auth | event","Specifies the type of audit for the filter condition."
+    "--filter_audit_type <filter_audit_type>","str","multi","",""," | user | admin | system | auth | event","Specifies the type of audit for the filter condition. Multiple values can be specified."
     "--filter_clmsg_id <filter_clmsg_id>","str","","","","","Specify the message ID of the client for the filter condition."
     "--filter_clmsg_sdate <filter_clmsg_sdate>","datetime","","","","","Specify the date and time (start) when the message occurred for the client in the filter condition."
     "--filter_clmsg_edate <filter_clmsg_edate>","datetime","","","","","Specify the date and time (end) when the message occurred for the client in the filter condition."
@@ -173,6 +173,7 @@ audit ( search ) : ``cmdbox -m audit -c search <Option>``
     "--filter_clmsg_title <filter_clmsg_title>","str","","","","","Specifies the message title of the client for the filter condition; a LIKE search is performed."
     "--filter_clmsg_user <filter_clmsg_user>","str","","","","","Specifies the user who generated the message for the client in the filter condition; performs a LIKE search."
     "--filter_clmsg_body <filter_clmsg_body>","dict","multi","","","","Specifies the body of the client's message in the filter condition in dictionary format; performs a LIKE search."
+    "--exclude_clmsg_body <exclude_clmsg_body>","dict","multi","","","","Specifies the body of the client's message in the exclude condition in dictionary format. Excludes rows matching the specified condition."
     "--filter_clmsg_tag <filter_clmsg_tag>","str","multi","","","","Specifies the tag of the client's message in the filter condition."
     "--filter_svmsg_id <filter_svmsg_id>","str","","","","","Specify the message ID of the server for the filter condition."
     "--filter_svmsg_sdate <filter_svmsg_sdate>","datetime","","","","","Specify the date and time (start) when the message occurred for the server in the filter condition."
@@ -262,6 +263,10 @@ audit ( write ) : ``cmdbox -m audit -c write <Option>``
     "--clmsg_tag <clmsg_tag>","str","multi","","","","Specifies the tag for the client's message. Specify to make it easier to search later."
     "--retention_period_days <retention_period_days>","int","","","365","","Specify the number of days to keep the audit. If the number is less than or equal to 0, the audit will be kept indefinitely."
     "--buffered_interval <buffered_interval>","int","","","30","","Specify the interval, in seconds, for buffering audit log writes."
+    "--exclude_audit_type <exclude_audit_type>","str","multi","","","user | admin | system | auth | event","Specify the type of audit for which audit logs will not be recorded."
+    "--exclude_clmsg_src <exclude_clmsg_src>","str","multi","","","","Specifies the source of client messages for which audit logs are not recorded. Specify using a regular expression."
+    "--exclude_clmsg_title <exclude_clmsg_title>","str","","","","","Specify the client message titles that should not be logged in the audit log. Specify using a regular expression."
+    "--exclude_clmsg_tag <exclude_clmsg_tag>","str","multi","","","","Specify the tags for client messages that should not be logged in the audit log."
 
 **Output Schema**
 

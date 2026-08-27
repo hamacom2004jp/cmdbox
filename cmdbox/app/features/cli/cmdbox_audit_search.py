@@ -51,9 +51,9 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
             dict(opt="select_date_format", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=['']+self.DT_FMT,
                  description_ja="取得項目の日時のフォーマットを指定します。",
                  description_en="Specifies the format of the date and time of the acquisition item."),
-            dict(opt="filter_audit_type", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=['']+Options.AUDITS,
-                 description_ja="フィルタ条件の監査の種類を指定します。",
-                 description_en="Specifies the type of audit for the filter condition."),
+            dict(opt="filter_audit_type", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=['']+Options.AUDITS,
+                 description_ja="フィルタ条件の監査の種類を指定します。複数指定できます。",
+                 description_en="Specifies the type of audit for the filter condition. Multiple values can be specified."),
             dict(opt="filter_clmsg_id", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                  description_ja="フィルタ条件のクライアントのメッセージIDを指定します。",
                  description_en="Specify the message ID of the client for the filter condition."),
@@ -75,6 +75,9 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
             dict(opt="filter_clmsg_body", type=Options.T_DICT, default=None, required=False, multi=True, hide=False, choice=None,
                  description_ja="フィルタ条件のクライアントのメッセージの本文を辞書形式で指定します。LIKE検索を行います。",
                  description_en="Specifies the body of the client's message in the filter condition in dictionary format; performs a LIKE search."),
+            dict(opt="exclude_clmsg_body", type=Options.T_DICT, default=None, required=False, multi=True, hide=False, choice=None,
+                 description_ja="除外条件のクライアントのメッセージの本文を辞書形式で指定します。指定した条件に合う行を除けます。",
+                 description_en="Specifies the body of the client's message in the exclude condition in dictionary format. Excludes rows matching the specified condition."),
             dict(opt="filter_clmsg_tag", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
                  description_ja="フィルタ条件のクライアントのメッセージのタグを指定します。",
                  description_en="Specifies the tag of the client's message in the filter condition."),
@@ -134,7 +137,8 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
         sort_b64 = convert.str2b64str(sort_str)
         offset = getattr(args, 'offset', None)
         limit = getattr(args, 'limit', None)
-        filter_audit_type_b64 = convert.str2b64str(getattr(args, 'filter_audit_type', None))
+        filter_audit_type_str = json.dumps(args.filter_audit_type, default=common.default_json_enc, ensure_ascii=False) if getattr(args, 'filter_audit_type', None) else '[]'
+        filter_audit_type_b64 = convert.str2b64str(filter_audit_type_str)
         filter_clmsg_id_b64 = convert.str2b64str(getattr(args, 'filter_clmsg_id', None))
         filter_clmsg_sdate = args.filter_clmsg_sdate+common.get_tzoffset_str() if getattr(args, 'filter_clmsg_sdate', None) else None
         filter_clmsg_sdate_b64 = convert.str2b64str(filter_clmsg_sdate)
@@ -145,6 +149,8 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
         filter_clmsg_user_b64 = convert.str2b64str(getattr(args, 'filter_clmsg_user', None))
         filter_clmsg_body_str = json.dumps(args.filter_clmsg_body, default=common.default_json_enc, ensure_ascii=False) if getattr(args, 'filter_clmsg_body', None) else '{}'
         filter_clmsg_body_b64 = convert.str2b64str(filter_clmsg_body_str)
+        exclude_clmsg_body_str = json.dumps(args.exclude_clmsg_body, default=common.default_json_enc, ensure_ascii=False) if getattr(args, 'exclude_clmsg_body', None) else '{}'
+        exclude_clmsg_body_b64 = convert.str2b64str(exclude_clmsg_body_str)
         filter_clmsg_tag_str = json.dumps(args.filter_clmsg_tag, default=common.default_json_enc, ensure_ascii=False) if getattr(args, 'filter_clmsg_tag', None) else '[]'
         filter_clmsg_tag_b64 = convert.str2b64str(filter_clmsg_tag_str)
         filter_svmsg_id_b64 = convert.str2b64str(getattr(args, 'filter_svmsg_id', None))
@@ -163,7 +169,7 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
                                      sort_b64, str(offset), str(limit),
                                      filter_audit_type_b64, filter_clmsg_id_b64, filter_clmsg_sdate_b64, filter_clmsg_edate_b64,
                                      filter_clmsg_src_b64, filter_clmsg_title_b64, filter_clmsg_user_b64, filter_clmsg_body_b64,
-                                     filter_clmsg_tag_b64, filter_svmsg_id_b64, filter_svmsg_sdate_b64, filter_svmsg_edate_b64,
+                                     exclude_clmsg_body_b64, filter_clmsg_tag_b64, filter_svmsg_id_b64, filter_svmsg_sdate_b64, filter_svmsg_edate_b64,
                                      pg_enabled, pg_host_b64, pg_port, pg_user_b64, pg_password_b64, pg_dbname_b64],
                                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
 
@@ -240,7 +246,7 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
         offset = int(msg[7]) if msg[7] else 0
         limit = int(msg[8]) if msg[8] else 100
         
-        filter_audit_type = convert.b64str2str(msg[9])
+        filter_audit_type = json.loads(convert.b64str2str(msg[9]))
         filter_clmsg_id = convert.b64str2str(msg[10])
         filter_clmsg_sdate = convert.b64str2str(msg[11])
         filter_clmsg_edate = convert.b64str2str(msg[12])
@@ -248,29 +254,30 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
         filter_clmsg_title = convert.b64str2str(msg[14])
         filter_clmsg_user = convert.b64str2str(msg[15])
         body = json.loads(convert.b64str2str(msg[16]))
-        tags = json.loads(convert.b64str2str(msg[17]))
-        filter_svmsg_id = convert.b64str2str(msg[18])
-        filter_svmsg_sdate = convert.b64str2str(msg[19])
-        filter_svmsg_edate = convert.b64str2str(msg[20])
-        pg_enabled = True if msg[21]=='True' else False
-        pg_host = convert.b64str2str(msg[22])
-        pg_port = int(msg[23]) if msg[23]!='None' else None
-        pg_user = convert.b64str2str(msg[24])
-        pg_password = convert.b64str2str(msg[25])
-        pg_dbname = convert.b64str2str(msg[26])
+        exclude_body = json.loads(convert.b64str2str(msg[17]))
+        tags = json.loads(convert.b64str2str(msg[18]))
+        filter_svmsg_id = convert.b64str2str(msg[19])
+        filter_svmsg_sdate = convert.b64str2str(msg[20])
+        filter_svmsg_edate = convert.b64str2str(msg[21])
+        pg_enabled = True if msg[22]=='True' else False
+        pg_host = convert.b64str2str(msg[23])
+        pg_port = int(msg[24]) if msg[24]!='None' else None
+        pg_user = convert.b64str2str(msg[25])
+        pg_password = convert.b64str2str(msg[26])
+        pg_dbname = convert.b64str2str(msg[27])
         st = self.search(msg[1], select, select_date_format, groupby, groupby_date_format,
                          sort, offset, limit,
                          filter_audit_type, filter_clmsg_id, filter_clmsg_sdate, filter_clmsg_edate,
-                         filter_clmsg_src, filter_clmsg_title, filter_clmsg_user, body, tags,
+                         filter_clmsg_src, filter_clmsg_title, filter_clmsg_user, body, exclude_body, tags,
                          filter_svmsg_id, filter_svmsg_sdate, filter_svmsg_edate,
                          pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname,
                          data_dir, logger, redis_cli)
         return st
 
     def search(self, reskey:str, select:Dict[str, str], select_date_format:str, groupby:List[str], groupby_date_format:str, sort:Dict[str, str], offset:int, limit:int,
-               filter_audit_type:str, filter_clmsg_id:str, filter_clmsg_sdate:str, filter_clmsg_edate:str,
+               filter_audit_type:List[str], filter_clmsg_id:str, filter_clmsg_sdate:str, filter_clmsg_edate:str,
                filter_clmsg_src:str, filter_clmsg_title:str, filter_clmsg_user:str, filter_clmsg_body:Dict[str, Any],
-               filter_clmsg_tags:List[str], filter_svmsg_id:str, filter_svmsg_sdate:str, filter_svmsg_edate:str,
+               exclude_clmsg_body:Dict[str, Any], filter_clmsg_tags:List[str], filter_svmsg_id:str, filter_svmsg_sdate:str, filter_svmsg_edate:str,
                pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str,
                data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient) -> int:
         """
@@ -285,7 +292,7 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
             sort (Dict[str, str]): ソート条件
             offset (int): 取得する行の開始位置
             limit (int): 取得する行数
-            filter_audit_type (str): 監査の種類
+            filter_audit_type (List[str]): 監査の種類（複数可）
             filter_clmsg_id (str): クライアントメッセージID
             filter_clmsg_sdate (str): クライアントメッセージ発生日時(開始)
             filter_clmsg_edate (str): クライアントメッセージ発生日時(終了)
@@ -293,6 +300,7 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
             filter_clmsg_title (str): クライアントメッセージのタイトル
             filter_clmsg_user (str): クライアントメッセージの発生させたユーザー
             filter_clmsg_body (Dict[str, Any]): クライアントメッセージの本文
+            exclude_clmsg_body (Dict[str, Any]): 除外条件のクライアントメッセージの本文
             filter_clmsg_tags (List[str]): クライアントメッセージのタグ
             filter_svmsg_id (str): サーバーメッセージID
             filter_svmsg_sdate (str): サーバーメッセージ発生日時(開始)
@@ -363,9 +371,12 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
                     sql = f"SELECT {','.join(sql)} FROM audit"
                     params = []
                     where = []
-                    if filter_audit_type and filter_audit_type != 'None':
-                        where.append(f'audit_type={"%s" if pg_enabled else "?"}')
-                        params.append(filter_audit_type)
+                    if filter_audit_type and len(filter_audit_type) > 0:
+                        filter_audit_type = [t for t in filter_audit_type if t and t != 'None']
+                        if filter_audit_type:
+                            placeholders = ', '.join([f'{"%s" if pg_enabled else "?"}' for _ in filter_audit_type])
+                            where.append(f'audit_type IN ({placeholders})')
+                            params.extend(filter_audit_type)
                     if filter_clmsg_id and filter_clmsg_id != 'None':
                         where.append(f'clmsg_id={"%s" if pg_enabled else "?"}')
                         params.append(filter_clmsg_id)
@@ -389,6 +400,12 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
                             raise RuntimeError("Python 3.10 or later is required for JSON support.")
                         for key, value in filter_clmsg_body.items():
                             where.append(f"clmsg_body->>'{key}' LIKE {'%s' if pg_enabled else '?'}")
+                            params.append(value)
+                    if exclude_clmsg_body:
+                        if sys.version_info[0] < 3 or sys.version_info[0] >= 3 and sys.version_info[1] < 10:
+                            raise RuntimeError("Python 3.10 or later is required for JSON support.")
+                        for key, value in exclude_clmsg_body.items():
+                            where.append(f"clmsg_body->>'{key}' NOT LIKE {'%s' if pg_enabled else '?'}")
                             params.append(value)
                     if filter_clmsg_tags:
                         for tag in filter_clmsg_tags:

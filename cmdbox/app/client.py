@@ -233,14 +233,14 @@ class Client(object):
         return res_json
 
     def file_upload(self, svpath:str, upload_file:Path, scope:str="client", client_data:Path=None,
-                    fwpaths:List[str]=None, rjpaths:List[str]=None, meta:Dict[str, Any]=None,
-                    mkdir:bool=False, overwrite:bool=False,
+                    fwpaths:List[str]=None, rjpaths:List[str]=None, lmpaths:List[str]=None,
+                    meta:Dict[str, Any]=None, mkdir:bool=False, overwrite:bool=False,
                     retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバー上にファイルをアップロードする
 
         Args:
-            svpath (Path): サーバー上のファイルパス
+            svpath (str): サーバー上のファイルパス
             upload_file (Path): ローカルのファイルパス
             scope (str, optional): 参照先のスコープ. Defaults to "client".
             mkdir (bool, optional): ディレクトリを作成するかどうか. Defaults to False.
@@ -248,6 +248,7 @@ class Client(object):
             client_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
+            lmpaths (List[str], optional): サイズ計算するパスのリスト. Defaults to None.
             meta (Dict[str, Any], optional): メタデータ. Defaults to None.
             retry_count (int, optional): リトライ回数. Defaults to 3.
             retry_interval (int, optional): リトライ間隔. Defaults to 5.
@@ -282,7 +283,8 @@ class Client(object):
                 return res_json
             elif scope == "server":
                 payload = dict(svpath=svpath, file_name=upload_file.name, file_data=convert.bytes2b64str(f.read()),
-                               mkdir=mkdir, overwrite=overwrite, fwpaths=fwpaths, rjpaths=rjpaths, meta=meta)
+                               mkdir=mkdir, overwrite=overwrite, fwpaths=fwpaths, rjpaths=rjpaths,
+                               lmpaths=lmpaths, meta=meta)
                 payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
                 res_json = self.redis_cli.send_cmd('client_file_upload', [payload_b64,],
                                     retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)

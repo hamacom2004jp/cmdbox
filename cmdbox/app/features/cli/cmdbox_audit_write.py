@@ -11,6 +11,7 @@ import json
 import pydantic
 import uuid
 import time
+import re
 
 
 class AuditWrite(audit_base.AuditBase, validator.Validator):
@@ -81,6 +82,18 @@ class AuditWrite(audit_base.AuditBase, validator.Validator):
             dict(opt="buffered_interval", type=Options.T_INT, default=30, required=False, multi=False, hide=True, choice=None, web="mask",
                  description_ja="監査ログ書込みをバッファリングする間隔を秒数で指定します。",
                  description_en="Specify the interval, in seconds, for buffering audit log writes."),
+            dict(opt="exclude_audit_type", type=Options.T_STR, default=None, required=False, multi=True, hide=True, choice=Options.AUDITS,
+                 description_ja="監査ログを記録しない、監査の種類を指定します。",
+                 description_en="Specify the type of audit for which audit logs will not be recorded."),
+            dict(opt="exclude_clmsg_src", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
+                 description_ja="監査ログを記録しない、クライアントのメッセージの発生源を指定します。正規表現で指定します。",
+                 description_en="Specifies the source of client messages for which audit logs are not recorded. Specify using a regular expression."),
+            dict(opt="exclude_clmsg_title", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
+                 description_ja="監査ログを記録しない、クライアントのメッセージタイトルを指定します。正規表現で指定します。",
+                 description_en="Specify the client message titles that should not be logged in the audit log. Specify using a regular expression."),
+            dict(opt="exclude_clmsg_tag", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
+                 description_ja="監査ログを記録しない、クライアントのメッセージのタグを指定します。",
+                 description_en="Specify the tags for client messages that should not be logged in the audit log."),
         ]
         return opt
 
@@ -108,6 +121,40 @@ class AuditWrite(audit_base.AuditBase, validator.Validator):
             ret = dict(success={k:v for k, v in vars(args).items() if v})
             common.print_format(ret, False, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_SUCCESS, ret, None
+
+        # 除外条件のチェック
+        # 1. audit_typeが除外対象かチェック
+        if hasattr(args, 'exclude_audit_type') and args.exclude_audit_type:
+            if args.audit_type in args.exclude_audit_type:
+                logger.debug(f"Audit type '{args.audit_type}' is excluded. Skip writing the audit log.")
+                ret = dict(success=True)
+                return self.RESP_SUCCESS, ret, None
+        # 2. clmsg_srcが除外パターンにマッチするかチェック
+        if hasattr(args, 'exclude_clmsg_src') and args.exclude_clmsg_src and args.clmsg_src:
+            for pattern in args.exclude_clmsg_src:
+                try:
+                    if re.search(pattern, args.clmsg_src):
+                        logger.debug(f"Message source '{args.clmsg_src}' matches exclude pattern '{pattern}'. Skip writing the audit log.")
+                        ret = dict(success=True)
+                        return self.RESP_SUCCESS, ret, None
+                except re.error as e:
+                    logger.warning(f"Invalid regex pattern '{pattern}' for exclude_clmsg_src: {e}")
+        # 3. clmsg_titleが除外パターンにマッチするかチェック
+        if hasattr(args, 'exclude_clmsg_title') and args.exclude_clmsg_title and args.clmsg_title:
+            try:
+                if re.search(args.exclude_clmsg_title, args.clmsg_title):
+                    logger.debug(f"Message title '{args.clmsg_title}' matches exclude pattern '{args.exclude_clmsg_title}'. Skip writing the audit log.")
+                    ret = dict(success=True)
+                    return self.RESP_SUCCESS, ret, None
+            except re.error as e:
+                logger.warning(f"Invalid regex pattern '{args.exclude_clmsg_title}' for exclude_clmsg_title: {e}")
+        # 4. clmsg_tagが除外対象かチェック
+        if hasattr(args, 'exclude_clmsg_tag') and args.exclude_clmsg_tag and args.clmsg_tag:
+            for tag in args.clmsg_tag:
+                if tag in args.exclude_clmsg_tag:
+                    logger.debug(f"Message tag '{tag}' is excluded. Skip writing the audit log.")
+                    ret = dict(success=True)
+                    return self.RESP_SUCCESS, ret, None
 
         payload = dict(
             audit_type=args.audit_type,

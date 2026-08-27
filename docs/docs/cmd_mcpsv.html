@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( mcpsv mode ) &mdash; cmdbox 2026/08/23 documentation</title>
+  <title>Command Reference ( mcpsv mode ) &mdash; cmdbox 2026/08/27 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=4cffd425"></script>
+      <script src="../_static/documentation_options.js?v=b08ece82"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -179,7 +179,31 @@
 <td></td>
 <td><p>When omitted, <cite>$HOME/.cmdbox</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--allow_host &lt;allow_host&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>3</p></td>
+<td></td>
+<td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>5</p></td>
+<td></td>
+<td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
+</tr>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
+<td><p>int</p></td>
+<td></td>
+<td></td>
+<td><p>60</p></td>
+<td></td>
+<td><p>Specify the maximum waiting time until the server responds.</p></td>
+</tr>
+<tr class="row-even"><td><p>--allow_host &lt;allow_host&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -187,7 +211,7 @@
 <td></td>
 <td><p>If omitted, <cite>0.0.0.0</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--mcpsv_listen_port &lt;mcpsv_listen_port&gt;</p></td>
+<tr class="row-odd"><td><p>--mcpsv_listen_port &lt;mcpsv_listen_port&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -195,7 +219,7 @@
 <td></td>
 <td><p>If omitted, <cite>8091</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--ssl_mcpsv_listen_port &lt;ssl_mcpsv_listen_port&gt;</p></td>
+<tr class="row-even"><td><p>--ssl_mcpsv_listen_port &lt;ssl_mcpsv_listen_port&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -203,7 +227,7 @@
 <td></td>
 <td><p>If omitted, <cite>8453</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--ssl_cert &lt;ssl_cert&gt;</p></td>
+<tr class="row-odd"><td><p>--ssl_cert &lt;ssl_cert&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -211,7 +235,7 @@
 <td></td>
 <td><p>Specify the SSL server certificate file.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--ssl_key &lt;ssl_key&gt;</p></td>
+<tr class="row-even"><td><p>--ssl_key &lt;ssl_key&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -219,7 +243,7 @@
 <td></td>
 <td><p>Specify the SSL server private key file.</p></td>
 </tr>
-<tr class="row-even"><td><p>--ssl_keypass &lt;ssl_keypass&gt;</p></td>
+<tr class="row-odd"><td><p>--ssl_keypass &lt;ssl_keypass&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td></td>
@@ -227,7 +251,7 @@
 <td></td>
 <td><p>Specify the composite password for the SSL server private key file.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--ssl_ca_certs &lt;ssl_ca_certs&gt;</p></td>
+<tr class="row-even"><td><p>--ssl_ca_certs &lt;ssl_ca_certs&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -235,7 +259,7 @@
 <td></td>
 <td><p>Specify the SSL server CA certificate file.</p></td>
 </tr>
-<tr class="row-even"><td><p>--signin_file &lt;signin_file&gt;</p></td>
+<tr class="row-odd"><td><p>--signin_file &lt;signin_file&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -243,7 +267,7 @@
 <td></td>
 <td><p>Specify a file containing users and passwords with which they can signin.Typically, specify '.cmdbox/user_list.yml'.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--gunicorn_workers &lt;gunicorn_workers&gt;</p></td>
+<tr class="row-even"><td><p>--gunicorn_workers &lt;gunicorn_workers&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -251,7 +275,7 @@
 <td></td>
 <td><p>Specifies the number of gunicorn workers, valid only in Linux environment. If -1 or unspecified, the number of CPUs is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>--gunicorn_timeout &lt;gunicorn_timeout&gt;</p></td>
+<tr class="row-odd"><td><p>--gunicorn_timeout &lt;gunicorn_timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>

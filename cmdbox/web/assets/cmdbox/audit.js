@@ -315,7 +315,7 @@ audit.init_form = async () => {
     const adv_link = $('<div class="text-center card-hover col-12 mb-3"><a href="#">[ advanced options ]</a></div>').appendTo(row_content);
     adv_link.off('click').on('click', (e) => {row_content.find('.adv').toggle();});
     // 高度なフィルター条件のフォームを表示
-    const adv_conditions = ['filter_clmsg_body', 'filter_clmsg_sdate', 'filter_svmsg_edate',
+    const adv_conditions = ['filter_clmsg_body', 'exclude_clmsg_body', 'filter_clmsg_sdate', 'filter_svmsg_edate',
                             'filter_svmsg_id', 'sort', 'offset', 'limit'];
     const adv_row_content = $('<div class="row_content"></div>').appendTo(row_content);
     py_get_cmd_choices.filter(row => adv_conditions.includes(row.opt)).forEach((row, i) => cmdbox.add_form_func(i, modal, adv_row_content, row, null, 12, 12));
@@ -336,7 +336,7 @@ audit.init_form = async () => {
         if (add_btn.length <= 0) return;
         add_btn.click();
         elem = row_content.find(`[name="${data['name']}"]:last`);
-        elem.val(val);
+        elem.val(data['value']);
     });
     row_content.find(':input').each((i, elem) => {
         const id = $(elem).attr('id');

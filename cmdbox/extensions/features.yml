@@ -66,3 +66,6 @@ audit:
     pg_password: pgsql                  # Specify the postgresql password.
     pg_dbname: audit                    # Specify the postgresql database name.
     retention_period_days: 365          # Specify the number of days to retain audit logs.
+    exclude_clmsg_src:                  # Specify the list of source names to be excluded from the audit log.
+    - ClientFileIs
+    - LLMTranslation

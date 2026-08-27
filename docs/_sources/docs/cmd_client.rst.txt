@@ -593,6 +593,7 @@ client ( file_upload ) : ``cmdbox -m client -c file_upload <Option>``
     "--svpath <svpath>","file","","required","/","","Specify the directory path to get the list of files."
     "--fwpath <fwpath>","file","multi","required","","","Specify the path to determine whether the specified path is out of bounds. If it is not under this path, it will result in an error."
     "--rjpath <rjpath>","file","multi","","","","If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."
+    "--lmpath <lmpath>","dir","multi","","","","If the specified path matches the svpath, the size under this path is calculated. Reflected in the limiter's registrations."
     "--scope <scope>","str","","required","client","client | current | server","Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory."
     "--upload_file <upload_file>","file","","","","","Specify the source path of the client."
     "--mkdir <mkdir>","bool","","","False","True | False","If there is no in between folder, create one."

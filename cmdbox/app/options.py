@@ -918,6 +918,12 @@ class Options:
         opt['pg_user'] = 'postgres' if opt.get('pg_user') is None else opt['pg_user']
         opt['pg_password'] = 'postgres' if opt.get('pg_password') is None else opt['pg_password']
         opt['pg_dbname'] = 'audit' if opt.get('pg_dbname') is None else opt['pg_dbname']
+        opt['retention_period_days'] = 365 if opt.get('retention_period_days') is None else opt['retention_period_days']
+        opt['buffered_interval'] = 30 if opt.get('buffered_interval') is None else opt['buffered_interval']
+        opt['exclude_audit_type'] = [] if not opt.get('exclude_audit_type',[]) else opt['exclude_audit_type']
+        opt['exclude_clmsg_src'] = [] if not opt.get('exclude_clmsg_src',[]) else opt['exclude_clmsg_src']
+        opt['exclude_clmsg_title'] = [] if not opt.get('exclude_clmsg_title',[]) else opt['exclude_clmsg_title']
+        opt['exclude_clmsg_tag'] = [] if not opt.get('exclude_clmsg_tag',[]) else opt['exclude_clmsg_tag']
         logger = self.default_logger
         if isinstance(body, FormData):
             body = dict(**body)

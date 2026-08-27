@@ -66,6 +66,9 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
                 dict(opt="rjpath", type=Options.T_FILE, default=None, required=False, multi=True, hide=False, choice=None, web="mask",
                      description_ja="指定したパスが要求されたパスにマッチする場合、アクセスが拒否されます。正規表現として解釈します。",
                      description_en="If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."),
+                dict(opt="lmpath", type=Options.T_DIR, default=None, required=False, multi=True, hide=False, choice=None, web="mask",
+                     description_ja="svpathで指定されたパスにマッチする場合、このパスの配下のサイズを計算します。limiterのregistrationsに反映されます。",
+                     description_en="If the specified path matches the svpath, the size under this path is calculated. Reflected in the limiter's registrations."),
                 dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
                      description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
@@ -117,8 +120,9 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
         upload_file = Path(str(upload_file).replace('"','')) if upload_file is not None else None
         fwpaths = [str(p).replace('"','') for p in args.fwpath] if args.fwpath is not None else ["/"]
         rjpaths = [str(p).replace('"','') for p in args.rjpath] if args.rjpath is not None else []
+        lmpaths = [str(p).replace('"','') for p in args.lmpath] if args.lmpath is not None else []
         ret = cl.file_upload(str(args.svpath).replace('"',''), upload_file, scope=args.scope, client_data=client_data,
-                             fwpaths=fwpaths, rjpaths=rjpaths, meta=args.meta, mkdir=args.mkdir, overwrite=args.overwrite,
+                             fwpaths=fwpaths, rjpaths=rjpaths, lmpaths=sorted(lmpaths, reverse=True), meta=args.meta, mkdir=args.mkdir, overwrite=args.overwrite,
                              retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
@@ -175,8 +179,14 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
     def apprun_registrations(self, data_dir, logger, args, msg):
         svpath = args.svpath if hasattr(args, 'svpath') else ''
         svpath = str(svpath).replace('"','').replace('\\','/').replace('//','/')
-        svpath = svpath if not svpath.startswith('/') else svpath[1:]
-        return self._apprun_registrations(data_dir / svpath, logger, args, msg)
+        svpath = svpath if not svpath.endswith('/') else svpath[:-1]
+        lmpath = args.lmpath if hasattr(args, 'lmpath') and isinstance(args.lmpath, list) and args.lmpath else []
+        for p in lmpath:
+            if not isinstance(p, str): continue
+            if not svpath.startswith(p if not p.endswith('/') else p[:-1]): continue
+            p = p if not p.startswith('/') else p[1:]
+            return self._apprun_registrations(data_dir / p, logger, args, msg)
+        return self._apprun_registrations(data_dir, logger, args, msg)
 
     def _apprun_registrations(self, data_dir, logger, args, msg):
         #total_size = sum(f.stat().st_size for f in data_dir.rglob('*') if f.is_file())
@@ -196,8 +206,15 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
     def svrun_registrations(self, data_dir, logger, opt, msg):
         svpath = opt.get('svpath', '')
         svpath = str(svpath).replace('"','').replace('\\','/').replace('//','/')
-        svpath = svpath if not svpath.startswith('/') else svpath[1:]
-        return self._svrun_registrations(data_dir / svpath, logger, opt, msg)
+        svpath = svpath if not svpath.endswith('/') else svpath[:-1]
+        lmpaths = opt.get('lmpaths', [])
+        lmpaths = lmpaths if lmpaths and isinstance(lmpaths, list) else []
+        for p in lmpaths:
+            if not isinstance(p, str): continue
+            if not svpath.startswith(p if not p.endswith('/') else p[:-1]): continue
+            p = p if not p.startswith('/') else p[1:]
+            return self._svrun_registrations(data_dir / p, logger, opt, msg)
+        return self._svrun_registrations(data_dir, logger, opt, msg)
 
     def _svrun_registrations(self, data_dir, logger, opt, msg):
         total_size = 0

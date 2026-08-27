@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Reference ( client mode ) &mdash; cmdbox 2026/08/23 documentation</title>
+  <title>Command Reference ( client mode ) &mdash; cmdbox 2026/08/27 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=4cffd425"></script>
+      <script src="../_static/documentation_options.js?v=b08ece82"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -2364,7 +2364,15 @@
 <td></td>
 <td><p>If the specified path matches the requested path, access will be denied. Interpreted as a regular expression.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--scope &lt;scope&gt;</p></td>
+<tr class="row-odd"><td><p>--lmpath &lt;lmpath&gt;</p></td>
+<td><p>dir</p></td>
+<td><p>multi</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>If the specified path matches the svpath, the size under this path is calculated. Reflected in the limiter's registrations.</p></td>
+</tr>
+<tr class="row-even"><td><p>--scope &lt;scope&gt;</p></td>
 <td><p>str</p></td>
 <td></td>
 <td><p>required</p></td>
@@ -2372,7 +2380,7 @@
 <td><p>client | current | server</p></td>
 <td><p>Specify the scope. <cite>client</cite> refers to the client side, and <cite>server</cite> refers to the server side. <cite>current</cite> refers to the current directory.</p></td>
 </tr>
-<tr class="row-even"><td><p>--upload_file &lt;upload_file&gt;</p></td>
+<tr class="row-odd"><td><p>--upload_file &lt;upload_file&gt;</p></td>
 <td><p>file</p></td>
 <td></td>
 <td></td>
@@ -2380,7 +2388,7 @@
 <td></td>
 <td><p>Specify the source path of the client.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--mkdir &lt;mkdir&gt;</p></td>
+<tr class="row-even"><td><p>--mkdir &lt;mkdir&gt;</p></td>
 <td><p>bool</p></td>
 <td></td>
 <td></td>
@@ -2388,7 +2396,7 @@
 <td><p>True | False</p></td>
 <td><p>If there is no in between folder, create one.</p></td>
 </tr>
-<tr class="row-even"><td><p>--overwrite &lt;overwrite&gt;</p></td>
+<tr class="row-odd"><td><p>--overwrite &lt;overwrite&gt;</p></td>
 <td><p>bool</p></td>
 <td></td>
 <td></td>
@@ -2396,7 +2404,7 @@
 <td><p>True | False</p></td>
 <td><p>Overwrites the file even if it exists at the upload destination.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--meta &lt;meta&gt;</p></td>
+<tr class="row-even"><td><p>--meta &lt;meta&gt;</p></td>
 <td><p>dict</p></td>
 <td><p>multi</p></td>
 <td></td>
@@ -2404,7 +2412,7 @@
 <td></td>
 <td><p>Specify the metadata.</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_count &lt;retry_count&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_count &lt;retry_count&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -2412,7 +2420,7 @@
 <td></td>
 <td><p>Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever.</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
+<tr class="row-even"><td><p>--retry_interval &lt;retry_interval&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
@@ -2420,7 +2428,7 @@
 <td></td>
 <td><p>Specifies the number of seconds before reconnecting to the Redis server.</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;timeout&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;timeout&gt;</p></td>
 <td><p>int</p></td>
 <td></td>
 <td></td>
