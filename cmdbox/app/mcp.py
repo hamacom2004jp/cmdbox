@@ -229,39 +229,6 @@ class ToolList(object):
         self.appcls = appcls
         self.ver = ver
         self.language = language
-        """ すべてのモードとコマンドから、エージェント用のツールを生成する場合のコード ---
-        options = Options.getInstance()
-        is_japan = common.is_japan()
-        for mode in options.get_mode_keys():
-            for cmd in options.get_cmd_keys(mode):
-                if not options.get_cmd_attr(mode, cmd, 'use_agent'):
-                    continue
-                # コマンドの説明と選択肢を取得
-                description = options.get_cmd_attr(mode, cmd, 'description_ja' if is_japan else 'description_en')
-                choices = options.get_cmd_choices(mode, cmd, False)
-                func_name = f"{mode}_{cmd}"
-                # 関数の定義を生成
-                func_txt  = self._create_func_txt(func_name, mode, cmd, is_japan, options)
-                if self.logger.level == logging.DEBUG:
-                    self.logger.debug(f"generating agent tool: {func_name}")
-                func_ctx = []
-                # 関数を実行してコンテキストに追加
-                exec(func_txt,
-                    dict(time=time,List=List, Path=Path, argparse=argparse, common=common, options=options, logging=logging, signin=signin,),
-                    dict(func_ctx=func_ctx))
-                # 関数のスキーマを生成
-                input_schema = dict(
-                    type="object",
-                    properties={o['opt']: self._to_schema(o, is_japan) for o in choices},
-                    required=[o['opt'] for o in choices if o['required']],
-                )
-                output_schema = dict(type="object", properties=dict())
-                func_tool = FunctionTool(fn=func_ctx[0], name=func_name, title=func_name.title(), description=description, 
-                                        tags=[f"mode={mode}", f"cmd={cmd}"],
-                                        parameters=input_schema, output_schema=output_schema,)
-                # ツールリストに追加
-                self.tools.append(func_tool)
-        """
         for tool in tools:
             if isinstance(tool, FunctionTool):
                 if self.logger.level == logging.DEBUG:
@@ -420,7 +387,7 @@ class ToolList(object):
 
             # output_schemaを生成
             output_schema = dict(type="object", properties=dict())
-            feat:feature.Feature = options.get_cmd_attr(mode, cmd, 'feature')
+            feat:feature.Feature = options.get_cmd_feature(mode, cmd)
             if feat is not None and isinstance(feat, validator.Validator):
                 schema = feat.output_schema()
                 if schema is not None:
@@ -590,7 +557,7 @@ class ToolList(object):
         func_txt += f'        logger.warning("mode={mode}, cmd={cmd}, sign="+common.to_str(sign)+", groups="+common.to_str(groups))\n'
         func_txt += f'        logger.warning("mode={mode}, cmd={cmd}, signin_file="+common.to_str(opt.get("signin_file")))\n'
         func_txt += f'        return dict(warn="You do not have permission to execute this command. check="+common.to_str(sign))\n'
-        func_txt += f'    feat = options.get_cmd_attr("{mode}", "{cmd}", "feature")\n'
+        func_txt += f'    feat = options.get_cmd_feature("{mode}", "{cmd}")\n'
         func_txt += f'    opt["groups"] = groups\n'
         func_txt += f'    try:\n'
         func_txt += f'        args = argparse.Namespace(**opt)\n'

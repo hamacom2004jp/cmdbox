@@ -267,7 +267,7 @@ def _run_command_spec(
 
     from cmdbox.app import app, options
     from cmdbox.app.commons import validator
-    feat = options.Options.getInstance(appcls, ver).get_cmd_attr(mode, cmd, 'feature')
+    feat = options.Options.getInstance(appcls, ver).get_cmd_feature(mode, cmd)
     if isinstance(feat, validator.Validator):
         feat.init_test()
 

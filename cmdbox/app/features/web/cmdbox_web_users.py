@@ -115,7 +115,7 @@ class Users(feature.WebFeature):
                 return dict(error='signin_file_data is None.')
             try:
                 form = await req.json()
-                apikey = web.apikey_add(form)
+                apikey = web.apikey_add(req, form)
                 form.update(dict(password='******', new_password='******', confirm_password='******'))
                 web.options.audit_exec(req, res, web, body=form)
                 return dict(success=apikey)
@@ -132,7 +132,7 @@ class Users(feature.WebFeature):
                 return dict(error='signin_file_data is None.')
             try:
                 form = await req.json()
-                apikey = web.apikey_del(form)
+                apikey = web.apikey_del(req, form)
                 form.update(dict(password='******', new_password='******', confirm_password='******'))
                 web.options.audit_exec(req, res, web, body=form)
                 return dict(success=apikey)

@@ -187,7 +187,7 @@ class Signin(object):
             user = Signin._find_user_by_name(name, signin_file_data)
             if user is not None:
                 #req.session['signin']['apikeys'] = user.get('apikeys', None)
-                req.session['apikeys'] = Signin._resolve_user_apikeys(signin_file_data, user)
+                req.session['apikeys'] = Signin._resolve_user_apikeys(req, signin_file_data, user)
             return None
         if logger.level == logging.DEBUG:
             logger.debug(f"Not found siginin session. Try check_apikey. path={req.url.path}")
@@ -222,7 +222,7 @@ class Signin(object):
         find_user = None
         jwt_enabled = signin_file_data['apikey']['verify_jwt']['enabled']
         for user in signin_file_data['users']:
-            apikeys = Signin._resolve_user_apikeys(signin_file_data, user)
+            apikeys = Signin._resolve_user_apikeys(None, signin_file_data, user)
             if not apikeys:
                 continue
             for ak, key in apikeys.items():
@@ -314,11 +314,12 @@ class Signin(object):
         return users[0] if len(users) > 0 else None
 
     @classmethod
-    def _resolve_user_apikeys(cls, signin_file_data:Dict[str, Any], user:Dict[str, Any]) -> Dict[str, str]:
+    def _resolve_user_apikeys(cls, req:Request, signin_file_data:Dict[str, Any], user:Dict[str, Any]) -> Dict[str, str]:
         """
         ユーザーのApiKey一覧を取得する（user_data優先、signin_fileをフォールバック）
 
         Args:
+            req (Request): リクエスト
             signin_file_data (Dict[str, Any]): サインインファイルデータ
             user (Dict[str, Any]): ユーザー情報
 
@@ -330,7 +331,7 @@ class Signin(object):
             web_cls = cls.get_webcls()
             if web_cls is not None:
                 webobj = web_cls.getInstance()
-                apikeys = webobj.get_user_apikeys(signin_file_data, user, include_legacy=True)
+                apikeys = webobj.get_user_apikeys(req, signin_file_data, user, include_legacy=True)
         except Exception:
             apikeys = dict()
         if isinstance(apikeys, dict) and len(apikeys) > 0:
@@ -850,7 +851,7 @@ class Signin(object):
             logger.debug(f"hashed apikey: {apikey}")
         find_user = None
         for user in signin_file_data['users']:
-            apikeys = cls._resolve_user_apikeys(signin_file_data, user)
+            apikeys = cls._resolve_user_apikeys(None, signin_file_data, user)
             if not apikeys:
                 continue
             for ak, key in apikeys.items():

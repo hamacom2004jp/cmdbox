@@ -1,14 +1,6 @@
 from cmdbox.app import common, mcp, web as _web
+from cmdbox.app.options import Options
 from cmdbox.app.auth import signin
-from cmdbox.app.features.cli import (
-    cmdbox_agent_agent_list,
-    cmdbox_agent_agent_load,
-    cmdbox_agent_mcpsv_list,
-    cmdbox_agent_mcpsv_load,
-    cmdbox_agent_chat,
-    cmdbox_llm_list,
-    cmdbox_llm_load,
-)
 from fastapi import FastAPI, Depends, HTTPException, Request, Response
 from pathlib import Path
 from typing import List, Dict, Any
@@ -24,14 +16,15 @@ class A2a(mcp.Mcp):
 
     def __init__(self, logger:logging.Logger, data_dir:Path, sign:signin.Signin, appcls:Any, ver:Any) -> None:
         super().__init__(logger, data_dir, sign, appcls, ver)
-        self.agent_list = cmdbox_agent_agent_list.AgentAgentList(self.appcls, self.ver)
-        self.agent_load = cmdbox_agent_agent_load.AgentAgentLoad(self.appcls, self.ver)
-        self.agent_chat = cmdbox_agent_chat.AgentChat(self.appcls, self.ver)
+        options = Options.getInstance(appcls, ver)
+        self.agent_list = options.get_cmd_feature('agent', 'agent_list')
+        self.agent_load = options.get_cmd_feature('agent', 'agent_load')
+        self.agent_chat = options.get_cmd_feature('agent', 'chat')
         self.agent_chat.call_a2asv_start = True
-        self.llm_list = cmdbox_llm_list.LLMList(self.appcls, self.ver)
-        self.llm_load = cmdbox_llm_load.LLMLoad(self.appcls, self.ver)
-        self.mcpsv_list = cmdbox_agent_mcpsv_list.AgentMcpList(self.appcls, self.ver)
-        self.mcpsv_load = cmdbox_agent_mcpsv_load.AgentMcpLoad(self.appcls, self.ver)
+        self.llm_list = options.get_cmd_feature('llm', 'list')
+        self.llm_load = options.get_cmd_feature('llm', 'load')
+        self.mcpsv_list = options.get_cmd_feature('agent', 'mcpsv_list')
+        self.mcpsv_load = options.get_cmd_feature('agent', 'mcpsv_load')
         self.agent_apps:Dict[str, Starlette] = {}
         self.agent_confs:Dict[str, Dict[str, Any]] = {}
         self.agent_lifespans:Dict[str, Dict[str, Any]] = {}
@@ -213,7 +206,9 @@ class A2a(mcp.Mcp):
                 logger.warning(f"Agent '{agent['name']}' has no valid MCPServer config.")
                 continue
             # エージェントのインスタンスを生成
-            agent_obj = self.agent_chat.create_agent(logger, self.data, True, agent_conf, llm_conf, mcpsv_confs, args.__dict__)
+            agent_obj = self.agent_chat.create_agent(logger=logger, data_dir=self.data, disable_remote_agent=True,
+                                                     agent_conf=agent_conf, llm_conf=llm_conf,
+                                                     mcpsv_confs=mcpsv_confs, payload=args.__dict__)
             if agent_obj is None:
                 logger.warning(f"Agent '{agent['name']}' creation skipped.")
                 continue

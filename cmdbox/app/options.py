@@ -102,7 +102,18 @@ class Options:
         if attr not in self._options["cmd"][mode][cmd]:
             return None
         return self._options["cmd"][mode][cmd][attr]
-    
+
+    def get_cmd_feature(self, mode:str, cmd:str) -> Any:
+        """
+        コマンドのフューチャーを取得します。
+        Args:
+            mode: 起動モード
+            cmd: コマンド
+        Returns:
+            feature.Feature: フューチャー
+        """
+        return self.get_cmd_attr(mode, cmd, 'feature')
+
     def get_svcmd_feature(self, svcmd:str) -> Any:
         """
         サーバー側のコマンドのフューチャーを取得します。
@@ -766,7 +777,7 @@ class Options:
         if 'cmd' not in yml['audit']['write']:
             raise Exception('features.yml is invalid. (The audit.write element must have "cmd" specified.)')
         cmd = yml['audit']['write']['cmd']
-        self.audit_write:feature.Feature = self.get_cmd_attr(mode, cmd, 'feature')
+        self.audit_write:feature.Feature = self.get_cmd_feature(mode, cmd)
         self.audit_write_args['mode'] = mode
         self.audit_write_args['cmd'] = cmd
         # searchフューチャー
@@ -778,7 +789,7 @@ class Options:
         if 'cmd' not in yml['audit']['search']:
             raise Exception('features.yml is invalid. (The audit.search element must have "cmd" specified.)')
         cmd = yml['audit']['search']['cmd']
-        self.audit_search:feature.Feature = self.get_cmd_attr(mode, cmd, 'feature')
+        self.audit_search:feature.Feature = self.get_cmd_feature(mode, cmd)
         self.audit_search_args['mode'] = mode
         self.audit_search_args['cmd'] = cmd
         self.audit_loaded = True

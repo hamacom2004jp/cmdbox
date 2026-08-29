@@ -185,7 +185,7 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
             schema = _options.get_cmd_choices(opt['mode'], opt['cmd'], False)
             try:
                 opt_path = web.cmds_path / f"cmd-{title}.json"
-                feat = _options.get_cmd_attr(opt['mode'], opt['cmd'], "feature")
+                feat = _options.get_cmd_feature(opt['mode'], opt['cmd'])
                 loaded = common.loadopt(opt_path, False)
                 for o in opt.keys():
                     if 'fwpath' in o and opt[o]: continue # fwpathはアクセスコントロールで使用するため、コマンドファイルから読み込まない

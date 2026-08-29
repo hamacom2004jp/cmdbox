@@ -34,7 +34,7 @@ class GetCmdChoices(feature.WebFeature):
             if not opt.get('mode', None) or not opt.get('cmd', None):
                 return dict(warn='Mode and cmd are required.')
             ret = web.options.get_cmd_choices(mode, cmd, True, opt).copy()
-            fobj = web.options.get_cmd_attr(mode, cmd, 'feature')
+            fobj = web.options.get_cmd_feature(mode, cmd)
             desc = web.options.get_cmd_attr(mode, cmd, 'description_en' if not common.is_japan(language=language) else 'description_ja')
             desc_nouse_webmode = '\U00002B55 Web' if not web.options.get_cmd_attr(mode, cmd, 'nouse_webmode') else '\U0000274C Web'
             desc_use_agent = '\U00002B55 Agent' if web.options.get_cmd_attr(mode, cmd, 'use_agent') else '\U0000274C Agent'

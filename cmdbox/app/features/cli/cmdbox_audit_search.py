@@ -405,7 +405,7 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
                         if sys.version_info[0] < 3 or sys.version_info[0] >= 3 and sys.version_info[1] < 10:
                             raise RuntimeError("Python 3.10 or later is required for JSON support.")
                         for key, value in exclude_clmsg_body.items():
-                            where.append(f"clmsg_body->>'{key}' NOT LIKE {'%s' if pg_enabled else '?'}")
+                            where.append(f"clmsg_body->>'{key}' IS NULL OR clmsg_body->>'{key}' NOT LIKE {'%s' if pg_enabled else '?'}")
                             params.append(value)
                     if filter_clmsg_tags:
                         for tag in filter_clmsg_tags:

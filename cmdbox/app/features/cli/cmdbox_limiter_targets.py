@@ -122,7 +122,7 @@ class LimiterTargets(feature.OneshotResultEdgeFeature, validator.Validator):
                 if filter_target_cmd and str(cmd) != str(filter_target_cmd):
                     continue
 
-                feat = options.get_cmd_attr(mode, cmd, 'feature')
+                feat = options.get_cmd_feature(mode, cmd)
                 if not isinstance(feat, limiter.LimitedFeature):
                     continue
                 feat_mode = feat.get_mode()

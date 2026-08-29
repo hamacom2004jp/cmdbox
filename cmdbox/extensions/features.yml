@@ -69,3 +69,6 @@ audit:
     exclude_clmsg_src:                  # Specify the list of source names to be excluded from the audit log.
     - ClientFileIs
     - LLMTranslation
+    exclude_clmsg_body:                 # Specify the dictionary of client message bodies to be excluded from the audit log.
+      mode: llm
+      cmd: "[file_is|translation]"

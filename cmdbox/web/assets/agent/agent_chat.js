@@ -34,7 +34,6 @@ agentView.chat = (session_id) => {
         agentView.set_user_msg('');
         // 入力内容をユーザーメッセージとして表示
         agentView.create_user_message(msg);
-        agentView.create_history(session_id, msg);
         // エージェント側のメッセージ読込中を表示
         if (!agentView.message_id) {
             agentView.message_id = cmdbox.random_string(16);
@@ -144,11 +143,6 @@ agentView.chat = (session_id) => {
             console.warn('JSON parse error:', error);
             return;
         }
-        if (packet && packet['end']) {
-            agentView.message_id = null;
-            console.log(packet);
-            return;
-        }
         let msg_container = $(`#${agentView.message_id}`);
         if (!agentView.message_id || msg_container.length <= 0) {
             // エージェント側の表示枠が無かったら追加
@@ -161,6 +155,13 @@ agentView.chat = (session_id) => {
             const txt = agentView.create_agent_message(agentView.message_id);
             await agentView.format_agent_message(txt, `${packet['warn']}`);
             agentView.message_id = null;
+            $('.ai-core').removeClass('ai-core2');
+            return;
+        }
+        if (packet && packet['end']) {
+            agentView.message_id = null;
+            console.log(packet);
+            $('.ai-core').removeClass('ai-core2');
             return;
         }
         const success = packet && packet['success'] || {};

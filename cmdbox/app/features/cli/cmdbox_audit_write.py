@@ -94,6 +94,10 @@ class AuditWrite(audit_base.AuditBase, validator.Validator):
             dict(opt="exclude_clmsg_tag", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
                  description_ja="監査ログを記録しない、クライアントのメッセージのタグを指定します。",
                  description_en="Specify the tags for client messages that should not be logged in the audit log."),
+            dict(opt="exclude_clmsg_body", type=Options.T_DICT, default=None, required=False, multi=True, hide=False, choice=None,
+                 description_ja="監査ログを記録しない、クライアントのメッセージの本文を辞書形式で指定します。指定したキーと値をすべて含む場合は記録しません。値は正規表現で指定します。",
+                 description_en="Specifies the body of client messages that should not be logged in the audit log, in dictionary format. " \
+                               +"If a message contains all of the specified keys and values, it will not be logged. Values are specified using regular expressions."),
         ]
         return opt
 
@@ -155,6 +159,14 @@ class AuditWrite(audit_base.AuditBase, validator.Validator):
                     logger.debug(f"Message tag '{tag}' is excluded. Skip writing the audit log.")
                     ret = dict(success=True)
                     return self.RESP_SUCCESS, ret, None
+        
+        # 5. clmsg_bodyが除外対象かチェック
+        if hasattr(args, 'exclude_clmsg_body') and args.exclude_clmsg_body and args.clmsg_body:
+            # 除外条件の辞書に含まれるすべてのキーと値がclmsg_bodyに含まれているかチェック
+            if all(key in args.clmsg_body and re.match(value, args.clmsg_body[key]) for key, value in args.exclude_clmsg_body.items()):
+                logger.debug(f"Message body contains exclude pattern {args.exclude_clmsg_body}. Skip writing the audit log.")
+                ret = dict(success=True)
+                return self.RESP_SUCCESS, ret, None
 
         payload = dict(
             audit_type=args.audit_type,

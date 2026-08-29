@@ -54,7 +54,7 @@ class DoSignin(cmdbox_web_signin.Signin):
                 if len(user) <= 0:
                     raise HTTPException(status_code=401, detail='Unauthorized')
                 user = copy.deepcopy(user[0])
-                user['apikeys'] = web.get_user_apikeys(signin_data, user, include_legacy=True)
+                user['apikeys'] = web.get_user_apikeys(req, signin_data, user, include_legacy=True)
                 if token['auth_type'] =="idpw" and 'password' in user:
                     jg = common.decrypt(token['token'], user['password'])
                     token_ok = True if jg is not None else False
@@ -243,7 +243,7 @@ class DoSignin(cmdbox_web_signin.Signin):
             req.session['signin'] = dict(uid=user['uid'], name=user['name'], home=user['home'], password=hashed_password,
                                          gids=gids, groups=group_names, group_homes=group_homes, group_sps=group_sps, email=email)
             #req.session['access_token'] = access_token # アクセストークンはセッションに保存しない。大きすぎてCookieに入らないため。
-            req.session['apikeys'] = web.get_user_apikeys(signin_data, user, include_legacy=True)
+            req.session['apikeys'] = web.get_user_apikeys(req, signin_data, user, include_legacy=True)
             # セッション変更を明示的にマーク（SessionMiddleware が認識するために重要）
             if hasattr(req.session, 'mark_modified'):
                 req.session.mark_modified()

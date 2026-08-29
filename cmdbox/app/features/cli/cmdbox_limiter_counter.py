@@ -125,7 +125,7 @@ class LimiterCounter(feature.OneshotResultEdgeFeature, validator.Validator):
     def _reflesh_counter(self, lmt: limiter.Limiter, data_dir: Path, limiter_name: str, scope: str, logger: logging.Logger, args: argparse.Namespace):
         config = self.limiter_load._load_limiter_config(data_dir, limiter_name)
         _options = Options.getInstance(self.appcls, ver=self.ver)
-        feat:limiter.LimitedFeature = _options.get_cmd_attr(config.get('target_mode'), config.get('target_cmd'), 'feature')
+        feat:limiter.LimitedFeature = _options.get_cmd_feature(config.get('target_mode'), config.get('target_cmd'))
         target_option = config.get('target_option', {})
         target_option = target_option if isinstance(target_option, dict) else {}
         command_options = dict(mode=config.get('target_mode'), cmd=config.get('target_cmd'), **target_option)

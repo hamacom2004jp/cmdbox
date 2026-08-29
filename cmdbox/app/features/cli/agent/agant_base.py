@@ -184,12 +184,13 @@ All incoming requests must be processed in the following order:
         ds_conf = self.ds_load.load_datasource(data_dir, dsname)
         return ds_conf
 
-    def create_session_service(self, logger:logging.Logger, ds_conf:Dict[str, Any]) -> Any:
+    def create_session_service(self, *, logger:logging.Logger, data_dir:Path, ds_conf:Dict[str, Any]) -> Any:
         """
         セッションサービスを作成します
 
         Args:
             logger (logging.Logger): ロガー
+            data_dir (Path): データディレクトリ
             ds_conf (Dict[str, Any]): データソースの設定
 
         Returns:
@@ -216,7 +217,7 @@ All incoming requests must be processed in the following order:
             logger.info(f"Using InMemorySessionService")
             return InMemorySessionService()
 
-    async def create_agent_session(self, session_service:Any, runner_name:str, user_name:str, session_id:str=None) -> Any:
+    async def create_agent_session(self, *, session_service:Any, runner_name:str, user_name:str, session_id:str=None) -> Any:
         """
         セッションを作成します
 
@@ -261,18 +262,25 @@ All incoming requests must be processed in the following order:
             return text
 
     @classmethod
-    def gen_msg(cls, event:Any) -> Tuple[str, bool, bool, bool]:
+    def gen_msg(cls, event:Any) -> Tuple[str, bool, bool, bool, int]:
         msg = None
         is_func_call = False
         is_func_response = False
         is_final_response = False
+        st = cls.RESP_SUCCESS
         calls = event.get_function_calls()
         responses = event.get_function_responses()
         is_func_call = bool(calls)
         is_func_response = bool(responses)
         is_final_response = event.is_final_response()
         if event.content and event.content.parts:
-            msg = "\n".join([p.text for p in event.content.parts if p and p.text])
+            msg = "\n".join([p.text for p in event.content.parts
+                             if p and p.text and not getattr(p, 'thought', False)])
         elif event.actions and event.actions.escalate:
             msg = f"Agent escalated: {event.error_message or 'No specific message.'}"
-        return msg, is_func_call, is_func_response, is_final_response
+        if event.error_message:
+            msg = msg if msg else ""
+            msg = f"{event.error_code if event.error_code else ''}"
+            msg = f"{msg} {event.error_message if event.error_message else ''}".strip()
+            st = cls.RESP_WARN
+        return msg, is_func_call, is_func_response, is_final_response, st

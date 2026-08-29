@@ -64,7 +64,7 @@ def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], ref_
                     if cmd in features[mode]:
                         _ref_cls = features[mode][cmd]['feature'].__class__
                     elif ref_options is not None and cmd in _cmd(ref_options, mode):
-                        _ref_cls = ref_options.get_cmd_attr(mode, cmd, 'feature').__class__
+                        _ref_cls = ref_options.get_cmd_feature(mode, cmd).__class__
                     if _ref_cls is not None:
                         raise ValueError(f'load_features: Duplicate feature for cmd "{cmd}" of mode "{mode}". ({_cls} is overwriting {_ref_cls})')
                     features[mode][cmd] = fobj.get_option()
@@ -80,7 +80,7 @@ def load_features(package_name:str, prefix:str="cmdbox_", excludes:list=[], ref_
                         if cmd in features[m]:
                             _ref_cls = features[m][cmd]['feature'].__class__
                         elif ref_options is not None and cmd in _cmd(ref_options, m):
-                            _ref_cls = ref_options.get_cmd_attr(m, cmd, 'feature').__class__
+                            _ref_cls = ref_options.get_cmd_feature(m, cmd).__class__
                         if _ref_cls is not None:
                             raise ValueError(f'load_features: Duplicate feature for  cmd "{cmd}" of mode "{m}". ({_cls} is overwriting {_ref_cls})')
                         features[m][cmd] = fobj.get_option()

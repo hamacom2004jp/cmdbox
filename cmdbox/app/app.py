@@ -184,7 +184,7 @@ class CmdBoxApp:
             #    warnings.showwarning = custom_warning_handler
 
             #scmdexectime = common.perf_counter()
-            feat = self.options.get_cmd_attr(args.mode, args.cmd, 'feature')
+            feat = self.options.get_cmd_feature(args.mode, args.cmd)
             if feat is not None and isinstance(feat, feature.Feature):
                 pf = []
                 pf.append(dict(key="featureload", val=f"{efeatureloadtime-sfeatureloadtime:.03f}s"))

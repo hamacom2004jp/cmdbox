@@ -94,6 +94,18 @@ class AgentSessionList(cmdbox_agent_chat.AgentChat, validator.Validator):
     def is_cluster_redirect(self):
         return False
 
+    def format_session_data(self, data:List[Dict[str, Any]]) -> Any:
+        """success に載せる data の最終形を決めるフック。"""
+        return data
+
+    def format_event(self, ev:Any) -> Dict[str, Any]:
+        """1 イベントを session_list 応答用 dict に整形するフック。"""
+        msg, is_func_call, is_func_response, is_final_response, st = cmdbox_agent_chat.AgentChat.gen_msg(ev)
+        return dict(author=ev.author, text=msg,
+                    final_response=is_final_response,
+                    function_call=is_func_call,
+                    function_response=is_func_response)
+
     async def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
                     sessions:Dict[str, Dict[str, Any]]):
         reskey = msg[1]
@@ -106,7 +118,7 @@ class AgentSessionList(cmdbox_agent_chat.AgentChat, validator.Validator):
             session_id = payload.get('session_id')
             user_name = payload.get('user_name')
             _, _, _, _, ds_conf = self.load_conf(name, data_dir, logger)
-            session_service = self.create_session_service(logger, ds_conf)
+            session_service = self.create_session_service(logger=logger, data_dir=data_dir, ds_conf=ds_conf)
             if session_id is None:
                 sessions = await session_service.list_sessions(app_name=name, user_id=user_name)
                 data = []
@@ -116,30 +128,22 @@ class AgentSessionList(cmdbox_agent_chat.AgentChat, validator.Validator):
                     ss = await session_service.get_session(app_name=name, user_id=user_name, session_id=s.id)
                     row['events'] = []
                     for ev in ss.events:
-                        msg, is_func_call, is_func_response, is_final_response = cmdbox_agent_chat.AgentChat.gen_msg(ev)
-                        row['events'].append(dict(author=ev.author, text=msg,
-                                                  final_response=is_final_response,
-                                                  function_call=is_func_call,
-                                                  function_response=is_func_response))
+                        row['events'].append(self.format_event(ev))
                     data.append(row)
                 data.sort(key=lambda x: (x['last_update_time'],))
-                out = dict(success=data, end=True)
+                out = dict(success=self.format_session_data(data), end=True)
                 redis_cli.rpush(reskey, out)
                 return self.RESP_SUCCESS
             else:
                 s = await session_service.get_session(app_name=name, user_id=user_name, session_id=session_id)
                 if s is None:
-                    out = dict(success=[], end=True)
+                    out = dict(success=self.format_session_data([]), end=True)
                 else:
                     row = dict(runner_name=s.app_name, session_id=s.id, user_name=s.user_id, last_update_time=s.last_update_time)
                     row['events'] = []
                     for ev in s.events:
-                        msg, is_func_call, is_func_response, is_final_response = cmdbox_agent_chat.AgentChat.gen_msg(ev)
-                        row['events'].append(dict(author=ev.author, text=msg,
-                                                  final_response=is_final_response,
-                                                  function_call=is_func_call,
-                                                  function_response=is_func_response))
-                    out = dict(success=[row], end=True)
+                        row['events'].append(self.format_event(ev))
+                    out = dict(success=self.format_session_data([row]), end=True)
                 redis_cli.rpush(reskey, out)
                 return self.RESP_SUCCESS
         except NotImplementedError as e:
@@ -150,6 +154,6 @@ class AgentSessionList(cmdbox_agent_chat.AgentChat, validator.Validator):
         except Exception as e:
             # それ以外のエラーが発生した時はログに出力して空リストを返す
             logger.warning(f"list_agent_sessions warning: {e}", exc_info=True)
-            out = dict(success=[], end=True)
+            out = dict(success=self.format_session_data([]), end=True)
             redis_cli.rpush(reskey, out)
             return self.RESP_WARN

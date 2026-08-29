@@ -325,7 +325,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
 
         return swap_native_output_schema_to_tool
 
-    def create_agent(self, logger:logging.Logger, data_dir:Path, disable_remote_agent:bool,
+    def create_agent(self, *, logger:logging.Logger, data_dir:Path, disable_remote_agent:bool,
                      agent_conf:Dict[str, Any], llm_conf:Dict[str, Any], mcpsv_confs:List[Dict[str, Any]],
                      payload:Dict[str, Any]) -> Any:
         """
@@ -607,6 +607,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             ))
         elif llmprov == 'ollama':
             return PlanReActPlanner()
+        elif llmprov == 'custom':
+            return None
         else:
             raise ValueError(f"Unknown llmprov: {llmprov}")
 
@@ -734,6 +736,97 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         tools.extend(self.create_tool_skills(logger, data_dir, agent_conf))
         return tools
 
+    async def create_runner_plugin(self, *, logger:logging.Logger, data_dir:Path,
+                                   redis_cli:redis_client.RedisClient, payload:Dict[str, Any],
+                                   agent_session:Any, reskey:str) -> List[Any]:
+        """
+        Runner用のプラグインを作成します。
+
+        Args:
+            logger (logging.Logger): ロガー
+            data_dir (Path): データディレクトリパス
+            redis_cli (redis_client.RedisClient): Redisクライアント
+            payload (Dict[str, Any]): クライアントからのリクエスト情報
+            agent_session (Any): エージェントセッション
+            reskey (str): レスポンスキー
+
+        Returns:
+            List[Any]: 作成したプラグインのリスト
+        """
+        return []
+
+    def prepare_agent_conf(self, agent_conf:Dict[str, Any], payload:Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Agent設定を準備します。payloadの内容をagent_confに反映させます。
+
+        Args:
+            agent_conf (Dict[str, Any]): エージェント設定
+            payload (Dict[str, Any]): クライアントからのリクエスト情報
+
+        Returns:
+            Dict[str, Any]: 更新後のエージェント設定
+        """
+        return agent_conf
+
+    async def before_chat_run(self, *, logger:logging.Logger, data_dir:Path, redis_cli:redis_client.RedisClient,
+                              payload:Dict[str, Any], agent_session:Any, reskey:str) -> Any:
+        """
+        Runnerのrun_asyncを実行する直前の拡張ポイントです。
+
+        Args:
+            logger (logging.Logger): ロガー
+            data_dir (Path): データディレクトリパス
+            redis_cli (redis_client.RedisClient): Redisクライアント
+            payload (Dict[str, Any]): クライアントからのリクエスト情報
+            agent_session (Any): エージェントセッション
+            reskey (str): レスポンスキー
+
+        Returns:
+            Any: chat_ctx。後続の _after_chat_run で受け取る値。
+        """
+        return None
+
+    async def after_chat_run(self, *, logger:logging.Logger, data_dir:Path, redis_cli:redis_client.RedisClient,
+                             payload:Dict[str, Any], agent_session:Any, reskey:str, chat_ctx:Any) -> int:
+        """
+        Runnerのrun_asyncを実行した直後の拡張ポイントです。
+
+        Args:
+            logger (logging.Logger): ロガー
+            data_dir (Path): データディレクトリパス
+            redis_cli (redis_client.RedisClient): Redisクライアント
+            payload (Dict[str, Any]): クライアントからのリクエスト情報
+            agent_session (Any): エージェントセッション
+            reskey (str): レスポンスキー
+            chat_ctx (Any): _before_chat_run で返した値
+        Returns:
+            int: ステータス
+        """
+        return self.RESP_SUCCESS
+
+    async def error_chat_run(self, *, logger:logging.Logger, data_dir:Path, redis_cli:redis_client.RedisClient,
+                             payload:Any, agent_session:Any, chat_ctx:Any, reskey:str, exc:Exception) -> int:
+        """
+        Runnerのrun_async実行中に例外が発生した場合の拡張ポイントです。
+
+        Args:
+            logger (logging.Logger): ロガー
+            data_dir (Path): データディレクトリパス
+            redis_cli (redis_client.RedisClient): Redisクライアント
+            payload (Any): クライアントからのリクエスト情報
+            agent_session (Any): エージェントセッション
+            chat_ctx (Any): _before_chat_run で返した値
+            reskey (str): レスポンスキー
+            exc (Exception): 発生した例外
+
+        Returns:
+            int: ステータス
+        """
+        msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {exc}")
+        logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {exc}", exc_info=True)
+        redis_cli.rpush(reskey, msg)
+        return self.RESP_WARN
+
     @limiter.async_svrun_check_limit
     async def svrun(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, msg:List[str],
                     sessions:Dict[str, Dict[str, Any]]):
@@ -741,10 +834,25 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
 
     async def _svrun_chat(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient,
                           msg:List[str], sessions:Dict[str, Dict[str, Any]]):
+        """
+        サーバーランナーとしてチャットを実行します
+
+        Args:
+            data_dir (Path): データディレクトリパス
+            logger (logging.Logger): ロガー
+            redis_cli (redis_client.RedisClient): Redisクライアント
+            msg (List[str]): クライアントからのメッセージ
+            sessions (Dict[str, Dict[str, Any]]): セッション情報
+
+        Returns:
+            Any: 実行結果
+        """
         reskey = msg[1]
+        session_service = None
         runner = None
         tts_engine_obj = None
         enable_tts = True
+        chat_ctx = None
         try:
             payload = json.loads(convert.b64str2str(msg[2]))
             runner_name = payload.get('runner_name')
@@ -756,63 +864,91 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             litellm.drop_params = True
             # 設定をロードする
             runner_conf, agent_conf, llm_conf, mcpsv_confs, ds_conf = self.load_conf(runner_name, data_dir, logger)
-            artifact_root_dir = data_dir / '.users' / user_name / 'artifacts' / runner_name
+            agent_conf = self.prepare_agent_conf(agent_conf, payload)
             # Agentを作成する
-            agent = self.create_agent(logger, data_dir, False, agent_conf, llm_conf, mcpsv_confs, payload)
+            agent = self.create_agent(logger=logger, data_dir=data_dir, disable_remote_agent=False,
+                                      agent_conf=agent_conf, llm_conf=llm_conf, mcpsv_confs=mcpsv_confs,
+                                      payload=payload)
+            # セッションサービスを作成する
+            session_service = self.create_session_service(logger=logger, data_dir=data_dir, ds_conf=ds_conf)
+            # セッションを作成する
+            agent_session = await self.create_agent_session(session_service=session_service, runner_name=runner_name,
+                                                            user_name=user_name, session_id=session_id)
+            # Runner用のプラグインを作成する
+            plugins = await self.create_runner_plugin(logger=logger, data_dir=data_dir,
+                                                      redis_cli=redis_cli, payload=payload,
+                                                      agent_session=agent_session, reskey=reskey)
+            # Artifactサービスを作成する
+            artifact_root_dir = data_dir / '.users' / user_name / 'artifacts' / runner_name
+            artifact_service = self.create_artifact_service(logger=logger, artifact_root_dir=artifact_root_dir)
             # Runnerを作成する
-            runner = self._create_runner(logger, runner_conf, agent, ds_conf, artifact_root_dir)
+            runner = self._create_runner(logger=logger, data_dir=data_dir, runner_conf=runner_conf,
+                                         agent=agent, session_service=session_service,
+                                         plugins=plugins, artifact_service=artifact_service)
+            # TTSエンジンのセットアップ
+            enable_tts, tts_engine_obj = self._setup_tts_engine(logger, data_dir, payload, runner_conf)
             # Agentに送信するメッセージを作成
             from google.genai import types
             content = types.Content(role='user', parts=[types.Part(text=message)])
-            # TTSエンジンのセットアップ
-            enable_tts, tts_engine_obj = self._setup_tts_engine(logger, data_dir, payload, runner_conf)
-            # セッションを作成する
-            agent_session = await self.create_agent_session(runner.session_service, runner.app_name,
-                                                            user_name, session_id=session_id)
             # チャットを実行する
+            chat_ctx = await self.before_chat_run(logger=logger, data_dir=data_dir, redis_cli=redis_cli,
+                                                  payload=payload, agent_session=agent_session, reskey=reskey)
             await self._svrun_chat_exec(redis_cli, payload, runner, agent_session, content,
-                                        enable_tts, tts_engine_obj, reskey)
-            return self.RESP_SUCCESS
+                                        enable_tts, tts_engine_obj, reskey, chat_ctx=chat_ctx)
+            st = await self.after_chat_run(logger=logger, data_dir=data_dir, redis_cli=redis_cli,
+                                                 payload=payload, agent_session=agent_session,
+                                                 reskey=reskey, chat_ctx=chat_ctx)
+            return st
 
         except Exception as e:
-            msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {e}", end=True)
-            logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {e}", exc_info=True)
+            st = self.RESP_WARN
+            try:
+                st = await self.error_chat_run(logger=logger, data_dir=data_dir, redis_cli=redis_cli,
+                                               payload=payload, agent_session=agent_session,
+                                               chat_ctx=chat_ctx, reskey=reskey, exc=e)
+            except Exception as inner_e:
+                logger.error(f"Error in error_chat_run: {inner_e}", exc_info=True)
+            msg = dict(success=dict(message=f"Chat successfully."), end=True)
             redis_cli.rpush(reskey, msg)
-            return self.RESP_WARN
+            return st
         finally:
             if enable_tts:
-                # TTSモデルの停止
                 cmdbox_tts_say.TtsSay.tts_stop(tts_engine_obj)
             if runner:
                 if hasattr(runner.session_service, 'db_engine'):
                     await runner.session_service.db_engine.dispose()
                 await runner.close()
+            elif session_service is not None and hasattr(session_service, 'db_engine'):
+                await session_service.db_engine.dispose()
 
-    def _create_runner(self, logger:logging.Logger, runner_conf:Dict[str, Any], agent:Any, ds_conf:Dict[str, Any], artifact_root_dir:Path) -> Any:
+    def _create_runner(self, *, logger:logging.Logger, data_dir:Path, runner_conf:Dict[str, Any],
+                       agent:Any, session_service:Any, plugins:Any, artifact_service:Any) -> Any:
         """
         Runnerを作成します
 
         Args:
             logger (logging.Logger): ロガー
+            data_dir (Path): データディレクトリパス
             runner_conf (Dict[str, Any]): Runner設定
             agent (Any): エージェント
-            ds_conf (Dict[str, Any]): データソース設定
-            artifact_root_dir (Path): アーティファクトのルートディレクトリ
+            session_service (Any): セッションサービス
+            plugins (Any): Runner用プラグイン
+            artifact_service (Any): アーティファクトサービス
 
         Returns:
             Runner: Runnerオブジェクト
         """
+        from google.adk.apps import App
         from google.adk.runners import Runner
-        artifact_service = self._create_artifact_service(logger, artifact_root_dir)
-        runner = Runner(
-            app_name=runner_conf.get('runner_name', self.ver.__appid__),
-            agent=agent,
-            session_service=self.create_session_service(logger, ds_conf),
-            artifact_service=artifact_service,
+        app = App(
+            name=runner_conf.get('runner_name', self.ver.__appid__),
+            root_agent=agent,
+            plugins=list(plugins or []),
         )
+        runner = Runner(app=app, session_service=session_service, artifact_service=artifact_service)
         return runner
 
-    def _create_artifact_service(self, logger:logging.Logger, artifact_root_dir:Path) -> Any:
+    def create_artifact_service(self, *, logger:logging.Logger, artifact_root_dir:Path) -> Any:
         """
         Artifactサービスを作成します
 
@@ -864,7 +1000,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
 
     async def _svrun_chat_exec(self, redis_cli:redis_client.RedisClient, payload:Dict[str, Any],
                                runner:Any, agent_session:Any, content:Any,
-                               enable_tts:bool, tts_engine_obj:Any, reskey:str) -> None:
+                               enable_tts:bool, tts_engine_obj:Any, reskey:str, chat_ctx:Any) -> None:
         """
         チャットの実行を行います
 
@@ -877,6 +1013,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
             enable_tts (bool): TTSが有効かどうか
             tts_engine_obj (Any): TTSエンジンオブジェクト
             reskey (str): Redisの結果キー
+            chat_ctx (Any): チャットコンテキスト
         """
         runner_name = payload.get('runner_name')
         user_name = payload.get('user_name')
@@ -900,29 +1037,31 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                     success = outputs['success']
                     ids = outputs['success']['ids'] = dict()
                     ids['agent_session_id'] = agent_session.id
-                    ids['event_id'] = event.id
-                    ids['invocation_id'] = event.invocation_id
+                    ids['event_id'] = ev.id
+                    ids['invocation_id'] = ev.invocation_id
                     flags = outputs['success']['flags'] = dict()
-                    flags['turn_complete'] = bool(event.turn_complete)
-                    flags['interrupted'] = bool(event.interrupted)
-                    msg, is_func_call, is_func_response, is_final_response = self.__class__.gen_msg(event)
+                    flags['turn_complete'] = bool(ev.turn_complete)
+                    flags['interrupted'] = bool(ev.interrupted)
+                    msg, is_func_call, is_func_response, is_final_response, st = self.__class__.gen_msg(ev)
                     flags['final_response'] = is_final_response
                     flags['function_call'] = is_func_call
                     flags['function_response'] = is_func_response
+                    if st != self.RESP_SUCCESS:
+                        outputs['warn'] = msg
 
-                    calls = event.get_function_calls() or []
+                    calls = ev.get_function_calls() or []
                     if calls:
                         success['function_calls'] = [self._serialize_function_call(c) for c in calls]
 
-                    responses = event.get_function_responses() or []
+                    responses = ev.get_function_responses() or []
                     if responses:
                         success['function_responses'] = [self._serialize_function_response(r) for r in responses]
 
                     artifacts = []
-                    if event.actions and event.actions.artifact_delta:
-                        success['artifact_delta'] = dict(event.actions.artifact_delta)
+                    if ev.actions and ev.actions.artifact_delta:
+                        success['artifact_delta'] = dict(ev.actions.artifact_delta)
                         if hasattr(runner, 'artifact_service') and runner.artifact_service is not None:
-                            for filename, version in event.actions.artifact_delta.items():
+                            for filename, version in ev.actions.artifact_delta.items():
                                 try:
                                     artifact_part = await runner.artifact_service.load_artifact(
                                         app_name=runner_name,
@@ -965,8 +1104,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                     resval.append(outputs)
                     if has_output:
                         redis_cli.rpush(reskey, outputs)
-                    if flags['final_response']:
-                        break
+                    #if flags['final_response']:
+                    #    break
 
             except Exception as e:
                 outputs = dict(success=dict(flags=dict(final_response=True, function_call=False, function_response=False),

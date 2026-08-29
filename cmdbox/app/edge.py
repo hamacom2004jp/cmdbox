@@ -297,7 +297,7 @@ class Edge(object):
             del pipe_cmd['resq']
             tool = edge_tool.Tool(self.logger, self.appcls, self.ver)
             tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2, self.saml)
-            feat:feature.Feature = self.options.get_cmd_attr(pipe_cmd['mode'], pipe_cmd['cmd'], 'feature')
+            feat:feature.Feature = self.options.get_cmd_feature(pipe_cmd['mode'], pipe_cmd['cmd'])
             while not thevent.is_set():
                 prevres = None if prevq is None else prevq.get(pipe_cmd['timeout'])
                 if prevres is False:
@@ -354,7 +354,7 @@ class Edge(object):
                     def _ex():
                         tool = edge_tool.Tool(self.logger, self.appcls, self.ver)
                         tool.set_session(self.session, self.svcert_no_verify, self.endpoint, self.icon_path, self.user_info, self.oauth2, self.saml)
-                        feat:feature.Feature = self.options.get_cmd_attr(opt['mode'], opt['cmd'], 'feature')
+                        feat:feature.Feature = self.options.get_cmd_feature(opt['mode'], opt['cmd'])
                         for status, ret in feat.edgerun(opt, tool, self.logger, self.timeout):
                             pass
                     return _ex
