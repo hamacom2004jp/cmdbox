@@ -267,6 +267,7 @@ audit ( write ) : ``cmdbox -m audit -c write <Option>``
     "--exclude_clmsg_src <exclude_clmsg_src>","str","multi","","","","Specifies the source of client messages for which audit logs are not recorded. Specify using a regular expression."
     "--exclude_clmsg_title <exclude_clmsg_title>","str","","","","","Specify the client message titles that should not be logged in the audit log. Specify using a regular expression."
     "--exclude_clmsg_tag <exclude_clmsg_tag>","str","multi","","","","Specify the tags for client messages that should not be logged in the audit log."
+    "--exclude_clmsg_body <exclude_clmsg_body>","dict","multi","","","","Specifies the body of client messages that should not be logged in the audit log, in dictionary format. If a message contains all of the specified keys and values, it will not be logged. Values are specified using regular expressions."
 
 **Output Schema**
 

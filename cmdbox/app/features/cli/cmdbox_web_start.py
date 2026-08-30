@@ -140,6 +140,9 @@ class WebStart(feature.UnsupportEdgeFeature, validator.Validator):
                 dict(opt="limiter_html", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
                      description_ja="`limiter.html` を指定します。省略時はcmdbox内蔵のHTMLファイルを使用します。",
                      description_en="Specify `limiter.html`. If omitted, the cmdbox built-in HTML file is used."),
+                dict(opt="status_html", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
+                     description_ja="`status.html` を指定します。省略時はcmdbox内蔵のHTMLファイルを使用します。",
+                     description_en="Specify `status.html`. If omitted, the cmdbox built-in HTML file is used."),
                 dict(opt="signin_html", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
                      description_ja="`signin.html` を指定します。省略時はcmdbox内蔵のHTMLファイルを使用します。",
                      description_en="Specify `signin.html`. If omitted, the cmdbox built-in HTML file is used."),
@@ -198,7 +201,7 @@ class WebStart(feature.UnsupportEdgeFeature, validator.Validator):
                     retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                     client_only=args.client_only, doc_root=args.doc_root, gui_html=args.gui_html, filer_html=args.filer_html,
                     result_html=args.result_html, users_html=args.users_html, agent_html=args.agent_html, audit_html=args.audit_html,
-                    assets=args.assets, limiter_html=args.limiter_html, signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=args.gui_mode,
+                    assets=args.assets, limiter_html=args.limiter_html, status_html=args.status_html, signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=args.gui_mode,
                     cache_clear=args.cache_clear, cache_timeout=args.cache_timeout,)
         return w
 

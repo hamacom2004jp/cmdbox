@@ -99,8 +99,61 @@ class Filer(object):
             return False, dict(warn=f"The specified path ( {rpath} ) is rejected.")
         return True, None
 
+    def _get_summary_info(self, current_path:str, fwpaths:List[str]=None, rjpaths:List[str]=None) -> Dict[str, Any]:
+        """
+        ディレクトリの要約情報を取得する（os.scandirを使用して効率的に取得）
+
+        Args:
+            current_path (str): ディレクトリパス
+            fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト, by default None
+            rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト, by default None
+
+        Returns:
+            Dict[str, Any]: 要約情報（files_cnt, dirs_cnt, dirs_size, dirs_last）
+        """
+        chk, abspath, msg = self._file_exists(current_path)
+        if not chk:
+            return msg
+        files_cnt = 0
+        dirs_cnt = 0
+        dirs_size = 0
+        dirs_last = ""
+        max_mtime = 0
+        # os.scandirを使用してディレクトリを走査（効率的に情報を取得）
+        def _scan_dir(dir_path: Path):
+            nonlocal files_cnt, dirs_cnt, dirs_size, dirs_last, max_mtime
+            try:
+                with os.scandir(dir_path) as entries:
+                    for entry in entries:
+                        # メタファイルをスキップ
+                        if entry.name.startswith('.meta'):
+                            continue
+                        try:
+                            if entry.is_dir(follow_symlinks=False):
+                                dirs_cnt += 1
+                                # サブディレクトリも再帰的に走査
+                                _scan_dir(entry.path)
+                            else:
+                                files_cnt += 1
+                                stat_info = entry.stat(follow_symlinks=False)
+                                dirs_size += stat_info.st_size
+                                if stat_info.st_mtime > max_mtime:
+                                    max_mtime = stat_info.st_mtime
+                        except (OSError, PermissionError):
+                            # アクセス権限がない場合はスキップ
+                            continue
+            except (OSError, PermissionError):
+                # ディレクトリにアクセスできない場合はスキップ
+                pass
+        _scan_dir(abspath)
+        if max_mtime > 0:
+            max_mtime = datetime.datetime.fromtimestamp(max_mtime)
+            dirs_last = common.format_dtvalue(max_mtime.isoformat())
+        return dict(path=current_path, files_cnt=files_cnt,
+                    dirs_cnt=dirs_cnt, dirs_size=dirs_size, dirs_last=dirs_last)
+
     def file_list(self, current_path:str, recursive:bool=False,
-                  fwpaths:List[str]=None, rjpaths:List[str]=None, listregs:str=".*") -> Tuple[int, Dict[str, Any]]:
+                  fwpaths:List[str]=None, rjpaths:List[str]=None, listregs:str=".*", summary:bool=False) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルリストを取得する
 
@@ -110,6 +163,7 @@ class Filer(object):
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト, by default None
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト, by default None
             listregs (str, optional): リストアップするgrep条件, by default ".*"
+            summary (bool, optional): 要約情報を取得するかどうか, by default False
     
         Returns:
             int: レスポンスコード
@@ -213,8 +267,15 @@ class Filer(object):
             if pt is None:
                 continue
             path_tree[tpath_key] = pt
+        
+        # summaryオプションが有効な場合、指定パスの情報を取得して返す
+        if summary:
+            for pt in path_tree.values():
+                if pt['path'] == current_path:
+                    summary_info = self._get_summary_info(current_path, fwpaths, rjpaths)
+                    pt.update(summary_info)
         return self.RESP_SUCCESS, dict(success=path_tree)
-    
+
     def file_mkdir(self, current_path:str, fwpaths:List[str]=None, rjpaths:List[str]=None, exist_ok:bool=False) -> Tuple[int, Dict[str, Any]]:
         """
         ディレクトリを作成する

@@ -49,6 +49,7 @@ gui ( start ) : ``cmdbox -m gui -c start <Option>``
     "--audit_html <audit_html>","file","","","","","Specify `audit.html`. If omitted, the cmdbox built-in HTML file is used."
     "--assets <assets>","file","multi","","","","Specify the asset file required when using html files."
     "--limiter_html <limiter_html>","file","","","","","Specify `limiter.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--status_html <status_html>","file","","","","","Specify `status.html`. If omitted, the cmdbox built-in HTML file is used."
     "--signin_html <signin_html>","file","","","","","Specify `signin.html`. If omitted, the cmdbox built-in HTML file is used."
 
 **Output Schema**

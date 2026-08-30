@@ -69,6 +69,9 @@ class ClientFileList(feature.OneshotResultEdgeFeature, validator.Validator):
                      description_ja="指定したパスに含まれるフォルダについて、再帰的にファイルリストを取得します。",
                      description_en="Get a list of files recursively for a folder contained in the specified path.",
                      test_true={"server":True, "client":False}),
+                dict(opt="summary", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
+                     description_ja="指定したパスに含まれるフォルダについて、要約情報を取得します。",
+                     description_en="Get summary information for a folder contained in the specified path.",),
                 dict(opt="scope", type=Options.T_STR, default="client", required=True, multi=False, hide=False, choice=["client", "current", "server"],
                      description_ja="スコープを指定します。`client` はクライアント側、`server` はサーバー側です。`current` は実行時ディレクトリです。",
                      description_en="Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory.",),
@@ -107,7 +110,7 @@ class ClientFileList(feature.OneshotResultEdgeFeature, validator.Validator):
         rjpaths = [str(p).replace('"','') for p in args.rjpath]
         listregs = args.listregs if args.listregs is not None else ".*"
         ret = cl.file_list(svpath=str(args.svpath).replace('"',''), recursive=args.recursive, scope=args.scope,
-                           client_data=client_data, fwpaths=fwpaths, rjpaths=rjpaths, listregs=listregs,
+                           client_data=client_data, fwpaths=fwpaths, rjpaths=rjpaths, listregs=listregs, summary=args.summary,
                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
@@ -151,11 +154,12 @@ class ClientFileList(feature.OneshotResultEdgeFeature, validator.Validator):
         fwpaths = payload.get('fwpaths', None)
         rjpaths = payload.get('rjpaths', None)
         listregs = payload.get('listregs', ".*")
-        st = self.file_list(msg[1], svpath, recursive, fwpaths, rjpaths, listregs, data_dir, logger, redis_cli, sessions)
+        summary = payload.get('summary', False)
+        st = self.file_list(msg[1], svpath, recursive, fwpaths, rjpaths, listregs, data_dir, logger, redis_cli, sessions, summary)
         return st
 
     def file_list(self, reskey:str, current_path:str, recursive:bool, fwpaths:List[str], rjpaths:List[str], listregs:str,
-                  data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:
+                  data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]], summary:bool=False) -> int:
         """
         ファイルリストを取得する
 
@@ -170,13 +174,14 @@ class ClientFileList(feature.OneshotResultEdgeFeature, validator.Validator):
             logger (logging.Logger): ロガー
             redis_cli (redis_client.RedisClient): Redisクライアント
             sessions (Dict[str, Dict[str, Any]]): セッション情報
+            summary (bool): 要約情報を取得するかどうか
 
         Returns:
             int: レスポンスコード
         """
         try:
             f = filer.Filer(data_dir, logger)
-            rescode, msg = f.file_list(current_path, recursive, fwpaths, rjpaths, listregs)
+            rescode, msg = f.file_list(current_path, recursive, fwpaths, rjpaths, listregs, summary)
             redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:

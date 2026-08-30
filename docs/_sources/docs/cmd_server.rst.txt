@@ -42,6 +42,7 @@ This command implements ``output_schema()`` returning ``Result`` model.
             "svname": "string",
             "status": "string",
             "ctime": "string",
+            "active_cnt": 0,
             "receive_cnt": 0,
             "success_cnt": 0,
             "warn_cnt": 0,

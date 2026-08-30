@@ -47,7 +47,7 @@ class Client(object):
         return res_json
     
     def file_list(self, svpath:str, recursive:bool, scope:str="client", client_data:Path=None,
-                  fwpaths:List[str]=None, rjpaths:List[str]=None, listregs:str="*", retry_count:int=3, retry_interval:int=5, timeout:int=60):
+                  fwpaths:List[str]=None, rjpaths:List[str]=None, listregs:str="*", summary:bool=False, retry_count:int=3, retry_interval:int=5, timeout:int=60):
         """
         サーバー上のファイルリストを取得する
 
@@ -59,6 +59,7 @@ class Client(object):
             fwpaths (List[str], optional): 範囲内かどうかを示すパスのリスト. Defaults to None.
             rjpaths (List[str], optional): 範囲外かどうかを示すパスのリスト. Defaults to None.
             listregs (str, optional): リストアップするgrep条件. Defaults to "*".
+            summary (bool, optional): 要約情報を取得するかどうか. Defaults to False.
             retry_count (int, optional): リトライ回数. Defaults to 3.
             retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
@@ -69,17 +70,17 @@ class Client(object):
         if scope == "client":
             if client_data is not None:
                 f = filer.Filer(client_data, self.logger)
-                _, res_json = f.file_list(svpath, recursive, fwpaths, rjpaths, listregs)
+                _, res_json = f.file_list(svpath, recursive, fwpaths, rjpaths, listregs, summary)
                 return res_json
             else:
                 self.logger.warning(f"client_data is empty.")
                 return dict(warn=f"client_data is empty.")
         elif scope == "current":
             f = filer.Filer(Path.cwd(), self.logger)
-            _, res_json = f.file_list(svpath, recursive, fwpaths, rjpaths, listregs)
+            _, res_json = f.file_list(svpath, recursive, fwpaths, rjpaths, listregs, summary)
             return res_json
         elif scope == "server":
-            payload = dict(svpath=svpath, recursive=recursive, fwpaths=fwpaths, rjpaths=rjpaths, listregs=listregs)
+            payload = dict(svpath=svpath, recursive=recursive, fwpaths=fwpaths, rjpaths=rjpaths, listregs=listregs, summary=summary)
             payload_b64 = convert.str2b64str(json.dumps(payload, default=common.default_json_enc))
             res_json = self.redis_cli.send_cmd('client_file_list', [payload_b64],
                                                retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)

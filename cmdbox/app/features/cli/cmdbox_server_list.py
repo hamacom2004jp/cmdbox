@@ -80,6 +80,7 @@ class ServerList(feature.OneshotResultEdgeFeature, validator.Validator):
             svname: Union[str, None] = pydantic.Field(default=None, description="サーバー名")
             status: Union[str, None] = pydantic.Field(default=None, description="ステータス")
             ctime: Union[str, None] = pydantic.Field(default=None, description="作成日時")
+            active_cnt: Union[int, None] = pydantic.Field(default=None, description="アクティブ件数")
             receive_cnt: Union[int, None] = pydantic.Field(default=None, description="受信件数")
             success_cnt: Union[int, None] = pydantic.Field(default=None, description="成功件数")
             warn_cnt: Union[int, None] = pydantic.Field(default=None, description="警告件数")

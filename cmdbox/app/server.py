@@ -129,6 +129,7 @@ return new_value
         self.redis_cli.hset(self.redis_cli.hbname, 'success_cnt', 0)
         self.redis_cli.hset(self.redis_cli.hbname, 'warn_cnt', 0)
         self.redis_cli.hset(self.redis_cli.hbname, 'error_cnt', 0)
+        self.redis_cli.hset(self.redis_cli.hbname, 'active_cnt', 0)
 
         def _publish(msg_str):
             # 各サーバーにメッセージを配布する
@@ -140,6 +141,8 @@ return new_value
 
         def _process(msg:list[str], to_cluster:bool, logger:logging.Logger,
                      svname:str, data_dir:Path, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]):
+            # スレッド開始時にアクティブカウントをインクリメント
+            redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, redis_cli.hbname, 'active_cnt', 1)
             try:
                 st = None
                 redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, redis_cli.hbname, 'receive_cnt', 1)
@@ -189,6 +192,9 @@ return new_value
                 self.is_running = False
             except Exception as e:
                 logger.warning(f"Unknown error occurred. {e}. Service will be stopped due to unknown cause.({msg})", exc_info=True)
+            finally:
+                # スレッド終了時にアクティブカウントをデクリメント
+                redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, redis_cli.hbname, 'active_cnt', -1)
 
         while self.is_running:
             try:

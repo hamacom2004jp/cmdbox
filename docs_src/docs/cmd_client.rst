@@ -264,6 +264,7 @@ client ( file_list ) : ``cmdbox -m client -c file_list <Option>``
     "--rjpath <rjpath>","file","multi","","","","If the specified path matches the requested path, access will be denied. Interpreted as a regular expression."
     "--listregs <listregs>","str","","",".*","","Specify the regular expression conditions to list."
     "--recursive <recursive>","bool","","","False","True | False","Get a list of files recursively for a folder contained in the specified path."
+    "--summary <summary>","bool","","","False","True | False","Get summary information for a folder contained in the specified path."
     "--scope <scope>","str","","required","client","client | current | server","Specify the scope. `client` refers to the client side, and `server` refers to the server side. `current` refers to the current directory."
     "--retry_count <retry_count>","int","","","3","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
     "--retry_interval <retry_interval>","int","","","5","","Specifies the number of seconds before reconnecting to the Redis server."

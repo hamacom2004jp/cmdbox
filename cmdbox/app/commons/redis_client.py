@@ -350,6 +350,8 @@ class RedisClient(object):
                 warn_cnt = int(val.decode()) if val is not None else 0
                 val = self.hget(hb, 'error_cnt')
                 error_cnt = int(val.decode()) if val is not None else 0
+                val = self.hget(hb, 'active_cnt')
+                active_cnt = int(val.decode()) if val is not None else 0
                 val = self.hget(hb, 'status')
                 status = val.decode() if val is not None else "unknown"
                 val = self.hget(hb, 'ctime')
@@ -357,5 +359,5 @@ class RedisClient(object):
             except redis.exceptions.ResponseError:
                 self.logger.warn(f"ResponseError. {hb}", exc_info=True)
             svlist.append(dict(svname=svname, status=status, ctime=ctime,
-                               receive_cnt=receive_cnt, success_cnt=success_cnt, warn_cnt=warn_cnt, error_cnt=error_cnt))
+                               receive_cnt=receive_cnt, success_cnt=success_cnt, warn_cnt=warn_cnt, error_cnt=error_cnt, active_cnt=active_cnt))
         return svlist
