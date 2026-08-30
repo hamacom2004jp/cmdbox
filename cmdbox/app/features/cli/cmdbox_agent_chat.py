@@ -849,6 +849,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         """
         reskey = msg[1]
         session_service = None
+        agent_session = None
+        payload = None
         runner = None
         tts_engine_obj = None
         enable_tts = True
