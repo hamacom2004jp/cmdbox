@@ -910,7 +910,7 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                                                chat_ctx=chat_ctx, reskey=reskey, exc=e)
             except Exception as inner_e:
                 logger.error(f"Error in error_chat_run: {inner_e}", exc_info=True)
-            msg = dict(success=dict(message=f"Chat successfully."), end=True)
+            msg = dict(success=dict(message=f"Chat Completed."), end=True)
             redis_cli.rpush(reskey, msg)
             return st
         finally:
@@ -1106,11 +1106,9 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                     resval.append(outputs)
                     if has_output:
                         redis_cli.rpush(reskey, outputs)
-                    #if flags['final_response']:
-                    #    break
-
             except Exception as e:
                 raise e
+
         msg = dict(success=dict(message=f"Chat '{runner_name}' completed.",
                                 ressize=len(convert.str2b64str(common.to_str(resval)))),
                                 end=True)
