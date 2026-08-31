@@ -154,6 +154,7 @@ agentView.chat = (session_id) => {
             console.log(packet);
             const txt = agentView.create_agent_message(agentView.message_id);
             await agentView.format_agent_message(txt, `${packet['warn']}`);
+            msg_container.find('.spinner-grow').remove();
             agentView.message_id = null;
             $('.ai-core').removeClass('ai-core2');
             return;

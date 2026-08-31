@@ -766,32 +766,29 @@ class Options:
         # フューチャーのoptions
         if 'options' not in yml['audit']:
             raise Exception('features.yml is invalid. (The audit element must have "options" specified.)')
-        self.audit_write_args = yml['audit']['options'].copy()
-        self.audit_search_args = yml['audit']['options'].copy()
+        audit_base_args = yml['audit']['options'].copy()
+        self.audit_write_args = audit_base_args.copy()
+        self.audit_search_args = audit_base_args.copy()
         # writeフューチャー
         if 'write' not in yml['audit']:
             raise Exception('features.yml is invalid. (The audit element must have "write" specified.)')
         if 'mode' not in yml['audit']['write']:
             raise Exception('features.yml is invalid. (The audit.write element must have "mode" specified.)')
-        mode = yml['audit']['write']['mode']
         if 'cmd' not in yml['audit']['write']:
             raise Exception('features.yml is invalid. (The audit.write element must have "cmd" specified.)')
-        cmd = yml['audit']['write']['cmd']
-        self.audit_write:feature.Feature = self.get_cmd_feature(mode, cmd)
-        self.audit_write_args['mode'] = mode
-        self.audit_write_args['cmd'] = cmd
+        self.audit_write:feature.Feature = self.get_cmd_feature(
+            yml['audit']['write']['mode'], yml['audit']['write']['cmd'])
+        self.audit_write_args.update(yml['audit']['write'])
         # searchフューチャー
         if 'search' not in yml['audit']:
             raise Exception('features.yml is invalid. (The audit element must have "search" specified.)')
         if 'mode' not in yml['audit']['search']:
             raise Exception('features.yml is invalid. (The audit.search element must have "mode" specified.)')
-        mode = yml['audit']['search']['mode']
         if 'cmd' not in yml['audit']['search']:
             raise Exception('features.yml is invalid. (The audit.search element must have "cmd" specified.)')
-        cmd = yml['audit']['search']['cmd']
-        self.audit_search:feature.Feature = self.get_cmd_feature(mode, cmd)
-        self.audit_search_args['mode'] = mode
-        self.audit_search_args['cmd'] = cmd
+        self.audit_search:feature.Feature = self.get_cmd_feature(
+            yml['audit']['search']['mode'], yml['audit']['search']['cmd'])
+        self.audit_search_args.update(yml['audit']['search'])
         self.audit_loaded = True
 
     def load_features_agentrule(self, logger:logging.Logger):

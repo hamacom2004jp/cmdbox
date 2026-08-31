@@ -2317,16 +2317,17 @@ cmdbox.choice_local_file = (unique_id) => {
  * @param {function} callback - コールバック関数
  * @param {string} title - コマンドタイトル
  * @param {string} opt_name - オプション名
- * @param {object} err_i18n - エラー発生時のメッセージを国際化するかどうか
- * @param {object} no_error - エラー発生時にメッセージを表示しないようにするかどうか
+ * @param {boolean} err_i18n - エラー発生時のメッセージを国際化するかどうか
+ * @param {boolean} no_error - エラー発生時にメッセージを表示しないようにするかどうか
+ * @param {boolean} cache_clear - キャッシュをクリアするかどうか
  * @returns {Promise} - レスポンス
  */
-cmdbox.callcmd = async (mode, cmd, params, callback, title, opt_name, err_i18n=true, no_error=false) => {
+cmdbox.callcmd = async (mode, cmd, params, callback, title, opt_name, err_i18n=true, no_error=false, cache_clear=true) => {
     const opt = {
         mode: mode,
         cmd: cmd,
         ...params,
-        cache_clear: true
+        cache_clear: !!cache_clear
     };
     let res = await fetch('exec_cmd', {
         method: 'POST',
@@ -2536,7 +2537,7 @@ cmdbox.translation = async (words, nosave, llmname) => {
         words: words,
         target_lang: targetLang,
         nosave: nosave ? true : false
-    }, undefined, undefined, undefined, false, true);
+    }, undefined, undefined, undefined, false, true, false);
     if (!res) return words;
     if (Array.isArray(res) && res.length > 0) res = res[0];
     if (!res['success'] || !res['success']['data']) return words;

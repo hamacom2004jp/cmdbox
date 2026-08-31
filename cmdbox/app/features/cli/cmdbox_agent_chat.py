@@ -1110,12 +1110,8 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                     #    break
 
             except Exception as e:
-                outputs = dict(success=dict(flags=dict(final_response=True, function_call=False, function_response=False),
-                                            message=str(e),
-                                            ids=dict(agent_session_id=agent_session.id)),)
-                redis_cli.rpush(reskey, outputs)
                 raise e
-        msg = dict(success=dict(message=f"Chat '{runner_name}' successfully.",
+        msg = dict(success=dict(message=f"Chat '{runner_name}' completed.",
                                 ressize=len(convert.str2b64str(common.to_str(resval)))),
                                 end=True)
         redis_cli.rpush(reskey, msg)
