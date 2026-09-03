@@ -110,17 +110,41 @@ statusPage.loadServer = async () => {
 
     const body = $('#sv_rows').empty();
     rows.forEach((row) => {
-        body.append(`<tr>
+        const tr = $(`<tr>
             <td>${row.svname || '-'}</td>
             <td>${row.status || '-'}</td>
             <td class="text-end">${statusPage.fmtNum(row.active_cnt)}</td>
             <td class="text-end">${statusPage.fmtNum(row.success_cnt)}</td>
             <td class="text-end">${statusPage.fmtNum(row.warn_cnt)}</td>
             <td class="text-end">${statusPage.fmtNum(row.error_cnt)}</td>
+            <td></td>
         </tr>`);
+        
+        const activeTasksTd = tr.find('td:last');
+        activeTasksTd.text('');
+        if (row.active_tasks && (Array.isArray(row.active_tasks) ? row.active_tasks.length : Object.keys(row.active_tasks).length)) {
+            const tasks = Array.isArray(row.active_tasks) ? row.active_tasks : [row.active_tasks];
+            const table = $('<table class="table table-sm mb-0">'
+                           + '<thead><tr><th>Task</th><th>Status</th><th>ID</th><th>Start Time</th><th>Proc Time</th><th>Message</th></tr></thead>'
+                           + '<tbody></tbody></table>');
+            const tbody = table.find('tbody');
+            tasks.forEach(task => {
+                const obj = typeof task === 'string' ? JSON.parse(task) : task;
+                $(`<tr>
+                    <td class="small">${obj.task || '-'}</td>
+                    <td class="small">${obj.status || '-'}</td>
+                    <td class="small">${obj.id || '-'}</td>
+                    <td class="small">${obj.start_tm || '-'}</td>
+                    <td class="small">${obj.proc_cnt ? (obj.proc_cnt * 1000).toFixed(0) + ' ms' : '-'}</td>
+                    <td class="small">${obj.msg || '-'}</td>
+                </tr>`).appendTo(tbody);
+            });
+            activeTasksTd.append(table);
+        }
+        body.append(tr);
     });
     if (rows.length === 0) {
-        body.append('<tr><td colspan="5" class="text-body-secondary">no data</td></tr>');
+        body.append('<tr><td colspan="7" class="text-body-secondary">no data</td></tr>');
     }
 };
 

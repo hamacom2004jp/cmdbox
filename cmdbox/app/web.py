@@ -421,6 +421,7 @@ class Web:
         サインインファイルにユーザーのApiKeyを追加する
 
         Args:
+            req (Request): リクエストオブジェクト
             user (Dict[str, Any]): ユーザー情報
 
         Returns:
@@ -471,6 +472,7 @@ class Web:
         サインインファイルのユーザーのApiKeyを削除する
 
         Args:
+            req (Request): リクエストオブジェクト
             user (Dict[str, Any]): ユーザー情報
         """
         signin_data = self.signin.signin_file_data

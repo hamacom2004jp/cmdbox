@@ -78,6 +78,9 @@ class RedisClient(object):
     def hset(self, name:str, key:str, value):
         self.redis_cli.hset(name, key, str(value))
 
+    def hdel(self, name:str, key:str):
+        self.redis_cli.hdel(name, key)
+
     def delete(self, name:str):
         self.redis_cli.delete(name)
     
@@ -356,8 +359,23 @@ class RedisClient(object):
                 status = val.decode() if val is not None else "unknown"
                 val = self.hget(hb, 'ctime')
                 ctime = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime(float(val.decode()))) if val is not None else "-"
+                # アクティブタスク情報を取得（hbname ハッシュ内で active_tasks_ で始まるフィールド）
+                hb_data = self.hgetall(hb)
+                active_tasks = []
+                for key, value in hb_data.items():
+                    key_str = key.decode() if isinstance(key, bytes) else key
+                    if key_str.startswith('active_tasks_'):
+                        thread_id = key_str.replace('active_tasks_', '')
+                        val = value.decode() if isinstance(value, bytes) else value
+                        task, status, start_tm, proc_cnt, msg = val.split('&&')
+                        start_tm_str = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime(float(start_tm))) if start_tm else "-"
+                        proc_cnt = float(proc_cnt) if proc_cnt else 0.0
+                        active_tasks.append(dict(id=thread_id, task=task, status=status, start_tm=start_tm_str, proc_cnt=proc_cnt, msg=msg))
+                # start_tmで昇順にソート
+                active_tasks.sort(key=lambda x: x['start_tm'], reverse=True)
             except redis.exceptions.ResponseError:
                 self.logger.warn(f"ResponseError. {hb}", exc_info=True)
+                active_tasks = []
             svlist.append(dict(svname=svname, status=status, ctime=ctime,
-                               receive_cnt=receive_cnt, success_cnt=success_cnt, warn_cnt=warn_cnt, error_cnt=error_cnt, active_cnt=active_cnt))
+                               receive_cnt=receive_cnt, success_cnt=success_cnt, warn_cnt=warn_cnt, error_cnt=error_cnt, active_cnt=active_cnt, active_tasks=active_tasks))
         return svlist

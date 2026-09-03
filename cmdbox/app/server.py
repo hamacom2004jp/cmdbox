@@ -121,6 +121,25 @@ return new_value
             except Exception as e:
                 self.redis_cli.delete(reskey)
 
+    def _clean_activetask(self):
+        # アクティブタスク情報を取得（hbname ハッシュ内で active_tasks_ で始まるフィールド）
+        hb_data = self.redis_cli.hgetall(self.redis_cli.hbname)
+        active_tasks = []
+        for key, value in hb_data.items():
+            key_str = key.decode() if isinstance(key, bytes) else key
+            if key_str.startswith('active_tasks_'):
+                val = value.decode() if isinstance(value, bytes) else value
+                task, status, start_tm, proc_cnt, msg = val.split('&&')
+                if status == 'running':
+                    continue
+                try:
+                    start_tm = float(start_tm)
+                    proc_cnt = float(proc_cnt)
+                    if time.time() - (start_tm + proc_cnt) > self.cleaning_interval:
+                        self.redis_cli.hdel(self.redis_cli.hbname, key_str)
+                except Exception as e:
+                    self.redis_cli.hdel(self.redis_cli.hbname, key_str)
+
     def _run_server(self):
         self.logger.info(f"start server. svname={self.svname}")
         ltime = time.time()
@@ -141,9 +160,15 @@ return new_value
 
         def _process(msg:list[str], to_cluster:bool, logger:logging.Logger,
                      svname:str, data_dir:Path, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]):
-            # スレッド開始時にアクティブカウントをインクリメント
+            # スレッド開始時にアクティブカウントをインクリメントし、処理中のコマンドを保存
+            thread_id = threading.current_thread().name
             redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, redis_cli.hbname, 'active_cnt', 1)
             try:
+                # アクティブタスクの情報を登録（タスク名&&ステータス&&開始時間&&終了時間&&メッセージ）
+                start_tm = time.time()
+                start_cnt = time.perf_counter()
+                redis_cli.hset(redis_cli.hbname, f"active_tasks_{thread_id}", f"{msg[0]}&&running&&{start_tm}&&0&&-")
+
                 st = None
                 redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, redis_cli.hbname, 'receive_cnt', 1)
                 redis_cli.hset(redis_cli.hbname, 'status', 'processing')
@@ -174,26 +199,40 @@ return new_value
                 elif st==self.RESP_ERROR:
                     redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, redis_cli.hbname, 'error_cnt', 1)
                 redis_cli.hset(redis_cli.hbname, 'ctime', time.time())
+                redis_cli.hset(redis_cli.hbname, f"active_tasks_{thread_id}", f"{msg[0]}&&complete&&{start_tm}&&{time.perf_counter()-start_cnt}&&-")
             except exceptions.TimeoutError:
                 pass
             except exceptions.ConnectionError as e:
-                logger.warning(f"Connection to the server was lost. {e}", exc_info=True)
-            except OSError as e:
-                logger.warning(f"OSError. {e}. This message is not executable in the server environment. ({msg})", exc_info=True)
+                _msg = f"Connection to the server was lost. {e}"
+                logger.warning(_msg, exc_info=True)
                 if msg is not None and len(msg) > 1:
-                    redis_cli.rpush(msg[1], dict(warn=f"OSError. {e}. This message is not executable in the server environment. ({msg[0]})"))
+                    redis_cli.hset(redis_cli.hbname, f"active_tasks_{thread_id}", f"{msg[0]}&&warning&&{start_tm}&&{time.perf_counter()-start_cnt}&&{_msg}")
+                else:
+                    redis_cli.hset(redis_cli.hbname, f"active_tasks_{thread_id}", f"Unknown&&warning&&{start_tm}&&{time.perf_counter()-start_cnt}&&{_msg}")
+            except OSError as e:
+                _msg = f"OSError. {e}. This message is not executable in the server environment."
+                logger.warning(_msg, exc_info=True)
+                if msg is not None and len(msg) > 1:
+                    redis_cli.rpush(msg[1], dict(warn=f"{_msg} ({msg[0]})"))
+                    redis_cli.hset(redis_cli.hbname, f"active_tasks_{thread_id}", f"{msg[0]}&&warning&&{start_tm}&&{time.perf_counter()-start_cnt}&&{_msg}")
+                else:
+                    redis_cli.hset(redis_cli.hbname, f"active_tasks_{thread_id}", f"Unknown&&warning&&{start_tm}&&{time.perf_counter()-start_cnt}&&{_msg}")
                 redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, redis_cli.hbname, 'error_cnt', 1)
             except IndexError as e:
-                logger.warning(f"IndexError. {e}. The message received by the server is invalid. ({msg})", exc_info=True)
+                _msg = f"IndexError. {e}. The message received by the server is invalid. ({msg})"
+                logger.warning(_msg, exc_info=True)
                 if msg is not None and len(msg) > 1:
-                    redis_cli.rpush(msg[1], dict(warn=f"IndexError. {e}. The message received by the server is invalid. ({msg[0]})"))
+                    redis_cli.rpush(msg[1], dict(warn=f"{_msg} ({msg[0]})"))
+                    redis_cli.hset(redis_cli.hbname, f"active_tasks_{thread_id}", f"{msg[0]}&&warning&&{start_tm}&&{time.perf_counter()-start_cnt}&&{_msg}")
+                else:
+                    redis_cli.hset(redis_cli.hbname, f"active_tasks_{thread_id}", f"Unknown&&warning&&{start_tm}&&{time.perf_counter()-start_cnt}&&{_msg}")
                 redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, redis_cli.hbname, 'error_cnt', 1)
             except KeyboardInterrupt as e:
                 self.is_running = False
             except Exception as e:
                 logger.warning(f"Unknown error occurred. {e}. Service will be stopped due to unknown cause.({msg})", exc_info=True)
             finally:
-                # スレッド終了時にアクティブカウントをデクリメント
+                # スレッド終了時にアクティブカウントをデクリメントし、処理中のコマンド情報を削除
                 redis_cli.redis_cli.eval(self._COUNTER_INCREMENT_LUA, 1, redis_cli.hbname, 'active_cnt', -1)
 
         while self.is_running:
@@ -207,6 +246,7 @@ return new_value
                 if ctime - ltime > self.cleaning_interval:
                     self._clean_server()
                     self._clean_reskey()
+                    self._clean_activetask()
                     ltime = ctime
                 to_cluster = False
                 if result is None or len(result) <= 0:
@@ -222,7 +262,7 @@ return new_value
                     time.sleep(1)
                     continue
 
-                th = threading.Thread(target=_process, name=f"svrun_{msg[0]}", daemon=True,
+                th = threading.Thread(target=_process, name=f"{msg[0]}_{msg[1]}", daemon=True,
                                       args=(msg, to_cluster, self.logger, self.svname, self.data_dir, self.redis_cli, self.sessions))
                 th.start()
 

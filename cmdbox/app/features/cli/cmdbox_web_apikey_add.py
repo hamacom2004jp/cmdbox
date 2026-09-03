@@ -70,7 +70,7 @@ class WebApikeyAdd(feature.UnsupportEdgeFeature, validator.Validator):
                         redis_host=self.default_host, redis_port=self.default_port, redis_password=self.default_pass, svname=self.default_svname,
                         signin_file=args.signin_file)
             user = dict(name=args.user_name, apikey_name=args.apikey_name)
-            apikey = w.apikey_add(user)
+            apikey = w.apikey_add(None, user)
             msg = dict(success=dict(apikey=apikey, msg=f"User ApiKey added. user_name={args.user_name} apikey_name={args.apikey_name}"))
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_SUCCESS, msg, w

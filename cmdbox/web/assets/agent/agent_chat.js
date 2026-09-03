@@ -2,6 +2,10 @@ agentView.scrollToBottom = () => {
     agentView.chatContainer.scrollTop(agentView.chatContainer.prop("scrollHeight"));
 };
 agentView.chat_listeners = [];
+agentView.chat_send_filters = [];
+agentView.user_message_listeners = [];
+agentView.before_chat_listeners = [];
+agentView.after_chat_listeners = [];   // 
 /**
  * チャットメッセージを送信
  * @param {WebSocket} ws WebSocketオブジェクト
@@ -12,10 +16,36 @@ agentView.chat_send = (ws, msg, from_system=false) => {
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
     ws.send(msg);
 };
+/**
+ * agentView.create_user_messageでユーザーメッセージを作成した後に実行される。
+ * agentView.user_message_listenersに登録された関数を順番に呼び出す。
+ * @returns {void}
+ */
+agentView.user_message = () => (agentView.user_message_listeners || []).forEach((l) => {
+    try { l(msgDiv, msg, ctx); } catch (e) { console.warn('user_message_listener failed:', e); }
+});
+/**
+ * agentView.chatを呼び出す前に実行される。
+ * agentView.before_chat_listenersに登録された関数を順番に呼び出す。
+ * @returns {void}
+ */
+agentView.before_chat = () => (agentView.before_chat_listeners || []).forEach((l) => {
+    try { l(session_id); } catch (e) { console.warn('before_chat_listener failed:', e); }
+});
+/**
+ * agentView.chatを呼び出した後に実行される。
+ * agentView.after_chat_listenersに登録された関数を順番に呼び出す。
+ * @returns {void}
+ */
+agentView.after_chat = () => (agentView.after_chat_listeners || []).forEach((l) => {
+    try { l(session_id); } catch (e) { console.warn('after_chat_listener failed:', e); }
+});
+
 agentView.chat = (session_id) => {
     const ping_interval = 5000; // pingの間隔
     const max_reconnect_count = 60000/ping_interval*1; // 最大再接続回数
     cmdbox.show_loading();
+    agentView.before_chat();
     // ws再接続のためのインターバル初期化
     if (agentView.chat_reconnectInterval_handler) {
         clearInterval(agentView.chat_reconnectInterval_handler);
@@ -29,11 +59,23 @@ agentView.chat = (session_id) => {
     //agentView.btn_user_msg.prop('disabled', true); // 初期状態で送信ボタンを無効化
     // 送信ボタンのクリックイベント
     agentView.btn_user_msg.off('click.cmdbox').on('click.cmdbox', async () => {
-        const msg = agentView.get_user_msg() ?? '';
+        let msg = agentView.get_user_msg() ?? '';
+        const runner_name = agentView.agent_runner ? agentView.agent_runner['runner_name'] : null;
+        const ctx = {session_id:session_id, runner_name:runner_name};
+        for (const filter of (agentView.chat_send_filters || [])) {
+            try {
+                const r = await filter(msg, ctx);
+                if (r && r.cancel) return;
+                if (r && typeof r.msg === 'string') msg = r.msg;
+            } catch (e) {
+                console.warn('chat_send_filter failed (send cancelled):', e);
+                return;
+            }
+        }
         if (msg.length <= 0) return;
         agentView.set_user_msg('');
         // 入力内容をユーザーメッセージとして表示
-        agentView.create_user_message(msg);
+        agentView.create_user_message(msg, ctx);
         // エージェント側のメッセージ読込中を表示
         if (!agentView.message_id) {
             agentView.message_id = cmdbox.random_string(16);
@@ -129,8 +171,14 @@ agentView.chat = (session_id) => {
     const path = window.location.pathname;
     const runner_name = agentView.agent_runner ? agentView.agent_runner['runner_name'] : null;
     cmdbox.hide_loading();
-    if (!runner_name || runner_name.length <= 0) return;
-    if (agentView.ws && agentView.ws.readyState === WebSocket.OPEN) return;
+    if (!runner_name || runner_name.length <= 0) {
+        agentView.after_chat();
+        return;
+    }
+    if (agentView.ws && agentView.ws.readyState === WebSocket.OPEN) {
+        agentView.after_chat();
+        return;
+    }
     cmdbox.show_loading();
     if (agentView.ws) agentView.ws.close();
     agentView.ws = new WebSocket(`${protocol}://${host}:${port}${path}/chat/ws/${runner_name}/${session_id}`);
@@ -152,9 +200,20 @@ agentView.chat = (session_id) => {
         agentView.chat_listeners && agentView.chat_listeners.forEach(listener => listener(packet));
         if (packet && packet['warn']) {
             console.log(packet);
-            const txt = agentView.create_agent_message(agentView.message_id);
+            let txt = agentView.create_agent_message(agentView.message_id);
+            const warn_container = $(`#${agentView.message_id}`);
+            if (txt.children().length > 0 || txt.hasClass('message-thinking')) {
+                warn_container.append('<div class="msg-content"></div>');
+                txt = warn_container.find('.msg-content').last();
+            }
             await agentView.format_agent_message(txt, `${packet['warn']}`);
             msg_container.find('.spinner-grow').remove();
+            warn_container.find('.msg-content').filter(() => {
+                return $(this).children().length === 0 && !$(this).text().trim();
+            }).remove();
+            if (warn_container.find('.message-thinking').length <= 0) {
+                warn_container.find('.btn-toggle-message').remove();
+            }
             agentView.message_id = null;
             $('.ai-core').removeClass('ai-core2');
             return;
@@ -245,8 +304,10 @@ agentView.chat = (session_id) => {
         console.error(event);
         clearInterval(agentView.chat_callback_ping_handler);
     };
+    const ws_of_this_chat = agentView.ws;
     agentView.ws.onclose = () => {
         clearInterval(agentView.chat_callback_ping_handler);
+        if (agentView.ws !== ws_of_this_chat) return; // 既に別ソケットへ切り替わっていたら再接続しない
         if (agentView.chat_reconnect_count >= max_reconnect_count) {
             clearInterval(agentView.chat_reconnectInterval_handler);
             cmdbox.message({'error':'Connection to the agent has failed for several minutes. Please reload to resume reconnection.'}, true);
@@ -258,6 +319,7 @@ agentView.chat = (session_id) => {
             agentView.chat(session_id);
         }, ping_interval);
     };
+    agentView.after_chat();
     cmdbox.hide_loading();
 };
 agentView.parse_message = (message) => {
@@ -361,13 +423,14 @@ agentView.parse_message = (message) => {
         return message;
     }
 };
-agentView.create_user_message = (msg) => {
+agentView.create_user_message = (msg, ctx) => {
     const msgDiv = $('<div/>').appendTo(agentView.chatMessages);
     msgDiv.addClass(`message message-user`);
     msgDiv.html(`
         <span class="msg-label msg-label-user">${agentView.user ? agentView.user['name'] : 'USER'}</span>
         <div class="msg-content">${msg}</div>
     `);
+    agentView.user_message();
     agentView.scrollToBottom();
 };
 agentView.create_agent_message = (message_id) => {

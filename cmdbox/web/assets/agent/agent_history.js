@@ -55,7 +55,11 @@ agentView.create_history = (session_id, runner_name, user_name, update_time, msg
             if (!msg || msg.length <= 0) continue;
             if (author == 'user') {
                 // ユーザーメッセージ
-                agentView.create_user_message(msg);
+                agentView.create_user_message(msg, {
+                    session_id: session_id,
+                    runner_name: runner_name,
+                    event: event,
+                });
             } else {
                 // エージェントメッセージ
                 if (!event['final_response']) {
