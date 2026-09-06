@@ -78,8 +78,9 @@ agent_mcp = [
     "mcp>=1.24.0,<2.0.0",
 ]
 agent_adk = [
-    "google-adk>=2.6.3",
+    "google-adk>=2.8,<2.9",
     "a2a-sdk>=1.0.0",
+    "culsans>=0.11.0",
     "litellm>=1.82.6",
 ]
 agent_mem = [

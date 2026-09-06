@@ -48,7 +48,7 @@
     flex-direction: column;
     border-right: 1px solid var(--bs-border-color);
     background: color-mix(in oklab, var(--bs-body-bg) 95%, black 5%);
-    transition: width 0.3s ease;
+    transition: width 0.35s ease-in-out, min-width 0.35s ease-in-out;
 }
 
 .nav-sidebar.expanded {
@@ -111,10 +111,13 @@
     white-space: nowrap;
     font-family: var(--font-body), sans-serif;
     letter-spacing: 0.04em;
+    opacity: 0;
+    transition: opacity 0.35s ease-in-out;
 }
 
 .nav-sidebar.expanded .nav-label {
     display: inline;
+    opacity: 1;
 }
 
 .status-frame {
@@ -132,7 +135,7 @@
     right: 0;
     bottom: 0;
     overflow: auto;
-    transition: left 0.3s ease;
+    transition: left 0.35s ease-in-out;
     padding: 12px;
     border-top: 1px solid var(--bs-border-color);
 }

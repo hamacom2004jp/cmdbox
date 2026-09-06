@@ -870,7 +870,7 @@ class Options:
             raise Exception(f'audit_type is invalid. (The audit_type must be one of the following: {Options.AUDITS})')
         tags = tags if tags is not None else []
         if tags is not None and type(tags) is not list:
-            raise Exception('clmsg_tags is invalid. (The clmsg_tags must be a list element.)')
+            raise Exception('clmsg_tag is invalid. (The clmsg_tag must be a list element.)')
         def _audit_write(func):
             @functools.wraps(func)
             def _wrapper(*args, **kwargs):
@@ -944,6 +944,10 @@ class Options:
                 mode = arg.mode if hasattr(arg, 'mode') else None
                 cmd = arg.cmd if hasattr(arg, 'cmd') else None
                 if mode is not None and cmd is not None:
+                    cmd_tag = f"{mode}_{cmd}"
+                    if not opt.get('clmsg_tag',[]): opt['clmsg_tag'] = []
+                    if cmd_tag not in opt['clmsg_tag']:
+                        opt['clmsg_tag'].append(cmd_tag)
                     opt_schema = self.get_cmd_choices(mode, cmd, True)
                     for key, val in arg.__dict__.items():
                         if key in ['capture_stdout', 'capture_maxsize']:

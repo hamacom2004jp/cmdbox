@@ -174,6 +174,8 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
         tags = []
         if 'tag' in opt and isinstance(opt['tag'], list):
             tags = [t for t in opt['tag'] if t is not None and t != '']
+        if 'mode' in opt and 'cmd' in opt:
+            tags += [f"{opt['mode']}_{opt['cmd']}"]
         audit_write_opt = web.options.audit_exec(req, res, web, tags=tags, title=title, body=opt)
         appcls = self.appcls if appcls is None else appcls
         appcls = app.CmdBoxApp if appcls is None else appcls

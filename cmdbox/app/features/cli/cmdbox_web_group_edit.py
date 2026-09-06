@@ -38,6 +38,30 @@ class WebGroupEdit(feature.UnsupportEdgeFeature, validator.Validator):
             description_ja="Webモードのグループを編集します。",
             description_en="Edit a group in Web mode.",
             choice=[
+                dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
+                     description_ja="Redisサーバーのサービスホストを指定します。",
+                     description_en="Specify the service host of the Redis server."),
+                dict(opt="port", type=Options.T_INT, default=self.default_port, required=True, multi=False, hide=True, choice=None, web="mask",
+                     description_ja="Redisサーバーのサービスポートを指定します。",
+                     description_en="Specify the service port of the Redis server."),
+                dict(opt="password", type=Options.T_PASSWD, default=self.default_pass, required=True, multi=False, hide=True, choice=None, web="mask",
+                     description_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
+                     description_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
+                dict(opt="svname", type=Options.T_STR, default=self.default_svname, required=True, multi=False, hide=True, choice=None, web="readonly",
+                     description_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
+                     description_en="Specify the service name of the inference server. If omitted, `server` is used."),
+                dict(opt="data", type=Options.T_DIR, default=self.default_data, required=False, multi=False, hide=False, choice=None, web="mask",
+                     description_ja=f"省略した時は `$HOME/.{self.ver.__appid__}` を使用します。",
+                     description_en=f"When omitted, `$HOME/.{self.ver.__appid__}` is used."),
+                dict(opt="retry_count", type=Options.T_INT, default=3, required=False, multi=False, hide=True, choice=None,
+                     description_ja="Redisサーバーへの再接続回数を指定します。0以下を指定すると永遠に再接続を行います。",
+                     description_en="Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."),
+                dict(opt="retry_interval", type=Options.T_INT, default=5, required=False, multi=False, hide=True, choice=None,
+                     description_ja="Redisサーバーに再接続までの秒数を指定します。",
+                     description_en="Specifies the number of seconds before reconnecting to the Redis server."),
+                dict(opt="timeout", type=Options.T_INT, default="60", required=False, multi=False, hide=True, choice=None,
+                     description_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定します。",
+                     description_en="Specify the maximum waiting time until the server responds."),
                 dict(opt="group_id", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      description_ja="グループIDを指定します。",
                      description_en="Specify the group ID. Do not duplicate other groups."),
@@ -72,8 +96,9 @@ class WebGroupEdit(feature.UnsupportEdgeFeature, validator.Validator):
         """
         w = None
         try:
-            w = web.Web(logger, self.default_data, appcls=self.appcls, ver=self.ver,
-                        redis_host=self.default_host, redis_port=self.default_port, redis_password=self.default_pass, svname=self.default_svname,
+            w = web.Web.getInstance(logger, self.data, appcls=self.appcls, ver=self.ver,
+                        redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
+                        retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout,
                         signin_file=args.signin_file)
             group = dict(gid=args.group_id, name=args.group_name, parent=args.group_parent, startpage=args.startpage)
             w.group_edit(group)

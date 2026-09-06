@@ -204,7 +204,7 @@ class AuditDelete(audit_base.AuditBase, validator.Validator):
     def delete(self, reskey:str,
                delete_audit_type:str, delete_clmsg_id:str, delete_clmsg_sdate:str, delete_clmsg_edate:str,
                delete_clmsg_src:str, delete_clmsg_title:str, delete_clmsg_user:str, delete_clmsg_body:Dict[str, Any],
-               delete_clmsg_tags:List[str], delete_svmsg_id:str, delete_svmsg_sdate:str, delete_svmsg_edate:str,
+               delete_clmsg_tag:List[str], delete_svmsg_id:str, delete_svmsg_sdate:str, delete_svmsg_edate:str,
                pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str,
                data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient) -> int:
         """
@@ -220,7 +220,7 @@ class AuditDelete(audit_base.AuditBase, validator.Validator):
             delete_clmsg_title (str): クライアントメッセージのタイトル
             delete_clmsg_user (str): クライアントメッセージの発生させたユーザー
             delete_clmsg_body (Dict[str, Any]): クライアントメッセージの本文
-            delete_clmsg_tags (List[str]): クライアントメッセージのタグ
+            delete_clmsg_tag (List[str]): クライアントメッセージのタグ
             delete_svmsg_id (str): サーバーメッセージID
             delete_svmsg_sdate (str): サーバーメッセージ発生日時(開始)
             delete_svmsg_edate (str): サーバーメッセージ発生日時(終了)
@@ -272,8 +272,8 @@ class AuditDelete(audit_base.AuditBase, validator.Validator):
                         for key, value in delete_clmsg_body.items():
                             where.append(f"clmsg_body->>'{key}' LIKE {'%s' if pg_enabled else '?'}")
                             params.append(value)
-                    if delete_clmsg_tags:
-                        for tag in delete_clmsg_tags:
+                    if delete_clmsg_tag:
+                        for tag in delete_clmsg_tag:
                             where.append(f"clmsg_tag like {'%s' if pg_enabled else '?'}")
                             params.append(f'%{tag}%')
                     if delete_svmsg_id and delete_svmsg_id != 'None':

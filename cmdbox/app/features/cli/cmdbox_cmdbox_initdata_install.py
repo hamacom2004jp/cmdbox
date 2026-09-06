@@ -196,14 +196,18 @@ class CmdboxInitdataInstall(cmdbox_base.CmdboxBase, validator.Validator):
                         break
 
             # 処理を監視し、完了したら次のファイルを追加
-            for future in as_completed(futures):
-                svp, msg, is_warn = future.result()
-                if is_warn:
-                    has_warn = True
-                    logger.warning(msg)
-                else:
-                    logger.info(msg)
-                del futures[future]
+            # as_completed() は呼び出し時点の Future 集合を監視するため、
+            # ループ中に追加した Future も回収できるよう while で包む。
+            while futures:
+                for future in as_completed(list(futures)):
+                    svp, msg, is_warn = future.result()
+                    if is_warn:
+                        has_warn = True
+                        logger.warning(msg)
+                    else:
+                        logger.info(msg)
+                    del futures[future]
+                    break
                 # 次のファイルを追加
                 while queue_index < len(file_queue):
                     svp, file_path, file_size = file_queue[queue_index]
@@ -213,7 +217,6 @@ class CmdboxInitdataInstall(cmdbox_base.CmdboxBase, validator.Validator):
                             future = executor.submit(upload_task, svp, file_path, file_size)
                             futures[future] = (svp, file_path, file_size)
                             queue_index += 1
-                            break
                         else:
                             break
         if has_warn:

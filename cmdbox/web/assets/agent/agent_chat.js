@@ -21,7 +21,7 @@ agentView.chat_send = (ws, msg, from_system=false) => {
  * agentView.user_message_listenersに登録された関数を順番に呼び出す。
  * @returns {void}
  */
-agentView.user_message = () => (agentView.user_message_listeners || []).forEach((l) => {
+agentView.user_message = (msgDiv, msg, ctx) => (agentView.user_message_listeners || []).forEach((l) => {
     try { l(msgDiv, msg, ctx); } catch (e) { console.warn('user_message_listener failed:', e); }
 });
 /**
@@ -29,7 +29,7 @@ agentView.user_message = () => (agentView.user_message_listeners || []).forEach(
  * agentView.before_chat_listenersに登録された関数を順番に呼び出す。
  * @returns {void}
  */
-agentView.before_chat = () => (agentView.before_chat_listeners || []).forEach((l) => {
+agentView.before_chat = (session_id) => (agentView.before_chat_listeners || []).forEach((l) => {
     try { l(session_id); } catch (e) { console.warn('before_chat_listener failed:', e); }
 });
 /**
@@ -37,7 +37,7 @@ agentView.before_chat = () => (agentView.before_chat_listeners || []).forEach((l
  * agentView.after_chat_listenersに登録された関数を順番に呼び出す。
  * @returns {void}
  */
-agentView.after_chat = () => (agentView.after_chat_listeners || []).forEach((l) => {
+agentView.after_chat = (session_id) => (agentView.after_chat_listeners || []).forEach((l) => {
     try { l(session_id); } catch (e) { console.warn('after_chat_listener failed:', e); }
 });
 
@@ -45,7 +45,7 @@ agentView.chat = (session_id) => {
     const ping_interval = 5000; // pingの間隔
     const max_reconnect_count = 60000/ping_interval*1; // 最大再接続回数
     cmdbox.show_loading();
-    agentView.before_chat();
+    agentView.before_chat(session_id);
     // ws再接続のためのインターバル初期化
     if (agentView.chat_reconnectInterval_handler) {
         clearInterval(agentView.chat_reconnectInterval_handler);
@@ -172,11 +172,11 @@ agentView.chat = (session_id) => {
     const runner_name = agentView.agent_runner ? agentView.agent_runner['runner_name'] : null;
     cmdbox.hide_loading();
     if (!runner_name || runner_name.length <= 0) {
-        agentView.after_chat();
+        agentView.after_chat(session_id);
         return;
     }
     if (agentView.ws && agentView.ws.readyState === WebSocket.OPEN) {
-        agentView.after_chat();
+        agentView.after_chat(session_id);
         return;
     }
     cmdbox.show_loading();
@@ -208,7 +208,7 @@ agentView.chat = (session_id) => {
             }
             await agentView.format_agent_message(txt, `${packet['warn']}`);
             msg_container.find('.spinner-grow').remove();
-            warn_container.find('.msg-content').filter(() => {
+            warn_container.find('.msg-content').filter(function () {
                 return $(this).children().length === 0 && !$(this).text().trim();
             }).remove();
             if (warn_container.find('.message-thinking').length <= 0) {
@@ -319,7 +319,7 @@ agentView.chat = (session_id) => {
             agentView.chat(session_id);
         }, ping_interval);
     };
-    agentView.after_chat();
+    agentView.after_chat(session_id);
     cmdbox.hide_loading();
 };
 agentView.parse_message = (message) => {
@@ -430,7 +430,7 @@ agentView.create_user_message = (msg, ctx) => {
         <span class="msg-label msg-label-user">${agentView.user ? agentView.user['name'] : 'USER'}</span>
         <div class="msg-content">${msg}</div>
     `);
-    agentView.user_message();
+    agentView.user_message(msgDiv, msg, ctx);
     agentView.scrollToBottom();
 };
 agentView.create_agent_message = (message_id) => {

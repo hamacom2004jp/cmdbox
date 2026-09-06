@@ -96,6 +96,9 @@ class RedisClient(object):
     def keys(self, pattern:str):
         return self.redis_cli.keys(pattern)
 
+    def get(self, name:str):
+        return self.redis_cli.get(name)
+
     def check_server(self, find_svname:bool=False, retry_count:int=20, retry_interval:int=5, outstatus:bool=False):
         """
         Redisサーバーにpingを送信し、応答があるか確認する

@@ -59,7 +59,7 @@ class WebStop(feature.UnsupportEdgeFeature, validator.Validator):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver)
+        w = web.Web.getInstance(logger, Path(args.data), appcls=self.appcls, ver=self.ver)
         w.stop()
         msg = dict(success="web complate.")
         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

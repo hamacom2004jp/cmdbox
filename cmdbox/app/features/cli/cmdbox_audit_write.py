@@ -242,7 +242,7 @@ class AuditWrite(audit_base.AuditBase, validator.Validator):
             clmsg_title = payload.get("clmsg_title")
             clmsg_user = payload.get("clmsg_user")
             clmsg_body = payload.get("clmsg_body")
-            clmsg_tags = payload.get("clmsg_tags")
+            clmsg_tag = payload.get("clmsg_tag")
             pg_enabled = payload.get("pg_enabled")
             pg_host = payload.get("pg_host")
             pg_port = payload.get("pg_port")
@@ -254,13 +254,13 @@ class AuditWrite(audit_base.AuditBase, validator.Validator):
             self.initdb(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname)
             with self.get_context(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname) as conn:
                 st = self.write(conn, reskey=msg[1], audit_type=audit_type, clmsg_id=clmsg_id, clmsg_date=clmsg_date, clmsg_src=clmsg_src,
-                                clmsg_title=clmsg_title, clmsg_user=clmsg_user, clmsg_body=clmsg_body, clmsg_tags=clmsg_tags,
+                                clmsg_title=clmsg_title, clmsg_user=clmsg_user, clmsg_body=clmsg_body, clmsg_tag=clmsg_tag,
                                 svmsg_id=svmsg_id, pg_enabled=pg_enabled, retention_period_days=retention_period_days,
                                 logger=logger, redis_cli=redis_cli)
         return st
 
     def write(self, conn, *, reskey:str, audit_type:str, clmsg_id:str, clmsg_date:str, clmsg_src:str, clmsg_title:str,
-              clmsg_user:str, clmsg_body:str, clmsg_tags:str, svmsg_id:str,
+              clmsg_user:str, clmsg_body:str, clmsg_tag:str, svmsg_id:str,
               pg_enabled:bool, retention_period_days:int,
               logger:logging.Logger, redis_cli:redis_client.RedisClient) -> int:
         """
@@ -276,7 +276,7 @@ class AuditWrite(audit_base.AuditBase, validator.Validator):
             clmsg_title (str): クライアントメッセージのタイトル
             clmsg_user (str): クライアントメッセージの発生させたユーザー
             clmsg_body (str): クライアントメッセージの本文
-            clmsg_tags (str): クライアントメッセージのタグ
+            clmsg_tag (str): クライアントメッセージのタグ
             svmsg_id (str): サーバーメッセージID
             pg_enabled (bool): PostgreSQLを使用する場合はTrue
             retention_period_days (int): 監査を保存する日数
@@ -295,7 +295,7 @@ class AuditWrite(audit_base.AuditBase, validator.Validator):
                         INSERT INTO audit (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tag, 
                                         svmsg_id, svmsg_date)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ''', (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tags, svmsg_id, svmsg_date))
+                    ''', (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tag, svmsg_id, svmsg_date))
                     if retention_period_days is not None and retention_period_days > 0:
                         cursor.execute('DELETE FROM audit WHERE svmsg_date < datetime(CURRENT_TIMESTAMP, ?)',
                                         (f'-{retention_period_days} days',))
@@ -304,7 +304,7 @@ class AuditWrite(audit_base.AuditBase, validator.Validator):
                         INSERT INTO audit (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tag, 
                                         svmsg_id, svmsg_date)
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    ''', (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tags, svmsg_id, svmsg_date))
+                    ''', (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tag, svmsg_id, svmsg_date))
                     if retention_period_days is not None and retention_period_days > 0:
                         cursor.execute("DELETE FROM audit WHERE svmsg_date < CURRENT_TIMESTAMP + %s ",
                                         (f'-{retention_period_days} day',))

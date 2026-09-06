@@ -195,11 +195,13 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
             if not os.path.exists(data_dir):
                 return 0
             for entry in os.scandir(data_dir):
+                if entry.name.endswith('.lock'):
+                    continue
                 if entry.is_file(follow_symlinks=False):
                     total_size += entry.stat().st_size
                 elif entry.is_dir(follow_symlinks=False):
                     total_size += self._apprun_registrations(entry.path, logger, args, msg)
-        except PermissionError as e:
+        except Exception as e:
             logger.warning(f"Failed to calculate total size: {e}", exc_info=True)
         return total_size
 
@@ -222,11 +224,13 @@ class ClientFileUpload(feature.UnsupportEdgeFeature, validator.Validator, limite
             if not os.path.exists(data_dir):
                 return 0
             for entry in os.scandir(data_dir):
+                if entry.name.endswith('.lock'):
+                    continue
                 if entry.is_file(follow_symlinks=False):
                     total_size += entry.stat().st_size
                 elif entry.is_dir(follow_symlinks=False):
                     total_size += self._svrun_registrations(entry.path, logger, opt, msg)
-        except PermissionError as e:
+        except Exception as e:
             logger.warning(f"Failed to calculate total size: {e}", exc_info=True)
         return total_size
 

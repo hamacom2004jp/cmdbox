@@ -125,9 +125,10 @@ class Filer(object):
             try:
                 with os.scandir(dir_path) as entries:
                     for entry in entries:
-                        # メタファイルをスキップ
                         if entry.name.startswith('.meta'):
-                            continue
+                            continue # メタファイルをスキップ
+                        if entry.name.endswith('.lock'):
+                            continue # ロックファイルをスキップ
                         try:
                             if entry.is_dir(follow_symlinks=False):
                                 dirs_cnt += 1
@@ -139,10 +140,10 @@ class Filer(object):
                                 dirs_size += stat_info.st_size
                                 if stat_info.st_mtime > max_mtime:
                                     max_mtime = stat_info.st_mtime
-                        except (OSError, PermissionError):
+                        except Exception:
                             # アクセス権限がない場合はスキップ
                             continue
-            except (OSError, PermissionError):
+            except Exception:
                 # ディレクトリにアクセスできない場合はスキップ
                 pass
         _scan_dir(abspath)

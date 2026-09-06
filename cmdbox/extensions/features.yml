@@ -48,12 +48,14 @@ audit:
   write:
     mode: audit                         # Specify the mode of the feature to be writed.
     cmd: write                          # Specify the command to be writed.
-    exclude_clmsg_src:                  # Specify the list of source names to be excluded from the audit log.
-    - ClientFileIs
-    - LLMTranslation
-    exclude_clmsg_body:                 # Specify the dictionary of client message bodies to be excluded from the audit log.
-      mode: llm
-      cmd: "[file_is|translation]"
+    exclude_clmsg_tag:                  # Specify the list of tags to be excluded from the audit log.
+    - client_file_is
+    - client_time
+    - cmd_check
+    - limiter_targets
+    - llm_translation
+    - server_list
+    - web_session_list
   search:
     mode: audit                         # Specify the mode of the feature to be searched.
     cmd: search                         # Specify the command to be searched.

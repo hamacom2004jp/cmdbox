@@ -277,7 +277,7 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
     def search(self, reskey:str, select:Dict[str, str], select_date_format:str, groupby:List[str], groupby_date_format:str, sort:Dict[str, str], offset:int, limit:int,
                filter_audit_type:List[str], filter_clmsg_id:str, filter_clmsg_sdate:str, filter_clmsg_edate:str,
                filter_clmsg_src:str, filter_clmsg_title:str, filter_clmsg_user:str, filter_clmsg_body:Dict[str, Any],
-               exclude_clmsg_body:Dict[str, Any], filter_clmsg_tags:List[str], filter_svmsg_id:str, filter_svmsg_sdate:str, filter_svmsg_edate:str,
+               exclude_clmsg_body:Dict[str, Any], filter_clmsg_tag:List[str], filter_svmsg_id:str, filter_svmsg_sdate:str, filter_svmsg_edate:str,
                pg_enabled:bool, pg_host:str, pg_port:int, pg_user:str, pg_password:str, pg_dbname:str,
                data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient) -> int:
         """
@@ -301,7 +301,7 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
             filter_clmsg_user (str): クライアントメッセージの発生させたユーザー
             filter_clmsg_body (Dict[str, Any]): クライアントメッセージの本文
             exclude_clmsg_body (Dict[str, Any]): 除外条件のクライアントメッセージの本文
-            filter_clmsg_tags (List[str]): クライアントメッセージのタグ
+            filter_clmsg_tag (List[str]): クライアントメッセージのタグ
             filter_svmsg_id (str): サーバーメッセージID
             filter_svmsg_sdate (str): サーバーメッセージ発生日時(開始)
             filter_svmsg_edate (str): サーバーメッセージ発生日時(終了)
@@ -407,14 +407,14 @@ class AuditSearch(audit_base.AuditBase, validator.Validator):
                         for key, value in exclude_clmsg_body.items():
                             where.append(f"(clmsg_body->>'{key}' IS NULL OR clmsg_body->>'{key}' NOT LIKE {'%s' if pg_enabled else '?'})")
                             params.append(value)
-                    if filter_clmsg_tags:
-                        for tag in filter_clmsg_tags:
+                    if filter_clmsg_tag:
+                        for tag in filter_clmsg_tag:
                             if not tag: continue
                             if pg_enabled:
                                 where.append(f"clmsg_tag ?| %s")
                                 params.append(f'{tag}')
                             else:
-                                where.append(f"clmsg_tag like '?'")
+                                where.append(f"clmsg_tag like ?")
                                 params.append(f'%{tag}%')
                     if filter_svmsg_id and filter_svmsg_id != 'None':
                         where.append(f'svmsg_id={"%s" if pg_enabled else "?"}')

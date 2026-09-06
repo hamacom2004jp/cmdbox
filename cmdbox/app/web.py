@@ -12,6 +12,7 @@ import copy
 import ctypes
 import datetime
 import gevent
+import json
 import jwt
 import logging
 import multiprocessing
@@ -320,6 +321,7 @@ class Web:
         ユーザーのApiKey一覧を取得する（user_data優先、必要に応じてsignin_fileをフォールバック）
 
         Args:
+            req (Request): リクエストオブジェクト
             signin_data (Dict[str, Any]): サインインファイルデータ
             user (Dict[str, Any]): ユーザー情報
             include_legacy (bool, optional): signin_fileのapikeysをフォールバックとして含めるか. Defaults to True.
@@ -489,7 +491,7 @@ class Web:
         apikey:str = None
         for u in signin_data['users']:
             if u['name'] == user['name']:
-                apikeys = self.get_user_apikeys(None, signin_data, u, include_legacy=True)
+                apikeys = self.get_user_apikeys(req, signin_data, u, include_legacy=True)
                 if user['apikey_name'] not in apikeys:
                     continue
                 apikey = apikeys[user['apikey_name']]
@@ -669,6 +671,53 @@ class Web:
             self.logger.debug(f"user_del: {self.signin_file}")
         self.signin.signin_file_data = signin_data
         common.save_yml(self.signin_file, signin_data, nolock=False)
+
+    def session_list(self) -> List[Dict[str, Any]]:
+        """
+        Redisに保存されているセッション情報一覧を取得する
+
+        Returns:
+            List[Dict[str, Any]]: セッション情報の一覧
+        """
+        try:
+            # セッションキーのプレフィックス
+            session_prefix = f"{self.ver.__appid__}:{self.svname}:session."
+            # すべてのセッションキーを取得
+            session_keys = self.redis_cli.keys(f"{session_prefix}*")
+            sessions = []
+            for key in session_keys:
+                try:
+                    # セッション情報を取得
+                    value = self.redis_cli.get(key)
+                    value = value.decode() if isinstance(value, bytes) else value
+                    key = key.decode() if isinstance(key, bytes) else key
+                    session_data = json.loads(value) if value else None
+                    if session_data:
+                        session_id = key.replace(session_prefix, "")
+                        signin = session_data.get('signin', {})
+                        meta = session_data.get('__metadata__', {})
+                        last_access = meta.get('last_access', 0)
+                        last = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime(last_access))
+                        remaining = (int(last_access) + int(meta.get('lifetime', 0))) - int(time.time())
+                        sessions.append({
+                            'session_id': session_id,
+                            'uid': signin.get('uid', '-'),
+                            'name': signin.get('name', '-'),
+                            'groups': signin.get('groups', []),
+                            'email': signin.get('email', '-'),
+                            'last': last,
+                            'remaining': remaining,
+                            'clmsg_id': signin.get('clmsg_id', '-'),
+                        })
+                except Exception as e:
+                    if self.logger.level == logging.DEBUG:
+                        self.logger.debug(f"Failed to get session data for {key}: {e}")
+                    continue
+            if self.logger.level == logging.DEBUG:
+                self.logger.debug(f"session_list: found {len(sessions)} sessions")
+            return sessions
+        except Exception as e:
+            raise ValueError(f"Failed to get session list from Redis: {e}")
 
     def group_list(self, name:str=None, ret_hidden:bool=False) -> List[Dict[str, Any]]:
         """
@@ -994,7 +1043,7 @@ class Web:
             res.headers["Access-Control-Allow-Origin"] = "*"
             return res
 
-        session_store = RedisStore(connection=session_redis, prefix=f"cmdbox:{self.svname}:session.")
+        session_store = RedisStore(connection=session_redis, prefix=f"{self.ver.__appid__}:{self.svname}:session.")
         mwparam = dict(store=session_store, cookie_path=self.session_path,
                        lifetime=self.session_timeout, rolling=True, cookie_same_site="lax")
         if self.session_domain is not None:
