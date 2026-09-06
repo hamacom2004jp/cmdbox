@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.web &mdash; cmdbox 2026/08/30 documentation</title>
+  <title>cmdbox.app.web &mdash; cmdbox 2026/09/06 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=1fc88e0b"></script>
+      <script src="../../../_static/documentation_options.js?v=cfafd609"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -93,6 +93,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">ctypes</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">gevent</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jwt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span>
@@ -414,6 +415,7 @@
 <span class="sd">        ユーザーのApiKey一覧を取得する（user_data優先、必要に応じてsignin_fileをフォールバック）</span>
 
 <span class="sd">        Args:</span>
+<span class="sd">            req (Request): リクエストオブジェクト</span>
 <span class="sd">            signin_data (Dict[str, Any]): サインインファイルデータ</span>
 <span class="sd">            user (Dict[str, Any]): ユーザー情報</span>
 <span class="sd">            include_legacy (bool, optional): signin_fileのapikeysをフォールバックとして含めるか. Defaults to True.</span>
@@ -524,6 +526,7 @@
 <span class="sd">        サインインファイルにユーザーのApiKeyを追加する</span>
 
 <span class="sd">        Args:</span>
+<span class="sd">            req (Request): リクエストオブジェクト</span>
 <span class="sd">            user (Dict[str, Any]): ユーザー情報</span>
 
 <span class="sd">        Returns:</span>
@@ -577,6 +580,7 @@
 <span class="sd">        サインインファイルのユーザーのApiKeyを削除する</span>
 
 <span class="sd">        Args:</span>
+<span class="sd">            req (Request): リクエストオブジェクト</span>
 <span class="sd">            user (Dict[str, Any]): ユーザー情報</span>
 <span class="sd">        """</span>
         <span class="n">signin_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span>
@@ -593,7 +597,7 @@
         <span class="n">apikey</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">signin_data</span><span class="p">[</span><span class="s1">'users'</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">==</span> <span class="n">user</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]:</span>
-                <span class="n">apikeys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_user_apikeys</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">include_legacy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">apikeys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_user_apikeys</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">include_legacy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">user</span><span class="p">[</span><span class="s1">'apikey_name'</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">apikeys</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="n">apikey</span> <span class="o">=</span> <span class="n">apikeys</span><span class="p">[</span><span class="n">user</span><span class="p">[</span><span class="s1">'apikey_name'</span><span class="p">]]</span>
@@ -782,6 +786,56 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"user_del: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signin</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="o">=</span> <span class="n">signin_data</span>
         <span class="n">common</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signin_file</span><span class="p">,</span> <span class="n">signin_data</span><span class="p">,</span> <span class="n">nolock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Web.session_list">
+<a class="viewcode-back" href="../../../resources/cmdbox.app.html#cmdbox.app.web.Web.session_list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">session_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Redisに保存されているセッション情報一覧を取得する</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[Dict[str, Any]]: セッション情報の一覧</span>
+<span class="sd">        """</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># セッションキーのプレフィックス</span>
+            <span class="n">session_prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="si">}</span><span class="s2">:session."</span>
+            <span class="c1"># すべてのセッションキーを取得</span>
+            <span class="n">session_keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">session_prefix</span><span class="si">}</span><span class="s2">*"</span><span class="p">)</span>
+            <span class="n">sessions</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">session_keys</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># セッション情報を取得</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="k">else</span> <span class="n">value</span>
+                    <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="k">else</span> <span class="n">key</span>
+                    <span class="n">session_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">if</span> <span class="n">value</span> <span class="k">else</span> <span class="kc">None</span>
+                    <span class="k">if</span> <span class="n">session_data</span><span class="p">:</span>
+                        <span class="n">session_id</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">session_prefix</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+                        <span class="n">signin</span> <span class="o">=</span> <span class="n">session_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'signin'</span><span class="p">,</span> <span class="p">{})</span>
+                        <span class="n">meta</span> <span class="o">=</span> <span class="n">session_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'__metadata__'</span><span class="p">,</span> <span class="p">{})</span>
+                        <span class="n">last_access</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'last_access'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                        <span class="n">last</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y/%m/</span><span class="si">%d</span><span class="s1"> %H:%M:%S'</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">last_access</span><span class="p">))</span>
+                        <span class="n">remaining</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">last_access</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'lifetime'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+                        <span class="n">sessions</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                            <span class="s1">'session_id'</span><span class="p">:</span> <span class="n">session_id</span><span class="p">,</span>
+                            <span class="s1">'uid'</span><span class="p">:</span> <span class="n">signin</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'uid'</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">),</span>
+                            <span class="s1">'name'</span><span class="p">:</span> <span class="n">signin</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">),</span>
+                            <span class="s1">'groups'</span><span class="p">:</span> <span class="n">signin</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'groups'</span><span class="p">,</span> <span class="p">[]),</span>
+                            <span class="s1">'email'</span><span class="p">:</span> <span class="n">signin</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'email'</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">),</span>
+                            <span class="s1">'last'</span><span class="p">:</span> <span class="n">last</span><span class="p">,</span>
+                            <span class="s1">'remaining'</span><span class="p">:</span> <span class="n">remaining</span><span class="p">,</span>
+                            <span class="s1">'clmsg_id'</span><span class="p">:</span> <span class="n">signin</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'clmsg_id'</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">),</span>
+                        <span class="p">})</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to get session data for </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">continue</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"session_list: found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sessions</span><span class="p">)</span><span class="si">}</span><span class="s2"> sessions"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">sessions</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to get session list from Redis: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Web.group_list">
@@ -1128,7 +1182,7 @@
             <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">"Access-Control-Allow-Origin"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"*"</span>
             <span class="k">return</span> <span class="n">res</span>
 
-        <span class="n">session_store</span> <span class="o">=</span> <span class="n">RedisStore</span><span class="p">(</span><span class="n">connection</span><span class="o">=</span><span class="n">session_redis</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">"cmdbox:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="si">}</span><span class="s2">:session."</span><span class="p">)</span>
+        <span class="n">session_store</span> <span class="o">=</span> <span class="n">RedisStore</span><span class="p">(</span><span class="n">connection</span><span class="o">=</span><span class="n">session_redis</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ver</span><span class="o">.</span><span class="n">__appid__</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="si">}</span><span class="s2">:session."</span><span class="p">)</span>
         <span class="n">mwparam</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">store</span><span class="o">=</span><span class="n">session_store</span><span class="p">,</span> <span class="n">cookie_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">session_path</span><span class="p">,</span>
                        <span class="n">lifetime</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">session_timeout</span><span class="p">,</span> <span class="n">rolling</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cookie_same_site</span><span class="o">=</span><span class="s2">"lax"</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

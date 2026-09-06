@@ -75,10 +75,11 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
             # ユーザー情報を取得する
             user_name, groups, mcpserver_apikey, a2asv_apikey, language = self.get_user_info(web, session)
             startmsg = self.get_startmsg(web, user_name, groups, mcpserver_apikey, a2asv_apikey)
-            st, ret, _ = llm_translation.apprun(web.logger, argparse.Namespace(
-                host=web.redis_host, port=web.redis_port, password=web.redis_password, svname=web.svname,
-                target_lang=language, words=[startmsg], cache_clear=False), 0, [])
-            startmsg = ret.get('success', {}).get('data', {}).get(startmsg, startmsg)
+            if startmsg:
+                st, ret, _ = llm_translation.apprun(web.logger, argparse.Namespace(
+                    host=web.redis_host, port=web.redis_port, password=web.redis_password, svname=web.svname,
+                    target_lang=language, words=[startmsg], cache_clear=False), 0, [])
+                startmsg = ret.get('success', {}).get('data', {}).get(startmsg, startmsg)
             yield json.dumps(dict(success=dict(message=startmsg)), default=common.default_json_enc)
 
             agent_chat = cmdbox_agent_chat.AgentChat(self.appcls, self.ver)

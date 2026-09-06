@@ -328,100 +328,142 @@ agentView.parse_message = (message) => {
         message = message.trim();
         const msg_json = JSON.parse(message);
         const ret = [];
-        const escapeHtml = (value) => {
-            if (value === null || value === undefined) return '';
-            return String(value)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        };
-        const jsonToTable = (value) => {
-            if (value === null || value === undefined) {
-                return '<span class="text-muted">null</span>';
-            }
-            if (Array.isArray(value)) {
-                if (value.length <= 0) {
-                    return '<span class="text-muted">[]</span>';
-                }
-                if (typeof value[0] === 'object') {
-                    const keys = Object.keys(value[0]);
-                    const cols = keys.map((key) => {
-                        return `<th class="th">${escapeHtml(key)}</th>`;
-                    }).join('');
-                    const rows = value.map((item, index) => {
-                        const tds = keys.map((key) => {
-                            return `<td>${jsonToTable(item[key])}</td>`;
-                        }).join('');
-                        return `<tr>${tds}</tr>`;
-                    }).join('');
-                    return `<table class="table table-sm table-bordered align-middle mb-2"><thead><tr>${cols}</tr></thead><tbody>${rows}</tbody></table>`;
-                }
-                if (value.length <= 1) {
-                    return `<span>${escapeHtml(value[0])}</span>`;
-                }
-                const rows = value.map((item, index) => {
-                    return `<tr><th class="th">${index}</th><td>${jsonToTable(item)}</td></tr>`;
-                }).join('');
-                return `<table class="table table-sm table-bordered align-middle mb-2"><tbody>${rows}</tbody></table>`;
-            }
-            if (typeof value === 'object') {
-                const keys = Object.keys(value);
-                if (keys.length <= 0) {
-                    return '<span class="text-muted">{}</span>';
-                }
-                const cols = keys.map((key) => {
-                    return `<th class="th">${escapeHtml(key)}</th>`;
-                }).join('');
-                const rows = keys.map((key) => {
-                    return `<td>${jsonToTable(value[key])}</td>`;
-                }).join('');
-                return `<table class="table table-sm table-bordered align-middle mb-2"><thead><tr>${cols}</tr></thead><tbody><tr>${rows}</tr></tbody></table>`;
-            }
-            return `<span>${escapeHtml(value)}</span>`;
-        };
-        const rep = (str) => {
-            try {
-                str = str.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '');
-                const elem = $(str);
-                elem.each((index, element) => {
-                    const el = $(element);
-                    el.html(marked.parse(el.html()));
-                });
-                if (elem.length > 0) str = elem.prop('outerHTML');
-            } catch (e) {
-                console.error(`Failed to parse message: ${str}`, e);
-            }
-            return str;
-        };
-        msg_json && msg_json['message'] && ret.push(`${rep(msg_json['message'])}\n`);
-        msg_json && msg_json['command'] && (ret.push(`**Command:**`) && ret.push(`- ${rep(msg_json['command'])}\n`));
-        if (msg_json && msg_json['parameters_json'] && msg_json['parameters_json'] !== '{}') {
-            try {
-                const obj = JSON.parse(msg_json['parameters_json']);
-                ret.push('**Parameters:**');
-                ret.push(`<div class="json-table-wrap">${jsonToTable(obj)}</div>`);
-            } catch (e) {
-                ret.push('**Parameters:**');
-                ret.push(`<div class="json-table-wrap"><pre>${escapeHtml(msg_json['parameters_json'])}</pre></div>`);
-            }
+        if (msg_json) {
+            agentView.render_msgjson_message(msg_json['message'], ret);
+            agentView.render_msgjson_command(msg_json['command'], ret);
+            agentView.render_msgjson_parameter(msg_json['parameters_json'], ret);
+            agentView.render_msgjson_result(msg_json['result_json'], ret);
+            agentView.render_msgjson_error(msg_json['error'], ret);
         }
-        if (msg_json && msg_json['result_json']) {
-            try {
-                const obj = JSON.parse(msg_json['result_json']);
-                ret.push('**Result:**');
-                ret.push(`<div class="json-table-wrap">${jsonToTable(obj)}</div>`);
-            } catch (e) {
-                ret.push('**Result:**');
-                ret.push(`<div class="json-table-wrap"><pre>${escapeHtml(msg_json['result_json'])}</pre></div>`);
-            }
-        }
-        msg_json && msg_json['error'] && (ret.push(`**Error:**`) && ret.push(`- ${rep(msg_json['error'])}\n`));
         return ret.join('\n');
     } catch (error) {
         return message;
     }
+};
+agentView.render_msgjson_escape_html = (value) => {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+};
+agentView.render_msgjson_json_to_table = (value) => {
+    if (value === null || value === undefined) {
+        return '<span class="text-muted">null</span>';
+    }
+    if (Array.isArray(value)) {
+        if (value.length <= 0) {
+            return '<span class="text-muted">[]</span>';
+        }
+        if (typeof value[0] === 'object') {
+            const keys = Object.keys(value[0]);
+            const cols = keys.map((key) => {
+                return `<th class="th">${agentView.render_msgjson_escape_html(key)}</th>`;
+            }).join('');
+            const rows = value.map((item, index) => {
+                const tds = keys.map((key) => {
+                    return `<td>${agentView.render_msgjson_json_to_table(item[key])}</td>`;
+                }).join('');
+                return `<tr>${tds}</tr>`;
+            }).join('');
+            return `<table class="table table-sm table-bordered align-middle mb-2"><thead><tr>${cols}</tr></thead><tbody>${rows}</tbody></table>`;
+        }
+        if (value.length <= 1) {
+            return `<span>${agentView.render_msgjson_escape_html(value[0])}</span>`;
+        }
+        const rows = value.map((item, index) => {
+            return `<tr><th class="th">${index}</th><td>${agentView.render_msgjson_json_to_table(item)}</td></tr>`;
+        }).join('');
+        return `<table class="table table-sm table-bordered align-middle mb-2"><tbody>${rows}</tbody></table>`;
+    }
+    if (typeof value === 'object') {
+        const keys = Object.keys(value);
+        if (keys.length <= 0) {
+            return '<span class="text-muted">{}</span>';
+        }
+        const cols = keys.map((key) => {
+            return `<th class="th">${agentView.render_msgjson_escape_html(key)}</th>`;
+        }).join('');
+        const rows = keys.map((key) => {
+            return `<td>${agentView.render_msgjson_json_to_table(value[key])}</td>`;
+        }).join('');
+        return `<table class="table table-sm table-bordered align-middle mb-2"><thead><tr>${cols}</tr></thead><tbody><tr>${rows}</tr></tbody></table>`;
+    }
+    return `<span>${agentView.render_msgjson_escape_html(value)}</span>`;
+};
+agentView.render_msgjson_rep = (str) => {
+    try {
+        str = str.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '');
+        const elem = $(str);
+        elem.each((index, element) => {
+            const el = $(element);
+            el.html(marked.parse(el.html()));
+        });
+        if (elem.length > 0) str = elem.prop('outerHTML');
+    } catch (e) {
+        console.error(`Failed to parse message: ${str}`, e);
+    }
+    return str;
+};
+/**
+ * Agentから返されるmessageをレンダリングする拡張ポイントです
+ * @param {string} content messageの内容
+ * @param {Array<string>} ret レンダリング結果を格納する配列
+ */
+agentView.render_msgjson_message = (content, ret=[]) => {
+    content && ret.push(`${agentView.render_msgjson_rep(content)}\n`);
+};
+/**
+ * Agentから返されるcommandをレンダリングする拡張ポイントです
+ * @param {string} content commandの内容
+ * @param {Array<string} ret レンダリング結果を格納する配列
+ */
+agentView.render_msgjson_command = (content, ret=[]) => {
+    content && (ret.push(`**Command:**`) && ret.push(`- ${agentView.render_msgjson_rep(content)}\n`));
+};
+/**
+ * Agentから返されるparameterをレンダリングする拡張ポイントです
+ * @param {string} content parameterの内容
+ * @param {Array<string} ret レンダリング結果を格納する配列
+ */
+agentView.render_msgjson_parameter = (content, ret=[]) => {
+    if (content && content !== '{}') {
+        try {
+            const obj = JSON.parse(content);
+            ret.push('**Parameters:**');
+            ret.push(`<div class="json-table-wrap">${agentView.render_msgjson_json_to_table(obj)}</div>`);
+        } catch (e) {
+            ret.push('**Parameters:**');
+            ret.push(`<div class="json-table-wrap"><pre>${agentView.render_msgjson_escape_html(content)}</pre></div>`);
+        }
+    }
+};
+/**
+ * Agentから返されるresultをレンダリングする拡張ポイントです
+ * @param {string} content resultの内容
+ * @param {Array<string} ret レンダリング結果を格納する配列
+ */
+agentView.render_msgjson_result = (content, ret=[]) => {
+    if (content) {
+        try {
+            const obj = JSON.parse(content);
+            ret.push('**Result:**');
+            ret.push(`<div class="json-table-wrap">${agentView.render_msgjson_json_to_table(obj)}</div>`);
+        } catch (e) {
+            ret.push('**Result:**');
+            ret.push(`<div class="json-table-wrap"><pre>${agentView.render_msgjson_escape_html(content)}</pre></div>`);
+        }
+    }
+};
+/**
+ * Agentから返されるerrorをレンダリングする拡張ポイントです
+ * @param {string} content errorの内容
+ * @param {Array<string>} ret レンダリング結果を格納する配列
+ */
+agentView.render_msgjson_error = (content, ret=[]) => {
+    content && (ret.push(`**Error:**`) && ret.push(`- ${agentView.render_msgjson_rep(content)}\n`));
 };
 agentView.create_user_message = (msg, ctx) => {
     const msgDiv = $('<div/>').appendTo(agentView.chatMessages);

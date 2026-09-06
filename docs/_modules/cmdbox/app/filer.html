@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cmdbox.app.filer &mdash; cmdbox 2026/08/30 documentation</title>
+  <title>cmdbox.app.filer &mdash; cmdbox 2026/09/06 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=1fc88e0b"></script>
+      <script src="../../../_static/documentation_options.js?v=cfafd609"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -211,9 +211,10 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">with</span> <span class="n">os</span><span class="o">.</span><span class="n">scandir</span><span class="p">(</span><span class="n">dir_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">entries</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
-                        <span class="c1"># メタファイルをスキップ</span>
                         <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'.meta'</span><span class="p">):</span>
-                            <span class="k">continue</span>
+                            <span class="k">continue</span> <span class="c1"># メタファイルをスキップ</span>
+                        <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">'.lock'</span><span class="p">):</span>
+                            <span class="k">continue</span> <span class="c1"># ロックファイルをスキップ</span>
                         <span class="k">try</span><span class="p">:</span>
                             <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">is_dir</span><span class="p">(</span><span class="n">follow_symlinks</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
                                 <span class="n">dirs_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -225,10 +226,10 @@
                                 <span class="n">dirs_size</span> <span class="o">+=</span> <span class="n">stat_info</span><span class="o">.</span><span class="n">st_size</span>
                                 <span class="k">if</span> <span class="n">stat_info</span><span class="o">.</span><span class="n">st_mtime</span> <span class="o">&gt;</span> <span class="n">max_mtime</span><span class="p">:</span>
                                     <span class="n">max_mtime</span> <span class="o">=</span> <span class="n">stat_info</span><span class="o">.</span><span class="n">st_mtime</span>
-                        <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">PermissionError</span><span class="p">):</span>
+                        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                             <span class="c1"># アクセス権限がない場合はスキップ</span>
                             <span class="k">continue</span>
-            <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">PermissionError</span><span class="p">):</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="c1"># ディレクトリにアクセスできない場合はスキップ</span>
                 <span class="k">pass</span>
         <span class="n">_scan_dir</span><span class="p">(</span><span class="n">abspath</span><span class="p">)</span>
