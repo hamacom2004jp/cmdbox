@@ -77,6 +77,25 @@ class Audit(feature.WebFeature):
                 return dict(warn='audit feature is disabled.')
             return dict(success=web.options.audit_search_args)
 
+        @app.post('/audit/write', responses=feature.WebFeature.DEFAULT_RESPONCE_STATES)
+        async def audit_write(req:Request, res:Response):
+            signin = web.signin.check_signin(req, res)
+            if signin is not None:
+                return signin
+            try:
+                body = await req.json()
+                audit_type = body.get('audit_type')
+                clmsg_src = body.get('clmsg_src')
+                clmsg_title = body.get('clmsg_title')
+                clmsg_body = body.get('clmsg_body', {})
+                clmsg_tag = body.get('clmsg_tag', [])
+            except Exception as e:
+                return dict(error=f'Failed to parse request body: {e}')
+            web.options.audit_exec(req, res, web, body=clmsg_body, audit_type=audit_type,
+                                   tags=clmsg_tag, src=clmsg_src, title=clmsg_title,
+                                   user=req.session.get('signin', {}).get('name'))
+            return dict(success='write log.')
+
     def toolmenu(self, web:Web) -> Dict[str, Any]:
         """
         ツールメニューの情報を返します

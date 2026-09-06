@@ -234,7 +234,8 @@ class ExecCmd(cmdbox_web_load_cmd.LoadCmd):
             if 'groups' in req.session['signin'] and req.session['signin']['groups'] is not None:
                 opt['groups'] = req.session['signin']['groups']
             if 'name' in req.session['signin'] and req.session['signin']['name'] is not None:
-                opt['meta'].update(dict(last_access_user=req.session['signin']['name']))
+                opt['meta'].update(dict(last_access_user=req.session['signin']['name'])) # ファイル操作のmeta情報として最後にアクセスしたユーザーを記録
+                opt['clmsg_user'] = req.session['signin']['name'] # 監査ログ用のユーザー名を強制上書き
         opt['meta'].update(dict(last_access_date=datetime.now().isoformat()))
         opt = self.coercion_param(req.session, opt.copy())
         ap.sv = None

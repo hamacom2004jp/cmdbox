@@ -2593,3 +2593,70 @@ cmdbox.add_url = async (url, period=600) => {
     const gen_url = `${res.success.data.short_url}`;
     return gen_url;
 }
+/**
+ * 監査ログを書き込みます。
+ * @param {string} audit_type 監査の種類
+ * @param {string} clmsg_src メッセージの発生源
+ * @param {string} clmsg_title メッセージタイトル
+ * @param {Object} clmsg_body メッセージの本文
+ * @param {Array} clmsg_tag メッセージのタグ
+ * @returns {Promise<Object>}
+ */
+cmdbox.audit_write = async (audit_type, clmsg_src, clmsg_title, clmsg_body={}, clmsg_tag=[]) => {
+    try {
+        return fetch('audit/write', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({audit_type:audit_type, clmsg_src:clmsg_src, clmsg_title:clmsg_title, clmsg_body:clmsg_body, clmsg_tag:clmsg_tag})
+        }).then(response => response.json()).catch((e) => {
+            console.warn(e);
+            return {'warn': e.toString()};
+        });
+    } catch (e) {
+        console.warn(e);
+        return {'warn': e.toString()};
+    }
+};
+
+/**
+ * すべてのBootstrapモーダルが開かれた時にcmdbox.audit_writeを呼び出す
+ * Bootstrap内部の処理に差し込むことで、動的に生成されるモーダルにも対応
+ */
+if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+    const originalShow = bootstrap.Modal.prototype.show;
+    bootstrap.Modal.prototype.show = function() {
+        // 元のshow()を呼び出す
+        originalShow.call(this);
+        // モーダルが完全に開かれたときにaudit_writeを実行
+        const handleShown = async () => {
+            const modalId = this._element.id || 'unnamed_modal';
+            const modalTitle = $(this._element).find('.modal-title').text() || modalId;
+            await cmdbox.audit_write('user', window.location.pathname, `Modal_${modalTitle?modalTitle.trim():modalId}`, 
+                {modal_id: modalId});
+            this._element.removeEventListener('shown.bs.modal', handleShown);
+        };
+        this._element.addEventListener('shown.bs.modal', handleShown);
+    };
+}
+
+// jQuery プラグイン形式でも対応（互換性のため）
+if (typeof $ !== 'undefined') {
+    const originalModalFn = $.fn.modal;
+    $.fn.modal = function(option) {
+        // 元のmodal()を呼び出す
+        originalModalFn.call(this, option);
+        // show オプションの場合、audit_writeを呼び出す
+        if (option === 'show' || (typeof option === 'object' && option.show !== false)) {
+            const self = this;
+            this.one('shown.bs.modal', async function() {
+                const modalId = $(self).attr('id') || 'unnamed_modal';
+                const modalTitle = $(self).find('.modal-title').text() || modalId;
+                await cmdbox.audit_write('user', window.location.pathname, `Modal_${modalTitle?modalTitle.trim():modalId}`, 
+                    {modal_id: modalId});
+            });
+        }
+        return this;
+    };
+}

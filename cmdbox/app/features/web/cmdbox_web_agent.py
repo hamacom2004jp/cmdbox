@@ -1,13 +1,13 @@
 from cmdbox.app import common, options
 from cmdbox.app.auth import signin
-from cmdbox.app.features.cli import cmdbox_agent_chat
+from cmdbox.app.features.cli import cmdbox_agent_chat, cmdbox_llm_translation
 from cmdbox.app.features.web import cmdbox_web_exec_cmd
 from cmdbox.app.web import Web
 from fastapi import FastAPI, Depends, HTTPException, Request, Response, WebSocket
 from fastapi.responses import HTMLResponse
 from starlette.websockets import WebSocketDisconnect
 from typing import Dict, Any, Tuple, List, Union
-import datetime
+import argparse
 import logging
 import json
 import jwt
@@ -71,10 +71,15 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
         async def _chat(session:Dict[str, Any], runner_name:str, session_id:str, sock, res:Response, receive_text=None):
             if web.logger.level == logging.DEBUG:
                 web.logger.debug(f"agent_chat: connected")
-
+            llm_translation = cmdbox_llm_translation.LLMTranslation(self.appcls, self.ver)
             # ユーザー情報を取得する
-            user_name, groups, mcpserver_apikey, a2asv_apikey = self.get_user_info(web, session)
-            yield json.dumps(dict(success=dict(message=self.get_startmsg(web, user_name, groups, mcpserver_apikey, a2asv_apikey))), default=common.default_json_enc)
+            user_name, groups, mcpserver_apikey, a2asv_apikey, language = self.get_user_info(web, session)
+            startmsg = self.get_startmsg(web, user_name, groups, mcpserver_apikey, a2asv_apikey)
+            st, ret, _ = llm_translation.apprun(web.logger, argparse.Namespace(
+                host=web.redis_host, port=web.redis_port, password=web.redis_password, svname=web.svname,
+                target_lang=language, words=[startmsg], cache_clear=False), 0, [])
+            startmsg = ret.get('success', {}).get('data', {}).get(startmsg, startmsg)
+            yield json.dumps(dict(success=dict(message=startmsg)), default=common.default_json_enc)
 
             agent_chat = cmdbox_agent_chat.AgentChat(self.appcls, self.ver)
             _options = options.Options.getInstance(self.appcls, self.ver)
@@ -144,17 +149,10 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
             str: 開始メッセージ
         """
         if mcpserver_apikey is None or a2asv_apikey is None:
-            if common.is_japan(language=web.language):
-                return "有効なAPIキーが設定されていません。ユーザーメニューから設定し、リロードしてからご利用ください。"
-            else:
-                return "A valid API key has not been configured. Please configure it from the user menu, reload the page, and then use the service."
+            return "A valid API key has not been configured. Please configure it from the user menu, reload the page, and then use the service."
+        return "Hello! Is there anything I can help you with?"
 
-        if common.is_japan(language=web.language):
-            return "こんにちは！何かお手伝いできることはありますか？"
-        else:
-            return "Hello! Is there anything I can help you with?"
-
-    def get_user_info(self, web:Web, session:Dict[str, Any]) -> Tuple[str, List[str], Union[str, None], Union[str, None]]:
+    def get_user_info(self, web:Web, session:Dict[str, Any]) -> Tuple[str, List[str], Union[str, None], Union[str, None], str]:
         user_name = common.random_string(16)
         groups = []
         mcpserver_apikey = None
@@ -173,7 +171,9 @@ class Agent(cmdbox_web_exec_cmd.ExecCmd):
                     if valid_apikey is not None:
                         mcpserver_apikey = valid_apikey
                         a2asv_apikey = valid_apikey
-        return user_name, groups, mcpserver_apikey, a2asv_apikey
+        language = session.get('user_data', {}).get('language', {}).get('default', web.language)
+        language = language if language else web.language
+        return user_name, groups, mcpserver_apikey, a2asv_apikey, language
 
     def _select_valid_apikey(self, web:Web, apikeys:Dict[str, str]) -> Union[str, None]:
         """
