@@ -2,7 +2,15 @@ from cmdbox.app import common, client, options
 from cmdbox.app.auth import signin
 from cmdbox.app.commons import convert, limiter, redis_client, resdata, validator
 from cmdbox.app.features.cli import cmdbox_tts_say
-from cmdbox.app.features.cli.agent import agant_base
+from cmdbox.app.features.cli.agent import (
+    agant_base,
+    SQLInjectionDetectionPlugin,
+    JavaScriptInjectionPlugin,
+    TemplateInjectionDetectionPlugin,
+    MaliciousKeywordDetectionPlugin,
+    DangerousSequencePlugin,
+    PromptInjectionException,
+)
 from cmdbox.app.options import Options
 from contextlib import aclosing
 from pathlib import Path
@@ -741,6 +749,9 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
                                    agent_session:Any, reskey:str) -> List[Any]:
         """
         Runner用のプラグインを作成します。
+        
+        Google ADK 公式の BasePlugin インターフェースを使用して、
+        プロンプトインジェクション攻撃を検知・遮断するプラグインを作成します。
 
         Args:
             logger (logging.Logger): ロガー
@@ -753,7 +764,14 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         Returns:
             List[Any]: 作成したプラグインのリスト
         """
-        return []
+        plugins = [
+            SQLInjectionDetectionPlugin(logger),
+            JavaScriptInjectionPlugin(logger),
+            TemplateInjectionDetectionPlugin(logger),
+            MaliciousKeywordDetectionPlugin(logger),
+            DangerousSequencePlugin(logger),
+        ]
+        return plugins
 
     def prepare_agent_conf(self, agent_conf:Dict[str, Any], payload:Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -822,6 +840,21 @@ class AgentChat(agant_base.AgentBase, validator.Validator, limiter.LimitedFeatur
         Returns:
             int: ステータス
         """
+        try:
+            # プロンプトインジェクション検知エラーの場合は特別なメッセージを返す
+            if isinstance(exc, PromptInjectionException):
+                msg = dict(warn=dict(
+                    error='Prompt Injection Attack Detected',
+                    message=str(exc),
+                    pattern=exc.pattern_type,
+                    detail='Your message contains suspicious patterns that could be used for prompt injection attacks. Please review your input.'
+                ))
+                logger.warning(f"Prompt injection detected: {exc.to_dict()}", exc_info=True)
+                redis_cli.rpush(reskey, msg)
+                return self.RESP_WARN
+        except Exception as inner_exc:
+            logger.debug(f"Error processing exception type check: {inner_exc}")
+        # その他の例外は通常処理
         msg = dict(warn=f"{self.get_mode()}_{self.get_cmd()}: {exc}")
         logger.warning(f"{self.get_mode()}_{self.get_cmd()}: {exc}", exc_info=True)
         redis_cli.rpush(reskey, msg)

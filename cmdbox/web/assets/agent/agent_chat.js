@@ -3,7 +3,16 @@ agentView.scrollToBottom = () => {
 };
 agentView.chat_listeners = [];
 agentView.chat_send_filters = [];
-agentView.user_message_listeners = [];
+agentView.user_message_listeners = [
+    (msgDiv, msg, ctx) => {
+        msg = msg ? msg : '';
+        msg = msg.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
+        msgDiv.html(`
+            <span class="msg-label msg-label-user">${agentView.user ? agentView.user['name'] : 'USER'}</span>
+            <div class="msg-content">${msg}</div>
+        `);
+    }
+];
 agentView.before_chat_listeners = [];
 agentView.after_chat_listeners = [];   // 
 /**
@@ -468,10 +477,6 @@ agentView.render_msgjson_error = (content, ret=[]) => {
 agentView.create_user_message = (msg, ctx) => {
     const msgDiv = $('<div/>').appendTo(agentView.chatMessages);
     msgDiv.addClass(`message message-user`);
-    msgDiv.html(`
-        <span class="msg-label msg-label-user">${agentView.user ? agentView.user['name'] : 'USER'}</span>
-        <div class="msg-content">${msg}</div>
-    `);
     agentView.user_message(msgDiv, msg, ctx);
     agentView.scrollToBottom();
 };
