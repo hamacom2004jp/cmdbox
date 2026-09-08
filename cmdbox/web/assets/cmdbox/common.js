@@ -2626,9 +2626,9 @@ cmdbox.audit_write = async (audit_type, clmsg_src, clmsg_title, clmsg_body={}, c
  */
 if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
     const originalShow = bootstrap.Modal.prototype.show;
-    bootstrap.Modal.prototype.show = function() {
+    bootstrap.Modal.prototype.show = function(...args) {
         // 元のshow()を呼び出す
-        originalShow.call(this);
+        originalShow.apply(this, args);
         // モーダルが完全に開かれたときにaudit_writeを実行
         const handleShown = async () => {
             const modalId = this._element.id || 'unnamed_modal';
@@ -2644,9 +2644,10 @@ if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
 // jQuery プラグイン形式でも対応（互換性のため）
 if (typeof $ !== 'undefined') {
     const originalModalFn = $.fn.modal;
-    $.fn.modal = function(option) {
+    $.fn.modal = function(...args) {
+        const option = args[0];
         // 元のmodal()を呼び出す
-        originalModalFn.call(this, option);
+        const result = originalModalFn.apply(this, args);
         // show オプションの場合、audit_writeを呼び出す
         if (option === 'show' || (typeof option === 'object' && option.show !== false)) {
             const self = this;
@@ -2657,6 +2658,6 @@ if (typeof $ !== 'undefined') {
                     {modal_id: modalId});
             });
         }
-        return this;
+        return result;
     };
 }
