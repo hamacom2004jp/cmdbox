@@ -106,7 +106,7 @@ class WebGroupList(feature.UnsupportEdgeFeature, validator.Validator):
 
     def output_schema(self) -> type:
         class GroupRecord(resdata.Base):
-            gid: Union[str, None] = pydantic.Field(default=None, description="グループID")
+            gid: Union[str, int, None] = pydantic.Field(default=None, description="グループID")
             name: Union[str, None] = pydantic.Field(default=None, description="名前")
             home: Union[str, None] = pydantic.Field(default=None, description="ホームディレクトリ")
             parent: Union[str, None] = pydantic.Field(default=None, description="親グループ")

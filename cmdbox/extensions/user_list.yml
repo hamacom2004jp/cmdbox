@@ -125,6 +125,10 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     cmds: [counter, evidences, # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
            list, load, targets, plan_list, plan_load]
     rule: allow
+  - groups: [admin]
+    mode: web
+    cmds: [user_add, user_del, user_edit, user_list, group_add, group_del, group_edit, group_list]
+    rule: allow
   - groups: [master]
     mode: test
     rule: deny
@@ -138,7 +142,7 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     rule: allow
   - groups: [admin, guest, user]
     mode: llm
-    cmds: [list, chat, translation]
+    cmds: [list, chat, embed, translation]
     rule: allow
   - groups: [admin, user]
     mode: client
@@ -152,10 +156,6 @@ cmdrule:                       # A list of command rules, Specify a rule that de
   - groups: [admin, user]
     mode: cmd
     cmds: [list, load, check]
-    rule: allow
-  - groups: [admin, user]
-    mode: embed
-    cmds: [list]
     rule: allow
   - groups: [admin, user]
     mode: extract
@@ -208,10 +208,6 @@ cmdrule:                       # A list of command rules, Specify a rule that de
   - groups: [admin, editor]
     mode: llm
     cmds: [del, load, save]
-    rule: allow
-  - groups: [admin, editor]
-    mode: embed
-    cmds: [del, load, save, start, stop]
     rule: allow
 pathrule:                      # List of RESTAPI rules, rules that determine whether or not a RESTAPI can be executed when a user in web mode accesses it.
   policy: deny                 # Specify the default policy for the rule. The value can be allow or deny.

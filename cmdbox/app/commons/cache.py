@@ -45,6 +45,7 @@ def apprun_cache(func:Callable=None, args_key:str=None, exclude_fn:Callable=None
             cached = self._apprun_cache.get(cache_key)
             if not cached:
                 st, msg, obj = f(self, logger, args, tm, pf)
+                # 処理に成功した場合のみキャッシュに保存します
                 if st == feature.Feature.RESP_SUCCESS:
                     self._apprun_cache.set(cache_key, msg, getattr(args, 'cache_timeout', 60))
                 return st, msg, obj

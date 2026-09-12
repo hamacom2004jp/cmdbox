@@ -2,6 +2,7 @@ from cmdbox.app import common, client
 from cmdbox.app.commons import convert, redis_client, resdata, validator
 from cmdbox.app.features.cli.audit import audit_base
 from cmdbox.app.options import Options
+from contextlib import ExitStack
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
@@ -12,13 +13,28 @@ import pydantic
 import uuid
 import time
 import re
+import sqlite3
+import threading
 
 
 class AuditWrite(audit_base.AuditBase, validator.Validator):
+    RETENTION_CLEANUP_INTERVAL_SEC = 300
+    _last_retention_cleanup_time = 0.0
+    _retention_cleanup_lock = threading.Lock()
+
     def __init__(self, appcls, ver, language = None):
         super().__init__(appcls, ver, language)
         self.buffer = []
         self.last_write_time = 0
+
+    @classmethod
+    def _should_run_retention_cleanup(cls) -> bool:
+        now = time.time()
+        with cls._retention_cleanup_lock:
+            if now - cls._last_retention_cleanup_time < cls.RETENTION_CLEANUP_INTERVAL_SEC:
+                return False
+            cls._last_retention_cleanup_time = now
+            return True
 
     def get_mode(self) -> Union[str, List[str]]:
         """
@@ -234,25 +250,37 @@ class AuditWrite(audit_base.AuditBase, validator.Validator):
             int: 終了コード
         """
         chunks = json.loads(convert.b64str2str(msg[2]))
-        for payload in chunks:
-            audit_type = payload.get("audit_type")
-            clmsg_id = payload.get("clmsg_id")
-            clmsg_date = payload.get("clmsg_date")
-            clmsg_src = payload.get("clmsg_src")
-            clmsg_title = payload.get("clmsg_title")
-            clmsg_user = payload.get("clmsg_user")
-            clmsg_body = payload.get("clmsg_body")
-            clmsg_tag = payload.get("clmsg_tag")
-            pg_enabled = payload.get("pg_enabled")
-            pg_host = payload.get("pg_host")
-            pg_port = payload.get("pg_port")
-            pg_user = payload.get("pg_user")
-            pg_password = payload.get("pg_password")
-            pg_dbname = payload.get("pg_dbname")
-            retention_period_days = payload.get("retention_period_days")
-            svmsg_id = str(uuid.uuid4())
-            self.initdb(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname)
-            with self.get_context(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname) as conn:
+        if len(chunks) == 0:
+            return self.RESP_WARN
+
+        st = self.RESP_SUCCESS
+        with ExitStack() as stack:
+            conn_map = {}
+            for payload in chunks:
+                audit_type = payload.get("audit_type")
+                clmsg_id = payload.get("clmsg_id")
+                clmsg_date = payload.get("clmsg_date")
+                clmsg_src = payload.get("clmsg_src")
+                clmsg_title = payload.get("clmsg_title")
+                clmsg_user = payload.get("clmsg_user")
+                clmsg_body = payload.get("clmsg_body")
+                clmsg_tag = payload.get("clmsg_tag")
+                pg_enabled = payload.get("pg_enabled")
+                pg_host = payload.get("pg_host")
+                pg_port = payload.get("pg_port")
+                pg_user = payload.get("pg_user")
+                pg_password = payload.get("pg_password")
+                pg_dbname = payload.get("pg_dbname")
+                retention_period_days = payload.get("retention_period_days")
+                svmsg_id = str(uuid.uuid4())
+
+                conn_key = (pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname)
+                conn = conn_map.get(conn_key)
+                if conn is None:
+                    self.initdb(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname)
+                    conn = stack.enter_context(self.get_context(data_dir, logger, pg_enabled, pg_host, pg_port, pg_user, pg_password, pg_dbname))
+                    conn_map[conn_key] = conn
+
                 st = self.write(conn, reskey=msg[1], audit_type=audit_type, clmsg_id=clmsg_id, clmsg_date=clmsg_date, clmsg_src=clmsg_src,
                                 clmsg_title=clmsg_title, clmsg_user=clmsg_user, clmsg_body=clmsg_body, clmsg_tag=clmsg_tag,
                                 svmsg_id=svmsg_id, pg_enabled=pg_enabled, retention_period_days=retention_period_days,
@@ -287,33 +315,48 @@ class AuditWrite(audit_base.AuditBase, validator.Validator):
             int: レスポンスコード
         """
         try:
-            cursor = conn.cursor()
-            try:
-                svmsg_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + common.get_tzoffset_str()
-                if not pg_enabled:
-                    cursor.execute('''
-                        INSERT INTO audit (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tag, 
-                                        svmsg_id, svmsg_date)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ''', (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tag, svmsg_id, svmsg_date))
-                    if retention_period_days is not None and retention_period_days > 0:
-                        cursor.execute('DELETE FROM audit WHERE svmsg_date < datetime(CURRENT_TIMESTAMP, ?)',
-                                        (f'-{retention_period_days} days',))
-                else:
-                    cursor.execute('''
-                        INSERT INTO audit (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tag, 
-                                        svmsg_id, svmsg_date)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    ''', (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tag, svmsg_id, svmsg_date))
-                    if retention_period_days is not None and retention_period_days > 0:
-                        cursor.execute("DELETE FROM audit WHERE svmsg_date < CURRENT_TIMESTAMP + %s ",
-                                        (f'-{retention_period_days} day',))
-                conn.commit()
-                rescode, msg = (self.RESP_SUCCESS, dict(success=True))
-                redis_cli.rpush(reskey, msg)
-                return rescode
-            finally:
-                cursor.close()
+            max_retry = 5
+            for attempt in range(max_retry + 1):
+                cursor = conn.cursor()
+                try:
+                    svmsg_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + common.get_tzoffset_str()
+                    run_retention_cleanup = retention_period_days is not None and retention_period_days > 0 and self._should_run_retention_cleanup()
+                    if not pg_enabled:
+                        cursor.execute('''
+                            INSERT INTO audit (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tag, 
+                                            svmsg_id, svmsg_date)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ''', (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tag, svmsg_id, svmsg_date))
+                        if run_retention_cleanup:
+                            cursor.execute('DELETE FROM audit WHERE svmsg_date < datetime(CURRENT_TIMESTAMP, ?)',
+                                            (f'-{retention_period_days} days',))
+                    else:
+                        cursor.execute('''
+                            INSERT INTO audit (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tag, 
+                                            svmsg_id, svmsg_date)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        ''', (audit_type, clmsg_id, clmsg_date, clmsg_src, clmsg_title, clmsg_user, clmsg_body, clmsg_tag, svmsg_id, svmsg_date))
+                        if run_retention_cleanup:
+                            cursor.execute("DELETE FROM audit WHERE svmsg_date < CURRENT_TIMESTAMP + %s ",
+                                            (f'-{retention_period_days} day',))
+                    conn.commit()
+                    rescode, msg = (self.RESP_SUCCESS, dict(success=True))
+                    redis_cli.rpush(reskey, msg)
+                    return rescode
+                except sqlite3.OperationalError as e:
+                    # SQLiteのロック競合時のみ再試行する
+                    is_locked = (not pg_enabled) and ('database is locked' in str(e).lower())
+                    if not is_locked or attempt >= max_retry:
+                        raise
+                    try:
+                        conn.rollback()
+                    except Exception:
+                        pass
+                    wait_sec = 0.2 * (2 ** attempt)
+                    logger.warning(f"Audit write retry due to sqlite lock. attempt={attempt+1}/{max_retry}, wait={wait_sec:.2f}s")
+                    time.sleep(wait_sec)
+                finally:
+                    cursor.close()
         except Exception as e:
             logger.warning(f"Failed to write: {e}", exc_info=True)
             redis_cli.rpush(reskey, dict(warn=f"Failed to write: {e}"))

@@ -375,10 +375,12 @@ limiter_plan_page.open_edit_modal = async (name) => {
     // limiters の行数を先に確保してからリストをロード（list_cmd.js と同じパターン）
     const limiter_names = cfg.limiters ? cfg.limiters.map(l => typeof l === 'string' ? l : l.limiter_name).filter(n => n) : [];
     let limiters = form.find('[name="limiters"]');
-    limiter_names.forEach((v, i) => {
-        const e = limiters.parent().find('.add_buton')[i];
-        if (e) $(e).click();
-    });
+    while (limiters.length < limiter_names.length) {
+        const add_btn = limiters.last().closest('.input-group').find('.add_buton');
+        if (add_btn.length <= 0) break;
+        add_btn.first().click();
+        limiters = form.find('[name="limiters"]');
+    }
     limiters = form.find('[name="limiters"]');
     limiters.empty().append('<option></option>');
     limiter_names.forEach(elm => {

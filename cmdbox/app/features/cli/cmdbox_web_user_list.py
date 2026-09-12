@@ -103,7 +103,7 @@ class WebUserList(feature.UnsupportEdgeFeature, validator.Validator):
 
     def output_schema(self) -> type:
         class UserRecord(resdata.Base):
-            uid: Union[str, None] = pydantic.Field(default=None, description="ユーザーID")
+            uid: Union[str, int, None] = pydantic.Field(default=None, description="ユーザーID")
             name: Union[str, None] = pydantic.Field(default=None, description="名前")
             password: Union[str, None] = pydantic.Field(default=None, description="パスワード")
             hash: Union[str, None] = pydantic.Field(default=None, description="ハッシュ値")
