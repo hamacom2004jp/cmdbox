@@ -1119,7 +1119,7 @@ class Signin(object):
             except (ValueError, TypeError):
                 continue
             if start_dt is None and end_dt is None:
-                continue # どちらも指定されていない場合は考慮しない
+                return True # どちらも指定されていない場合はTrueとみなす
             if start_dt is not None and end_dt is not None and start_dt <= now <= end_dt:
                 return True # 期間内のプランが見つかった場合はTrue
             if start_dt is not None and end_dt is None and start_dt <= now:
